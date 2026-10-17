@@ -2,11 +2,24 @@ name: PoshQC (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
-  poshqc:
-    name: PowerShell QC
+  poshqc-static:
+    name: PowerShell QC static
+    if: ${{ inputs.run-heavy }}
     runs-on: windows-latest
 
     steps:
@@ -35,24 +48,129 @@ jobs:
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
           Invoke-PoshQCAnalyze -Root "${{ github.workspace }}"
 
+  # Issue #953 (FR-09, CR-10, CR-11): the Pester suite runs in size-balanced shards. The matrix below is the
+  # only place the shard count is written; the poshqc job verifies shard completeness and merges coverage.
+  poshqc-shard:
+    name: PowerShell QC shard ${{ matrix.shard }}
+    if: ${{ inputs.run-heavy }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install PoshQC tooling
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Install-PoshQCTools
+
       - name: Test PowerShell
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
-          Invoke-PoshQCTest -Root "${{ github.workspace }}"
+          Invoke-PoshQCTest -Root "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount ${{ strategy.job-total }} -ShardFileListPath artifacts/pester/shard-files.json -DisableKoverageCopy
+
+      - name: Upload PowerShell shard test artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: poshqc-test-results-shard-${{ matrix.shard }}
+          path: |
+            artifacts/pester/pester-junit.xml
+            artifacts/pester/powershell-coverage.xml
+            artifacts/pester/shard-files.json
+          if-no-files-found: ignore
+
+  poshqc:
+    name: PowerShell QC
+    runs-on: windows-latest
+    needs: [poshqc-static, poshqc-shard]
+    if: always()
+
+    steps:
+      - name: Require the static and shard jobs to succeed
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          $staticResult = '${{ needs.poshqc-static.result }}'
+          $shardResult = '${{ needs.poshqc-shard.result }}'
+          Write-Output "poshqc-static: $staticResult; poshqc-shard: $shardResult"
+          if ($staticResult -ne 'success' -or $shardResult -ne 'success') {
+            exit 1
+          }
+
+      - name: Check out repository
+        if: ${{ inputs.run-heavy }}
+        uses: actions/checkout@v7
+
+      - name: Install PoshQC tooling
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Install-PoshQCTools
+
+      - name: Download PowerShell shard test artifacts
+        if: ${{ inputs.run-heavy }}
+        uses: actions/download-artifact@v7
+        with:
+          pattern: poshqc-test-results-shard-*
+          path: artifacts/shards
+
+      - name: Verify shard completeness
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99
+          $manifests = @(Get-ChildItem -LiteralPath artifacts/shards -Recurse -Filter shard-files.json | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json })
+          Test-PoshQCShardCompleteness -ShardManifest $manifests | Out-Null
+          $discovery = New-PesterConfiguration
+          $discovery.Run.Path = [string[]] @($manifests[0].all)
+          $discovery.Run.SkipRun = $true
+          $discovery.Run.PassThru = $true
+          $discovery.Output.Verbosity = 'None'
+          $discovered = Invoke-Pester -Configuration $discovery
+          $shardTestCounts = @(Get-ChildItem -LiteralPath artifacts/shards -Recurse -Filter pester-junit.xml | ForEach-Object { [int] ([xml] (Get-Content -Raw -LiteralPath $_.FullName)).testsuites.tests })
+          Test-PoshQCShardTestCount -ShardTestCount $shardTestCounts -DiscoveryCount $discovered.TotalCount | Out-Null
+          Write-Output "Shard completeness verified: $($manifests.Count) shards, $(@($manifests[0].all).Count) test files, shard tests $($shardTestCounts -join ' + ') = discovery $($discovered.TotalCount)."
+
+      - name: Merge PowerShell shard coverage
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
+          $shardCount = [int] (Get-Content -Raw -LiteralPath artifacts/shards/poshqc-test-results-shard-1/shard-files.json | ConvertFrom-Json).shardCount
+          $coverageXml = @(1..$shardCount | ForEach-Object { Get-Content -Raw -LiteralPath "artifacts/shards/poshqc-test-results-shard-$_/powershell-coverage.xml" })
+          $merged = Merge-PoshQCCoverageReport -CoverageXml $coverageXml
+          Set-Content -LiteralPath artifacts/pester/powershell-coverage.xml -Value $merged -Encoding utf8 -NoNewline
+          Convert-PoshQCCoverageToRelative -InputPath artifacts/pester/powershell-coverage.xml -OutputPath artifacts/pester/powershell-coverage.koverage.xml -RepoRoot "${{ github.workspace }}"
+          foreach ($shardNumber in 1..$shardCount) {
+            Copy-Item -LiteralPath "artifacts/shards/poshqc-test-results-shard-$shardNumber/pester-junit.xml" -Destination "artifacts/pester/pester-junit-shard-$shardNumber.xml"
+          }
+          $summary = Get-PoshQCCoverageLineSummary -CoverageXml $merged
+          Write-Output "Merged PowerShell line coverage: $($summary.covered) of $($summary.total) lines ($($summary.percent)%), $($summary.missed) missed."
 
       - name: Upload PowerShell test artifacts
+        if: ${{ inputs.run-heavy }}
         uses: actions/upload-artifact@v7
         with:
           name: poshqc-test-results
           path: |
-            artifacts/pester/pester-junit.xml
             artifacts/pester/powershell-coverage.xml
             artifacts/pester/powershell-coverage.koverage.xml
+            artifacts/pester/pester-junit-shard-*.xml
           if-no-files-found: ignore
 
   poshqc-linux-hooks:
     name: PowerShell hook suites (Linux)
+    if: ${{ inputs.run-heavy }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -70,7 +188,7 @@ jobs:
       - name: Test PowerShell hook suites
         shell: pwsh
         run: |
-          Import-Module Pester -MinimumVersion 5.6.1
+          Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99
           New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
           $config = New-PesterConfiguration
           $config.Run.Path = @('tests/scripts/claude-hooks', 'tests/scripts/codex-hooks')

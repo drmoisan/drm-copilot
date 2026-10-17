@@ -16,7 +16,13 @@
         'Invoke-PoshQCAnalyze',
         'Invoke-PoshQCAnalyzeAutofix',
         'Invoke-PoshQCSuite',
-        'Invoke-PoshQCTest'
+        'Invoke-PoshQCTest',
+        'Get-PoshQCShardSlice',
+        'Merge-PoshQCCoverageReport',
+        'Get-PoshQCCoverageLineSummary',
+        'New-PoshQCShardManifest',
+        'Test-PoshQCShardCompleteness',
+        'Test-PoshQCShardTestCount'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()

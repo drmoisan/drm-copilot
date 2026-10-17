@@ -36,10 +36,14 @@ Describe 'enforce-epic-merge-gate.ps1' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows gh pr merge without --merge (e.g., --squash)' {
+        It 'denies gh pr merge --squash without a checkpoint (issue #952 method-agnostic scope)' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"gh pr merge 10 --squash"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
         }
 
         It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {

@@ -2,7 +2,19 @@ name: Build Check (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build-check:
@@ -11,22 +23,27 @@ jobs:
 
     steps:
       - name: Check out repository
+        if: ${{ inputs.run-heavy }}
         uses: actions/checkout@v7
 
       - name: Set up Python
+        if: ${{ inputs.run-heavy }}
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Install Poetry
+        if: ${{ inputs.run-heavy }}
         uses: snok/install-poetry@v1
         with:
           version: latest
 
       - name: Build package
+        if: ${{ inputs.run-heavy }}
         run: poetry build
 
       - name: Verify package can be installed
+        if: ${{ inputs.run-heavy }}
         run: |
           python -m venv test-venv
           source test-venv/bin/activate
@@ -34,4 +51,5 @@ jobs:
           atomic-executor --help
 
       - name: Shell QC smoke (native)
+        if: ${{ inputs.run-heavy }}
         run: bash scripts/bash/shell-qc.sh --help

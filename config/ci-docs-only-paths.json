@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include_prefixes": [
+    "docs/features/active/",
+    "docs/features/completed/",
+    "docs/features/potential/",
+    "docs/research/"
+  ],
+  "exclude_prefixes": [
+    "docs/features/potential/template.md",
+    "docs/features/templates/"
+  ],
+  "extensions": [".md", ".txt", ".log", ".json", ".xml"]
+}

@@ -26,8 +26,11 @@ param()
 
 BeforeAll {
     $libDir = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state").Path
-    Import-Module (Join-Path $libDir 'OrchestratorStateIssueAdoption.psm1') -Force
+    # Issue #953 (CR-21): OrchestratorStateRoutingContract.psm1 imports OrchestratorStateIssueAdoption.psm1 with
+    # -Force, which unloads an instance imported here first. Importing the routing contract first and the adoption
+    # module second, without -Force, keeps both visible whatever ran earlier in the Pester process.
     Import-Module (Join-Path $libDir 'OrchestratorStateRoutingContract.psm1') -Force
+    Import-Module (Join-Path $libDir 'OrchestratorStateIssueAdoption.psm1')
 
     $script:LargeTools = [string[]]@('new_potential_entry', 'potential_to_issue', 'new_active_feature_folder', 'collect_pr_context', 'validate_orchestration_artifacts')
     $script:LargeBugTools = [string[]]@('new_potential_bug_entry', 'potential_to_issue', 'new_active_feature_folder', 'collect_pr_context', 'validate_orchestration_artifacts')

@@ -231,6 +231,8 @@ run_test() {
 	# returns 0. A missing bats prints the exact non-coverage skip marker and returns
 	# 0. Otherwise bats runs once per directory; all directories run even if one
 	# fails, and the maximum exit code is returned.
+	# bats receives --recursive, so .bats files in subdirectories of a test directory are
+	# collected as well as top-level ones (issue #962).
 	#
 	# Every bats run inherits BASH_ENV set to kcov_trace_env.sh (resolved from this
 	# library's own directory) and BASH_XTRACEFD set to a descriptor opened on /dev/null,
@@ -259,7 +261,7 @@ run_test() {
 	# Run every directory even on failure so all suites report, matching prior behavior.
 	for test_dir in "${test_dirs[@]}"; do
 		rc=0
-		BASH_ENV="$trace_env" BASH_XTRACEFD="$trace_fd" "$bats_bin" "$test_dir" || rc=$?
+		BASH_ENV="$trace_env" BASH_XTRACEFD="$trace_fd" "$bats_bin" --recursive "$test_dir" || rc=$?
 		if ((rc > exit_code)); then
 			exit_code=$rc
 		fi
@@ -306,6 +308,38 @@ print_coverage_summary() {
 	printf 'Bash coverage (lines): %s%%\n' "$percent"
 }
 
+check_coverage_threshold() {
+	# Enforce the minimum bash line coverage on a Cobertura cov.xml (issue #962).
+	#
+	# The minimum is SHELL_QC_MIN_LINE_COVERAGE, an integer percentage from 0 to 100,
+	# defaulting to 85 (the repository line-coverage default). The comparison uses the
+	# one-decimal percentage that print_coverage_summary prints. A missing or unparseable
+	# cov.xml prints nothing and returns 0, matching print_coverage_summary.
+	#
+	# Args: $1 = path to cov.xml.
+	# Returns 0 when coverage meets the minimum, 1 when it is below, and 2 when the
+	# minimum is not an integer from 0 to 100.
+	local cov_xml="$1"
+	local minimum=${SHELL_QC_MIN_LINE_COVERAGE:-85}
+	if [[ ! $minimum =~ ^[0-9]+$ ]] || ((10#$minimum > 100)); then
+		printf 'Invalid SHELL_QC_MIN_LINE_COVERAGE: %s (expected an integer from 0 to 100).\n' "$minimum"
+		return 2
+	fi
+	local rate
+	if ! rate=$(extract_cobertura_line_rate "$cov_xml"); then
+		return 0
+	fi
+	local percent
+	percent=$(awk -v r="$rate" 'BEGIN { printf "%.1f", r * 100 }')
+	# awk exits 0 when the printed percentage is at least the integer minimum.
+	if awk -v p="$percent" -v m="$minimum" 'BEGIN { exit !(p + 0 >= m + 0) }'; then
+		printf 'Bash coverage %s%% meets the minimum line coverage of %s%%.\n' "$percent" "$minimum"
+		return 0
+	fi
+	printf 'Bash coverage %s%% is below the minimum line coverage of %s%%.\n' "$percent" "$minimum"
+	return 1
+}
+
 run_test_coverage() {
 	# Run bats under kcov, merge the reports, and print the coverage summary.
 	#
@@ -316,6 +350,8 @@ run_test_coverage() {
 	# root when relative) is deleted and recreated. Each directory runs under kcov with
 	# a stable run dir, stopping at the first failure; successful runs are merged into a
 	# single cov.xml. The transient .kcov_runs directory is always removed.
+	# bats receives --recursive (issue #962). After the summary, check_coverage_threshold
+	# enforces the minimum line coverage, and its non-zero status becomes the return value.
 	local -a test_dirs=()
 	mapfile -t test_dirs < <(find_bats_test_dirs)
 	if ((${#test_dirs[@]} == 0)); then
@@ -362,7 +398,7 @@ run_test_coverage() {
 		"$kcov_bin" \
 			"--include-pattern=$include_pattern" \
 			"--exclude-pattern=$exclude_pattern" \
-			"$run_dir" "$bats_bin" "$test_dir" || rc=$?
+			"$run_dir" "$bats_bin" --recursive "$test_dir" || rc=$?
 		if ((rc > exit_code)); then
 			exit_code=$rc
 		fi
@@ -386,9 +422,11 @@ run_test_coverage() {
 	fi
 	# Always remove the intermediate run directories, on success or failure.
 	rm -rf "$runs_dir"
-	# On overall success, emit the one-line coverage summary when cov.xml is parseable.
+	# On overall success, emit the one-line coverage summary when cov.xml is parseable,
+	# then enforce the minimum line coverage on the same report.
 	if ((exit_code == 0)); then
 		print_coverage_summary "$out_dir/cov.xml"
+		check_coverage_threshold "$out_dir/cov.xml" || exit_code=$?
 	fi
 	return "$exit_code"
 }
