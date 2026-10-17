@@ -15,13 +15,14 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 15
 - `current_cohort`: 0
 - `recolor_generation`: 2
-- `last_updated`: 10/16/2026 23:15:23
-- `next_step`: merge 952 first when green; merge 935 when it reports ready (verify rescue commit b8eb85631 content is on its branch); 962 executing; 953 under merge hold pending '953 VERIFIED – merge authorized'
+- `last_updated`: 10/17/2026 14:29:49
+- `next_step`: merge 962 and 964 as each is green with review passed; #935-R4 and the #952 docs-only follow-up (5c8fff171) are coordinator-owned follow-ons; worktree removals for merged items await the operator's direct confirmation
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 0 | in_flight | ci_green | https://github.com/drmoisan/drm-copilot/pull/974 |  | 10/17/2026 12:53:52 |  |  |
 | 543 | docs/features/active/epic-planner-receipt-checks-key-gate-543 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/955 | 5bdf22d0f4300d2ee3a0f7e88b21fbeb69fb2dea | 10/16/2026 00:01:22 | 10/16/2026 10:10:14 |  |
 | 884 | docs/features/active/untouched-files-coverage-verification-884 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/942 | afa951ac0207eae934ac695e7340f18b3cf77522 | 10/16/2026 00:01:22 | 10/16/2026 04:51:16 |  |
 | 927 | docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/961 | 5d2d9a9728b3763cb4398bdae1e54ef84ee98936 | 10/16/2026 00:01:22 | 10/16/2026 13:57:13 |  |
@@ -37,10 +38,11 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 937 | docs/features/active/exempt-operand-unc-path-leg-937 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/960 | 3fc83c8c395f699cda0c21b4fb6fc1996dc43af6 | 10/16/2026 00:01:22 | 10/16/2026 13:20:42 |  |
 | 938 | docs/features/active/2026-10-15-test-support-hygiene-793-skipif-938 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/944 | ba53ff5694a42e975d5d1db99b2b6ef505143e66 | 10/16/2026 00:01:22 | 10/16/2026 03:54:52 |  |
 | 940 | docs/features/active/dependabot-bumps-types-vscode-past-engines-940 |  | merged | merged | https://github.com/drmoisan/drm-copilot/pull/943 | 97559c3e0dcfceb807ae330d3c9e6ae4c5d67964 | 10/16/2026 00:01:22 | 10/16/2026 01:58:55 |  |
-| 952 | docs/features/active/2026-10-16-ci-merge-queue-for-main-952 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/965 |  | 10/16/2026 09:00:59 |  |  |
+| 952 | docs/features/active/2026-10-16-ci-merge-queue-for-main-952 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/965 | b8fcd77905a51284cfbca54226a2da2a7916a836 | 10/16/2026 09:00:59 | 10/16/2026 23:33:03 |  |
 | 953 | docs/features/active/2026-10-16-pester-profiler-coverage-953 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/959 | 475bb06d5c6caeb3e68b13f847a4097dc026fa89 | 10/16/2026 06:33:16 | 10/16/2026 23:08:29 |  |
-| 962 | docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962 | 0 | in_flight | worktree_created |  |  | 10/16/2026 20:40:33 |  |  |
-| 964 | docs/features/active/2026-10-16-planning-process-churn-964 | 0 | in_flight | worktree_created |  |  | 10/16/2026 23:14:52 |  |  |
+| 962 | docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/966 | 4365fab937f39473b7b9ad16df17b4ed7bb65ebb | 10/16/2026 20:40:33 | 10/17/2026 02:48:45 |  |
+| 964 | docs/features/active/2026-10-16-planning-process-churn-964 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/969 | db7e9b90c0e700b8019ec5791628e71efb833821 | 10/16/2026 23:14:52 | 10/17/2026 04:56:31 |  |
+| 973 | docs/features/active/2026-10-17-ci-docs-only-pr-runs-full-ci-973 | 0 | in_flight | ci_green | https://github.com/drmoisan/drm-copilot/pull/975 |  | 10/17/2026 13:01:00 |  |  |
 
 **Cohorts**
 
@@ -49,14 +51,14 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 0 | 0 | 543, 884, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 940, 953, 952 |
 | 0 | 1 | 935, 952, 953 |
 | 1 | 1 | 962 |
-| 0 | 2 | 935, 952, 953, 962, 964 |
+| 0 | 2 | 935, 952, 953, 962, 964, 527, 973 |
 
 ## Conflict Edges
 
 | a | b | reason |
 | --- | --- | --- |
 
-Tolerated overlaps recorded: 53 (see the manifest Scheduling section).
+Tolerated overlaps recorded: 71 (see the manifest Scheduling section).
 
 ## Mutations
 
@@ -66,6 +68,8 @@ Tolerated overlaps recorded: 53 (see the manifest Scheduling section).
 | add | 952 |  | scheduled |  | 0 | 2026-10-16T08-59 |
 | add | 962 |  | scheduled |  | 1 | 2026-10-16T17-13 |
 | add | 964 |  | scheduled |  | 2 | 2026-10-16T23-13 |
+| add | 527 |  | scheduled |  | 2 | 2026-10-17T12-52 |
+| add | 973 |  | scheduled |  | 2 | 2026-10-17T12-59 |
 
 ## Drift Events
 
