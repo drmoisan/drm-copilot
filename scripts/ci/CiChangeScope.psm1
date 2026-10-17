@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 
-# Pure helpers for the issue #962 CI change-scope decision.
+# Pure helpers for the issue #962 CI change-scope decision and its issue #973 merge-base fallback.
 #
 # The decision tells ci.yml whether the heavy CI steps must run for the commit under test. Every
 # function here works on in-memory values only: no function runs git or gh, reads or writes a file,
@@ -298,6 +298,53 @@ function Test-CiFullRunMarker {
     return $false
 }
 
+function Test-CiMergeBaseFallbackApplicable {
+    <#
+    .SYNOPSIS
+        Returns $true when a full-run reason may fall back to the pull request's merge base (issue #973).
+    .DESCRIPTION
+        Only the reasons that mean the branch has no usable green base fall back: NO_FULL_GREEN_RUN,
+        BASE_NOT_PRESENT, and BASE_NOT_ANCESTOR. The fallback applies only to a pull request whose base ref
+        is exactly 'main'. Both comparisons are case-sensitive. Unreadable run or job data and a failed
+        ancestry check stay full runs.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string] $PrimaryReason,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string] $BaseRef
+    )
+
+    $fallbackReasons = @('NO_FULL_GREEN_RUN', 'BASE_NOT_PRESENT', 'BASE_NOT_ANCESTOR')
+    return (($fallbackReasons -ccontains $PrimaryReason) -and ($BaseRef -ceq 'main'))
+}
+
+function ConvertFrom-CiMergeBaseOutput {
+    <#
+    .SYNOPSIS
+        Returns the SHA printed by git merge-base, or an empty string when the output is not one full SHA.
+    .DESCRIPTION
+        At most one trailing LF is removed. The remaining text must be exactly 40 (SHA-1) or 64 (SHA-256)
+        lower-case hexadecimal characters. Empty, multi-line, short, upper-case, padded, or non-hex output
+        returns an empty string, which the caller treats as an unresolved merge base.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string] $Text
+    )
+
+    $candidate = $Text
+    if ($candidate.EndsWith("`n", [StringComparison]::Ordinal)) {
+        $candidate = $candidate.Substring(0, $candidate.Length - 1)
+    }
+    # \A and \z anchor the whole text; unlike $, \z does not admit a trailing newline.
+    if ($candidate -cmatch '\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z') {
+        return $candidate
+    }
+    return ''
+}
+
 function New-CiChangeScopeDecision {
     <#
     .SYNOPSIS
@@ -341,6 +388,8 @@ Export-ModuleMember -Function @(
     'Get-CiChangeScopePathDecision'
     'Select-CiGreenBaseCandidates'
     'Test-CiFullRunMarker'
+    'Test-CiMergeBaseFallbackApplicable'
+    'ConvertFrom-CiMergeBaseOutput'
     'New-CiChangeScopeDecision'
 )
 # Changes to this module fall outside the docs-only allowlist, so they always start a full CI run (issue #962, proof step P3).

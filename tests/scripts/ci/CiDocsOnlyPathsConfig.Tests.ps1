@@ -92,7 +92,19 @@ Describe 'config/ci-docs-only-paths.json docs-only allowlist' {
         $extensionText = $extensions -join ','
 
         # Assert
-        $includeText | Should -BeExactly 'docs/features/active/,docs/features/completed/,docs/features/potential/,docs/research/' -Because 'the include prefixes are fixed by spec decision D3'
+        $includeText | Should -BeExactly 'docs/features/active/,docs/features/archive/,docs/features/completed/,docs/features/epics/,docs/features/parallel/,docs/features/potential/,docs/research/' -Because 'the include prefixes are fixed by spec decision D3 of issue #962 as extended by spec decision D5 of issue #973'
         $extensionText | Should -BeExactly '.json,.log,.md,.txt,.xml' -Because 'the extensions are fixed by spec decision D3'
+    }
+
+    It 'lists <Prefix> as an include prefix (#973)' -ForEach @(
+        @{ Prefix = 'docs/features/archive/' }
+        @{ Prefix = 'docs/features/parallel/' }
+        @{ Prefix = 'docs/features/epics/' }
+    ) {
+        # Arrange / Act: ordinal membership, so a different spelling or case does not count.
+        $listed = $script:IncludePrefixes -ccontains $Prefix
+
+        # Assert
+        $listed | Should -BeTrue -Because "$Prefix holds archive moves, parallel-run status, or epic documents that are docs-only (issue #973)"
     }
 }

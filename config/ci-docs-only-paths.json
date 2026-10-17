@@ -2,7 +2,10 @@
   "version": 1,
   "include_prefixes": [
     "docs/features/active/",
+    "docs/features/archive/",
     "docs/features/completed/",
+    "docs/features/epics/",
+    "docs/features/parallel/",
     "docs/features/potential/",
     "docs/research/"
   ],

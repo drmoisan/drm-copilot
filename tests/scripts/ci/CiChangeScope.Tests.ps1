@@ -31,6 +31,8 @@ Describe 'CiChangeScope.psm1 pure change-scope helpers' {
 '@
         $script:Config = ConvertFrom-CiDocsOnlyPathConfig -Json $script:ConfigJson
         $script:Repository = 'drmoisan/drm-copilot'
+        # The seven-prefix allowlist of issue #973 (spec decision D5), used only by the #973 rows.
+        $script:SevenPrefixConfig = ConvertFrom-CiDocsOnlyPathConfig -Json '{"version":1,"include_prefixes":["docs/features/active/","docs/features/archive/","docs/features/completed/","docs/features/epics/","docs/features/parallel/","docs/features/potential/","docs/research/"],"exclude_prefixes":["docs/features/potential/template.md","docs/features/templates/"],"extensions":[".md",".txt",".log",".json",".xml"]}'
 
         # Builds one workflow-run entry shaped like the GitHub Actions runs API payload.
         function Get-TestRunEntry {
@@ -193,6 +195,70 @@ Describe 'CiChangeScope.psm1 pure change-scope helpers' {
 
             $result | Should -BeNullOrEmpty -Because 'an all-docs diff produces no full-run reason'
         }
+
+        It 'Test-CiDocsOnlyPath accepts a Markdown path under <Prefix> with the seven-prefix allowlist (#973)' -ForEach @(
+            @{ Prefix = 'docs/features/archive/' }
+            @{ Prefix = 'docs/features/parallel/' }
+            @{ Prefix = 'docs/features/epics/' }
+        ) {
+            $result = Test-CiDocsOnlyPath -Path ($Prefix + 'x/evidence/a.md') -Config $script:SevenPrefixConfig
+
+            $result | Should -BeTrue -Because "$Prefix is an include prefix of the issue #973 allowlist"
+        }
+
+        It 'Get-CiChangeScopePathDecision returns NON_ALLOWLISTED_PATH for a rename <Direction> the allowlist (#973)' -ForEach @(
+            @{ Direction = 'into'; Paths = @('scripts/x.ps1', 'docs/features/archive/x.md') }
+            @{ Direction = 'out of'; Paths = @('docs/features/archive/x.md', 'scripts/x.ps1') }
+        ) {
+            # git diff --no-renames lists a rename on the green-run diff as the deleted old path and the added new path.
+            $result = Get-CiChangeScopePathDecision -Paths $Paths -Config $script:SevenPrefixConfig
+
+            $result | Should -BeExactly 'NON_ALLOWLISTED_PATH: scripts/x.ps1' -Because "a rename $Direction the allowlist has one side outside it"
+        }
+    }
+
+    Context 'merge-base fallback helpers' {
+        It 'Test-CiMergeBaseFallbackApplicable returns <Expected> for <PrimaryReason> with base ref <BaseRef> (#973)' -ForEach @(
+            @{ PrimaryReason = 'NO_FULL_GREEN_RUN'; BaseRef = 'main'; Expected = $true }
+            @{ PrimaryReason = 'BASE_NOT_PRESENT'; BaseRef = 'main'; Expected = $true }
+            @{ PrimaryReason = 'BASE_NOT_ANCESTOR'; BaseRef = 'main'; Expected = $true }
+            @{ PrimaryReason = 'NO_FULL_GREEN_RUN'; BaseRef = 'development'; Expected = $false }
+            @{ PrimaryReason = 'NO_FULL_GREEN_RUN'; BaseRef = 'epic/x'; Expected = $false }
+            @{ PrimaryReason = 'NO_FULL_GREEN_RUN'; BaseRef = ''; Expected = $false }
+            @{ PrimaryReason = 'NO_FULL_GREEN_RUN'; BaseRef = 'Main'; Expected = $false }
+            @{ PrimaryReason = 'RUN_LIST_FAILED'; BaseRef = 'main'; Expected = $false }
+            @{ PrimaryReason = 'JOB_LIST_FAILED'; BaseRef = 'main'; Expected = $false }
+            @{ PrimaryReason = 'ANCESTRY_CHECK_FAILED'; BaseRef = 'main'; Expected = $false }
+        ) {
+            $result = Test-CiMergeBaseFallbackApplicable -PrimaryReason $PrimaryReason -BaseRef $BaseRef
+
+            $result | Should -BeExactly $Expected -Because 'only the three no-usable-base reasons fall back, and only for base ref main (case-sensitive)'
+        }
+
+        It 'ConvertFrom-CiMergeBaseOutput returns the SHA for <Case> (#973)' -ForEach @(
+            @{ Case = '40 hex characters'; Text = ('0123456789abcdef0123' * 2); Expected = ('0123456789abcdef0123' * 2) }
+            @{ Case = '40 hex characters with one trailing LF'; Text = (('e' * 40) + "`n"); Expected = ('e' * 40) }
+            @{ Case = '64 hex characters'; Text = ('0123456789abcdef' * 4); Expected = ('0123456789abcdef' * 4) }
+        ) {
+            $result = ConvertFrom-CiMergeBaseOutput -Text $Text
+
+            $result | Should -BeExactly $Expected -Because "$Case is exactly one full SHA"
+        }
+
+        It 'ConvertFrom-CiMergeBaseOutput returns an empty string for <Case> (#973)' -ForEach @(
+            @{ Case = 'empty text'; Text = '' }
+            @{ Case = 'two lines'; Text = (('e' * 40) + "`n" + ('a' * 40)) }
+            @{ Case = '39 characters'; Text = ('e' * 39) }
+            @{ Case = 'upper-case hex'; Text = ('E' * 40) }
+            @{ Case = 'a non-hex character'; Text = (('e' * 39) + 'g') }
+            @{ Case = 'a leading space'; Text = (' ' + ('e' * 40)) }
+            @{ Case = 'a trailing space'; Text = (('e' * 40) + ' ') }
+            @{ Case = 'two trailing LFs'; Text = (('e' * 40) + "`n`n") }
+        ) {
+            $result = ConvertFrom-CiMergeBaseOutput -Text $Text
+
+            $result | Should -BeExactly '' -Because "$Case is not exactly one full lower-case SHA"
+        }
     }
 
     Context 'green base candidate selection' {
@@ -300,12 +366,12 @@ Describe 'CiChangeScope.psm1 pure change-scope helpers' {
     }
 
     Context 'module structure' {
-        It 'CiChangeScope.psm1 defines only the eight pure functions and calls no git, gh, file, or network command (AC-17)' {
+        It 'CiChangeScope.psm1 defines only the ten pure functions and calls no git, gh, file, or network command (AC-17)' {
             # Arrange: parse the module file and collect its function definitions and command names.
             $tokens = $null
             $parseErrors = $null
             $ast = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $script:ModulePath).Path, [ref] $tokens, [ref] $parseErrors)
-            $expected = @('ConvertFrom-CiDocsOnlyPathConfig', 'ConvertFrom-CiNulPathList', 'Get-CiChangeScopePathDecision', 'New-CiChangeScopeDecision', 'Select-CiGreenBaseCandidates', 'Test-CiChangeScopeEventEligible', 'Test-CiDocsOnlyPath', 'Test-CiFullRunMarker')
+            $expected = @('ConvertFrom-CiDocsOnlyPathConfig', 'ConvertFrom-CiMergeBaseOutput', 'ConvertFrom-CiNulPathList', 'Get-CiChangeScopePathDecision', 'New-CiChangeScopeDecision', 'Select-CiGreenBaseCandidates', 'Test-CiChangeScopeEventEligible', 'Test-CiDocsOnlyPath', 'Test-CiFullRunMarker', 'Test-CiMergeBaseFallbackApplicable')
             # The banned names are assembled from parts so this test file stays free of the literal cmdlet names.
             $banned = @('git', 'gh', 'Get-Content', ('Set-' + 'Content'), 'Add-Content', ('Out-' + 'File'), ('New-' + 'Item'), 'Remove-Item', 'Copy-Item', 'Move-Item', 'Test-Path', 'Get-ChildItem', 'Get-Item', ('Invoke-' + 'WebRequest'), ('Invoke-' + 'RestMethod'), ('Start-' + 'Process'), 'Import-Module', 'Invoke-Expression')
 
@@ -316,7 +382,7 @@ Describe 'CiChangeScope.psm1 pure change-scope helpers' {
 
             # Assert
             @($parseErrors).Count | Should -Be 0
-            ($defined -join ',') | Should -BeExactly ((@($expected) | Sort-Object) -join ',') -Because 'the module holds exactly the eight pure functions of the spec'
+            ($defined -join ',') | Should -BeExactly ((@($expected) | Sort-Object) -join ',') -Because 'the module holds exactly the ten pure functions of the issue #962 and #973 specs'
             ($bannedHits -join ',') | Should -BeExactly '' -Because 'the pure module must not call git, gh, file, process, or network commands'
         }
     }

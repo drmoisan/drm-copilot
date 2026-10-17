@@ -229,9 +229,10 @@ Describe "ci.yml workflow triggers" {
         foreach ($graphFile in $graphFiles) {
             # Act: read the workflow file as text.
             $graphLines = @(Get-Content -LiteralPath $graphFile)
-            # Issue #962: the ci.yml 'changes' job reads these five pull-request fields only with
-            # merge_group-safe fallbacks, and its decision returns code=true for every event other
-            # than pull_request before it uses them. Exactly these lines, once each, are allowed.
+            # Issues #962 and #973: the ci.yml 'changes' job reads these seven pull-request fields only
+            # with merge_group-safe fallbacks or as values that are blank on other events, and its
+            # decision returns code=true for every event other than pull_request before it uses them.
+            # Exactly these lines, once each, are allowed.
             $allowedEventFieldLines = @()
             if ($graphFile -eq $script:workflowPath) {
                 $allowedEventFieldLines = @(
@@ -240,6 +241,8 @@ Describe "ci.yml workflow triggers" {
                     'HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}'
                     'HEAD_REF: ${{ github.head_ref }}'
                     'HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}'
+                    'BASE_SHA: ${{ github.event.pull_request.base.sha }}'
+                    'BASE_REF: ${{ github.base_ref }}'
                 )
             }
             $allowedHits = @($graphLines | Where-Object { $allowedEventFieldLines -ccontains $_.Trim() })
@@ -248,7 +251,7 @@ Describe "ci.yml workflow triggers" {
 
             # Assert: no pull-request event field and no path filter in this file.
             $eventFieldLines.Count | Should -Be 0 -Because "$graphFile must not read a pull-request event field, which a merge_group run does not carry"
-            $allowedHits.Count | Should -Be $allowedEventFieldLines.Count -Because "$graphFile must carry each issue #962 change-scope event-field line exactly once"
+            $allowedHits.Count | Should -Be $allowedEventFieldLines.Count -Because "$graphFile must carry each issue #962 and #973 change-scope event-field line exactly once"
             $pathFilterLines.Count | Should -Be 0 -Because "$graphFile must not declare a path filter, which would leave a required check unreported for a queue entry"
         }
     }
