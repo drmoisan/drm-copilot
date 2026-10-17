@@ -5,8 +5,7 @@
 .DESCRIPTION
     Holds the functions that decide whether a suite's dot-source or other command loads a
     hook script. This file is dot-sourced from the top of EpicStateIsolation.Helpers.ps1 and
-    calls helpers defined there (Get-EpicStateIsolationElementText and
-    Get-EpicStateIsolationStringConstant) at run time.
+    calls one helper defined there (Get-EpicStateIsolationElementText) at run time.
 
     Every function is pure. No function creates a file, runs a process, or reads gitignored
     state. This file is not mirrored under extensions/drm-copilot/resources/.
@@ -23,7 +22,7 @@ function Get-EpicStateIsolationPattern {
         'HookLiteral' { '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)' }
         'Leaf' { '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$' }
         'HooksRoot' { '(^|[\\/])hooks[\\/]?$' }
-        'ExpandableLeaf' { '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$' }
+        'ExpandableLeaf' { '^\$(?:\{(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}|(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?))[\\/](?<leaf>[^\\/]+)$' }
     }
 }
 
@@ -152,6 +151,7 @@ function Test-EpicStateIsolationVariableBoundToHook {
 function Get-EpicStateIsolationVariableBinding {
     # Pure: the expressions the suite binds to the named variable, by assignment or by a hashtable
     # entry with the same key name (the -ForEach data shape), in source order (issue #935).
+    [CmdletBinding()]
     [OutputType([System.Management.Automation.Language.Ast])]
     param(
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
@@ -176,6 +176,7 @@ function Get-EpicStateIsolationVariableBinding {
 function Test-EpicStateIsolationHooksRootBinding {
     # Pure (issue #935, R1): true when the suite binds the variable (assignment or hashtable entry) to an
     # expression holding a string literal whose value ends with a hooks path segment. One level of indirection.
+    [CmdletBinding()]
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
@@ -193,6 +194,7 @@ function Test-EpicStateIsolationHooksRootBinding {
 function Get-EpicStateIsolationJoinPathPart {
     # Pure: the Path, ChildPath, and AdditionalChildPath arguments of a Join-Path command, bound by name
     # or by position (Path, then ChildPath, then the remaining arguments as AdditionalChildPath).
+    [CmdletBinding()]
     [OutputType([hashtable])]
     param([Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command)
     $part = @{ Path = $null; ChildPath = $null; Additional = [System.Collections.Generic.List[object]]::new() }
@@ -218,7 +220,8 @@ function Get-EpicStateIsolationJoinPathPart {
 
 function Get-EpicStateIsolationJoinPathSegment {
     # Pure: the literal value of each Join-Path segment in order (Path, ChildPath, then each
-    # AdditionalChildPath element), $null for a segment that is not a string constant.
+    # AdditionalChildPath element), an empty string for a segment that is not a string constant.
+    [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)] [hashtable] $Part)
     $nodes = [System.Collections.Generic.List[object]]::new()
@@ -238,6 +241,7 @@ function Test-EpicStateIsolationHookReference {
         or -ChildPath); or (d) a Join-Path segment list ending in 'hooks', '<name>.ps1'. For (b) and (c)
         <var>, or a variable inside <expr>, must satisfy Test-EpicStateIsolationHooksRootBinding.
     #>
+    [CmdletBinding()]
     [OutputType([bool])]
     param(
         [AllowNull()] [System.Management.Automation.Language.Ast] $Node,
@@ -301,6 +305,7 @@ function Get-EpicStateIsolationHookDotSource {
 function Test-EpicStateIsolationHelperDotSource {
     # Pure (issue #935, R2): true when a dot-source is a test-helper load: its argument holds a string
     # literal whose leaf matches \.Helpers\.ps1$ and Test-EpicStateIsolationHookReference is false for it.
+    [CmdletBinding()]
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command,
@@ -316,6 +321,7 @@ function Test-EpicStateIsolationHelperDotSource {
 
 function Get-EpicStateIsolationHookRoot {
     # Pure: '.claude/hooks' or '.codex/hooks' when the text names that root, otherwise $null.
+    [CmdletBinding()]
     [OutputType([string])]
     param([AllowNull()] [string] $Text)
     if ([string]::IsNullOrEmpty($Text)) { return $null }
@@ -333,6 +339,7 @@ function Get-EpicStateIsolationReferenceRecord {
         not a literal), Form (Literal, RootVariable, Segment, Dynamic) and Root (.claude/hooks,
         .codex/hooks, or $null).
     #>
+    [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
         [AllowNull()] [System.Management.Automation.Language.Ast] $Node,
@@ -400,6 +407,7 @@ function Get-EpicStateIsolationHookReference {
         separate-token value of a value-taking parameter outside the load positions is not a load
         (issue #935, CR-N3).
     #>
+    [CmdletBinding()]
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Ast)
     $cmdlet = 'Start' + '-' + 'Process'

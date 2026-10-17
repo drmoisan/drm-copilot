@@ -205,6 +205,109 @@ Describe 'fixture' {
 Describe 'issue #903 F-1 conditional ancestors' {
     It 'F-1 non-compliant <Branch>' -ForEach @(
         @{
+            Branch = 'ESR mock inside switch'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        switch ('x') {
+            'x' { Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null } }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside foreach'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        foreach ($item in @(1)) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside while'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        while ($false) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside trap'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        trap {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+            continue
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside a matching Get-Command guard with else'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        } else { }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside a matching Get-Command guard with elseif'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        } elseif ($true) { }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
             Branch = 'ESR mock inside if ($false)'
             Source = @'
 Describe 'fixture' {

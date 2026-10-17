@@ -15,6 +15,12 @@
     while presence and ordering rules still apply. Every fixture hook name is absent from
     .claude/hooks and .codex/hooks.
 
+    F-3 rows prove that Get-EpicStateIsolationHookReference reports hook references in load
+    positions and ignores a Join-Path read only by Get-FileHash, Get-Content or ParseFile, and that
+    the process-spawning report and the loaded-source closure handle variable-built loads as the
+    spec states. CR-N3 rows prove that the separate-token value of a value-taking parameter is not
+    a load, and CR-R1 rows test Test-EpicStateIsolationSeparateValue directly.
+
     This file uses in-memory fixtures only: it loads no hook, creates no file, reads no
     gitignored state, and runs no process or git command.
 #>
@@ -71,6 +77,18 @@ Describe 'fixture' {
         @{ Case = 'expandable backslash bound by hashtable'; Source = @'
 Describe 'fixture <Name>' -ForEach @(@{ Name = 'claude'; HookRoot = '.claude\hooks\' }) {
     BeforeAll { . (Join-Path $script:RepoRoot "$HookRoot\enforce-x.ps1") }
+}
+'@ }
+        @{ Case = 'expandable braced bound by assignment'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "${HookRoot}/enforce-x.ps1") }
+}
+'@ }
+        @{ Case = 'expandable braced scoped bound by assignment'; Source = @'
+$script:HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "${script:HookRoot}/enforce-x.ps1") }
 }
 '@ }
         @{ Case = 'Join-Path positional bound by assignment'; Source = @'
@@ -130,6 +148,12 @@ Describe 'fixture <Name>' -ForEach @(@{ Name = 'codex'; HookDirectory = '.codex/
     BeforeAll { . (Join-Path $HookDirectory 'gate.ps1') }
 }
 '@ }
+        @{ Case = 'unbalanced brace'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "$HookRoot}/enforce-x.ps1") }
+}
+'@ }
         @{ Case = 'unbound variable'; Source = @'
 Describe 'fixture' {
     BeforeAll { . (Join-Path $HookDirectory 'gate.ps1') }
@@ -144,7 +168,7 @@ Describe 'fixture' {
         $identified = Test-EpicStateIsolationHookReference -Node $dotSource -SuiteAst $ast
 
         # Assert
-        $identified | Should -BeFalse -Because "the $Case fixture names no hooks root"
+        $identified | Should -BeFalse -Because "the $Case fixture does not form a hook path from a variable bound to a hooks root"
     }
 }
 

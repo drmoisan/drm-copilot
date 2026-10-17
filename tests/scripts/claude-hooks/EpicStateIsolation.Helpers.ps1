@@ -3,7 +3,8 @@
     Structural helpers for the epic-state isolation guard (issues #709 and #690).
 
 .DESCRIPTION
-    Dot-sourced by enforce-gate-suites.EpicStateIsolation.Tests.ps1. The functions parse a
+    Dot-sourced by the enforce-gate-suites.EpicStateIsolation suites (legacy guard, Branches,
+    Predicate, Discovery, HookReference, Memo). The functions parse a
     suite's AST and report whether its outermost BeforeAll isolates both run-checkpoint
     reads: after the hook dot-source, an Import-Module of EpicScopeResolution.psm1 without
     -Force followed by a $null Mock of Get-EpicScopeCheckpointText in module scope
@@ -110,6 +111,7 @@ function Test-EpicStateIsolationConditionalAncestor {
     # Pure (issue #903, #737 F-1): true when Node is an if, switch, loop, try, or trap that may skip
     # Command, except a single-clause if with no else whose condition is one Get-Command <Name>
     # pipeline naming the Command's target.
+    [CmdletBinding()]
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node,
