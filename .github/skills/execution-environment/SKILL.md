@@ -101,6 +101,7 @@ These pass every validator rule and are found only by reading the plan against t
 - `origin/main` advancing during planning: scope diffs anchor on the merge base of `origin/main` and `HEAD`, never on `origin/main` itself.
 - `Measure-Object -Line` counts non-empty lines only; physical line counts use `wc -l` or `@(Get-Content -LiteralPath <path>).Count`.
 - A coverage argument written as a filesystem path measures nothing; the dotted module form is required, and branch figures come from the JSON report, not the combined terminal column.
+- A task that changes the observable behavior of an existing function, script, fixture, or test stub (signature, argv, output, exit status, or written files) while the tests that assert that behavior are outside the task's file set: those tests fail once the change lands, and the plan's own acceptance cannot be met. Preflight searches the test tree for the changed symbol, the file name, and the asserted output, and confirms that the task names each matching test with its disposition (unchanged because unaffected, or updated with the reason).
 
 ## Evidence and Documentation Rules
 

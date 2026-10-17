@@ -325,6 +325,41 @@ def test_copilot_bundle_copies_match_canonical() -> None:
     assert differing == [], f"bundled Copilot copies differ: {differing}"
 
 
+def test_contract_requires_tests_asserting_changed_existing_behavior() -> None:
+    """Every contract copy requires naming tests that assert changed behavior.
+
+    The rule sits inside the design-level section, names the behavior kinds,
+    the search, both dispositions, and the self-review obligation.
+    """
+
+    # Arrange
+    tokens = (
+        "**Changed existing behavior names its asserting tests.**",
+        "an existing function, script, fixture, or test stub",
+        "signature, argv, output, exit status, or the files it writes",
+        "searching the test tree for the symbol, the file name, and the asserted "
+        "output",
+        "unchanged because it is unaffected, or updated, with the reason for the "
+        "update",
+        "adversarial self-review includes this search",
+    )
+
+    # Act
+    sections: dict[str, str] = {}
+    for path in _CONTRACTS:
+        text = _read(path)
+        start = text.index("## Design-Level Plan Contract (Mandatory)")
+        sections[path] = text[start : text.index(" ## ", start + 1)]
+    lacking = {
+        path: [token for token in tokens if token not in section]
+        for path, section in sections.items()
+        if any(token not in section for token in tokens)
+    }
+
+    # Assert
+    assert lacking == {}, f"changed-behavior rule missing from section: {lacking}"
+
+
 def test_contract_premortem_test_isolation_requires_seeded_pester_shuffle() -> None:
     """The contract's Test isolation label requires seeded Pester shuffles."""
 

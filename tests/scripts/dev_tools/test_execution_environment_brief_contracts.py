@@ -357,6 +357,30 @@ def test_brief_has_no_g11_or_g12_findings() -> None:
     assert citations == [], f"brief carries citations: {citations}"
 
 
+def test_brief_preflight_classes_include_changed_existing_behavior() -> None:
+    """The preflight section states the changed-behavior class and its check."""
+
+    # Arrange
+    section = _section("## Preflight Defect Classes the Validator Cannot See")
+
+    # Act
+    missing = _missing(
+        section,
+        (
+            "changes the observable behavior of an existing function, script, "
+            "fixture, or test stub",
+            "signature, argv, output, exit status, or written files",
+            "outside the task's file set",
+            "Preflight searches the test tree for the changed symbol, the file "
+            "name, and the asserted output",
+            "unchanged because unaffected, or updated with the reason",
+        ),
+    )
+
+    # Assert
+    assert missing == [], f"Preflight Defect Classes lacks {missing}"
+
+
 def test_brief_npm_run_tokens_exist_in_package_json() -> None:
     """Every backticked npm script token in the brief exists in the root package."""
 
