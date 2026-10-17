@@ -442,7 +442,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - `gh pr view <PR> --json mergeStateStatus` is not blocked by checks (recorded verbatim).
 
   The run duration (`updatedAt - createdAt`) is recorded next to the baseline run 38896898318 from PR #959. Proof Procedure steps P0 and P2.1–P2.7. (CI-dependent; verified at S9 on the PR head by the item's orchestrator)
-- [ ] AC-34 (CI-AC-3): Code change after a skip runs full CI. A subsequent commit that touches a non-allowlisted path produces a run in which:
+- [x] AC-34 (CI-AC-3): Code change after a skip runs full CI. A subsequent commit that touches a non-allowlisted path produces a run in which:
   - `CI full run` is `success`;
   - the heavy jobs are `success`;
   - the `Change scope` log shows `code=true reason=NON_ALLOWLISTED_PATH: <path>`.
