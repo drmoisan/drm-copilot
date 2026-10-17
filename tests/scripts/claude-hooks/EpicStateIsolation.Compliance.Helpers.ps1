@@ -209,6 +209,7 @@ function Get-EpicStateProcessSpawningReport {
 function Get-EpicStateVariableHookLoadReport {
     # One REPORT-VARIABLE-LOAD line for a suite with variable-built hook loads and nothing otherwise;
     # report-only, never a finding (issue #935, #737 F-3).
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)] [string] $RepoRoot,

@@ -3,15 +3,17 @@
     Discovery helpers for the epic-state isolation guard (issue #737).
 
 .DESCRIPTION
-    Dot-sourced by enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1 and by the
+    Dot-sourced by enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1, by
+    enforce-gate-suites.EpicStateIsolation.HookReference.Tests.ps1 and by the
     compliance helpers. The functions enumerate the hook suites of both surfaces, compute the
     loaded-source closure of a suite from string literals, take a census of the read seams in
     that closure, and detect process-spawning suites.
 
     Get-EpicStateHookLiteral, Get-EpicStateProcessSpawningHook and Get-EpicStateVariableHookLoad call
-    functions defined in EpicStateIsolation.HookReference.Helpers.ps1 (Test-EpicStateIsolationExcludedHookName,
-    Get-EpicStateIsolationHookReference), which EpicStateIsolation.Helpers.ps1 dot-sources; dot-source
-    EpicStateIsolation.Helpers.ps1 before calling any of them (issue #935, CR-R4).
+    functions defined in EpicStateIsolation.HookReference.Helpers.ps1 (Get-EpicStateIsolationPattern,
+    Test-EpicStateIsolationExcludedHookName, Get-EpicStateIsolationHookReference), which
+    EpicStateIsolation.Helpers.ps1 dot-sources; dot-source EpicStateIsolation.Helpers.ps1 before
+    calling any of them (issue #935, CR-R4, CR-F5).
 
     Every function is pure over text and AST except the two readers at the file boundary,
     Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader, which read the committed tree
@@ -128,13 +130,14 @@ function Resolve-EpicStateRelativePath {
 }
 
 function Get-EpicStateHookLiteral {
-    # Pure: the distinct hook script names named by hooks/<name>.ps1 string literals, excluding EpicStateIsolation helpers.
+    # Pure: the distinct hook script names named by hooks/<name>.ps1 string literals, excluding EpicStateIsolation helper files and test files.
     [OutputType([string])]
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText)
     $names = [System.Collections.Generic.List[string]]::new()
+    $hookLiteralPattern = Get-EpicStateIsolationPattern -Name HookLiteral
     foreach ($literal in (Get-EpicStateParsedSource -Text $SuiteText).Literal) {
         # The lookbehind keeps a test path such as tests/scripts/claude-hooks/X.Tests.ps1 from reading as a hook.
-        foreach ($match in [regex]::Matches($literal, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
+        foreach ($match in [regex]::Matches($literal, $hookLiteralPattern)) {
             $name = $match.Groups['name'].Value
             if (Test-EpicStateIsolationExcludedHookName -Name $name) { continue }
             if (-not $names.Contains($name)) { $names.Add($name) }
@@ -247,6 +250,7 @@ function Get-EpicStateVariableHookLoad {
         rendered as *(<root>), or * when its root names neither hook surface. Parses through the
         Get-EpicStateParsedSource memo, so no additional parse is made.
     #>
+    [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText)
     $literal = @(Get-EpicStateHookLiteral -SuiteText $SuiteText)
@@ -257,7 +261,7 @@ function Get-EpicStateVariableHookLoad {
         if ($literal -contains $name -or $names.Contains($name)) { continue }
         $names.Add($name)
     }
-    return [string[]]$names.ToArray()
+    foreach ($loadName in $names) { $loadName }
 }
 
 function Get-EpicStateSuiteCensusRow {

@@ -15,6 +15,12 @@
     while presence and ordering rules still apply. Every fixture hook name is absent from
     .claude/hooks and .codex/hooks.
 
+    F-3 rows prove that Get-EpicStateIsolationHookReference reports hook references in load
+    positions and ignores a Join-Path read only by Get-FileHash, Get-Content or ParseFile, and that
+    the process-spawning report and the loaded-source closure handle variable-built loads as the
+    spec states. CR-N3 rows prove that the separate-token value of a value-taking parameter is not
+    a load, and CR-R1 rows test Test-EpicStateIsolationSeparateValue directly.
+
     This file uses in-memory fixtures only: it loads no hook, creates no file, reads no
     gitignored state, and runs no process or git command.
 #>

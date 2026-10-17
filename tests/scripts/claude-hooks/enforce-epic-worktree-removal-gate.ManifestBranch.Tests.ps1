@@ -15,8 +15,9 @@
 #>
 # Sanctioned-removal manifest branch (issue #635). A separate Describe so the
 # manifest module import and its two seam mocks do not alter the fixture set the
-# pre-existing Describe above pins. Both checkpoint seams are mocked on every test
-# here, as the suite rule requires of any test that can reach a deny.
+# pre-existing Describe in enforce-epic-worktree-removal-gate.Tests.ps1 pins. Both
+# checkpoint seams are mocked on every test here, as the suite rule requires of any
+# test that can reach a deny.
 Describe 'enforce-epic-worktree-removal-gate.ps1 manifest branch' {
     BeforeAll {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
