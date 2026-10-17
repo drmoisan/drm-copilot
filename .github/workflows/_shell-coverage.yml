@@ -2,7 +2,19 @@ name: Shell Coverage (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   shell-coverage:
@@ -11,9 +23,11 @@ jobs:
 
     steps:
       - name: Check out repository
+        if: ${{ inputs.run-heavy }}
         uses: actions/checkout@v7
 
       - name: Install shell tooling (shellcheck, shfmt, bats)
+        if: ${{ inputs.run-heavy }}
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck bats
@@ -24,6 +38,7 @@ jobs:
           sudo mv /tmp/shfmt /usr/local/bin/shfmt
 
       - name: Cache kcov build
+        if: ${{ inputs.run-heavy }}
         id: cache-kcov
         uses: actions/cache@v6
         with:
@@ -31,7 +46,7 @@ jobs:
           key: kcov-v43-ubuntu-latest
 
       - name: Build kcov from source
-        if: steps.cache-kcov.outputs.cache-hit != 'true'
+        if: ${{ inputs.run-heavy && steps.cache-kcov.outputs.cache-hit != 'true' }}
         run: |
           sudo apt-get install -y binutils-dev build-essential cmake \
             libssl-dev libcurl4-openssl-dev libelf-dev libstdc++-12-dev \
@@ -44,17 +59,21 @@ jobs:
           make install
 
       - name: Install kcov from cache
+        if: ${{ inputs.run-heavy }}
         run: |
           sudo cp -r /tmp/kcov-install/bin/* /usr/local/bin/
           kcov --version
 
       - name: Run shell-qc check (shfmt diff + shellcheck)
+        if: ${{ inputs.run-heavy }}
         run: bash scripts/bash/shell-qc.sh check
 
       - name: Run shell-qc test with coverage
+        if: ${{ inputs.run-heavy }}
         run: bash scripts/bash/shell-qc.sh test --coverage
 
       - name: Upload shell coverage artifacts
+        if: ${{ inputs.run-heavy }}
         uses: actions/upload-artifact@v7
         with:
           name: shell-coverage

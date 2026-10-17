@@ -48,7 +48,7 @@ Describe '_poshqc.yml workflow invariants' {
 
         # Issue #953 (CR-7): returns the reasons a poshqc job text fails to gate on the static and shard job
         # results. An empty result means the gate step reads both results, compares each with 'success' under
-        # -or, exits 1, carries no step-level if condition, and precedes the completeness and merge steps.
+        # -or, exits 1, carries no step-level if condition other than the issue #962 run-heavy gate, and precedes the completeness and merge steps.
         $script:GetResultGateViolation = {
             param([string] $JobText)
             $steps = [System.Collections.Generic.List[object]]::new()
@@ -82,7 +82,7 @@ Describe '_poshqc.yml workflow invariants' {
             if ($gate -notmatch '(?m)^ +exit 1[ \t]*$') {
                 $violations.Add('the gate step does not exit 1')
             }
-            if ($gate -match '(?m)^ {8}if:') {
+            if ($gate -match '(?m)^ {8}if:' -and $gate -notmatch '(?m)^ {8}if:[ \t]*\$\{\{ inputs\.run-heavy \}\}[ \t]*$') {
                 $violations.Add('the gate step carries a step-level if condition')
             }
             $names = @($steps | ForEach-Object { $_.Name })

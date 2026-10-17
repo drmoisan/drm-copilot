@@ -2,11 +2,24 @@ name: PoshQC (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   poshqc-static:
     name: PowerShell QC static
+    if: ${{ inputs.run-heavy }}
     runs-on: windows-latest
 
     steps:
@@ -39,6 +52,7 @@ jobs:
   # only place the shard count is written; the poshqc job verifies shard completeness and merges coverage.
   poshqc-shard:
     name: PowerShell QC shard ${{ matrix.shard }}
+    if: ${{ inputs.run-heavy }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -80,6 +94,7 @@ jobs:
 
     steps:
       - name: Require the static and shard jobs to succeed
+        if: ${{ inputs.run-heavy }}
         shell: pwsh
         run: |
           $staticResult = '${{ needs.poshqc-static.result }}'
@@ -90,21 +105,25 @@ jobs:
           }
 
       - name: Check out repository
+        if: ${{ inputs.run-heavy }}
         uses: actions/checkout@v7
 
       - name: Install PoshQC tooling
+        if: ${{ inputs.run-heavy }}
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
           Install-PoshQCTools
 
       - name: Download PowerShell shard test artifacts
+        if: ${{ inputs.run-heavy }}
         uses: actions/download-artifact@v7
         with:
           pattern: poshqc-test-results-shard-*
           path: artifacts/shards
 
       - name: Verify shard completeness
+        if: ${{ inputs.run-heavy }}
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
@@ -122,6 +141,7 @@ jobs:
           Write-Output "Shard completeness verified: $($manifests.Count) shards, $(@($manifests[0].all).Count) test files, shard tests $($shardTestCounts -join ' + ') = discovery $($discovered.TotalCount)."
 
       - name: Merge PowerShell shard coverage
+        if: ${{ inputs.run-heavy }}
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
@@ -138,6 +158,7 @@ jobs:
           Write-Output "Merged PowerShell line coverage: $($summary.covered) of $($summary.total) lines ($($summary.percent)%), $($summary.missed) missed."
 
       - name: Upload PowerShell test artifacts
+        if: ${{ inputs.run-heavy }}
         uses: actions/upload-artifact@v7
         with:
           name: poshqc-test-results
@@ -149,6 +170,7 @@ jobs:
 
   poshqc-linux-hooks:
     name: PowerShell hook suites (Linux)
+    if: ${{ inputs.run-heavy }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
