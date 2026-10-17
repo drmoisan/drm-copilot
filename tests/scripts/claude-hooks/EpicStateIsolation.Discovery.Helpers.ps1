@@ -28,6 +28,12 @@
     $script:EpicStateParseCache is a deliberate memo exception to the no-mutable-state rule: it
     is deterministic, keyed by source text, and lives for one test session only (#737 F-6).
 
+    The census, closure-node and reader memos follow the same exception (issue #935, PERF):
+    $script:EpicStateCensusCache is keyed by file path and text, $script:EpicStateClosureNodeCache
+    by reader instance and path, and $script:EpicStateReaderCache by repository root. Dot-sourcing
+    this file replaces every memo with an empty one, and each suite dot-sources it before calling
+    these functions, so no suite reads another suite's memo entries.
+
     This file is not mirrored under extensions/drm-copilot/resources/.
 #>
 
@@ -38,6 +44,9 @@ $script:EpicStateNamedSeam = @(
     'Get-WorktreeItemLiveRoot'
 )
 $script:EpicStateParseCache = @{}
+$script:EpicStateCensusCache = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
+$script:EpicStateClosureNodeCache = [System.Collections.Generic.Dictionary[object, object]]::new()
+$script:EpicStateReaderCache = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
 
 function Get-EpicStateDiscoveredSuite {
     <#
@@ -64,16 +73,20 @@ function Get-EpicStateSourceReader {
     <#
         Reader: a script block that takes a repository-relative path and returns the file text,
         or $null when the file does not exist.
+        The same script block is returned for a repository root on every call (issue #935, PERF).
     #>
     [OutputType([scriptblock])]
     param([Parameter(Mandatory)] [string] $RepoRoot)
+    if ($script:EpicStateReaderCache.ContainsKey($RepoRoot)) { return $script:EpicStateReaderCache[$RepoRoot] }
     $root = $RepoRoot
-    return {
+    $reader = {
         param([string] $RelativePath)
         $full = Join-Path $root $RelativePath
         if (Test-Path -LiteralPath $full -PathType Leaf) { return (Get-Content -Raw -LiteralPath $full) }
         return $null
     }.GetNewClosure()
+    $script:EpicStateReaderCache[$RepoRoot] = $reader
+    return $reader
 }
 
 function Get-EpicStateLibraryDirectory {
@@ -146,6 +159,59 @@ function Get-EpicStateHookLiteral {
     return [string[]]$names.ToArray()
 }
 
+function Get-EpicStateMemoSourceText {
+    <#
+        Pure over the injected reader: the reader's text for one path, or $null when it returns
+        none, memoized in $script:EpicStateClosureNodeCache per reader instance and path. A reader
+        returns the same text for a path for as long as the instance lives (issue #935, PERF).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $Path,
+        [Parameter(Mandatory)] [scriptblock] $ReadSource
+    )
+    $key = [System.Tuple[object, string]]::new($ReadSource, 'text' + [char]0 + $Path)
+    if (-not $script:EpicStateClosureNodeCache.ContainsKey($key)) { $script:EpicStateClosureNodeCache[$key] = & $ReadSource $Path }
+    return $script:EpicStateClosureNodeCache[$key]
+}
+
+function Get-EpicStateClosureSuccessor {
+    <#
+        Pure over the injected reader: the paths that the .ps1 and .psm1 string literals of one
+        closure file resolve to, in literal order; each is the first candidate (resolved beside the
+        file, beside the file by leaf, then in each library directory) for which the reader returns
+        text. Memoized per reader instance, path and library directories (issue #935, PERF).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $Path,
+        [Parameter(Mandatory)] [scriptblock] $ReadSource,
+        [string[]] $LibraryDirectory = @()
+    )
+    $key = [System.Tuple[object, string]]::new($ReadSource, 'next' + [char]0 + $Path + [char]0 + ($LibraryDirectory -join [char]0))
+    if (-not $script:EpicStateClosureNodeCache.ContainsKey($key)) {
+        $text = Get-EpicStateMemoSourceText -Path $Path -ReadSource $ReadSource
+        $folder = if ($Path.Contains('/')) { $Path.Substring(0, $Path.LastIndexOf('/')) } else { '' }
+        $next = [System.Collections.Generic.List[string]]::new()
+        $literals = if ($null -eq $text) { @() } else { (Get-EpicStateParsedSource -Text $text).Literal }
+        foreach ($literal in $literals) {
+            if ($literal -notmatch '\.psm?1$' -or $literal.Contains('*')) { continue }
+            $leaf = $literal.Replace([string][char]92, '/').Split('/')[-1]
+            $candidates = @(Resolve-EpicStateRelativePath -Directory $folder -Literal $literal) + @("$folder/$leaf") + @($LibraryDirectory | ForEach-Object { "$_/$leaf" })
+            foreach ($candidate in $candidates) {
+                if ($null -ne (Get-EpicStateMemoSourceText -Path $candidate -ReadSource $ReadSource)) {
+                    $next.Add($candidate)
+                    break
+                }
+            }
+        }
+        $script:EpicStateClosureNodeCache[$key] = [string[]]$next.ToArray()
+    }
+    foreach ($candidate in $script:EpicStateClosureNodeCache[$key]) { $candidate }
+}
+
 function Get-EpicStateLoadedSourceClosure {
     <#
         Pure over the injected reader: the files a suite loads. Starts from every hooks/<name>.ps1
@@ -153,6 +219,8 @@ function Get-EpicStateLoadedSourceClosure {
         transitively through string literals ending .ps1 or .psm1 in each loaded file, resolved
         beside the file or in a library directory. Literal scanning (not statement scanning) is
         required because the closure includes variable-driven loads.
+        Reads and resolutions go through the per-reader memo (Get-EpicStateMemoSourceText,
+        Get-EpicStateClosureSuccessor), so each file is read and resolved once (issue #935, PERF).
     #>
     [OutputType([pscustomobject])]
     param(
@@ -168,21 +236,11 @@ function Get-EpicStateLoadedSourceClosure {
     while ($queue.Count -gt 0) {
         $path = $queue.Dequeue()
         if ($loaded.Contains($path)) { continue }
-        $text = & $ReadSource $path
+        $text = Get-EpicStateMemoSourceText -Path $path -ReadSource $ReadSource
         if ($null -eq $text) { continue }
         $loaded[$path] = $text
-        $folder = if ($path.Contains('/')) { $path.Substring(0, $path.LastIndexOf('/')) } else { '' }
-        foreach ($literal in (Get-EpicStateParsedSource -Text $text).Literal) {
-            if ($literal -notmatch '\.psm?1$' -or $literal.Contains('*')) { continue }
-            $leaf = $literal.Replace([string][char]92, '/').Split('/')[-1]
-            $candidates = @(Resolve-EpicStateRelativePath -Directory $folder -Literal $literal) + @("$folder/$leaf") + @($LibraryDirectory | ForEach-Object { "$_/$leaf" })
-            foreach ($candidate in $candidates) {
-                if ($loaded.Contains($candidate)) { break }
-                if ($null -ne (& $ReadSource $candidate)) {
-                    $queue.Enqueue($candidate)
-                    break
-                }
-            }
+        foreach ($candidate in @(Get-EpicStateClosureSuccessor -Path $path -ReadSource $ReadSource -LibraryDirectory $LibraryDirectory)) {
+            if (-not $loaded.Contains($candidate)) { $queue.Enqueue($candidate) }
         }
     }
     foreach ($key in $loaded.Keys) { [pscustomobject]@{ Path = $key; Text = $loaded[$key] } }
@@ -193,20 +251,37 @@ function Get-EpicStateSeamCensus {
         Pure: the read seams in a closure. A seam is a function whose body contains a read
         primitive (Get-Content, ReadAllText, ReadAllLines) and either whose name matches
         Checkpoint or whose body or defining file holds an artifacts/ string literal (Decision 3),
-        plus the four named seams of Decision 1 whenever defined in the closure.
+        plus the four named seams of Decision 1 whenever defined in the closure. Each file's
+        records come from the Get-EpicStateFileSeamCensus memo (issue #935, PERF).
     #>
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $ClosureFile)
-    $isFunction = { param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }
-    $isLiteral = {
-        param($node)
-        $node -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $node -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
-    foreach ($file in $ClosureFile) {
-        $parsed = Get-EpicStateParsedSource -Text $file.Text
+    foreach ($file in $ClosureFile) { Get-EpicStateFileSeamCensus -Path $file.Path -Text $file.Text }
+}
+
+function Get-EpicStateFileSeamCensus {
+    <#
+        Pure: the census records of one closure file, memoized in $script:EpicStateCensusCache by
+        path and text, because a file's census does not depend on the suite that loaded it. A
+        repeated path and text returns the cached record objects; callers do not modify them.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)] [string] $Path,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $Text
+    )
+    $key = $Path + [char]0 + $Text
+    if (-not $script:EpicStateCensusCache.ContainsKey($key)) {
+        $isFunction = { param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }
+        $isLiteral = {
+            param($node)
+            $node -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+            $node -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+        }
+        $parsed = Get-EpicStateParsedSource -Text $Text
         $fileHoldsArtifacts = @($parsed.Literal | Where-Object { $_.Contains('artifacts/') }).Count -gt 0
-        foreach ($function in $parsed.Ast.FindAll($isFunction, $true)) {
+        $records = foreach ($function in $parsed.Ast.FindAll($isFunction, $true)) {
             $body = $function.Body.Extent.Text
             $reads = $body -match 'Get-Content|ReadAllText|ReadAllLines'
             $named = $script:EpicStateNamedSeam -contains $function.Name
@@ -216,11 +291,13 @@ function Get-EpicStateSeamCensus {
             $parameterDefaultReads = $null -ne $paramBlock -and @($paramBlock.Parameters | Where-Object { $null -ne $_.DefaultValue -and $_.DefaultValue.Extent.Text -match 'Get-Content|ReadAllText|ReadAllLines' }).Count -gt 0
             $class = if ($body -match '\(Get-Location\)\.Path') { 'CwdDerivedResolver' }
             elseif ($parameterDefaultReads -and -not $named) { 'DefaultParameterSeam' }
-            elseif ($file.Path -match '(^|/)lib/.+\.psm1$') { 'ModuleTextSeam' }
+            elseif ($Path -match '(^|/)lib/.+\.psm1$') { 'ModuleTextSeam' }
             else { 'HookLocalContentSeam' }
-            [pscustomobject]@{ Name = $function.Name; Class = $class; DefiningFile = $file.Path }
+            [pscustomobject]@{ Name = $function.Name; Class = $class; DefiningFile = $Path }
         }
+        $script:EpicStateCensusCache[$key] = [object[]]@($records)
     }
+    foreach ($record in $script:EpicStateCensusCache[$key]) { $record }
 }
 
 function Get-EpicStateProcessSpawningHook {
