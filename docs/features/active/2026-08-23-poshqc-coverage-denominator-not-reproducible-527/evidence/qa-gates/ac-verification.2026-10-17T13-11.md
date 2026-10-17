@@ -9,7 +9,7 @@ Source: `docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reprodu
 
 | AC | Criterion | Status | Evidence |
 | --- | --- | --- | --- |
-| AC-01 | Deterministic derivation | PENDING-CI (unchecked) | Local legs pass: `evidence/qa-gates/determinism-comparison.2026-10-17T13-03.md` (runs A, B, C: 215 files, LINE total 19095, identical KEY_SHA256, zero per-file differences); CI leg named in `evidence/qa-gates/ci-leg-pending.2026-10-17T13-03.md`. The orchestrator checks it off at S9. |
+| AC-01 | Deterministic derivation | checked (S9, CI leg resolved) | Local legs pass: `evidence/qa-gates/determinism-comparison.2026-10-17T13-03.md` (runs A, B, C: 215 files, LINE total 19095, identical KEY_SHA256, zero per-file differences). The CI leg was pending in `evidence/qa-gates/ci-leg-pending.2026-10-17T13-03.md` and is resolved in `evidence/qa-gates/ci-leg-resolved.2026-10-17T13-32.md` (CI full run: 215 files, LINE total 19095). Updated at S9 after the CI gate; this row replaces the former PENDING-CI status. |
 | AC-02 | Route independence | checked (round 1) | `evidence/regression-testing/fail-first-coverage-tests.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md` |
 | AC-03 | Derived population contents | checked (round 1) | `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md` |
 | AC-04 | Precedence order | checked (round 1) | `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md` |
@@ -29,4 +29,4 @@ Source: `docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reprodu
 | AC-18 | File size limits | checked (round 1) | `evidence/qa-gates/line-limits.2026-10-02T08-45.md` |
 | AC-19 | Order independence | checked (round 2) | `evidence/regression-testing/order-independence-summary.2026-10-17T13-09.md` and the three seed artifacts (seeds 527, 1017, 20261017): zero failures in each, three distinct file orders, same key set and root LINE total as run A |
 
-Status summary: 19 criteria; 18 checked; 1 pending CI (AC-01).
+Status summary (updated at S9): 19 criteria; 19 checked; 0 pending CI.
