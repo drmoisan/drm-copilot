@@ -114,8 +114,9 @@ Describe 'discovery guard (both hook surfaces)' -ForEach @(@{ DiscoveredSuiteByS
         # One variable-built hook-load report per surface, read by the AC-5b and F-3 non-vacuity rows
         # (operator direction, issue #935 PERF; supersedes the CR-N4 disposition).
         $script:VariableLoadReport = @{}
+        $script:VariableLoadError = @{}
         foreach ($surface in @($DiscoveredSuiteBySurface.Keys)) {
-            $script:VariableLoadReport[$surface] = @(foreach ($suite in $DiscoveredSuiteBySurface[$surface]) { Get-EpicStateVariableHookLoadReport -RepoRoot $script:RepoRoot -RelativePath $suite })
+            try { $script:VariableLoadReport[$surface] = @(foreach ($suite in $DiscoveredSuiteBySurface[$surface]) { Get-EpicStateVariableHookLoadReport -RepoRoot $script:RepoRoot -RelativePath $suite }) } catch { $script:VariableLoadError[$surface] = $_.Exception.Message; $script:VariableLoadReport[$surface] = @() }
         }
     }
 
@@ -180,7 +181,8 @@ Describe 'discovery guard (both hook surfaces)' -ForEach @(@{ DiscoveredSuiteByS
 
     It 'AC-5b variable-built hook-load report <Surface>' -ForEach $script:SurfaceRow {
         # Arrange and act: read the lines of every suite on the surface from the Describe BeforeAll report (issue #935, F-3, PERF).
-        { $script:VariableLoadLine = @($script:VariableLoadReport[$Surface]) } | Should -Not -Throw
+        $script:VariableLoadError[$Surface] | Should -BeNullOrEmpty -Because 'building the variable-built hook-load report for the surface must not throw'
+        $script:VariableLoadLine = @($script:VariableLoadReport[$Surface])
 
         # Assert: the row reports and never fails on an entry; the lines go to the information stream.
         foreach ($line in $script:VariableLoadLine) { Write-Information $line -InformationAction Continue }
@@ -362,97 +364,5 @@ Describe 'discovery guard (both hook surfaces)' -ForEach @(@{ DiscoveredSuiteByS
 
         # Assert: the extra name satisfies its requirement and the empty array literal adds no finding.
         $findings.Count | Should -Be 0 -Because ($findings -join '; ')
-    }
-}
-
-Describe 'issue #935 PERF memo' {
-    It 'PERF census memo returns the cached records for a repeated file' {
-        # Arrange: one closure file that defines one seam.
-        $file = [pscustomobject]@{ Path = '.claude/hooks/perf-a.ps1'; Text = $script:HookText }
-
-        # Act: take the census of the same path and text twice.
-        $first = @(Get-EpicStateSeamCensus -ClosureFile @($file))
-        $second = @(Get-EpicStateSeamCensus -ClosureFile @($file))
-
-        # Assert: the second call returns the memoized record objects.
-        $second.Count | Should -Be 1
-        $second[0].Name | Should -Be 'Get-FixtureCheckpointContent'
-        [object]::ReferenceEquals($first[0], $second[0]) | Should -BeTrue -Because 'a repeated path and text is served from the census memo'
-    }
-
-    It 'PERF census memo recomputes for changed text' {
-        # Arrange: the same path with a second text that renames the seam.
-        $before = [pscustomobject]@{ Path = '.claude/hooks/perf-b.ps1'; Text = $script:HookText }
-        $after = [pscustomobject]@{ Path = '.claude/hooks/perf-b.ps1'; Text = $script:HookText.Replace('Get-FixtureCheckpointContent', 'Get-RenamedCheckpointContent') }
-
-        # Act
-        $first = @(Get-EpicStateSeamCensus -ClosureFile @($before))
-        $second = @(Get-EpicStateSeamCensus -ClosureFile @($after))
-
-        # Assert: the changed text is a different memo key and is censused afresh.
-        $second.Count | Should -Be 1
-        $second[0].Name | Should -Be 'Get-RenamedCheckpointContent'
-        [object]::ReferenceEquals($first[0], $second[0]) | Should -BeFalse -Because 'a changed text must not be served from the memo'
-    }
-
-    It 'PERF census memo keys by path as well as text' {
-        # Arrange and act: the same text as a hook file and as a library module.
-        $hookCensus = @(Get-EpicStateSeamCensus -ClosureFile @([pscustomobject]@{ Path = '.claude/hooks/perf-c.ps1'; Text = $script:HookText }))
-        $moduleCensus = @(Get-EpicStateSeamCensus -ClosureFile @([pscustomobject]@{ Path = '.claude/lib/perf/perf-c.psm1'; Text = $script:HookText }))
-
-        # Assert: each path gets its own class and defining file.
-        $hookCensus[0].Class | Should -Be 'HookLocalContentSeam'
-        $moduleCensus[0].Class | Should -Be 'ModuleTextSeam'
-        $moduleCensus[0].DefiningFile | Should -Be '.claude/lib/perf/perf-c.psm1'
-    }
-
-    It 'PERF closure memo reads each file once for a repeated closure' {
-        # Arrange: a counting reader over a hook that imports a library module.
-        $count = @{ Value = 0 }
-        $table = @{ $script:HookFile = "Import-Module (Join-Path `$PSScriptRoot '../lib/fixture/b.psm1')`n"; '.claude/lib/fixture/b.psm1' = "function Get-Thing { return 1 }`n" }
-        $reader = { param([string] $RelativePath) $count.Value++; if ($table.ContainsKey($RelativePath)) { $table[$RelativePath] } else { $null } }.GetNewClosure()
-
-        # Act: walk the closure twice with the same reader.
-        $first = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource $reader)
-        $readsAfterFirst = $count.Value
-        $second = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource $reader)
-
-        # Assert: the second walk reads no file and returns the same files in the same order.
-        $readsAfterFirst | Should -BeGreaterThan 0
-        $count.Value | Should -Be $readsAfterFirst -Because 'a repeated closure with the same reader is served from the closure-node memo'
-        (@($first | ForEach-Object { $_.Path }) -join ',') | Should -Be '.claude/hooks/a.ps1,.claude/lib/fixture/b.psm1'
-        (@($second | ForEach-Object { $_.Path }) -join ',') | Should -Be '.claude/hooks/a.ps1,.claude/lib/fixture/b.psm1'
-    }
-
-    It 'PERF closure memo recomputes for a reader with changed text' {
-        # Arrange: two readers over the same paths; in the second, the hook imports another module.
-        $tableA = @{ $script:HookFile = "Import-Module (Join-Path `$PSScriptRoot '../lib/fixture/b.psm1')`n"; '.claude/lib/fixture/b.psm1' = "function Get-Thing { return 1 }`n"; '.claude/lib/fixture/c.psm1' = "function Get-Other { return 2 }`n" }
-        $tableB = @{} + $tableA
-        $tableB[$script:HookFile] = "Import-Module (Join-Path `$PSScriptRoot '../lib/fixture/c.psm1')`n"
-
-        # Act
-        $first = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource (Get-FixtureReader -File $tableA))
-        $second = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource (Get-FixtureReader -File $tableB))
-
-        # Assert: the reader with the changed hook text is walked afresh.
-        (@($first | ForEach-Object { $_.Path }) -join ',') | Should -Be '.claude/hooks/a.ps1,.claude/lib/fixture/b.psm1'
-        (@($second | ForEach-Object { $_.Path }) -join ',') | Should -Be '.claude/hooks/a.ps1,.claude/lib/fixture/c.psm1'
-    }
-
-    It 'PERF memo starts empty when the helper is dot-sourced' {
-        # Arrange: populate the census and closure-node memos of this suite.
-        $null = @(Get-EpicStateSeamCensus -ClosureFile @([pscustomobject]@{ Path = '.claude/hooks/perf-d.ps1'; Text = $script:HookText }))
-        $null = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource (Get-FixtureReader -File @{ $script:HookFile = $script:HookText }))
-        $populated = $script:EpicStateCensusCache.Count -gt 0 -and $script:EpicStateClosureNodeCache.Count -gt 0
-
-        # Act: dot-source the helper, as each suite does in BeforeDiscovery or BeforeAll.
-        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Discovery.Helpers.ps1')
-
-        # Assert: every memo is replaced by an empty one, so a separate suite starts empty.
-        $populated | Should -BeTrue
-        $script:EpicStateCensusCache.Count | Should -Be 0
-        $script:EpicStateClosureNodeCache.Count | Should -Be 0
-        $script:EpicStateReaderCache.Count | Should -Be 0
-        $script:EpicStateParseCache.Count | Should -Be 0
     }
 }

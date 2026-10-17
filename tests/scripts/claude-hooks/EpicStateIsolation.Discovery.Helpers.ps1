@@ -3,9 +3,11 @@
     Discovery helpers for the epic-state isolation guard (issue #737).
 
 .DESCRIPTION
-    Dot-sourced by enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1, by
-    enforce-gate-suites.EpicStateIsolation.HookReference.Tests.ps1 and by the
-    compliance helpers. The functions enumerate the hook suites of both surfaces, compute the
+    Dot-sourced by enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1,
+    enforce-gate-suites.EpicStateIsolation.HookReference.Tests.ps1 and
+    enforce-gate-suites.EpicStateIsolation.Memo.Tests.ps1, before
+    EpicStateIsolation.Compliance.Helpers.ps1, whose functions call these. The functions
+    enumerate the hook suites of both surfaces, compute the
     loaded-source closure of a suite from string literals, take a census of the read seams in
     that closure, and detect process-spawning suites.
 
@@ -15,8 +17,9 @@
     EpicStateIsolation.Helpers.ps1 dot-sources; dot-source EpicStateIsolation.Helpers.ps1 before
     calling any of them (issue #935, CR-R4, CR-F5).
 
-    Every function is pure over text and AST except the two readers at the file boundary,
-    Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader, which read the committed tree
+    Every function is pure over text and AST, apart from the memo writes described below, except
+    the two readers at the file boundary, Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader,
+    which read the committed tree
     from a supplied repository root. Callers inject a reader script block, so fixtures run over
     in-memory text. No function creates a file, runs a process, or reads gitignored state.
 
@@ -43,7 +46,7 @@ $script:EpicStateNamedSeam = @(
     'Get-WorktreeItemCheckpointText'
     'Get-WorktreeItemLiveRoot'
 )
-$script:EpicStateParseCache = @{}
+$script:EpicStateParseCache = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
 $script:EpicStateCensusCache = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
 $script:EpicStateClosureNodeCache = [System.Collections.Generic.Dictionary[object, object]]::new()
 $script:EpicStateReaderCache = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
@@ -75,6 +78,7 @@ function Get-EpicStateSourceReader {
         or $null when the file does not exist.
         The same script block is returned for a repository root on every call (issue #935, PERF).
     #>
+    [CmdletBinding()]
     [OutputType([scriptblock])]
     param([Parameter(Mandatory)] [string] $RepoRoot)
     if ($script:EpicStateReaderCache.ContainsKey($RepoRoot)) { return $script:EpicStateReaderCache[$RepoRoot] }
@@ -144,6 +148,7 @@ function Resolve-EpicStateRelativePath {
 
 function Get-EpicStateHookLiteral {
     # Pure: the distinct hook script names named by hooks/<name>.ps1 string literals, excluding EpicStateIsolation helper files and test files.
+    [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText)
     $names = [System.Collections.Generic.List[string]]::new()
@@ -156,14 +161,14 @@ function Get-EpicStateHookLiteral {
             if (-not $names.Contains($name)) { $names.Add($name) }
         }
     }
-    return [string[]]$names.ToArray()
+    foreach ($name in $names) { $name }
 }
 
 function Get-EpicStateMemoSourceText {
     <#
-        Pure over the injected reader: the reader's text for one path, or $null when it returns
-        none, memoized in $script:EpicStateClosureNodeCache per reader instance and path. A reader
-        returns the same text for a path for as long as the instance lives (issue #935, PERF).
+        Deterministic over the injected reader; records the result in $script:EpicStateClosureNodeCache:
+        the reader's text for one path, or $null when it returns none, per reader instance and path.
+        A reader returns the same text for a path for as long as the instance lives (issue #935, PERF).
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -178,7 +183,8 @@ function Get-EpicStateMemoSourceText {
 
 function Get-EpicStateClosureSuccessor {
     <#
-        Pure over the injected reader: the paths that the .ps1 and .psm1 string literals of one
+        Deterministic over the injected reader; records the result in $script:EpicStateClosureNodeCache:
+        the paths that the .ps1 and .psm1 string literals of one
         closure file resolve to, in literal order; each is the first candidate (resolved beside the
         file, beside the file by leaf, then in each library directory) for which the reader returns
         text. Memoized per reader instance, path and library directories (issue #935, PERF).
@@ -222,6 +228,7 @@ function Get-EpicStateLoadedSourceClosure {
         Reads and resolutions go through the per-reader memo (Get-EpicStateMemoSourceText,
         Get-EpicStateClosureSuccessor), so each file is read and resolved once (issue #935, PERF).
     #>
+    [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText,
@@ -254,6 +261,7 @@ function Get-EpicStateSeamCensus {
         plus the four named seams of Decision 1 whenever defined in the closure. Each file's
         records come from the Get-EpicStateFileSeamCensus memo (issue #935, PERF).
     #>
+    [CmdletBinding()]
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $ClosureFile)
     foreach ($file in $ClosureFile) { Get-EpicStateFileSeamCensus -Path $file.Path -Text $file.Text }
@@ -261,7 +269,7 @@ function Get-EpicStateSeamCensus {
 
 function Get-EpicStateFileSeamCensus {
     <#
-        Pure: the census records of one closure file, memoized in $script:EpicStateCensusCache by
+        Deterministic: the census records of one closure file, recorded in $script:EpicStateCensusCache by
         path and text, because a file's census does not depend on the suite that loaded it. A
         repeated path and text returns the cached record objects; callers do not modify them.
     #>

@@ -79,6 +79,18 @@ Describe 'fixture <Name>' -ForEach @(@{ Name = 'claude'; HookRoot = '.claude\hoo
     BeforeAll { . (Join-Path $script:RepoRoot "$HookRoot\enforce-x.ps1") }
 }
 '@ }
+        @{ Case = 'expandable braced bound by assignment'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "${HookRoot}/enforce-x.ps1") }
+}
+'@ }
+        @{ Case = 'expandable braced scoped bound by assignment'; Source = @'
+$script:HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "${script:HookRoot}/enforce-x.ps1") }
+}
+'@ }
         @{ Case = 'Join-Path positional bound by assignment'; Source = @'
 $script:HookDirectory = Join-Path $script:RepoRoot '.claude/hooks'
 Describe 'fixture' {
@@ -156,7 +168,7 @@ Describe 'fixture' {
         $identified = Test-EpicStateIsolationHookReference -Node $dotSource -SuiteAst $ast
 
         # Assert
-        $identified | Should -BeFalse -Because "the $Case fixture names no hooks root"
+        $identified | Should -BeFalse -Because "the $Case fixture does not form a hook path from a variable bound to a hooks root"
     }
 }
 

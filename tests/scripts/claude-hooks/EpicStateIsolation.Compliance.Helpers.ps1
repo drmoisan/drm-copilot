@@ -177,6 +177,7 @@ function Get-EpicStateProbeFinding {
     # One finding when a suite that complies by form F1 or the helper form for a named seam (PI-2)
     # never calls the interception probe from inside an It; nothing otherwise. A caller that already
     # holds the probe seams of the suite passes them as -Seam, which skips the scan (issue #935, PERF).
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)] [string] $RepoRoot,
@@ -187,6 +188,7 @@ function Get-EpicStateProbeFinding {
     $probeSeam = @(if ($PSBoundParameters.ContainsKey('Seam')) { $Seam } else { Get-EpicStateProbeSeam -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource })
     if ($probeSeam.Count -eq 0) { return }
     $state = Get-EpicStateSuiteState -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource
+    if ($null -ne $state.Error) { return $state.Error }
     if (-not (Test-EpicStateProbeCalledFromIt -Ast $state.Ast)) {
         "${RelativePath}: complies for $($probeSeam -join ', ') but never calls Invoke-EpicStateInterceptionProbe from inside an It"
     }

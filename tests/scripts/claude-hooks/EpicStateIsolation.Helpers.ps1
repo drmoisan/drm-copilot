@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Dot-sourced by the enforce-gate-suites.EpicStateIsolation suites (legacy guard, Branches,
-    Predicate, Discovery, HookReference). The functions parse a
+    Predicate, Discovery, HookReference, Memo). The functions parse a
     suite's AST and report whether its outermost BeforeAll isolates both run-checkpoint
     reads: after the hook dot-source, an Import-Module of EpicScopeResolution.psm1 without
     -Force followed by a $null Mock of Get-EpicScopeCheckpointText in module scope
