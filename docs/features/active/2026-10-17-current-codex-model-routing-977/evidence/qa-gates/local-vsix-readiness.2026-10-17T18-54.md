@@ -1,6 +1,7 @@
 Timestamp: 2026-10-17T18:54:36Z
-Command: pwsh -NoProfile -File scripts/powershell/Publish-DrmCopilotExtension.ps1 -Package; supported code-insiders --install-extension <local-vsix> --force; packaged-resource and installed-file verification; MCP model/topology validation
-EXIT_CODE: 0 for build/package, archive verification and local installation; MCP validation ok=false
+Command: pwsh -NoProfile -File scripts/powershell/Publish-DrmCopilotExtension.ps1 -Package; supported code-insiders --install-extension <local-vsix> --force; packaged-resource and installed-file verification
+EXIT_CODE: 0
+MCP_VALIDATION_OK: false (separate model/topology validation tool result)
 Output Summary: Local package and installation succeeded. This running MCP provider continues requiring former model identifiers; authoritative readiness is not established.
 
 - Package: artifacts/vsix/drm-copilot-1.1.20-20261017-145307.vsix
@@ -27,4 +28,3 @@ Checkpoint codex_model_routing_receipts[13].model must be 'gpt-5.6-terra', found
 Checkpoint codex_model_routing_receipts[14].model must be 'gpt-5.6-terra', found 'gpt-6.1-sol'.
 Checkpoint codex_model_routing_receipts[15].model must be 'gpt-5.6-terra', found 'gpt-6.1-sol'.
 ~~~
-
