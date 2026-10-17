@@ -39,6 +39,8 @@ Describe 'validate-planner-output entry point (issues #786 and #903)' {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'))
         $script:PlanPathText = 'plan-path: docs/features/active/foo/plan.md'
         $script:ValidText = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)"
+        # Issue #964: the allowed-plan fixture carries a valid Pre-Mortem section.
+        $script:PreMortemFixture = @('## Pre-Mortem', '- Review checklists: walked.', '- Coverage: measured.', '- Mirror parity: copied.', '- File size: measured.', '- Test isolation: shuffled.', '- CI-only behavior: checked.', '- Evidence: recorded.', '## Phases')
 
         function Invoke-HookTail {
             # Runs the hook entry tail with stdin, stderr, and CLAUDE_HOOK_INPUT replaced for one call; all are restored in finally.
@@ -81,10 +83,11 @@ Describe 'validate-planner-output entry point (issues #786 and #903)' {
             # Serves the plan lines of the structural-contract row in validate-planner-output.Tests.ps1.
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers a Pester mock for one test only; it changes no system state.')]
             param()
+            $preMortem = $script:PreMortemFixture
             Mock -CommandName Get-PlanFileContent -MockWith {
                 @{
                     Exists = $true
-                    Lines  = @(
+                    Lines  = @($preMortem) + @(
                         "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
                         '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
@@ -94,7 +97,7 @@ Describe 'validate-planner-output entry point (issues #786 and #903)' {
                         '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
-            }
+            }.GetNewClosure()
         }
     }
 
