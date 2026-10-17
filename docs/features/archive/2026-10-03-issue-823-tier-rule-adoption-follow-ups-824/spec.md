@@ -296,7 +296,7 @@ No content-hash file needs updating. `extensions/drm-copilot/resources/codex-and
 - Resolver false reads from descriptive prose in a consumer `CLAUDE.md`. Mitigation: comparator requirement and test rows. Residual: combined "line and branch" statements fall back to the defaults (stricter direction).
 - `<solution>.sln` is a placeholder and is not directly executable; this follows the existing convention.
 - Bundle mirrors under `extensions/drm-copilot/resources/customizations/.github/` have no generic parity test; byte drift between `.github` copies is not otherwise detected. The new test checks both copies for `TaskMaster.sln` absence.
-- kcov does not measure `.codex/codex-web-setup.sh` (pre-existing discovery-root gap). The bats tests verify behavior.
+- kcov does not measure `.codex/codex-web-setup.sh` (pre-existing discovery-root gap). The bats tests verify behavior. (Superseded; see Change Log 2026-10-10.)
 - FU-823-4 remains visible only in an active folder that is archived when #824 completes. Mitigation: listed below and in the PR body.
 
 ## Rollout & Follow-up
@@ -307,7 +307,7 @@ No content-hash file needs updating. `extensions/drm-copilot/resources/codex-and
   - `.codex/hooks/validate-feature-review-coverage.ps1` (and its bundle mirror) is a separate implementation with an 80 percent floor (prior review A4).
   - 80/90 figures remain in `.agents/skills/feature-review-workflow/SKILL.md`, `.github/skills/feature-review-workflow/SKILL.md`, `.codex/agents/feature-review.toml`, and their bundle mirrors.
   - `No-COM` remains in `.claude/rules/typescript.md:57` and `.claude/rules/csharp.md:5,10` and their bundle mirrors (prior review A3); after the heading rename, the `typescript.md` cross-reference wording no longer matches the architecture-boundaries heading.
-  - `.codex/` is outside shell-qc discovery and kcov include roots, so `.codex/codex-web-setup.sh` coverage is not measured (prior review A2).
+  - `.codex/` is outside shell-qc discovery and kcov include roots, so `.codex/codex-web-setup.sh` coverage is not measured (prior review A2). (Superseded; see Change Log 2026-10-10.)
   - Optional: if the maintainer wants FU-823-4 in the potential backlog, create a new single-item potential entry.
 - Links: issue #824 (Addendum 2), issue #823, research `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/research/2026-10-09T02-25-issue-823-tier-rule-adoption-follow-ups-research.md`, prior work branch `origin/wip/preserve-824-addendum2-2026-10-08`.
 

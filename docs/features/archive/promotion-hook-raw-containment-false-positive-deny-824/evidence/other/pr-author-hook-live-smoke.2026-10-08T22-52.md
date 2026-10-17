@@ -1,7 +1,7 @@
 # pr-author Allowlist Hook Live Smoke (AC-20) ([P9-T5])
 
 Timestamp: 2026-10-08T22-52
-Status: PENDING-ORCHESTRATOR
+Status: PASS (2026-10-17 re-run; see the final Result section)
 
 Reason pending: the live smoke requires a delegation to the `pr-author` subagent with the `enforce-pr-author-command-allowlist.ps1` PreToolUse hook registered from `.claude/agents/pr-author.md` frontmatter. The executor cannot start that delegation; the orchestrator runs it at PR stage (plan DC-24).
 
@@ -28,3 +28,15 @@ EXIT_CODE: 1
 Output Summary: The command was not denied. It printed `99cec29930006a09c183a9f5305a1f658a6be57f` and exited 1 only because `artifacts/pr_body_5.md` does not exist. No `PR_AUTHOR_COMMAND_NOT_ALLOWED:` text appeared for this or other chained/piped commands in the same delegation.
 
 Observed cause (likely, not confirmed): the delegation loaded `.claude/agents/pr-author.md` from the session root checkout (`drm-copilot-wt/2026-09-29T13-45`), whose copy registers only the `SubagentStop` hook. The `PreToolUse` `Bash` registration exists only on this branch. The smoke can pass only from a session whose root contains this branch's `pr-author.md` (after the change reaches the session root's branch). AC-20 remains unchecked pending that operator-run smoke.
+
+## Result (coordinator re-run, 2026-10-17)
+
+Timestamp: 2026-10-17T11-53
+Status: PASS
+Session root: `drm-copilot-wt/2026-09-29T13-45` at `b8fcd7790`, whose `.claude/agents/pr-author.md` registers the `PreToolUse` `Bash` hook `enforce-pr-author-command-allowlist.ps1`.
+Command: `git log -1 --format=%H && sha256sum artifacts/pr_body_5.md`
+Outcome: denied by the PreToolUse hook before execution (permission decision `reject`, source `hook`). Deny reason:
+
+> PR_AUTHOR_COMMAND_NOT_ALLOWED: the segment 'sha256sum artifacts/pr_body_5.md' is rejected because it is not an allowed command form. The pr-author agent may run only: git log, git rev-parse, gh pr create, gh pr edit, sha256sum artifacts/pr_body_<N>.md, date -u [+<format>], each without wrappers, substitutions, or redirections.
+
+This confirms the 2026-10-09 FAIL was environmental: that session root carried an older `pr-author.md` without the `PreToolUse` registration.
