@@ -3,9 +3,9 @@
 - **Issue:** #935
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-15
-- **Status:** Draft
-- **Version:** 0.2
+- **Last Updated:** 2026-10-16
+- **Status:** Implemented (CI-dependent acceptance criteria are confirmed at S9)
+- **Version:** 0.3
 - **Work Mode:** full-bug (acceptance criteria are tracked in this file only; no `user-story.md`)
 - **Design source:** `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/research/research.2026-10-15T22-03.md`
 
@@ -211,8 +211,8 @@ Seeded from issue (dispositions per `## Decisions`):
 - [x] AC-21: `git diff --name-only origin/main...HEAD` lists no path under `.claude/`, `.codex/`, `.github/`, `extensions/`, `scripts/` or `config/` (therefore no `.claude/rules/` or `.github/instructions/` change), and lists only paths in `## Write Set`.
 - [x] AC-22: The same diff lists no suite named in AC-6, no `tests/scripts/claude-hooks/validate-*-output*.Tests.ps1`, no `validate-discovery-artifact-gate.Tests.ps1`, no `hook-dependency-failure*.Tests.ps1` in either hook-suite directory, no SubagentStop validator, and no `enforce-orchestration-preimplementation-gate-modes*.Tests.ps1` or `enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1` (concurrent items #928, #929, #936).
 - [x] AC-23: `run_poshqc_format` reports no change, `run_poshqc_analyze` reports zero findings, and `run_poshqc_test` passes for every created or edited `.ps1` file in a single clean pass; the PR CI jobs `poshqc / PowerShell QC` and `poshqc / PowerShell hook suites (Linux)` conclude `success` on the final PR head.
-- [x] AC-24: The Pester coverage file from `poshqc / PowerShell QC` on the final PR head shows overall line coverage not lower than the baseline recorded under `evidence/baseline/` and not below 85%; the comparison is recorded under `evidence/qa-gates/`. No production file is excluded from coverage.
-  - Amendment (2026-10-16, coordinator decision): accepted under option 1 (Pester breakpoint attribution loss in production files this branch does not change), not met as written for the baseline comparison; the 85% floor and the no-exclusion clause still apply. Decision record: `evidence/other/cov1-decision-option1.2026-10-16T20-38.md`.
+- [ ] AC-24: The Pester coverage file from `poshqc / PowerShell QC` on the final PR head shows overall line coverage not lower than the baseline recorded under `evidence/baseline/` and not below 85%; the comparison is recorded under `evidence/qa-gates/`. No production file is excluded from coverage.
+  - Amendment (2026-10-16, coordinator decision): accepted under option 1 (Pester breakpoint attribution loss in production files this branch does not change), not met as written for the baseline comparison; the 85% floor and the no-exclusion clause still apply. Decision record: `evidence/other/cov1-decision-option1.2026-10-16T20-38.md`. Left unchecked under acceptance-criteria-tracking rule 4 until S9; P7-T10 records AC-24 as ACCEPTED-OPTION-1 when P7-T6 confirms the 85% floor and no exclusion on the final head, or as PASS when P7-T6 also records BASELINE-CLAUSE: MET.
 - [x] AC-25: No created or edited test file uses `New-TemporaryFile`, `TestDrive`, `[System.IO.Path]::GetTempFileName`, `Get-Date`, `Start-Sleep`, `Start-Process` or `ProcessStartInfo` outside string fixtures (verified by Grep, recorded under `evidence/qa-gates/`).
 - [x] AC-26: `## Decisions` in this spec records the dispositions for N-2 (closed, no action), F-6 (no policy change; mirror-drift note), F-3 enforcement (deferred), the shape-B residual limit, and the I-3 residue, and the PR description lists the same operator follow-ups.
 

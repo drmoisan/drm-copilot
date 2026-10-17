@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-15
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/hook-test-isolation-737-remainder/ (Issue #935)
+- Status: Promoted -> docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/ (Issue #935)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -63,5 +63,5 @@ F-6 needs operator approval because it edits .claude/rules/powershell.md and .gi
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
