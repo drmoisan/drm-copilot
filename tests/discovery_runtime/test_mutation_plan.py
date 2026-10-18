@@ -254,6 +254,7 @@ def test_values_reject_mutability_and_metadata_ambiguity(
     assert baseline.inspect("new/deep/file").kind == "missing"
     entries = dict(baseline.metadata)
     entries["new"] = PathMetadata(kind="missing")
+    entries["."] = replace(entries["."], children=(*entries["."].children, "new"))
     assert (
         replace(baseline, metadata=tuple(entries.items())).inspect("new/file").kind
         == "missing"

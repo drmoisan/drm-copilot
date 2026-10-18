@@ -211,7 +211,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 3 — Safe consumer workspace operations
 
-- [ ] [P3-T1] Commit validated prospective artifact mutations with compare-and-swap.
+- [x] [P3-T1] Commit validated prospective artifact mutations with compare-and-swap.
   - Files and behavior: Create R/{mutation_plan,mutation_io}.py and PT/test_{mutation_plan,mutation_commit}.py. Plan exact artifact-kind/path/ID grants, validate the prospective graph, recheck parent metadata and input hashes, and perform exclusive creation or digest-matched replacement.
   - Tests and proof: Test unchanged bytes, invalid proposed content over valid old content, wrong roles/kinds/IDs, stale original digest, concurrent collision, parent-link replacement, bounded partial I/O failure, and repeatable dry-run; use in-memory writers.
   - Acceptance: Unauthorized or invalid prospective writes change nothing; a race or partial failure is reported explicitly and invalidates completion authority; successful mutation preserves unrelated artifacts.
