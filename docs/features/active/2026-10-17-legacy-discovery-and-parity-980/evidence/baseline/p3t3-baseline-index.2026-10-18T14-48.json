@@ -1,0 +1,13 @@
+{
+  "written_at_utc": "2026-10-18T14:48:38.096425+00:00",
+  "acceptance_baseline": "639c37269ed12b0bd4b5d74d66723e2f5ce4dedd",
+  "receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-lint.2026-10-18T14-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-tests.2026-10-18T14-30.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-types.2026-10-18T14-29.md"
+  ],
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t3-baseline-coverage-raw.2026-10-18T14-48.json",
+  "result": "51 tests passed; existing activation_models 28/28 lines, 4/4 arcs; Ruff and full Pyright passed.",
+  "new_modules": "All three new production modules were absent at baseline; coverage is not applicable before creation.",
+  "copy_provenance": "Raw baseline coverage is retained without modification. Original command times remain in the linked receipts and coverage metadata; this index and copied filename use actual publication time."
+}

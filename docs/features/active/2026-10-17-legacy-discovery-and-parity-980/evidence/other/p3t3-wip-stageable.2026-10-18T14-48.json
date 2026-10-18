@@ -1,0 +1,48 @@
+{
+  "authored_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+    "tests/discovery_runtime/test_configuration.py",
+    "tests/discovery_runtime/test_activation_store.py",
+    "tests/discovery_runtime/test_activation_filesystem.py"
+  ],
+  "specialist_evidence": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t3-baseline-coverage-raw.2026-10-18T14-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t3-baseline-index.2026-10-18T14-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t3-wip-handoff.2026-10-18T14-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t3-wip-inventory.2026-10-18T14-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t3-wip5-coverage-raw.2026-10-18T14-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-lint.2026-10-18T14-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-tests.2026-10-18T14-30.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-baseline-types.2026-10-18T14-29.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-preparation-format.2026-10-18T14-34.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip-inventory-command.2026-10-18T14-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip-wrap.2026-10-18T14-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip0-format.2026-10-18T14-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip1-format.2026-10-18T14-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip1-lint.2026-10-18T14-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip2-format.2026-10-18T14-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip2-lint.2026-10-18T14-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip3-format.2026-10-18T14-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip3-lint.2026-10-18T14-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip3-types.2026-10-18T14-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip4-core-tests.2026-10-18T14-44.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip4-format.2026-10-18T14-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip4-lint.2026-10-18T14-44.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip4-types.2026-10-18T14-44.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip5-core-tests-raw.2026-10-18T14-48.xml",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip5-core-tests.2026-10-18T14-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip5-format.2026-10-18T14-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip5-lint.2026-10-18T14-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-wip5-types.2026-10-18T14-45.md"
+  ],
+  "verifier_evidence_separate_owner": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t3-executor-consolidated-review.2026-10-18T14-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-executor-boundaries-initial.2026-10-18T14-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-executor-boundaries-initial.2026-10-18T14-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-executor-harness-initial.2026-10-18T14-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t3-executor-harness-initial.2026-10-18T14-37.md"
+  ],
+  "subsequent_receipt": "The runner emits one p3t3-wip-inventory-command-retry receipt after this script exits; include its reported exact path."
+}
