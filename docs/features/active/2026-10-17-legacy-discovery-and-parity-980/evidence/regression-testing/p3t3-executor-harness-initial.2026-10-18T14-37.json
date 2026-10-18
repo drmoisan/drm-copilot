@@ -1,0 +1,59 @@
+{
+  "task": "P3-T3",
+  "stage": "initial diagnostic",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "cd2f6cdf45a94374d95ad9f9d76791fcff681d3cf13fd613afa4c35aefd66b83",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "b6ccf7c0803e618df0f77b065ea45bf882c281a47d178af77c5153bf7b25d30f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "1f2453c3ed4747fa41396576c67fc7a92768c3a9cbb0fbc9f37a82e0759ffae4"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py": "cd2f6cdf45a94374d95ad9f9d76791fcff681d3cf13fd613afa4c35aefd66b83",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "b6ccf7c0803e618df0f77b065ea45bf882c281a47d178af77c5153bf7b25d30f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "1f2453c3ed4747fa41396576c67fc7a92768c3a9cbb0fbc9f37a82e0759ffae4"
+  },
+  "source_stable": true,
+  "passed": 0,
+  "total": 8,
+  "cases": [
+    {
+      "name": "real-memory root activation and deliberate deactivation",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "default profile requires controlled activation",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "active locator deletion remains blocking",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "dry-run cannot assert root authority",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "deactivated fast path detects concurrent reactivation",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "known candidate appearing before guarded commit blocks activation",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "parent identity changing at registry publication is not recaptured as trusted",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    },
+    {
+      "name": "partial workspace failure retains protected active intent",
+      "passed": false,
+      "error": "TypeError: ActivationStore.__init__() missing 1 required keyword-only argument: 'open_directory'"
+    }
+  ]
+}

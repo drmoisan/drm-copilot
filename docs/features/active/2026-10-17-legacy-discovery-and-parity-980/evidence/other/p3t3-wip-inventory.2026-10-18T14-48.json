@@ -1,0 +1,131 @@
+{
+  "written_at_utc": "2026-10-18T14:48:38.096706+00:00",
+  "status": "FROZEN_WIP_READY; P3-T3 incomplete, not accepted",
+  "acceptance_baseline": "639c37269ed12b0bd4b5d74d66723e2f5ce4dedd",
+  "source_binding": "All six hashes equal the pre-test observations. No production/test edits occurred during WIP5.",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "sha256": "0193463923026c5c06d4154b6854a9445682e3a05f372a81f2859b422494d3d2",
+      "physical_lines": 310
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "d001281488ba92425a38929ce5770fbffd8000acfe34e0dade1e91f2e7fe572c",
+      "physical_lines": 450
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "physical_lines": 179
+    },
+    {
+      "path": "tests/discovery_runtime/test_configuration.py",
+      "sha256": "2f753f49d9e53df620b12e1a54f254632e5cdfa069cd2690d26c53b8ad4f5565",
+      "physical_lines": 329
+    },
+    {
+      "path": "tests/discovery_runtime/test_activation_store.py",
+      "sha256": "1529f379924ca5bff42379caaad5b1e46d39079ef9a834eb0e39be197f1fee86",
+      "physical_lines": 331
+    },
+    {
+      "path": "tests/discovery_runtime/test_activation_filesystem.py",
+      "sha256": "39ab451a74374a77b09361901f9dbc9cb57d3d64df70effe4c738790c1145c9b",
+      "physical_lines": 111
+    }
+  ],
+  "gates": {
+    "black": "passed",
+    "ruff": "passed; zero findings",
+    "pyright": "full repository passed; zero errors/warnings",
+    "core_tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "65",
+      "time": "32.707",
+      "timestamp": "2026-10-18T10:46:03.701266-04:00",
+      "hostname": "Megalodon4"
+    },
+    "pytest_duration_seconds": 32.74,
+    "runner_duration_seconds": 33.989
+  },
+  "baseline_index": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t3-baseline-index.2026-10-18T14-48.json",
+  "preliminary_coverage": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\activation_filesystem.py": {
+      "covered_lines": 44,
+      "num_statements": 102,
+      "percent_covered": 42.42424242424242,
+      "percent_covered_display": "42",
+      "missing_lines": 58,
+      "excluded_lines": 4,
+      "percent_statements_covered": 43.13725490196079,
+      "percent_statements_covered_display": "43",
+      "num_branches": 30,
+      "num_partial_branches": 0,
+      "covered_branches": 12,
+      "missing_branches": 18,
+      "percent_branches_covered": 40.0,
+      "percent_branches_covered_display": "40"
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\activation_store.py": {
+      "covered_lines": 140,
+      "num_statements": 160,
+      "percent_covered": 83.94495412844037,
+      "percent_covered_display": "84",
+      "missing_lines": 20,
+      "excluded_lines": 13,
+      "percent_statements_covered": 87.5,
+      "percent_statements_covered_display": "88",
+      "num_branches": 58,
+      "num_partial_branches": 11,
+      "covered_branches": 43,
+      "missing_branches": 15,
+      "percent_branches_covered": 74.13793103448276,
+      "percent_branches_covered_display": "74"
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\configuration.py": {
+      "covered_lines": 122,
+      "num_statements": 123,
+      "percent_covered": 98.83040935672514,
+      "percent_covered_display": "99",
+      "missing_lines": 1,
+      "excluded_lines": 3,
+      "percent_statements_covered": 99.1869918699187,
+      "percent_statements_covered_display": "99",
+      "num_branches": 48,
+      "num_partial_branches": 1,
+      "covered_branches": 47,
+      "missing_branches": 1,
+      "percent_branches_covered": 97.91666666666667,
+      "percent_branches_covered_display": "98"
+    }
+  },
+  "coverage_disposition": "Preliminary WIP measurement only. Coverage thresholds and final seven-stage acceptance have not passed.",
+  "prior_preservation": {
+    "paths": 240,
+    "frozen_paths": 24
+  },
+  "race_regressions": [
+    "Tombstone-to-active protected record change rejects inactive selection after the second read.",
+    "Known alternate profile introduced at guarded authorization aborts before revocation or publication."
+  ],
+  "retained_failures": [
+    "WIP1/WIP2 lint findings",
+    "WIP3 three type diagnostics",
+    "WIP4 42 passing cases then oversized generated parameter ID caused Windows setup/teardown errors; fixed by explicit short IDs",
+    "Verifier initial eight-case run: six pass, two race failures; initial harness error separately retained"
+  ],
+  "guarantee": "Trusted host-injected root authorization and revocation, external per-workspace registry, cooperative serialization, optimistic freshness and per-file atomic publication. No kernel digest CAS or multi-file transaction claim. Request/profile/locator values cannot establish native authority.",
+  "pending": [
+    "Complete NativeRegistry memory seam coverage and remaining selection/commit negative and concurrency branches.",
+    "Run final stable seven-stage ordered gate including module/class/function thresholds, reverse-order isolation, compatibility/contracts and native Windows integration.",
+    "Record final raw callable ranges, native operation timing, staged-byte binding and final prior/frozen audit.",
+    "Independent executor acceptance and task checkoff; P3-T4 remains unreleased.",
+    "P11-T5 exhaustive property/mutation inventory remains owned by that later task."
+  ],
+  "operational_processes": "All owned bounded commands have exited; no test/receipt writer remains active.",
+  "review_patch": "No redundant patch generated; exact six new full-file blobs and SHA-256 inventory are the WIP review boundary, per coordinator instruction."
+}
