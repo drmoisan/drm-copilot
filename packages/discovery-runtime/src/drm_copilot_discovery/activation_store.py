@@ -429,8 +429,11 @@ class ActivationStore:
                     raise OSError(
                         "Configuration parent identity changed after publication"
                     )
+                expected_files = dict(candidates)
+                expected_files.update((path, content) for path, content, _ in writes)
                 if self.registry.read() != next_record or any(
-                    self._optional(path) != content for path, content, _ in writes
+                    self._optional(path) != content
+                    for path, content in expected_files.items()
                 ):
                     raise OSError("Configuration changed after publication")
             return ConfigurationResult(
