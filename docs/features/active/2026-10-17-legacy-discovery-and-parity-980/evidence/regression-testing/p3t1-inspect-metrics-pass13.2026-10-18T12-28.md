@@ -1,0 +1,35 @@
+# p3t1-inspect-metrics-pass13
+
+Timestamp: 2026-10-18T12-28
+Command: poetry run python SCRATCH/issue-980-p3t1-inspect-metrics.py
+EXIT_CODE: 0
+Output Summary:     125;   ],;   "targeted_tests_passed": 2; }
+
+Working directory: .
+Started: 2026-10-18T12:28:33.725594+00:00
+Duration seconds: 1.098
+Phase: P3-T1 planned mutations and guarded commits; focused task verification.
+
+## Captured output
+
+```text
+{
+  "scope": "P3-T1 bounded diagnostic; complete task suite still required",
+  "timestamp": "2026-10-18T12:28:34.775618+00:00",
+  "source": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+  "source_sha256": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+  "test": "tests/discovery_runtime/test_mutation_plan.py",
+  "test_sha256": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+  "class": "CapturedWorkspace",
+  "method": "inspect",
+  "start_line": 105,
+  "end_line": 125,
+  "covered_lines": 15,
+  "statements": 16,
+  "line_percent": 93.75,
+  "missing_lines": [
+    125
+  ],
+  "targeted_tests_passed": 2
+}
+```

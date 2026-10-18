@@ -1,0 +1,2787 @@
+diff --git a/packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py
+new file mode 100644
+index 000000000..198a76793
+--- /dev/null
++++ b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py
+@@ -0,0 +1,436 @@
++"""Publish mutations on Windows/Linux through anchored, injectable OS boundaries.
++
++The external workspace lock serializes cooperating authorized writers. Native
++controls must deny analyst writes through other routes. Portable filesystems do
++not offer a digest-conditioned rename against arbitrary same-user processes;
++complete pre/postchecks detect observed external changes and invalidate results.
++No lock is stolen automatically after a crash; root recovery must inspect it.
++"""
++
++from __future__ import annotations
++
++import ctypes
++import os
++import stat
++from contextlib import ExitStack, contextmanager
++from hashlib import sha256
++from pathlib import Path
++from typing import TYPE_CHECKING, Protocol, cast
++from uuid import uuid4
++
++from drm_copilot_discovery.path_models import PathMetadata, relative_path
++
++if TYPE_CHECKING:
++    from collections.abc import Callable, Generator
++    from contextlib import AbstractContextManager
++
++    from drm_copilot_discovery.path_models import PathMetadataReader, ResolvedPath
++
++
++class Directory(Protocol):
++    """Expose only operations anchored to an already checked directory handle."""
++
++    def identity(self) -> str:
++        """Return the opened handle identity, independently of the pathname."""
++        ...
++
++    def child(self, name: str, *, create: bool) -> AbstractContextManager[Directory]:
++        """Open a non-following child, creating it exclusively only when requested."""
++        ...
++
++    def read(self, name: str, *, limit: int) -> bytes:
++        """Read an ordinary anchored file within a finite byte ceiling."""
++        ...
++
++    def stage(self, name: str, content: bytes) -> None:
++        """Exclusively create and flush a staged file, exposing partial errors."""
++        ...
++
++    def publish(self, staged: str, name: str, *, replace: bool) -> None:
++        """Atomically link without overwrite, or replace under the workspace guard."""
++        ...
++
++    def remove(self, name: str) -> None:
++        """Remove only the caller-owned staged name; propagate cleanup failure."""
++        ...
++
++
++class _WindowsCall(Protocol):
++    """Type the two narrow kernel calls without exposing untyped ctypes elsewhere."""
++
++    argtypes: list[object]
++    restype: object
++
++    def __call__(self, *args: object) -> int | None:
++        """Return the native handle/status; errors are checked by its caller."""
++        ...
++
++
++def _ordinary(info: os.stat_result, *, directory: bool) -> None:
++    """Reject links, reparse points and nonordinary entries before any byte access."""
++    expected = stat.S_ISDIR if directory else stat.S_ISREG
++    if not expected(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
++        raise OSError("Mutation paths must be ordinary non-reparse entries")
++
++
++@contextmanager
++def pin_windows_path(
++    path: Path, *, directory: bool
++) -> Generator[os.stat_result, None, None]:
++    """Deny delete sharing so Windows cannot rename/replace an opened ancestor."""
++    _ordinary(os.lstat(path), directory=directory)
++    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
++    opening = cast("_WindowsCall", kernel.CreateFileW)
++    opening.argtypes = [
++        ctypes.c_wchar_p,
++        ctypes.c_uint32,
++        ctypes.c_uint32,
++        ctypes.c_void_p,
++        ctypes.c_uint32,
++        ctypes.c_uint32,
++        ctypes.c_void_p,
++    ]
++    opening.restype = ctypes.c_void_p
++    closing = cast("_WindowsCall", kernel.CloseHandle)
++    closing.argtypes, closing.restype = [ctypes.c_void_p], ctypes.c_int
++    # Read/list access participates in sharing checks; attribute access alone does not.
++    # OPEN_REPARSE_POINT plus no FILE_SHARE_DELETE protects the checked name.
++    handle = opening(str(path), 0x81, 3, None, 3, 0x02200000, None)
++    if handle is None or handle == ctypes.c_void_p(-1).value:
++        raise OSError("Cannot pin Windows mutation path")
++    import msvcrt
++
++    # Transfer ownership to a descriptor so fstat uses the exact retained handle.
++    try:
++        descriptor = msvcrt.open_osfhandle(handle, os.O_RDONLY)
++    except OSError:
++        closing(handle)
++        raise
++    try:
++        _ordinary(os.lstat(path), directory=directory)
++        info = os.fstat(descriptor)
++        _ordinary(info, directory=directory)
++        yield info
++    finally:
++        os.close(descriptor)
++
++
++class NativeDirectory:
++    """Implement anchored primitive calls; POSIX uses dir_fd, Windows pins parents."""
++
++    def __init__(self, path: Path, descriptor: int | None, identity: str) -> None:
++        """Retain a pinned directory for the lifetime of its owning context."""
++        self.path, self.descriptor = path, descriptor
++        self._identity = identity
++
++    def identity(self) -> str:
++        """Expose the stat identity of the retained directory handle."""
++        return self._identity
++
++    def _name(self, name: str) -> str:
++        """
++        Reject multicomponent names before selecting relative or pinned absolute
++        I/O.
++        """
++        if "/" in relative_path(name):
++            raise ValueError("Anchored operation requires an immediate child name")
++        return name if self.descriptor is not None else str(self.path / name)
++
++    @contextmanager
++    def child(self, name: str, *, create: bool) -> Generator[Directory, None, None]:
++        """Keep every ancestor open and exclusively create requested missing parents."""
++        # Only a previously absent parent may be created; existing parents are anchored
++        # as-is.
++        if create:
++            os.mkdir(self._name(name), 0o700, dir_fd=self.descriptor)
++        with open_local_directory(self.path / name, parent=self) as child:
++            yield child
++
++    def read(self, name: str, *, limit: int) -> bytes:
++        """Bound reads and reject file links while all parent handles remain pinned."""
++        with ExitStack() as stack:
++            # Windows needs a retained file handle because its open API has no dir_fd
++            # route.
++            if os.name == "nt":
++                stack.enter_context(pin_windows_path(self.path / name, directory=False))
++            descriptor = os.open(
++                self._name(name),
++                os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0),
++                dir_fd=self.descriptor,
++            )
++            stack.callback(os.close, descriptor)
++            _ordinary(os.fstat(descriptor), directory=False)
++            pieces: list[bytes] = []
++            remaining = limit + 1
++            # A short kernel read is not EOF; consume only the finite allowed budget.
++            while remaining:
++                piece = os.read(descriptor, min(remaining, 65536))
++                if not piece:
++                    break
++                pieces.append(piece)
++                remaining -= len(piece)
++            content = b"".join(pieces)
++            if len(content) > limit:
++                raise OSError("Mutation input exceeds the bounded read limit")
++            return content
++
++    def stage(self, name: str, content: bytes) -> None:
++        """Write every staged byte before flushing; zero/short writes cannot pass."""
++        descriptor = os.open(
++            self._name(name),
++            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
++            0o600,
++            dir_fd=self.descriptor,
++        )
++        try:
++            try:
++                offset = 0
++                # Partial writes are finite progress; zero writes are failures.
++                while offset < len(content):
++                    count = os.write(descriptor, content[offset:])
++                    if count <= 0:
++                        raise OSError("Staged mutation write made no progress")
++                    offset += count
++                os.fsync(descriptor)
++            finally:
++                os.close(descriptor)
++        except OSError:
++            # Only a successfully created stage is ours to clean on failure.
++            self.remove(name)
++            raise
++
++    def publish(self, staged: str, name: str, *, replace: bool) -> None:
++        """
++        Publish within one filesystem; exclusive links never overwrite a collision.
++        """
++        # Replacement consumes its stage; creation uses a link that rejects a colliding
++        # leaf.
++        if replace:
++            os.replace(
++                self._name(staged),
++                self._name(name),
++                src_dir_fd=self.descriptor,
++                dst_dir_fd=self.descriptor,
++            )
++        else:
++            os.link(
++                self._name(staged),
++                self._name(name),
++                src_dir_fd=self.descriptor,
++                dst_dir_fd=self.descriptor,
++                follow_symlinks=False,
++            )
++
++    def remove(self, name: str) -> None:
++        """Remove a known stage and expose failures instead of hiding leaked state."""
++        os.unlink(self._name(name), dir_fd=self.descriptor)
++
++
++@contextmanager
++def open_local_directory(
++    path: Path, *, parent: NativeDirectory | None = None, platform: str | None = None
++) -> Generator[Directory, None, None]:
++    """Anchor directories without following links on the two supported platforms."""
++    selected = platform or os.name
++    # Windows denies deletion sharing; POSIX keeps non-following directory descriptors.
++    if selected == "nt":
++        with pin_windows_path(path, directory=True) as info:
++            yield NativeDirectory(path, None, f"{info.st_dev}:{info.st_ino}")
++    elif selected == "posix":
++        directory_flag = cast("int", getattr(os, "O_DIRECTORY", 0))
++        nofollow_flag = cast("int", getattr(os, "O_NOFOLLOW", 0))
++        if not directory_flag or not nofollow_flag:
++            raise OSError("POSIX mutation directory flags are unavailable")
++        descriptor = os.open(
++            path.name if parent else str(path),
++            os.O_RDONLY | directory_flag | nofollow_flag,
++            dir_fd=parent.descriptor if parent else None,
++        )
++        try:
++            info = os.fstat(descriptor)
++            _ordinary(info, directory=True)
++            yield NativeDirectory(path, descriptor, f"{info.st_dev}:{info.st_ino}")
++        finally:
++            os.close(descriptor)
++    else:
++        raise OSError("Mutation filesystem requires Windows or POSIX directory handles")
++
++
++@contextmanager
++def exclusive_workspace_lock(path: Path) -> Generator[None, None, None]:
++    """Use an externally provisioned canonical lock; never steal a stale lock."""
++    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
++    try:
++        yield
++    finally:
++        os.close(descriptor)
++        os.unlink(path)
++
++
++class LocalMutationPrimitives:
++    """Provide real local publication and memory-only injectable OS seams.
++
++    lock_path is trusted, canonical, external to the workspace and identical for
++    all its mutators. Its parent is provisioned by root; request data cannot set it.
++    Input captures must use metadata/read_bytes below for matching file identities.
++    Inject directory/lock factories only from trusted composition or unit tests.
++    """
++
++    def __init__(
++        self,
++        *,
++        workspace_root: str,
++        lock_path: str,
++        open_directory: Callable[[], AbstractContextManager[Directory]] | None = None,
++        lock: Callable[[], AbstractContextManager[None]] | None = None,
++        metadata: PathMetadataReader | None = None,
++        nonce: Callable[[], str] | None = None,
++        document_bytes: int = 16777216,
++    ) -> None:
++        """
++        Bind canonical trusted paths and injectable capabilities without touching
++        disk.
++        """
++        self.root, self.lock_path = Path(workspace_root), Path(lock_path)
++        if not self.root.is_absolute() or not self.lock_path.is_absolute():
++            raise ValueError("Workspace and external lock paths must be absolute")
++        if self.lock_path == self.root or self.root in self.lock_path.parents:
++            raise ValueError("Mutation lock must be outside the workspace")
++        if not 1 <= document_bytes <= 67108864:
++            raise ValueError(
++                "Document byte limit is outside the supported finite range"
++            )
++        self.document_bytes = document_bytes
++        self._open = open_directory or (lambda: open_local_directory(self.root))
++        self._lock = lock or (lambda: exclusive_workspace_lock(self.lock_path))
++        self._metadata = metadata or self.metadata
++        self._nonce = nonce or (lambda: uuid4().hex)
++        self._guarded = False
++        self._anchors: ExitStack | None = None
++
++    def metadata(self, path: str) -> PathMetadata:
++        """Supply complete ordinary namespace identities to the accepted path policy."""
++        target = self.root if path == "." else self.root / relative_path(path)
++        try:
++            info = os.lstat(target)
++        except FileNotFoundError:
++            return PathMetadata(kind="missing")
++        # Classify links/reparse entries before ordinary types so policy can reject
++        # them.
++        kind = (
++            "symlink"
++            if stat.S_ISLNK(info.st_mode)
++            else (
++                "reparse"
++                if getattr(info, "st_file_attributes", 0) & 0x400
++                else (
++                    "directory"
++                    if stat.S_ISDIR(info.st_mode)
++                    else "file" if stat.S_ISREG(info.st_mode) else "other"
++                )
++            )
++        )
++        children = tuple(sorted(os.listdir(target))) if kind == "directory" else ()
++        return PathMetadata(
++            kind=kind,
++            identity=f"{info.st_dev}:{info.st_ino}",
++            resolved_path=target.as_posix(),
++            children=children,
++        )
++
++    def read_bytes(self, path: str, *, limit: int) -> bytes:
++        """
++        Read bounded snapshot inputs through non-following pinned directory chains.
++        """
++        parts = relative_path(path).split("/")
++        with ExitStack() as stack:
++            directory = stack.enter_context(self._open())
++            # Every parent stays pinned until the final bounded read has completed.
++            for name in parts[:-1]:
++                directory = stack.enter_context(directory.child(name, create=False))
++            return directory.read(parts[-1], limit=limit)
++
++    @contextmanager
++    def guard(self) -> Generator[None, None, None]:
++        """
++        Serialize authorized writes and reject reentry instead of bypassing
++        exclusion.
++        """
++        if self._guarded:
++            raise OSError("Mutation workspace guard is already held")
++        with self._lock(), ExitStack() as anchors:
++            self._guarded = True
++            self._anchors = anchors
++            try:
++                yield
++            finally:
++                self._guarded = False
++                self._anchors = None
++
++    def create_exclusive(self, target: ResolvedPath, content: bytes) -> None:
++        """Publish only to an absent path while retaining all parent anchors."""
++        self._publish(target, content, expected_sha256=None)
++
++    def replace_if_digest(
++        self, target: ResolvedPath, content: bytes, *, expected_sha256: str
++    ) -> None:
++        """
++        Recheck original bytes under exclusion before atomically replacing the file.
++        """
++        self._publish(target, content, expected_sha256=expected_sha256)
++
++    def _publish(
++        self, target: ResolvedPath, content: bytes, *, expected_sha256: str | None
++    ) -> None:
++        """
++        Stage, validate parents/digest, publish once and clean only the owned stage.
++        """
++        if not self._guarded or self._anchors is None or target.grant is None:
++            raise OSError("An active workspace guard and exact grant are required")
++        # Bind opened native handles to the exact stamps checked by the path policy.
++        observations = {item.path: item for item in target.observations}
++        parts = relative_path(target.path).split("/")
++        staged = ".drm-mutation-" + self._nonce()
++        relative_path(staged)
++        with ExitStack() as cleanup:
++            directory = self._anchors.enter_context(self._open())
++            if directory.identity() != observations["."].identity:
++                raise OSError("Opened workspace root identity changed")
++            # Verify original parent identities before opening/creating their anchors.
++            for index, name in enumerate(parts[:-1], 1):
++                path = "/".join(parts[:index])
++                old = observations[path]
++                current = self._metadata(path)
++                if (old.kind, old.identity, old.resolved_path) != (
++                    current.kind,
++                    current.identity,
++                    current.resolved_path,
++                ):
++                    raise OSError("Mutation parent changed before publication")
++                directory = self._anchors.enter_context(
++                    directory.child(name, create=old.kind == "missing")
++                )
++                if old.kind != "missing" and directory.identity() != old.identity:
++                    raise OSError("Opened mutation parent identity changed")
++            # Stage ownership is established by exclusive creation; collisions
++            # propagate.
++            directory.stage(staged, content)
++            cleanup.callback(directory.remove, staged)
++            published = False
++            try:
++                # Creation must not read a foreign target; replacement verifies current
++                # bytes.
++                if expected_sha256 is not None:
++                    original = directory.read(parts[-1], limit=self.document_bytes)
++                    if sha256(original).hexdigest() != expected_sha256:
++                        raise OSError(
++                            "Mutation original digest changed before replacement"
++                        )
++                directory.publish(
++                    staged, parts[-1], replace=expected_sha256 is not None
++                )
++                published = True
++            finally:
++                # Replacement consumes its stage; creation keeps the owned hard link.
++                if published and expected_sha256 is not None:
++                    cleanup.pop_all()
+diff --git a/packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py
+new file mode 100644
+index 000000000..0ca4ad457
+--- /dev/null
++++ b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py
+@@ -0,0 +1,418 @@
++"""Capture and commit planned mutations through explicit trusted I/O contracts.
++
++This module never opens files or launches a process. Native adapters provide
++non-following reads, complete captures, authority invalidation and guarded atomic
++writes. Separate Python checks alone cannot close an operating-system race.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, replace
++from typing import TYPE_CHECKING, Literal, Protocol, cast
++
++from drm_copilot_discovery.findings import Finding
++from drm_copilot_discovery.mutation_plan import (
++    CapturedWorkspace,
++    MutationError,
++    MutationPlan,
++    PlannedWrite,
++    plan_mutation,
++    project_snapshot,
++)
++from drm_copilot_discovery.path_policy import PathPolicy
++from drm_copilot_discovery.snapshot_io import SnapshotIO
++from drm_copilot_discovery.snapshot_loading import load_snapshot
++from drm_copilot_discovery.validation import validate_snapshot
++
++if TYPE_CHECKING:
++    from collections.abc import Callable
++    from contextlib import AbstractContextManager
++
++    from drm_copilot_discovery.catalog import SchemaCatalog
++    from drm_copilot_discovery.path_models import (
++        PathMetadata,
++        PathMetadataReader,
++        ResolvedPath,
++        WriteGrant,
++    )
++    from drm_copilot_discovery.repository_reader import RepositoryReader
++    from drm_copilot_discovery.snapshot_io import WorkspaceBytes
++    from drm_copilot_discovery.validation import SnapshotValidation
++
++
++def capture_workspace(
++    *,
++    workspace_root: str,
++    profile_path: str,
++    metadata: PathMetadataReader,
++    read_bytes: WorkspaceBytes,
++    catalog: SchemaCatalog,
++    repository: RepositoryReader | None = None,
++) -> CapturedWorkspace:
++    """Capture complete bytes and stable non-following metadata through the loader.
++
++    Each call is fresh. Readers are injected; errors propagate before any mutation.
++    The catalog must be the trusted unextended core catalog accepted by the loader.
++    """
++    observed: dict[str, PathMetadata] = {}
++
++    def inspect(path: str) -> PathMetadata:
++        """Record stable directory/file identities while the loader checks reads."""
++        value = metadata(path)
++        value = replace(value, children=tuple(sorted(value.children)))
++        if observed.setdefault(path, value) != value:
++            raise OSError("Metadata changed during workspace capture")
++        return value
++
++    snapshot = load_snapshot(
++        io=SnapshotIO(
++            workspace_root=workspace_root, metadata=inspect, read_bytes=read_bytes
++        ),
++        profile_path=profile_path,
++        repository=repository,
++        catalog=catalog,
++    )
++    return CapturedWorkspace(
++        workspace_root=workspace_root,
++        snapshot=snapshot,
++        metadata=tuple(observed.items()),
++    )
++
++
++class MutationWriter(Protocol):
++    """Supply a trusted local boundary; clients cannot provide implementations.
++
++    atomic_write must guard the entire expected input set and metadata together
++    with path revalidation and the write: exclusive create when original digest
++    is null, otherwise digest-matched atomic replacement. Reject links and newly
++    colliding entries, create missing parents exclusively, and preserve unrelated
++    bytes. No unchecked ordinary overwrite is a conforming implementation.
++    An OSError may follow an uncertain commit; the result reports that explicitly.
++    """
++
++    def capture(self) -> CapturedWorkspace:
++        """Return a fresh complete capture, with no persistent read cache."""
++        ...
++
++    def invalidate_authority(self) -> None:
++        """Revoke existing completion authority before any attempted artifact write.
++
++        Raise OSError on failure; no write may proceed after that failure.
++        """
++        ...
++
++    def atomic_write(self, write: PlannedWrite, *, expected: CapturedWorkspace) -> None:
++        """Check complete expected state under the write guard, then commit one file."""
++        ...
++
++
++class MutationPrimitives(Protocol):
++    """Provide guarded non-following publication; unavailable guarantees fail closed.
++
++    The workspace guard serializes every authorized mutator. Native enforcement
++    must deny analysts other mutation routes. Primitives anchor parent handles,
++    exclusively create missing parents and atomically publish complete bytes.
++    """
++
++    def guard(self) -> AbstractContextManager[None]:
++        """Exclude authorized workspace mutations until context exit."""
++        ...
++
++    def create_exclusive(self, target: ResolvedPath, content: bytes) -> None:
++        """Publish a new file without replacing any existing entry."""
++        ...
++
++    def replace_if_digest(
++        self, target: ResolvedPath, content: bytes, *, expected_sha256: str
++    ) -> None:
++        """Atomically replace only bytes matching the guarded original digest."""
++        ...
++
++
++class GuardedMutationWriter:
++    """Own complete-state/CAS sequencing; the service only wires its collaborators."""
++
++    def __init__(
++        self,
++        *,
++        capture: Callable[[], CapturedWorkspace],
++        invalidate_authority: Callable[[], None],
++        primitives: MutationPrimitives,
++    ) -> None:
++        """Bind trusted I/O without performing reads or acquiring permission."""
++        self._capture = capture
++        self._invalidate = invalidate_authority
++        self._primitives = primitives
++
++    def capture(self) -> CapturedWorkspace:
++        """Reload all relevant bytes and identities for this operation."""
++        return self._capture()
++
++    def invalidate_authority(self) -> None:
++        """Revoke prior receipts through the separately protected native store."""
++        self._invalidate()
++
++    def atomic_write(self, write: PlannedWrite, *, expected: CapturedWorkspace) -> None:
++        """Check complete state and target under exclusion, then publish once."""
++        with self._primitives.guard():
++            current = self.capture()
++            _same_state(expected, current)
++            PathPolicy(
++                current.snapshot.profile,
++                workspace_root=current.workspace_root,
++                metadata=current.inspect,
++            ).revalidate_write(write.target)
++            # Compare the original bytes inside exclusion before selecting a primitive.
++            prior = next(
++                (
++                    item
++                    for item in current.snapshot.manifest.files
++                    if item.path == write.change.path
++                ),
++                None,
++            )
++            digest = prior.sha256 if prior is not None else None
++            if digest != write.change.expected_sha256:
++                raise MutationError("MUTATION_PRECONDITION", "Guarded original differs")
++            # Absence permits only exclusive creation; existing bytes require
++            # replacement CAS.
++            if digest is None:
++                self._primitives.create_exclusive(write.target, write.change.content)
++            else:
++                self._primitives.replace_if_digest(
++                    write.target,
++                    write.change.content,
++                    expected_sha256=digest,
++                )
++            _after_write(current, self.capture(), write)
++
++
++@dataclass(frozen=True, kw_only=True)
++class MutationArtifact:
++    """Report an exact output and its operation disposition, never authority."""
++
++    path: str
++    artifact_kind: str
++    artifact_id: str
++    sha256: str
++    status: Literal["planned", "created", "updated", "skipped", "conflict"]
++
++
++@dataclass(frozen=True, kw_only=True)
++class MutationResult:
++    """Report complete or bounded partial execution without minting a receipt.
++
++    On a failed write, uncertain_paths identifies the attempted file and possible
++    newly created parents. Prior successful outputs remain explicit. Callers must
++    reload after any failure; even ok results require separate native validation.
++    """
++
++    ok: bool
++    artifacts: tuple[MutationArtifact, ...]
++    findings: tuple[Finding, ...]
++    validation: SnapshotValidation
++    authority_invalidated: bool
++    uncertain_paths: tuple[str, ...] = ()
++
++
++def _artifact(
++    write: PlannedWrite,
++    status: Literal["planned", "created", "updated", "skipped", "conflict"],
++) -> MutationArtifact:
++    """Project exact intended bytes and a status; perform no external operation."""
++    from hashlib import sha256
++
++    value = write.change
++    return MutationArtifact(
++        path=value.path,
++        artifact_kind=value.artifact_kind,
++        artifact_id=value.artifact_id,
++        sha256=sha256(value.content).hexdigest(),
++        status=status,
++    )
++
++
++def _same_state(expected: CapturedWorkspace, current: CapturedWorkspace) -> None:
++    """Reject changed hashes, complete input sets, pins and metadata identities."""
++    if (
++        current.workspace_root != expected.workspace_root
++        or current.snapshot.sha256 != expected.snapshot.sha256
++        or current.metadata != expected.metadata
++    ):
++        raise MutationError("MUTATION_STALE", "Complete input state changed; reload")
++
++
++def _after_write(
++    expected: CapturedWorkspace, current: CapturedWorkspace, write: PlannedWrite
++) -> None:
++    """Accept only the committed file and its exclusively created parents as effects."""
++    projected = project_snapshot(expected, (write.change,))
++    if (
++        current.workspace_root != expected.workspace_root
++        or current.snapshot.sha256 != projected.sha256
++    ):
++        raise MutationError(
++            "MUTATION_POSTCONDITION", "Committed input bytes differ from the plan"
++        )
++    path = write.change.path
++    # Existing ancestors and unrelated files must retain their physical identities.
++    for name, old in expected.metadata:
++        new = current.inspect(name)
++        if name == path or old.kind == "missing" and path.startswith(name + "/"):
++            continue
++        if (old.kind, old.identity, old.resolved_path) != (
++            new.kind,
++            new.identity,
++            new.resolved_path,
++        ):
++            raise MutationError(
++                "MUTATION_POSTCONDITION", "An unrelated input identity changed"
++            )
++    # Reusing the path policy rejects links/aliases even in newly created parents.
++    PathPolicy(
++        current.snapshot.profile,
++        workspace_root=current.workspace_root,
++        metadata=current.inspect,
++    ).resolve_write(path, grant=cast("WriteGrant", write.target.grant))
++
++
++def commit_mutation(
++    plan: MutationPlan, *, writer: MutationWriter, dry_run: bool = False
++) -> MutationResult:
++    """Recheck a plan and apply deterministic guarded writes, stopping at first failure.
++
++    Dry-run performs fresh reads but no writes, directory creation or invalidation.
++    Invalid/reconstructed plans raise before I/O. Operational failures return one
++    actionable finding, prior completed outputs and explicit uncertain paths.
++    """
++    # Reconstruction revalidates every requested byte instead of trusting result flags.
++    rebuilt = plan_mutation(
++        plan.baseline,
++        tuple(write.change for write in plan.writes),
++        grants=plan.grants,
++        invocation=plan.invocation,
++    )
++    if (
++        rebuilt.writes != plan.writes
++        or rebuilt.prospective.sha256 != plan.prospective.sha256
++        or rebuilt.prospective.artifacts != plan.prospective.artifacts
++        or rebuilt.validation != plan.validation
++    ):
++        raise MutationError(
++            "MUTATION_PLAN", "Plan fields differ from their validated reconstruction"
++        )
++    outputs: list[MutationArtifact] = []
++    revoked = False
++    attempted: PlannedWrite | None = None
++    expected = plan.baseline
++    try:
++        _same_state(expected, writer.capture())
++        # Dry-run reports intended dispositions without invalidating current authority.
++        if dry_run:
++            # Preserve canonical output order so repeated dry-runs compare identically.
++            return MutationResult(
++                ok=True,
++                artifacts=tuple(
++                    _artifact(write, "skipped" if write.skipped else "planned")
++                    for write in plan.writes
++                ),
++                findings=(),
++                validation=plan.validation,
++                authority_invalidated=False,
++            )
++        # Stop on the first failed guard/write; do not roll back over concurrent edits.
++        for write in plan.writes:
++            _same_state(expected, writer.capture())
++            # Same bytes require no publication but still require the complete freshness
++            # check.
++            if write.skipped:
++                outputs.append(_artifact(write, "skipped"))
++                continue
++            # Revoke once before the first attempted write, including later partial
++            # failure.
++            if not revoked:
++                writer.invalidate_authority()
++                revoked = True
++            policy = PathPolicy(
++                expected.snapshot.profile,
++                workspace_root=expected.workspace_root,
++                metadata=writer.capture().inspect,
++            )
++            target = policy.resolve_write(
++                write.change.path, grant=cast("WriteGrant", write.target.grant)
++            )
++            # The adapter repeats complete freshness and these path checks atomically.
++            current_write = PlannedWrite(
++                change=write.change, target=target, skipped=False
++            )
++            attempted = current_write
++            writer.atomic_write(current_write, expected=expected)
++            current = writer.capture()
++            _after_write(expected, current, current_write)
++            expected = current
++            outputs.append(
++                _artifact(
++                    write,
++                    "created" if write.change.expected_sha256 is None else "updated",
++                )
++            )
++            attempted = None
++        _same_state(expected, writer.capture())
++        checked = validate_snapshot(
++            expected.snapshot, mode=plan.validation.mode, invocation=plan.invocation
++        )
++        if not checked.ok or expected.snapshot.sha256 != plan.prospective.sha256:
++            raise MutationError(
++                "MUTATION_POSTCONDITION",
++                "Final committed graph differs from the validated plan",
++            )
++        return MutationResult(
++            ok=True,
++            artifacts=tuple(outputs),
++            findings=(),
++            validation=checked,
++            authority_invalidated=revoked,
++        )
++    except (OSError, ValueError) as error:
++        # Stale state revokes old authority; failed revocation remains visible.
++        if not dry_run and not revoked:
++            try:
++                writer.invalidate_authority()
++                revoked = True
++            except OSError as invalidation_error:
++                error = OSError(
++                    f"{error}; authority invalidation failed: {invalidation_error}"
++                )
++        uncertain: tuple[str, ...] = ()
++        if attempted is not None:
++            # Report the file and every possibly created ancestor, retaining prior
++            # successes.
++            uncertain = tuple(
++                sorted(
++                    {
++                        attempted.change.path,
++                        *(
++                            stamp.path
++                            for stamp in attempted.target.observations
++                            if stamp.kind == "missing"
++                        ),
++                    }
++                )
++            )
++            outputs.append(_artifact(attempted, "conflict"))
++        finding = Finding(
++            code="MUTATION_FAILED",
++            message=str(error),
++            next_action=(
++                "Reload all inputs, inspect partial/uncertain paths, "
++                "and revalidate before retrying."
++            ),
++        )
++        return MutationResult(
++            ok=False,
++            artifacts=tuple(outputs),
++            findings=(finding,),
++            validation=plan.validation,
++            authority_invalidated=revoked,
++            uncertain_paths=uncertain,
++        )
+diff --git a/packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py
+new file mode 100644
+index 000000000..9f4f634cc
+--- /dev/null
++++ b/packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py
+@@ -0,0 +1,386 @@
++"""Plan exact artifact mutations over captured bytes without filesystem writes.
++
++Callers authenticate principals/grants before this boundary. The immutable values
++below cannot mint native authority. The accepted loader and validator determine
++the prospective graph; the overlay only supplies bytes and directory metadata.
++"""
++
++from __future__ import annotations
++
++import re
++from dataclasses import dataclass, replace
++from pathlib import PurePosixPath, PureWindowsPath
++from typing import TYPE_CHECKING, cast
++
++from drm_copilot_discovery.agent_output import REPORT_KINDS
++from drm_copilot_discovery.catalog import SchemaCatalog
++from drm_copilot_discovery.path_models import (
++    PathMetadata,
++    WriteGrant,
++    check_path_collisions,
++    relative_path,
++)
++from drm_copilot_discovery.path_policy import PathPolicy
++from drm_copilot_discovery.snapshot_io import SnapshotIO
++from drm_copilot_discovery.snapshot_loading import load_snapshot
++from drm_copilot_discovery.validation import validate_snapshot
++
++if TYPE_CHECKING:
++    from drm_copilot_discovery.agent_output import InvocationContext
++    from drm_copilot_discovery.findings import Finding
++    from drm_copilot_discovery.path_models import ResolvedPath
++    from drm_copilot_discovery.repository_reader import (
++        RepositoryFile,
++        RepositoryIdentity,
++    )
++    from drm_copilot_discovery.snapshot import DiscoverySnapshot
++    from drm_copilot_discovery.validation import SnapshotValidation
++
++
++class MutationError(ValueError):
++    """Retain a stable failure code and original validation findings; perform no I/O."""
++
++    def __init__(
++        self, code: str, message: str, *, findings: tuple[Finding, ...] = ()
++    ) -> None:
++        """Expose actionable errors without converting them into write permission."""
++        self.code, self.findings = code, findings
++        super().__init__(f"{code}: {message}")
++
++
++@dataclass(frozen=True, kw_only=True)
++class MutationChange:
++    """Request immutable whole-document bytes under one exact original precondition.
++
++    A null expected_sha256 requires absence; equal bytes become a skipped write.
++    Identity fields are requests, never grants. No deletion or patch is supported.
++    """
++
++    artifact_kind: str
++    artifact_id: str
++    path: str
++    content: bytes
++    expected_sha256: str | None
++
++    def __post_init__(self) -> None:
++        """Reject unsafe identities, mutable content and malformed original digests."""
++        WriteGrant(
++            artifact_kind=self.artifact_kind,
++            artifact_id=self.artifact_id,
++            path=self.path,
++        )
++        if not isinstance(cast("object", self.content), bytes):
++            raise ValueError("Mutation content must be immutable bytes")
++        if (
++            self.expected_sha256 is not None
++            and re.fullmatch(r"[0-9a-f]{64}", self.expected_sha256) is None
++        ):
++            raise ValueError("Expected SHA-256 must be lowercase hexadecimal or null")
++
++
++@dataclass(frozen=True, kw_only=True)
++class CapturedWorkspace:
++    """Bind a complete snapshot to non-following metadata captured during its load.
++
++    Construct with capture_workspace. Complete child lists allow absent proposed
++    paths to be resolved without new reads. No persisted cache or authority exists.
++    """
++
++    workspace_root: str
++    snapshot: DiscoverySnapshot
++    metadata: tuple[tuple[str, PathMetadata], ...]
++
++    def __post_init__(self) -> None:
++        """Detach metadata and reject ambiguous capture keys or an absent root."""
++        entries = tuple(sorted(self.metadata))
++        # A complete capture has one authoritative observation for each path.
++        if len({path for path, _ in entries}) != len(entries) or not any(
++            path == "." for path, _ in entries
++        ):
++            raise ValueError(
++                "Captured metadata requires unique paths and a workspace root"
++            )
++        object.__setattr__(self, "metadata", entries)
++
++    def inspect(self, path: str) -> PathMetadata:
++        """Read captured metadata or prove absence from its complete parent listing.
++
++        Raise OSError for uncaptured existing entries; never invent their identity.
++        """
++        entries = dict(self.metadata)
++        if path in entries:
++            return entries[path]
++        parts = relative_path(path).split("/")
++        # Walk complete captured namespaces until absence is established.
++        for index, name in enumerate(parts):
++            parent = entries.get("/".join(parts[:index]) or ".")
++            if parent is None or parent.kind == "missing":
++                return PathMetadata(kind="missing")
++            if parent.kind != "directory":
++                raise OSError("An input ancestor is not a directory")
++            if name not in parent.children:
++                return PathMetadata(kind="missing")
++            if "/".join(parts[: index + 1]) not in entries:
++                raise OSError("Existing input metadata was not captured")
++        raise OSError("Input metadata is incomplete")
++
++
++@dataclass(frozen=True, kw_only=True)
++class PlannedWrite:
++    """Bind one checked request to its observed target and unchanged-byte status."""
++
++    change: MutationChange
++    target: ResolvedPath
++    skipped: bool
++
++
++@dataclass(frozen=True, kw_only=True)
++class MutationPlan:
++    """Keep a validated prospective graph and exact original capture for commit.
++
++    Plans are internal Python values, not trusted serialized client input. Commit
++    rebuilds this value before using it and authenticating the adapter separately.
++    """
++
++    baseline: CapturedWorkspace
++    writes: tuple[PlannedWrite, ...]
++    grants: tuple[WriteGrant, ...]
++    prospective: DiscoverySnapshot
++    validation: SnapshotValidation
++    invocation: InvocationContext | None = None
++
++
++class _PinnedReader:
++    """Replay captured Git objects without any new repository/process access."""
++
++    def __init__(
++        self, snapshot: DiscoverySnapshot, checkout: RepositoryIdentity
++    ) -> None:
++        """Retain only immutable previously inspected repository bytes."""
++        self.snapshot = snapshot
++        self.checkout = checkout
++
++    def identity(self) -> RepositoryIdentity:
++        """Return the captured checkout without discovering another repository."""
++        return self.checkout
++
++    def read_file(self, *, revision: str, path: str, limit: int) -> RepositoryFile:
++        """Return an exactly pinned captured blob or require a new complete capture."""
++        # A new reference cannot introduce an uninspected Git object during planning.
++        for item in self.snapshot.repository_files:
++            if item.path == path and item.repository.revision == revision:
++                if len(item.content) > limit:
++                    raise OSError("Captured Git object exceeds the read limit")
++                return item
++        raise OSError("Pinned object was not captured; reload the requested inputs")
++
++
++class _Overlay:
++    """Supply a transient byte/metadata overlay to the existing complete loader.
++
++    It creates no files and interprets no artifact semantics. Synthetic identities
++    describe projected new paths only and must never be used as native stamps.
++    """
++
++    def __init__(
++        self, baseline: CapturedWorkspace, changes: tuple[MutationChange, ...]
++    ) -> None:
++        """Copy captured values and overlay exact requested files plus their parents."""
++        self.baseline = baseline
++        self.entries = dict(baseline.metadata)
++        # Reuse exactly the captured bytes; a projection cannot discover new inputs.
++        self.files = {
++            item.path: item.content for item in baseline.snapshot.manifest.files
++        }
++        # Preserve the caller's path model without consulting the native filesystem.
++        root = (
++            PureWindowsPath(baseline.workspace_root)
++            if ":" in baseline.workspace_root
++            or baseline.workspace_root.startswith("\\\\")
++            else PurePosixPath(baseline.workspace_root)
++        )
++        # Add only ancestors of checked output paths; leave every other entry intact.
++        for change in changes:
++            parts = change.path.split("/")
++            # Materialize only absent ancestors needed by this particular output.
++            for length, name in enumerate(parts, 1):
++                parent = "/".join(parts[: length - 1]) or "."
++                path = "/".join(parts[:length])
++                entry = self.entries[parent]
++                self.entries[parent] = replace(
++                    entry, children=tuple(sorted(set((*entry.children, name))))
++                )
++                prior = self.entries.get(path, PathMetadata(kind="missing"))
++                # Existing identities are retained; only projected additions are
++                # synthetic.
++                if prior.kind == "missing":
++                    self.entries[path] = PathMetadata(
++                        kind="file" if length == len(parts) else "directory",
++                        identity="projected:" + path,
++                        resolved_path=root.joinpath(*parts[:length]).as_posix(),
++                    )
++            self.files[change.path] = change.content
++
++    def inspect(self, path: str) -> PathMetadata:
++        """Read projected metadata, retaining captured absence for other paths."""
++        return self.entries.get(path) or self.baseline.inspect(path)
++
++    def read(self, path: str, *, limit: int) -> bytes:
++        """Return only captured/proposed bytes within the loader's finite ceiling."""
++        if path not in self.files or len(self.files[path]) > limit:
++            raise OSError("Input is uncaptured or exceeds its byte limit")
++        return self.files[path]
++
++
++def project_snapshot(
++    baseline: CapturedWorkspace, changes: tuple[MutationChange, ...]
++) -> DiscoverySnapshot:
++    """Load complete proposed inputs from memory with the authoritative classifier.
++
++    No disk, process or network access occurs. Loader errors propagate; findings
++    remain in the result for validation. This helper does not authorize changes.
++    """
++    overlay = _Overlay(baseline, changes)
++    original = baseline.snapshot
++    # Rebuild extension bindings through the accepted loader while replaying pinned
++    # bytes.
++    return load_snapshot(
++        io=SnapshotIO(
++            workspace_root=baseline.workspace_root,
++            metadata=overlay.inspect,
++            read_bytes=overlay.read,
++            max_entries=original.profile.limits.source_files,
++            max_depth=original.profile.limits.nesting_depth,
++        ),
++        profile_path=original.profile.artifacts["profile"],
++        repository=(
++            _PinnedReader(original, original.checkout)
++            if original.checkout is not None
++            else None
++        ),
++        catalog=(
++            SchemaCatalog(documents=original.catalog.documents)
++            if original.catalog.extensions
++            else original.catalog
++        ),
++    )
++
++
++def plan_mutation(
++    baseline: CapturedWorkspace,
++    changes: tuple[MutationChange, ...],
++    *,
++    grants: tuple[WriteGrant, ...],
++    invocation: InvocationContext | None = None,
++) -> MutationPlan:
++    """Validate all prospective bytes before returning an immutable commit plan.
++
++    Grants and optional native invocation must be authenticated by the caller.
++    Absence of invocation is the explicit local-user/root route, not an analyst
++    fallback. Invalid requests raise MutationError/ValueError/OSError; no writes
++    or authority-store operations occur, including during repeated dry runs.
++    """
++    if not changes or len(changes) > baseline.snapshot.profile.limits.artifact_records:
++        raise MutationError("MUTATION_LIMIT", "Provide a bounded nonempty change set")
++    changes = tuple(sorted(changes, key=lambda item: item.path))
++    # Reject platform aliases before mapping exact requested identities to grants.
++    check_path_collisions(item.path for item in changes)
++    # Grants also require unique paths; dictionary insertion must not discard authority.
++    check_path_collisions(grant.path for grant in grants)
++    # Index authenticated capabilities independently from caller-proposed changes.
++    permitted = {grant.path: grant for grant in grants}
++    # Original bytes and parsed identities remain separate preconditions.
++    files = {item.path: item for item in baseline.snapshot.manifest.files}
++    # Imported artifact identities cannot be overwritten as locally authored records.
++    originals = {item.path: item for item in baseline.snapshot.artifacts}
++    policy = PathPolicy(
++        baseline.snapshot.profile,
++        workspace_root=baseline.workspace_root,
++        metadata=baseline.inspect,
++    )
++    if invocation is not None and (
++        invocation.baseline.sha256 != baseline.snapshot.sha256
++        or invocation.workspace.get("workspace_root") != baseline.workspace_root
++    ):
++        raise MutationError("MUTATION_CONTEXT", "Invocation baseline/workspace differs")
++    writes: list[PlannedWrite] = []
++    # Exact trusted grants and original-byte preconditions precede any projection.
++    for change in changes:
++        grant = permitted.get(change.path)
++        if grant is None or grant != WriteGrant(
++            artifact_kind=change.artifact_kind,
++            artifact_id=change.artifact_id,
++            path=change.path,
++        ):
++            raise MutationError("MUTATION_GRANT", "No exact kind/ID/path write grant")
++        prior = files.get(change.path)
++        if change.expected_sha256 != (prior.sha256 if prior else None):
++            raise MutationError(
++                "MUTATION_PRECONDITION", "Original content digest differs"
++            )
++        original = originals.get(change.path)
++        if original is not None and (
++            original.expected_kind != change.artifact_kind
++            or original.origin_path is not None
++            or original.document is not None
++            and original.document.get("id") != change.artifact_id
++        ):
++            raise MutationError(
++                "MUTATION_IDENTITY", "Existing artifact identity differs"
++            )
++        if len(change.content) > baseline.snapshot.profile.limits.document_bytes:
++            raise MutationError(
++                "MUTATION_LIMIT", "Proposed content exceeds document limit"
++            )
++        writes.append(
++            PlannedWrite(
++                change=change,
++                target=policy.resolve_write(change.path, grant=grant),
++                skipped=prior is not None and prior.content == change.content,
++            )
++        )
++    prospective = project_snapshot(baseline, changes)
++    # Only loader-classified artifacts establish the proposed structured identities.
++    artifacts = {item.path: item for item in prospective.artifacts}
++    # Loader-derived kinds and document IDs must agree with granted output identities.
++    for change in changes:
++        artifact = artifacts.get(change.path)
++        opaque = (
++            change.artifact_kind == "evidence-payload"
++            and prospective.file(change.path).category == "evidence"
++            or change.artifact_kind == "acceptance-view"
++            and change.path.endswith((".md", ".feature"))
++        )
++        # A Markdown report view must name the same kind/ID as its structured peer.
++        if change.artifact_kind in REPORT_KINDS and change.path.endswith(".md"):
++            artifact = artifacts.get(change.path[:-3] + ".json")
++        if artifact is None and opaque:
++            continue
++        if (
++            artifact is None
++            or artifact.expected_kind != change.artifact_kind
++            or artifact.document is None
++            or artifact.document.get("id") != change.artifact_id
++        ):
++            raise MutationError(
++                "MUTATION_IDENTITY", "Proposed artifact kind/ID differs"
++            )
++    validation = validate_snapshot(
++        prospective,
++        mode="agent-output" if invocation else "structural",
++        invocation=invocation,
++    )
++    if not validation.ok:
++        raise MutationError(
++            "MUTATION_INVALID",
++            "Prospective graph is invalid",
++            findings=validation.findings,
++        )
++    return MutationPlan(
++        baseline=baseline,
++        writes=tuple(writes),
++        grants=tuple(grants),
++        prospective=prospective,
++        validation=validation,
++        invocation=invocation,
++    )
+diff --git a/tests/discovery_runtime/mutation_test_support.py b/tests/discovery_runtime/mutation_test_support.py
+new file mode 100644
+index 000000000..322118bba
+--- /dev/null
++++ b/tests/discovery_runtime/mutation_test_support.py
+@@ -0,0 +1,294 @@
++"""Supply immutable schemas and fresh memory stores for mutation behavior tests."""
++
++from __future__ import annotations
++
++import json
++import os
++from contextlib import contextmanager
++from dataclasses import replace
++from typing import TYPE_CHECKING, TypeVar, cast
++
++import pytest
++from drm_copilot_discovery.agent_output import required_output_digest
++from drm_copilot_discovery.catalog import load_catalog
++from drm_copilot_discovery.models import to_plain_value
++from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
++from drm_copilot_discovery.mutation_io import capture_workspace
++from drm_copilot_discovery.mutation_plan import (
++    CapturedWorkspace,
++    MutationChange,
++    project_snapshot,
++)
++from drm_copilot_discovery.path_models import PathStamp, ResolvedPath, WriteGrant
++
++from tests.discovery_runtime.test_references import immutable
++from tests.discovery_runtime.test_snapshot_io import (
++    PROFILE_PATH,
++    MemoryStore,
++    memory_workspace,
++)
++from tests.discovery_runtime.validation_test_support import output_context
++from tests.schemas.discovery.v2_schema_test_support import as_object, load_fixture
++
++if TYPE_CHECKING:
++    from collections.abc import Callable, Generator
++
++    from drm_copilot_discovery.agent_output import InvocationContext
++    from drm_copilot_discovery.catalog import SchemaCatalog
++    from drm_copilot_discovery.mutation_filesystem import Directory
++
++
++Value = TypeVar("Value")
++
++
++def constant(value: Value) -> Callable[..., Value]:
++    """Return a typed inert kernel stub without unknown lambda parameters."""
++
++    def result(*args: object, **kwargs: object) -> Value:
++        """Return only the fixed test-local value supplied by its owner."""
++        return value
++
++    return result
++
++
++@pytest.fixture(scope="module")
++def mutation_catalog() -> SchemaCatalog:
++    """Share only immutable schemas; every graph and memory store remains local."""
++    return load_catalog()
++
++
++def capture(store: MemoryStore, catalog: SchemaCatalog) -> CapturedWorkspace:
++    """Capture an isolated memory filesystem through the actual runtime loader."""
++    return capture_workspace(
++        workspace_root=store.metadata.root.as_posix(),
++        profile_path=PROFILE_PATH,
++        metadata=store.metadata,
++        read_bytes=store.read,
++        catalog=catalog,
++    )
++
++
++def mutation_case(catalog: SchemaCatalog) -> tuple[MemoryStore, CapturedWorkspace]:
++    """Create an honestly incomplete source workspace without fabricated source pins."""
++    store, document = memory_workspace()
++    document["profile_state"] = "draft"
++    as_object(document["repository"])["revision"] = None
++    store.put(PROFILE_PATH, json.dumps(document).encode())
++    return store, capture(store, catalog)
++
++
++def collection_change(
++    baseline: CapturedWorkspace,
++    *,
++    decisions: bool = False,
++    identifier: str = "questions",
++) -> MutationChange:
++    """Create a schema-valid empty collection with its exact captured precondition."""
++    kind = (
++        "product-decision-collection"
++        if decisions
++        else "unspecified-behavior-collection"
++    )
++    path = baseline.snapshot.profile.artifacts[
++        "product_decisions" if decisions else "unspecified_behaviors"
++    ]
++    value = load_fixture(kind)
++    value.update(id=identifier, records=[])
++    # Updates bind the exact prior bytes, while new outputs carry an absence
++    # precondition.
++    previous = next(
++        (file for file in baseline.snapshot.manifest.files if file.path == path), None
++    )
++    return MutationChange(
++        artifact_kind=kind,
++        artifact_id=identifier,
++        path=path,
++        content=json.dumps(value).encode(),
++        expected_sha256=previous.sha256 if previous else None,
++    )
++
++
++def grants_for(*changes: MutationChange) -> tuple[WriteGrant, ...]:
++    """Model exact caller-authenticated grants without creating native authority."""
++    # Keep kind, ID and path together so fixtures cannot accidentally widen grants.
++    return tuple(
++        WriteGrant(
++            artifact_kind=change.artifact_kind,
++            artifact_id=change.artifact_id,
++            path=change.path,
++        )
++        for change in changes
++    )
++
++
++def role_plan(
++    baseline: CapturedWorkspace, *, role: str = "legacy-parity-analyst"
++) -> tuple[tuple[MutationChange, ...], InvocationContext]:
++    """Bind a local proposed collection and its exact manifest to separate context."""
++    change = collection_change(baseline)
++    projected = project_snapshot(baseline, (change,))
++    # Bind the manifest to the actual loader-classified proposed output.
++    output = next(item for item in projected.artifacts if item.path == change.path)
++    helper = replace(
++        baseline.snapshot,
++        manifest=replace(baseline.snapshot.manifest, missing_paths=()),
++    )
++    _, context = output_context(helper, role, outputs=(output,))
++    manifest = as_object(to_plain_value(context.required_outputs))
++    workspace = as_object(manifest["workspace"])
++    workspace["workspace_root"] = baseline.workspace_root
++    manifest_path = (
++        baseline.snapshot.profile.artifacts["reports"]
++        + "/required-output-manifest.json"
++    )
++    rows = cast("list[dict[str, object]]", manifest["outputs"])
++    rows[-1]["path"] = manifest_path
++    manifest["manifest_sha256"] = required_output_digest(immutable(manifest))
++    context = replace(
++        context,
++        baseline=baseline.snapshot,
++        workspace=immutable(workspace),
++        required_outputs=immutable(manifest),
++    )
++    control = MutationChange(
++        artifact_kind="required-output-manifest",
++        artifact_id=str(manifest["id"]),
++        path=manifest_path,
++        content=json.dumps(manifest).encode(),
++        expected_sha256=None,
++    )
++    return (change, control), context
++
++
++class MemoryDisk:
++    """Own isolated namespace state, retained handles and an exclusive guard."""
++
++    def __init__(self) -> None:
++        """Use platform-valid synthetic absolute paths without filesystem access."""
++        self.root = "C:/workspace" if os.name == "nt" else "/workspace"
++        self.store = MemoryStore(self.root)
++        self.store.metadata.add("docs", kind="directory")
++        self.held = 0
++        self.locked = False
++        self.before_open: Callable[[str], None] = lambda path: None
++        self.fail_publish = False
++        self.limits: list[int] = []
++
++    @contextmanager
++    def open(self, path: str = ".") -> Generator[Directory, None, None]:
++        """Retain the actual opened identity independently of earlier path metadata."""
++        self.before_open(path)
++        self.held += 1
++        try:
++            yield MemoryDirectory(self, path)
++        finally:
++            self.held -= 1
++
++    @contextmanager
++    def lock(self) -> Generator[None, None, None]:
++        """Make concurrent authorized writers fail rather than share a guard."""
++        if self.locked:
++            raise FileExistsError("workspace busy")
++        self.locked = True
++        try:
++            yield
++        finally:
++            self.locked = False
++
++    def provider(self, *, limit: int = 16777216) -> LocalMutationPrimitives:
++        """Inject only memory kernel seams into the real publication algorithm."""
++        lock = "C:/state/workspace.lock" if os.name == "nt" else "/state/workspace.lock"
++        return LocalMutationPrimitives(
++            workspace_root=self.root,
++            lock_path=lock,
++            open_directory=self.open,
++            lock=self.lock,
++            metadata=self.store.metadata,
++            nonce=lambda: "owned",
++            document_bytes=limit,
++        )
++
++    def target(self, path: str = "docs/output.json") -> ResolvedPath:
++        """Create exact path observations over the current memory namespace."""
++        parts = path.split("/")
++        # Include the root and every parent so handle-substitution probes retain full
++        # context.
++        names = [".", *("/".join(parts[:index]) for index in range(1, len(parts) + 1))]
++        # Detach the original observations before any injected metadata-to-open race.
++        stamps = tuple(
++            PathStamp(
++                path=name,
++                kind=self.store.metadata(name).kind,
++                identity=self.store.metadata(name).identity,
++                resolved_path=self.store.metadata(name).resolved_path,
++            )
++            for name in names
++        )
++        return ResolvedPath(
++            path=path,
++            absolute_path=self.root + "/" + path,
++            observations=stamps,
++            grant=WriteGrant(
++                artifact_kind="feature-contract", artifact_id="feature", path=path
++            ),
++        )
++
++
++class MemoryDirectory:
++    """Represent a retained directory capability over one test-owned memory disk."""
++
++    def __init__(self, disk: MemoryDisk, path: str) -> None:
++        """Capture the handle identity at open, before any later namespace changes."""
++        self.disk, self.path = disk, path
++        self.stamp = str(disk.store.metadata(path).identity)
++
++    def identity(self) -> str:
++        """Return the opened identity rather than reread the pathname."""
++        return self.stamp
++
++    def name(self, name: str) -> str:
++        """Join one child under this test directory without touching native paths."""
++        return name if self.path == "." else self.path + "/" + name
++
++    @contextmanager
++    def child(self, name: str, *, create: bool) -> Generator[Directory, None, None]:
++        """Model exclusive missing-parent creation and retained parent handles."""
++        path = self.name(name)
++        # Existing parents are opened; only proven missing parents may be created.
++        if create:
++            if self.disk.store.metadata(path).kind != "missing":
++                raise FileExistsError(path)
++            self.disk.store.metadata.add(path, kind="directory")
++        with self.disk.open(path) as child:
++            yield child
++
++    def read(self, name: str, *, limit: int) -> bytes:
++        """Apply the real provider's configured limit to exact retained bytes."""
++        self.disk.limits.append(limit)
++        value = self.disk.store.files[self.name(name)]
++        if len(value) > limit:
++            raise OSError("bounded read")
++        return value
++
++    def stage(self, name: str, content: bytes) -> None:
++        """Reject stage collisions so cleanup never owns someone else's file."""
++        path = self.name(name)
++        if path in self.disk.store.files:
++            raise FileExistsError(path)
++        self.disk.store.put(path, content)
++
++    def publish(self, staged: str, name: str, *, replace: bool) -> None:
++        """Model atomic publication while preserving a concurrently created output."""
++        path = self.name(name)
++        if self.disk.fail_publish or not replace and path in self.disk.store.files:
++            raise FileExistsError("publication conflict")
++        self.disk.store.put(path, self.disk.store.files[self.name(staged)])
++        # Atomic replacement consumes its stage; exclusive links retain a cleanup name.
++        if replace:
++            self.remove(staged)
++
++    def remove(self, name: str) -> None:
++        """Remove only the named owned staging file."""
++        path = self.name(name)
++        del self.disk.store.files[path]
++        self.disk.store.metadata.remove(path)
+diff --git a/tests/discovery_runtime/test_mutation_commit.py b/tests/discovery_runtime/test_mutation_commit.py
+new file mode 100644
+index 000000000..39c6aa14c
+--- /dev/null
++++ b/tests/discovery_runtime/test_mutation_commit.py
+@@ -0,0 +1,332 @@
++"""Exercise guarded mutation races and partial failures with memory-only writers."""
++
++from __future__ import annotations
++
++from contextlib import contextmanager
++from dataclasses import replace
++from hashlib import sha256
++from typing import TYPE_CHECKING
++
++import pytest
++from drm_copilot_discovery.mutation_io import GuardedMutationWriter, commit_mutation
++from drm_copilot_discovery.mutation_plan import MutationError, plan_mutation
++
++from tests.discovery_runtime.mutation_test_support import (
++    capture,
++    collection_change,
++    grants_for,
++    mutation_case,
++    role_plan,
++)
++from tests.discovery_runtime.mutation_test_support import (
++    mutation_catalog as mutation_catalog,
++)
++
++if TYPE_CHECKING:
++    from collections.abc import Callable, Generator
++
++    from drm_copilot_discovery.catalog import SchemaCatalog
++    from drm_copilot_discovery.mutation_plan import CapturedWorkspace, PlannedWrite
++    from drm_copilot_discovery.path_models import ResolvedPath
++
++    from tests.discovery_runtime.test_snapshot_io import MemoryStore
++
++
++class MemoryWriter:
++    """Model an atomic guarded adapter with explicit failpoints and local storage.
++
++    Each instance owns its memory store; callbacks simulate races only at named
++    I/O boundaries. No filesystem, process, network or global mutable state exists.
++    """
++
++    def __init__(self, store: MemoryStore, catalog: SchemaCatalog) -> None:
++        """Bind one test store and observable counters/failure controls."""
++        self.store, self.catalog = store, catalog
++        self.attempts = 0
++        self.invalidations = 0
++        self.fail_at = 0
++        self.fail_after = False
++        self.fail_invalidation = False
++        self.before_write: Callable[[], None] | None = None
++        self.after_write: Callable[[], None] | None = None
++
++    def capture(self) -> CapturedWorkspace:
++        """Use actual runtime loading for every before/after complete-state check."""
++        return capture(self.store, self.catalog)
++
++    def invalidate_authority(self) -> None:
++        """Record revocation or an explicit simulated protected-store failure."""
++        self.invalidations += 1
++        if self.fail_invalidation:
++            raise OSError("authority store unavailable")
++
++    def atomic_write(self, write: PlannedWrite, *, expected: CapturedWorkspace) -> None:
++        """Exercise the concrete production safety algorithm over memory primitives."""
++        GuardedMutationWriter(
++            capture=self.capture,
++            invalidate_authority=self.invalidate_authority,
++            primitives=self,
++        ).atomic_write(write, expected=expected)
++
++    @contextmanager
++    def guard(self) -> Generator[None, None, None]:
++        """Inject concurrency immediately before acquiring the modeled guard."""
++        self.attempts += 1
++        if self.before_write is not None:
++            self.before_write()
++        yield
++
++    def create_exclusive(self, target: ResolvedPath, content: bytes) -> None:
++        """Reject existing entries even when their content is identical."""
++        if target.path in self.store.files:
++            raise FileExistsError("atomic creation collision")
++        self._publish(target.path, content)
++
++    def replace_if_digest(
++        self, target: ResolvedPath, content: bytes, *, expected_sha256: str
++    ) -> None:
++        """Model the final digest check inside guarded atomic replacement."""
++        if sha256(self.store.files[target.path]).hexdigest() != expected_sha256:
++            raise FileExistsError("atomic content precondition changed")
++        self._publish(target.path, content)
++
++    def _publish(self, path: str, content: bytes) -> None:
++        """Expose bounded before/after commit failures and unrelated side effects."""
++        if self.attempts == self.fail_at and not self.fail_after:
++            raise OSError("injected write failure")
++        self.store.put(path, content)
++        if self.after_write is not None:
++            self.after_write()
++        if self.attempts == self.fail_at and self.fail_after:
++            raise OSError("injected uncertain acknowledgement")
++
++
++def test_commit_creates_all_outputs_and_preserves_unrelated_bytes(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """A valid role mutation creates a new parent safely and revokes old authority."""
++    store, baseline = mutation_case(mutation_catalog)
++    changes, context = role_plan(baseline)
++    plan = plan_mutation(
++        baseline, changes, grants=grants_for(*changes), invocation=context
++    )
++    before = dict(store.files)
++    writer = MemoryWriter(store, mutation_catalog)
++    boundary = GuardedMutationWriter(
++        capture=writer.capture,
++        invalidate_authority=writer.invalidate_authority,
++        primitives=writer,
++    )
++    result = commit_mutation(plan, writer=boundary)
++    assert result.ok, result.findings
++    assert writer.attempts == 2 and writer.invalidations == 1
++    assert result.authority_invalidated and not result.uncertain_paths
++    # Both exact outputs must be reported, with every unrelated captured byte preserved.
++    assert all(item.status == "created" for item in result.artifacts)
++    # Compare the whole original byte set rather than checking a selected sentinel
++    # alone.
++    assert all(store.files[path] == content for path, content in before.items())
++    assert result.validation.input_sha256 == plan.prospective.sha256
++
++
++def test_digest_matched_replacement_and_unchanged_skip(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """An authored collection can change formatting without changing identity."""
++    store, baseline = mutation_case(mutation_catalog)
++    original = collection_change(baseline)
++    store.put(original.path, original.content)
++    baseline = capture(store, mutation_catalog)
++    change = replace(collection_change(baseline), content=original.content + b"\n")
++    writer = MemoryWriter(store, mutation_catalog)
++    result = commit_mutation(
++        plan_mutation(baseline, (change,), grants=grants_for(change)), writer=writer
++    )
++    assert result.ok and result.artifacts[0].status == "updated"
++    baseline = writer.capture()
++    unchanged = replace(
++        change, expected_sha256=baseline.snapshot.file(change.path).sha256
++    )
++    result = commit_mutation(
++        plan_mutation(baseline, (unchanged,), grants=grants_for(unchanged)),
++        writer=writer,
++    )
++    assert result.ok and result.artifacts[0].status == "skipped"
++    assert writer.attempts == 1 and writer.invalidations == 1
++    assert not result.authority_invalidated
++
++
++def test_repeatable_dry_run_has_no_writes_directories_or_revocations(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Repeated plans return identical projected output without any writable action."""
++    store, baseline = mutation_case(mutation_catalog)
++    changes, context = role_plan(baseline)
++    plan = plan_mutation(
++        baseline, changes, grants=grants_for(*changes), invocation=context
++    )
++    writer = MemoryWriter(store, mutation_catalog)
++    before = (dict(store.files), dict(store.metadata.entries))
++    first = commit_mutation(plan, writer=writer, dry_run=True)
++    second = commit_mutation(plan, writer=writer, dry_run=True)
++    assert first == second and first.ok
++    assert (store.files, store.metadata.entries) == before
++    assert writer.attempts == writer.invalidations == 0
++
++
++@pytest.mark.parametrize(
++    "race", ["bytes", "addition", "deletion", "identity", "parent", "collision"]
++)
++def test_stale_complete_inputs_and_parent_changes_block_before_writes(
++    race: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """The complete read set detects changes beyond the destination's own digest."""
++    store, baseline = mutation_case(mutation_catalog)
++    store.put("docs/migration/notes.md", b"original")
++    baseline = writer_baseline = capture(store, mutation_catalog)
++    change = collection_change(baseline)
++    plan = plan_mutation(baseline, (change,), grants=grants_for(change))
++    # Inject one kind of input drift after planning and before the writer captures
++    # again.
++    if race == "bytes":
++        store.files["docs/migration/notes.md"] = b"changed"
++    elif race == "addition":
++        store.put("docs/migration/added.md", b"added")
++    elif race == "deletion":
++        store.metadata.remove("docs/migration/notes.md")
++        store.files.pop("docs/migration/notes.md")
++    elif race == "identity":
++        entry = store.metadata.entries["docs/migration/notes.md"]
++        store.metadata.entries["docs/migration/notes.md"] = replace(
++            entry, identity="replacement"
++        )
++    elif race == "parent":
++        entry = store.metadata.entries["docs/migration"]
++        store.metadata.entries["docs/migration"] = replace(
++            entry, kind="symlink", children=()
++        )
++    else:
++        store.put(change.path, change.content)
++    before = dict(store.files)
++    writer = MemoryWriter(store, mutation_catalog)
++    result = commit_mutation(plan, writer=writer)
++    assert not result.ok and writer.attempts == 0 and result.authority_invalidated
++    assert (
++        store.files == before
++        and writer_baseline.snapshot.sha256 == plan.baseline.snapshot.sha256
++    )
++
++
++def test_atomic_guard_closes_race_after_python_freshness_check(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """The atomic guard preserves a concurrently created destination."""
++    store, baseline = mutation_case(mutation_catalog)
++    change = collection_change(baseline)
++    writer = MemoryWriter(store, mutation_catalog)
++    writer.before_write = lambda: store.put(change.path, change.content + b"\n")
++    result = commit_mutation(
++        plan_mutation(baseline, (change,), grants=grants_for(change)), writer=writer
++    )
++    assert not result.ok and writer.attempts == 1
++    assert store.files[change.path] == change.content + b"\n"
++    assert change.path in result.uncertain_paths
++
++
++@pytest.mark.parametrize("after", [False, True])
++def test_partial_failure_stops_remaining_writes_and_reports_uncertainty(
++    after: bool, mutation_catalog: SchemaCatalog
++) -> None:
++    """Earlier writes and the failed attempt remain explicit without rollback."""
++    store, baseline = mutation_case(mutation_catalog)
++    changes = (collection_change(baseline), collection_change(baseline, decisions=True))
++    plan = plan_mutation(baseline, changes, grants=grants_for(*changes))
++    writer = MemoryWriter(store, mutation_catalog)
++    writer.fail_at, writer.fail_after = 2, after
++    result = commit_mutation(plan, writer=writer)
++    assert not result.ok and result.authority_invalidated
++    # Earlier success remains visible when the next publication fails or loses
++    # acknowledgement.
++    assert [item.status for item in result.artifacts] == ["created", "conflict"]
++    assert plan.writes[0].change.path in store.files
++    assert (plan.writes[1].change.path in store.files) is after
++    assert result.uncertain_paths == (plan.writes[1].change.path,)
++    assert writer.attempts == 2
++
++
++@pytest.mark.parametrize("effect", ["bytes", "identity"])
++def test_unexpected_adapter_side_effects_cannot_report_success(
++    effect: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Postchecks detect unrelated content and same-byte identity changes."""
++    store, _ = mutation_case(mutation_catalog)
++    store.put("docs/migration/notes.md", b"original")
++    baseline = capture(store, mutation_catalog)
++    change = collection_change(baseline)
++    writer = MemoryWriter(store, mutation_catalog)
++
++    def disturb() -> None:
++        """Inject one explicit nonconforming adapter side effect in memory."""
++        # Byte changes and same-byte identity replacement exercise independent
++        # postconditions.
++        if effect == "bytes":
++            store.files["docs/migration/notes.md"] = b"unexpected"
++        else:
++            store.metadata.entries["docs/migration/notes.md"] = replace(
++                store.metadata.entries["docs/migration/notes.md"], identity="unexpected"
++            )
++
++    writer.after_write = disturb
++    result = commit_mutation(
++        plan_mutation(baseline, (change,), grants=grants_for(change)), writer=writer
++    )
++    assert not result.ok and result.authority_invalidated
++    assert change.path in result.uncertain_paths
++
++
++def test_authority_failure_prevents_every_write(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """A protected-store failure cannot leave an apparently revoked state."""
++    store, baseline = mutation_case(mutation_catalog)
++    change = collection_change(baseline)
++    writer = MemoryWriter(store, mutation_catalog)
++    writer.fail_invalidation = True
++    before = dict(store.files)
++    result = commit_mutation(
++        plan_mutation(baseline, (change,), grants=grants_for(change)), writer=writer
++    )
++    assert not result.ok and not result.authority_invalidated
++    assert writer.attempts == 0 and store.files == before
++    assert "authority invalidation failed" in result.findings[0].message
++
++
++def test_forged_plan_validation_is_rejected_before_io(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Reconstruct internal plans before trusting success fields."""
++    store, baseline = mutation_case(mutation_catalog)
++    change = collection_change(baseline)
++    plan = plan_mutation(baseline, (change,), grants=grants_for(change))
++    forged = replace(plan, validation=replace(plan.validation, input_sha256="0" * 64))
++    writer = MemoryWriter(store, mutation_catalog)
++    with pytest.raises(MutationError, match="MUTATION_PLAN"):
++        commit_mutation(forged, writer=writer)
++    assert writer.attempts == writer.invalidations == 0
++
++
++def test_guarded_writer_rechecks_the_supplied_original_digest(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """
++    The concrete writer rejects a mismatched precondition even for a current capture.
++    """
++    store, baseline = mutation_case(mutation_catalog)
++    change = collection_change(baseline)
++    plan = plan_mutation(baseline, (change,), grants=grants_for(change))
++    stale = replace(plan.writes[0], change=replace(change, expected_sha256="0" * 64))
++    writer = MemoryWriter(store, mutation_catalog)
++    before = dict(store.files)
++    with pytest.raises(MutationError, match="MUTATION_PRECONDITION"):
++        writer.atomic_write(stale, expected=baseline)
++    assert store.files == before and writer.invalidations == 0
+diff --git a/tests/discovery_runtime/test_mutation_filesystem.py b/tests/discovery_runtime/test_mutation_filesystem.py
+new file mode 100644
+index 000000000..ccb5aaa1b
+--- /dev/null
++++ b/tests/discovery_runtime/test_mutation_filesystem.py
+@@ -0,0 +1,426 @@
++"""Verify local publication with memory directories and injected kernel calls."""
++
++from __future__ import annotations
++
++import ctypes
++import os
++import stat
++import sys
++from contextlib import contextmanager
++from dataclasses import replace
++from hashlib import sha256
++from pathlib import Path
++from types import SimpleNamespace
++from typing import TYPE_CHECKING, cast
++
++import pytest
++from drm_copilot_discovery import mutation_filesystem as filesystem
++from drm_copilot_discovery.mutation_filesystem import (
++    LocalMutationPrimitives,
++    NativeDirectory,
++)
++
++if TYPE_CHECKING:
++    from collections.abc import Callable, Generator
++
++    from drm_copilot_discovery.mutation_filesystem import Directory
++
++
++from tests.discovery_runtime.mutation_test_support import MemoryDisk, constant
++
++
++def test_local_create_replace_and_parent_handles_remain_until_guard_exit() -> None:
++    """
++    Concrete publication pins parents through checks and preserves unrelated bytes.
++    """
++    disk = MemoryDisk()
++    disk.store.put("docs/unrelated", b"preserve")
++    provider = disk.provider()
++    with provider.guard():
++        provider.create_exclusive(disk.target("docs/new/output.json"), b"first")
++        assert disk.held == 3
++    assert disk.held == 0 and not disk.locked
++    with provider.guard():
++        provider.replace_if_digest(
++            disk.target("docs/new/output.json"),
++            b"second",
++            expected_sha256=sha256(b"first").hexdigest(),
++        )
++    assert provider.read_bytes("docs/new/output.json", limit=8) == b"second"
++    assert disk.store.files == {
++        "docs/unrelated": b"preserve",
++        "docs/new/output.json": b"second",
++    }
++
++
++@pytest.mark.parametrize(
++    "failure", ["collision", "stale", "publish", "stage", "guard", "reentry"]
++)
++def test_failed_publication_preserves_foreign_bytes_and_closes_handles(
++    failure: str,
++) -> None:
++    """Every bounded failure leaves old/foreign content and no owned staging file."""
++    disk = MemoryDisk()
++    provider = disk.provider()
++    disk.store.put("docs/output.json", b"original")
++    if failure == "stage":
++        disk.store.put("docs/.drm-mutation-owned", b"foreign")
++    disk.fail_publish = failure == "publish"
++    before = dict(disk.store.files)
++    # Select failures before exclusion, during publication, or at reentry without
++    # retries.
++    with pytest.raises(OSError):
++        if failure == "guard":
++            provider.create_exclusive(disk.target(), b"changed")
++        else:
++            with provider.guard():
++                if failure == "reentry":
++                    with provider.guard():
++                        pytest.fail("reentry admitted")
++                elif failure in {"collision", "stage"}:
++                    provider.create_exclusive(disk.target(), b"changed")
++                else:
++                    provider.replace_if_digest(
++                        disk.target(),
++                        b"changed",
++                        expected_sha256=sha256(
++                            b"stale" if failure == "stale" else b"original"
++                        ).hexdigest(),
++                    )
++    assert disk.store.files == before and disk.held == 0 and not disk.locked
++
++
++@pytest.mark.parametrize("path", [".", "docs"])
++def test_opened_identity_substitution_is_rejected_before_staging(path: str) -> None:
++    """Swapping a normal directory after metadata inspection cannot redirect writes."""
++    disk = MemoryDisk()
++    target = disk.target()
++
++    def exchange(opening: str) -> None:
++        """Simulate the exact metadata-to-open race once at the named parent."""
++        if opening == path:
++            disk.store.metadata.entries[path] = replace(
++                disk.store.metadata.entries[path], identity="substituted"
++            )
++
++    disk.before_open = exchange
++    provider = disk.provider()
++    with pytest.raises(OSError, match="identity changed"):
++        with provider.guard():
++            provider.create_exclusive(target, b"proposed")
++    assert not disk.store.files and disk.held == 0
++
++
++def test_separate_providers_share_exclusion_and_honor_configured_byte_bound() -> None:
++    """Two authorized writers cannot overlap, and configured larger originals work."""
++    disk = MemoryDisk()
++    original = b"x" * 16777217
++    disk.store.put("docs/output.json", original)
++    first, second = disk.provider(limit=33554432), disk.provider()
++    with first.guard():
++        with pytest.raises(FileExistsError):
++            with second.guard():
++                pytest.fail("concurrent writer admitted")
++        first.replace_if_digest(
++            disk.target(), b"new", expected_sha256=sha256(original).hexdigest()
++        )
++    assert disk.limits == [33554432] and disk.store.files["docs/output.json"] == b"new"
++
++
++@pytest.mark.parametrize("bound", [0, 67108865])
++def test_provider_requires_finite_bounds_and_external_absolute_lock(bound: int) -> None:
++    """Invalid deployment configuration cannot create an operational provider."""
++    disk = MemoryDisk()
++    with pytest.raises(ValueError, match="finite range"):
++        disk.provider(limit=bound)
++    with pytest.raises(ValueError, match="absolute"):
++        LocalMutationPrimitives(workspace_root="relative", lock_path="relative")
++    with pytest.raises(ValueError, match="outside"):
++        LocalMutationPrimitives(workspace_root=disk.root, lock_path=disk.root + "/lock")
++
++
++def stat_value(*, directory: bool = False) -> os.stat_result:
++    """
++    Return deterministic inode/device data without consulting the operating system.
++    """
++    return cast(
++        "os.stat_result",
++        SimpleNamespace(
++            st_mode=stat.S_IFDIR if directory else stat.S_IFREG,
++            st_ino=11,
++            st_dev=7,
++            st_file_attributes=0,
++        ),
++    )
++
++
++@pytest.mark.parametrize("failure", ["none", "zero", "flush", "collision", "cleanup"])
++def test_native_stage_closes_handles_and_cleans_only_owned_files(
++    failure: str, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    """
++    Real native-stage control flow handles short writes, I/O failures and
++    collisions.
++    """
++    removed: list[str] = []
++
++    def removing(name: str, **kwargs: object) -> None:
++        """Observe cleanup without touching the native namespace."""
++        removed.append(name)
++        if failure == "cleanup":
++            raise OSError("owned stage cleanup failed")
++
++    closed: list[int] = []
++    writes: list[bytes] = []
++
++    def opening(*args: object, **kwargs: object) -> int:
++        """Inject exclusive-create failure before ownership can be established."""
++        if failure == "collision":
++            raise FileExistsError("foreign stage")
++        return 17
++
++    def writing(descriptor: int, value: bytes) -> int:
++        """Model a short write or a zero-progress error without external I/O."""
++        writes.append(value)
++        return 0 if failure in {"zero", "cleanup"} else min(2, len(value))
++
++    def flushing(descriptor: int) -> None:
++        """Fail only the explicit fsync boundary under test."""
++        if failure == "flush":
++            raise OSError("flush failed")
++
++    monkeypatch.setattr(os, "open", opening)
++    monkeypatch.setattr(os, "write", writing)
++    monkeypatch.setattr(os, "fsync", flushing)
++    monkeypatch.setattr(os, "close", closed.append)
++    monkeypatch.setattr(os, "unlink", removing)
++    directory = NativeDirectory(Path("anchor"), 5, "7:11")
++    # Successful short writes must flush all bytes; failure cases expose their cleanup
++    # outcome.
++    if failure == "none":
++        directory.stage("stage", b"abcde")
++        assert writes == [b"abcde", b"cde", b"e"]
++    else:
++        with pytest.raises(OSError):
++            directory.stage("stage", b"abcde")
++    assert closed == ([] if failure == "collision" else [17])
++    assert removed == (["stage"] if failure in {"zero", "flush", "cleanup"} else [])
++
++
++@pytest.mark.parametrize("platform", ["nt", "posix", "unsupported"])
++def test_native_directory_uses_actual_handle_identity_and_closes(
++    platform: str, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    """
++    Both supported directory mechanisms bind identity; other platforms fail closed.
++    """
++    closed: list[int] = []
++
++    @contextmanager
++    def pin(path: Path, *, directory: bool) -> Generator[os.stat_result, None, None]:
++        """Model an already pinned Windows handle without calling a native library."""
++        yield stat_value(directory=directory)
++
++    monkeypatch.setattr(filesystem, "pin_windows_path", pin)
++    monkeypatch.setattr(os, "open", constant(23))
++    monkeypatch.setattr(os, "fstat", constant(stat_value(directory=True)))
++    monkeypatch.setattr(os, "close", closed.append)
++    monkeypatch.setattr(os, "O_DIRECTORY", 0x10000, raising=False)
++    monkeypatch.setattr(os, "O_NOFOLLOW", 0x20000, raising=False)
++    # Only supported handle providers may produce a directory capability.
++    if platform == "unsupported":
++        with pytest.raises(OSError, match="requires"):
++            with filesystem.open_local_directory(Path("anchor"), platform=platform):
++                pytest.fail("unsupported platform admitted")
++    else:
++        with filesystem.open_local_directory(
++            Path("anchor"), platform=platform
++        ) as directory:
++            assert directory.identity() == "7:11"
++    assert closed == ([23] if platform == "posix" else [])
++
++
++@pytest.mark.parametrize("failure", ["none", "open", "transfer", "kind"])
++def test_windows_pins_transfer_real_handle_ownership_and_check_identity(
++    failure: str, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    """Injected Win32 calls verify no-delete-sharing flags and exact-handle fstat."""
++    closed: list[int] = []
++    native_closed: list[int] = []
++
++    class KernelCall:
++        """Model typed ctypes function attributes and record native close calls."""
++
++        argtypes: list[object] = []
++        restype: object = None
++
++        def __init__(self, *, closing: bool) -> None:
++            """Select one narrow injected Windows function."""
++            self.closing = closing
++
++        def __call__(self, *args: object) -> int | None:
++            """Return a handle/status without invoking the kernel."""
++            # Track native closes separately from descriptor closes after ownership
++            # transfer.
++            if self.closing:
++                native_closed.append(cast("int", args[0]))
++                return 1
++            assert (
++                args[1] == 0x81 and args[2] == 3 and cast("int", args[5]) & 0x00200000
++            )
++            return None if failure == "open" else 31
++
++    def transfer(handle: int, flags: int) -> int:
++        """Simulate descriptor ownership transfer or its explicit failure."""
++        if failure == "transfer":
++            raise OSError("transfer failed")
++        return handle + 1
++
++    kernel = SimpleNamespace(
++        CreateFileW=KernelCall(closing=False), CloseHandle=KernelCall(closing=True)
++    )
++    monkeypatch.setattr(ctypes, "WinDLL", constant(kernel), raising=False)
++    monkeypatch.setitem(
++        sys.modules, "msvcrt", cast("object", SimpleNamespace(open_osfhandle=transfer))
++    )
++    monkeypatch.setattr(os, "lstat", constant(stat_value(directory=True)))
++    monkeypatch.setattr(
++        os,
++        "fstat",
++        constant(stat_value(directory=failure != "kind")),
++    )
++    monkeypatch.setattr(os, "close", closed.append)
++    # Every unsuccessful ownership transfer/open must unwind the resource it actually
++    # owns.
++    if failure == "none":
++        with filesystem.pin_windows_path(Path("anchor"), directory=True) as info:
++            assert (info.st_dev, info.st_ino) == (7, 11)
++    else:
++        with pytest.raises(OSError):
++            with filesystem.pin_windows_path(Path("anchor"), directory=True):
++                pytest.fail("invalid pin admitted")
++    assert closed == ([32] if failure in {"none", "kind"} else [])
++    assert native_closed == ([31] if failure == "transfer" else [])
++
++
++@pytest.mark.parametrize("failure", ["none", "overflow", "kind"])
++def test_native_bounded_read_consumes_short_reads_and_closes(
++    failure: str, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    """Bounded ordinary-file reads preserve exact bytes and reject overflow/types."""
++    closed: list[int] = []
++    pieces = [b"ab", b"c", b""]
++
++    def reading(descriptor: int, count: int) -> bytes:
++        """Return the next deterministic short-read chunk."""
++        return pieces.pop(0)
++
++    @contextmanager
++    def pin(path: Path, *, directory: bool) -> Generator[os.stat_result, None, None]:
++        """Model a retained Windows file while the injected descriptor is read."""
++        yield stat_value(directory=directory)
++
++    monkeypatch.setattr(filesystem, "pin_windows_path", pin)
++    monkeypatch.setattr(os, "open", constant(43))
++    monkeypatch.setattr(
++        os,
++        "fstat",
++        constant(stat_value(directory=failure == "kind")),
++    )
++    monkeypatch.setattr(os, "read", reading)
++    monkeypatch.setattr(os, "close", closed.append)
++    directory = NativeDirectory(Path("anchor"), 5, "7:11")
++    # Valid reads assemble short chunks; overflow and nonregular handles fail
++    # explicitly.
++    if failure == "none":
++        assert directory.read("input", limit=3) == b"abc"
++    else:
++        with pytest.raises(OSError):
++            directory.read("input", limit=2 if failure == "overflow" else 3)
++    assert closed == [43]
++    with pytest.raises(ValueError, match="immediate"):
++        directory.stage("nested/name", b"invalid")
++
++
++def test_native_publication_child_creation_and_external_lock_primitives(
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    """Native wrappers select atomic link/replace, relative parents and lock cleanup."""
++    calls: list[tuple[str, tuple[object, ...], dict[str, object]]] = []
++
++    def record(name: str) -> Callable[..., None]:
++        """Record one injected primitive without executing external effects."""
++
++        def invoke(*args: object, **kwargs: object) -> None:
++            """Retain exact primitive argument dispatch for assertions."""
++            calls.append((name, args, kwargs))
++
++        return invoke
++
++    @contextmanager
++    def opening(
++        path: Path, *, parent: NativeDirectory | None = None
++    ) -> Generator[Directory, None, None]:
++        """Expose one already-anchored child for native directory sequencing."""
++        assert parent is not None
++        yield NativeDirectory(path, 51, "7:11")
++
++    monkeypatch.setattr(filesystem, "open_local_directory", opening)
++    # Replace every native operation reached by this test, preserving observable call
++    # order.
++    for name in ("mkdir", "link", "replace", "unlink", "close"):
++        monkeypatch.setattr(os, name, record(name))
++    monkeypatch.setattr(os, "open", constant(53))
++    directory = NativeDirectory(Path("anchor"), None, "7:11")
++    with directory.child("new", create=True) as child:
++        assert child.identity() == "7:11"
++    with directory.child("existing", create=False):
++        pass
++    directory.publish("stage", "output", replace=False)
++    directory.publish("stage", "output", replace=True)
++    with filesystem.exclusive_workspace_lock(Path("external.lock")):
++        assert calls[-1][0] == "replace"
++    # Publication must precede guard cleanup, and child creation must be exclusive.
++    assert [item[0] for item in calls] == [
++        "mkdir",
++        "link",
++        "replace",
++        "close",
++        "unlink",
++    ]
++
++
++@pytest.mark.parametrize(
++    "kind", ["file", "directory", "symlink", "reparse", "other", "missing"]
++)
++def test_native_metadata_keeps_complete_names_and_nonfollowing_identity(
++    kind: str, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    """The provider exposes complete namespaces, explicit links and honest absence."""
++    disk = MemoryDisk()
++    provider = disk.provider()
++
++    def inspect(path: object) -> os.stat_result:
++        """Return deterministic native metadata or the exact missing-file signal."""
++        if kind == "missing":
++            raise FileNotFoundError("missing")
++        mode = {
++            "file": stat.S_IFREG,
++            "directory": stat.S_IFDIR,
++            "symlink": stat.S_IFLNK,
++        }.get(kind, stat.S_IFIFO)
++        return cast(
++            "os.stat_result",
++            SimpleNamespace(
++                st_mode=mode,
++                st_dev=7,
++                st_ino=11,
++                st_file_attributes=0x400 if kind == "reparse" else 0,
++            ),
++        )
++
++    monkeypatch.setattr(os, "lstat", inspect)
++    monkeypatch.setattr(os, "listdir", constant(["z", "a"]))
++    result = provider.metadata("." if kind == "directory" else "file")
++    assert result.kind == kind
++    assert result.children == (("a", "z") if kind == "directory" else ())
+diff --git a/tests/discovery_runtime/test_mutation_plan.py b/tests/discovery_runtime/test_mutation_plan.py
+new file mode 100644
+index 000000000..b160f59fd
+--- /dev/null
++++ b/tests/discovery_runtime/test_mutation_plan.py
+@@ -0,0 +1,453 @@
++"""Prove prospective mutations use real complete loading and shared validation."""
++
++from __future__ import annotations
++
++import itertools
++import json
++from dataclasses import FrozenInstanceError, replace
++from typing import TYPE_CHECKING, cast
++
++import pytest
++from drm_copilot_discovery.models import to_plain_value
++from drm_copilot_discovery.mutation_io import capture_workspace
++from drm_copilot_discovery.mutation_plan import (
++    MutationChange,
++    MutationError,
++    plan_mutation,
++    project_snapshot,
++)
++from drm_copilot_discovery.path_models import PathMetadata, PathPolicyError
++from drm_copilot_discovery.validation import report_projection
++
++from tests.discovery_runtime.test_references import immutable
++from tests.discovery_runtime.test_snapshot_io import PROFILE_PATH, memory_workspace
++from tests.discovery_runtime.test_snapshot_loading import MemoryRepository
++from tests.schemas.discovery.v2_schema_test_support import as_object, load_fixture
++
++if TYPE_CHECKING:
++    from drm_copilot_discovery.catalog import SchemaCatalog
++
++
++from tests.discovery_runtime.mutation_test_support import (
++    capture,
++    collection_change,
++    grants_for,
++    mutation_case,
++    role_plan,
++)
++from tests.discovery_runtime.mutation_test_support import (
++    mutation_catalog as mutation_catalog,
++)
++
++
++def test_planner_projects_complete_valid_graph_and_preserves_originals(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Projection validates bytes in memory and retains unrelated inputs unchanged."""
++    store, baseline = mutation_case(mutation_catalog)
++    changes = (
++        collection_change(baseline),
++        collection_change(baseline, decisions=True, identifier="decisions"),
++    )
++    before = dict(store.files)
++    plan = plan_mutation(baseline, changes, grants=grants_for(*changes))
++    assert (
++        plan.validation.ok and plan.validation.input_sha256 == plan.prospective.sha256
++    )
++    assert (
++        store.files == before
++        and baseline.snapshot.file(PROFILE_PATH).content == before[PROFILE_PATH]
++    )
++    assert plan.prospective.file(PROFILE_PATH) == baseline.snapshot.file(PROFILE_PATH)
++    assert len(plan.prospective.artifacts) == 2
++
++
++def test_plan_permutation_and_repeatability_property(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Proposal/grant permutations preserve the canonical plan and prospective hash."""
++    _, baseline = mutation_case(mutation_catalog)
++    changes = (collection_change(baseline), collection_change(baseline, decisions=True))
++    expected = plan_mutation(baseline, changes, grants=grants_for(*changes))
++    # Enumerate the finite ordering domain without a shared RNG or mutable fixture.
++    for permutation in itertools.permutations(changes):
++        plan = plan_mutation(
++            baseline, permutation, grants=grants_for(*reversed(permutation))
++        )
++        assert plan.writes == expected.writes
++        assert plan.validation == expected.validation
++        assert plan.prospective.sha256 == expected.prospective.sha256
++
++
++@pytest.mark.parametrize(
++    "error", ["content", "kind", "id", "digest", "grant", "duplicate", "missing"]
++)
++def test_invalid_proposals_never_change_valid_existing_bytes(
++    error: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Invalid requests cannot substitute the valid old document for validation."""
++    store, initial = mutation_case(mutation_catalog)
++    first = collection_change(initial)
++    store.put(first.path, first.content)
++    baseline = capture(store, mutation_catalog)
++    change = collection_change(baseline)
++    grants = grants_for(change)
++    expected = "MUTATION_"
++    # Each case changes one independent precondition while retaining valid prior bytes.
++    if error == "content":
++        change = replace(change, content=b'{"schema_version":"2.0.0"}')
++    elif error == "kind":
++        change = replace(change, artifact_kind="coverage-ledger")
++    elif error == "id":
++        change = replace(change, artifact_id="other")
++        grants = grants_for(change)
++    elif error == "digest":
++        change = replace(change, expected_sha256="0" * 64)
++    elif error == "grant":
++        grants = (replace(grants[0], path=grants[0].path + ".other"),)
++    elif error == "missing":
++        grants = ()
++    else:
++        expected = "PATH_COLLISION"
++    before = dict(store.files)
++    with pytest.raises((MutationError, PathPolicyError), match=expected):
++        plan_mutation(
++            baseline,
++            (change, change) if error == "duplicate" else (change,),
++            grants=grants,
++        )
++    assert store.files == before
++
++
++def test_unchanged_bytes_are_explicit_skips(mutation_catalog: SchemaCatalog) -> None:
++    """A valid same-byte update is idempotent and still requires the original digest."""
++    store, initial = mutation_case(mutation_catalog)
++    change = collection_change(initial)
++    store.put(change.path, change.content)
++    baseline = capture(store, mutation_catalog)
++    change = collection_change(baseline)
++    result = plan_mutation(baseline, (change,), grants=grants_for(change))
++    assert result.writes[0].skipped
++    assert result.prospective.sha256 == baseline.snapshot.sha256
++
++
++@pytest.mark.parametrize(
++    "role",
++    [
++        "legacy-parity-analyst",
++        "runtime-characterization-analyst",
++        "requirements-reconciler",
++    ],
++)
++def test_role_output_uses_exact_accepted_validator(
++    role: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Draft questions require an exact role output manifest."""
++    _, baseline = mutation_case(mutation_catalog)
++    changes, context = role_plan(baseline, role=role)
++    result = plan_mutation(
++        baseline, changes, grants=grants_for(*changes), invocation=context
++    )
++    assert (
++        result.validation.mode == "agent-output"
++        and result.validation.output_valid is True
++    )
++    assert result.validation.role == role
++
++
++@pytest.mark.parametrize(
++    "fault", ["role", "workspace", "baseline", "manifest", "unrequested"]
++)
++def test_role_mismatches_and_unrequested_changes_are_rejected(
++    fault: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Caller context and required outputs cannot be substituted or widened by bytes."""
++    _, baseline = mutation_case(mutation_catalog)
++    changes, context = role_plan(baseline)
++    # Vary one context binding to prove none can widen the authenticated manifest.
++    if fault == "role":
++        context = replace(context, role="migration-coverage-reviewer")
++    elif fault == "workspace":
++        value = as_object(to_plain_value(context.workspace))
++        value["workspace_root"] = "/different"
++        context = replace(context, workspace=immutable(value))
++    elif fault == "baseline":
++        context = replace(context, baseline=project_snapshot(baseline, changes[:1]))
++    elif fault == "manifest":
++        changes = changes[:1]
++    else:
++        changes += (collection_change(baseline, decisions=True),)
++    with pytest.raises(MutationError, match="MUTATION_(CONTEXT|INVALID)"):
++        plan_mutation(
++            baseline, changes, grants=grants_for(*changes), invocation=context
++        )
++
++
++@pytest.mark.parametrize(
++    "path",
++    [
++        "src/changed.py",
++        "config/discovery.json",
++        "../escape",
++        "docs/migration/discovery/reports/arbitrary.json",
++    ],
++)
++def test_unsafe_or_misclassified_paths_fail_before_write(
++    path: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Path policy and real loader classification both constrain proposed locations."""
++    _, baseline = mutation_case(mutation_catalog)
++    with pytest.raises((MutationError, PathPolicyError)):
++        change = replace(collection_change(baseline), path=path)
++        plan_mutation(baseline, (change,), grants=grants_for(change))
++
++
++def test_parser_findings_are_retained_in_graph_rejection(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """A schema-valid envelope with broken references returns actual graph findings."""
++    _, baseline = mutation_case(mutation_catalog)
++    value = load_fixture("unspecified-behavior-collection")
++    value["records"] = [load_fixture("unspecified-behavior")]
++    change = replace(
++        collection_change(baseline),
++        artifact_id=str(value["id"]),
++        content=json.dumps(value).encode(),
++    )
++    with pytest.raises(MutationError, match="MUTATION_INVALID") as raised:
++        plan_mutation(baseline, (change,), grants=grants_for(change))
++    # Preserve the validator's concrete errors instead of replacing them with a generic
++    # code.
++    assert raised.value.findings and any(
++        item.severity == "error" for item in raised.value.findings
++    )
++
++
++@pytest.mark.parametrize("digest", ["short", "A" * 64, "g" * 64])
++def test_change_rejects_malformed_original_digests(digest: str) -> None:
++    """Precondition syntax cannot be interpreted as an expression or mutable value."""
++    with pytest.raises(ValueError, match="SHA-256"):
++        MutationChange(
++            artifact_kind="scope",
++            artifact_id="scope",
++            path="docs/scope.yaml",
++            content=b"{}",
++            expected_sha256=digest,
++        )
++
++
++def test_values_reject_mutability_and_metadata_ambiguity(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Frozen captures and requests cannot be changed through mutable caller data."""
++    _, baseline = mutation_case(mutation_catalog)
++    change = collection_change(baseline)
++    with pytest.raises(ValueError, match="immutable bytes"):
++        replace(change, content=cast("bytes", bytearray()))
++    attribute = "path"
++    with pytest.raises(FrozenInstanceError):
++        setattr(change, attribute, "other")
++    with pytest.raises(ValueError, match="unique"):
++        replace(baseline, metadata=baseline.metadata + (baseline.metadata[0],))
++    with pytest.raises(ValueError, match="workspace root"):
++        replace(baseline, metadata=())
++    assert baseline.inspect("new/deep/file").kind == "missing"
++    entries = dict(baseline.metadata)
++    entries["new"] = PathMetadata(kind="missing")
++    entries["."] = replace(entries["."], children=(*entries["."].children, "new"))
++    assert (
++        replace(baseline, metadata=tuple(entries.items())).inspect("new/file").kind
++        == "missing"
++    )
++    entries["."] = replace(
++        entries["."], children=(*entries["."].children, "uncaptured")
++    )
++    incomplete = replace(baseline, metadata=tuple(entries.items()))
++    with pytest.raises(OSError, match="not captured"):
++        incomplete.inspect("uncaptured/file")
++    entries["uncaptured"] = PathMetadata(
++        kind="file", identity="f", resolved_path="/workspace/uncaptured"
++    )
++    with pytest.raises(OSError, match="not a directory"):
++        replace(baseline, metadata=tuple(entries.items())).inspect("uncaptured/file")
++
++
++def test_bounded_empty_and_oversized_changes_fail(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Empty mutations and oversized proposed documents cannot start a write plan."""
++    _, baseline = mutation_case(mutation_catalog)
++    with pytest.raises(MutationError, match="MUTATION_LIMIT"):
++        plan_mutation(baseline, (), grants=())
++    change = replace(
++        collection_change(baseline),
++        content=b"x" * (baseline.snapshot.profile.limits.document_bytes + 1),
++    )
++    with pytest.raises(MutationError, match="MUTATION_LIMIT"):
++        plan_mutation(baseline, (change,), grants=grants_for(change))
++
++
++def test_directory_enumeration_permutations_preserve_capture(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Changing only directory enumeration order never reports changed inputs."""
++    store, baseline = mutation_case(mutation_catalog)
++    calls = 0
++
++    def reordered(path: str) -> PathMetadata:
++        """Return alternating namespace order over the same test-owned metadata."""
++        nonlocal calls
++        calls += 1
++        entry = store.metadata(path)
++        return replace(entry, children=entry.children[:: (-1 if calls % 2 else 1)])
++
++    result = capture_workspace(
++        workspace_root=baseline.workspace_root,
++        profile_path=PROFILE_PATH,
++        metadata=reordered,
++        read_bytes=store.read,
++        catalog=mutation_catalog,
++    )
++    assert (
++        result.metadata == baseline.metadata
++        and result.snapshot.sha256 == baseline.snapshot.sha256
++    )
++
++
++@pytest.mark.parametrize("kind", ["evidence-payload", "acceptance-view"])
++def test_opaque_grants_cannot_create_structured_records(
++    kind: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Opaque kinds cannot suppress authoritative parsed kind/ID comparisons."""
++    store, baseline = mutation_case(mutation_catalog)
++    key, structured = (
++        ("evidence", "evidence-reference")
++        if kind == "evidence-payload"
++        else ("acceptance", "acceptance-specification")
++    )
++    # Supply the referenced payload so this case reaches authoritative identity checks.
++    if kind == "evidence-payload":
++        store.put("docs/migration/discovery/evidence/capture-alpha.json", b"{}")
++        baseline = capture(store, mutation_catalog)
++    change = MutationChange(
++        artifact_kind=kind,
++        artifact_id="granted",
++        path=baseline.snapshot.profile.artifacts[key] + "/record.yaml",
++        content=json.dumps(load_fixture(structured)).encode(),
++        expected_sha256=None,
++    )
++    with pytest.raises(MutationError, match="MUTATION_IDENTITY"):
++        plan_mutation(baseline, (change,), grants=grants_for(change))
++
++
++@pytest.mark.parametrize("wrong_id", [False, True])
++def test_report_view_requires_exact_structured_peer(
++    wrong_id: bool, mutation_catalog: SchemaCatalog
++) -> None:
++    """Markdown views require the same report kind/ID as their structured peer."""
++    _, baseline = mutation_case(mutation_catalog)
++    document = report_projection(
++        baseline.snapshot,
++        kind="coverage-report",
++        identifier="coverage",
++        mode="structural",
++    )
++    report = MutationChange(
++        artifact_kind="coverage-report",
++        artifact_id="coverage",
++        path=baseline.snapshot.profile.artifacts["reports"] + "/coverage-report.json",
++        content=json.dumps(document).encode(),
++        expected_sha256=None,
++    )
++    view = replace(
++        report,
++        artifact_id="wrong" if wrong_id else "coverage",
++        path=report.path[:-5] + ".md",
++        content=b"# Coverage\n",
++    )
++    # A matching view shares the structured report identity; mismatches must fail early.
++    if wrong_id:
++        with pytest.raises(MutationError, match="MUTATION_IDENTITY"):
++            plan_mutation(baseline, (report, view), grants=grants_for(report, view))
++    else:
++        assert plan_mutation(
++            baseline, (report, view), grants=grants_for(report, view)
++        ).validation.ok
++
++
++@pytest.mark.parametrize("failure", ["none", "missing", "oversized"])
++def test_projection_replays_only_captured_git_objects(
++    failure: str, mutation_catalog: SchemaCatalog
++) -> None:
++    """Projections reuse pinned byte values and cannot read new Git objects."""
++    store, _ = memory_workspace()
++    store.put("src/a.py", b"source")
++    repository = MemoryRepository({("a" * 40, "src/a.py"): b"source"})
++    baseline = capture_workspace(
++        workspace_root="/workspace",
++        profile_path=PROFILE_PATH,
++        metadata=store.metadata,
++        read_bytes=store.read,
++        catalog=mutation_catalog,
++        repository=repository,
++    )
++    # Missing and oversized pins are loader errors, never substituted live reads.
++    if failure == "missing":
++        baseline = replace(
++            baseline, snapshot=replace(baseline.snapshot, repository_files=())
++        )
++    elif failure == "oversized":
++        pinned = replace(baseline.snapshot.repository_files[0], content=b"x" * 16777217)
++        baseline = replace(
++            baseline, snapshot=replace(baseline.snapshot, repository_files=(pinned,))
++        )
++    change = collection_change(baseline)
++    # Successful replay is pure; absent or oversized captured objects abort the load.
++    if failure == "none":
++        assert not project_snapshot(baseline, (change,)).findings
++    else:
++        with pytest.raises(OSError, match="not captured|read limit"):
++            project_snapshot(baseline, (change,))
++    assert repository.requests == [("a" * 40, "src/a.py")]
++
++
++def test_projection_refuses_uncaptured_profile_bytes(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """Metadata alone cannot supply bytes missing from a complete captured graph."""
++    _, baseline = mutation_case(mutation_catalog)
++    baseline = replace(
++        baseline,
++        snapshot=replace(
++            baseline.snapshot, manifest=replace(baseline.snapshot.manifest, files=())
++        ),
++    )
++    with pytest.raises(OSError, match="uncaptured"):
++        project_snapshot(baseline, ())
++
++
++def test_capture_rejects_metadata_changes_during_loading(
++    mutation_catalog: SchemaCatalog,
++) -> None:
++    """
++    A namespace identity change during one capture cannot yield an immutable input.
++    """
++    store, baseline = mutation_case(mutation_catalog)
++    seen: set[str] = set()
++
++    def changing(path: str) -> PathMetadata:
++        """Replace the root identity only after its first recorded observation."""
++        value = store.metadata(path)
++        if path == "." and path in seen:
++            return replace(value, identity="changed")
++        seen.add(path)
++        return value
++
++    with pytest.raises(OSError, match="Metadata changed"):
++        capture_workspace(
++            workspace_root=baseline.workspace_root,
++            profile_path=PROFILE_PATH,
++            metadata=changing,
++            read_bytes=store.read,
++            catalog=mutation_catalog,
++        )
