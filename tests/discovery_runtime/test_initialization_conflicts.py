@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from drm_copilot_discovery.init_flow import (
@@ -40,10 +40,22 @@ if TYPE_CHECKING:
         InitializationCapture,
         InitializationTemplates,
     )
+    from drm_copilot_discovery.profile_models import ArtifactKey
 
 
 @pytest.mark.parametrize(
-    "conflict", ["profile", "scope", "identity", "directory", "unknown-artifact"]
+    "conflict",
+    [
+        "profile",
+        "scope",
+        "coverage_ledger",
+        "unspecified_behaviors",
+        "product_decisions",
+        "parity_matrix",
+        "identity",
+        "directory",
+        "unknown-artifact",
+    ],
 )
 def test_invalid_or_incompatible_existing_content_aborts_before_any_write(
     initialization_catalog: SchemaCatalog,
@@ -59,8 +71,16 @@ def test_invalid_or_incompatible_existing_content_aborts_before_any_write(
     request = request_for()
     if conflict == "profile":
         case.disk.store.put(profile.artifacts["profile"], b"invalid: true")
-    elif conflict == "scope":
-        case.disk.store.put(profile.artifacts["scope"], b"invalid: true")
+    elif conflict in {
+        "scope",
+        "coverage_ledger",
+        "unspecified_behaviors",
+        "product_decisions",
+        "parity_matrix",
+    }:
+        case.disk.store.put(
+            profile.artifacts[cast("ArtifactKey", conflict)], b"invalid: true"
+        )
     elif conflict == "directory":
         case.disk.store.put(profile.artifacts["reports"], b"occupied directory")
     elif conflict == "unknown-artifact":
@@ -79,6 +99,16 @@ def test_invalid_or_incompatible_existing_content_aborts_before_any_write(
 
     assert caught.value.outputs and caught.value.findings
     assert all(item.status == "conflict" for item in caught.value.outputs)
+    if conflict in {
+        "scope",
+        "coverage_ledger",
+        "unspecified_behaviors",
+        "product_decisions",
+        "parity_matrix",
+    }:
+        assert {item.path for item in caught.value.outputs} == {
+            profile.artifacts[cast("ArtifactKey", conflict)]
+        }
     assert (case.disk.store.files, case.disk.store.metadata.entries) == before
     assert case.revocations == 0 and case.disk.held == 0
 
@@ -307,12 +337,14 @@ def test_existing_graph_preservation_without_writes(
     assert case.revocations == 0
 
 
-@pytest.mark.parametrize("swapped", [False, True])
+@pytest.mark.parametrize(
+    "change", ["none", "identity", "bytes", "lost-path", "kind", "namespace"]
+)
 def test_new_directory_identity_is_bound_through_guarded_postcapture(
     initialization_catalog: SchemaCatalog,
     initialization_plan: InitializationPlan,
     monkeypatch: pytest.MonkeyPatch,
-    swapped: bool,
+    change: str,
 ) -> None:
     """Postcapture cannot adopt a replacement of a newly opened empty directory."""
     case, plan = InitializationCase(initialization_catalog), initialization_plan
@@ -324,21 +356,34 @@ def test_new_directory_identity_is_bound_through_guarded_postcapture(
         if case.disk.store.metadata(path).kind == "missing":
             return plan.capture
         assert case.disk.held > 0 and case.disk.locked
-        if swapped:
+        if change == "identity":
             old = case.disk.store.metadata.entries[path]
             case.disk.store.metadata.entries[path] = replace(
                 old, identity="replaced-after-open"
             )
-        return bootstrap_capture(case, plan)
+        captured = bootstrap_capture(case, plan)
+        metadata = dict(captured.physical_metadata)
+        profile_path = plan.capture.proposal_base.snapshot.profile.artifacts["profile"]
+        if change == "bytes":
+            return replace(captured, physical_files=((profile_path, b"changed"),))
+        if change == "lost-path":
+            metadata.pop("verification")
+        elif change == "kind":
+            metadata[profile_path] = replace(metadata[profile_path], kind="directory")
+        elif change == "namespace":
+            metadata["application"] = replace(
+                metadata["application"], children=("unexpected",)
+            )
+        return replace(captured, physical_metadata=tuple(metadata.items()))
 
     monkeypatch.setattr(case.io, "capture", capture)
     result = case.io.bootstrap(
         plan.capture, profile_bytes=plan.profile_bytes, directories=plan.directories
     )
-    assert result.ok is (not swapped), result.error
+    assert result.ok is (change == "none"), result.error
     assert result.authority_invalidated and case.disk.held == 0
-    if swapped:
-        assert result.physical is None and "identity changed" in str(result.error)
+    if change != "none":
+        assert result.physical is None and result.error
     else:
         assert result.physical is not None
         assert (
@@ -396,6 +441,7 @@ def test_concurrent_profile_creation_has_typed_conflict_path(
     case, plan = InitializationCase(initialization_catalog), initialization_plan
     path = plan.capture.proposal_base.snapshot.profile.artifacts["profile"]
     case.disk.store.put(path, plan.profile_bytes)
+    # Preserve every prior observation except the concurrent profile appearance.
     changed = replace(
         plan.capture,
         physical_metadata=tuple(

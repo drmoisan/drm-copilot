@@ -29,6 +29,7 @@ class FakeFileSystem:
 
     def list_dir(self, path: Path) -> list[Path]:
         """Enumerate complete immediate memory children."""
+        # Exclude descendants so parent checks see the same shape as native reads.
         return [
             item
             for item in {*self.files, *self.dirs}
@@ -53,12 +54,14 @@ class FakeFileSystem:
 def seed_templates(fs: FakeFileSystem, root: Path) -> None:
     """Retain the complete legacy template shape for helper compatibility tests."""
     fs.dirs.add(root)
+    # Preserve every old declared path for diagnostics without reading disk.
     for path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
         fs.files[root / path] = "legacy fixture"
 
 
 def test_public_exports_are_thin_runtime_aliases() -> None:
     """Every supported old import resolves to the authoritative runtime function."""
+    # Verify the whole explicit export contract instead of one representative name.
     for name in mod.__all__:
         assert getattr(mod, name) is getattr(runtime, name)
 
@@ -102,6 +105,7 @@ def test_template_override_and_complete_missing_template_diagnostics() -> None:
     seed_templates(fs, root)
     mod.validate_template_set(root, fs)
     missing = EXPECTED_TEMPLATE_RELATIVE_PATHS[-2:]
+    # Remove two independent declarations to prove diagnostics are complete.
     for path in missing:
         del fs.files[root / path]
     with pytest.raises(FileNotFoundError) as failure:

@@ -216,7 +216,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test unchanged bytes, invalid proposed content over valid old content, wrong roles/kinds/IDs, stale original digest, concurrent collision, parent-link replacement, bounded partial I/O failure, and repeatable dry-run; use in-memory writers.
   - Acceptance: Unauthorized or invalid prospective writes change nothing; a race or partial failure is reported explicitly and invalidates completion authority; successful mutation preserves unrelated artifacts.
 
-- [ ] [P3-T2] Initialize a structurally valid draft without overwriting existing content.
+- [x] [P3-T2] Initialize a structurally valid draft without overwriting existing content.
   - Files and behavior: Move/rework DT/discovery/init_flow.py into R/init_flow.py with a thin old adapter; create docs/discovery/templates/v2/{domain-profile.yaml,scope.yaml,coverage-ledger.json,unspecified-behaviors.yaml,product-decisions.yaml,parity-matrix.json}; extend resource-manifest.json. Add PT/test_{initialization,initialization_conflicts}.py and update Set C flow/model/neutrality tests.
   - Tests and proof: Cover caller-provided identity/role/roots, honest null draft pins, all configured directories, source/target/combined structures, first/repeat/partial-recovery runs, invalid existing file, conflict-before-write, no-overwrite force compatibility, and dry-run without directories/activation/receipts.
   - Acceptance: Identical inputs produce identical projected content; repeat initialization skips valid files unchanged; the created or projected draft passes structural validation and fails completion.

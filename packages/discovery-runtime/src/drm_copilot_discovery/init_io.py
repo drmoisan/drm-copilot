@@ -128,6 +128,7 @@ class InitializationIO:
         # Recheck physical inputs after the virtual loader's own consistency checks.
         for path in tuple(inputs.metadata):
             inputs.physical(path)
+        # A successful virtual load cannot conceal a later physical byte change.
         for path, content in tuple(inputs.files.items()):
             if self.read_bytes(path, limit=max(1, len(content))) != content:
                 raise OSError("Initialization bytes changed after capture")
@@ -178,6 +179,7 @@ class InitializationIO:
             raise OSError("Opened initialization workspace identity changed")
         opened["."] = directory.identity()
         stamps = target.observations[1:-1] if parents_only else target.observations[1:]
+        # Retain each opened ancestor so publication cannot adopt a changed parent.
         for stamp in stamps:
             current = self.metadata(stamp.path)
             if (current.kind, current.identity, current.resolved_path) != (
@@ -219,6 +221,7 @@ class InitializationIO:
             raise ValueError(
                 "Bootstrap profile bytes differ from the validated proposal"
             )
+        # Bootstrap accepts exactly the configured directory categories.
         allowed = tuple(
             sorted(
                 str(value)
@@ -266,6 +269,7 @@ class InitializationIO:
                     target = policy.resolve_read(profile_path, allow_missing=True)
                     if target.observations[-1].kind != "missing":
                         raise FileExistsError("The proposed profile now exists; reload")
+                    # A failure may leave only these previously absent ancestors.
                     uncertain = tuple(
                         stamp.path
                         for stamp in target.observations
@@ -288,9 +292,11 @@ class InitializationIO:
                     self.primitives.create_exclusive(target, profile_bytes)
                     created.append(profile_path)
                     uncertain = ()
+                # Empty configured directories are effects even without file output.
                 for path in directories:
                     active_path = path
                     target = policy.resolve_read(path, allow_missing=True)
+                    # Bound partial uncertainty to the currently attempted route.
                     uncertain = tuple(
                         stamp.path
                         for stamp in target.observations
@@ -364,6 +370,7 @@ class InitializationIO:
             raise OSError(
                 "Opened initialization directory identity changed after creation"
             )
+        # Only explicitly created paths and their parent child lists may change.
         for path, old in before.physical_metadata:
             new = actual.get(path)
             if new is None:
@@ -375,6 +382,7 @@ class InitializationIO:
                     raise OSError("Initialization created an unexpected path kind")
                 continue
             prefix = "" if path == "." else path + "/"
+            # Admit only names introduced by the recorded bootstrap effects.
             children = set(old.children) | {
                 item[len(prefix) :].split("/")[0]
                 for item in created

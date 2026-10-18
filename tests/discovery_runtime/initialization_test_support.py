@@ -68,8 +68,10 @@ def initialization_plan(
 
 def seed_proposal(case: InitializationCase, plan: InitializationPlan) -> None:
     """Copy immutable projected bytes into a fresh test-owned physical workspace."""
+    # Seed empty configured directories independently of artifact presence.
     for path in plan.directories:
         case.disk.store.metadata.add(path, kind="directory")
+    # Copy immutable graph bytes into this invocation's fresh mutable store.
     for item in plan.mutation.prospective.manifest.files:
         case.disk.store.put(item.path, item.content)
 
@@ -78,6 +80,7 @@ def bootstrap_capture(
     case: InitializationCase, plan: InitializationPlan
 ) -> InitializationCapture:
     """Bind actual memory metadata to an unchanged immutable profile-only graph."""
+    # Bind current memory identities while reusing only immutable graph values.
     metadata = tuple(
         (path, case.disk.store.metadata(path))
         for path, _ in plan.capture.physical_metadata

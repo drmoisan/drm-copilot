@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-10-18T13:48:17.956796+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "63177775e6c9e3c1604e71720edcb2c12b8d2d860055fbe74ebb18d4423c863d"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "63177775e6c9e3c1604e71720edcb2c12b8d2d860055fbe74ebb18d4423c863d"
+  },
+  "source_stable": true,
+  "module_ast_comparisons": 3,
+  "comparison_baseline": "667cb753aa512b518cd0625750dadaf1e11d89b4",
+  "verified_executable_delta": "Only the exact snapshot.ok rejection already exercised by the five missing-ID cases; all subsequent changes are comments.",
+  "retained_execution_count": 14,
+  "retained_proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-executor-bootstrap-bound.2026-10-18T13-28.json",
+      "sha256": "73e8b4329d6a08ecc8823c007fe3a33e1af6ee69229eb15365ec350fa55a3c2e",
+      "passed": 7,
+      "total": 7
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-executor-handoff-bound.2026-10-18T13-28.json",
+      "sha256": "8ddf57c193c630e4ef4b09c16f52c31d723ac7a93916c6e4af4fc536a733ae80",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-executor-missing-id.2026-10-18T13-34.json",
+      "sha256": "e39ed36024edaa7957f2c3fce3dcf8ec80ef5fa3ef3b9766ac7e665a6f21df88",
+      "passed": 5,
+      "total": 5
+    }
+  ],
+  "behavior_cases_rerun": 0,
+  "findings": []
+}

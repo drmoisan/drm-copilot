@@ -714,10 +714,10 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 **Initialization**
 
 - [ ] A deterministic command initializes a consumer discovery workspace.
-- [ ] Initialization is idempotent.
-- [ ] Dry-run is supported.
-- [ ] Existing files are not silently overwritten.
-- [ ] The initialized workspace validates successfully.
+- [x] Initialization is idempotent.
+- [x] Dry-run is supported.
+- [x] Existing files are not silently overwritten.
+- [x] The initialized workspace validates successfully.
 
 **Validation and reporting**
 

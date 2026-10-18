@@ -80,6 +80,7 @@ def _plan_initialization(
     profile = initial.proposal_base.snapshot.profile
     require_compatible(request, profile)
     profile_bytes = initial.proposal_base.snapshot.file(profile_path).content
+    # Only configured directory categories belong to root bootstrap publication.
     directories = tuple(
         sorted(
             str(value)
@@ -95,6 +96,13 @@ def _plan_initialization(
     if captured.proposal_base.snapshot.file(profile_path).content != profile_bytes:
         raise OSError("Profile changed while preparing initialization")
     snapshot = captured.proposal_base.snapshot
+    if not snapshot.ok:
+        raise InitializationConflict(
+            profile_path,
+            "Existing initialization inputs are invalid; correct the reported paths",
+            findings=snapshot.findings,
+        )
+    # Existing validated records retain their IDs and exact original bytes.
     originals = {item.path: item for item in snapshot.artifacts}
     scope = originals.get(profile.artifacts["scope"])
     scope_id = (
@@ -104,6 +112,7 @@ def _plan_initialization(
     )
     values = artifact_values(profile, scope_id=scope_id)
     changes: list[MutationChange] = []
+    # Source-only workspaces have no target parity artifact to initialize.
     for key, kind, template in ARTIFACT_TEMPLATES:
         if key == "parity_matrix" and profile.system.role == "legacy-source":
             continue
@@ -142,6 +151,7 @@ def _plan_initialization(
     mutation = plan_mutation(
         captured.proposal_base,
         tuple(changes),
+        # Each publication is restricted to its exact projected kind, ID and path.
         grants=tuple(
             WriteGrant(
                 artifact_kind=item.artifact_kind,
@@ -203,6 +213,7 @@ def _outputs(plan: InitializationPlan) -> tuple[InitializationOutput, ...]:
             sha256=sha256(plan.profile_bytes).hexdigest(),
         )
     ]
+    # Synthetic directory existence never changes a physical planned disposition.
     outputs.extend(
         InitializationOutput(
             path=path,
@@ -211,6 +222,7 @@ def _outputs(plan: InitializationPlan) -> tuple[InitializationOutput, ...]:
         )
         for path in sorted(directories)
     )
+    # Ordinary artifact dispositions come from the accepted mutation projection.
     outputs.extend(
         InitializationOutput(
             path=write.change.path,
@@ -267,6 +279,7 @@ def commit_initialization(
             plan.capture, profile_bytes=plan.profile_bytes, directories=plan.directories
         )
         revoked = bootstrap.authority_invalidated
+        # Bootstrap effects remain visible even when a later stage fails.
         outputs = tuple(
             InitializationOutput(
                 path=item.path,
@@ -314,7 +327,9 @@ def commit_initialization(
                 primitives=io.primitives,
             ),
         )
+        # Report only parents implied by confirmed ordinary artifact creation.
         statuses = {item.path: item.status for item in result.artifacts}
+        # Successful children prove creation of their previously absent parents.
         created_parents = {
             item.path
             for item in outputs
@@ -325,6 +340,7 @@ def commit_initialization(
                 for output in result.artifacts
             )
         }
+        # Merge exact file outcomes without upgrading unperformed planned writes.
         outputs = tuple(
             InitializationOutput(
                 path=item.path,
@@ -354,7 +370,9 @@ def commit_initialization(
         )
     except (OSError, ValueError) as error:
         if isinstance(error, InitializationConflict):
+            # Typed conflicts retain their exact paths through the result adapter.
             conflicts = {item.path for item in error.outputs}
+            # Preserve all unaffected dispositions when a freshness check fails.
             outputs = tuple(
                 InitializationOutput(
                     path=item.path,
@@ -401,6 +419,7 @@ def validate_template_set(template_root: Path, fs: FileSystem) -> None:
     """
     Preserve the legacy helper's complete missing-template diagnostics without writes.
     """
+    # Report every missing legacy template in one actionable diagnostic.
     missing = (
         [str(template_root)]
         if not fs.exists(template_root)
@@ -433,6 +452,7 @@ def substitute_placeholders(text: str, tokens: Mapping[str, str] | None = None) 
     """
     Retain the legacy literal substitution helper, separate from typed v2 rendering.
     """
+    # Legacy callers rely on literal token substitution with no parsing semantics.
     for token, value in (tokens or {}).items():
         text = text.replace(token, value)
     return text

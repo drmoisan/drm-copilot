@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-18T13:50:10.812947+00:00",
+  "status": "diagnostic only; full current-byte coverage still required",
+  "mapping_basis": "Production ASTs retain the already verified missing-ID guard; later changes add comments only. Sorted executable-statement ordinal mapping retains exact statement counts. Raw runs are kept separately and are not merged or relabeled as final coverage.",
+  "independent_ast_proof": "evidence/regression-testing/p3t2-executor-comment-binding.2026-10-18T13-48.json",
+  "targeted_result": "5 passed, 26 deselected in 12.42 seconds; all 25 source/test/resource hashes stable",
+  "interrupted_full_run": "Pass 12 was terminated by coordinator direction after 34 passing markers in 34.45 seconds; observed process exit 4294967295. No final coverage or after-binding was emitted or claimed.",
+  "rows": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "sha256": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+      "name": "commit_initialization",
+      "current_range": [
+        238,
+        400
+      ],
+      "previous_missing": [
+        261,
+        290,
+        314,
+        377,
+        378
+      ],
+      "mapped_current_missing": [
+        267,
+        297,
+        321,
+        389,
+        390
+      ],
+      "all_missing_exercised_now": true,
+      "diagnostic_combined_covered": 39,
+      "diagnostic_statements": 39,
+      "diagnostic_combined_percent": 100.0,
+      "targeted_only_percent": 76.92307692307692
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+      "name": "capture",
+      "current_range": [
+        109,
+        140
+      ],
+      "previous_missing": [
+        133
+      ],
+      "mapped_current_missing": [
+        134
+      ],
+      "all_missing_exercised_now": true,
+      "diagnostic_combined_covered": 9,
+      "diagnostic_statements": 9,
+      "diagnostic_combined_percent": 100.0,
+      "targeted_only_percent": 100.0
+    }
+  ]
+}

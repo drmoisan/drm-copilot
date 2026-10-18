@@ -44,6 +44,7 @@ def test_main_success_path_invokes_create_discovery_workspace(
         *,
         force: bool,
     ) -> None:
+        """Record delegated arguments without opening the supplied filesystem."""
         calls.append(
             {
                 "target_dir": target_dir,
@@ -76,6 +77,7 @@ def test_main_honors_template_root_override(monkeypatch: pytest.MonkeyPatch) -> 
         *,
         force: bool,
     ) -> None:
+        """Capture only the selected template root for the override assertion."""
         calls.append(template_root)
 
     monkeypatch.setattr(
@@ -104,6 +106,7 @@ def test_main_exits_1_on_fail_fast_exception(
     """Each fail-fast exception type causes `main()` to raise `SystemExit(1)`."""
 
     def fake_create_discovery_workspace(*_args: object, **_kwargs: object) -> None:
+        """Raise the selected boundary failure without producing any output files."""
         raise raised_exception
 
     monkeypatch.setattr(

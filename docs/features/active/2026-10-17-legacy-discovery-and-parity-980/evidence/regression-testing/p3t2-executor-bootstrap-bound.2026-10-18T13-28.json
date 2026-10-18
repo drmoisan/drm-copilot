@@ -1,0 +1,109 @@
+{
+  "timestamp_utc": "2026-10-18T13:27:51.319312+00:00",
+  "results": [
+    {
+      "name": "unchanged-bootstrap-postcondition-control",
+      "passed": true,
+      "detail": {
+        "created": [
+          "docs/migration",
+          "docs/migration/discovery",
+          "docs/migration/discovery/acceptance",
+          "docs/migration/discovery/characterization",
+          "docs/migration/discovery/domain-profile.yaml",
+          "docs/migration/discovery/evidence",
+          "docs/migration/discovery/feature-contracts",
+          "docs/migration/discovery/implementation-records",
+          "docs/migration/discovery/inventory",
+          "docs/migration/discovery/reports",
+          "docs/migration/discovery/source-snapshots"
+        ],
+        "profile_observed": true
+      }
+    },
+    {
+      "name": "old-directory-identity-substitution-rejected",
+      "passed": true,
+      "detail": {
+        "rejected": true,
+        "path": "docs"
+      }
+    },
+    {
+      "name": "new-directory-identity-substitution-rejected",
+      "passed": true,
+      "detail": {
+        "rejected": true,
+        "path": "docs/migration/discovery/evidence"
+      }
+    },
+    {
+      "name": "bootstrap-capture-rejects-post-open-directory-substitution",
+      "passed": true,
+      "detail": {
+        "error": "Opened initialization directory identity changed after creation",
+        "attacked": [
+          "docs/migration/discovery/evidence"
+        ],
+        "created": [
+          "docs/migration",
+          "docs/migration/discovery",
+          "docs/migration/discovery/acceptance",
+          "docs/migration/discovery/characterization",
+          "docs/migration/discovery/domain-profile.yaml",
+          "docs/migration/discovery/evidence",
+          "docs/migration/discovery/feature-contracts",
+          "docs/migration/discovery/implementation-records",
+          "docs/migration/discovery/inventory",
+          "docs/migration/discovery/reports",
+          "docs/migration/discovery/source-snapshots"
+        ]
+      }
+    },
+    {
+      "name": "invalid-existing-artifact-has-structured-conflict",
+      "passed": true,
+      "detail": {
+        "conflict_path": "docs/migration/discovery/coverage-ledger.json",
+        "typed_exception": "InitializationConflict"
+      }
+    },
+    {
+      "name": "invalid-existing-profile-has-structured-conflict-with-force",
+      "passed": true,
+      "detail": {
+        "conflict_path": "docs/migration/discovery/domain-profile.yaml",
+        "force_preserved": true
+      }
+    },
+    {
+      "name": "concurrent-profile-collision-reports-known-partial-state",
+      "passed": true,
+      "detail": {
+        "conflicts": [
+          "docs/migration/discovery/domain-profile.yaml"
+        ],
+        "created": [
+          "docs/migration",
+          "docs/migration/discovery"
+        ],
+        "uncertain": [
+          "docs/migration/discovery/domain-profile.yaml"
+        ]
+      }
+    }
+  ],
+  "passed": 7,
+  "total": 7,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "7064bdcdb2bcd241420e1070ff6ae7a00f4b7453b3de09d5eca2340b73627f6e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "7064bdcdb2bcd241420e1070ff6ae7a00f4b7453b3de09d5eca2340b73627f6e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "source_stable": true
+}

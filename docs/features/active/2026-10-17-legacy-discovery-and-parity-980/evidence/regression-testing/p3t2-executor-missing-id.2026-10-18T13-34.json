@@ -1,0 +1,67 @@
+{
+  "timestamp_utc": "2026-10-18T13:34:07.012809+00:00",
+  "results": [
+    {
+      "name": "scope",
+      "passed": true,
+      "conflict_path": "docs/migration/discovery/scope.yaml",
+      "no_effects": true
+    },
+    {
+      "name": "coverage_ledger",
+      "passed": true,
+      "conflict_path": "docs/migration/discovery/coverage-ledger.json",
+      "no_effects": true
+    },
+    {
+      "name": "unspecified_behaviors",
+      "passed": true,
+      "conflict_path": "docs/migration/discovery/unspecified-behaviors.yaml",
+      "no_effects": true
+    },
+    {
+      "name": "product_decisions",
+      "passed": true,
+      "conflict_path": "docs/migration/discovery/product-decisions.yaml",
+      "no_effects": true
+    },
+    {
+      "name": "parity_matrix",
+      "passed": true,
+      "conflict_path": "docs/migration/discovery/parity-matrix.json",
+      "no_effects": true
+    }
+  ],
+  "passed": 5,
+  "total": 5,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "6e3a6ffbe467055de32747244272a0c05956555d09dc0d4c922fe9fd86e71720",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "6e3a6ffbe467055de32747244272a0c05956555d09dc0d4c922fe9fd86e71720",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "source_stable": true,
+  "changed_function": "_plan_initialization",
+  "exact_ast_delta": "if not snapshot.ok: raise InitializationConflict(..., findings=snapshot.findings)",
+  "unchanged_io_projection_bytes": true,
+  "all_other_flow_function_asts_unchanged": true,
+  "retained_historical_proofs": {
+    "bootstrap": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-executor-bootstrap-bound.2026-10-18T13-28.json",
+      "sha256": "73e8b4329d6a08ecc8823c007fe3a33e1af6ee69229eb15365ec350fa55a3c2e",
+      "passed": 7,
+      "total": 7
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-executor-handoff-bound.2026-10-18T13-28.json",
+      "sha256": "8ddf57c193c630e4ef4b09c16f52c31d723ac7a93916c6e4af4fc536a733ae80",
+      "passed": 2,
+      "total": 2
+    }
+  },
+  "attribution": "Five new current-source negative cases; nine retained bootstrap/handoff cases are historical, with exact unchanged IO/projection bytes and unchanged commit/control-flow function ASTs. No full first/repeat initialization rerun."
+}

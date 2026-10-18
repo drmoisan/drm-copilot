@@ -20,27 +20,33 @@ def test_real_file_system_delegates_to_pathlib(
     calls: list[str] = []
 
     def fake_exists(self: Path) -> bool:  # noqa: ARG001
+        """Record the existence query without inspecting a real path."""
         calls.append("exists")
         return True
 
     def fake_is_dir(self: Path) -> bool:  # noqa: ARG001
+        """Return the fixture's directory classification without disk access."""
         calls.append("is_dir")
         return True
 
     def fake_iterdir(self: Path):  # noqa: ARG001
+        """Supply immutable child names and record the enumeration request."""
         calls.append("iterdir")
         return iter([Path("a"), Path("b")])
 
     def fake_mkdir(self: Path, parents: bool, exist_ok: bool) -> None:  # noqa: ARG001
+        """Record directory creation while leaving the real filesystem untouched."""
         calls.append("mkdir")
 
     def fake_read_text(self: Path, encoding: str) -> str:  # noqa: ARG001
+        """Return fixed text through the adapter's normal read interface."""
         calls.append("read_text")
         return "content"
 
     def fake_write_text(
         self: Path, content: str, encoding: str
     ) -> None:  # noqa: ARG001
+        """Record publication without writing the supplied text anywhere."""
         calls.append("write_text")
 
     monkeypatch.setattr(Path, "exists", fake_exists, raising=True)
@@ -80,6 +86,7 @@ def test_expected_template_relative_paths_has_eight_entries() -> None:
     assert mod.EXPECTED_TEMPLATE_RELATIVE_PATHS[0] == mod.DOMAIN_PROFILE_RELATIVE_PATH
     assert mod.OUTPUT_RELATIVE_PATHS[0] == Path("domain-profile.yaml")
 
+    # Preserve the frozen v1 path correspondence independently of v2 projection.
     for template_path, output_path in zip(
         mod.EXPECTED_TEMPLATE_RELATIVE_PATHS[1:],
         mod.OUTPUT_RELATIVE_PATHS[1:],
