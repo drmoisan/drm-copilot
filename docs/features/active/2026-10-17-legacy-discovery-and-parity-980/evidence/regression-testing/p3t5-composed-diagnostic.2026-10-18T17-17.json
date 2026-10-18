@@ -1,0 +1,96 @@
+{
+  "written_at_utc": "2026-10-18T17:17:09.546244+00:00",
+  "label": "diagnostic",
+  "kind": "actual planner and guarded writer with injected memory OS seams; no new platform provider",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164"
+  },
+  "checks": [
+    {
+      "name": "dry-run-has-no-write-directory-or-authority-effects",
+      "passed": true
+    },
+    {
+      "name": "dry-run-identifies-three-exact-outputs",
+      "passed": true
+    },
+    {
+      "name": "record-payload-and-link-publish-exact-bytes",
+      "passed": true
+    },
+    {
+      "name": "exclusive-create-and-digest-checked-update-dispositions",
+      "passed": true
+    },
+    {
+      "name": "completion-authority-invalidated-once",
+      "passed": true
+    },
+    {
+      "name": "only-selected-link-array-changed",
+      "passed": true
+    },
+    {
+      "name": "observation-remains-unknown-with-null-statement",
+      "passed": true
+    },
+    {
+      "name": "unrelated-input-bytes-preserved",
+      "passed": true
+    },
+    {
+      "name": "exact-local-evidence-is-verifiable",
+      "passed": true
+    },
+    {
+      "name": "guard-and-retained-anchors-released",
+      "passed": true
+    },
+    {
+      "name": "duplicate-registration-rejects-without-effects",
+      "passed": true
+    },
+    {
+      "name": "partial-publication-reports-created-and-conflict",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-invalidates-completion-authority",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-retains-findings-and-uncertainty",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-preserves-unrelated-and-uncommitted-bytes",
+      "passed": true
+    },
+    {
+      "name": "partial-failure-releases-guard-and-parent-anchors",
+      "passed": true
+    },
+    {
+      "name": "bound-source-bytes-stable",
+      "passed": true
+    }
+  ],
+  "timings": {
+    "preview_seconds": 6.8095870000106515,
+    "commit_seconds": 39.60503280001285,
+    "partial_failure_seconds": 20.48741109999537
+  },
+  "passed": 17,
+  "failed": 0
+}

@@ -64,7 +64,7 @@ class EvidenceLink:
     link_path: tuple[str | int, ...] = ()
 
     def __post_init__(self) -> None:
-        """Detach sequences and check selectors; invalid inputs raise ValueError."""
+        """Detach supplied sequences; return None or raise ValueError for bad inputs."""
         object.__setattr__(self, "payloads", tuple(self.payloads))
         object.__setattr__(self, "link_path", tuple(self.link_path))
         MutationChange(
@@ -74,6 +74,7 @@ class EvidenceLink:
             content=b"",
             expected_sha256=self.expected_sha256,
         )
+        # Reject mutable provenance and invalid path tokens before graph traversal.
         if (
             cast("object", self.expected_sha256) is None
             or not isinstance(cast("object", self.record), JsonObject)
@@ -92,7 +93,11 @@ class EvidenceLink:
 
 
 def _default_path(kind: str, evidence_type: JsonValue) -> tuple[str | int, ...]:
-    """Choose only existing core link fields; row-based artifacts need a selector."""
+    """Return core field tokens for the selected kind/type without effects.
+
+    Unsupported or row-based kinds return an empty tuple requiring an explicit
+    selector; this lookup neither creates a field nor validates its current value.
+    """
     # Runtime captures and manual observations belong to the feature's runtime links.
     if kind == "feature-contract":
         return (
@@ -114,7 +119,11 @@ def _default_path(kind: str, evidence_type: JsonValue) -> tuple[str | int, ...]:
 def _append_link(
     value: JsonValue, path: tuple[str | int, ...], reference: JsonObject
 ) -> tuple[JsonValue, int]:
-    """Copy one selected array while preserving every unrelated value and state."""
+    """Return copied value and link index, following typed path tokens in memory.
+
+    reference is appended only to an existing tuple leaf, with exact repeats
+    retained once. Invalid paths/leaves raise MutationError; inputs stay immutable.
+    """
     # Only the selected leaf can grow; object members and array siblings stay exact.
     if not path:
         if not isinstance(value, tuple):
@@ -141,8 +150,11 @@ def _linked_document(
     """Append only where the accepted schema identifies an evidence reference.
 
     Schema-directed traversal excludes extension payloads and arbitrary arrays.
+    baseline supplies the trusted catalog; target supplies the containing document
+    and member pointer. request selects the leaf for the supplied reference.
     The containing artifact is preserved, including collection siblings and all
-    observation/approval fields. Missing or non-evidence locations fail explicitly.
+    observation/approval fields. Return its updated immutable object without I/O;
+    missing or non-evidence locations raise MutationError.
     """
     selected = request.link_path or _default_path(
         target.kind, request.record.get("evidence_type")
@@ -160,6 +172,7 @@ def _linked_document(
         pointer = child_pointer(pointer, part)
     schemas = dict(baseline.snapshot.catalog.documents)
     identifier = V2_URN + target.artifact.expected_kind
+    # Recognition must come from a core schema leaf at the exact appended position.
     if not any(
         location == pointer and expected == "evidence-reference"
         for location, _, expected, _ in schema_references(
@@ -177,7 +190,9 @@ def evidence_changes(
 ) -> tuple[MutationChange, ...]:
     """Project create-only evidence/payloads and one exact-byte artifact update.
 
-    Uses the accepted schema and reference index; no local or remote I/O occurs.
+    baseline supplies captured bytes/identities and request selects the append.
+    Return immutable MutationChange values using the accepted schema/reference
+    index; no local or remote I/O occurs and neither input is modified.
     Invalid metadata, duplicate identities, absent/imported targets and unrelated
     payloads raise MutationError. This projection is not a validated write plan;
     roots, grants, freshness and the complete graph are checked by plan_evidence_link.
@@ -277,7 +292,8 @@ def plan_evidence_link(
 ) -> MutationPlan:
     """Validate a complete prospective graph and require exact local evidence bytes.
 
-    Grants/invocation are forwarded unchanged, never generated here. Source/test
+    Return a MutationPlan for baseline/request; grants/invocation are forwarded
+    unchanged, never generated here. Source/test
     proof requires objects already captured at full pins in baseline; working-tree
     bytes are not substituted. URI-only descriptions cannot satisfy this operation.
     Shared planning errors or EVIDENCE_UNVERIFIED propagate before any writes.

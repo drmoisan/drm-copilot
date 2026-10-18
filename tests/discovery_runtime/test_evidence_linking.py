@@ -16,6 +16,7 @@ from drm_copilot_discovery.evidence_linking import (
 )
 from drm_copilot_discovery.findings import Finding
 from drm_copilot_discovery.models import JsonObject, canonical_json, to_plain_value
+from drm_copilot_discovery.mutation_io import MutationArtifact, MutationResult
 from drm_copilot_discovery.mutation_plan import MutationError
 
 from tests.discovery_runtime.evidence_test_support import (
@@ -297,6 +298,50 @@ def test_invalid_captured_input_remains_an_explicit_prewrite_error(
     )
 
 
+@pytest.mark.parametrize("already_linked", [False, True])
+def test_existing_links_are_preserved_and_exact_repeat_is_not_duplicated(
+    link_baseline: CapturedWorkspace, already_linked: bool
+) -> None:
+    """Adding provenance retains unrelated links and one copy of a selected link."""
+    target = next(
+        item
+        for item in link_baseline.snapshot.artifacts
+        if item.expected_kind == "feature-contract"
+    )
+    document = as_object(to_plain_value(target.document))
+    existing = [{"artifact_kind": "evidence-reference", "id": "other"}]
+    selected = {"artifact_kind": "evidence-reference", "id": "proof"}
+    if already_linked:
+        existing.append(selected)
+    document["runtime_evidence_refs"] = existing
+    baseline = add_record(link_baseline, document, path=target.path)
+    result = evidence_changes(baseline, request_for(baseline))
+    updated = as_object(json.loads(result[1].content))
+    assert updated["runtime_evidence_refs"] == [existing[0], selected]
+
+
+def test_evidence_link_cannot_create_a_product_approval(
+    link_baseline: CapturedWorkspace,
+) -> None:
+    """An unapproved decision's null approval cannot become an object during linking."""
+    document = load_fixture("product-decision-collection")
+    member = load_fixture("product-decision")
+    member.update(status="proposed", approval=None)
+    document["records"] = [member]
+    path = link_baseline.snapshot.profile.artifacts["product_decisions"]
+    baseline = add_record(link_baseline, document, path=path)
+    request = replace(
+        request_for(baseline),
+        artifact_kind="product-decision",
+        artifact_id=str(member["id"]),
+        expected_sha256=baseline.snapshot.file(path).sha256,
+    )
+    with pytest.raises(MutationError) as caught:
+        evidence_changes(baseline, request)
+    assert caught.value.code == "EVIDENCE_LINK_FIELD"
+    assert member["approval"] is None and member["status"] == "proposed"
+
+
 @pytest.fixture(scope="module")
 def evidence_plan(link_baseline: CapturedWorkspace) -> MutationPlan:
     """Exercise the real complete planner once; reuse only its immutable result."""
@@ -331,7 +376,7 @@ def test_wrapper_forwards_exact_context_grants_and_dry_run(
     evidence_plan: MutationPlan,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Thin orchestration returns the shared dry-run result without side effects."""
+    """Thin orchestration forwards dry-run arguments and returns the exact result."""
     context = cast("InvocationContext", object())
     seen: list[object] = []
 
@@ -349,6 +394,20 @@ def test_wrapper_forwards_exact_context_grants_and_dry_run(
     monkeypatch.setattr(evidence_linking, "plan_evidence_link", planned)
     request = request_for(link_baseline)
     writer = memory_writer(link_baseline)
+    expected = MutationResult(
+        ok=True,
+        artifacts=(),
+        findings=(),
+        validation=evidence_plan.validation,
+        authority_invalidated=False,
+    )
+
+    def committed(plan: MutationPlan, **options: object) -> MutationResult:
+        """Observe the wrapper seam; actual publication is an integration concern."""
+        seen.extend((plan, options))
+        return expected
+
+    monkeypatch.setattr(evidence_linking, "commit_mutation", committed)
     result = link_evidence(
         link_baseline,
         request,
@@ -357,13 +416,15 @@ def test_wrapper_forwards_exact_context_grants_and_dry_run(
         dry_run=True,
         invocation=context,
     )
-    assert seen == [link_baseline, request, evidence_plan.grants, context]
-    assert (
-        result.ok
-        and not result.authority_invalidated
-        and writer.invalidations == writer.attempts == 0
-    )
-    assert {item.status for item in result.artifacts} == {"planned"}
+    assert seen == [
+        link_baseline,
+        request,
+        evidence_plan.grants,
+        context,
+        evidence_plan,
+        {"writer": writer, "dry_run": True},
+    ]
+    assert result is expected and writer.invalidations == writer.attempts == 0
 
 
 @pytest.mark.parametrize("fail", [False, True])
@@ -373,30 +434,47 @@ def test_shared_writer_commits_or_reports_explicit_partial_failure(
     monkeypatch: pytest.MonkeyPatch,
     fail: bool,
 ) -> None:
-    """Memory publication retains unrelated bytes and reports partial I/O."""
+    """The wrapper preserves the shared writer's complete or partial disposition."""
     monkeypatch.setattr(evidence_linking, "plan_evidence_link", constant(evidence_plan))
     writer = memory_writer(link_baseline)
-    writer.fail_at = 2 if fail else 0
-    original = dict(writer.store.files)
+    output = evidence_plan.writes[0].change
+    artifact = MutationArtifact(
+        path=output.path,
+        artifact_kind=output.artifact_kind,
+        artifact_id=output.artifact_id,
+        sha256=evidence_plan.prospective.file(output.path).sha256,
+        status="conflict" if fail else "created",
+    )
+    expected = MutationResult(
+        ok=not fail,
+        artifacts=(artifact,),
+        findings=(
+            (
+                Finding(
+                    code="MUTATION_IO", message="bounded failure", next_action="Reload"
+                ),
+            )
+            if fail
+            else ()
+        ),
+        validation=evidence_plan.validation,
+        authority_invalidated=True,
+        uncertain_paths=(output.path,) if fail else (),
+    )
+    seen: list[object] = []
+
+    def committed(plan: MutationPlan, **options: object) -> MutationResult:
+        """Return a distinct shared result without running unrelated graph logic."""
+        seen.extend((plan, options))
+        return expected
+
+    monkeypatch.setattr(evidence_linking, "commit_mutation", committed)
     result = link_evidence(
         link_baseline,
         request_for(link_baseline),
         grants=evidence_plan.grants,
         writer=writer,
     )
-    assert result.ok is not fail and result.authority_invalidated
-    if fail:
-        assert [item.status for item in result.artifacts] == ["created", "conflict"]
-        assert result.uncertain_paths and result.findings
-    else:
-        assert [item.status for item in result.artifacts] == [
-            "created",
-            "created",
-            "updated",
-        ]
-    changed = {item.path for item in result.artifacts}
-    assert all(
-        writer.store.files[path] == value
-        for path, value in original.items()
-        if path not in changed
-    )
+    assert result is expected
+    assert seen == [evidence_plan, {"writer": writer, "dry_run": False}]
+    assert writer.invalidations == writer.attempts == 0

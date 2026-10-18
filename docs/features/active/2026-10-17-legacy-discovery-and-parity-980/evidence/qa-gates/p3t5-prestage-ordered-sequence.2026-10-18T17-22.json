@@ -1,0 +1,72 @@
+{
+  "started_at_utc": "2026-10-18T17:17:29.194505+00:00",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+    "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+  },
+  "ordered_steps": [
+    {
+      "stage": 1,
+      "purpose": "p3t5-pass1-format",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:17:30.300274+00:00"
+    },
+    {
+      "stage": 2,
+      "purpose": "p3t5-pass1-lint",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:17:31.163970+00:00"
+    },
+    {
+      "stage": 3,
+      "purpose": "p3t5-pass1-types",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:17:40.460789+00:00"
+    },
+    {
+      "stage": 4,
+      "purpose": "p3t5-pass1-architecture",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:17:41.674331+00:00"
+    },
+    {
+      "stage": 5,
+      "purpose": "p3t5-pass1-tests",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:19:53.189148+00:00"
+    },
+    {
+      "stage": 5,
+      "purpose": "p3t5-pass1-coverage-check",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:19:54.556352+00:00"
+    },
+    {
+      "stage": 5,
+      "purpose": "p3t5-pass1-reverse",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:20:47.765245+00:00"
+    },
+    {
+      "stage": 6,
+      "purpose": "p3t5-pass1-contracts",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:21:15.476298+00:00"
+    },
+    {
+      "stage": 7,
+      "purpose": "p3t5-pass1-integration",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-18T17:22:27.610843+00:00"
+    }
+  ],
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+    "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+  },
+  "source_stable": true
+}

@@ -1,0 +1,42 @@
+{
+  "pass1": {
+    "started_at_utc": "2026-10-18T17:17:42.565661+00:00",
+    "ended_at_utc": "2026-10-18T17:19:53.052598+00:00",
+    "elapsed_seconds": 130.4869394999987,
+    "pytest_exit": 0,
+    "source_hashes_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_hashes_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_stable": true,
+    "reverse": false
+  },
+  "reverse1": {
+    "started_at_utc": "2026-10-18T17:19:55.491315+00:00",
+    "ended_at_utc": "2026-10-18T17:20:47.676319+00:00",
+    "elapsed_seconds": 52.18500189999759,
+    "pytest_exit": 0,
+    "source_hashes_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_hashes_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_stable": true,
+    "reverse": true
+  }
+}

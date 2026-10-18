@@ -136,7 +136,11 @@ def test_source_and_test_records_use_actual_captured_immutable_objects(
     )
     baseline = replace(
         link_baseline,
-        snapshot=replace(link_baseline.snapshot, repository_files=(retained,)),
+        snapshot=replace(
+            link_baseline.snapshot,
+            checkout=retained.repository,
+            repository_files=(retained,),
+        ),
     )
     changes = evidence_changes(baseline, request)
     result = plan_evidence_link(baseline, request, grants=grants_for(*changes))
