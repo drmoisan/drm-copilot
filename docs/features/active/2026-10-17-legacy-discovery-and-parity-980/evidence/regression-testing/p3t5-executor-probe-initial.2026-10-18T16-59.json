@@ -1,0 +1,96 @@
+{
+  "task": "P3-T5",
+  "acceptance_baseline": "1cc73b60cd636f186ca0269bf3942d32acd18105",
+  "scope": "Independent bounded projection, failure and forwarding checks; one real valid planner and two early planner preconditions. Other full graph/writer proof belongs to the task gate.",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "553b8afe4a86c6b5b1f23003b5fb421683abace78cdbbad0e5dbead371cbd6a5",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/schemas/discovery/v2_schema_test_support.py": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "553b8afe4a86c6b5b1f23003b5fb421683abace78cdbbad0e5dbead371cbd6a5",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/schemas/discovery/v2_schema_test_support.py": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48"
+  },
+  "elapsed_seconds": 5.402,
+  "passed": 12,
+  "failed": 1,
+  "checks": [
+    {
+      "name": "deterministic-exact-projection",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "explicit-create-and-original-digest-preconditions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "runtime-link-preserves-entire-original-observation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "source-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "test-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "observation-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "documentation-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "decision-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inventory-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "nested-array-only-update",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "existing-exact-link-is-not-duplicated-and-other-link-remains",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "probe-harness-completed",
+      "passed": false,
+      "detail": {
+        "error": "PATH_COLLISION: 'docs/migration/discovery/product-decisions.yaml': Remove duplicate or aliased paths.",
+        "traceback": "Traceback (most recent call last):\n  File \"SCRATCH\\issue-980-p3t5-review-probes.py\", line 191, in <module>\n    main()\n    ~~~~^^\n  File \"SCRATCH\\issue-980-p3t5-review-probes.py\", line 117, in main\n    selected = put_record(baseline, collection, path)\n  File \"SCRATCH\\issue-980-p3t5-review-probes.py\", line 66, in put_record\n    manifest=replace(baseline.snapshot.manifest,\n             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                     files=tuple(item for item in baseline.snapshot.manifest.files if item.path != path)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                     + (SnapshotFile(path=path, content=canonical_json(value), category=\"artifact\"),))))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"PYTHON_RUNTIME\\Lib\\dataclasses.py\", line 1596, in replace\n    return _replace(obj, **changes)\n  File \"PYTHON_RUNTIME\\Lib\\dataclasses.py\", line 1630, in _replace\n    return self.__class__(**changes)\n           ~~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"<string>\", line 7, in __init__\n  File \"WORKTREE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\snapshot.py\", line 162, in __post_init__\n    check_path_collisions(paths + missing)\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"WORKTREE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\path_models.py\", line 100, in check_path_collisions\n    raise PathPolicyError(\n        \"PATH_COLLISION\", path, \"Remove duplicate or aliased paths.\"\n    )\ndrm_copilot_discovery.path_models.PathPolicyError: PATH_COLLISION: 'docs/migration/discovery/product-decisions.yaml': Remove duplicate or aliased paths.\n"
+      }
+    },
+    {
+      "name": "source-and-accepted-fixtures-stable",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "timestamp": "2026-10-18T16:59:31Z",
+  "disposition": "Historical failed independent probe: 12 checks passed, one SCRATCH fixture error. The injected collection remained listed as absent while its file was supplied, so the accepted manifest constructor rejected the collision before the selected production operation. No production defect or acceptance claim."
+}

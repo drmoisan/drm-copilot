@@ -1,0 +1,257 @@
+{
+  "task": "P3-T5",
+  "acceptance_baseline": "1cc73b60cd636f186ca0269bf3942d32acd18105",
+  "scope": "Independent bounded projection, failure and forwarding checks; one real valid planner and two early planner preconditions. Other full graph/writer proof belongs to the task gate.",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "f5b1fcddfcc1e920f99dce71230041622c122470bdabdc422229ad31a9f9ed7f",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/schemas/discovery/v2_schema_test_support.py": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "f5b1fcddfcc1e920f99dce71230041622c122470bdabdc422229ad31a9f9ed7f",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/schemas/discovery/v2_schema_test_support.py": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48"
+  },
+  "elapsed_seconds": 14.724,
+  "passed": 36,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "deterministic-exact-projection",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "explicit-create-and-original-digest-preconditions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "runtime-link-preserves-entire-original-observation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "source-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "test-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "observation-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "documentation-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "decision-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inventory-projection-preserves-states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "nested-array-only-update",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "existing-exact-link-is-not-duplicated-and-other-link-remains",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "product-decision-collection-preserves-envelope-sibling-and-state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no-approval-container-is-created",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_LINK_FIELD",
+        "error": "EVIDENCE_LINK_FIELD: The selected link field does not exist"
+      }
+    },
+    {
+      "name": "unspecified-behavior-collection-preserves-envelope-sibling-and-state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "reject-extension-array",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_LINK_FIELD",
+        "error": "EVIDENCE_LINK_FIELD: Select a core evidence-reference array"
+      }
+    },
+    {
+      "name": "reject-other-core-array",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_LINK_FIELD",
+        "error": "EVIDENCE_LINK_FIELD: Select a core evidence-reference array"
+      }
+    },
+    {
+      "name": "reject-missing-field",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_LINK_FIELD",
+        "error": "EVIDENCE_LINK_FIELD: The selected link field does not exist"
+      }
+    },
+    {
+      "name": "reject-scalar-state",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_LINK_FIELD",
+        "error": "EVIDENCE_LINK_FIELD: Select an existing link array"
+      }
+    },
+    {
+      "name": "missing-target",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_TARGET",
+        "error": "EVIDENCE_TARGET: Select one captured local artifact"
+      }
+    },
+    {
+      "name": "imported-target",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_TARGET",
+        "error": "EVIDENCE_TARGET: Select one captured local artifact"
+      }
+    },
+    {
+      "name": "duplicate-id",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_DUPLICATE",
+        "error": "EVIDENCE_DUPLICATE: Evidence identity already exists"
+      }
+    },
+    {
+      "name": "duplicate-evidence_id",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_DUPLICATE",
+        "error": "EVIDENCE_DUPLICATE: Evidence identity already exists"
+      }
+    },
+    {
+      "name": "unrelated-supplied-payload",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_PAYLOAD",
+        "error": "EVIDENCE_PAYLOAD: Payload is not named by the record"
+      }
+    },
+    {
+      "name": "malformed-short-pin",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_RECORD",
+        "error": "EVIDENCE_RECORD: Evidence metadata is invalid"
+      }
+    },
+    {
+      "name": "malformed-bad-checksum",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_RECORD",
+        "error": "EVIDENCE_RECORD: Evidence metadata is invalid"
+      }
+    },
+    {
+      "name": "malformed-bad-timestamp",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_RECORD",
+        "error": "EVIDENCE_RECORD: Evidence metadata is invalid"
+      }
+    },
+    {
+      "name": "custom-evidence-root-is-respected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real-complete-planner-retains-exact-bytes-and-unknown-state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real-stale-destination-digest",
+      "passed": true,
+      "detail": {
+        "code": "MUTATION_PRECONDITION",
+        "error": "MUTATION_PRECONDITION: Original content digest differs"
+      }
+    },
+    {
+      "name": "real-ungranted-destination",
+      "passed": true,
+      "detail": {
+        "code": "MUTATION_GRANT",
+        "error": "MUTATION_GRANT: No exact kind/ID/path write grant"
+      }
+    },
+    {
+      "name": "planner-forwards-exact-grants-and-trusted-context",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local-proof-gate-remains-independent",
+      "passed": true,
+      "detail": {
+        "code": "EVIDENCE_UNVERIFIED",
+        "error": "EVIDENCE_UNVERIFIED: Evidence must identify locally verified bytes"
+      }
+    },
+    {
+      "name": "wrapper-preserves-outcome-and-context-dry-false",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "wrapper-preserves-outcome-and-context-dry-true",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all-projections-leave-baseline-unchanged",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "source-and-accepted-fixtures-stable",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "timestamp": "2026-10-18T17:04:00Z",
+  "source_stable": true,
+  "disposition": "R1 correction verified by the actual complete planner and the same bounded 36-case set. Final task acceptance remains pending complete worker gates, coverage and exact index/prior audit."
+}
