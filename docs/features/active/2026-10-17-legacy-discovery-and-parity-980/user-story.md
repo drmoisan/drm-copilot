@@ -45,7 +45,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 ### Core framework
 - [ ] A reusable legacy discovery and parity framework exists in `drm-copilot`.
 - [ ] Core content contains no TaskMaster- or TMW-specific behavior.
-- [ ] Configuration is loaded from a local domain profile.
+- [x] Configuration is loaded from a local domain profile.
 - [ ] Repositories not using discovery remain unaffected.
 ### Agents and skills
 - [ ] All required generic agents are implemented and validated.

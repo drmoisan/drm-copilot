@@ -273,6 +273,7 @@ def test_record_round_trip_preserves_audit_chain_and_workspace_identity() -> Non
         ("action", "root"),
         ("schema_version", "1"),
         ("workspace_sha256", ""),
+        ("workspace_sha256", None),
         ("profile_sha256", 4),
         ("locator_sha256", None),
         ("profile_path", "../outside"),

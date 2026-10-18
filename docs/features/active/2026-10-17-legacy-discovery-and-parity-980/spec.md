@@ -692,7 +692,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 - [ ] A reusable legacy discovery and parity framework exists in `drm-copilot`.
 - [ ] Core content contains no TaskMaster- or TMW-specific behavior.
-- [ ] Configuration is loaded from a local domain profile.
+- [x] Configuration is loaded from a local domain profile.
 - [ ] Repositories not using discovery remain unaffected.
 
 **Agents and skills**

@@ -221,7 +221,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover caller-provided identity/role/roots, honest null draft pins, all configured directories, source/target/combined structures, first/repeat/partial-recovery runs, invalid existing file, conflict-before-write, no-overwrite force compatibility, and dry-run without directories/activation/receipts.
   - Acceptance: Identical inputs produce identical projected content; repeat initialization skips valid files unchanged; the created or projected draft passes structural validation and fails completion.
 
-- [ ] [P3-T3] Manage explicit activation and configuration changes.
+- [x] [P3-T3] Manage explicit activation and configuration changes.
   - Files and behavior: Create R/{configuration,activation_store}.py and PT/test_{configuration,activation_store}.py for config/discovery.json and the trusted external per-workspace activation registry.
   - Tests and proof: Test default/custom profile selection, multiple candidates, argument/locator disagreement, missing/deleted/malformed active configuration, inactive nonparticipants, root-only activate/deactivate, no authority path from inputs, platform registry locations, invalidated grants, and dry-run no writes.
   - Acceptance: Configuration deletion cannot disable an active gate; deliberate deactivation is a recorded root operation, while repositories without activation or a default profile remain unaffected.

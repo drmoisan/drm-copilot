@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from drm_copilot_discovery.catalog import SchemaCatalog
+    from drm_copilot_discovery.path_models import ResolvedPath
 
 
 class MemoryRegistry:
@@ -329,3 +330,136 @@ def test_new_candidate_inside_guard_aborts_before_revocation_or_publication(
     assert not result.ok and result.error and "candidates changed" in result.error
     assert case.registry.raw is None and case.revocations == 0 and not result.changed
     assert set(case.disk.store.files) == {alternate}
+
+
+@pytest.mark.parametrize("condition", ["profile-path", "candidate"])
+def test_configuration_conflicts_are_rejected_before_lock_or_revocation(
+    config_catalog: SchemaCatalog, condition: str
+) -> None:
+    """A root request cannot publish inconsistent paths or hide known candidates."""
+    case = ConfigurationCase(config_catalog)
+    if condition == "candidate":
+        case.disk.store.put("docs/alternate.yaml", profile_bytes("docs/alternate.yaml"))
+        case.service.candidate_paths = (DEFAULT_PROFILE, "docs/alternate.yaml")
+    request = ConfigurationRequest(
+        action="activate",
+        profile_bytes=profile_bytes(),
+        profile_path=(
+            "docs/custom.yaml" if condition == "profile-path" else DEFAULT_PROFILE
+        ),
+    )
+    with pytest.raises(ConfigurationError):
+        case.service.configure(request)
+    assert case.registry.writes == 0 and case.revocations == 0 and not case.disk.locked
+
+
+@pytest.mark.parametrize("change", ["bytes", "parent", "candidate", "authorization"])
+def test_guarded_input_changes_abort_before_protected_publication(
+    config_catalog: SchemaCatalog, change: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Freshness and authorization are checked again before protected state changes."""
+    case = ConfigurationCase(config_catalog)
+    alternate = "docs/alternate.yaml"
+    case.service.candidate_paths = (DEFAULT_PROFILE, alternate)
+
+    def mutate() -> None:
+        """Inject one independent changed input at the explicit invalidation seam."""
+        if change == "bytes":
+            case.disk.store.put(DEFAULT_PROFILE, b"changed")
+        elif change == "parent":
+            case.disk.store.metadata.add("docs", kind="directory", identity="changed")
+        else:
+            case.disk.store.put(alternate, profile_bytes(alternate))
+
+    if change == "authorization":
+
+        def deny_second() -> None:
+            """Revoke the trusted principal between planning and guard acquisition."""
+            case.authorize()
+            if case.authorization_calls == 2:
+                raise PermissionError("root authorization revoked")
+
+        monkeypatch.setattr(case.service, "authorize_root", deny_second)
+    else:
+        case.on_revoke = mutate
+    result = case.service.configure(
+        ConfigurationRequest(action="activate", profile_bytes=profile_bytes())
+    )
+    assert not result.ok and not result.changed and case.registry.raw is None
+    assert result.authority_invalidated == (change != "authorization")
+    assert not case.disk.locked and case.disk.held == 0
+
+
+@pytest.mark.parametrize("change", ["root", "parent", "opened-parent", "leaf"])
+def test_physical_substitutions_after_activation_intent_fail_explicitly(
+    config_catalog: SchemaCatalog, change: str
+) -> None:
+    """Recorded active intent remains blocking if a publication anchor changes."""
+    case = ConfigurationCase(config_catalog)
+
+    def replace_path(path: str) -> None:
+        """Substitute a directory only in the requested metadata-to-open interval."""
+        if path == ("." if change == "root" else "docs"):
+            prior = case.disk.store.metadata(path)
+            case.disk.store.metadata.entries[path] = replace(prior, identity="changed")
+
+    def after_record() -> None:
+        """Change one pre-observed path after protected intent is recorded."""
+        if change in {"root", "opened-parent"}:
+            case.disk.before_open = replace_path
+        elif change == "parent":
+            replace_path("docs")
+        else:
+            case.disk.store.put(DEFAULT_PROFILE, b"concurrent leaf")
+
+    case.registry.after_write = after_record
+    result = case.service.configure(
+        ConfigurationRequest(action="activate", profile_bytes=profile_bytes())
+    )
+    assert not result.ok and result.authority_invalidated and result.uncertain
+    assert case.record().active and "protected-activation" in result.changed
+    assert not case.disk.locked and case.disk.held == 0
+
+
+@pytest.mark.parametrize("change", ["parent", "bytes", "candidate"])
+def test_postpublication_changes_invalidate_configuration_success(
+    config_catalog: SchemaCatalog, change: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Retained parent identities and exact final bytes both bind successful output."""
+    case = ConfigurationCase(config_catalog)
+    alternate = "docs/alternate.yaml"
+    case.service.candidate_paths = (DEFAULT_PROFILE, alternate)
+    original = case.service.primitives.create_exclusive
+
+    def publish(target: ResolvedPath, content: bytes) -> None:
+        """Inject an observed external edit after the final atomic publication."""
+        original(target, content)
+        if target.path == LOCATOR_PATH:
+            if change == "parent":
+                case.disk.store.metadata.add(
+                    "docs", kind="directory", identity="changed"
+                )
+            elif change == "bytes":
+                case.disk.store.put(LOCATOR_PATH, b"changed")
+            else:
+                case.disk.store.put(alternate, profile_bytes(alternate))
+
+    monkeypatch.setattr(case.service.primitives, "create_exclusive", publish)
+    result = case.service.configure(
+        ConfigurationRequest(action="activate", profile_bytes=profile_bytes())
+    )
+    assert not result.ok and result.authority_invalidated
+    assert set(result.changed) >= {DEFAULT_PROFILE, LOCATOR_PATH}
+    assert case.record().active and not case.disk.locked and case.disk.held == 0
+
+
+def test_inactive_selection_rejects_a_concurrent_protected_record_change(
+    config_catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The ordinary inactive branch also rechecks protected state before return."""
+    case = ConfigurationCase(config_catalog)
+    observations = iter([None, b"new protected record"])
+    monkeypatch.setattr(case.registry, "read", lambda: next(observations))
+    with pytest.raises(ConfigurationError, match="changed during selection"):
+        case.service.select()
+    assert case.registry.writes == 0
