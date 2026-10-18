@@ -2,6 +2,36 @@
   "manifest_version": 1,
   "resources": [
     {
+      "path": "docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "size": 364
+    },
+    {
+      "path": "docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c04bd95b1827f73f47aecf9dae3e33b9715ead0899e1c8cc5d8bd591298499da",
+      "size": 1225
+    },
+    {
+      "path": "docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "size": 296
+    },
+    {
+      "path": "docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "size": 184
+    },
+    {
+      "path": "docs/discovery/templates/v2/scope.yaml",
+      "sha256": "89bd691ebdd070f890bc80eac95397e1c0d3813655adace0f170123ce219d2b5",
+      "size": 479
+    },
+    {
+      "path": "docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "size": 193
+    },
+    {
       "path": "schemas/discovery/v1/coverage-ledger.schema.json",
       "sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
       "size": 4035

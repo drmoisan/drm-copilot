@@ -1,0 +1,67 @@
+{
+  "timestamp_utc": "2026-10-18T13:12:30.881317+00:00",
+  "results": [
+    {
+      "name": "unchanged-bootstrap-postcondition-control",
+      "passed": true,
+      "detail": {
+        "created": [
+          "docs/migration",
+          "docs/migration/discovery",
+          "docs/migration/discovery/acceptance",
+          "docs/migration/discovery/characterization",
+          "docs/migration/discovery/domain-profile.yaml",
+          "docs/migration/discovery/evidence",
+          "docs/migration/discovery/feature-contracts",
+          "docs/migration/discovery/implementation-records",
+          "docs/migration/discovery/inventory",
+          "docs/migration/discovery/reports",
+          "docs/migration/discovery/source-snapshots"
+        ],
+        "profile_observed": true
+      }
+    },
+    {
+      "name": "old-directory-identity-substitution-rejected",
+      "passed": true,
+      "detail": {
+        "rejected": true,
+        "path": "docs"
+      }
+    },
+    {
+      "name": "new-directory-identity-substitution-rejected",
+      "passed": false,
+      "error": "Post-bootstrap validation accepted substituted identity of newly created docs/migration/discovery/evidence",
+      "type": "AssertionError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 48, in case\n    detail = action()\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 81, in changed_created_directory_identity\n    raise AssertionError(\"Post-bootstrap validation accepted substituted identity of newly created \" + selected)\nAssertionError: Post-bootstrap validation accepted substituted identity of newly created docs/migration/discovery/evidence\n"
+    },
+    {
+      "name": "bootstrap-capture-rejects-post-open-directory-substitution",
+      "passed": false,
+      "error": "Guarded bootstrap reported success after opened new-directory identity substitution",
+      "type": "AssertionError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 48, in case\n    detail = action()\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 107, in bootstrap_capture_identity_race\n    assert not result.ok, \"Guarded bootstrap reported success after opened new-directory identity substitution\"\n           ^^^^^^^^^^^^^\nAssertionError: Guarded bootstrap reported success after opened new-directory identity substitution\n"
+    },
+    {
+      "name": "invalid-existing-artifact-has-structured-conflict",
+      "passed": false,
+      "error": "Existing artifact conflict has no typed path/status result; only ValueError: Existing initialization artifact is invalid: docs/migration/discovery/coverage-ledger.json",
+      "type": "AssertionError",
+      "traceback": "Traceback (most recent call last):\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 117, in invalid_existing_artifact_conflict\n    result = flow.initialize_workspace(request, io=bad_io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 355, in initialize_workspace\n    plan = plan_initialization(request, io=io, templates=templates)\n  File \"packages\\discovery-runtime\\src\\drm_copilot_discovery\\init_flow.py\", line 130, in plan_initialization\n    raise ValueError(f\"Existing initialization artifact is invalid: {path}\")\nValueError: Existing initialization artifact is invalid: docs/migration/discovery/coverage-ledger.json\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 48, in case\n    detail = action()\n  File \"SCRATCH/issue-980-p3t2-boundaries.py\", line 121, in invalid_existing_artifact_conflict\n    raise AssertionError(\"Existing artifact conflict has no typed path/status result; only \"\n                         + type(error).__name__ + \": \" + str(error)) from error\nAssertionError: Existing artifact conflict has no typed path/status result; only ValueError: Existing initialization artifact is invalid: docs/migration/discovery/coverage-ledger.json\n"
+    }
+  ],
+  "passed": 2,
+  "total": 5,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "f3930fae6a90ab427c4514648cf9bbb60db5e5cd28107e99de41b0df8da1e9d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "1d066420b9617f3da87a87df0026e9e8e128a89d57e938cbeed8572874446b21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "899a7d308ae4adca430a271661883f2918e8641ebe89a97f170c3561c7fb3445"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "f3930fae6a90ab427c4514648cf9bbb60db5e5cd28107e99de41b0df8da1e9d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "1d066420b9617f3da87a87df0026e9e8e128a89d57e938cbeed8572874446b21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "899a7d308ae4adca430a271661883f2918e8641ebe89a97f170c3561c7fb3445"
+  },
+  "source_stable": true
+}
