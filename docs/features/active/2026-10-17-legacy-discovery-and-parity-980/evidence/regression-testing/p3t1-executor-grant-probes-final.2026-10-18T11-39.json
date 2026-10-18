@@ -1,0 +1,29 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:38:55.607166+00:00",
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015"
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015"
+  },
+  "source_stable": true,
+  "passed": 2,
+  "total": 2,
+  "results": [
+    {
+      "name": "Opaque payload grant cannot create a structured evidence record",
+      "passed": true,
+      "rejected": "MUTATION_IDENTITY",
+      "message": "MUTATION_IDENTITY: Proposed artifact kind/ID differs"
+    },
+    {
+      "name": "Directory enumeration order is semantically irrelevant",
+      "passed": true,
+      "stable_snapshot": "5e57fe61e126bf065d2bb1ea3a975da7145c99afc87814dab18119bb9ae3c1b2",
+      "shuffled_snapshot": "5e57fe61e126bf065d2bb1ea3a975da7145c99afc87814dab18119bb9ae3c1b2"
+    }
+  ]
+}

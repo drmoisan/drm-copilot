@@ -1,0 +1,18 @@
+# p1t10-ruff-pass5
+
+Timestamp: 2026-10-18T06-59
+Command: poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py scripts/dev_tools/validate_discovery_profile.py tests/discovery_runtime/test_profile_v2.py tests/discovery_runtime/test_profile_dimensions.py tests/scripts/dev_tools/test_validate_discovery_profile.py tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py
+EXIT_CODE: 1
+Output Summary: [1mpackages\discovery-runtime\src\drm_copilot_discovery\profile_v2.py[0m[36m:[0m59[36m:[0m89[36m:[0m [1m[31m]8;;httpEXTERNAL_PATH Line too long (91 > 88); Found 1 error.
+
+Working directory: .
+Started: 2026-10-18T06:59:08.716845+00:00
+Duration seconds: 0.758
+Phase: P1-T10 immutable profile, inherited gates and explicit compatibility; focused task verification.
+
+## Captured output
+
+```text
+[1mpackages\discovery-runtime\src\drm_copilot_discovery\profile_v2.py[0m[36m:[0m59[36m:[0m89[36m:[0m [1m[31m]8;;httpEXTERNAL_PATH Line too long (91 > 88)
+Found 1 error.
+```

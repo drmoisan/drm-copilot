@@ -1,0 +1,357 @@
+{
+  "added_dependency_packages": [
+    "drm-copilot-discovery"
+  ],
+  "added_quality_tier_paths": [
+    "packages/discovery-runtime"
+  ],
+  "baseline_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-coverage.2026-10-18T03-51.json",
+  "coverage": [
+    {
+      "baseline_path": "scripts/dev_tools/discovery/__init__.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 3,
+      "changed_executable_lines_covered": 3,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 4,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "statements": 4
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/domain_profile.py",
+      "baseline_percent": {
+        "branch": 98.71794871794872,
+        "line": 99.47089947089947
+      },
+      "branches": 78,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 77,
+      "covered_lines": 189,
+      "current_percent": {
+        "branch": 98.71794871794872,
+        "line": 99.47368421052632
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "statements": 190
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/domain_profile_models.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 14,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 0,
+      "changed_executable_lines_covered": 0,
+      "changed_line_percent": 100.0,
+      "covered_branches": 14,
+      "covered_lines": 55,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "statements": 55
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/init_models.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 6,
+      "changed_executable_lines_covered": 6,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 30,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "statements": 30
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/io.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 2,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 0,
+      "changed_executable_lines_covered": 0,
+      "changed_line_percent": 100.0,
+      "covered_branches": 2,
+      "covered_lines": 16,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "statements": 16
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/rendering.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 2,
+      "category": "relocated canonical implementation",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 6,
+      "changed_executable_lines_covered": 6,
+      "changed_line_percent": 100.0,
+      "covered_branches": 2,
+      "covered_lines": 15,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "statements": 15
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/__init__.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 1,
+      "changed_executable_lines_covered": 1,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 2,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/__init__.py",
+      "statements": 2
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/domain_profile.py",
+      "baseline_percent": {
+        "branch": 98.71794871794872,
+        "line": 99.47089947089947
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 2,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/domain_profile.py",
+      "statements": 2
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/domain_profile_models.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 2,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/domain_profile_models.py",
+      "statements": 2
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/init_models.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 3,
+      "changed_executable_lines_covered": 3,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 5,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/init_models.py",
+      "statements": 5
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/io.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 2,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/io.py",
+      "statements": 2
+    },
+    {
+      "baseline_path": "scripts/dev_tools/discovery/rendering.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 0,
+      "category": "compatibility adapter",
+      "changed_branches": 0,
+      "changed_branches_covered": 0,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 0,
+      "covered_lines": 2,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/discovery/rendering.py",
+      "statements": 2
+    },
+    {
+      "baseline_path": "scripts/dev_tools/quality_tiers_contract.py",
+      "baseline_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "branches": 78,
+      "category": "changed existing project-discovery core",
+      "changed_branches": 2,
+      "changed_branches_covered": 2,
+      "changed_executable_lines": 2,
+      "changed_executable_lines_covered": 2,
+      "changed_line_percent": 100.0,
+      "covered_branches": 78,
+      "covered_lines": 191,
+      "current_percent": {
+        "branch": 100.0,
+        "line": 100.0
+      },
+      "path": "scripts/dev_tools/quality_tiers_contract.py",
+      "statements": 191
+    }
+  ],
+  "dependency_versions_changed": [],
+  "errors": [],
+  "explicit_any_in_runtime": [],
+  "frozen_v1_changes": [],
+  "generated_code_or_resource_copies": 0,
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py": 39,
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": 426,
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py": 158,
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py": 94,
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": 156,
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": 102,
+    "scripts/dev_tools/discovery/__init__.py": 25,
+    "scripts/dev_tools/discovery/domain_profile.py": 25,
+    "scripts/dev_tools/discovery/domain_profile_models.py": 19,
+    "scripts/dev_tools/discovery/init_models.py": 32,
+    "scripts/dev_tools/discovery/io.py": 17,
+    "scripts/dev_tools/discovery/rendering.py": 11,
+    "scripts/dev_tools/quality_tiers_contract.py": 392,
+    "tests/discovery_runtime/test_package_contract.py": 172,
+    "tests/scripts/dev_tools/discovery/test_domain_profile.py": 452,
+    "tests/scripts/dev_tools/discovery/test_init_models.py": 97,
+    "tests/scripts/dev_tools/discovery/test_io.py": 87,
+    "tests/scripts/dev_tools/discovery/test_rendering.py": 86,
+    "tests/scripts/dev_tools/test_quality_tiers_contract.py": 351,
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py": 202
+  },
+  "owned_paths": [
+    "packages/discovery-runtime/README.md",
+    "packages/discovery-runtime/pyproject.toml",
+    "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+    "poetry.lock",
+    "pyproject.toml",
+    "quality-tiers.yml",
+    "scripts/dev_tools/discovery/__init__.py",
+    "scripts/dev_tools/discovery/domain_profile.py",
+    "scripts/dev_tools/discovery/domain_profile_models.py",
+    "scripts/dev_tools/discovery/init_models.py",
+    "scripts/dev_tools/discovery/io.py",
+    "scripts/dev_tools/discovery/rendering.py",
+    "scripts/dev_tools/quality_tiers_contract.py",
+    "tests/discovery_runtime/test_package_contract.py",
+    "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+    "tests/scripts/dev_tools/discovery/test_init_models.py",
+    "tests/scripts/dev_tools/discovery/test_io.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py"
+  ],
+  "preserved_quality_tier_rows": 25,
+  "scope": "Focused task proof; repository-wide final QA remains a later plan gate.",
+  "staged_owned_count": 26,
+  "task": "P1-T1",
+  "timestamp_utc": "2026-10-18T04-34"
+}

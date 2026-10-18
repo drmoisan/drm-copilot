@@ -1,0 +1,20 @@
+# p2t3-lint-pass8
+
+Timestamp: 2026-10-18T09-01
+Original capture timestamp: 2026-10-18T08-34
+Source aggregate: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md
+Source block ordinal: 25
+Command: poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py
+EXIT_CODE: 0
+Output Summary: All checks passed!
+
+Working directory: .
+Started: 2026-10-18T08:34:06.148426+00:00
+Duration seconds: 0.774
+Phase: P2-T3 evidence integrity and declared repository revisions; focused task verification.
+
+## Captured output
+
+```text
+All checks passed!
+```

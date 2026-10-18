@@ -1,118 +1,39 @@
-"""Validate a domain-profile discovery configuration document.
-
-Purpose:
-    Provide the deterministic `validate_profile_text` entry point that checks
-    a domain-profile configuration document's structure against the upstream
-    contract defined by `legacy-discovery-config-contract` (#9001). This
-    module checks profile structure independently of #9001's typed loader.
-
-Constraints:
-    #9001's final field contract has not shipped as of this module's
-    authorship. Only `legacy_source_path` is enforced as a placeholder
-    required field, per the illustrative example in spec.md's API/CLI Surface
-    section. `_check_required_profile_fields` is the single isolated seam
-    that will change once #9001 finalizes its field contract.
-"""
+"""Thin compatibility adapter for the authoritative versioned profile parsers."""
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING
 
-import yaml
+from drm_copilot_discovery.catalog import CatalogError
+from drm_copilot_discovery.domain_profile import parse_domain_profile_text
+from drm_copilot_discovery.domain_profile_models import DomainProfileError
+from drm_copilot_discovery.profile_v2 import parse_profile_v2
 
-# TODO(#9001): replace with the finalized field contract once #9001 ships.
-_PLACEHOLDER_REQUIRED_FIELDS: tuple[str, ...] = ("legacy_source_path",)
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
 
 
-def _parse_profile_mapping(text: str) -> tuple[dict[str, Any] | None, list[str]]:
-    """Parse profile text into a mapping, or report a single error string.
+def validate_profile_text(
+    text: str, *, schema_version: str = "2.0.0", catalog: SchemaCatalog | None = None
+) -> list[str]:
+    """Return authoritative profile errors without selecting a version from input.
 
-    Purpose:
-        Isolate the untyped `yaml.safe_load` boundary and narrow its result to
-        a mapping the required-field checker can consume.
-
-    Args:
-        text (str): Raw profile document text.
-
-    Returns:
-        tuple[dict[str, Any] | None, list[str]]: `(mapping, [])` on success;
-        `(None, [<error>])` on a YAML parse failure or a non-mapping root.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
+    The finalized v2 contract replaces the former placeholder field check.
+    Explicit v1 reads preserve their established typed parser. Supplying a
+    catalog binds declared extension bytes; no consumer files are read here.
     """
-
     try:
-        parsed = yaml.safe_load(text)
-    except yaml.YAMLError as exc:
-        return None, [f"Profile document is not valid YAML: {exc}"]
-
-    if not isinstance(parsed, dict):
-        return None, ["Profile document root must be a mapping."]
-
-    return cast("dict[str, Any]", parsed), []
-
-
-def _check_required_profile_fields(mapping: dict[str, Any]) -> list[str]:
-    """Check `mapping` for the placeholder required-field set.
-
-    Purpose:
-        Report every missing required field so a maintainer can correct a
-        profile document in a single pass.
-
-    Args:
-        mapping (dict[str, Any]): Parsed profile mapping.
-
-    Returns:
-        list[str]: One `"Missing required field: <field>."` entry per absent
-        field; `[]` when every placeholder field is present.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    errors: list[str] = []
-    # TODO(#9001): replace with the finalized field contract once #9001 ships.
-    for field in _PLACEHOLDER_REQUIRED_FIELDS:
-        if field not in mapping:
-            errors.append(f"Missing required field: {field}.")
-    return errors
-
-
-def validate_profile_text(text: str) -> list[str]:
-    """Validate domain-profile document text.
-
-    Purpose:
-        Provide the stable, pure conformance check for a domain-profile
-        configuration document, following the canonical
-        `validate_<artifact>_text` contract.
-
-    Args:
-        text (str): Raw profile document text, already read from disk by the
-            caller.
-
-    Returns:
-        list[str]: Empty list when the document conforms; otherwise one or
-        more human-readable error strings.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    if not text.strip():
-        return ["Profile document is empty."]
-
-    mapping, errors = _parse_profile_mapping(text)
-    if mapping is None:
-        return errors
-
-    return _check_required_profile_fields(mapping)
+        # Keep compatibility explicit; unsupported versions never fall back.
+        if schema_version == "2.0.0":
+            parse_profile_v2(text, catalog=catalog)
+        elif schema_version == "1.0.0":
+            if catalog is not None:
+                raise DomainProfileError("v1 profiles do not accept extension catalogs")
+            parse_domain_profile_text(text)
+        else:
+            raise DomainProfileError(
+                f"Unsupported profile schema version: {schema_version}"
+            )
+    except (DomainProfileError, CatalogError) as error:
+        return [str(error)]
+    return []

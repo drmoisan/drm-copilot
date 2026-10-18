@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:required-output-manifest",
+  "title": "Discovery v2 required output manifest",
+  "description": "Exact required artifact identities and paths for one invocation. This document describes output scope; only the protected invocation can grant writes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "invocation_id",
+    "workspace",
+    "role",
+    "outputs",
+    "manifest_sha256"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:required-output-manifest"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"required-output-manifest"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "invocation_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "workspace": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "role": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"},
+    "outputs": {"type":"array","uniqueItems":true,"minItems":1,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:required-output-manifest#/$defs/output"}},
+    "manifest_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+  },
+  "$defs": {
+    "output-kind": {
+      "enum": [
+        "domain-profile",
+        "scope",
+        "feature-contract",
+        "coverage-ledger",
+        "runtime-characterization-scenario",
+        "parity-matrix",
+        "unspecified-behavior",
+        "product-decision",
+        "evidence-reference",
+        "inventory-snapshot",
+        "acceptance-specification",
+        "source-snapshot-manifest",
+        "implementation-record",
+        "unspecified-behavior-collection",
+        "product-decision-collection",
+        "extension-result-manifest",
+        "coverage-report",
+        "parity-report",
+        "completion-report",
+        "validation-report",
+        "migration-report",
+        "acceptance-view",
+        "evidence-payload",
+        "activation",
+        "required-output-manifest"
+      ]
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_kind","id","path","format","expected_sha256"],
+      "properties": {
+        "artifact_kind": {"$ref":"urn:drm-copilot:discovery:2.0.0:required-output-manifest#/$defs/output-kind"},
+        "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "format": {"enum":["json","yaml","markdown","gherkin","binary"]},
+        "expected_sha256": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},{"type":"null"}]}
+      }
+    }
+  }
+}

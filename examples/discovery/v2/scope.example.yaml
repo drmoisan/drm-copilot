@@ -1,0 +1,27 @@
+# Synthetic scope references other synthetic artifact identities.
+$schema: urn:drm-copilot:discovery:2.0.0:scope
+schema_version: 2.0.0
+artifact_kind: scope
+id: scope-example
+status: confirmed
+repository:
+  id: source-example
+  revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+included_roots: [src]
+included_components: [processor-example]
+included_features: [{artifact_kind: feature-contract, id: feature-example}]
+exclusions:
+  - path_or_glob: src/vendor/**
+    rationale: Dependencies are accounted for separately.
+inventory_snapshot_refs: [{artifact_kind: inventory-snapshot, id: inventory-example}]
+confirmed_by:
+  owner: owner-example
+  timestamp: "2026-01-01T00:00:00Z"
+  evidence_refs: [{artifact_kind: evidence-reference, id: scope-approval-example}]
+required_coverage:
+  feature_refs: [{artifact_kind: feature-contract, id: feature-example}]
+  client_ids: [browser-example, portable-example]
+  modes: [online, offline]
+disposition: in-scope
+no_scope_rationale: null
+extensions: {}

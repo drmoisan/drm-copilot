@@ -1,0 +1,1010 @@
+{
+  "task": "P1-T9",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 9,
+  "independent_boundary_cases": [
+    {
+      "name": "v2 valid example acceptance-specification",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example acceptance-specification",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/then"
+      ]
+    },
+    {
+      "name": "v2 valid example coverage-ledger",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example coverage-ledger",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/components/0/exclusion_rationale"
+      ]
+    },
+    {
+      "name": "v2 valid example domain-profile",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example domain-profile",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/completion_gates/require_confirmed_scope"
+      ]
+    },
+    {
+      "name": "v2 valid example evidence-reference",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example evidence-reference",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/checksum",
+        "/checksum/value"
+      ]
+    },
+    {
+      "name": "v2 valid example extension-result-manifest",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example extension-result-manifest",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/result_files/0/artifact_kind"
+      ]
+    },
+    {
+      "name": "v2 valid example feature-contract",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example feature-contract",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "v2 valid example implementation-record",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example implementation-record",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/test_references",
+        "/test_references",
+        "/verification_evidence_refs"
+      ]
+    },
+    {
+      "name": "v2 valid example inventory-snapshot",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example inventory-snapshot",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/files/0/sha256"
+      ]
+    },
+    {
+      "name": "v2 valid example parity-matrix",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example parity-matrix",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/entries/0/source_contract_ref/revision"
+      ]
+    },
+    {
+      "name": "v2 valid example product-decision-collection",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example product-decision-collection",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/records"
+      ]
+    },
+    {
+      "name": "v2 valid example product-decision",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example product-decision",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/approval"
+      ]
+    },
+    {
+      "name": "v2 valid example runtime-characterization-scenario",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example runtime-characterization-scenario",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/expected_result",
+        "/runs",
+        "/unresolved_findings"
+      ]
+    },
+    {
+      "name": "v2 valid example scope",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example scope",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/repository/revision"
+      ]
+    },
+    {
+      "name": "v2 valid example source-snapshot-manifest",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example source-snapshot-manifest",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/source_repository/revision"
+      ]
+    },
+    {
+      "name": "v2 valid example unspecified-behavior-collection",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example unspecified-behavior-collection",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/records"
+      ]
+    },
+    {
+      "name": "v2 valid example unspecified-behavior",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v2 invalid example unspecified-behavior",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/approved_target_behavior"
+      ]
+    },
+    {
+      "name": "v1 valid compatibility example coverage-ledger",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example coverage-ledger",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/summary/total_units"
+      ]
+    },
+    {
+      "name": "three exact legacy aliases coverage-ledger",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example evidence-reference",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example evidence-reference",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/schema_version"
+      ]
+    },
+    {
+      "name": "three exact legacy aliases evidence-reference",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example feature-contract",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example feature-contract",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "three exact legacy aliases feature-contract",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example parity-matrix",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example parity-matrix",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/rows/1"
+      ]
+    },
+    {
+      "name": "three exact legacy aliases parity-matrix",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example product-decision",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example product-decision",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "three exact legacy aliases product-decision",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example runtime-characterization-scenario",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example runtime-characterization-scenario",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/observation_method"
+      ]
+    },
+    {
+      "name": "three exact legacy aliases runtime-characterization-scenario",
+      "valid": true
+    },
+    {
+      "name": "v1 valid compatibility example unspecified-behavior",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "v1 invalid compatibility example unspecified-behavior",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/id"
+      ]
+    },
+    {
+      "name": "three exact legacy aliases unspecified-behavior",
+      "valid": true
+    },
+    {
+      "name": "weaker schema",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/$schema"
+      ]
+    },
+    {
+      "name": "remote schema",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/$schema"
+      ]
+    },
+    {
+      "name": "local schema path",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/$schema"
+      ]
+    },
+    {
+      "name": "wrong artifact kind",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/artifact_kind"
+      ]
+    },
+    {
+      "name": "unsupported declared version",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/schema_version"
+      ]
+    },
+    {
+      "name": "unsupported caller version",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_UNAVAILABLE"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "common cannot validate artifact",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_UNAVAILABLE"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "wrong caller kind",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_IDENTITY",
+        "SCHEMA_IDENTITY"
+      ],
+      "pointers": [
+        "/$schema",
+        "/artifact_kind"
+      ]
+    },
+    {
+      "name": "duplicate keys fail before catalog",
+      "valid": false,
+      "finding_codes": [
+        "DOCUMENT_DUPLICATE_KEY"
+      ],
+      "pointers": [
+        "/id"
+      ]
+    },
+    {
+      "name": "invalid core enum has actionable pointer",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/confidence"
+      ]
+    },
+    {
+      "name": "timestamp 2026-02-30T00:00:00Z",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/timestamp"
+      ]
+    },
+    {
+      "name": "timestamp 2016-12-31T23:59:60Z",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "timestamp 2017-01-01T00:59:60+01:00",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "timestamp 2026-12-31T23:59:60Z",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/timestamp"
+      ]
+    },
+    {
+      "name": "evidence URI https://[::1]/valid%20path",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "evidence URI https://[invalid",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/uri"
+      ]
+    },
+    {
+      "name": "evidence URI https://example.invalid/%GG",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/uri"
+      ]
+    },
+    {
+      "name": "evidence URI https://example.invalid/path?query#fragment",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "unsupported declared format",
+      "valid": false,
+      "catalog_error": "Unsupported schema format: date"
+    },
+    {
+      "name": "remote extension reference",
+      "valid": false,
+      "catalog_error": "Extension reference must be local: https://example.invalid/weak.json"
+    },
+    {
+      "name": "core replacement identity",
+      "valid": false,
+      "catalog_error": "Extension schema IDs are assigned from their content pin"
+    },
+    {
+      "name": "missing extension local reference",
+      "valid": false,
+      "catalog_error": "Unresolved schema reference: #/$defs/missing"
+    },
+    {
+      "name": "nested decision extension",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/records/0/extensions/example.review/mode"
+      ]
+    },
+    {
+      "name": "nested environment extension",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID",
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/environment",
+        "/environment/extensions/example.review/mode"
+      ]
+    },
+    {
+      "name": "arbitrary domain extension key remains data",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "non-consuming recursion yields finding",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_UNAVAILABLE"
+      ],
+      "pointers": [
+        ""
+      ]
+    },
+    {
+      "name": "finite recursive extension",
+      "valid": true,
+      "finding_codes": [],
+      "pointers": []
+    },
+    {
+      "name": "extension cannot weaken core enum",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_INVALID"
+      ],
+      "pointers": [
+        "/confidence"
+      ]
+    },
+    {
+      "name": "missing required format checker",
+      "valid": false,
+      "finding_codes": [
+        "SCHEMA_UNAVAILABLE"
+      ],
+      "pointers": [
+        ""
+      ]
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p1t9.py",
+  "probe_source_hashes_unchanged": true,
+  "unchanged_prior_paths": 144,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py"
+  ],
+  "coverage_lines": "346/346",
+  "coverage_branch_arcs": "144/144",
+  "new_executable_production_lines": 313,
+  "adapter_baseline_lines": "44/44",
+  "adapter_baseline_branch_arcs": "4/4",
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": 382,
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": 335,
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": 142,
+    "tests/discovery_runtime/test_catalog.py": 279,
+    "tests/discovery_runtime/test_schema_formats.py": 194,
+    "tests/discovery_runtime/test_schema_validation.py": 378,
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": 171,
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py": 138,
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py": 39
+  },
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": [
+      {
+        "name": "CatalogError",
+        "line": 70,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "schema_path",
+        "line": 74,
+        "covered": 8,
+        "executable": 8
+      },
+      {
+        "name": "schema_aliases",
+        "line": 89,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "_schema_object",
+        "line": 100,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "_schema_nodes",
+        "line": 108,
+        "covered": 16,
+        "executable": 16
+      },
+      {
+        "name": "ExtensionSchema",
+        "line": 152,
+        "covered": 18,
+        "executable": 18
+      },
+      {
+        "name": "_deny_retrieval",
+        "line": 183,
+        "covered": 3,
+        "executable": 3
+      },
+      {
+        "name": "_registry",
+        "line": 190,
+        "covered": 41,
+        "executable": 41
+      },
+      {
+        "name": "SchemaCatalog",
+        "line": 261,
+        "covered": 43,
+        "executable": 43
+      },
+      {
+        "name": "load_catalog",
+        "line": 349,
+        "covered": 12,
+        "executable": 12
+      },
+      {
+        "name": "__post_init__",
+        "line": 165,
+        "covered": 10,
+        "executable": 10
+      },
+      {
+        "name": "identifier",
+        "line": 178,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 272,
+        "covered": 12,
+        "executable": 12
+      },
+      {
+        "name": "schema",
+        "line": 299,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "schema_for_alias",
+        "line": 308,
+        "covered": 6,
+        "executable": 6
+      },
+      {
+        "name": "extension_documents",
+        "line": 318,
+        "covered": 15,
+        "executable": 15
+      },
+      {
+        "name": "registry",
+        "line": 344,
+        "covered": 2,
+        "executable": 2
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": [
+      {
+        "name": "is_rfc3339_timestamp",
+        "line": 51,
+        "covered": 25,
+        "executable": 25
+      },
+      {
+        "name": "_valid_http_authority",
+        "line": 82,
+        "covered": 21,
+        "executable": 21
+      },
+      {
+        "name": "is_http_evidence_uri",
+        "line": 110,
+        "covered": 14,
+        "executable": 14
+      },
+      {
+        "name": "discovery_format_checker",
+        "line": 136,
+        "covered": 9,
+        "executable": 9
+      },
+      {
+        "name": "_Validator",
+        "line": 150,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "SchemaValidationResult",
+        "line": 159,
+        "covered": 11,
+        "executable": 11
+      },
+      {
+        "name": "_validator",
+        "line": 186,
+        "covered": 9,
+        "executable": 9
+      },
+      {
+        "name": "_header_errors",
+        "line": 209,
+        "covered": 12,
+        "executable": 12
+      },
+      {
+        "name": "_add_schema_errors",
+        "line": 232,
+        "covered": 9,
+        "executable": 9
+      },
+      {
+        "name": "validate_document",
+        "line": 265,
+        "covered": 18,
+        "executable": 18
+      },
+      {
+        "name": "iter_errors",
+        "line": 153,
+        "covered": 1,
+        "executable": 1
+      },
+      {
+        "name": "ok",
+        "line": 173,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "compatibility_only",
+        "line": 181,
+        "covered": 2,
+        "executable": 2
+      }
+    ],
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": [
+      {
+        "name": "load_schema",
+        "line": 22,
+        "covered": 3,
+        "executable": 3
+      },
+      {
+        "name": "_extract_schema_uri",
+        "line": 28,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "_validate_against_schema",
+        "line": 36,
+        "covered": 5,
+        "executable": 5
+      },
+      {
+        "name": "validate_feature_contract_text",
+        "line": 61,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_coverage_ledger_text",
+        "line": 73,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_runtime_scenario_text",
+        "line": 85,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_parity_matrix_text",
+        "line": 97,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_unspecified_behavior_text",
+        "line": 109,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_product_decision_text",
+        "line": 121,
+        "covered": 2,
+        "executable": 2
+      },
+      {
+        "name": "validate_evidence_reference_text",
+        "line": 133,
+        "covered": 2,
+        "executable": 2
+      }
+    ]
+  },
+  "installed_runtime": {
+    "distribution": "drm-copilot-discovery",
+    "version": "2.0.0",
+    "editable": true,
+    "isolated_wheel_proof": "pending P11-T7"
+  },
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t9-coverage-metrics.2026-10-18T06-43.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t9-coverage.2026-10-18T06-43.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "git_blob": "7f095e147f9e2dd2260217baae4b5614b20324af",
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "git_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409",
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b"
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "git_blob": "269cfcf5cfda44ef1bbd25c89642db64c2886cc6",
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8"
+    },
+    {
+      "path": "tests/discovery_runtime/test_catalog.py",
+      "git_blob": "9dc78cc260a1861b094823f265792325f760a93d",
+      "sha256": "ef541fe805557dfc60d7c8bf66a229cb5a4236e0ac285d7bb5bce09ad6029168"
+    },
+    {
+      "path": "tests/discovery_runtime/test_schema_formats.py",
+      "git_blob": "cbf3bb380361493ccc7f8e51ffea030393409a60",
+      "sha256": "b3bdbabb9c1247e9fdab5e359361e9485318105e0529143caf9d27c55014ea67"
+    },
+    {
+      "path": "tests/discovery_runtime/test_schema_validation.py",
+      "git_blob": "fd4fb0406bda76075aed7f4a99389f0eba6341ea",
+      "sha256": "c6d9547a947cef45fafd56693545b6a28acb1b3335bd79b5054b30c10c895062"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "git_blob": "38afd461db9ac0e2b07a0e3498af16b15a169bf7",
+      "sha256": "f183da713b53b81758f99d357e4c9309ab6435a08999132eec7323b4c24707c9"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "git_blob": "c6b730e73b996d267d12159cc4e361ce2bc925fd",
+      "sha256": "6d3319e7344492a4e0f702386158c86b28ce940a11343226667b4ba67832fe7f"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "git_blob": "e5749b440b6c221ec1486e18dccbad88894ba353",
+      "sha256": "37c9ba4e658ec4840916fcf069a7da8faeaa186e62ce86adcf7f3ddfe37b6577"
+    }
+  ]
+}

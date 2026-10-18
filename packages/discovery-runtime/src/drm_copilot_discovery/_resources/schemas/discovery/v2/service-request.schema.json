@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:service-request",
+  "title": "Discovery v2 service request",
+  "description": "Canonical normalized operations. CLI aliases and analyzer shortcuts map here before dispatch. Caller correlation and opaque references are not identity or authorization grants.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "request_id",
+    "operation",
+    "mode",
+    "workspace_root",
+    "profile_path",
+    "dry_run",
+    "write",
+    "format",
+    "inputs",
+    "invocation_ref",
+    "authorization_ref"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:service-request"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"service-request"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "request_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "operation": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/operation"},
+    "mode": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/mode"},
+    "workspace_root": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-root"},
+    "profile_path": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},{"type":"null"}]},
+    "dry_run": {"type":"boolean"},
+    "write": {"type":"boolean"},
+    "format": {"enum":["json","markdown","both"]},
+    "inputs": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/inputs"},
+    "invocation_ref": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},{"type":"null"}]},
+    "authorization_ref": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},{"type":"null"}]}
+  },
+  "$defs": {
+    "operation": {
+      "enum": [
+        "init",
+        "configure",
+        "profile",
+        "inventory",
+        "new-contract",
+        "new-scenario",
+        "update-artifact",
+        "link-evidence",
+        "validate-profile",
+        "validate-feature-contract",
+        "validate-coverage-ledger",
+        "validate-runtime-scenario",
+        "validate-parity-matrix",
+        "validate-unspecified-behavior",
+        "validate-product-decision",
+        "validate-evidence-reference",
+        "validate-decisions",
+        "validate-all",
+        "coverage-report",
+        "parity-report",
+        "completion-report",
+        "generate-acceptance",
+        "snapshot-export",
+        "snapshot-import",
+        "import-inventory",
+        "migrate",
+        "doctor",
+        "read-source",
+        "prepare-agent",
+        "finalize-agent"
+      ]
+    },
+    "mode": {"enum":["structural","agent-output","discovery-complete","parity-complete","planning"]},
+    "role": {"enum":["legacy-parity-analyst","runtime-characterization-analyst","requirements-reconciler","migration-coverage-reviewer"]},
+    "host": {"enum":["claude-code","codex","github-copilot"]},
+    "correlation-id": {"type":"string","minLength":1,"maxLength":256,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"},
+    "opaque-reference": {"type":"string","minLength":16,"maxLength":256,"pattern":"^[A-Za-z0-9][A-Za-z0-9._-]*$(?![\\s\\S])","description":"Protected-store token only; no filesystem location, credential or authority claim."},
+    "workspace-root": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?:\\.|/[^\\x00-\\x1f\\u2028\\u2029]*|[A-Za-z]:[/\\\\][^\\x00-\\x1f\\u2028\\u2029]*|\\\\\\\\[^\\\\/\\x00-\\x1f]+[\\\\/][^\\x00-\\x1f\\u2028\\u2029]+)$(?![\\s\\S])",
+      "description": "Explicit outer invocation boundary, absolute or current directory. Canonicalization and trusted host selection are runtime requirements."
+    },
+    "workspace-binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace_root","workspace_sha256","profile_path","profile_sha256"],
+      "properties": {
+        "workspace_root": {"allOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-root"},{"not":{"const":"."}}]},
+        "workspace_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "profile_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "profile_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+      }
+    },
+    "native-identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host","session_id","agent_id","role","invocation_id"],
+      "properties": {
+        "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "session_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "agent_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "role": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"},
+        "invocation_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_version","schema_version","build_sha256","policy_version","policy_sha256"],
+      "properties": {
+        "package_version": {"const":"2.0.0"},
+        "schema_version": {"const":"2.0.0"},
+        "build_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "policy_version": {"type":"integer","minimum":1},
+        "policy_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "system_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "system_name": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "system_role": {"enum":["legacy-source","modernization-target","combined"]},
+        "repository_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "production_roots": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+        "test_roots": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+        "draft": {"type":"boolean"},
+        "input_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "artifact_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "artifact_kind": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/artifact-kind"},
+        "artifact_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "feature_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "feature_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "name": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "capability_group": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "scenario_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "analyzer_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "expected_sha256": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},{"type":"null"}]},
+        "evidence_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "output_prefix": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "acceptance_kind": {"enum":["legacy-characterization","target-acceptance"]},
+        "client_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "mode_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "platform_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "output_format": {"enum":["markdown","gherkin","both"]},
+        "manifest_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "from_version": {"const":1},
+        "to_version": {"const":2},
+        "destination": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "configuration_action": {"enum":["activate","deactivate"]},
+        "update_action": {"enum":["replace","approve-decision"]},
+        "approval_owner": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "approval_evidence_refs": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "paths": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+        "selected_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+        "read_operation": {"enum":["list","read","search"]},
+        "query": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "regex": {"type":"boolean"},
+        "max_bytes": {"type":"integer","minimum":1,"maximum":16777216},
+        "line_start": {"type":"integer","minimum":1},
+        "line_end": {"type":"integer","minimum":1},
+        "skill_id": {
+          "enum": [
+            "inventory-legacy-system",
+            "extract-feature-contract",
+            "characterize-runtime-behavior",
+            "reconcile-parity-matrix",
+            "review-discovery-coverage",
+            "adjudicate-unspecified-behavior",
+            "generate-acceptance-scenarios",
+            "initialize-discovery-workspace",
+            "validate-discovery-artifacts"
+          ]
+        },
+        "complexity": {"enum":["C1","C2","C3","C4"]},
+        "execution_context": {"enum":["standalone","epic_preparation_child","epic_execution_child"]},
+        "expected_outputs": {"type":"array","uniqueItems":true,"minItems":1,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:required-output-manifest#/$defs/output"}}
+      },
+      "description": "Closed request data. Operation-specific combinations and principal permissions are enforced by the service; these fields never select executable code or authority storage."
+    }
+  },
+  "allOf": [
+    {"if":{"properties":{"mode":{"const":"agent-output"}},"required":["mode"]},"then":{"properties":{"invocation_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"}}}},
+    {
+      "if": {"properties":{"operation":{"const":"init"}},"required":["operation"]},
+      "then": {"properties":{"inputs":{
+        "required":["system_id","system_name","system_role","repository_id"],
+        "if":{"properties":{"draft":{"const":true}},"required":["draft"]},
+        "else":{"required":["production_roots"],"properties":{"production_roots":{"minItems":1}}}
+      }}}
+    },
+    {
+      "if": {"properties":{"operation":{"const":"update-artifact"}},"required":["operation"]},
+      "then": {"properties":{"inputs":{"required":["artifact_kind","artifact_path","input_path","expected_sha256","update_action"]}}}
+    },
+    {
+      "if": {"properties":{"operation":{"const":"prepare-agent"}},"required":["operation"]},
+      "then": {"properties":{"inputs":{"required":["skill_id","selected_ids","paths","expected_outputs","execution_context","complexity"]}}}
+    },
+    {
+      "if": {"properties":{"operation":{"const":"finalize-agent"}},"required":["operation"]},
+      "then": {"properties":{"invocation_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},"mode":{"const":"agent-output"}}}
+    }
+  ]
+}

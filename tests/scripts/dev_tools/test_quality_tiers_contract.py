@@ -216,6 +216,30 @@ def test_discover_projects_root_package_json_yields_root() -> None:
     assert projects == frozenset({"."})
 
 
+@pytest.mark.parametrize(
+    ("tracked", "expected"),
+    [
+        (["pyproject.toml"], frozenset({"."})),
+        (["packages/runtime/pyproject.toml"], frozenset({"packages/runtime"})),
+        (
+            ["pyproject.toml", "package.json", "packages/runtime/pyproject.toml"],
+            frozenset({".", "packages/runtime"}),
+        ),
+        (["packages/runtime/pyproject.toml.backup"], frozenset[str]()),
+    ],
+)
+def test_discover_projects_includes_exact_python_project_roots(
+    tracked: list[str], expected: frozenset[str]
+) -> None:
+    """Tracked Python manifests classify root and nested projects only once."""
+    # Act
+    projects = discover_projects(tracked)
+
+    # Assert
+    assert projects == expected
+    assert discover_projects(reversed(tracked)) == expected
+
+
 def test_discover_projects_csproj_directory_is_project() -> None:
     """The directory holding a tracked ``*.csproj`` is a project."""
     # Act
@@ -252,6 +276,11 @@ def test_discover_projects_ignores_settings_psd1_without_sibling_psm1() -> None:
         "tests/fixtures/sample/Sample.csproj",
         "docs/examples/package.json",
         "node_modules/left-pad/package.json",
+        "extensions/drm-copilot/resources/sample/pyproject.toml",
+        "tests/fixtures/sample/pyproject.toml",
+        "docs/examples/pyproject.toml",
+        "node_modules/sample/pyproject.toml",
+        "packages/sample/node_modules/nested/pyproject.toml",
     ],
 )
 def test_discover_projects_ignores_excluded_roots(tracked_path: str) -> None:

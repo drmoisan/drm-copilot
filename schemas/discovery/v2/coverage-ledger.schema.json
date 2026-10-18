@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:coverage-ledger",
+  "title": "Discovery v2 coverage ledger",
+  "description": "Inspection and disposition records, distinct from analyzer detections. An empty unpinned draft is structurally valid and cannot establish completion.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "repository", "revision", "inventory_snapshot_refs", "scope_ref", "components", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:coverage-ledger"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "coverage-ledger"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "revision": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}, {"type": "null"}]},
+    "inventory_snapshot_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/inventory-references"},
+    "scope_ref": {"$ref": "#/$defs/scope-reference"},
+    "components": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/component"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"revision": {"type": "null"}}, "required": ["revision"]},
+      "then": {"properties": {"components": {"maxItems": 0}, "inventory_snapshot_refs": {"maxItems": 0}}}
+    },
+    {
+      "if": {"properties": {"components": {"minItems": 1}}, "required": ["components"]},
+      "then": {"properties": {"inventory_snapshot_refs": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "scope-reference": {
+      "allOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/artifact-reference"}],
+      "properties": {"artifact_kind": {"const": "scope"}}
+    },
+    "nullable-text": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "test-reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "classification", "confidence", "evidence_refs"],
+      "properties": {
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "symbol": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "line_range": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/line_range"},
+        "classification": {"enum": ["detected", "inferred"]},
+        "confidence": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/confidence"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"}
+      },
+      "description": "A test reference records relevance, not measured coverage or a test pass."
+    },
+    "component": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_id", "component_type", "path", "source_sha256", "inspection_status", "disposition", "feature_refs", "tests_found", "runtime_validation_requirement", "runtime_rationale", "exclusion_rationale", "exclusion_scope_ref", "supporting_rationale", "blocked_reason", "responsible_workflow", "responsible_agent", "last_updated_evidence_refs", "extensions"],
+      "properties": {
+        "component_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "component_type": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "source_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "symbol": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "line_range": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/line_range"},
+        "inspection_status": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/inspection-status"},
+        "disposition": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/coverage-disposition"},
+        "feature_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references"},
+        "tests_found": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/test-reference"}},
+        "runtime_validation_requirement": {"enum": ["required", "not-required", "undetermined"]},
+        "runtime_rationale": {"$ref": "#/$defs/nullable-text"},
+        "exclusion_rationale": {"$ref": "#/$defs/nullable-text"},
+        "exclusion_scope_ref": {"anyOf": [{"$ref": "#/$defs/scope-reference"}, {"type": "null"}]},
+        "supporting_rationale": {"$ref": "#/$defs/nullable-text"},
+        "blocked_reason": {"$ref": "#/$defs/nullable-text"},
+        "responsible_workflow": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "responsible_agent": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}, {"type": "null"}]},
+        "last_updated_evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"disposition": {"const": "feature-linked"}}, "required": ["disposition"]},
+          "then": {"properties": {"feature_refs": {"minItems": 1}, "inspection_status": {"const": "inspected"}}}
+        },
+        {
+          "if": {"properties": {"disposition": {"const": "supporting"}}, "required": ["disposition"]},
+          "then": {"properties": {"supporting_rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "inspection_status": {"const": "inspected"}}}
+        },
+        {
+          "if": {"properties": {"disposition": {"const": "excluded"}}, "required": ["disposition"]},
+          "then": {"properties": {"exclusion_rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "exclusion_scope_ref": {"$ref": "#/$defs/scope-reference"}}},
+          "else": {"properties": {"exclusion_rationale": {"type": "null"}, "exclusion_scope_ref": {"type": "null"}}}
+        },
+        {
+          "if": {"anyOf": [{"properties": {"disposition": {"const": "blocked"}}, "required": ["disposition"]}, {"properties": {"inspection_status": {"const": "blocked"}}, "required": ["inspection_status"]}]},
+          "then": {"properties": {"blocked_reason": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        },
+        {
+          "if": {"properties": {"runtime_validation_requirement": {"const": "not-required"}}, "required": ["runtime_validation_requirement"]},
+          "then": {"properties": {"runtime_rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        },
+        {
+          "if": {"anyOf": [{"properties": {"inspection_status": {"const": "inspected"}}, "required": ["inspection_status"]}, {"properties": {"disposition": {"enum": ["feature-linked", "supporting", "excluded"]}}, "required": ["disposition"]}]},
+          "then": {"properties": {"last_updated_evidence_refs": {"minItems": 1}}}
+        }
+      ]
+    }
+  }
+}

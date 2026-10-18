@@ -1,0 +1,55 @@
+# Synthetic behavior only; this is not a production template or complete graph.
+$schema: urn:drm-copilot:discovery:2.0.0:feature-contract
+schema_version: 2.0.0
+artifact_kind: feature-contract
+id: feature-alpha
+feature_id: feature-alpha
+name: Activate a configured processor
+capability_group: processing
+summary: A supplied operation transitions the synthetic processor from idle to active.
+lifecycle: reviewed
+observation_state: verified
+trigger: {"observation_state":"verified","statement":"An operator requests activation.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+preconditions: {"observation_state":"verified","statement":"The processor is idle.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+inputs: {"observation_state":"verified","statement":"A configured operation identifier is supplied.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+observable_outputs: {"observation_state":"verified","statement":"State becomes active.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+side_effects: {"observation_state":"verified","statement":"The state is persisted.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+ordering: {"observation_state":"verified","statement":"Persist state before reporting activation.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+timing: {"observation_state":"verified","statement":"Acknowledgement follows persistence.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+cancellation: {"observation_state":"verified","statement":"Cancellation before acknowledgement leaves state idle.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+failure: {"observation_state":"verified","statement":"An invalid identifier returns an error and preserves state.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+offline: {"observation_state":"verified","statement":"The operation requires a connected service.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+mobile: {"observation_state":"verified","statement":"No portable client is represented in this synthetic fixture.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+alternate_clients: {"observation_state":"verified","statement":"One configured client is represented.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+environment_constraints: {"observation_state":"verified","statement":"A configured service endpoint is available.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+security_permissions: {"observation_state":"verified","statement":"The caller needs activation permission.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+state_transitions:
+  disposition: present
+  behavior: {"observation_state":"verified","statement":"Activation changes idle state to active state.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+  entries:
+    - id: transition-alpha
+      before: {"observation_state":"verified","statement":"The processor is idle.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+      action: {"observation_state":"verified","statement":"An activation request is submitted.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+      after: {"observation_state":"verified","statement":"The processor is active.","evidence_refs":[{"artifact_kind":"evidence-reference","id":"source-alpha"}],"unresolved_behavior_refs":[],"confidence":"high"}
+      evidence_refs: [{artifact_kind: evidence-reference, id: source-alpha}]
+  rationale: null
+source_evidence_refs: [{artifact_kind: evidence-reference, id: source-alpha}]
+runtime_evidence_refs: []
+confidence: high
+unresolved_behavior_refs: []
+product_decision_status: not-required
+product_decision_refs: []
+target_relevance: required
+required_dimensions: [trigger, state_transitions, observable_outputs, failure]
+acceptance_criteria:
+  - id: criterion-alpha
+    readiness: ready
+    statement: Activating the configured processor updates its state.
+    expected_result: The processor state is active after acknowledgement.
+    pending_reason: null
+    evidence_refs: [{artifact_kind: evidence-reference, id: source-alpha}]
+    product_decision_refs: []
+    client_ids: [client-alpha]
+    platforms: [generic]
+    modes: [online]
+extensions: {}

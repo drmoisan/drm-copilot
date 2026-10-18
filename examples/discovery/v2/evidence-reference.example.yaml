@@ -1,0 +1,27 @@
+# Synthetic runtime capture metadata; no payload or completed graph is implied.
+$schema: urn:drm-copilot:discovery:2.0.0:evidence-reference
+schema_version: 2.0.0
+artifact_kind: evidence-reference
+id: runtime-alpha
+evidence_id: runtime-alpha
+evidence_type: runtime
+repository: source-example
+revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+path: docs/migration/discovery/evidence/capture-alpha.json
+runtime_artifact:
+  path: docs/migration/discovery/evidence/capture-alpha.json
+  capture_method: manual
+timestamp: "2026-01-01T00:00:00Z"
+environment:
+  id: environment-alpha
+  platform: generic
+  operating_mode: online
+  client_id: client-alpha
+  extensions: {}
+checksum:
+  algorithm: sha256
+  value: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+author_or_agent: {kind: human, id: analyst-example}
+confidence: high
+notes: Manual pre-state and post-state capture in an isolated synthetic environment.
+extensions: {}

@@ -1,0 +1,171 @@
+{
+  "manifest_version": 1,
+  "resources": [
+    {
+      "path": "schemas/discovery/v1/coverage-ledger.schema.json",
+      "sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
+      "size": 4035
+    },
+    {
+      "path": "schemas/discovery/v1/evidence-reference.schema.json",
+      "sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a",
+      "size": 3052
+    },
+    {
+      "path": "schemas/discovery/v1/feature-contract.schema.json",
+      "sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54",
+      "size": 5201
+    },
+    {
+      "path": "schemas/discovery/v1/parity-matrix.schema.json",
+      "sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399",
+      "size": 3952
+    },
+    {
+      "path": "schemas/discovery/v1/product-decision-record.schema.json",
+      "sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb",
+      "size": 3526
+    },
+    {
+      "path": "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df",
+      "size": 4477
+    },
+    {
+      "path": "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62",
+      "size": 2905
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "size": 4787
+    },
+    {
+      "path": "schemas/discovery/v2/activation.schema.json",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731",
+      "size": 726
+    },
+    {
+      "path": "schemas/discovery/v2/capability-attestation.schema.json",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4",
+      "size": 5263
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "size": 10229
+    },
+    {
+      "path": "schemas/discovery/v2/coverage-ledger.schema.json",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e",
+      "size": 7244
+    },
+    {
+      "path": "schemas/discovery/v2/discovery-invocation.schema.json",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2",
+      "size": 5909
+    },
+    {
+      "path": "schemas/discovery/v2/domain-profile.schema.json",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a",
+      "size": 12552
+    },
+    {
+      "path": "schemas/discovery/v2/evidence-reference.schema.json",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56",
+      "size": 5147
+    },
+    {
+      "path": "schemas/discovery/v2/extension-result-manifest.schema.json",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613",
+      "size": 3070
+    },
+    {
+      "path": "schemas/discovery/v2/feature-contract.schema.json",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0",
+      "size": 10173
+    },
+    {
+      "path": "schemas/discovery/v2/implementation-record.schema.json",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070",
+      "size": 3911
+    },
+    {
+      "path": "schemas/discovery/v2/inventory-snapshot.schema.json",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417",
+      "size": 9186
+    },
+    {
+      "path": "schemas/discovery/v2/migration-report.schema.json",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b",
+      "size": 4577
+    },
+    {
+      "path": "schemas/discovery/v2/parity-matrix.schema.json",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5",
+      "size": 9231
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision-collection.schema.json",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33",
+      "size": 841
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision.schema.json",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c",
+      "size": 5745
+    },
+    {
+      "path": "schemas/discovery/v2/required-output-manifest.schema.json",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d",
+      "size": 2901
+    },
+    {
+      "path": "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7",
+      "size": 9134
+    },
+    {
+      "path": "schemas/discovery/v2/scope.schema.json",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713",
+      "size": 4168
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "size": 11635
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
+      "size": 7181
+    },
+    {
+      "path": "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0",
+      "size": 4451
+    },
+    {
+      "path": "schemas/discovery/v2/tool-authorization.schema.json",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8",
+      "size": 4288
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3",
+      "size": 861
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior.schema.json",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d",
+      "size": 5089
+    },
+    {
+      "path": "schemas/discovery/v2/validation-receipt.schema.json",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b",
+      "size": 5972
+    }
+  ],
+  "runtime_version": "2.0.0"
+}

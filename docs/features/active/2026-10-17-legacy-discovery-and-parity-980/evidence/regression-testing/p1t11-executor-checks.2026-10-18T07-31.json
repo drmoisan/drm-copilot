@@ -1,0 +1,345 @@
+{
+  "task": "P1-T11",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    "unsafe path ''",
+    "unsafe path '.'",
+    "unsafe path '..'",
+    "unsafe path 'a/../b'",
+    "unsafe path 'a/./b'",
+    "unsafe path '/root'",
+    "unsafe path '//host/share'",
+    "unsafe path 'C:/root'",
+    "unsafe path 'C:relative'",
+    "unsafe path '\\\\\\\\?\\\\C:\\\\work'",
+    "unsafe path 'a\\\\b'",
+    "unsafe path 'a//b'",
+    "unsafe path 'a/'",
+    "unsafe path 'a:b'",
+    "unsafe path 'a\\x00b'",
+    "unsafe path 'a\\nb'",
+    "unsafe path 'a\\rb'",
+    "unsafe path 'a\\tb'",
+    "unsafe path 'a\\u2028b'",
+    "unsafe path 'a\\u2029b'",
+    "unsafe path 'a*'",
+    "unsafe path 'a?'",
+    "unsafe path 'a<'",
+    "unsafe path 'a>'",
+    "unsafe path 'a|'",
+    "unsafe path 'a\"b'",
+    "unsafe path 'name.'",
+    "unsafe path 'name '",
+    "unsafe path 'dir /file'",
+    "unsafe path 'x/CON'",
+    "unsafe path 'nul.txt'",
+    "unsafe path 'NUL .txt'",
+    "unsafe path 'COM1.log'",
+    "unsafe path 'lpt9'",
+    "unsafe path 'LPT\u00b9.txt'",
+    "unsafe path 'COM\u00b2'",
+    "unsafe path 'conin$'",
+    "unsafe path 'conout$'",
+    "unsafe path 'CLOCK$'",
+    "unsafe path 'a\\x7fb'",
+    "portable path docs/\u00c9vidence Records/Case.json",
+    "portable path .config/data",
+    "portable path a-b/c_d.e",
+    "portable path src/COM10.cs",
+    "portable path docs/\u62a5\u544a.json",
+    "component containment",
+    "unicode collision equivalence",
+    "collision ('docs/a', 'docs/a')",
+    "collision ('Docs/a', 'docs/b')",
+    "collision ('docs/caf\u00e9/a', 'docs/cafe\u0301/b')",
+    "collision ('src/\u00df/a', 'src/ss/b')",
+    "deterministic path ordering",
+    "read anchor /work",
+    "project missing write /work",
+    "configuration missing roots classified /work",
+    "read anchor C:/work",
+    "project missing write C:/work",
+    "configuration missing roots classified C:/work",
+    "read anchor //server/share/work",
+    "project missing write //server/share/work",
+    "configuration missing roots classified //server/share/work",
+    "read scope src-other/main.cs",
+    "read scope Src/main.cs",
+    "read scope .git/config",
+    "read scope outside/secret",
+    "missing read fails",
+    "explicit missing read classification",
+    "grant exact path",
+    "write kind and protected name domain-profile docs/migration/discovery/domain-profile.yaml",
+    "write kind and protected name feature-contract src/main.cs",
+    "write kind and protected name feature-contract docs/migration/discovery/feature-contracts",
+    "write kind and protected name feature-contract docs/migration/discovery/evidence/item.json",
+    "write kind and protected name feature-contract docs/migration/discovery/feature-contracts/.claude/settings.json",
+    "write kind and protected name feature-contract docs/migration/discovery/feature-contracts/AGENTS.md",
+    "write kind and protected name feature-contract docs/migration/discovery/feature-contracts/local.schema.json",
+    "link ancestor symlink",
+    "link ancestor reparse",
+    "resolved sibling escape",
+    "resolved component alias",
+    "repeated ancestor identity",
+    "filesystem ancestor case collision",
+    "enumeration inspection disagreement",
+    "unchanged write revalidation",
+    "unrelated sibling does not invalidate",
+    "missing parent appeared",
+    "existing parent replaced",
+    "leaf appeared after preparation",
+    "read cannot revalidate as write",
+    "unsafe layout feature_contracts src/output",
+    "unsafe layout root src",
+    "unsafe layout feature_contracts config/discovery",
+    "unsafe layout reports docs/migration/discovery/feature-contracts/reports",
+    "unsafe layout coverage_ledger docs/migration/discovery/domain-profile.yaml",
+    "unsafe layout reports Docs/Reports"
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p1t11.py",
+  "probe_production_hashes": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "e12502eaf48dbb337def7288141e9f331b7d3ee76d05ac66d153583ad0444b96"
+    }
+  ],
+  "owned_paths": 5,
+  "unchanged_prior_paths": 160,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "251/251",
+  "coverage_branch_arcs": "116/116",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": [
+      {
+        "name": "PathPolicyError",
+        "line": 24,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "relative_path",
+        "line": 38,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "collision_key",
+        "line": 72,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "path_contains",
+        "line": 81,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "check_path_collisions",
+        "line": 87,
+        "covered_lines": 17,
+        "statements": 17
+      },
+      {
+        "name": "PathMetadata",
+        "line": 120,
+        "covered_lines": 22,
+        "statements": 22
+      },
+      {
+        "name": "PathMetadataReader",
+        "line": 165,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "WriteGrant",
+        "line": 179,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "PathStamp",
+        "line": 201,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "ResolvedPath",
+        "line": 215,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "__init__",
+        "line": 31,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "__post_init__",
+        "line": 134,
+        "covered_lines": 17,
+        "statements": 17
+      },
+      {
+        "name": "__call__",
+        "line": 173,
+        "covered_lines": 1,
+        "statements": 1
+      },
+      {
+        "name": "__post_init__",
+        "line": 191,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "__post_init__",
+        "line": 228,
+        "covered_lines": 3,
+        "statements": 3
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": [
+      {
+        "name": "_absolute",
+        "line": 84,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "_overlaps",
+        "line": 115,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_reserved_output",
+        "line": 120,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "PathPolicy",
+        "line": 141,
+        "covered_lines": 128,
+        "statements": 128
+      },
+      {
+        "name": "__init__",
+        "line": 152,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "_validate_layout",
+        "line": 181,
+        "covered_lines": 18,
+        "statements": 18
+      },
+      {
+        "name": "_inspect",
+        "line": 236,
+        "covered_lines": 20,
+        "statements": 20
+      },
+      {
+        "name": "_walk",
+        "line": 278,
+        "covered_lines": 29,
+        "statements": 29
+      },
+      {
+        "name": "validate_configuration",
+        "line": 361,
+        "covered_lines": 20,
+        "statements": 20
+      },
+      {
+        "name": "resolve_read",
+        "line": 398,
+        "covered_lines": 7,
+        "statements": 7
+      },
+      {
+        "name": "resolve_write",
+        "line": 420,
+        "covered_lines": 15,
+        "statements": 15
+      },
+      {
+        "name": "revalidate_write",
+        "line": 454,
+        "covered_lines": 7,
+        "statements": 7
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": 231,
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": 472,
+    "tests/discovery_runtime/test_path_collisions.py": 350,
+    "tests/discovery_runtime/test_path_policy.py": 314,
+    "tests/discovery_runtime/test_path_resolution.py": 385
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t11-coverage.2026-10-18T07-30.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t11-coverage-metrics.2026-10-18T07-30.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "git_blob": "1f916e605db08561b861c3af9f7bde59a81fe8db",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "git_blob": "4b762f2f045189b43b7963a74328d667a848c3d8",
+      "sha256": "e12502eaf48dbb337def7288141e9f331b7d3ee76d05ac66d153583ad0444b96"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_collisions.py",
+      "git_blob": "8ee709db39f44d353a4f8e13063bf8228ea05a1f",
+      "sha256": "f3ff39910b4cbfdef8d5148bc283978e9bd0eacee0ae6b9a7169f3d5eb935cb4"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_policy.py",
+      "git_blob": "828e380889a2259307ec5c06a169f6620ba93104",
+      "sha256": "b3f072157d04ac6cd08f4b69869160ed5a5546afe2eb503018f4818df4649b49"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_resolution.py",
+      "git_blob": "f62c127682a5812e7e79a505305a086f0fe760e3",
+      "sha256": "d05b7e713912a1f2ba8dab95c61f9c5e64cfa6517f7b906da710cbd50ce788a3"
+    }
+  ]
+}

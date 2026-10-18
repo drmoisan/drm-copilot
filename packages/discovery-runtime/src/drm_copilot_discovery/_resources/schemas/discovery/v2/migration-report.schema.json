@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:migration-report",
+  "title": "Discovery v2 explicit artifact migration report",
+  "description": "Immutable old/new path, byte and identity mapping for no-overwrite v1-to-v2 migration. Successful conversion remains draft and never switches activation or creates verified behavior.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "from_version",
+    "to_version",
+    "destination",
+    "source_manifest_sha256",
+    "dry_run",
+    "activation_switched",
+    "result",
+    "mappings",
+    "unresolved_behavior_refs",
+    "unmapped_metadata",
+    "migration_extension",
+    "findings",
+    "extensions"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:migration-report"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"migration-report"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "from_version": {"const":1},
+    "to_version": {"const":2},
+    "destination": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+    "source_manifest_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "dry_run": {"type":"boolean"},
+    "activation_switched": {"const":false},
+    "result": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/validation-outcome"},
+    "mappings": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:migration-report#/$defs/mapping"}},
+    "unresolved_behavior_refs": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/unresolved-references"},
+    "unmapped_metadata": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:migration-report#/$defs/unmapped"}},
+    "migration_extension": {"type":"string","pattern":"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$(?![\\s\\S])"},
+    "findings": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/finding"}},
+    "extensions": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "$defs": {
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["old_path","old_sha256","old_id","old_kind","new_path","new_sha256","new_id","new_kind","status"],
+      "properties": {
+        "old_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "old_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "old_id": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},{"type":"null"}]},
+        "old_kind": {"enum":["domain-profile","coverage-ledger","evidence-reference","feature-contract","parity-matrix","product-decision-record","runtime-characterization-scenario","unspecified-behavior-record"]},
+        "new_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "new_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "new_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "new_kind": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/artifact-kind"},
+        "status": {"enum":["planned","created","skipped","conflict"]}
+      }
+    },
+    "unmapped": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["old_path","pointer","value","reason"],
+      "properties": {
+        "old_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "pointer": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/finding/properties/pointer"},
+        "value": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/json-value"},
+        "reason": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}
+      }
+    }
+  },
+  "allOf": [
+    {"if":{"properties":{"dry_run":{"const":true}},"required":["dry_run"]},"then":{"properties":{"mappings":{"items":{"properties":{"status":{"enum":["planned","skipped","conflict"]}}}}}}},
+    {
+      "if": {"properties":{"result":{"const":"pass"}},"required":["result"]},
+      "then": {"properties":{"mappings":{"items":{"properties":{"status":{"enum":["planned","created","skipped"]}}}},"findings":{"items":{"properties":{"severity":{"enum":["warning","info"]}}}}}},
+      "else": {"properties":{"findings":{"minItems":1,"contains":{"properties":{"severity":{"const":"error"}},"required":["severity"]}}}}
+    }
+  ]
+}

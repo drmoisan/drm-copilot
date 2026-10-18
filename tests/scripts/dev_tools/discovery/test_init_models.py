@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery import init_models as mod
+from drm_copilot_discovery import init_models as mod
+
+from scripts.dev_tools.discovery.init_models import resolve_default_template_root
 
 if TYPE_CHECKING:
     import pytest
@@ -90,5 +92,6 @@ def test_expected_template_relative_paths_has_eight_entries() -> None:
 
 def test_resolve_default_template_root_returns_expected_path() -> None:
     """The default template root ends in `docs/discovery/templates`."""
-    result = mod.resolve_default_template_root()
-    assert result.parts[-3:] == ("docs", "discovery", "templates")
+    result = resolve_default_template_root()
+    repository = Path(__file__).resolve().parents[4]
+    assert result == repository / "docs" / "discovery" / "templates"

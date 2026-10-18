@@ -1,0 +1,43 @@
+# Invalid: passed cannot be asserted while the expected legacy result is unknown.
+$schema: urn:drm-copilot:discovery:2.0.0:runtime-characterization-scenario
+schema_version: 2.0.0
+artifact_kind: runtime-characterization-scenario
+id: scenario-alpha
+scenario_id: scenario-alpha
+feature_refs: [{artifact_kind: feature-contract, id: feature-alpha}]
+environment: {"id":"environment-alpha","platform":"generic","operating_mode":"online","client_id":"client-alpha","extensions":{}}
+fixture:
+  description: An isolated synthetic processor with known initial state.
+  setup_steps: [Reset the processor to idle.]
+  teardown_steps: [Restore the original state.]
+  evidence_refs: []
+preconditions: [The fixture is ready.]
+action:
+  description: Submit the activation request.
+  inputs: [{name: operation, value: alpha}]
+observation_plan:
+  - id: observation-alpha
+    dimension: state_transitions
+    description: Compare processor state before and after activation.
+pre_state_capture: {"plan":"Record processor state before activation.","observed_state":"idle","evidence_refs":[{"artifact_kind":"evidence-reference","id":"pre-alpha"}]}
+post_state_capture: {"plan":"Record processor state after activation.","observed_state":"active","evidence_refs":[{"artifact_kind":"evidence-reference","id":"post-alpha"}]}
+expected_result: null
+expected_result_basis: unknown
+result_status: passed
+deviations: []
+evidence_refs: [{artifact_kind: evidence-reference, id: runtime-alpha}]
+repeatability: not-assessed
+confidence: high
+unresolved_findings: [{artifact_kind: unspecified-behavior, id: behavior-alpha}]
+runs:
+  - id: run-alpha
+    timestamp: "2026-01-01T00:00:00Z"
+    environment: {"id":"environment-alpha","platform":"generic","operating_mode":"online","client_id":"client-alpha","extensions":{}}
+    pre_state_capture: {"plan":"Record processor state before activation.","observed_state":"idle","evidence_refs":[{"artifact_kind":"evidence-reference","id":"pre-alpha"}]}
+    post_state_capture: {"plan":"Record processor state after activation.","observed_state":"active","evidence_refs":[{"artifact_kind":"evidence-reference","id":"post-alpha"}]}
+    observed_result: The processor state changed from idle to active.
+    expected_result: null
+    result_status: observed
+    evidence_refs: [{artifact_kind: evidence-reference, id: runtime-alpha}]
+    deviations: []
+extensions: {}

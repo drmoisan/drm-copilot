@@ -1,0 +1,21 @@
+$schema: urn:drm-copilot:discovery:2.0.0:implementation-record
+schema_version: 2.0.0
+artifact_kind: implementation-record
+id: implementation-alpha
+target_repository:
+  id: synthetic-target
+  revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+client_id: client-alpha
+feature_refs:
+  - {artifact_kind: feature-contract, id: feature-alpha}
+implementation_paths:
+  - repository: synthetic-target
+    revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    path: src/Processor.cs
+    sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+    symbol: Processor.Activate
+test_references: []
+verification_evidence_refs: []
+verification_state: passed
+verification_reason: null
+extensions: {}

@@ -1,0 +1,50 @@
+{
+  "task": "P2-T1",
+  "timestamp_utc": "2026-10-18T07-46",
+  "command": "poetry run python SCRATCH/issue-980-review-p2t1.py",
+  "review_outcome": "corrections-required",
+  "blocking_findings": [
+    "P2T1-R1: Runtime evidence revisions must not require a capture blob at that Git commit.",
+    "P2T1-R2: Evidence classification must not remove selected source paths from pinned Git inputs.",
+    "P2T1-R3: Equivalent directory child ordering must not cause a freshness failure."
+  ],
+  "cases": [
+    {"case": "baseline minimal snapshot", "ok": true, "files": 1},
+    {"case": "valid referenced JSON runtime payload", "ok": true, "findings": []},
+    {
+      "case": "runtime application revision does not pin capture blob",
+      "exception": "OSError",
+      "message": "Runtime capture is deliberately untracked at the source commit",
+      "git_requests": ["docs/migration/discovery/evidence/capture-alpha.bin"]
+    },
+    {
+      "case": "payload reference must not unselect source",
+      "ok": true,
+      "git_requests": [],
+      "source_category": "evidence"
+    },
+    {
+      "case": "equivalent directory enumeration order",
+      "exception": "OSError",
+      "message": "Snapshot metadata changed at '.'; reload"
+    }
+  ],
+  "production_paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "sha256": "7eca517de01795b08277b7a9018890850ce7109002635377f271f48b6297425f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "sha256": "b974287152805a7beda90990b9d84a5a0ec4f29f9def4aad04e09870fff06b57"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "fea4d922d79cf71c51d364d5237860d46fb79afe380561bbff6e5b85e1b57aa8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "4669155897037715542b50c171f935fdc58201bd292dfe9da5587381602ef61a"
+    }
+  ]
+}

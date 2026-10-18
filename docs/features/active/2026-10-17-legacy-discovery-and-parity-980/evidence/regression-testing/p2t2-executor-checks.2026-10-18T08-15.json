@@ -1,0 +1,398 @@
+{
+  "task": "P2-T2",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "name": "empty snapshot retains empty graph",
+      "status": "pass"
+    },
+    {
+      "name": "artifact ownership and path use trusted snapshot",
+      "status": "pass"
+    },
+    {
+      "name": "common artifact ID resolves exactly",
+      "status": "pass"
+    },
+    {
+      "name": "alias is distinct from artifact ID",
+      "status": "pass"
+    },
+    {
+      "name": "missing ID blocks",
+      "status": "pass"
+    },
+    {
+      "name": "existing wrong-kind ID blocks",
+      "status": "pass"
+    },
+    {
+      "name": "typed field cannot select an existing different kind",
+      "status": "pass"
+    },
+    {
+      "name": "missing kind blocks",
+      "status": "pass"
+    },
+    {
+      "name": "nonstring identifier blocks",
+      "status": "pass"
+    },
+    {
+      "name": "identity comparison is case sensitive",
+      "status": "pass"
+    },
+    {
+      "name": "qualified repository excludes another owner",
+      "status": "pass"
+    },
+    {
+      "name": "explicit matching path resolves",
+      "status": "pass"
+    },
+    {
+      "name": "explicit mismatched path blocks",
+      "status": "pass"
+    },
+    {
+      "name": "source contract resolves stable feature alias",
+      "status": "pass"
+    },
+    {
+      "name": "resolved reference retains pin and digest bytes",
+      "status": "pass"
+    },
+    {
+      "name": "same ID in different repositories is not duplicate",
+      "status": "pass"
+    },
+    {
+      "name": "bare duplicate foreign ID is ambiguous",
+      "status": "pass"
+    },
+    {
+      "name": "qualified foreign ID resolves original identity",
+      "status": "pass"
+    },
+    {
+      "name": "foreign storage path cannot replace original path",
+      "status": "pass"
+    },
+    {
+      "name": "same artifact ID and owner is duplicate",
+      "status": "pass"
+    },
+    {
+      "name": "same alias with distinct artifact IDs is duplicate",
+      "status": "pass"
+    },
+    {
+      "name": "cross-kind IDs retain separate namespaces",
+      "status": "pass"
+    },
+    {
+      "name": "artifact ID and feature alias remain separate namespaces",
+      "status": "pass"
+    },
+    {
+      "name": "collection member has its own namespace and pointer",
+      "status": "pass"
+    },
+    {
+      "name": "collection member reference is traversed with member source",
+      "status": "pass"
+    },
+    {
+      "name": "collection duplicate IDs cannot resolve uniquely",
+      "status": "pass"
+    },
+    {
+      "name": "whole-file transport cannot resolve a collection member",
+      "status": "pass"
+    },
+    {
+      "name": "ordinary link can resolve collection member path",
+      "status": "pass"
+    },
+    {
+      "name": "nested behavior and criterion evidence links are traversed",
+      "status": "pass"
+    },
+    {
+      "name": "extension payload cannot add references or duplicate IDs",
+      "status": "pass"
+    },
+    {
+      "name": "untyped action value cannot add references or duplicate IDs",
+      "status": "pass"
+    },
+    {
+      "name": "wrong path-derived kind creates blocking finding",
+      "status": "pass"
+    },
+    {
+      "name": "nonstring artifact identity creates blocking finding",
+      "status": "pass"
+    },
+    {
+      "name": "identityless derived report cannot satisfy references",
+      "status": "pass"
+    },
+    {
+      "name": "upstream malformed-input finding is preserved",
+      "status": "pass"
+    },
+    {
+      "name": "inventory internal scalar links resolve",
+      "status": "pass"
+    },
+    {
+      "name": "unknown finding component blocks",
+      "status": "pass"
+    },
+    {
+      "name": "unknown relationship source component blocks",
+      "status": "pass"
+    },
+    {
+      "name": "unknown relationship target component blocks",
+      "status": "pass"
+    },
+    {
+      "name": "unknown file diagnostic ID blocks",
+      "status": "pass"
+    },
+    {
+      "name": "scope component binds to selected inventory",
+      "status": "pass"
+    },
+    {
+      "name": "scope cannot bind a component from an unselected inventory",
+      "status": "pass"
+    },
+    {
+      "name": "ledger component binds to selected inventory",
+      "status": "pass"
+    },
+    {
+      "name": "duplicate nested component identity blocks",
+      "status": "pass"
+    },
+    {
+      "name": "parity feature matches pinned source-contract alias",
+      "status": "pass"
+    },
+    {
+      "name": "parity row feature mismatch blocks",
+      "status": "pass"
+    },
+    {
+      "name": "acceptance feature and criterion bind to source context",
+      "status": "pass"
+    },
+    {
+      "name": "acceptance absent criterion blocks",
+      "status": "pass"
+    },
+    {
+      "name": "duplicate diagnostics are input-order deterministic",
+      "status": "pass"
+    },
+    {
+      "name": "reference index is frozen",
+      "status": "pass"
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t2.py",
+  "probe_scope": "Independent pure-index identity/reference probes; malformed fragments are deliberate unit inputs, not schema-complete feature catalogs.",
+  "probe_production_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "3d71c88775f69f014982ebb35e79ecc05ba3c21bb9d015184de61291ce3444b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py": "5f371c89809365b75bc91a8310ab4bf58a0f8191f9536635345730315bf666de"
+  },
+  "owned_paths": 4,
+  "unchanged_prior_paths": 174,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "245/247",
+  "coverage_branch_arcs": "139/144",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py": [
+      {
+        "name": "string_value",
+        "line": 22,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "reference_finding",
+        "line": 27,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "schema_references",
+        "line": 45,
+        "covered_lines": 35,
+        "statements": 35
+      },
+      {
+        "name": "_objects",
+        "line": 132,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "validate_linkage",
+        "line": 142,
+        "covered_lines": 45,
+        "statements": 45
+      },
+      {
+        "name": "selected",
+        "line": 152,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "check",
+        "line": 169,
+        "covered_lines": 3,
+        "statements": 3
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": [
+      {
+        "name": "ArtifactRecord",
+        "line": 57,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "ReferenceResolution",
+        "line": 82,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "ReferenceIndex",
+        "line": 93,
+        "covered_lines": 42,
+        "statements": 43
+      },
+      {
+        "name": "_records",
+        "line": 217,
+        "covered_lines": 21,
+        "statements": 21
+      },
+      {
+        "name": "_duplicates",
+        "line": 269,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "_local_duplicates",
+        "line": 295,
+        "covered_lines": 19,
+        "statements": 20
+      },
+      {
+        "name": "index_references",
+        "line": 331,
+        "covered_lines": 25,
+        "statements": 25
+      },
+      {
+        "name": "id",
+        "line": 66,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "repository",
+        "line": 71,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "path",
+        "line": 76,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 103,
+        "covered_lines": 13,
+        "statements": 13
+      },
+      {
+        "name": "candidates",
+        "line": 124,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "resolve",
+        "line": 140,
+        "covered_lines": 22,
+        "statements": 23
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py": 274,
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": 390,
+    "tests/discovery_runtime/test_reference_uniqueness.py": 473,
+    "tests/discovery_runtime/test_references.py": 453
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-coverage.2026-10-18T08-15.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-coverage-metrics.2026-10-18T08-15.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "git_blob": "41b964ee36208d23081d88b5dea4123bd3542aa8",
+      "sha256": "5f371c89809365b75bc91a8310ab4bf58a0f8191f9536635345730315bf666de"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "git_blob": "dc89577ab1fd723bf51ccbd3d7d1549e6cd5f05d",
+      "sha256": "3d71c88775f69f014982ebb35e79ecc05ba3c21bb9d015184de61291ce3444b0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_reference_uniqueness.py",
+      "git_blob": "4bafa12af06e4a7f97df6969c9730df0fb1882f1",
+      "sha256": "d1b58842db97149eb7111d44169f7439ebdc3be3902bb9d17231057437ce8f89"
+    },
+    {
+      "path": "tests/discovery_runtime/test_references.py",
+      "git_blob": "b5a8b01631e924e6d755fe1b307818c6926797c0",
+      "sha256": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+# Synthetic configuration; this is not a production initialization template.
+$schema: urn:drm-copilot:discovery:2.0.0:domain-profile
+schema_version: 2.0.0
+artifact_kind: domain-profile
+id: profile-example
+profile_version: 2
+profile_state: configured
+system:
+  id: processing-example
+  name: Example processing system
+  role: combined
+repository:
+  id: workspace-example
+  vcs: git
+  revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  revision_policy: working-tree-at-pin
+production_roots: [src]
+test_roots: [tests]
+project_entry_points: [src/Example.csproj]
+documentation_roots: [docs]
+evidence_roots: [docs/migration/discovery/evidence]
+repositories:
+  - id: source-example
+    role: legacy-source
+    revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    snapshot_manifest: docs/migration/discovery/source-snapshots/source-example/manifest.json
+    clients: []
+  - id: target-example
+    role: modernization-target
+    revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    snapshot_manifest: null
+    clients: [browser-example, portable-example]
+clients:
+  - id: browser-example
+    target_repository: target-example
+    platforms: [browser]
+    modes: [online]
+    required_feature_dimensions: [failure]
+    applicability_defaults:
+      offline: {applicability: not-applicable, rationale: This client is connected-only.}
+  - id: portable-example
+    target_repository: target-example
+    platforms: [portable]
+    modes: [online, offline]
+    required_feature_dimensions: [offline, mobile]
+    applicability_defaults:
+      mobile: {applicability: applicable, rationale: Explicitly selected portable client.}
+required_platforms: [browser]
+required_modes: [online]
+required_feature_dimensions: [trigger, observable_outputs]
+runtime:
+  capability: manual
+  required_feature_ids: []
+analyzers:
+  enabled: [repository, dotnet, dependencies]
+  options: {max_file_bytes: 16777216}
+  ignored_paths: [{path_or_glob: src/generated/**, rationale: Generated output is inventoried through its inputs.}]
+  extension_result_manifests: []
+excluded_paths:
+  - path_or_glob: src/vendor/**
+    rationale: Vendored dependencies are accounted for by dependency inventory.
+artifacts:
+  root: docs/migration/discovery
+  profile: docs/migration/discovery/domain-profile.yaml
+  scope: docs/migration/discovery/scope.yaml
+  coverage_ledger: docs/migration/discovery/coverage-ledger.json
+  unspecified_behaviors: docs/migration/discovery/unspecified-behaviors.yaml
+  product_decisions: docs/migration/discovery/product-decisions.yaml
+  parity_matrix: docs/migration/discovery/parity-matrix.json
+  feature_contracts: docs/migration/discovery/feature-contracts
+  characterization: docs/migration/discovery/characterization
+  evidence: docs/migration/discovery/evidence
+  inventory: docs/migration/discovery/inventory
+  acceptance: docs/migration/discovery/acceptance
+  reports: docs/migration/discovery/reports
+  source_snapshots: docs/migration/discovery/source-snapshots
+  implementation_records: docs/migration/discovery/implementation-records
+completion_gates:
+  require_confirmed_scope: true
+  require_current_inventory: true
+  require_all_dispositions: true
+  require_feature_evidence: true
+  require_acceptance_scenarios: true
+  require_runtime_for_declared_features: true
+  block_on_unresolved_required_behavior: true
+  require_approved_deviations: true
+  planning_prerequisite: discovery-complete
+decision_owners:
+  - id: owner-example
+    required_evidence_types: [decision]
+extensions:
+  example.discovery: {catalog_label: Synthetic fixture, revision_notes: []}
+extension_schemas:
+  example.discovery:
+    path: docs/schemas/example-discovery.schema.json
+    sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:capability-attestation",
+  "title": "Discovery v2 native host capability attestation",
+  "description": "Observed native controls and denial-probe evidence. Only the protected host writer and current handler/configuration hashes can establish supported capability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "attestation_ref",
+    "workspace",
+    "host",
+    "session_id",
+    "runtime",
+    "configuration_sha256",
+    "handlers",
+    "controls",
+    "probe",
+    "status",
+    "findings",
+    "observed_at",
+    "expires_at"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:capability-attestation"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"capability-attestation"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "attestation_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "workspace": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+    "session_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "runtime": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"},
+    "configuration_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "handlers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event","path","sha256"],
+        "properties": {"event":{"enum":["start","tool","stop"]},"path":{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},"sha256":{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}}
+      }
+    },
+    "controls": {"$ref":"urn:drm-copilot:discovery:2.0.0:capability-attestation#/$defs/controls"},
+    "probe": {"$ref":"urn:drm-copilot:discovery:2.0.0:capability-attestation#/$defs/probe"},
+    "status": {"enum":["supported","unsupported"]},
+    "findings": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/finding"}},
+    "observed_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "expires_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"}
+  },
+  "$defs": {
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace_trusted","hooks_enabled","trusted_attribution","start_event","tool_event","stop_event","forbidden_tools_denied"],
+      "properties": {
+        "workspace_trusted": {"type":"boolean"},
+        "hooks_enabled": {"type":"boolean"},
+        "trusted_attribution": {"type":"boolean"},
+        "start_event": {"type":"boolean"},
+        "tool_event": {"type":"boolean"},
+        "stop_event": {"type":"boolean"},
+        "forbidden_tools_denied": {"type":"boolean"}
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sentinel_id","result","evidence_ref"],
+      "properties": {
+        "sentinel_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "result": {"enum":["denied","allowed","unavailable"]},
+        "evidence_ref": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},{"type":"null"}]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties":{"status":{"const":"supported"}},"required":["status"]},
+      "then": {
+        "properties": {
+          "handlers": {"minItems":3,"allOf":[
+            {"contains":{"properties":{"event":{"const":"start"}},"required":["event"]}},
+            {"contains":{"properties":{"event":{"const":"tool"}},"required":["event"]}},
+            {"contains":{"properties":{"event":{"const":"stop"}},"required":["event"]}}
+          ]},
+          "controls": {
+            "properties": {
+              "workspace_trusted": {"const":true},
+              "hooks_enabled": {"const":true},
+              "trusted_attribution": {"const":true},
+              "start_event": {"const":true},
+              "tool_event": {"const":true},
+              "stop_event": {"const":true},
+              "forbidden_tools_denied": {"const":true}
+            }
+          },
+          "probe": {"properties":{"result":{"const":"denied"},"evidence_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"}}},
+          "findings": {"items":{"properties":{"severity":{"enum":["warning","info"]}}}}
+        }
+      },
+      "else": {"properties":{"findings":{"minItems":1,"contains":{"properties":{"severity":{"const":"error"}},"required":["severity"]}}}}
+    },
+    {
+      "if": {"properties":{"probe":{"properties":{"result":{"enum":["denied","allowed"]}},"required":["result"]}},"required":["probe"]},
+      "then": {"properties":{"probe":{"properties":{"evidence_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"}}}}}
+    }
+  ]
+}

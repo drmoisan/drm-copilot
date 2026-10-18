@@ -1,0 +1,37 @@
+$schema: urn:drm-copilot:discovery:2.0.0:product-decision
+schema_version: 2.0.0
+artifact_kind: product-decision
+id: decision-alpha
+decision_id: decision-alpha
+feature_refs:
+  - {artifact_kind: feature-contract, id: feature-alpha}
+unspecified_behavior_refs: []
+decision_key: activation-timing
+scope:
+  feature_ids: [feature-alpha]
+  client_ids: [client-alpha]
+  platforms: [desktop]
+  modes: [online]
+  dimensions: [timing]
+status: approved
+decision: The target reports active state before activation returns.
+rationale: The target interaction requires an immediate result.
+alternatives: []
+affected_platforms: [desktop]
+required_migration_behavior: Preserve an immediate activation result.
+approval: null
+resulting_acceptance_criteria:
+  - id: criterion-alpha
+    readiness: ready
+    statement: Activation exposes the active state.
+    expected_result: Active state is visible before activation returns.
+    pending_reason: null
+    evidence_refs:
+      - {artifact_kind: evidence-reference, id: decision-evidence-alpha}
+    product_decision_refs:
+      - {artifact_kind: product-decision, id: decision-alpha}
+    client_ids: [client-alpha]
+    platforms: [desktop]
+    modes: [online]
+supersedes: []
+extensions: {}

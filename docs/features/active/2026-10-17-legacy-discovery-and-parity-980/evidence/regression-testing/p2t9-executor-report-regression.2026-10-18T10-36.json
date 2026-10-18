@@ -1,0 +1,18 @@
+{
+  "task": "P2-T9",
+  "timestamp": "2026-10-18T10:36:10.525850+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "bb9bd8f9bd22465598e5fbcc0ce1eff77d2d0c167ea3a37dbb5b42b38c3ce3d3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "068c0d70860fcc84fafa4f9528d9566baeaa9cf150723f2fc8c49fd08e6d6269",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "96e1ced622afc6894d9dd32a1ab88f36b5498da362273f91deb371d5700939c9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "66f4028386aa186fcfc1faef25a1e22073b468de7a3c48761e6dc5c75d81835c"
+  },
+  "source_stable": true,
+  "baseline_valid": true,
+  "baseline_findings": [],
+  "expected_output_valid": true,
+  "output_valid": true,
+  "validation_result": "pass",
+  "findings": [],
+  "report_unchanged": true
+}

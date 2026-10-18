@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+  "title": "Discovery v2 domain profile",
+  "description": "Consumer-owned paths, repository pins, clients and gates. Draft validity does not establish discovery or parity completion.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "profile_version", "profile_state", "system", "repository", "production_roots", "test_roots", "project_entry_points", "documentation_roots", "evidence_roots", "repositories", "clients", "required_platforms", "required_modes", "required_feature_dimensions", "runtime", "analyzers", "excluded_paths", "artifacts", "completion_gates", "decision_owners", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:domain-profile"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "domain-profile"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "profile_version": {"type": "integer", "const": 2},
+    "profile_state": {"enum": ["draft", "configured"]},
+    "system": {
+      "type": "object", "additionalProperties": false, "required": ["id", "name", "role"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "name": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "role": {"enum": ["legacy-source", "modernization-target", "combined"]}
+      }
+    },
+    "repository": {
+      "type": "object", "additionalProperties": false, "required": ["id", "vcs", "revision", "revision_policy"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "vcs": {"const": "git"},
+        "revision": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}, {"type": "null"}]},
+        "revision_policy": {"enum": ["pinned", "working-tree-at-pin"]}
+      }
+    },
+    "production_roots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "test_roots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "project_entry_points": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "documentation_roots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "evidence_roots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "repositories": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/related-repository"}},
+    "clients": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/client"}},
+    "required_platforms": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+    "required_modes": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers", "default": ["online"]},
+    "required_feature_dimensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimensions"},
+    "runtime": {
+      "type": "object", "additionalProperties": false, "required": ["capability", "required_feature_ids"],
+      "properties": {
+        "capability": {"enum": ["none", "manual", "semi-automated", "automated"]},
+        "required_feature_ids": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"}
+      }
+    },
+    "analyzers": {"$ref": "#/$defs/analyzers"},
+    "excluded_paths": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/exclusions"},
+    "artifacts": {"$ref": "#/$defs/artifacts"},
+    "completion_gates": {"$ref": "#/$defs/completion-gates"},
+    "decision_owners": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "required_evidence_types"],
+        "properties": {
+          "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+          "required_evidence_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-type"}}
+        }
+      }
+    },
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"},
+    "extension_schemas": {
+      "type": "object", "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$(?![\\s\\S])": {
+          "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+          "properties": {
+            "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+            "sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "document_bytes": {"type": "integer", "minimum": 1, "maximum": 67108864, "default": 16777216},
+        "nesting_depth": {"type": "integer", "minimum": 1, "maximum": 128, "default": 64},
+        "artifact_records": {"type": "integer", "minimum": 1, "maximum": 1000000, "default": 100000},
+        "source_files": {"type": "integer", "minimum": 1, "maximum": 10000000, "default": 1000000}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"profile_state": {"const": "configured"}}, "required": ["profile_state"]},
+      "then": {
+        "properties": {
+          "repository": {"properties": {"revision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}}},
+          "repositories": {"items": {"properties": {"revision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}}}},
+          "production_roots": {"minItems": 1},
+          "required_modes": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"profile_state": {"const": "configured"}, "system": {"properties": {"role": {"enum": ["modernization-target", "combined"]}}, "required": ["role"]}}, "required": ["profile_state", "system"]},
+      "then": {"properties": {"clients": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "related-repository": {
+      "type": "object", "additionalProperties": false, "required": ["id", "role", "revision", "snapshot_manifest", "clients"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "role": {"enum": ["legacy-source", "modernization-target"]},
+        "revision": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"}, {"type": "null"}]},
+        "snapshot_manifest": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"}, {"type": "null"}]},
+        "clients": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"}
+      }
+    },
+    "client": {
+      "type": "object", "additionalProperties": false, "required": ["id", "target_repository", "platforms", "modes", "required_feature_dimensions", "applicability_defaults"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "target_repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "platforms": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers", "minItems": 1},
+        "modes": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers", "minItems": 1},
+        "required_feature_dimensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimensions"},
+        "applicability_defaults": {
+          "type": "object", "additionalProperties": false,
+          "propertyNames": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimension-id"},
+          "patternProperties": {"^[a-z][a-z0-9_]*$(?![\\s\\S])": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimension-applicability"}}
+        }
+      }
+    },
+    "analyzers": {
+      "type": "object", "additionalProperties": false, "required": ["enabled", "options", "ignored_paths", "extension_result_manifests"],
+      "properties": {
+        "enabled": {
+          "type": "array", "uniqueItems": true,
+          "items": {"enum": ["repository", "dotnet", "csharp-symbols", "event-subscriptions", "configuration", "filesystem-access", "registry-access", "com-interop", "ui-callbacks", "test-references", "dependencies", "office-vsto"]}
+        },
+        "options": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"max_file_bytes": {"type": "integer", "minimum": 1, "maximum": 67108864, "default": 16777216}}
+        },
+        "ignored_paths": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/exclusions"},
+        "extension_result_manifests": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"}
+      }
+    },
+    "artifacts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["root", "profile", "scope", "coverage_ledger", "unspecified_behaviors", "product_decisions", "parity_matrix", "feature_contracts", "characterization", "evidence", "inventory", "acceptance", "reports", "source_snapshots", "implementation_records"],
+      "properties": {
+        "root": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery"},
+        "profile": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/domain-profile.yaml"},
+        "scope": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/scope.yaml"},
+        "coverage_ledger": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/coverage-ledger.json"},
+        "unspecified_behaviors": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/unspecified-behaviors.yaml"},
+        "product_decisions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/product-decisions.yaml"},
+        "parity_matrix": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/parity-matrix.json"},
+        "feature_contracts": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/feature-contracts"},
+        "characterization": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/characterization"},
+        "evidence": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/evidence"},
+        "inventory": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/inventory"},
+        "acceptance": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/acceptance"},
+        "reports": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/reports"},
+        "source_snapshots": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/source-snapshots"},
+        "implementation_records": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path", "default": "docs/migration/discovery/implementation-records"}
+      }
+    },
+    "completion-gates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["require_confirmed_scope", "require_current_inventory", "require_all_dispositions", "require_feature_evidence", "require_acceptance_scenarios", "require_runtime_for_declared_features", "block_on_unresolved_required_behavior", "require_approved_deviations", "planning_prerequisite"],
+      "properties": {
+        "require_confirmed_scope": {"type": "boolean", "default": true},
+        "require_current_inventory": {"type": "boolean", "default": true},
+        "require_all_dispositions": {"type": "boolean", "default": true},
+        "require_feature_evidence": {"type": "boolean", "default": true},
+        "require_acceptance_scenarios": {"type": "boolean", "default": true},
+        "require_runtime_for_declared_features": {"type": "boolean", "default": true},
+        "block_on_unresolved_required_behavior": {"type": "boolean", "default": true},
+        "require_approved_deviations": {"type": "boolean", "default": true},
+        "planning_prerequisite": {"enum": ["none", "discovery-complete", "parity-complete"], "default": "discovery-complete"}
+      }
+    }
+  }
+}

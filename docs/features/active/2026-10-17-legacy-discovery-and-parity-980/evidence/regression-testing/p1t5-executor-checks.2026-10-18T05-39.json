@@ -1,0 +1,264 @@
+{
+  "task": "P1-T5",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 20,
+  "schemas": [
+    "coverage-ledger",
+    "inventory-snapshot",
+    "source-snapshot-manifest",
+    "extension-result-manifest"
+  ],
+  "fixtures": [
+    {
+      "kind": "coverage-ledger",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "components",
+            0,
+            "exclusion_rationale"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    },
+    {
+      "kind": "inventory-snapshot",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "files",
+            0,
+            "sha256"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    },
+    {
+      "kind": "source-snapshot-manifest",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "source_repository",
+            "revision"
+          ],
+          "message": "'main' does not match '^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "extension-result-manifest",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "result_files",
+            0,
+            "artifact_kind"
+          ],
+          "message": "'inventory-snapshot' was expected"
+        }
+      ]
+    }
+  ],
+  "independent_boundary_cases": [
+    {
+      "name": "empty null-pin draft ledger",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "populated null-pin ledger",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "detected cannot be feature-linked without inspection",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "excluded component without rationale",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "inspected input without exact byte hash",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "unreadable input without diagnostic",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "partial unreadable input with diagnostic linkage",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "detection cannot claim verified behavior",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "mutable source export revision",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "manifest digest trailing newline",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "empty adapter success",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "explicit adapter failure without fabricated result",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "adapter transport cannot select executable",
+      "valid": false,
+      "finding_count": 1
+    }
+  ],
+  "packaged_resources": 17,
+  "unchanged_prior_paths": 66,
+  "coverage_lines": "312/312",
+  "coverage_branch_arcs": "132/132",
+  "new_or_changed_production_executable_lines": 0,
+  "line_counts": {
+    "examples/discovery/v2/coverage-ledger.example.yaml": 45,
+    "examples/discovery/v2/extension-result-manifest.example.yaml": 25,
+    "examples/discovery/v2/inventory-snapshot.example.yaml": 88,
+    "examples/discovery/v2/source-snapshot-manifest.example.yaml": 37,
+    "packages/discovery-runtime/resource-manifest.json": 26,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 91,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json": 103,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json": 48,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json": 142,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json": 66,
+    "schemas/discovery/v2/coverage-ledger.schema.json": 103,
+    "schemas/discovery/v2/extension-result-manifest.schema.json": 48,
+    "schemas/discovery/v2/inventory-snapshot.schema.json": 142,
+    "schemas/discovery/v2/source-snapshot-manifest.schema.json": 66,
+    "tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml": 30,
+    "tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml": 25,
+    "tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml": 26,
+    "tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml": 28,
+    "tests/schemas/discovery/test_v2_inventory_schemas.py": 366,
+    "tests/schemas/discovery/test_v2_transport_schemas.py": 205
+  },
+  "paths": [
+    {
+      "path": "examples/discovery/v2/coverage-ledger.example.yaml",
+      "git_blob": "b508faba7299fe4403b26be56ba4d315d05a7a04",
+      "sha256": "bf52c7bf8a18e6bdee547525c46fe313f71311fb51ad46a898465643f931f30c"
+    },
+    {
+      "path": "examples/discovery/v2/extension-result-manifest.example.yaml",
+      "git_blob": "506154cc77d87743fa3c0b58c2c53288d7977a7d",
+      "sha256": "e7694ef08f376c0ae810c9698a3a5f05fd3fc4d4728f7fe60d5c3a38d50ab6a0"
+    },
+    {
+      "path": "examples/discovery/v2/inventory-snapshot.example.yaml",
+      "git_blob": "34b4d2bfb3d52e31a86adf0ae609b5f608742110",
+      "sha256": "c218beee402c859360a7fd9844a23fd12603abbfd868652f4f0af4398ae17988"
+    },
+    {
+      "path": "examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "git_blob": "b7fbc3b5d56a5b7ba97b11a325d426699d24c985",
+      "sha256": "1fbff8077952e1e0e6d752d714f42642bf52fea5732a92be920f5be08ac2a494"
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "52e66edfff8062b701cc698acffb63fbc2c1eb7b",
+      "sha256": "e1ca90f902f20db426e7060dd7a544cf17fb8b4d12091ceaa4cbb2218ba84587"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "b307ef502afbf228795fbe31d1aadb0580ea98e9",
+      "sha256": "0ae4aa0f0a5b293f217f1cab881bcae84a232481f21eb420a2a2123f5941e602"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "git_blob": "5a5e0fc1d4b733f1166ff6358b9c4ba99560e7d8",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "git_blob": "5bbaa8e4ed5df6575ea6b873cd70596a41b26f38",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "git_blob": "52ffc6019d808a173a449ba1f39ca3c1cafc3eb6",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "git_blob": "4e45b5dbeca43b8b8c9472efa6f01f28e2562063",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0"
+    },
+    {
+      "path": "schemas/discovery/v2/coverage-ledger.schema.json",
+      "git_blob": "5a5e0fc1d4b733f1166ff6358b9c4ba99560e7d8",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e"
+    },
+    {
+      "path": "schemas/discovery/v2/extension-result-manifest.schema.json",
+      "git_blob": "5bbaa8e4ed5df6575ea6b873cd70596a41b26f38",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613"
+    },
+    {
+      "path": "schemas/discovery/v2/inventory-snapshot.schema.json",
+      "git_blob": "52ffc6019d808a173a449ba1f39ca3c1cafc3eb6",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417"
+    },
+    {
+      "path": "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "git_blob": "4e45b5dbeca43b8b8c9472efa6f01f28e2562063",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "git_blob": "99ab086ee8fb9bf59887f88c54d2730eb5a37740",
+      "sha256": "f85c16851be4552cc3d3017f28dbb9577f556f1fe89216466485a06b7ce7d846"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "git_blob": "49a9e56f601766afe156d78907fc3188797ef1d5",
+      "sha256": "25cc6d74601ab02a68c1bd8c433bf9f13e930a5a20ef98a5f4198a755e41d2db"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "git_blob": "a6bcd944790b6d8240964c509192ce2d57f87d8b",
+      "sha256": "5585c680e895298f8d710d7da4c30f05f35e19b7d224e19528ac8e66b967e7e5"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "git_blob": "1eb71997c97b8407f922e3b11556a0c2ba7c90e7",
+      "sha256": "d04fdc08b0ec6021c07f0ab7d88cdb6c192f391d83d8d1efa26f406bf38f5119"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "git_blob": "df57e94df84a2782c046cc459375bea0df0ab807",
+      "sha256": "ba46ee04c93298247ee56f751d16d5bac7f5fb380c263cc862f7c6cb7a05071f"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_transport_schemas.py",
+      "git_blob": "9730e5b28b4f404352647a92bcc1a3b5773acd7c",
+      "sha256": "8edddafbcea1704b2d8d95a063fad750fb694555d12a190203e2079e8f20bc41"
+    }
+  ]
+}

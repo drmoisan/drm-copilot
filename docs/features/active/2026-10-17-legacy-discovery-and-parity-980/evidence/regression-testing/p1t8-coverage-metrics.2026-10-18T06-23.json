@@ -1,0 +1,528 @@
+{
+  "all_owned_paths_staged": true,
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 97.05882352941177,
+      "branches": 34,
+      "classification": "new production module",
+      "covered_branches": 33,
+      "covered_lines": 76,
+      "line_percent": 100.0,
+      "statements": 76
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 100.0,
+      "branches": 36,
+      "classification": "new production module",
+      "covered_branches": 36,
+      "covered_lines": 84,
+      "line_percent": 100.0,
+      "statements": 84
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 97.67441860465117,
+      "branches": 86,
+      "classification": "new production module",
+      "covered_branches": 84,
+      "covered_lines": 200,
+      "line_percent": 97.0873786407767,
+      "statements": 206
+    }
+  },
+  "covered_new_production_lines": 360,
+  "findings": [],
+  "focused_tests_passed": 383,
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": 154,
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": 170,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": 418,
+    "tests/discovery_runtime/test_findings.py": 227,
+    "tests/discovery_runtime/test_parsing.py": 234,
+    "tests/discovery_runtime/test_parsing_limits.py": 227
+  },
+  "new_executable_production_lines": 366,
+  "new_production_branch_percent": 98.07692307692308,
+  "new_production_line_percent": 98.36065573770492,
+  "new_tests_passed": 185,
+  "owned_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+    "tests/discovery_runtime/test_findings.py",
+    "tests/discovery_runtime/test_parsing.py",
+    "tests/discovery_runtime/test_parsing_limits.py"
+  ],
+  "reversed_tests_passed": 185,
+  "staged_whitespace_exit_code": 0,
+  "task": "P1-T8",
+  "timestamp_utc": "2026-10-18T06-23",
+  "unchanged_prior_paths": [
+    "examples/discovery/v2/acceptance-specification.example.yaml",
+    "examples/discovery/v2/coverage-ledger.example.yaml",
+    "examples/discovery/v2/domain-profile.example.yaml",
+    "examples/discovery/v2/evidence-reference.example.yaml",
+    "examples/discovery/v2/extension-result-manifest.example.yaml",
+    "examples/discovery/v2/feature-contract.example.yaml",
+    "examples/discovery/v2/implementation-record.example.yaml",
+    "examples/discovery/v2/inventory-snapshot.example.yaml",
+    "examples/discovery/v2/parity-matrix.example.yaml",
+    "examples/discovery/v2/product-decision-collection.example.yaml",
+    "examples/discovery/v2/product-decision.example.yaml",
+    "examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+    "examples/discovery/v2/scope.example.yaml",
+    "examples/discovery/v2/source-snapshot-manifest.example.yaml",
+    "examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+    "examples/discovery/v2/unspecified-behavior.example.yaml",
+    "packages/discovery-runtime/README.md",
+    "packages/discovery-runtime/pyproject.toml",
+    "packages/discovery-runtime/resource-manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+    "poetry.lock",
+    "pyproject.toml",
+    "quality-tiers.yml",
+    "schemas/discovery/v2/acceptance-specification.schema.json",
+    "schemas/discovery/v2/activation.schema.json",
+    "schemas/discovery/v2/capability-attestation.schema.json",
+    "schemas/discovery/v2/common.schema.json",
+    "schemas/discovery/v2/coverage-ledger.schema.json",
+    "schemas/discovery/v2/discovery-invocation.schema.json",
+    "schemas/discovery/v2/domain-profile.schema.json",
+    "schemas/discovery/v2/evidence-reference.schema.json",
+    "schemas/discovery/v2/extension-result-manifest.schema.json",
+    "schemas/discovery/v2/feature-contract.schema.json",
+    "schemas/discovery/v2/implementation-record.schema.json",
+    "schemas/discovery/v2/inventory-snapshot.schema.json",
+    "schemas/discovery/v2/migration-report.schema.json",
+    "schemas/discovery/v2/parity-matrix.schema.json",
+    "schemas/discovery/v2/product-decision-collection.schema.json",
+    "schemas/discovery/v2/product-decision.schema.json",
+    "schemas/discovery/v2/required-output-manifest.schema.json",
+    "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v2/scope.schema.json",
+    "schemas/discovery/v2/service-request.schema.json",
+    "schemas/discovery/v2/service-result.schema.json",
+    "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "schemas/discovery/v2/tool-authorization.schema.json",
+    "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "schemas/discovery/v2/unspecified-behavior.schema.json",
+    "schemas/discovery/v2/validation-receipt.schema.json",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "scripts/dev_tools/discovery/__init__.py",
+    "scripts/dev_tools/discovery/domain_profile.py",
+    "scripts/dev_tools/discovery/domain_profile_models.py",
+    "scripts/dev_tools/discovery/init_models.py",
+    "scripts/dev_tools/discovery/io.py",
+    "scripts/dev_tools/discovery/rendering.py",
+    "scripts/dev_tools/quality_tiers_contract.py",
+    "tests/discovery_runtime/test_package_contract.py",
+    "tests/discovery_runtime/test_resources.py",
+    "tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+    "tests/schemas/discovery/test_v2_acceptance_schemas.py",
+    "tests/schemas/discovery/test_v2_authority_schemas.py",
+    "tests/schemas/discovery/test_v2_common_schemas.py",
+    "tests/schemas/discovery/test_v2_control_schemas.py",
+    "tests/schemas/discovery/test_v2_decision_schemas.py",
+    "tests/schemas/discovery/test_v2_format_schemas.py",
+    "tests/schemas/discovery/test_v2_inventory_schemas.py",
+    "tests/schemas/discovery/test_v2_observation_schemas.py",
+    "tests/schemas/discovery/test_v2_profile_schemas.py",
+    "tests/schemas/discovery/test_v2_runtime_schemas.py",
+    "tests/schemas/discovery/test_v2_target_schemas.py",
+    "tests/schemas/discovery/test_v2_transport_schemas.py",
+    "tests/schemas/discovery/v2_control_test_support.py",
+    "tests/schemas/discovery/v2_schema_test_support.py",
+    "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+    "tests/scripts/dev_tools/discovery/test_init_models.py",
+    "tests/scripts/dev_tools/discovery/test_io.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py"
+  ],
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": [
+      {
+        "covered_lines": 5,
+        "line": 16,
+        "line_percent": 100.0,
+        "name": "validate_finding_path",
+        "statements": 5
+      },
+      {
+        "covered_lines": 29,
+        "line": 29,
+        "line_percent": 100.0,
+        "name": "Finding",
+        "statements": 29
+      },
+      {
+        "covered_lines": 2,
+        "line": 82,
+        "line_percent": 100.0,
+        "name": "finding_key",
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 96,
+        "line_percent": 100.0,
+        "name": "child_pointer",
+        "statements": 2
+      },
+      {
+        "covered_lines": 26,
+        "line": 101,
+        "line_percent": 100.0,
+        "name": "FindingCollector",
+        "statements": 26
+      },
+      {
+        "covered_lines": 5,
+        "line": 146,
+        "line_percent": 100.0,
+        "name": "ordered_findings",
+        "statements": 5
+      },
+      {
+        "covered_lines": 18,
+        "line": 45,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "statements": 18
+      },
+      {
+        "covered_lines": 2,
+        "line": 68,
+        "line_percent": 100.0,
+        "name": "to_dict",
+        "statements": 2
+      },
+      {
+        "covered_lines": 7,
+        "line": 108,
+        "line_percent": 100.0,
+        "name": "__init__",
+        "statements": 7
+      },
+      {
+        "covered_lines": 12,
+        "line": 117,
+        "line_percent": 100.0,
+        "name": "add",
+        "statements": 12
+      },
+      {
+        "covered_lines": 5,
+        "line": 134,
+        "line_percent": 100.0,
+        "name": "findings",
+        "statements": 5
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": [
+      {
+        "covered_lines": 10,
+        "line": 21,
+        "line_percent": 100.0,
+        "name": "_validate_value",
+        "statements": 10
+      },
+      {
+        "covered_lines": 21,
+        "line": 36,
+        "line_percent": 100.0,
+        "name": "JsonObject",
+        "statements": 21
+      },
+      {
+        "covered_lines": 6,
+        "line": 76,
+        "line_percent": 100.0,
+        "name": "to_plain_value",
+        "statements": 6
+      },
+      {
+        "covered_lines": 2,
+        "line": 87,
+        "line_percent": 100.0,
+        "name": "canonical_json",
+        "statements": 2
+      },
+      {
+        "covered_lines": 14,
+        "line": 102,
+        "line_percent": 100.0,
+        "name": "ParseLimits",
+        "statements": 14
+      },
+      {
+        "covered_lines": 18,
+        "line": 136,
+        "line_percent": 100.0,
+        "name": "ParsedDocument",
+        "statements": 18
+      },
+      {
+        "covered_lines": 10,
+        "line": 45,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "statements": 10
+      },
+      {
+        "covered_lines": 5,
+        "line": 59,
+        "line_percent": 100.0,
+        "name": "__getitem__",
+        "statements": 5
+      },
+      {
+        "covered_lines": 2,
+        "line": 67,
+        "line_percent": 100.0,
+        "name": "__iter__",
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 71,
+        "line_percent": 100.0,
+        "name": "__len__",
+        "statements": 2
+      },
+      {
+        "covered_lines": 6,
+        "line": 115,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "statements": 6
+      },
+      {
+        "covered_lines": 2,
+        "line": 130,
+        "line_percent": 100.0,
+        "name": "expanded_nodes",
+        "statements": 2
+      },
+      {
+        "covered_lines": 10,
+        "line": 148,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "statements": 10
+      },
+      {
+        "covered_lines": 2,
+        "line": 168,
+        "line_percent": 100.0,
+        "name": "ok",
+        "statements": 2
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": [
+      {
+        "covered_lines": 1,
+        "line": 40,
+        "line_percent": 100.0,
+        "name": "_ObjectPairs",
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 44,
+        "line_percent": 100.0,
+        "name": "_DiscoveryLoader",
+        "statements": 1
+      },
+      {
+        "covered_lines": 3,
+        "line": 52,
+        "line_percent": 100.0,
+        "name": "_YamlApi",
+        "statements": 3
+      },
+      {
+        "covered_lines": 3,
+        "line": 64,
+        "line_percent": 100.0,
+        "name": "_ScalarConstructor",
+        "statements": 3
+      },
+      {
+        "covered_lines": 1,
+        "line": 79,
+        "line_percent": 100.0,
+        "name": "_LimitReached",
+        "statements": 1
+      },
+      {
+        "covered_lines": 2,
+        "line": 83,
+        "line_percent": 100.0,
+        "name": "_is_sequence",
+        "statements": 2
+      },
+      {
+        "covered_lines": 144,
+        "line": 88,
+        "line_percent": 97.29729729729729,
+        "name": "_DocumentReader",
+        "statements": 148
+      },
+      {
+        "covered_lines": 32,
+        "line": 343,
+        "line_percent": 94.11764705882354,
+        "name": "parse_document",
+        "statements": 34
+      },
+      {
+        "covered_lines": 1,
+        "line": 55,
+        "line_percent": 100.0,
+        "name": "parse",
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 59,
+        "line_percent": 100.0,
+        "name": "compose",
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 67,
+        "line_percent": 100.0,
+        "name": "construct_object",
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 71,
+        "line_percent": 100.0,
+        "name": "dispose",
+        "statements": 1
+      },
+      {
+        "covered_lines": 10,
+        "line": 95,
+        "line_percent": 100.0,
+        "name": "__init__",
+        "statements": 10
+      },
+      {
+        "covered_lines": 2,
+        "line": 107,
+        "line_percent": 100.0,
+        "name": "error",
+        "statements": 2
+      },
+      {
+        "covered_lines": 3,
+        "line": 119,
+        "line_percent": 100.0,
+        "name": "stop",
+        "statements": 3
+      },
+      {
+        "covered_lines": 45,
+        "line": 124,
+        "line_percent": 100.0,
+        "name": "preflight",
+        "statements": 45
+      },
+      {
+        "covered_lines": 5,
+        "line": 181,
+        "line_percent": 100.0,
+        "name": "check_source_budget",
+        "statements": 5
+      },
+      {
+        "covered_lines": 22,
+        "line": 194,
+        "line_percent": 91.66666666666667,
+        "name": "scalar",
+        "statements": 24
+      },
+      {
+        "covered_lines": 26,
+        "line": 233,
+        "line_percent": 92.85714285714286,
+        "name": "mapping_items",
+        "statements": 28
+      },
+      {
+        "covered_lines": 30,
+        "line": 280,
+        "line_percent": 100.0,
+        "name": "visit",
+        "statements": 30
+      }
+    ]
+  }
+}

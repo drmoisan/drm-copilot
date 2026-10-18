@@ -1,0 +1,719 @@
+{
+  "task": "P2-T3",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "name": "authoritative timestamp 2026-01-01T00:00:00Z",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "authoritative timestamp 2026-01-01t00:00:00z",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "authoritative timestamp 2016-12-31T23:59:60Z",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "authoritative timestamp 2017-01-01T00:59:60+01:00",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "one-based inclusive",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "integer-valued JSON numbers",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "out-of-range span",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_LINE_RANGE"
+        ]
+      }
+    },
+    {
+      "name": "reversed span",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_LINE_RANGE"
+        ]
+      }
+    },
+    {
+      "name": "very large integer bound",
+      "status": "pass",
+      "detail": {
+        "schema_valid": true,
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_LINE_RANGE"
+        ]
+      }
+    },
+    {
+      "name": "separate identical runtime payload",
+      "status": "pass",
+      "detail": {
+        "locally_verified": true,
+        "codes": []
+      }
+    },
+    {
+      "name": "replaced runtime payload",
+      "status": "pass",
+      "detail": {
+        "locally_verified": false,
+        "codes": [
+          "EVIDENCE_CHECKSUM"
+        ]
+      }
+    },
+    {
+      "name": "documentation-only HEAD advancement",
+      "status": "pass",
+      "detail": {
+        "findings": 0,
+        "remote_freshness": "unknown"
+      }
+    },
+    {
+      "name": "missing local capture is not proof",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CONTENT_UNAVAILABLE",
+          "EVIDENCE_CONTENT_UNAVAILABLE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "changed general payload fails checksum",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CHECKSUM",
+          "EVIDENCE_CHECKSUM"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "incorrect checksum algorithm fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CHECKSUM",
+          "EVIDENCE_CHECKSUM"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "missing checksum fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CHECKSUM",
+          "EVIDENCE_CHECKSUM"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "missing capture author fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_AUTHOR"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "invalid capture author identity fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_AUTHOR"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "unknown capture author kind fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_AUTHOR"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "missing environment fails runtime evidence",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_ENVIRONMENT"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "missing operating mode fails runtime evidence",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_ENVIRONMENT"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "missing runtime capture declaration fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CAPTURE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "unknown capture method fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CAPTURE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "invalid timestamp fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_TIMESTAMP"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "timezone-free timestamp fails",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_TIMESTAMP"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "unconfigured repository cannot supply proof",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CONTENT_UNAVAILABLE",
+          "EVIDENCE_REPOSITORY",
+          "EVIDENCE_CONTENT_UNAVAILABLE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "capture method manual",
+      "status": "pass",
+      "detail": {
+        "findings": [],
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "capture method semi-automated",
+      "status": "pass",
+      "detail": {
+        "findings": [],
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "capture method automated",
+      "status": "pass",
+      "detail": {
+        "findings": [],
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "invalid line endpoint zero",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_LINE_RANGE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "invalid line endpoint boolean",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_LINE_RANGE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "invalid line endpoint fraction",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_LINE_RANGE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "invalid line endpoint negative",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_LINE_RANGE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "URI-only description remains valid but cannot prove completion",
+      "status": "pass",
+      "detail": {
+        "findings": 0,
+        "local_proof": false
+      }
+    },
+    {
+      "name": "source proof requires captured immutable bytes",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CONTENT_UNAVAILABLE"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "source proof accepts exact pinned bytes",
+      "status": "pass",
+      "detail": {
+        "findings": [],
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "source proof rejects revision expressions",
+      "status": "pass",
+      "detail": {
+        "findings": [
+          "EVIDENCE_CONTENT_UNAVAILABLE",
+          "EVIDENCE_PIN"
+        ],
+        "locally_verified": false
+      }
+    },
+    {
+      "name": "test proof accepts exact pinned bytes",
+      "status": "pass",
+      "detail": {
+        "findings": [],
+        "locally_verified": true
+      }
+    },
+    {
+      "name": "claim proof requires exact owner pin and requested evidence type",
+      "status": "pass",
+      "detail": {
+        "owner_pin_type_bound": true
+      }
+    },
+    {
+      "name": "selected source exact bytes match configured pin",
+      "status": "pass",
+      "detail": {
+        "codes": [],
+        "remote_freshness": "unknown"
+      }
+    },
+    {
+      "name": "selected source replaced bytes fail",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_SOURCE_CHANGED"
+        ],
+        "remote_freshness": "unknown"
+      }
+    },
+    {
+      "name": "selected source missing immutable object fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_CONTENT_UNAVAILABLE"
+        ],
+        "remote_freshness": "unknown"
+      }
+    },
+    {
+      "name": "wrong local checkout owner fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_CHECKOUT_IDENTITY"
+        ],
+        "remote_freshness": "unknown"
+      }
+    },
+    {
+      "name": "immutable source contract hash and declared pin match",
+      "status": "pass",
+      "detail": {
+        "codes": []
+      }
+    },
+    {
+      "name": "immutable source contract replacement hash fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_ARTIFACT_HASH"
+        ]
+      }
+    },
+    {
+      "name": "immutable source contract wrong configured pin fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_ARTIFACT_PIN",
+          "REVISION_PIN_MISMATCH"
+        ]
+      }
+    },
+    {
+      "name": "target-only repository cannot provide source contract identity",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_REPOSITORY"
+        ]
+      }
+    },
+    {
+      "name": "transport payload bytes and size verified",
+      "status": "pass",
+      "detail": {
+        "codes": []
+      }
+    },
+    {
+      "name": "transport replaced payload hash fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_TRANSPORT_BYTES"
+        ]
+      }
+    },
+    {
+      "name": "transport absent payload fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_TRANSPORT_BYTES"
+        ]
+      }
+    },
+    {
+      "name": "transport inconsistent payload size fails",
+      "status": "pass",
+      "detail": {
+        "codes": [
+          "REVISION_TRANSPORT_BYTES"
+        ]
+      }
+    },
+    {
+      "name": "content lookup cannot cross repository or immutable pin context",
+      "status": "pass",
+      "detail": {
+        "exact_context": true
+      }
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t3.py",
+  "probe_scope": "Pure evidence/revision probes over immutable captured memory; reference-only fixtures are deliberately narrow and not full completion graphs.",
+  "probe_production_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc"
+  },
+  "owned_paths": 4,
+  "unchanged_prior_paths": 178,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "296/297",
+  "coverage_branch_arcs": "148/150",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": [
+      {
+        "name": "EvidenceAssessment",
+        "line": 25,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "EvidenceValidation",
+        "line": 61,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "_identifier",
+        "line": 72,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_metadata",
+        "line": 80,
+        "covered_lines": 16,
+        "statements": 16
+      },
+      {
+        "name": "_checksum",
+        "line": 148,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "_line_number",
+        "line": 177,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "_span",
+        "line": 188,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "assess_evidence",
+        "line": 214,
+        "covered_lines": 28,
+        "statements": 28
+      },
+      {
+        "name": "validate_evidence",
+        "line": 290,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "locally_verified",
+        "line": 33,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "can_prove",
+        "line": 39,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "for_record",
+        "line": 67,
+        "covered_lines": 2,
+        "statements": 2
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": [
+      {
+        "name": "is_full_revision",
+        "line": 24,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "RevisionInputs",
+        "line": 36,
+        "covered_lines": 21,
+        "statements": 21
+      },
+      {
+        "name": "RevisionValidation",
+        "line": 101,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "_pin",
+        "line": 112,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "_selected",
+        "line": 140,
+        "covered_lines": 18,
+        "statements": 18
+      },
+      {
+        "name": "_references",
+        "line": 175,
+        "covered_lines": 19,
+        "statements": 19
+      },
+      {
+        "name": "_declarations",
+        "line": 225,
+        "covered_lines": 34,
+        "statements": 34
+      },
+      {
+        "name": "_transport",
+        "line": 327,
+        "covered_lines": 14,
+        "statements": 15
+      },
+      {
+        "name": "_source_bytes",
+        "line": 362,
+        "covered_lines": 29,
+        "statements": 29
+      },
+      {
+        "name": "validate_revisions",
+        "line": 435,
+        "covered_lines": 15,
+        "statements": 15
+      },
+      {
+        "name": "__post_init__",
+        "line": 43,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "content",
+        "line": 68,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "remote_freshness",
+        "line": 107,
+        "covered_lines": 2,
+        "statements": 2
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": 306,
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": 458,
+    "tests/discovery_runtime/test_evidence_rules.py": 462,
+    "tests/discovery_runtime/test_revision_rules.py": 483
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-coverage.2026-10-18T08-35.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-coverage-metrics.2026-10-18T08-35.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "git_blob": "fe791c05ff764b04b8a7da49392dc5a04cb1f724",
+      "sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "git_blob": "7f7cf81d5e18d9fbd617eab84eba4b34da94b644",
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc"
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_rules.py",
+      "git_blob": "85e69a0b8b5537bdf597669678616d31812c9022",
+      "sha256": "aacf4e1eed97712b890a2718613382d789bbf1703207013e77f7ac080ac48c6a"
+    },
+    {
+      "path": "tests/discovery_runtime/test_revision_rules.py",
+      "git_blob": "1150df13c22a53c2dcc5f06cd21aea807cd62141",
+      "sha256": "d368d60cd7f77ec7e5f69b69a771417fd0abb00583ce122a92b6797fded49dd1"
+    }
+  ],
+  "review_corrections": [
+    "P2T3-R1: authoritative RFC3339 lowercase and known leap-second timestamps accepted.",
+    "P2T3-R2: arbitrarily large integer line endpoints produce a finding without float overflow."
+  ],
+  "carried_runtime_payload_binding": "verified: distinct runtime_artifact.path has its own captured-byte checksum check",
+  "command_exit_code": 0
+}

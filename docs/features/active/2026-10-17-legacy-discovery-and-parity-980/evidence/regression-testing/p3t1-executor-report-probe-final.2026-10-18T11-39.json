@@ -1,0 +1,24 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:38:54.531602+00:00",
+  "initial_report_directory_exists": false,
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+  },
+  "source_stable": true,
+  "result": {
+    "name": "Valid paired JSON and Markdown report is a permitted artifact mutation",
+    "passed": true,
+    "writes": [
+      "docs/migration/discovery/reports/coverage-report.json",
+      "docs/migration/discovery/reports/coverage-report.md"
+    ]
+  }
+}

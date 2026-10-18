@@ -1,0 +1,572 @@
+{
+  "task": "P2-T9",
+  "timestamp": "2026-10-18T10:50:14.533835+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "8158901bda32ca5e265c2a8c89d6dbfd536aa3c0e51696c2452eba8b6e4feff3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "9cff1c614cfe3e1871671c77227473a91ff8f857cbc3bc6b0be930e95f20028d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992"
+  },
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "8158901bda32ca5e265c2a8c89d6dbfd536aa3c0e51696c2452eba8b6e4feff3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "9cff1c614cfe3e1871671c77227473a91ff8f857cbc3bc6b0be930e95f20028d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992"
+  },
+  "source_stable": true,
+  "passed": 23,
+  "total": 23,
+  "results": [
+    {
+      "name": "feature evidence switch True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COMPLETION_EVIDENCE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required features need retained source observation evidence.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "current inventory switch corrected True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIGURATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/inventory/inventory-alpha.json",
+          "pointer": "/scan_configuration_sha256",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Inventory scan configuration differs from the current profile.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "feature evidence switch False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "current inventory switch corrected False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "required open legacy question with approved target switch True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "DIMENSION_UNRESOLVED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/timing",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required legacy observation remains unresolved.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COMPLETION_UNRESOLVED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/unspecified-behaviors.yaml",
+          "pointer": "/records/0/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required legacy behavior remains unresolved.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "required open legacy question with approved target switch False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "optional open legacy question preserves approved target readiness",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "scoped intentional deviation switch True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COMPLETION_DECISION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/timing",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Intentional uncertainty needs current scoped approval.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "scoped intentional deviation switch False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "runtime analyst may produce an unknown not-run plan",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": true,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "runtime pass cannot invent unknown expected result",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/evidence_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "[] should be non-empty",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/expected_result",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "'Activation succeeded.' is not of type 'null'",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/post_state_capture/evidence_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "[] should be non-empty",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/post_state_capture/observed_state",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "None is not of type 'string'",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/pre_state_capture/evidence_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "[] should be non-empty",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/pre_state_capture/observed_state",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "None is not of type 'string'",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/runs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "[] does not contain items matching the given schema",
+          "next_action": "Correct the field against the expected schema."
+        },
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/characterization/runtime-plan.json",
+          "pointer": "/runs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "[] should be non-empty",
+          "next_action": "Correct the field against the expected schema."
+        }
+      ]
+    },
+    {
+      "name": "reconciler may propose a selected product decision",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": true,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "legacy analyst cannot propose target policy",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_ROLE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/product-decisions.yaml",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The invocation role cannot produce this artifact kind.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "reconciler cannot self-approve new policy",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_APPROVAL",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Analyst output cannot change approved or historical decisions.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "reconciler must preserve current approved decision facts",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "agent-output",
+      "output_valid": false,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "OUTPUT_APPROVAL",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Analyst output cannot change approved or historical decisions.",
+          "next_action": "Restore the exact invocation outputs and revalidate."
+        }
+      ]
+    },
+    {
+      "name": "honest partial parity remains structurally valid",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "structural",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "discovery completion is distinct from parity completion",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "required partial parity cannot complete parity",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "parity-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required parity remains unassessed, partial, missing or conflicting.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "planning honors configured discovery prerequisite",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "planning",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "planning honors configured parity prerequisite",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "planning",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "PARITY_INCOMPLETE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required parity remains unassessed, partial, missing or conflicting.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "role invocation cannot authorize root planning",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "planning",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "VALIDATION_CONTEXT",
+          "severity": "error",
+          "artifact_path": null,
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Role invocation context cannot select a root gate mode.",
+          "next_action": "Correct the inputs and validate the requested mode."
+        }
+      ]
+    },
+    {
+      "name": "disabled completion switches cannot waive claim evidence integrity",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "planning",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "EVIDENCE_CHECKSUM",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/evidence/target-run.json",
+          "pointer": "/path",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The captured payload does not match the declared SHA-256 checksum.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "EVIDENCE_CHECKSUM",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/evidence/target-run.json",
+          "pointer": "/runtime_artifact/path",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The captured payload does not match the declared SHA-256 checksum.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Implementation needs matching target bytes/client/test proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Parity claims need independently evidenced target implementation.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Missing target proof: browser-example/browser/online.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Implementation links need matching feature/client/bytes.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "aggregate diagnostics remain bounded sorted and fail closed",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "findings_count": 100,
+      "marker_count": 1,
+      "order_independent": true
+    }
+  ]
+}

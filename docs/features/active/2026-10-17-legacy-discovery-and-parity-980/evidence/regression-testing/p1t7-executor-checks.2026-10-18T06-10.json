@@ -1,0 +1,1059 @@
+{
+  "task": "P1-T7",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 23,
+  "schemas": [
+    "activation",
+    "service-request",
+    "service-result",
+    "discovery-invocation",
+    "required-output-manifest",
+    "validation-receipt",
+    "migration-report",
+    "capability-attestation",
+    "tool-authorization"
+  ],
+  "v2_catalog": [
+    "acceptance-specification",
+    "activation",
+    "capability-attestation",
+    "common",
+    "coverage-ledger",
+    "discovery-invocation",
+    "domain-profile",
+    "evidence-reference",
+    "extension-result-manifest",
+    "feature-contract",
+    "implementation-record",
+    "inventory-snapshot",
+    "migration-report",
+    "parity-matrix",
+    "product-decision-collection",
+    "product-decision",
+    "required-output-manifest",
+    "runtime-characterization-scenario",
+    "scope",
+    "service-request",
+    "service-result",
+    "source-snapshot-manifest",
+    "tool-authorization",
+    "unspecified-behavior-collection",
+    "unspecified-behavior",
+    "validation-receipt"
+  ],
+  "existing_example_pairs": [
+    {
+      "kind": "acceptance-specification",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "then"
+          ],
+          "message": "['An expectation that has not been established.'] is not of type 'null'"
+        }
+      ]
+    },
+    {
+      "kind": "coverage-ledger",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "components",
+            0,
+            "exclusion_rationale"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    },
+    {
+      "kind": "domain-profile",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "completion_gates",
+            "require_confirmed_scope"
+          ],
+          "message": "'true' is not of type 'boolean'"
+        }
+      ]
+    },
+    {
+      "kind": "evidence-reference",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "checksum"
+          ],
+          "message": "{'algorithm': 'sha256', 'value': 'invalid-digest'} is not valid under any of the given schemas"
+        },
+        {
+          "pointer": [
+            "checksum",
+            "value"
+          ],
+          "message": "'invalid-digest' does not match '^[0-9a-f]{64}$(?![\\\\s\\\\S])'"
+        },
+        {
+          "pointer": [
+            "checksum",
+            "value"
+          ],
+          "message": "'invalid-digest' does not match '^[0-9a-f]{64}$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "extension-result-manifest",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "result_files",
+            0,
+            "artifact_kind"
+          ],
+          "message": "'inventory-snapshot' was expected"
+        }
+      ]
+    },
+    {
+      "kind": "feature-contract",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [],
+          "message": "{'$schema': 'urn:drm-copilot:discovery:2.0.0:feature-contract', 'schema_version': '2.0.0', 'artifact_kind': 'feature-contract', 'id': 'feature-alpha', 'feature_id': 'feature-alpha', 'name': 'Activate a configured processor', 'capability_group': 'processing', 'summary': 'A supplied operation transitions the synthetic processor from idle to active.', 'lifecycle': 'reviewed', 'observation_state': 'verified', 'trigger': {'observation_state': 'verified', 'statement': 'An operator requests activation.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'preconditions': {'observation_state': 'verified', 'statement': 'The processor is idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'inputs': {'observation_state': 'verified', 'statement': 'A configured operation identifier is supplied.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'observable_outputs': {'observation_state': 'verified', 'statement': 'State becomes active.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'side_effects': {'observation_state': 'verified', 'statement': 'The state is persisted.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'ordering': {'observation_state': 'verified', 'statement': 'Persist state before reporting activation.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'timing': {'observation_state': 'verified', 'statement': 'Acknowledgement follows persistence.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'cancellation': {'observation_state': 'verified', 'statement': 'Cancellation before acknowledgement leaves state idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'failure': {'observation_state': 'verified', 'statement': 'An invalid identifier returns an error and preserves state.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'offline': {'observation_state': 'verified', 'statement': 'The operation requires a connected service.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'mobile': {'observation_state': 'verified', 'statement': 'No portable client is represented in this synthetic fixture.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'alternate_clients': {'observation_state': 'verified', 'statement': 'One configured client is represented.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'environment_constraints': {'observation_state': 'verified', 'statement': 'A configured service endpoint is available.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'security_permissions': {'observation_state': 'verified', 'statement': 'The caller needs activation permission.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'state_transitions': {'disposition': 'present', 'behavior': {'observation_state': 'verified', 'statement': 'Activation changes idle state to active state.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'entries': [{'id': 'transition-alpha', 'before': {'observation_state': 'verified', 'statement': 'The processor is idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'action': {'observation_state': 'verified', 'statement': 'An activation request is submitted.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'after': {'observation_state': 'verified', 'statement': 'The processor is active.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}]}], 'rationale': None}, 'source_evidence_refs': [], 'runtime_evidence_refs': [], 'confidence': 'high', 'unresolved_behavior_refs': [], 'product_decision_status': 'not-required', 'product_decision_refs': [], 'target_relevance': 'required', 'required_dimensions': ['trigger', 'state_transitions', 'observable_outputs', 'failure'], 'acceptance_criteria': [{'id': 'criterion-alpha', 'readiness': 'ready', 'statement': 'Activating the configured processor updates its state.', 'expected_result': 'The processor state is active after acknowledgement.', 'pending_reason': None, 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'product_decision_refs': [], 'client_ids': ['client-alpha'], 'platforms': ['generic'], 'modes': ['online']}], 'extensions': {}} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "kind": "implementation-record",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "test_references"
+          ],
+          "message": "[] does not contain items matching the given schema"
+        },
+        {
+          "pointer": [
+            "verification_evidence_refs"
+          ],
+          "message": "[] should be non-empty"
+        },
+        {
+          "pointer": [
+            "test_references"
+          ],
+          "message": "[] should be non-empty"
+        }
+      ]
+    },
+    {
+      "kind": "inventory-snapshot",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "files",
+            0,
+            "sha256"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    },
+    {
+      "kind": "parity-matrix",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "entries",
+            0,
+            "source_contract_ref",
+            "revision"
+          ],
+          "message": "'main' does not match '^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "product-decision-collection",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "records"
+          ],
+          "message": "'not-a-list' is not of type 'array'"
+        }
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "approval"
+          ],
+          "message": "None is not of type 'object'"
+        }
+      ]
+    },
+    {
+      "kind": "runtime-characterization-scenario",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "expected_result"
+          ],
+          "message": "None is not of type 'string'"
+        },
+        {
+          "pointer": [
+            "unresolved_findings"
+          ],
+          "message": "[{'artifact_kind': 'unspecified-behavior', 'id': 'behavior-alpha'}] is expected to be empty"
+        },
+        {
+          "pointer": [
+            "runs"
+          ],
+          "message": "[{'id': 'run-alpha', 'timestamp': '2026-01-01T00:00:00Z', 'environment': {'id': 'environment-alpha', 'platform': 'generic', 'operating_mode': 'online', 'client_id': 'client-alpha', 'extensions': {}}, 'pre_state_capture': {'plan': 'Record processor state before activation.', 'observed_state': 'idle', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'pre-alpha'}]}, 'post_state_capture': {'plan': 'Record processor state after activation.', 'observed_state': 'active', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'post-alpha'}]}, 'observed_result': 'The processor state changed from idle to active.', 'expected_result': None, 'result_status': 'observed', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'runtime-alpha'}], 'deviations': []}] does not contain items matching the given schema"
+        }
+      ]
+    },
+    {
+      "kind": "scope",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "repository",
+            "revision"
+          ],
+          "message": "None is not of type 'string'"
+        }
+      ]
+    },
+    {
+      "kind": "source-snapshot-manifest",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "source_repository",
+            "revision"
+          ],
+          "message": "'main' does not match '^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "unspecified-behavior-collection",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "records"
+          ],
+          "message": "'not-a-list' is not of type 'array'"
+        }
+      ]
+    },
+    {
+      "kind": "unspecified-behavior",
+      "valid": true,
+      "invalid_errors": [
+        {
+          "pointer": [
+            "approved_target_behavior"
+          ],
+          "message": "'An unapproved expectation.' is not of type 'null'"
+        }
+      ]
+    }
+  ],
+  "independent_boundary_cases": [
+    {
+      "name": "independent valid activation",
+      "kind": "activation",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version activation",
+      "kind": "activation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path activation",
+      "kind": "activation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid service-request",
+      "kind": "service-request",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version service-request",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path service-request",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid service-result",
+      "kind": "service-result",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version service-result",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path service-result",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid discovery-invocation",
+      "kind": "discovery-invocation",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version discovery-invocation",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path discovery-invocation",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid required-output-manifest",
+      "kind": "required-output-manifest",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version required-output-manifest",
+      "kind": "required-output-manifest",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path required-output-manifest",
+      "kind": "required-output-manifest",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid validation-receipt",
+      "kind": "validation-receipt",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version validation-receipt",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path validation-receipt",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid migration-report",
+      "kind": "migration-report",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version migration-report",
+      "kind": "migration-report",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path migration-report",
+      "kind": "migration-report",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid capability-attestation",
+      "kind": "capability-attestation",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version capability-attestation",
+      "kind": "capability-attestation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path capability-attestation",
+      "kind": "capability-attestation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "independent valid tool-authorization",
+      "kind": "tool-authorization",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "unsupported version tool-authorization",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller receipt path tool-authorization",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "init draft=True roots=[]",
+      "kind": "service-request",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "init draft=True roots=None",
+      "kind": "service-request",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "init draft=False roots=[]",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "init draft=False roots=None",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "init draft=None roots=[]",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "init draft=None roots=None",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "configured init with explicit source roots",
+      "kind": "service-request",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "caller executable input",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "caller root identity",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "agent mode missing invocation",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "unknown operation",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "unknown mode",
+      "kind": "service-request",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "numeric activation enabled",
+      "kind": "activation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "activation extra artifact header",
+      "kind": "activation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "result extra artifact header",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "success nonzero exit",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "failure zero exit",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 4
+    },
+    {
+      "name": "failure missing actionable finding",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "success with error finding",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "actionable failure result",
+      "kind": "service-result",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "invalid JSON pointer escape",
+      "kind": "service-result",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "escaped JSON pointer",
+      "kind": "service-result",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "root cannot satisfy agent stop",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "root cannot carry output grant",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "missing principal attribution",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 6
+    },
+    {
+      "name": "CLI cannot mint native receipt",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 6
+    },
+    {
+      "name": "root cannot claim analyst role",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "analyst output receipt",
+      "kind": "validation-receipt",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "analyst receipt cannot satisfy planning",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "invalid output cannot claim validation pass",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "valid reviewer failure output",
+      "kind": "validation-receipt",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "completion requires pinned source",
+      "kind": "validation-receipt",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "capability requires denied sentinel",
+      "kind": "capability-attestation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "capability requires trusted attribution",
+      "kind": "capability-attestation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "capability requires all native handlers",
+      "kind": "capability-attestation",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "prepared invocation cannot have start attestation",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "started invocation needs native identity",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 2
+    },
+    {
+      "name": "finalized invocation needs receipt",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "production writes forbidden in invocation",
+      "kind": "discovery-invocation",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "tool grant cannot choose shell",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "tool grant cannot approve config",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "consumed grant needs timestamp",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "authority token is not a path",
+      "kind": "tool-authorization",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "migration cannot switch activation",
+      "kind": "migration-report",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "output grants cannot be empty",
+      "kind": "required-output-manifest",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive acceptance-specification",
+      "kind": "acceptance-specification",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version acceptance-specification",
+      "kind": "acceptance-specification",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive coverage-ledger",
+      "kind": "coverage-ledger",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version coverage-ledger",
+      "kind": "coverage-ledger",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive domain-profile",
+      "kind": "domain-profile",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version domain-profile",
+      "kind": "domain-profile",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive evidence-reference",
+      "kind": "evidence-reference",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version evidence-reference",
+      "kind": "evidence-reference",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive extension-result-manifest",
+      "kind": "extension-result-manifest",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version extension-result-manifest",
+      "kind": "extension-result-manifest",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive feature-contract",
+      "kind": "feature-contract",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version feature-contract",
+      "kind": "feature-contract",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive implementation-record",
+      "kind": "implementation-record",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version implementation-record",
+      "kind": "implementation-record",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive inventory-snapshot",
+      "kind": "inventory-snapshot",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version inventory-snapshot",
+      "kind": "inventory-snapshot",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive parity-matrix",
+      "kind": "parity-matrix",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version parity-matrix",
+      "kind": "parity-matrix",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive product-decision-collection",
+      "kind": "product-decision-collection",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version product-decision-collection",
+      "kind": "product-decision-collection",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive product-decision",
+      "kind": "product-decision",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version product-decision",
+      "kind": "product-decision",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive runtime-characterization-scenario",
+      "kind": "runtime-characterization-scenario",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version runtime-characterization-scenario",
+      "kind": "runtime-characterization-scenario",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive scope",
+      "kind": "scope",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version scope",
+      "kind": "scope",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive source-snapshot-manifest",
+      "kind": "source-snapshot-manifest",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version source-snapshot-manifest",
+      "kind": "source-snapshot-manifest",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive unspecified-behavior-collection",
+      "kind": "unspecified-behavior-collection",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version unspecified-behavior-collection",
+      "kind": "unspecified-behavior-collection",
+      "valid": false,
+      "finding_count": 1
+    },
+    {
+      "name": "existing positive unspecified-behavior",
+      "kind": "unspecified-behavior",
+      "valid": true,
+      "finding_count": 0
+    },
+    {
+      "name": "exact version unspecified-behavior",
+      "kind": "unspecified-behavior",
+      "valid": false,
+      "finding_count": 1
+    }
+  ],
+  "packaged_resources": 33,
+  "unchanged_prior_paths": 115,
+  "coverage_lines": "312/312",
+  "coverage_branch_arcs": "132/132",
+  "new_or_changed_production_executable_lines": 0,
+  "line_counts": {
+    "packages/discovery-runtime/resource-manifest.json": 42,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 171,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json": 20,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json": 113,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json": 110,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json": 83,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json": 73,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": 212,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": 125,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json": 103,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json": 79,
+    "schemas/discovery/v2/activation.schema.json": 20,
+    "schemas/discovery/v2/capability-attestation.schema.json": 113,
+    "schemas/discovery/v2/discovery-invocation.schema.json": 110,
+    "schemas/discovery/v2/migration-report.schema.json": 83,
+    "schemas/discovery/v2/required-output-manifest.schema.json": 73,
+    "schemas/discovery/v2/service-request.schema.json": 212,
+    "schemas/discovery/v2/service-result.schema.json": 125,
+    "schemas/discovery/v2/tool-authorization.schema.json": 103,
+    "schemas/discovery/v2/validation-receipt.schema.json": 79,
+    "tests/schemas/discovery/test_v2_authority_schemas.py": 398,
+    "tests/schemas/discovery/test_v2_control_schemas.py": 430,
+    "tests/schemas/discovery/v2_control_test_support.py": 333
+  },
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "57aff5c41b8eb74f4344473e9ffb3f79d7dfd1fc",
+      "sha256": "d4dffff4bd5a47634a8fa13480f635cbd9f0d9589c17d91051d63c4ed3e1dbfa"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "e47bffc283707b5a9a8efb51eba25a494c6123db",
+      "sha256": "c286991d90a71c5e043eee1417839672bb007b6887cc3a10811826a14d3e6ccf"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "git_blob": "85ae95a2cc5b3ae3d8f5c42d1d15a4f481090b93",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "git_blob": "f8022b23b7c085d6d08618a59ae28daa3fc5e846",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "git_blob": "78dec4ad08b2827d80c19fc1de368b33e3ed682d",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "git_blob": "bdb77e12751677875886b05b9e7e813e9ab0fff0",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "git_blob": "464bbd99d8132aae2c85a5a484aaab6213781703",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "git_blob": "ccc9ec3069dcdcb7ea1cb9595bcdb018e6edfd30",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "git_blob": "7778fc6fc0675866225fed5e6b1d31aabe0fc90f",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "git_blob": "858644e5a291096c3ea3fa73f4b2f8cd6557ef1f",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b"
+    },
+    {
+      "path": "schemas/discovery/v2/activation.schema.json",
+      "git_blob": "85ae95a2cc5b3ae3d8f5c42d1d15a4f481090b93",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731"
+    },
+    {
+      "path": "schemas/discovery/v2/capability-attestation.schema.json",
+      "git_blob": "f8022b23b7c085d6d08618a59ae28daa3fc5e846",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4"
+    },
+    {
+      "path": "schemas/discovery/v2/discovery-invocation.schema.json",
+      "git_blob": "78dec4ad08b2827d80c19fc1de368b33e3ed682d",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2"
+    },
+    {
+      "path": "schemas/discovery/v2/migration-report.schema.json",
+      "git_blob": "bdb77e12751677875886b05b9e7e813e9ab0fff0",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b"
+    },
+    {
+      "path": "schemas/discovery/v2/required-output-manifest.schema.json",
+      "git_blob": "464bbd99d8132aae2c85a5a484aaab6213781703",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d"
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "git_blob": "ccc9ec3069dcdcb7ea1cb9595bcdb018e6edfd30",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b"
+    },
+    {
+      "path": "schemas/discovery/v2/tool-authorization.schema.json",
+      "git_blob": "7778fc6fc0675866225fed5e6b1d31aabe0fc90f",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8"
+    },
+    {
+      "path": "schemas/discovery/v2/validation-receipt.schema.json",
+      "git_blob": "858644e5a291096c3ea3fa73f4b2f8cd6557ef1f",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_authority_schemas.py",
+      "git_blob": "d8548657135c2924566a0988e68a64fd10d9cd5c",
+      "sha256": "da49451672b4002ac76836744c567327de08a99a8e168a1facedc28198aada46"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_control_schemas.py",
+      "git_blob": "960220ef1c432ca7843ba239095c4227ba99cc52",
+      "sha256": "c60d562cef8b6af253de431e8c98fbe334d98ba1b95db394990762d32f837273"
+    },
+    {
+      "path": "tests/schemas/discovery/v2_control_test_support.py",
+      "git_blob": "1ac45982a381b563523d45f95f9ee46b93cceee5",
+      "sha256": "5075c10ea9fe0021ff94671a4f5abffb2cc242f20f3681a41a25dd4419569500"
+    }
+  ]
+}

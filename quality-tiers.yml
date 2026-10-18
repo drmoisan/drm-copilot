@@ -10,6 +10,9 @@ projects:
   - path: "packages/mcp-server"
     tier: T4
     rationale: "npm packaging manifest plus esbuild/prepack scripts; no source of its own"
+  - path: "packages/discovery-runtime"
+    tier: T2
+    rationale: "Reusable discovery artifact models, validation, and workflows installed in consuming repositories"
   - path: "scripts/powershell/PoshQC"
     tier: T3
     rationale: "QC module bundled into the extension; wraps PSScriptAnalyzer and Pester"

@@ -1,0 +1,18 @@
+# p2t8-pass6-format
+
+Timestamp: 2026-10-18T10-17
+Command: poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py tests/discovery_runtime/test_parity_rules.py tests/discovery_runtime/test_parity_clients.py tests/discovery_runtime/parity_test_support.py
+EXIT_CODE: 0
+Output Summary: All done! ✨ 🍰 ✨; 5 files would be left unchanged.
+
+Working directory: .
+Started: 2026-10-18T10:17:26.317216+00:00
+Duration seconds: 1.045
+Phase: P2-T8 source-to-target parity rules; focused task verification.
+
+## Captured output
+
+```text
+All done! ✨ 🍰 ✨
+5 files would be left unchanged.
+```

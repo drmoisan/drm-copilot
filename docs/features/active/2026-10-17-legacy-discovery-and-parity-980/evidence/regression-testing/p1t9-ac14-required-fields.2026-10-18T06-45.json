@@ -1,0 +1,38 @@
+{
+  "task": "P1-T9",
+  "criterion": "AC-14",
+  "command": "poetry run python SCRATCH/issue-980-p1t9-required-fields.py",
+  "exit_code": 0,
+  "cases": [
+    {
+      "name": "missing-core-field",
+      "findings": [
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/feature.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "'feature_id' is a required property",
+          "next_action": "Correct the field against the expected schema."
+        }
+      ]
+    },
+    {
+      "name": "extra-core-field",
+      "findings": [
+        {
+          "code": "SCHEMA_INVALID",
+          "severity": "error",
+          "artifact_path": "docs/feature.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Additional properties are not allowed ('unrecognized_core_property' was unexpected)",
+          "next_action": "Correct the field against the expected schema."
+        }
+      ]
+    }
+  ]
+}

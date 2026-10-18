@@ -7,7 +7,7 @@ Covers `sort_rows` (id-field sort and case-insensitive fallback sort) and
 
 from __future__ import annotations
 
-from scripts.dev_tools.discovery.rendering import render_pretty_json, sort_rows
+from drm_copilot_discovery.rendering import render_pretty_json, sort_rows
 
 
 def test_sort_rows_sorts_ascending_by_id_field() -> None:

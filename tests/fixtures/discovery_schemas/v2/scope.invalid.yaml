@@ -1,0 +1,20 @@
+# A confirmed scope cannot retain an unknown repository revision.
+$schema: urn:drm-copilot:discovery:2.0.0:scope
+schema_version: 2.0.0
+artifact_kind: scope
+id: scope-invalid
+status: confirmed
+repository: {id: source-example, revision: null}
+included_roots: [src]
+included_components: []
+included_features: []
+exclusions: []
+inventory_snapshot_refs: []
+confirmed_by:
+  owner: owner-example
+  timestamp: "2026-01-01T00:00:00Z"
+  evidence_refs: [{artifact_kind: evidence-reference, id: scope-approval-example}]
+required_coverage: {feature_refs: [], client_ids: [], modes: [online]}
+disposition: in-scope
+no_scope_rationale: null
+extensions: {}

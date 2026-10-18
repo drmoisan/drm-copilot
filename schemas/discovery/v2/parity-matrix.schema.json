@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:parity-matrix",
+  "title": "Discovery v2 source-to-target parity matrix",
+  "description": "Client-scoped parity claims against immutable source contracts. Configured dimension obligations and evidence truth are validated against the graph.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "source_repositories", "target_repositories", "entries", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:parity-matrix"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "parity-matrix"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "source_repositories": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/draft-repository-reference"}},
+    "target_repositories": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/draft-repository-reference"}},
+    "entries": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entry"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "if": {"properties": {"entries": {"minItems": 1}}, "required": ["entries"]},
+  "then": {"properties": {
+    "source_repositories": {"minItems": 1, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"}},
+    "target_repositories": {"minItems": 1, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"}}
+  }},
+  "$defs": {
+    "source-contract-reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_kind", "repository_id", "revision", "artifact_path", "artifact_sha256", "feature_id", "schema_version"],
+      "properties": {
+        "artifact_kind": {"const": "feature-contract"},
+        "repository_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "revision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/revision"},
+        "artifact_path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "artifact_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "feature_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "schema_version": {"const": "2.0.0"}
+      }
+    },
+    "implementation-reference": {
+      "allOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/immutable-artifact-reference"}],
+      "properties": {"artifact_kind": {"const": "implementation-record"}}
+    },
+    "dimension": {
+      "type": "object", "additionalProperties": false,
+      "required": ["applicability", "verification", "rationale", "evidence_refs", "product_decision_refs"],
+      "properties": {
+        "applicability": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/applicability"},
+        "verification": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimension-verification"},
+        "rationale": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "product_decision_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-references"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"applicability": {"const": "unspecified"}}, "required": ["applicability"]},
+          "then": {"properties": {"verification": {"const": "not-run"}}}
+        },
+        {
+          "if": {"anyOf": [{"properties": {"applicability": {"const": "not-applicable"}}, "required": ["applicability"]}, {"properties": {"verification": {"const": "not-applicable"}}, "required": ["verification"]}]},
+          "then": {"properties": {"applicability": {"const": "not-applicable"}, "verification": {"const": "not-applicable"}, "rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        },
+        {
+          "if": {"properties": {"verification": {"enum": ["passed", "failed"]}}, "required": ["verification"]},
+          "then": {"properties": {"applicability": {"const": "applicable"}, "evidence_refs": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"verification": {"const": "blocked"}}, "required": ["verification"]},
+          "then": {"properties": {"rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        }
+      ]
+    },
+    "dimensions": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "trigger": {"$ref": "#/$defs/dimension"}, "preconditions": {"$ref": "#/$defs/dimension"},
+        "inputs": {"$ref": "#/$defs/dimension"}, "state_transitions": {"$ref": "#/$defs/dimension"},
+        "observable_outputs": {"$ref": "#/$defs/dimension"}, "side_effects": {"$ref": "#/$defs/dimension"},
+        "ordering": {"$ref": "#/$defs/dimension"}, "timing": {"$ref": "#/$defs/dimension"},
+        "cancellation": {"$ref": "#/$defs/dimension"}, "failure": {"$ref": "#/$defs/dimension"},
+        "online": {"$ref": "#/$defs/dimension"}, "offline": {"$ref": "#/$defs/dimension"},
+        "mobile": {"$ref": "#/$defs/dimension"}, "alternate_clients": {"$ref": "#/$defs/dimension"},
+        "environment_constraints": {"$ref": "#/$defs/dimension"}, "security_permissions": {"$ref": "#/$defs/dimension"}
+      }
+    },
+    "entry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "feature_id", "source_contract_ref", "client_id", "target_repository", "target_implementation_refs", "parity_state", "dimensions", "evidence_refs", "intentional_deviation_refs", "retirement_decision_ref", "blockers", "validation_status", "missing_reason", "extensions"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "feature_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "source_contract_ref": {"$ref": "#/$defs/source-contract-reference"},
+        "client_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "target_repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"},
+        "target_implementation_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/implementation-reference"}},
+        "parity_state": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/parity-state"},
+        "dimensions": {"$ref": "#/$defs/dimensions"},
+        "online": {"$ref": "#/$defs/dimension"}, "offline": {"$ref": "#/$defs/dimension"}, "mobile": {"$ref": "#/$defs/dimension"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "intentional_deviation_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-references"},
+        "retirement_decision_ref": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-reference"}, {"type": "null"}]},
+        "blockers": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}},
+        "validation_status": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/validation-outcome"}, {"type": "null"}]},
+        "missing_reason": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"parity_state": {"enum": ["full", "partial"]}}, "required": ["parity_state"]},
+          "then": {"properties": {"target_implementation_refs": {"minItems": 1}, "evidence_refs": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"parity_state": {"const": "full"}}, "required": ["parity_state"]},
+          "then": {"properties": {"validation_status": {"const": "pass"}, "blockers": {"maxItems": 0}}}
+        },
+        {
+          "if": {"properties": {"parity_state": {"const": "missing"}}, "required": ["parity_state"]},
+          "then": {"properties": {"target_implementation_refs": {"maxItems": 0}, "missing_reason": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        },
+        {
+          "if": {"properties": {"parity_state": {"const": "intentionally-changed"}}, "required": ["parity_state"]},
+          "then": {"properties": {"intentional_deviation_refs": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"parity_state": {"const": "retired"}}, "required": ["parity_state"]},
+          "then": {"properties": {"retirement_decision_ref": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-reference"}}},
+          "else": {"properties": {"retirement_decision_ref": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"parity_state": {"const": "conflicting"}}, "required": ["parity_state"]},
+          "then": {"properties": {"blockers": {"minItems": 1}}}
+        }
+      ]
+    }
+  }
+}

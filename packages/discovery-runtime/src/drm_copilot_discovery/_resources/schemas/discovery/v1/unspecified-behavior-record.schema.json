@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+  "version": "1.0.0",
+  "title": "Unspecified Behavior Record",
+  "description": "A record of undocumented, contradictory, or ambiguous behavior found during discovery. Domain-neutral: no source or target technology is named in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "title",
+    "description",
+    "category",
+    "discovery_context",
+    "resolution_status",
+    "evidence_refs"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Scheme-less relative path from the instance file to its schema file."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Instance schema version. Major component pinned to the v1 directory; minor and patch are free."
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short human-readable name of the record."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the unspecified behavior."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "undocumented",
+        "contradictory",
+        "ambiguous",
+        "environment_dependent"
+      ],
+      "description": "The nature of the unspecified behavior."
+    },
+    "discovery_context": {
+      "type": "string",
+      "description": "How and where the behavior was discovered."
+    },
+    "resolution_status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "under_review",
+        "resolved"
+      ],
+      "description": "Current resolution state."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "description": "Evidence Reference id values grounding this record."
+    },
+    "feature_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "decision_ref": {
+      "$ref": "#/$defs/identifier"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Shared identifier grammar. Lowercase alphanumeric start; dots, underscores, and hyphens permitted."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO-8601 timestamp enforced by regex because the validator runs without a FormatChecker."
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Free-form consumer metadata",
+      "description": "Sanctioned extension point. Additional properties are permitted here only."
+    }
+  }
+}
