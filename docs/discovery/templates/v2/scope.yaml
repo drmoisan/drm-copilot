@@ -1,0 +1,16 @@
+$schema: urn:drm-copilot:discovery:2.0.0:scope
+schema_version: 2.0.0
+artifact_kind: scope
+id: "{{scope_id}}"
+status: draft
+repository: {id: "{{repository_id}}", revision: "{{revision}}"}
+included_roots: "{{production_roots}}"
+included_components: []
+included_features: []
+exclusions: []
+inventory_snapshot_refs: []
+confirmed_by: null
+required_coverage: {feature_refs: [], client_ids: [], modes: []}
+disposition: in-scope
+no_scope_rationale: null
+extensions: {}
