@@ -30,6 +30,7 @@ def transport_digest(document: JsonObject) -> str:
     The three verification fields describe a later local check, never authority.
     """
     transport = cast("JsonObject", document["transport"])
+    # Import attribution is intentionally outside the immutable export identity.
     payload = JsonObject(
         tuple(
             (key, value)
@@ -37,6 +38,7 @@ def transport_digest(document: JsonObject) -> str:
             if key not in {"verification_status", "verified_at", "verified_by"}
         )
     )
+    # Bind every other field while excluding the digest's own recursive value.
     value = JsonObject(
         tuple(
             (key, payload if key == "transport" else child)
@@ -49,7 +51,11 @@ def transport_digest(document: JsonObject) -> str:
 
 @dataclass(frozen=True, kw_only=True)
 class TransportMember:
-    """Bind an exact physical output to an original path and immutable byte digest."""
+    """Bind a physical grant to original path, byte digest and finite byte count.
+
+    Routes derive members from a validated manifest; consumers compare exact
+    identity and bytes. A null origin denotes the header, published last.
+    """
 
     grant: WriteGrant
     origin: str | None
@@ -72,6 +78,7 @@ class TransportRoute:
 
     def allows(self, grant: WriteGrant, *, root: str) -> bool:
         """Match one exact member beneath the configured transport root, purely."""
+        # The root constrains location; only exact membership grants this output.
         return (
             self.manifest.path.startswith(root + "/")
             and self.manifest.path != root + "/manifest.json"
@@ -80,6 +87,7 @@ class TransportRoute:
 
     def check(self, grant: WriteGrant, content: bytes) -> None:
         """Reject a substituted member identity or byte sequence with ValueError."""
+        # Identity selects the declaration before size and digest establish its bytes.
         member = next((item for item in self.members if item.grant == grant), None)
         if member is None or (
             member.size != len(content) or member.sha256 != sha256(content).hexdigest()
@@ -92,6 +100,7 @@ class TransportRoute:
         by_path = {file.path: file.content for file in files}
         if set(by_path) != {member.grant.path for member in self.members}:
             raise ValueError("Transport requires its exact complete declared file set")
+        # Set equality alone cannot prove the declared immutable content of a member.
         for member in self.members:
             self.check(member.grant, by_path[member.grant.path])
 
@@ -152,6 +161,7 @@ def bind_transport(
         raise ValueError("Transport contains duplicate artifact identities")
     parent = path.rsplit("/", 1)[0]
     members: list[TransportMember] = []
+    # Original kinds remain intact; only the physical destination gains the prefix.
     for row in artifacts + payloads:
         origin = cast("str", row["path"])
         if origin.split("/")[-1] == "manifest.json":
@@ -176,6 +186,7 @@ def bind_transport(
                 size=size,
             )
         )
+    # Publish the header after its members so a partial write cannot advertise success.
     members.append(
         TransportMember(
             grant=WriteGrant(
@@ -189,6 +200,7 @@ def bind_transport(
         )
     )
     paths = set(check_path_collisions(member.grant.path for member in members))
+    # A file cannot also be a parent directory, even when every leaf is unique.
     if any(
         "/".join(path.split("/")[:length]) in paths
         for path in paths
@@ -210,6 +222,7 @@ def replica_aliases(snapshot: DiscoverySnapshot) -> dict[str, str]:
     bound: set[str] = set()
     artifacts = {item.path: item for item in snapshot.artifacts}
     root = snapshot.profile.artifacts["source_snapshots"]
+    # Only actual complete local manifests establish eligible replica provenance.
     for header in snapshot.artifacts:
         if (
             header.expected_kind != "source-snapshot-manifest"
@@ -223,12 +236,14 @@ def replica_aliases(snapshot: DiscoverySnapshot) -> dict[str, str]:
                 catalog=snapshot.catalog,
                 limits=snapshot.profile.limits.parse_limits(),
             )
+            # Presence alone is insufficient: every declared physical byte is checked.
             route.check_files(
                 tuple(snapshot.file(item.grant.path) for item in route.members)
             )
         except (KeyError, ValueError):
             # Failure preserves ordinary duplicate rejection; it grants no exemption.
             continue
+        # Match loader ownership, origin and kind against the exact physical member.
         for member in route.members:
             artifact = artifacts.get(member.grant.path)
             if (
@@ -244,6 +259,7 @@ def replica_aliases(snapshot: DiscoverySnapshot) -> dict[str, str]:
     groups: dict[
         tuple[RepositoryIdentity, str, str, str, bytes], list[ArtifactSnapshot]
     ] = defaultdict(list)
+    # Full pin, origin, kind, ID and raw bytes must all agree before coalescing.
     for artifact in snapshot.artifacts:
         if artifact.document is None or artifact.repository.revision is None:
             continue
@@ -258,11 +274,14 @@ def replica_aliases(snapshot: DiscoverySnapshot) -> dict[str, str]:
         )
         groups[key].append(artifact)
     aliases: dict[str, str] = {}
+    # Preserve ordinary local mutation identity and never exempt ordinary duplicates.
     for copies in groups.values():
+        # Stable imported order supplies a canonical identity when no local file exists.
         imported = sorted(item.path for item in copies if item.path in bound)
         local = [item.path for item in copies if item.origin_path is None]
         if imported and len(local) <= 1:
             representative = local[0] if local else imported[0]
+            # Only noncanonical proven physical copies receive aliases.
             aliases.update(
                 (item.path, representative)
                 for item in copies

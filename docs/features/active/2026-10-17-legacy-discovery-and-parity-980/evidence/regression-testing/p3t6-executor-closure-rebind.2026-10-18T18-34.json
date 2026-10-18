@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-10-18T18:33:51.973446+00:00",
+  "task": "P3-T6 corrected replica-link closure",
+  "checks": [
+    {
+      "name": "actual_loaded_graph_valid",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit_source_selects_imported",
+      "passed": true
+    },
+    {
+      "name": "ordinary_source_has_outgoing_links",
+      "passed": true,
+      "detail": 18
+    },
+    {
+      "name": "imported_source_retains_outgoing_links",
+      "passed": true,
+      "detail": 18
+    },
+    {
+      "name": "ordinary_source_proof_cannot_be_target_proof",
+      "passed": true
+    },
+    {
+      "name": "imported_source_proof_cannot_be_target_proof",
+      "passed": true
+    },
+    {
+      "name": "bound_bytes_unchanged",
+      "passed": true
+    }
+  ],
+  "passed": 7,
+  "failed": 0,
+  "before_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+  },
+  "after_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+  },
+  "elapsed_seconds": 9.307,
+  "local_path": "docs/migration/discovery/feature-contracts/alpha.json",
+  "imported_path": "docs/migration/discovery/source-snapshots/export-alpha/docs/migration/discovery/feature-contracts/alpha.json",
+  "limits": "Direct existing ClaimContext/TargetProof behavior only; no full parity completion or write acceptance claim."
+}

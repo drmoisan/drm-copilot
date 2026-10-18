@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-10-18T18:26:01.366137+00:00",
+  "task": "P3-T6",
+  "phase": "retained proof binding",
+  "baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "wip": "8f446b674dce58e7158e2019e6b90bc2b677a44c",
+  "checks": [
+    "complete stable 44-case API proof",
+    "six current production modules",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "unchanged tested production: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "only import assertions and support additions differ from API proof",
+    "all original fixture/class bodies and decorators unchanged",
+    "only two added support declarations",
+    "original imports retained",
+    "support imports add only existing pure runtime symbols",
+    "no changed module executable setup",
+    "owned assertion suites are not executed by retained API probe",
+    "stable retained prerequisite proof: r1-final",
+    "five unchanged prerequisite module hashes: r1-final",
+    "stable retained prerequisite proof: replica-links-final",
+    "five unchanged prerequisite module hashes: replica-links-final"
+  ],
+  "findings": [],
+  "passed": 19,
+  "failed": 0,
+  "current_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "6222b7135dce93869b02e9e00276d31b4f648dc3c9b42e4b5c8fdb8f8d904ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "f70fba9b394490881f2e6c0e8d05fd9011b810ae15339dfe18a84c2ffef19f0f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "d5ba8ec85f7e1937aa38d687cfe506a7001c814513257140cee8bfb280e181e5",
+    "tests/discovery_runtime/test_snapshot_export.py": "cc1b079ebf51af27e0bfccd032c5b668eadd295d024caafcf79dca82ba8ce261",
+    "tests/discovery_runtime/test_snapshot_import.py": "1ffa14533047c53de4298c3e335b7fdef014c64e802ba447d892834e7f0d64d4",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "455563b3a564f9ac2a69f5c68a519dca33bbfca0a6789182e4348134dd30e10b",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d"
+  },
+  "api_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-executor-api.2026-10-18T18-15.json",
+  "api_cases": 44,
+  "support_added_definitions": [
+    "retained_fault",
+    "retained_target"
+  ],
+  "prerequisite_proofs": {
+    "r1-final": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-executor-r1-final.2026-10-18T17-57.json",
+      "cases": 13,
+      "production_hashes": {
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+        "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "6222b7135dce93869b02e9e00276d31b4f648dc3c9b42e4b5c8fdb8f8d904ed2",
+        "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "f70fba9b394490881f2e6c0e8d05fd9011b810ae15339dfe18a84c2ffef19f0f"
+      }
+    },
+    "replica-links-final": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-executor-replica-links-final.2026-10-18T17-57.json",
+      "cases": 7,
+      "production_hashes": {
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+        "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "6222b7135dce93869b02e9e00276d31b4f648dc3c9b42e4b5c8fdb8f8d904ed2",
+        "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "f70fba9b394490881f2e6c0e8d05fd9011b810ae15339dfe18a84c2ffef19f0f"
+      }
+    }
+  },
+  "qualification": "Original prerequisite fixture inputs remain historical and recorded; moved/extracted files are not claimed byte-identical. Full task gates/index/preservation audit remain pending."
+}

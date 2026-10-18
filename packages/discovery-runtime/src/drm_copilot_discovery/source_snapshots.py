@@ -37,7 +37,11 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class SnapshotExport:
-    """Select source artifacts and explicit export attribution, without authority."""
+    """Carry immutable selection and attribution into pure export planning.
+
+    Callers provide distinct kind/ID pairs and an export identity. Projection
+    validates them against the capture; this value grants no access or I/O.
+    """
 
     export_id: str
     artifacts: tuple[tuple[str, str], ...]
@@ -47,7 +51,11 @@ class SnapshotExport:
 
 @dataclass(frozen=True, kw_only=True)
 class SnapshotImport:
-    """Select an already captured local bundle and its expected configured source."""
+    """Carry a captured bundle path, expected source pin and local attribution.
+
+    Import planning compares these values with configured sources and captured
+    bytes. Construction neither reads a repository nor establishes trust.
+    """
 
     manifest_path: str
     source: RepositoryIdentity
@@ -57,7 +65,11 @@ class SnapshotImport:
 
 @dataclass(frozen=True, kw_only=True)
 class SnapshotProposal:
-    """Bind a complete immutable transport proposal, not a validated write grant."""
+    """Pair a checked transport envelope with exact proposed immutable changes.
+
+    Pass this pure projection through shared planning with external grants before
+    publication. Its members include the manifest; it grants no native authority.
+    """
 
     route: TransportRoute
     changes: tuple[MutationChange, ...]
@@ -66,11 +78,16 @@ class SnapshotProposal:
 def _closure(
     baseline: CapturedWorkspace, selections: tuple[tuple[str, str], ...]
 ) -> tuple[ReferenceIndex, tuple[ArtifactRecord, ...]]:
-    """Include whole immutable containers and their transitive local dependencies."""
+    """Return the index and whole-container closure for captured kind/ID selections.
+
+    The capture is unchanged. MutationError identifies ambiguous, foreign,
+    malformed or unresolved selections before any proposal is published.
+    """
     if not selections or len(set(selections)) != len(selections):
         raise MutationError("SNAPSHOT_SELECTION", "Select distinct nonempty artifacts")
     index = index_references(baseline.snapshot)
     pending: list[ArtifactRecord] = []
+    # Resolve each explicit selection before extending it through graph dependencies.
     for kind, identifier in selections:
         matches = index.candidates(
             kind, identifier, repository=baseline.snapshot.profile.repository.id
@@ -81,6 +98,7 @@ def _closure(
             )
         pending.append(matches[0])
     selected: dict[str, ArtifactRecord] = {}
+    # Visit each physical container once so cycles cannot duplicate exported files.
     while pending:
         record = pending.pop()
         artifact = record.artifact
@@ -93,6 +111,7 @@ def _closure(
             raise MutationError(
                 "SNAPSHOT_SOURCE", "Export only this repository's local artifacts"
             )
+        # Selected malformed files remain blockers even if their IDs were indexed.
         findings = tuple(
             item
             for item in baseline.snapshot.findings
@@ -110,6 +129,7 @@ def _closure(
             for item in index.records
             if item.artifact.path == artifact.path and not item.pointer
         )
+        # Every reference in a copied container must remain locally resolvable.
         for link in index.links:
             if link.source.artifact.path == artifact.path:
                 if link.target is None:
@@ -125,9 +145,14 @@ def _closure(
 def _payloads(
     baseline: CapturedWorkspace, index: ReferenceIndex, paths: set[str]
 ) -> dict[str, bytes]:
-    """Require locally verified evidence and retain exact captured payload bytes."""
+    """Map selected artifact paths to exact locally verified evidence payload bytes.
+
+    The supplied index and capture remain unchanged. MutationError rejects
+    unverified evidence, missing captured objects or conflicting payload bytes.
+    """
     inputs = RevisionInputs(baseline.snapshot)
     payloads: dict[str, bytes] = {}
+    # Export evidence only after the shared rules establish its captured local proof.
     for record in index.records:
         if record.artifact.path not in paths or record.kind != "evidence-reference":
             continue
@@ -143,6 +168,7 @@ def _payloads(
         runtime = document.get("runtime_artifact")
         if isinstance(runtime, JsonObject):
             locations.add(cast("str", runtime["path"]))
+        # Runtime evidence may name a separate capture; preserve both exact payloads.
         for path in sorted(locations):
             content = inputs.content(
                 record,
@@ -163,9 +189,14 @@ def _payloads(
 def _proposal(
     baseline: CapturedWorkspace, route: TransportRoute, contents: dict[str, bytes]
 ) -> SnapshotProposal:
-    """Allow only new outputs or byte-identical repeats, retaining original CAS."""
+    """Return exact route changes using original-path contents and captured CAS.
+
+    No inputs are mutated. MutationError rejects different destination bytes;
+    route validation rejects any supplied member identity or checksum mismatch.
+    """
     files = {item.path: item for item in baseline.snapshot.manifest.files}
     changes: list[MutationChange] = []
+    # Preserve original CAS bytes and reject replacement before constructing changes.
     for member in route.members:
         content = (
             route.manifest.content if member.origin is None else contents[member.origin]
@@ -203,6 +234,7 @@ def prepare_snapshot_export(
     revision = full_revision(snapshot.profile.repository.revision or "")
     index, records = _closure(baseline, request.artifacts)
     contents = _payloads(baseline, index, {item.artifact.path for item in records})
+    # Stable ordering binds the same selected payload bytes to one canonical digest.
     payload_rows = tuple(
         JsonObject(
             (
@@ -214,6 +246,7 @@ def prepare_snapshot_export(
         for path, content in sorted(contents.items())
     )
     rows: list[JsonObject] = []
+    # Preserve whole artifact bytes and reject overlap with an evidence payload path.
     for record in records:
         file = snapshot.file(record.artifact.path)
         if file.path in contents:
@@ -233,6 +266,7 @@ def prepare_snapshot_export(
                 )
             )
         )
+    # An export declares pending verification; only a later local import verifies it.
     fields: dict[str, JsonValue] = {
         "$schema": "urn:drm-copilot:discovery:2.0.0:source-snapshot-manifest",
         "schema_version": "2.0.0",
@@ -287,6 +321,7 @@ def _captured_transport(baseline: CapturedWorkspace, path: str) -> TransportRout
         limits=snapshot.profile.limits.parse_limits(),
     )
     parent = path.rsplit("/", 1)[0] + "/"
+    # Include every captured file beneath this bundle, so extras cannot be ignored.
     route.check_files(
         tuple(item for item in snapshot.manifest.files if item.path.startswith(parent))
     )
@@ -313,6 +348,7 @@ def prepare_snapshot_import(
         )
     root = snapshot.profile.artifacts["source_snapshots"]
     path = root + "/" + cast("str", incoming.source.revision) + "/manifest.json"
+    # An explicit profile manifest takes precedence over the deterministic default.
     configured = next(
         (
             item.snapshot_manifest
@@ -332,11 +368,13 @@ def prepare_snapshot_import(
     )
     if len(existing) > 1:
         raise MutationError("SNAPSHOT_CONFLICT", "Transport identity is duplicated")
+    # Preserve original repository-relative member names when moving the bundle.
     contents = {
         item.origin: snapshot.file(item.grant.path).content
         for item in incoming.members
         if item.origin is not None
     }
+    # Identical reimports retain prior attribution; mismatches never replace bytes.
     if existing:
         retained = _captured_transport(baseline, existing[0].path)
         if (
@@ -350,6 +388,7 @@ def prepare_snapshot_import(
                 "SNAPSHOT_CONFLICT", "Existing transport identity differs"
             )
         return _proposal(baseline, retained, contents)
+    # Verification metadata changes only after all captured member bytes were checked.
     transport = dict(cast("JsonObject", incoming.document["transport"]))
     transport.update(
         verification_status="verified",
