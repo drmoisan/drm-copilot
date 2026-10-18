@@ -1,0 +1,95 @@
+{
+  "task": "P3-T4",
+  "source_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "b4c46e652f6e6fcbfa3e98bf670135c8febc66c4e0d8f8e668d41ddf2f66bea5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "edd8ecf20a0f08236a44c3f8dfd8ad01213b3cefc9c7ef33a8ac3a8425615372"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "b4c46e652f6e6fcbfa3e98bf670135c8febc66c4e0d8f8e668d41ddf2f66bea5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "edd8ecf20a0f08236a44c3f8dfd8ad01213b3cefc9c7ef33a8ac3a8425615372"
+  },
+  "source_stable": true,
+  "checks": [
+    {
+      "name": "inferred-positive",
+      "passed": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "findings": [],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "timing",
+        "trigger"
+      ]
+    },
+    {
+      "name": "verified-nested-rejected",
+      "passed": false,
+      "expected_valid": false,
+      "actual_valid": true,
+      "findings": [],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "timing",
+        "trigger"
+      ]
+    },
+    {
+      "name": "unknown-nested-linked",
+      "passed": false,
+      "expected_valid": true,
+      "actual_valid": false,
+      "findings": [
+        {
+          "code": "CLAIM_UNRESOLVED",
+          "pointer": "/state_transitions/entries/0/before",
+          "message": "Uncertainty requires an open record for this feature/dimension."
+        }
+      ],
+      "question_dimensions": [
+        "alternate_clients",
+        "cancellation",
+        "environment_constraints",
+        "failure",
+        "inputs",
+        "mobile",
+        "observable_outputs",
+        "offline",
+        "online",
+        "ordering",
+        "preconditions",
+        "security_permissions",
+        "side_effects",
+        "timing",
+        "trigger"
+      ]
+    }
+  ],
+  "passed": 1,
+  "failed": 2,
+  "Timestamp": "2026-10-18T15-43"
+}
