@@ -93,8 +93,9 @@ def pin_windows_path(
     opening.restype = ctypes.c_void_p
     closing = cast("_WindowsCall", kernel.CloseHandle)
     closing.argtypes, closing.restype = [ctypes.c_void_p], ctypes.c_int
+    # Read/list access participates in sharing checks; attribute access alone does not.
     # OPEN_REPARSE_POINT plus no FILE_SHARE_DELETE protects the checked name.
-    handle = opening(str(path), 0x80, 3, None, 3, 0x02200000, None)
+    handle = opening(str(path), 0x81, 3, None, 3, 0x02200000, None)
     if handle is None or handle == ctypes.c_void_p(-1).value:
         raise OSError("Cannot pin Windows mutation path")
     import msvcrt
