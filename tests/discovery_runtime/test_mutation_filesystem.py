@@ -143,8 +143,14 @@ def stat_value(*, directory: bool = False) -> os.stat_result:
     """
     Return deterministic inode/device data without consulting the operating system.
     """
-    return os.stat_result(
-        (stat.S_IFDIR if directory else stat.S_IFREG, 11, 7, 1, 0, 0, 0, 0, 0, 0)
+    return cast(
+        "os.stat_result",
+        SimpleNamespace(
+            st_mode=stat.S_IFDIR if directory else stat.S_IFREG,
+            st_ino=11,
+            st_dev=7,
+            st_file_attributes=0,
+        ),
     )
 
 
@@ -259,7 +265,9 @@ def test_windows_pins_transfer_real_handle_ownership_and_check_identity(
             if self.closing:
                 native_closed.append(cast("int", args[0]))
                 return 1
-            assert args[2] == 3 and cast("int", args[5]) & 0x00200000
+            assert (
+                args[1] == 0x81 and args[2] == 3 and cast("int", args[5]) & 0x00200000
+            )
             return None if failure == "open" else 31
 
     def transfer(handle: int, flags: int) -> int:

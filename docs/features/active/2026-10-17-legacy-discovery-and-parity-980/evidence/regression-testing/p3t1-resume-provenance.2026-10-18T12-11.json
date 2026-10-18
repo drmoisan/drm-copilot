@@ -1,0 +1,98 @@
+{
+  "persisted_at_utc": "2026-10-18T12:11:13.825776+00:00",
+  "task": "P3-T1",
+  "authority": {
+    "attestation_key": "4cc68ff593a614aebcddeeb95a8874ba246117a25428d1806c6c6a5f4c896712",
+    "actual_model": "gpt-6-astra",
+    "actual_reasoning_effort": "max",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+    "routing_valid": true,
+    "provenance_valid": true,
+    "launch_authority_valid": true
+  },
+  "prior_pause": {
+    "timestamp_utc": "2026-10-18T11:44:55.5594462Z",
+    "status": "PAUSED_READY",
+    "commands": [
+      {
+        "pid": 85168,
+        "outcome": "terminated for user pause",
+        "name": "python.exe"
+      },
+      {
+        "pid": 96208,
+        "outcome": "terminated for user pause",
+        "name": "python.exe"
+      },
+      {
+        "pid": 83792,
+        "outcome": "already exited"
+      },
+      {
+        "pid": 84004,
+        "outcome": "already exited"
+      },
+      {
+        "pid": 89136,
+        "outcome": "already exited"
+      },
+      {
+        "pid": 94848,
+        "outcome": "already exited"
+      },
+      {
+        "pid": 83480,
+        "outcome": "already exited"
+      }
+    ],
+    "remaining_owned_processes": [],
+    "partial_test_output": ".................................................",
+    "completed_suite": false,
+    "partial_pass_markers": 49,
+    "partial_failure_markers": 0,
+    "repository_receipt_written": false,
+    "seven_frozen_hashes": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+      "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "3d4ebf82948d07f6d7404c1b17e6a0caa6c8c0bcce7360b4e46a35486a2ab2ba",
+      "tests/discovery_runtime/test_mutation_plan.py": "411a4db98c99f57961420d01b5b2d7870140e68734ebbbcd80a3148593fe6f14",
+      "tests/discovery_runtime/test_mutation_commit.py": "31c0dff2382bbbf563f1b63c96a24e505b6cc9cd2e33c379a5034b82a1249c42",
+      "tests/discovery_runtime/test_mutation_filesystem.py": "99bf2270334ece43e6f19d05b7514e144b1ec2ed341cc4da1948012d8bf5f116",
+      "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2"
+    },
+    "correction_unapplied": "CreateFileW desired access 0x80 to 0x81; assert read/list access in the injected native-call unit test."
+  },
+  "native_access_probe": {
+    "timestamp": "2026-10-18T11:41:41.903423+00:00",
+    "rows": [
+      {
+        "desired_access": "0x80",
+        "share_mode": 3,
+        "rename_blocked_while_held": false,
+        "winerror": null,
+        "rename_succeeded_after_close": true,
+        "identity_matches_path": true
+      },
+      {
+        "desired_access": "0x81",
+        "share_mode": 3,
+        "rename_blocked_while_held": true,
+        "winerror": 32,
+        "rename_succeeded_after_close": true,
+        "identity_matches_path": true
+      },
+      {
+        "desired_access": "0x80000000",
+        "share_mode": 3,
+        "rename_blocked_while_held": true,
+        "winerror": 32,
+        "rename_succeeded_after_close": true,
+        "identity_matches_path": true
+      }
+    ],
+    "scratch_name": "issue-980-p3t1-windows-access-d90727d061ca4864a401dcd364e3f1f9",
+    "source": "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-iochecklinkshareaccess",
+    "inference": "Metadata-only access does not participate in normal read/write/delete sharing checks; request FILE_LIST_DIRECTORY/FILE_READ_DATA alongside attributes."
+  },
+  "disposition": "Pass 9 was user-interrupted, not a completed test/coverage gate. Original failure is retained. Resume changes only the native access mask and its direct unit assertion."
+}
