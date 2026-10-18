@@ -157,10 +157,19 @@ class GuardedMutationWriter:
         with self._primitives.guard():
             current = self.capture()
             _same_state(expected, current)
+            if write.transport is not None:
+                write.transport.revalidate(
+                    catalog=current.snapshot.catalog,
+                    limits=current.snapshot.profile.limits.parse_limits(),
+                )
+                write.transport.check(
+                    cast("WriteGrant", write.target.grant), write.change.content
+                )
             PathPolicy(
                 current.snapshot.profile,
                 workspace_root=current.workspace_root,
                 metadata=current.inspect,
+                transport=write.transport,
             ).revalidate_write(write.target)
             # Compare the original bytes inside exclusion before selecting a primitive.
             prior = next(
@@ -174,6 +183,10 @@ class GuardedMutationWriter:
             digest = prior.sha256 if prior is not None else None
             if digest != write.change.expected_sha256:
                 raise MutationError("MUTATION_PRECONDITION", "Guarded original differs")
+            if write.transport is not None and prior is not None:
+                raise MutationError(
+                    "MUTATION_TRANSPORT", "Transport publication requires absence"
+                )
             # Absence permits only exclusive creation; existing bytes require
             # replacement CAS.
             if digest is None:
@@ -273,6 +286,7 @@ def _after_write(
         current.snapshot.profile,
         workspace_root=current.workspace_root,
         metadata=current.inspect,
+        transport=write.transport,
     ).resolve_write(path, grant=cast("WriteGrant", write.target.grant))
 
 
@@ -291,6 +305,7 @@ def commit_mutation(
         tuple(write.change for write in plan.writes),
         grants=plan.grants,
         invocation=plan.invocation,
+        transport=plan.transport,
     )
     if (
         rebuilt.writes != plan.writes
@@ -337,13 +352,17 @@ def commit_mutation(
                 expected.snapshot.profile,
                 workspace_root=expected.workspace_root,
                 metadata=writer.capture().inspect,
+                transport=write.transport,
             )
             target = policy.resolve_write(
                 write.change.path, grant=cast("WriteGrant", write.target.grant)
             )
             # The adapter repeats complete freshness and these path checks atomically.
             current_write = PlannedWrite(
-                change=write.change, target=target, skipped=False
+                change=write.change,
+                target=target,
+                skipped=False,
+                transport=write.transport,
             )
             attempted = current_write
             writer.atomic_write(current_write, expected=expected)

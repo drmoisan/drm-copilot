@@ -20,6 +20,7 @@ from drm_copilot_discovery.reference_links import (
     string_value,
     validate_linkage,
 )
+from drm_copilot_discovery.transport_manifest import replica_aliases
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Mapping
@@ -96,6 +97,7 @@ class ReferenceIndex:
     records: tuple[ArtifactRecord, ...]
     findings: tuple[Finding, ...] = ()
     links: tuple[ReferenceResolution, ...] = ()
+    replicas: tuple[tuple[str, ArtifactRecord], ...] = ()
     identities: Mapping[tuple[str, str, str], tuple[ArtifactRecord, ...]] = field(
         init=False, repr=False, compare=False
     )
@@ -115,6 +117,7 @@ class ReferenceIndex:
         object.__setattr__(self, "records", tuple(self.records))
         object.__setattr__(self, "findings", tuple(self.findings))
         object.__setattr__(self, "links", tuple(self.links))
+        object.__setattr__(self, "replicas", tuple(self.replicas))
         object.__setattr__(
             self,
             "identities",
@@ -169,6 +172,10 @@ class ReferenceIndex:
         candidates = self.candidates(
             kind or "", identifier or "", repository=owner, identity_field=name
         )
+        if len(candidates) == 1 and (source_contract or transport):
+            candidates = self._replica_targets(
+                candidates[0], source=source, transport=transport
+            )
         code: str | None = None
         # A typed field cannot select a different kind even when that target exists.
         if kind is None or identifier is None:
@@ -212,6 +219,30 @@ class ReferenceIndex:
             target=next(iter(candidates)) if code is None else None,
             findings=findings,
         )
+
+    def _replica_targets(
+        self, target: ArtifactRecord, *, source: ArtifactRecord, transport: bool
+    ) -> tuple[ArtifactRecord, ...]:
+        """Select physical imported bytes only within a proven equivalence group.
+
+        Ordinary candidates retain local mutation identity. Manifest rows select
+        their own physical member; source links use a deterministic proven copy.
+        Different bytes, pins or unbound duplicates never enter this group.
+        """
+        copies = tuple(
+            record
+            for representative, record in self.replicas
+            if representative == target.artifact.path
+            and record.pointer == target.pointer
+        )
+        if target.artifact.origin_path is not None:
+            copies = (*copies, target)
+        if not copies:
+            return (target,)
+        if transport and source.kind == "source-snapshot-manifest":
+            path = source.artifact.path.rsplit("/", 1)[0] + "/" + target.path
+            return tuple(record for record in copies if record.artifact.path == path)
+        return (min(copies, key=lambda record: record.artifact.path),)
 
 
 def _records(
@@ -335,17 +366,26 @@ def index_references(snapshot: DiscoverySnapshot) -> ReferenceIndex:
     for finding in snapshot.findings:
         collector.add(finding)
     # Flatten configured documents and permitted collection members exactly once.
+    aliases = replica_aliases(snapshot)
     records = tuple(
         record
         for artifact in snapshot.artifacts
+        if artifact.path not in aliases
         for record in _records(artifact, collector)
     )
-    index = ReferenceIndex(records=records)
+    replicas = tuple(
+        (aliases[artifact.path], record)
+        for artifact in snapshot.artifacts
+        if artifact.path in aliases
+        for record in _records(artifact, collector)
+    )
+    index = ReferenceIndex(records=records, replicas=replicas)
     _duplicates(index, collector)
     schemas = dict(snapshot.catalog.documents)
     links: dict[tuple[str, str], ReferenceResolution] = {}
-    # Collection members are walked individually to retain their own source identity.
-    for record in records:
+    # Physical replicas need outgoing links for later path-keyed provenance checks.
+    # Their common links retain canonical targets and existing evidence assessments.
+    for record in records + tuple(record for _, record in replicas):
         if record.kind in _COLLECTIONS:
             continue
         # Trusted schemas select reference fields, not authored payload key names.

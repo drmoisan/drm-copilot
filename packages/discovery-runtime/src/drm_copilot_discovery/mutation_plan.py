@@ -34,6 +34,7 @@ if TYPE_CHECKING:
         RepositoryIdentity,
     )
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
+    from drm_copilot_discovery.transport_manifest import TransportRoute
     from drm_copilot_discovery.validation import SnapshotValidation
 
 
@@ -132,6 +133,7 @@ class PlannedWrite:
     change: MutationChange
     target: ResolvedPath
     skipped: bool
+    transport: TransportRoute | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -148,6 +150,7 @@ class MutationPlan:
     prospective: DiscoverySnapshot
     validation: SnapshotValidation
     invocation: InvocationContext | None = None
+    transport: TransportRoute | None = None
 
 
 class _PinnedReader:
@@ -272,6 +275,7 @@ def plan_mutation(
     *,
     grants: tuple[WriteGrant, ...],
     invocation: InvocationContext | None = None,
+    transport: TransportRoute | None = None,
 ) -> MutationPlan:
     """Validate all prospective bytes before returning an immutable commit plan.
 
@@ -283,6 +287,32 @@ def plan_mutation(
     if not changes or len(changes) > baseline.snapshot.profile.limits.artifact_records:
         raise MutationError("MUTATION_LIMIT", "Provide a bounded nonempty change set")
     changes = tuple(sorted(changes, key=lambda item: item.path))
+    if transport is not None:
+        if invocation is not None:
+            raise MutationError(
+                "MUTATION_TRANSPORT", "Transport is a root-only operation"
+            )
+        transport.revalidate(
+            catalog=baseline.snapshot.catalog,
+            limits=baseline.snapshot.profile.limits.parse_limits(),
+        )
+        members = {member.grant for member in transport.members}
+        if (
+            set(grants) != members
+            or len(grants) != len(members)
+            or {item.path for item in changes} != {grant.path for grant in members}
+        ):
+            raise MutationError(
+                "MUTATION_TRANSPORT",
+                "Require the exact complete transport grants and members",
+            )
+        # The header is published only after every complete immutable member exists.
+        changes = tuple(
+            sorted(
+                changes,
+                key=lambda item: (item.path == transport.manifest.path, item.path),
+            )
+        )
     # Reject platform aliases before mapping exact requested identities to grants.
     check_path_collisions(item.path for item in changes)
     # Grants also require unique paths; dictionary insertion must not discard authority.
@@ -297,6 +327,7 @@ def plan_mutation(
         baseline.snapshot.profile,
         workspace_root=baseline.workspace_root,
         metadata=baseline.inspect,
+        transport=transport,
     )
     if invocation is not None and (
         invocation.baseline.sha256 != baseline.snapshot.sha256
@@ -314,6 +345,12 @@ def plan_mutation(
         ):
             raise MutationError("MUTATION_GRANT", "No exact kind/ID/path write grant")
         prior = files.get(change.path)
+        if transport is not None:
+            transport.check(grant, change.content)
+            if prior is not None and prior.content != change.content:
+                raise MutationError(
+                    "MUTATION_TRANSPORT", "Immutable snapshot bytes cannot be replaced"
+                )
         if change.expected_sha256 != (prior.sha256 if prior else None):
             raise MutationError(
                 "MUTATION_PRECONDITION", "Original content digest differs"
@@ -322,6 +359,7 @@ def plan_mutation(
         if original is not None and (
             original.expected_kind != change.artifact_kind
             or original.origin_path is not None
+            and transport is None
             or original.document is not None
             and original.document.get("id") != change.artifact_id
         ):
@@ -337,6 +375,7 @@ def plan_mutation(
                 change=change,
                 target=policy.resolve_write(change.path, grant=grant),
                 skipped=prior is not None and prior.content == change.content,
+                transport=transport,
             )
         )
     prospective = project_snapshot(baseline, changes)
@@ -383,4 +422,5 @@ def plan_mutation(
         prospective=prospective,
         validation=validation,
         invocation=invocation,
+        transport=transport,
     )
