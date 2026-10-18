@@ -236,7 +236,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover source/test/runtime/manual/decision evidence, immutable pins/checksums, allowed payload roots, duplicate IDs, checksum mismatch, path escape, stale destination digest, missing artifact, unrelated link preservation, and partial failure reporting.
   - Acceptance: A successful evidence link identifies exact local evidence and preserves the original observation/approval state; malformed or unverified evidence cannot upgrade a claim.
 
-- [ ] [P3-T6] Export and import immutable source snapshots.
+- [x] [P3-T6] Export and import immutable source snapshots.
   - Files and behavior: Create R/source_snapshots.py and PT/test_{snapshot_export,snapshot_import}.py, using the versioned manifest and configured source-snapshot root.
   - Tests and proof: Exercise source revision/contract/evidence hashes, local transport manifests, foreign identities, unsupported versions, changed bytes, duplicate or conflicting imports, no-overwrite/dry-run, combined-repository identities, and multiple target clients.
   - Acceptance: Target references resolve only to locally imported bytes matching the declared immutable source identity; no sibling checkout, remote fetch, or silent snapshot replacement occurs.
