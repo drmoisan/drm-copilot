@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -36,7 +35,7 @@ def test_main_success_path_invokes_create_discovery_workspace(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """On success, `main()` resolves the default template root and delegates."""
-    calls: list[dict[str, Any]] = []
+    calls: list[dict[str, object]] = []
 
     def fake_create_discovery_workspace(
         target_dir: Path,
@@ -76,7 +75,7 @@ def test_main_honors_template_root_override(monkeypatch: pytest.MonkeyPatch) -> 
         fs: object,
         *,
         force: bool,
-    ) -> None:  # noqa: ARG001
+    ) -> None:
         calls.append(template_root)
 
     monkeypatch.setattr(
@@ -127,3 +126,27 @@ def test_console_script_registered_in_pyproject() -> None:
         '"dev.discovery.init" = "scripts.dev_tools.discovery.init_cli:main"'
         in pyproject_text
     )
+
+
+def test_legacy_cli_reports_explicit_v2_migration_without_writes(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Preserve old flags but require root context before initialization writes."""
+    from tests.scripts.dev_tools.discovery.test_init_flow import (
+        FakeFileSystem,
+        seed_templates,
+    )
+
+    fs, root, target = FakeFileSystem(), Path("/templates"), Path("/consumer/discovery")
+    fs.dirs.add(target.parent)
+    seed_templates(fs, root)
+    before = (dict(fs.files), set(fs.dirs))
+    monkeypatch.setattr(mod.init_models, "RealFileSystem", lambda: fs)
+
+    with pytest.raises(SystemExit) as failure:
+        mod.main([str(target), "--template-root", str(root), "--force"])
+
+    assert failure.value.code == 1
+    assert "initialize_workspace" in capsys.readouterr().err
+    assert (fs.files, fs.dirs) == before

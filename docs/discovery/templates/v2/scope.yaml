@@ -10,7 +10,7 @@ included_features: []
 exclusions: []
 inventory_snapshot_refs: []
 confirmed_by: null
-required_coverage: {feature_refs: [], client_ids: [], modes: []}
+required_coverage: {feature_refs: [], client_ids: [], modes: "{{required_modes}}"}
 disposition: in-scope
 no_scope_rationale: null
 extensions: {}

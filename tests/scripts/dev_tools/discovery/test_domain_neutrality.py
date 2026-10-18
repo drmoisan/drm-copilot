@@ -1,76 +1,76 @@
-"""Domain-neutrality regression tests for discovery templates and rendered output."""
+"""Keep v1 fixtures neutral and verify caller-owned v2 draft projection."""
 
 from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery.init_flow import create_discovery_workspace
-from scripts.dev_tools.discovery.init_models import (
-    EXPECTED_TEMPLATE_RELATIVE_PATHS,
-    OUTPUT_RELATIVE_PATHS,
+from drm_copilot_discovery.init_projection import (
+    ARTIFACT_TEMPLATES,
+    TEMPLATE_NAMES,
+    artifact_values,
+    profile_proposal,
 )
+from drm_copilot_discovery.profile_v2 import ProfileV2
+
+from scripts.dev_tools.discovery.init_models import EXPECTED_TEMPLATE_RELATIVE_PATHS
+from tests.discovery_runtime.initialization_test_support import (
+    initialization_catalog as initialization_catalog,
+)
+from tests.discovery_runtime.initialization_test_support import (
+    initialization_templates as initialization_templates,
+)
+from tests.discovery_runtime.initialization_test_support import request_for
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
+    from drm_copilot_discovery.init_projection import InitializationTemplates
 
 DISALLOWED_TOKEN_PATTERN = re.compile(r"TaskMaster|TMW|Outlook|VSTO", re.IGNORECASE)
-
-_REPO_ROOT = Path(__file__).resolve().parents[4]
-_TEMPLATE_ROOT = _REPO_ROOT / "docs" / "discovery" / "templates"
-
-
-class _FakeFileSystem:
-    """In-memory `FileSystem` test double with no real disk I/O."""
-
-    def __init__(self) -> None:
-        self.files: dict[Path, str] = {}
-        self.dirs: set[Path] = set()
-
-    def exists(self, path: Path) -> bool:
-        return path in self.files or path in self.dirs
-
-    def is_dir(self, path: Path) -> bool:
-        return path in self.dirs
-
-    def list_dir(self, path: Path) -> list[Path]:
-        return [
-            candidate
-            for candidate in {*self.files, *self.dirs}
-            if candidate != path and candidate.parent == path
-        ]
-
-    def ensure_dir(self, path: Path) -> None:
-        self.dirs.add(path)
-
-    def read_text(self, path: Path) -> str:
-        return self.files[path]
-
-    def write_text(self, path: Path, content: str) -> None:
-        self.files[path] = content
+_TEMPLATE_ROOT = Path(__file__).resolve().parents[4] / "docs/discovery/templates"
 
 
 def test_domain_neutrality_templates_contain_no_disallowed_tokens() -> None:
-    """Every discovery template file contains none of the disallowed tokens."""
-    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
-        text = (_TEMPLATE_ROOT / relative_path).read_text(encoding="utf-8")
+    """Preserve the frozen v1 check and cover all six production v2 templates."""
+    paths = (
+        *EXPECTED_TEMPLATE_RELATIVE_PATHS,
+        *(Path("v2") / name for name in TEMPLATE_NAMES),
+    )
+    for path in paths:
         assert not DISALLOWED_TOKEN_PATTERN.search(
-            text
-        ), f"Disallowed token found in template {relative_path}"
+            (_TEMPLATE_ROOT / path).read_text(encoding="utf-8")
+        ), path
 
 
-def test_domain_neutrality_rendered_output_contains_no_disallowed_tokens() -> None:
-    """Every file `create_discovery_workspace` writes contains no disallowed tokens."""
-    fs = _FakeFileSystem()
-    target_dir = Path("/consumer/discovery")
-    fs.dirs.add(target_dir.parent)
-    fs.dirs.add(_TEMPLATE_ROOT)
-    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
-        fs.files[_TEMPLATE_ROOT / relative_path] = (
-            _TEMPLATE_ROOT / relative_path
-        ).read_text(encoding="utf-8")
+def test_rendered_v2_drafts_use_only_caller_identity_and_empty_knowledge(
+    initialization_catalog: SchemaCatalog,
+    initialization_templates: InitializationTemplates,
+) -> None:
+    """
+    Production projection contains no example-domain facts or generated feature IDs.
+    """
+    request = request_for("combined")
+    content = profile_proposal(
+        request,
+        templates=initialization_templates,
+        catalog=initialization_catalog,
+        revision=None,
+    )
+    profile = ProfileV2(content, catalog=initialization_catalog)
+    values = artifact_values(profile, scope_id="scope-" + request.system_id)
+    outputs = (
+        content,
+        *(
+            initialization_templates.render(name, values)
+            for _, _, name in ARTIFACT_TEMPLATES
+        ),
+    )
 
-    create_discovery_workspace(target_dir, _TEMPLATE_ROOT, fs)
-
-    for output_relative in OUTPUT_RELATIVE_PATHS:
-        rendered = fs.files[target_dir / output_relative]
-        assert not DISALLOWED_TOKEN_PATTERN.search(
-            rendered
-        ), f"Disallowed token found in rendered output {output_relative}"
+    assert profile.system.id == request.system_id
+    assert profile.repository.id == request.repository_id
+    assert profile.required_modes == ("online",)
+    assert profile.clients == () and profile.repositories == ()
+    for output in outputs:
+        assert not DISALLOWED_TOKEN_PATTERN.search(output.decode())
+        assert "example" not in output.decode().lower()

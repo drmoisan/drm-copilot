@@ -14,7 +14,7 @@ evidence_roots: "{{evidence_roots}}"
 repositories: []
 clients: []
 required_platforms: []
-required_modes: []
+required_modes: [online]
 required_feature_dimensions: []
 runtime: {capability: none, required_feature_ids: []}
 analyzers: {enabled: [], options: {}, ignored_paths: [], extension_result_manifests: []}

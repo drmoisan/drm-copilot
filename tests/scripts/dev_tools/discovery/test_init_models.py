@@ -72,7 +72,7 @@ def test_real_file_system_delegates_to_pathlib(
 
 
 def test_expected_template_relative_paths_has_eight_entries() -> None:
-    """The template/output path constants have the expected, index-aligned shape."""
+    """Frozen v1 constants remain import-compatible; they do not select v2 outputs."""
     assert len(mod.EXPECTED_TEMPLATE_RELATIVE_PATHS) == 8
     assert len(mod.ARTIFACT_RELATIVE_PATHS) == 7
     assert len(mod.OUTPUT_RELATIVE_PATHS) == 8
@@ -95,3 +95,13 @@ def test_resolve_default_template_root_returns_expected_path() -> None:
     result = resolve_default_template_root()
     repository = Path(__file__).resolve().parents[4]
     assert result == repository / "docs" / "discovery" / "templates"
+
+
+def test_v2_template_layout_is_separate_from_frozen_legacy_constants() -> None:
+    """The new root workflow selects six closed templates without changing v1 paths."""
+    from drm_copilot_discovery.init_projection import ARTIFACT_TEMPLATES, TEMPLATE_NAMES
+
+    assert len(TEMPLATE_NAMES) == 6
+    assert TEMPLATE_NAMES[0] == "domain-profile.yaml"
+    assert {name for _, _, name in ARTIFACT_TEMPLATES} == set(TEMPLATE_NAMES[1:])
+    assert not any("feature-contract" in name for name in TEMPLATE_NAMES)
