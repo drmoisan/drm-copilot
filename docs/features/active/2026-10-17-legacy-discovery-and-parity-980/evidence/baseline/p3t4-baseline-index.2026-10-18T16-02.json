@@ -1,0 +1,37 @@
+{
+  "written_at_utc": "2026-10-18T16:02:01.047490+00:00",
+  "acceptance_baseline": "c114f98583599ebd5ee02281ece3524b2909fa51",
+  "new_modules_absent_at_baseline": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": true,
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": true
+  },
+  "baseline_coverage_applicability": "Not applicable for absent new modules; accepted shared claim primitives measured separately.",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t4-baseline-raw-coverage.2026-10-18T16-02.json",
+  "measured_totals": {
+    "covered_lines": 217,
+    "num_statements": 220,
+    "percent_covered": 97.1590909090909,
+    "percent_covered_display": "97",
+    "missing_lines": 3,
+    "excluded_lines": 7,
+    "percent_statements_covered": 98.63636363636364,
+    "percent_statements_covered_display": "99",
+    "num_branches": 132,
+    "num_partial_branches": 7,
+    "covered_branches": 125,
+    "missing_branches": 7,
+    "percent_branches_covered": 94.6969696969697,
+    "percent_branches_covered_display": "95"
+  },
+  "command_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-lint.2026-10-18T15-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-tests.2026-10-18T15-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-types.2026-10-18T15-33.md"
+  ],
+  "lint_findings": 0,
+  "pyright_errors": 0,
+  "pyright_warnings": 0,
+  "tests_passed": 98,
+  "tests_failed": 0,
+  "disposition": "Retained captured baseline outputs, not a rerun or a new repository-wide coverage claim."
+}

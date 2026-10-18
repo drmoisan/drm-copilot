@@ -30,14 +30,20 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, kw_only=True)
 class ScenarioDraft:
-    """Require feature links and caller-supplied environment and observation plans."""
+    """Carry selected feature links and an immutable caller-supplied observation plan.
+
+    Construct with unique feature IDs and explicit structured planning fields, then
+    use plan_scenario/create_scenario with separate grants. The value validates ID
+    shape but grants no authority, performs no I/O and never describes an executed
+    run. Complete graph validation remains the shared planner's responsibility.
+    """
 
     scenario_id: str
     feature_ids: tuple[str, ...]
     fields: JsonObject
 
     def __post_init__(self) -> None:
-        """Detach IDs and reject empty, duplicate or unsafe request identities."""
+        """Return None after detaching IDs; invalid identity/fields raise ValueError."""
         object.__setattr__(self, "feature_ids", tuple(self.feature_ids))
         WriteGrant(
             artifact_kind="runtime-characterization-scenario",
@@ -52,6 +58,7 @@ class ScenarioDraft:
             raise ValueError(
                 "A scenario requires unique feature IDs and immutable structured fields"
             )
+        # Validate each selected identity without treating it as an output grant.
         for identifier in self.feature_ids:
             WriteGrant(
                 artifact_kind="feature-contract",
@@ -63,15 +70,21 @@ class ScenarioDraft:
 def scenario_changes(
     baseline: CapturedWorkspace, request: ScenarioDraft
 ) -> tuple[MutationChange, ...]:
-    """Preserve plans, generate no run, and link unknown expectations."""
+    """Return scenario and any necessary question proposals from captured inputs.
+
+    The request supplies environment, fixture, action and observation plans. Unknown
+    expectations remain null and gain an open question covering selected features;
+    known text retains its supplied basis for shared graph validation. Invalid
+    inputs/claims raise MutationError/ValueError. No I/O or input mutation occurs.
+    """
     identifier = "unknown-scenario-" + request.scenario_id
     features = tuple(sorted(request.feature_ids))
     fields = draft_header("runtime-characterization-scenario", request.scenario_id)
+    # Stable feature order makes equivalent selections produce identical bytes.
+    feature_refs = tuple(draft_reference("feature-contract", name) for name in features)
     fields.update(
         scenario_id=request.scenario_id,
-        feature_refs=tuple(
-            draft_reference("feature-contract", name) for name in features
-        ),
+        feature_refs=feature_refs,
         pre_state_capture=draft_object(
             plan="Capture state before the planned action.",
             observed_state=None,
@@ -116,6 +129,7 @@ def scenario_changes(
         raise MutationError(
             "DRAFT_INPUT", "Supply planning fields: " + ", ".join(sorted(missing))
         )
+    # Capture instructions are plans; observed states must come from later execution.
     for name in ("pre_state_capture", "post_state_capture"):
         value = fields[name]
         if isinstance(value, JsonObject) and (
@@ -125,6 +139,7 @@ def scenario_changes(
                 "DRAFT_CLAIM", "A new observation plan cannot claim captured execution"
             )
     changes: list[MutationChange] = []
+    # Only unknown expectations need generated questions; known claims need real proof.
     if fields["expected_result"] is None:
         links = fields["unresolved_findings"]
         if not isinstance(links, tuple):
@@ -133,6 +148,7 @@ def scenario_changes(
             dict.fromkeys((*links, draft_reference("unspecified-behavior", identifier)))
         )
         plan = fields["observation_plan"]
+        # Include every planned dimension; malformed plan rows remain schema errors.
         dimensions = (
             tuple(
                 sorted(
@@ -179,7 +195,12 @@ def plan_scenario(
     grants: tuple[WriteGrant, ...],
     invocation: InvocationContext | None = None,
 ) -> MutationPlan:
-    """Require resolvable feature links and accepted complete-graph validation."""
+    """Return a shared validated plan with resolvable feature links and exact grants.
+
+    Baseline/request determine proposed bytes. Caller-authenticated grants and
+    optional invocation are forwarded unchanged. Shared planning exceptions
+    propagate; this thin composition does not perform I/O or manufacture authority.
+    """
     return plan_mutation(
         baseline,
         scenario_changes(baseline, request),
@@ -197,7 +218,12 @@ def create_scenario(
     dry_run: bool = False,
     invocation: InvocationContext | None = None,
 ) -> MutationResult:
-    """Commit or preview through the existing writer and exact freshness contract."""
+    """Plan and publish through the injected writer, returning its MutationResult.
+
+    Inputs have the same meaning as plan_scenario; planning errors propagate. The
+    shared writer owns freshness, invalidation and explicit partial results. A real
+    commit writes only planned files; dry-run leaves all external state unchanged.
+    """
     return commit_mutation(
         plan_scenario(baseline, request, grants=grants, invocation=invocation),
         writer=writer,

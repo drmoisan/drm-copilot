@@ -28,12 +28,20 @@ if TYPE_CHECKING:
 
 
 def draft_object(**fields: JsonValue) -> JsonObject:
-    """Detach generated members without accepting mutable JSON descendants."""
+    """Return immutable JSON from typed keyword members without external effects.
+
+    JsonObject rejects mutable descendants with TypeError/ValueError; callers
+    retain their input objects and receive a detached member tuple.
+    """
     return JsonObject(tuple(fields.items()))
 
 
 def draft_header(kind: str, identifier: str) -> dict[str, JsonValue]:
-    """Select the fixed v2 identity rather than accepting a caller schema route."""
+    """Return fixed v2 header members for the given kind and stable identifier.
+
+    This pure projection leaves schema/path validation to the shared planner;
+    it does not interpret these strings as native authority.
+    """
     return {
         "$schema": "urn:drm-copilot:discovery:2.0.0:" + kind,
         "schema_version": "2.0.0",
@@ -44,15 +52,21 @@ def draft_header(kind: str, identifier: str) -> dict[str, JsonValue]:
 
 
 def draft_reference(kind: str, identifier: str) -> JsonObject:
-    """Keep a link's kind and stable local identity explicit."""
+    """Return an immutable kind/identifier link without resolving or granting it."""
     return draft_object(artifact_kind=kind, id=identifier)
 
 
 def merge_draft_fields(
     defaults: Mapping[str, JsonValue], supplied: JsonObject, *, fixed: tuple[str, ...]
 ) -> dict[str, JsonValue]:
-    """Preserve supplied planning data but reject identity or completed-state claims."""
+    """Return detached defaults overlaid with immutable caller planning members.
+
+    Fixed names must retain their default values or MutationError is raised.
+    Unknown fields remain visible to the accepted schema validator. No input or
+    external state is changed.
+    """
     result = dict(defaults)
+    # Preserve planning detail while preventing changes to creation invariants.
     for name, value in supplied.items():
         if name in fixed and value != defaults[name]:
             raise MutationError("DRAFT_CLAIM", f"Creation cannot change {name}")
@@ -67,13 +81,17 @@ def open_question(
     dimensions: tuple[str, ...],
     question: str,
 ) -> JsonObject:
-    """Record uncertainty without a decision, owner, evidence or resolution claim."""
+    """Return an open question for selected feature IDs and dimension names.
+
+    The supplied text describes uncertainty; owner, resolution and evidence stay
+    unset. This pure projection delegates shape/link validation to the planner.
+    """
     fields = draft_header("unspecified-behavior", identifier)
+    # Every selected feature must remain explicit in the unresolved record.
+    feature_refs = tuple(draft_reference("feature-contract", name) for name in features)
     fields.update(
         behavior_id=identifier,
-        feature_refs=tuple(
-            draft_reference("feature-contract", name) for name in features
-        ),
+        feature_refs=feature_refs,
         dimensions=dimensions,
         question=question,
         evidence_refs=(),
@@ -95,7 +113,12 @@ def open_question(
 def append_questions(
     baseline: CapturedWorkspace, questions: tuple[JsonObject, ...]
 ) -> MutationChange:
-    """Preserve the existing collection and bind its replacement to exact old bytes."""
+    """Return a collection change that appends immutable questions to captured data.
+
+    The CapturedWorkspace supplies configured paths and original-byte CAS. Invalid
+    baseline/collection data raises MutationError with available findings. Existing
+    records and extension values are preserved; this function performs no I/O.
+    """
     snapshot = baseline.snapshot
     if not snapshot.ok:
         raise MutationError(
@@ -104,7 +127,9 @@ def append_questions(
             findings=snapshot.findings,
         )
     path = snapshot.profile.artifacts["unspecified_behaviors"]
+    # Resolve only the configured collection, never an arbitrary matching kind.
     original = next((item for item in snapshot.artifacts if item.path == path), None)
+    # Absence authorizes only a create proposal; existing bytes remain a CAS input.
     if original is None:
         document = draft_header(
             "unspecified-behavior-collection",
@@ -136,7 +161,13 @@ def append_questions(
 
 @dataclass(frozen=True, kw_only=True)
 class ContractDraft:
-    """Carry caller-owned feature identity and immutable optional structured fields."""
+    """Carry selected feature identity and immutable optional planning fields.
+
+    Construct with an explicit ID/name, then pass to plan_contract/create_contract
+    with separately authenticated grants. Construction checks ID syntax and input
+    immutability; graph validation remains the planner's responsibility. This value
+    performs no I/O and cannot supply native authority.
+    """
 
     feature_id: str
     name: str
@@ -144,7 +175,7 @@ class ContractDraft:
     fields: JsonObject = JsonObject(())
 
     def __post_init__(self) -> None:
-        """Reject unsafe IDs and mutable input before constructing any proposal."""
+        """Return None after checking stored inputs; invalid values raise ValueError."""
         WriteGrant(
             artifact_kind="feature-contract",
             artifact_id=self.feature_id,
@@ -195,6 +226,7 @@ def _link_transitions(value: JsonObject, link: JsonObject) -> tuple[JsonObject, 
     # Nested phases carry independent observation claims, even with an inferred summary.
     if isinstance(entries, tuple):
         updated: list[JsonValue] = []
+        # Preserve malformed rows for schema errors, and normalize valid objects.
         for entry in entries:
             if not isinstance(entry, JsonObject):
                 updated.append(entry)
@@ -212,7 +244,13 @@ def _link_transitions(value: JsonObject, link: JsonObject) -> tuple[JsonObject, 
 def contract_changes(
     baseline: CapturedWorkspace, request: ContractDraft
 ) -> tuple[MutationChange, ...]:
-    """Render deterministic unknown observations and their linked open question."""
+    """Return exact contract/question proposals for a captured workspace and request.
+
+    Configured requirements are inherited without guessing legacy behavior. Only
+    inferred, unknown or contradictory supplied observations are allowed; unknowns
+    gain linked questions. Invalid claims/inputs raise MutationError/ValueError.
+    The immutable byte proposals do not modify the captured or physical workspace.
+    """
     profile = baseline.snapshot.profile
     identifier = "unknown-feature-" + request.feature_id
     link = draft_reference("unspecified-behavior", identifier)
@@ -242,6 +280,7 @@ def contract_changes(
         required_dimensions=(),
         acceptance_criteria=(),
     )
+    # Every supported dimension starts honestly unknown, including optional modes.
     fields.update({name: unknown for name in FEATURE_DIMENSIONS})
     fields["state_transitions"] = draft_object(
         disposition="unknown", behavior=unknown, entries=(), rationale=None
@@ -275,6 +314,7 @@ def contract_changes(
         platforms=(), modes=(), dimensions=cast("tuple[str, ...]", dimensions)
     )
     inherited = set(local.dimensions)
+    # Include global and client requirements so selection cannot hide required work.
     for client in (None, *(item.id for item in profile.clients)):
         required = profile.requirements(client_id=client, feature=local)
         inherited.update(required.dimensions)
@@ -319,7 +359,12 @@ def plan_contract(
     grants: tuple[WriteGrant, ...],
     invocation: InvocationContext | None = None,
 ) -> MutationPlan:
-    """Validate the complete prospective graph under authenticated exact grants."""
+    """Return the shared validated plan for the captured workspace and draft request.
+
+    Grants and optional invocation are caller-authenticated values, forwarded
+    unchanged. The shared planner raises MutationError/ValueError/OSError for
+    invalid proposals, paths or graph claims. This thin wrapper performs no I/O.
+    """
     return plan_mutation(
         baseline,
         contract_changes(baseline, request),
@@ -337,7 +382,13 @@ def create_contract(
     dry_run: bool = False,
     invocation: InvocationContext | None = None,
 ) -> MutationResult:
-    """Use the shared freshness and publication checks for commit or dry-run."""
+    """Plan then commit the selected draft through the injected MutationWriter.
+
+    The baseline, request, exact grants and optional invocation retain the same
+    contract as plan_contract. Planning errors propagate; publication returns the
+    shared MutationResult, including explicit partial failures and invalidation.
+    Dry-run performs no writes; real commits may create/replace only planned files.
+    """
     return commit_mutation(
         plan_contract(baseline, request, grants=grants, invocation=invocation),
         writer=writer,

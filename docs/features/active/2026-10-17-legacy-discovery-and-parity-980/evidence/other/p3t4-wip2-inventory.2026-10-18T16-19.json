@@ -1,0 +1,108 @@
+{
+  "written_at_utc": "2026-10-18T16:19:37.553141+00:00",
+  "status": "FROZEN_FOR_WIP; final ordered gate pending",
+  "baseline": "c114f98583599ebd5ee02281ece3524b2909fa51",
+  "head": "d9791ad7baaed3e6990bc6dc6c06b8feb204482c",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "sha256": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "git_blob": "9914ebe3fe91eb286c3a9db3626dd866bfcb8b43",
+      "physical_lines": 396
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "sha256": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "git_blob": "2655c4d999cc79933cf9e72af2e2f0ebe5e114b1",
+      "physical_lines": 231
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_contracts.py",
+      "sha256": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "git_blob": "30c14e3859692f9169dcb606ec7167939bc5dfb0",
+      "physical_lines": 431
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_scenarios.py",
+      "sha256": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "git_blob": "d84dc26a53d2bb3bf4add5a528ed7149c42d92a3",
+      "physical_lines": 378
+    },
+    {
+      "path": "tests/discovery_runtime/draft_test_support.py",
+      "sha256": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+      "git_blob": "ffba64c7b5752ee733012d7f2ce5847342d5c0b7",
+      "physical_lines": 126
+    }
+  ],
+  "changed_owned_since_head": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+    "tests/discovery_runtime/test_draft_contracts.py"
+  ],
+  "prior_unchanged": 246,
+  "frozen_unchanged": 24,
+  "coverage_audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-pass1-coverage-audit.2026-10-18T16-10.json",
+  "historical_raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-wip2-historical-raw-coverage.2026-10-18T16-19.json",
+  "historical_test_bindings": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-wip2-historical-test-bindings.2026-10-18T16-19.json",
+  "corrected_diagnostic": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-composed-integration.2026-10-18T16-18.json",
+  "checkpoint_note": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t4-wip2-checkpoint.2026-10-18T16-19.md",
+  "evidence_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t4-baseline-index.2026-10-18T16-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t4-baseline-raw-coverage.2026-10-18T16-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t4-wip-inventory.2026-10-18T15-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t4-wip-inventory.2026-10-18T15-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t4-wip2-checkpoint.2026-10-18T16-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-pass1-coverage-audit.2026-10-18T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-wip2-historical-raw-coverage.2026-10-18T16-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-wip2-historical-test-bindings.2026-10-18T16-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-index-receipt.2026-10-18T16-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-lint.2026-10-18T15-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-tests.2026-10-18T15-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-baseline-types.2026-10-18T15-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-composed-diagnostic-corrected.2026-10-18T16-18.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-composed-integration.2026-10-18T16-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-correction-format.2026-10-18T15-44.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-final-preparation-format.2026-10-18T15-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-architecture.2026-10-18T15-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-contracts.2026-10-18T16-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-coverage-check.2026-10-18T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-format.2026-10-18T15-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-integration.2026-10-18T16-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-lint.2026-10-18T15-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-reverse.2026-10-18T16-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-tests.2026-10-18T16-08.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass1-types.2026-10-18T15-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation-format.2026-10-18T15-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation-import-fix.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation-lint.2026-10-18T15-41.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation2-format.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation2-lint.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation2-types.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation3-core-tests.2026-10-18T15-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation3-format.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation3-lint.2026-10-18T15-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation3-types.2026-10-18T15-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation4-format.2026-10-18T15-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation5-format.2026-10-18T15-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation5-import-fix.2026-10-18T15-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation5-lint.2026-10-18T15-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation6-core-tests.2026-10-18T15-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation6-format.2026-10-18T15-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation6-lint.2026-10-18T15-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation6-types.2026-10-18T15-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation7-format.2026-10-18T15-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation7-lint.2026-10-18T15-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation7-scenario-controls.2026-10-18T15-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-preparation7-types.2026-10-18T15-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-scenario-fixture-diagnosis.2026-10-18T15-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-wip-inventory-receipt.2026-10-18T15-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p3t4-wip2-inventory.2026-10-18T16-19.json"
+  ],
+  "pending": [
+    "Complete clean pass 2",
+    "Final index audit and handoff",
+    "Independent executor acceptance",
+    "Accepted-task commit before P3-T5"
+  ]
+}

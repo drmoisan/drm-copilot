@@ -273,6 +273,18 @@ def test_exact_grants_and_existing_id_collisions_fail_before_effects(
         {"trigger": None},
         {"extra": "unsupported"},
         {
+            "state_transitions": {
+                "behavior": {"observation_state": "unknown"},
+                "entries": None,
+            }
+        },
+        {
+            "state_transitions": {
+                "behavior": {"observation_state": "unknown"},
+                "entries": [None],
+            }
+        },
+        {
             "trigger": {
                 "observation_state": "unknown",
                 "statement": "Invented.",
