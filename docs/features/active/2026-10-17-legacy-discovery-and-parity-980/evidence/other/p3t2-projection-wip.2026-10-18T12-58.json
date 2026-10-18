@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-10-18T12:58:03.862020+00:00",
+  "task": "P3-T2",
+  "task_entry_commit": "a74cb240a7698c1454a8e6018ac23862cd91dab0",
+  "status": "WIP only; task unchecked and full gate pending",
+  "command": "poetry run python SCRATCH/issue-980-p3t2-wip-receipt.py",
+  "exit_code": 0,
+  "stageable": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "sha256": "1b72e902fc25e712527121c8c6131864fb8c699b57979dafb7571892baddf869",
+      "physical_lines": 263
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "sha256": "04d4519350221015ec201089abacf1a47dbf99bc73c6e64579cc57668c82c02b",
+      "physical_lines": 49
+    },
+    {
+      "path": "docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c2542a6ae5a5be2c13e11a7da452036a82135089c46f061ea0cff00b1502afd6",
+      "physical_lines": 34
+    },
+    {
+      "path": "docs/discovery/templates/v2/scope.yaml",
+      "sha256": "0ef9dd1d15721ac5874bfac0b4026bb39f6bffe6058914f6eef9e4e82cd363bd",
+      "physical_lines": 16
+    },
+    {
+      "path": "docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "physical_lines": 12
+    },
+    {
+      "path": "docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "physical_lines": 6
+    },
+    {
+      "path": "docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "physical_lines": 6
+    },
+    {
+      "path": "docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "physical_lines": 10
+    }
+  ],
+  "unstaged_incomplete": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "sha256": "6460f7b5df40c66b2292b90121cda331538ed1c59f0fd62508970e29d8d7473a",
+      "physical_lines": 244
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "00310e02d6dc33a3fee922507b22e6ff0d1bb0b524a56238857024c09f2e5459",
+      "physical_lines": 287
+    }
+  ],
+  "receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-baseline.2026-10-18T12-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-contract.2026-10-18T12-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-format-clean.2026-10-18T12-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-format.2026-10-18T12-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-lint-clean.2026-10-18T12-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-lint-initial.2026-10-18T12-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-types-clean.2026-10-18T12-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t2-projection-wip-types-initial.2026-10-18T12-56.md"
+  ],
+  "raw_baseline": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p3t2-initialization-coverage.2026-10-18T12-58.json",
+  "results": {
+    "baseline_tests": 27,
+    "baseline_flow_lines": "36/36",
+    "projection_checks": 38,
+    "templates": 6,
+    "resource_closure": 39,
+    "projection_lint_findings": 0,
+    "projection_type_diagnostics": 0
+  },
+  "limits": [
+    "No unit suite, callable coverage, complete graph commit, or installed/native runtime validation yet",
+    "Projection probe imports no init_flow/init_io draft; all imported dependencies besides init_projection are committed",
+    "Initial lint failure is retained; final bounded format/lint/type/projection checks passed",
+    "Inherited pytest addopts emitted a default ignored LCOV file; final task commands will override addopts and use canonical evidence outputs"
+  ]
+}
