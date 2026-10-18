@@ -226,7 +226,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test default/custom profile selection, multiple candidates, argument/locator disagreement, missing/deleted/malformed active configuration, inactive nonparticipants, root-only activate/deactivate, no authority path from inputs, platform registry locations, invalidated grants, and dry-run no writes.
   - Acceptance: Configuration deletion cannot disable an active gate; deliberate deactivation is a recorded root operation, while repositories without activation or a default profile remain unaffected.
 
-- [ ] [P3-T4] Create feature contracts and runtime scenarios with explicit unknowns.
+- [x] [P3-T4] Create feature contracts and runtime scenarios with explicit unknowns.
   - Files and behavior: Create R/{draft_contracts,draft_scenarios}.py and PT/test_{draft_contracts,draft_scenarios}.py; use the shared mutation planner to create selected artifacts plus required unresolved records.
   - Tests and proof: Test unique stable IDs, custom roots, missing feature links, unknown required dimensions, multi-feature scenario linkage, nullable unknown expectations, zero synthetic approval/evidence, collisions, and dry-run.
   - Acceptance: New artifacts are structurally truthful drafts; unknown behavior has linked unresolved records and cannot become verified or passed merely through creation.

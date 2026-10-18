@@ -1,0 +1,46 @@
+{
+  "pass2": {
+    "started_at_utc": "2026-10-18T16:23:31.802183+00:00",
+    "ended_at_utc": "2026-10-18T16:35:22.666782+00:00",
+    "elapsed_seconds": 710.8646067000082,
+    "pytest_exit": 0,
+    "source_hashes_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "tests/discovery_runtime/test_draft_contracts.py": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "tests/discovery_runtime/test_draft_scenarios.py": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+    },
+    "source_hashes_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "tests/discovery_runtime/test_draft_contracts.py": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "tests/discovery_runtime/test_draft_scenarios.py": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+    },
+    "source_stable": true,
+    "reverse": false
+  },
+  "reverse2": {
+    "started_at_utc": "2026-10-18T16:35:25.222840+00:00",
+    "ended_at_utc": "2026-10-18T16:40:29.542351+00:00",
+    "elapsed_seconds": 304.31950620000134,
+    "pytest_exit": 0,
+    "source_hashes_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "tests/discovery_runtime/test_draft_contracts.py": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "tests/discovery_runtime/test_draft_scenarios.py": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+    },
+    "source_hashes_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "tests/discovery_runtime/test_draft_contracts.py": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "tests/discovery_runtime/test_draft_scenarios.py": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236"
+    },
+    "source_stable": true,
+    "reverse": true
+  }
+}
