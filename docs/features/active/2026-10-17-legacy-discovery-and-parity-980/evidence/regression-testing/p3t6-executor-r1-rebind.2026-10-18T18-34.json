@@ -1,0 +1,104 @@
+{
+  "timestamp": "2026-10-18T18:33:56.315002+00:00",
+  "task": "P3-T6 prerequisite R1 only",
+  "acceptance_baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "checks": [
+    {
+      "name": "frozen_production_hashes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local_evidence_projection_before_export",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual_export_projection_valid",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local_evidence_projection_after_export",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary_lookup_keeps_local_identity",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "pinned_source_reference_uses_imported_bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "transport_reference_uses_imported_bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "manifest_links_retain_physical_imported_targets",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "changed_replica_bytes_still_block",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unbound_replica_still_blocks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary_same_byte_duplicate_still_blocks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical_local_and_imported_bytes_retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all_bound_bytes_unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "passed": 13,
+  "failed": 0,
+  "elapsed_seconds": 13.665,
+  "before_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/test_snapshot_import.py": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18"
+  },
+  "after_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+    "tests/discovery_runtime/test_snapshot_export.py": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+    "tests/discovery_runtime/test_snapshot_import.py": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18"
+  },
+  "limits": "No commit or full-task acceptance; local mutation projection and explicit reference contexts only. Differing replicas remain conflicts."
+}

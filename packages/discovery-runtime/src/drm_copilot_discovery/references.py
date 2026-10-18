@@ -229,18 +229,22 @@ class ReferenceIndex:
         their own physical member; source links use a deterministic proven copy.
         Different bytes, pins or unbound duplicates never enter this group.
         """
+        # Only manifest-proven physical aliases justify context-specific selection.
         copies = tuple(
             record
             for representative, record in self.replicas
             if representative == target.artifact.path
             and record.pointer == target.pointer
         )
-        if target.artifact.origin_path is not None:
-            copies = (*copies, target)
         if not copies:
             return (target,)
+        # An imported representative joins its proven aliases, not a synthetic group.
+        if target.artifact.origin_path is not None:
+            copies = (*copies, target)
+        # A manifest selects its own member; source-contract links select a proven copy.
         if transport and source.kind == "source-snapshot-manifest":
             path = source.artifact.path.rsplit("/", 1)[0] + "/" + target.path
+            # Other equivalent exports cannot satisfy this manifest's physical entry.
             return tuple(record for record in copies if record.artifact.path == path)
         return (min(copies, key=lambda record: record.artifact.path),)
 
@@ -367,12 +371,14 @@ def index_references(snapshot: DiscoverySnapshot) -> ReferenceIndex:
         collector.add(finding)
     # Flatten configured documents and permitted collection members exactly once.
     aliases = replica_aliases(snapshot)
+    # Canonical enumeration preserves logical uniqueness without dropping raw inputs.
     records = tuple(
         record
         for artifact in snapshot.artifacts
         if artifact.path not in aliases
         for record in _records(artifact, collector)
     )
+    # Retain each proven physical replica for path-keyed outgoing-link checks.
     replicas = tuple(
         (aliases[artifact.path], record)
         for artifact in snapshot.artifacts

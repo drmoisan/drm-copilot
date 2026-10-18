@@ -34,7 +34,11 @@ from tests.discovery_runtime.source_snapshot_test_support import (
     export_request,
     import_case,
     isolated_plan,
+    retained_fault,
     with_files,
+)
+from tests.discovery_runtime.source_snapshot_test_support import (
+    retained_target as retained_target,
 )
 from tests.discovery_runtime.source_snapshot_test_support import (
     source_capture as source_capture,
@@ -45,7 +49,6 @@ from tests.discovery_runtime.source_snapshot_test_support import (
 from tests.schemas.discovery.v2_schema_test_support import as_object
 
 if TYPE_CHECKING:
-
     from drm_copilot_discovery.agent_output import InvocationContext
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.mutation_io import MutationWriter
@@ -79,6 +82,7 @@ def test_import_rejects_changed_members_or_incomplete_grants_before_graph_work(
     changes = tuple(item.change for item in plan.writes)
     grants = plan.grants
     baseline = plan.baseline
+    # Vary one trust input at a time; every case must fail before graph projection.
     if fault == "grant":
         grants = grants[:-1]
     elif fault == "extra-grant":
@@ -89,16 +93,7 @@ def test_import_rejects_changed_members_or_incomplete_grants_before_graph_work(
         prior = SnapshotFile(
             path=changes[0].path, content=b"existing", category="artifact"
         )
-        baseline = replace(
-            baseline,
-            snapshot=replace(
-                baseline.snapshot,
-                manifest=replace(
-                    baseline.snapshot.manifest,
-                    files=baseline.snapshot.manifest.files + (prior,),
-                ),
-            ),
-        )
+        baseline = with_files(baseline, (*baseline.snapshot.manifest.files, prior))
         changes = (replace(changes[0], expected_sha256=prior.sha256), *changes[1:])
     with pytest.raises(
         ValueError, match="complete transport|checksum|cannot be replaced"
@@ -121,6 +116,7 @@ def test_commit_reconstructs_transport_and_dry_run_performs_no_publication(
         invocation: InvocationContext | None,
         transport: TransportRoute | None,
     ) -> MutationPlan:
+        """Check exact reconstruction inputs and return the fixed isolated plan."""
         assert baseline is plan.baseline and changes == tuple(
             item.change for item in plan.writes
         )
@@ -159,6 +155,7 @@ def test_guarded_writer_revalidates_route_and_exact_bytes_before_create(
     plan = isolated_plan(mutation_catalog)
     write = plan.writes[0]
     baseline = plan.baseline
+    # Separate forged routes, changed bytes and absence failures from successful create.
     if fault == "route":
         assert write.transport is not None
         write = replace(
@@ -171,16 +168,7 @@ def test_guarded_writer_revalidates_route_and_exact_bytes_before_create(
         prior = SnapshotFile(
             path=write.change.path, content=write.change.content, category="artifact"
         )
-        baseline = replace(
-            baseline,
-            snapshot=replace(
-                baseline.snapshot,
-                manifest=replace(
-                    baseline.snapshot.manifest,
-                    files=baseline.snapshot.manifest.files + (prior,),
-                ),
-            ),
-        )
+        baseline = with_files(baseline, (*baseline.snapshot.manifest.files, prior))
         write = replace(
             write, change=replace(write.change, expected_sha256=prior.sha256)
         )
@@ -189,6 +177,7 @@ def test_guarded_writer_revalidates_route_and_exact_bytes_before_create(
     def postcheck(
         expected: CapturedWorkspace, current: CapturedWorkspace, item: PlannedWrite
     ) -> None:
+        """Assert the captured identities and record the exact postchecked write."""
         assert expected is baseline and current is baseline
         postchecks.append(item)
 
@@ -219,6 +208,7 @@ def test_postcheck_keeps_transport_route_for_final_path_validation(
     def projected(
         baseline: CapturedWorkspace, changes: tuple[MutationChange, ...]
     ) -> object:
+        """Check projection forwarding and preserve the fixed immutable snapshot."""
         assert baseline is plan.baseline and changes == (write.change,)
         return baseline.snapshot
 
@@ -251,6 +241,7 @@ def test_import_verifies_new_local_bundle_without_changing_inputs_or_clients(
     assert proposal.route.document["manifest_sha256"] == transport_digest(
         proposal.route.document
     )
+    # Transport relocation must preserve each original member's captured bytes.
     for member, change in zip(proposal.route.members, proposal.changes, strict=True):
         if member.origin is not None:
             assert (
@@ -274,6 +265,7 @@ def test_import_rejects_foreign_changed_incomplete_or_escaping_transport(
     """Captured staging data must match one complete immutable configured source."""
     baseline, request = target_capture
     files = baseline.snapshot.manifest.files
+    # Identity/path faults alter selection; other faults alter only captured staging.
     if fault in {"identity", "pin"}:
         source = replace(
             request.source,
@@ -291,6 +283,7 @@ def test_import_rejects_foreign_changed_incomplete_or_escaping_transport(
             ),
         )
     else:
+        # Select header or payload so each fault exercises its intended precondition.
         chosen = next(
             item
             for item in files
@@ -304,6 +297,7 @@ def test_import_rejects_foreign_changed_incomplete_or_escaping_transport(
                 "3.0.0" if fault == "version" else "0" * 64
             )
             content = json.dumps(document).encode()
+        # Preserve every unrelated input while replacing or removing the selected file.
         files = tuple(
             replace(item, content=content) if item == chosen else item
             for item in files
@@ -324,6 +318,7 @@ def test_import_respects_custom_root_without_renaming_source_paths(
     _, baseline, request = import_case(mutation_catalog, exported, custom=True)
     proposal = prepare_snapshot_import(baseline, request)
     assert all(item.path.startswith("docs/transport/") for item in proposal.changes)
+    # Relocation changes only physical destinations, never declared source origins.
     assert [item.origin for item in proposal.route.members] == [
         item.origin for item in exported.route.members
     ]
@@ -356,6 +351,7 @@ def test_public_planner_forwards_exact_proposal_grants_and_invocation(
     def plan(
         actual: CapturedWorkspace, changes: object, **options: object
     ) -> MutationPlan:
+        """Record exact shared-planner arguments and return its unchanged sentinel."""
         calls.append((actual, changes, options))
         return expected
 
@@ -413,10 +409,12 @@ def test_public_commit_forwards_dry_run_and_preserves_partial_result(
     committed: list[object] = []
 
     def prepare(actual: object, selected: object, **options: object) -> MutationPlan:
+        """Record the selected request and external planning context without I/O."""
         planned.append((actual, selected, options))
         return plan
 
     def commit(actual: object, **options: object) -> MutationResult:
+        """Return the fixed writer outcome after recording exact commit options."""
         committed.append((actual, options))
         return result
 
@@ -447,3 +445,45 @@ def test_public_commit_forwards_dry_run_and_preserves_partial_result(
         (baseline, selected, dict(grants=plan.grants, invocation=context))
     ]
     assert committed == [(plan, dict(writer=writer, dry_run=dry_run))]
+
+
+@pytest.mark.parametrize("fault", [None, "duplicate", "configured", "pin"])
+def test_existing_import_preserves_attribution_or_rejects_conflicting_identity(
+    retained_target: tuple[CapturedWorkspace, SnapshotImport],
+    fault: str | None,
+) -> None:
+    """Keep original verification bytes and reject conflicting persisted identities."""
+    baseline, request = retained_target
+    if fault:
+        with pytest.raises(MutationError, match="SNAPSHOT_CONFLICT"):
+            prepare_snapshot_import(retained_fault(baseline, fault), request)
+    else:
+        later = replace(request, verified_at="2026-02-01T00:00:00Z")
+        proposal = prepare_snapshot_import(baseline, later)
+        # A repeat binds every existing byte rather than authorizing its replacement.
+        assert all(
+            item.expected_sha256 == baseline.snapshot.file(item.path).sha256
+            for item in proposal.changes
+        )
+        assert (
+            proposal.route.manifest.content
+            == baseline.snapshot.file(proposal.route.manifest.path).content
+        )
+        assert (
+            as_object(to_plain_value(proposal.route.document["transport"]))[
+                "verified_at"
+            ]
+            == request.verified_at
+        )
+
+
+def test_source_and_target_roles_cannot_exchange_their_transport_operations(
+    source_capture: CapturedWorkspace,
+    target_capture: tuple[CapturedWorkspace, SnapshotImport],
+) -> None:
+    """Configured source/target roles constrain operations before reading a bundle."""
+    target, request = target_capture
+    with pytest.raises(MutationError, match="SNAPSHOT_ROLE"):
+        prepare_snapshot_import(source_capture, request)
+    with pytest.raises(MutationError, match="SNAPSHOT_ROLE"):
+        source_snapshots.prepare_snapshot_export(target, export_request())

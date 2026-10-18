@@ -57,6 +57,7 @@ def test_manifest_binds_exact_bytes_and_excludes_only_importer_verification(
 ) -> None:
     """Authored success flags cannot replace raw digest/member validation."""
     route = unit_transport(mutation_catalog)
+    # Build the complete inert byte set so membership checks exercise no graph loader.
     route.check_files(
         tuple(
             SnapshotFile(
@@ -139,6 +140,7 @@ def test_manifest_member_conflicts_and_bounds_are_rejected(
     route = unit_transport(mutation_catalog)
     document = as_object(json.loads(route.manifest.content))
     rows = cast("list[dict[str, object]]", document["artifacts"])
+    # Each branch violates one independent envelope invariant before rebinding.
     if fault == "counts":
         as_object(document["transport"])["payload_count"] = 1
     elif fault == "duplicate-id":
@@ -204,6 +206,7 @@ def test_real_planner_accepts_exact_export_replicas_and_publishes_header_last(
     assert len(plan.prospective.artifacts) == len(baseline.snapshot.artifacts) * 2 + 1
     index = index_references(plan.prospective)
     assert not index.findings
+    # Export cannot alter any captured source file while adding its immutable replica.
     assert all(
         plan.prospective.file(item.path).content == item.content
         for item in baseline.snapshot.manifest.files
@@ -234,6 +237,7 @@ def test_real_planner_accepts_exact_export_replicas_and_publishes_header_last(
     assert context.targets(local, "")
     assert context.targets(resolved.target, "") == context.targets(local, "")
     assert resolved.target not in index.records
+    # Every manifest link must select that manifest's physical imported member.
     for link in index.links:
         if link.source.kind == "source-snapshot-manifest":
             assert link.target is not None and link.target.artifact.origin_path
@@ -253,11 +257,14 @@ def test_unbound_or_conflicting_copies_keep_duplicate_errors(
 ) -> None:
     """Only actual manifest-provenance-bound raw replicas can share lookup identity."""
     store, baseline, route, changes = transport_case(mutation_catalog)
+    # Capture the real complete export before corrupting one provenance constraint.
     for item in changes:
         store.put(item.path, item.content)
     snapshot = capture(store, mutation_catalog).snapshot
     imported = next(item for item in snapshot.artifacts if item.origin_path)
+    # Matching IDs never compensate for missing provenance, changed pin or byte drift.
     if fault == "unbound":
+        # Remove only provenance; the physical imported files remain present.
         snapshot = replace(
             snapshot,
             artifacts=tuple(
@@ -265,6 +272,7 @@ def test_unbound_or_conflicting_copies_keep_duplicate_errors(
             ),
         )
     elif fault == "changed-pin":
+        # Alter one captured repository pin while keeping identical content and IDs.
         snapshot = replace(
             snapshot,
             artifacts=tuple(
@@ -279,6 +287,7 @@ def test_unbound_or_conflicting_copies_keep_duplicate_errors(
             ),
         )
     elif fault == "changed-origin":
+        # Origin equality is required independently of content or repository identity.
         snapshot = replace(
             snapshot,
             artifacts=tuple(
@@ -288,6 +297,7 @@ def test_unbound_or_conflicting_copies_keep_duplicate_errors(
         )
     else:
         path = imported.path if fault == "changed-bytes" else route.manifest.path
+        # Mutate one physical input without hiding it from complete snapshot capture.
         snapshot = replace(
             snapshot,
             manifest=replace(
@@ -305,6 +315,7 @@ def test_unbound_or_conflicting_copies_keep_duplicate_errors(
         if fault == "changed-header":
             document = as_object(json.loads(snapshot.file(path).content))
             document["manifest_sha256"] = "0" * 64
+            # Preserve a parseable header whose canonical digest no longer agrees.
             snapshot = replace(
                 snapshot,
                 manifest=replace(
@@ -379,6 +390,7 @@ def test_export_projection_is_deterministic_complete_and_read_only(
         as_object(json.loads(first.route.manifest.content))["transport"]
     )
     assert transport["verification_status"] == "pending"
+    # Relocated artifacts retain raw bytes, including unknown observation state.
     for member, change in zip(first.route.members, first.changes, strict=True):
         if member.origin is not None:
             assert change.content == source_capture.snapshot.file(member.origin).content
@@ -455,6 +467,7 @@ def test_export_repeat_binds_original_hash_and_conflicting_bytes_are_not_replace
 ) -> None:
     """Repeated projection skips identical immutable files and rejects replacements."""
     proposal = prepare_snapshot_export(source_capture, export_request())
+    # Model persisted immutable bytes without invoking actual publication in this unit.
     files = tuple(
         SnapshotFile(path=item.path, content=item.content, category="source-snapshot")
         for item in proposal.changes
@@ -463,6 +476,7 @@ def test_export_repeat_binds_original_hash_and_conflicting_bytes_are_not_replace
         source_capture, (*source_capture.snapshot.manifest.files, *files)
     )
     repeated = prepare_snapshot_export(baseline, export_request())
+    # Every skipped destination must retain its original-byte CAS precondition.
     assert all(
         item.expected_sha256 == sha256(item.content).hexdigest()
         for item in repeated.changes

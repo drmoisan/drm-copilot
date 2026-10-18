@@ -1,0 +1,127 @@
+{
+  "written_at_utc": "2026-10-18T18:50:57.075210+00:00",
+  "task": "P3-T6",
+  "status": "CHECKED_WIP_NOT_ACCEPTED",
+  "baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "head": "8f446b674dce58e7158e2019e6b90bc2b677a44c",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "physical_lines": 483,
+      "documented_units": 12
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426,
+      "documented_units": 19
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "physical_lines": 437,
+      "documented_units": 21
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "physical_lines": 436,
+      "documented_units": 14
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "physical_lines": 290,
+      "documented_units": 9
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "physical_lines": 476,
+      "documented_units": 13
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_export.py",
+      "sha256": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+      "physical_lines": 489,
+      "documented_units": 13
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_import.py",
+      "sha256": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+      "physical_lines": 489,
+      "documented_units": 18
+    },
+    {
+      "path": "tests/discovery_runtime/source_snapshot_test_support.py",
+      "sha256": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+      "physical_lines": 460,
+      "documented_units": 18
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "physical_lines": 75,
+      "documented_units": 1
+    }
+  ],
+  "previous_nine_paths_byte_identical_to_pass2": true,
+  "production_changed_for_coverage": false,
+  "added_cases": 4,
+  "future_full_population": 434,
+  "prior_unchanged": 251,
+  "frozen_unchanged": 24,
+  "pass2_result": {
+    "passed": 430,
+    "failed": 0,
+    "seconds": 784.0,
+    "coverage_gate": "failed references.py baseline percentages; reverse/contracts/integration not run"
+  },
+  "narrow_result": {
+    "passed": 4,
+    "failed": 0,
+    "seconds": 0.22,
+    "measured_missing_line": 243,
+    "measured_missing_arc": [
+      242,
+      243
+    ]
+  },
+  "diagnostic_same_source_union": {
+    "covered_lines": 169,
+    "lines": 171,
+    "line_percent": 98.83040935672514,
+    "covered_branches": 82,
+    "branches": 84,
+    "branch_percent": 97.61904761904762,
+    "qualification": "Measured union proves preparation gap closure only; it is not the required new single-pass final gate."
+  },
+  "references_baseline": {
+    "covered_lines": 152,
+    "lines": 154,
+    "covered_branches": 74,
+    "branches": 76
+  },
+  "prior_full_raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-correction-wip-pass2-raw-coverage.2026-10-18T18-50.json",
+  "narrow_raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-correction-wip-narrow-coverage.2026-10-18T18-50.json",
+  "prior_test_binding": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-correction-wip-pass2-binding.2026-10-18T18-50.json",
+  "prior_sequence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-correction-wip-pass2-sequence.2026-10-18T18-50.json",
+  "completed_checks": [
+    "Black 10 paths",
+    "Ruff 10 paths",
+    "full Pyright 0 errors/warnings",
+    "4 pure replica-selection tests",
+    "line 243 and arc 242->243 measured",
+    "all 10 file-size/docstring/loop/suppression checks",
+    "251 prior and 24 frozen preservation"
+  ],
+  "pending": [
+    "Clean seven-stage sequence from formatting after WIP commit",
+    "434-case forward coverage and reversed isolation",
+    "contracts",
+    "already-prevalidated 11-check composed harness",
+    "final index audit and independent executor acceptance"
+  ],
+  "source_freeze": true
+}

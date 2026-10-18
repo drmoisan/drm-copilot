@@ -11,19 +11,21 @@ from typing import TYPE_CHECKING, cast
 import pytest
 from drm_copilot_discovery.evidence_linking import evidence_changes
 from drm_copilot_discovery.findings import Finding
-from drm_copilot_discovery.models import ParseLimits, canonical_json
+from drm_copilot_discovery.models import ParseLimits, canonical_json, to_plain_value
 from drm_copilot_discovery.mutation_plan import (
     MutationChange,
     MutationPlan,
     PlannedWrite,
 )
 from drm_copilot_discovery.path_policy import PathPolicy
+from drm_copilot_discovery.profile_v2 import parse_profile_v2
 from drm_copilot_discovery.repository_reader import RepositoryFile, RepositoryIdentity
 from drm_copilot_discovery.snapshot import SnapshotFile
 from drm_copilot_discovery.source_snapshots import (
     SnapshotExport,
     SnapshotImport,
     prepare_snapshot_export,
+    prepare_snapshot_import,
 )
 from drm_copilot_discovery.transport_manifest import bind_transport, transport_digest
 from drm_copilot_discovery.validation import SnapshotValidation
@@ -65,6 +67,7 @@ def transport_case(
     )
     parent = path.rsplit("/", 1)[0]
     document = load_fixture("source-snapshot-manifest")
+    # Derive each declaration from the exact immutable captured source artifact.
     document.update(
         id="export-alpha",
         source_repository={
@@ -92,12 +95,14 @@ def transport_case(
     route = bind_transport(
         path, canonical_json(immutable(document)), catalog=catalog, limits=ParseLimits()
     )
+    # Retain source bytes under the transport prefix, excluding the profile itself.
     contents = {
         parent + "/" + item.path: item.content
         for item in baseline.snapshot.manifest.files
         if item.path != PROFILE_PATH
     }
     contents[path] = route.manifest.content
+    # Mirror the bound route exactly; the shared planner validates this proposal.
     changes = tuple(
         MutationChange(
             artifact_kind=member.grant.artifact_kind,
@@ -114,6 +119,7 @@ def transport_case(
 def unit_transport(catalog: SchemaCatalog) -> TransportRoute:
     """Bind small inert byte declarations for isolated envelope validation cases."""
     document = load_fixture("source-snapshot-manifest")
+    # Two different kinds expose duplicate/path faults without loading a full graph.
     document["artifacts"] = [
         dict(
             artifact_kind=kind,
@@ -170,11 +176,13 @@ def evidence_capture(baseline: CapturedWorkspace, kind: str) -> CapturedWorkspac
     """Attach fresh evidence and exact pinned objects for pure export-unit cases."""
     request = replace(request_for(baseline, kind=kind), artifact_id="alpha")
     result = baseline
+    # Reuse accepted evidence projection while retaining fresh immutable records.
     for change in evidence_changes(baseline, request):
         if change.artifact_kind != "evidence-payload":
             result = add_record(
                 result, as_object(json.loads(change.content)), path=change.path
             )
+    # Preserve exact local payload bytes independently from evidence documents.
     files = tuple(
         SnapshotFile(path=item.path, content=item.content, category="evidence")
         for item in request.payloads
@@ -182,6 +190,7 @@ def evidence_capture(baseline: CapturedWorkspace, kind: str) -> CapturedWorkspac
     identity = RepositoryIdentity(
         id=baseline.snapshot.profile.repository.id, revision="a" * 40
     )
+    # Source/test assertions require pinned objects, not substituted working-tree bytes.
     objects = tuple(
         RepositoryFile(repository=identity, path=item.path, content=item.content)
         for item in files
@@ -219,6 +228,7 @@ def import_case(
             clients=[],
         )
     ]
+    # Both clients share the same target repository without changing their identities.
     for client in cast("list[dict[str, object]]", document["clients"]):
         client["target_repository"] = "target"
     if custom:
@@ -226,6 +236,7 @@ def import_case(
     store = MemoryStore()
     store.put(PROFILE_PATH, json.dumps(document).encode())
     origin = proposal.route.manifest.path.rsplit("/", 1)[0]
+    # Stage the complete bundle in readable documentation outside artifact discovery.
     for change in proposal.changes:
         store.put("docs/incoming/source" + change.path[len(origin) :], change.content)
     baseline = capture(store, catalog)
@@ -270,6 +281,7 @@ def export_fault(
     feature = next(
         item for item in artifacts if item.expected_kind == "feature-contract"
     )
+    # Selection faults preserve the graph; other faults alter its captured provenance.
     if fault in {"empty", "duplicate", "missing"}:
         selected = (
             ()
@@ -297,6 +309,7 @@ def export_fault(
             ),
         )
     else:
+        # Keep unrelated artifacts unless the case intentionally removes dependencies.
         selected_artifacts = tuple(
             (
                 replace(item, origin_path="original.json")
@@ -316,17 +329,21 @@ class RecordingPrimitives:
     """Record one isolated publication request without graph loading or native I/O."""
 
     def __init__(self) -> None:
+        """Create a private empty publication log for one test instance."""
         self.calls: list[tuple[ResolvedPath, bytes]] = []
 
     def guard(self) -> AbstractContextManager[None]:
+        """Provide a no-I/O guard seam for isolated guarded-writer tests."""
         return nullcontext()
 
     def create_exclusive(self, target: ResolvedPath, content: bytes) -> None:
+        """Record exact target and bytes without publishing to a filesystem."""
         self.calls.append((target, content))
 
     def replace_if_digest(
         self, target: ResolvedPath, content: bytes, *, expected_sha256: str
     ) -> None:
+        """Fail explicitly if immutable transport attempts a replacement."""
         raise AssertionError("An immutable transport must never request replacement")
 
 
@@ -334,6 +351,7 @@ def isolated_plan(catalog: SchemaCatalog) -> MutationPlan:
     """Build internal values for forwarding tests; never claim graph validation."""
     _, baseline = mutation_case(catalog)
     route = unit_transport(catalog)
+    # Construct inert complete inputs solely for forwarding and guard assertions.
     changes = tuple(
         MutationChange(
             artifact_kind=item.grant.artifact_kind,
@@ -350,6 +368,7 @@ def isolated_plan(catalog: SchemaCatalog) -> MutationPlan:
         metadata=baseline.inspect,
         transport=route,
     )
+    # Preserve one exact grant/route per write without claiming a real graph result.
     return MutationPlan(
         baseline=baseline,
         writes=tuple(
@@ -369,5 +388,73 @@ def isolated_plan(catalog: SchemaCatalog) -> MutationPlan:
             findings=(),
             input_sha256=baseline.snapshot.sha256,
             validation_result="pass",
+        ),
+    )
+
+
+@pytest.fixture(scope="module")
+def retained_target(
+    target_capture: tuple[CapturedWorkspace, SnapshotImport],
+    mutation_catalog: SchemaCatalog,
+) -> tuple[CapturedWorkspace, SnapshotImport]:
+    """Capture immutable already-published bytes for isolated repeat/conflict units."""
+    baseline, request = target_capture
+    proposal = prepare_snapshot_import(baseline, request)
+    store = MemoryStore()
+    # Rebuild a fresh memory namespace rather than sharing fixture mutation state.
+    for file in baseline.snapshot.manifest.files:
+        store.put(file.path, file.content)
+    # Populate already-published bytes; actual publication is proved in integration.
+    for change in proposal.changes:
+        store.put(change.path, change.content)
+    return capture(store, mutation_catalog), request
+
+
+def retained_fault(baseline: CapturedWorkspace, fault: str) -> CapturedWorkspace:
+    """Construct distinct conflicting persisted identities without shared mutation."""
+    snapshot = baseline.snapshot
+    header = next(
+        item
+        for item in snapshot.artifacts
+        if item.expected_kind == "source-snapshot-manifest"
+    )
+    # Each fixture changes exactly one persisted identity constraint.
+    if fault == "duplicate":
+        file = replace(
+            snapshot.file(header.path),
+            path=header.path.replace("manifest.json", "duplicate/manifest.json"),
+        )
+        result = with_files(baseline, (*snapshot.manifest.files, file))
+        return replace(
+            result,
+            snapshot=replace(
+                result.snapshot,
+                artifacts=(*snapshot.artifacts, replace(header, path=file.path)),
+            ),
+        )
+    if fault == "configured":
+        document = as_object(to_plain_value(snapshot.profile.document))
+        as_object(cast("list[object]", document["repositories"])[0])[
+            "snapshot_manifest"
+        ] = (
+            snapshot.profile.artifacts["source_snapshots"] + "/elsewhere/manifest.json"
+        )
+        profile = parse_profile_v2(
+            json.dumps(document), format="json", catalog=snapshot.catalog
+        )
+        return replace(baseline, snapshot=replace(snapshot, profile=profile))
+    document = as_object(json.loads(snapshot.file(header.path).content))
+    as_object(document["source_repository"])["revision"] = "c" * 40
+    document["manifest_sha256"] = transport_digest(immutable(document))
+    # Replace only the manifest bytes; preserve every other captured physical input.
+    return with_files(
+        baseline,
+        tuple(
+            (
+                replace(item, content=canonical_json(immutable(document)))
+                if item.path == header.path
+                else item
+            )
+            for item in snapshot.manifest.files
         ),
     )
