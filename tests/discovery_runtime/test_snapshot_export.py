@@ -13,7 +13,6 @@ from drm_copilot_discovery.evidence_linking import evidence_changes
 from drm_copilot_discovery.evidence_rules import EvidenceValidation
 from drm_copilot_discovery.models import ParseLimits, canonical_json
 from drm_copilot_discovery.mutation_plan import (
-    MutationChange,
     MutationError,
     plan_mutation,
 )
@@ -21,128 +20,36 @@ from drm_copilot_discovery.path_models import PathPolicyError
 from drm_copilot_discovery.path_policy import PathPolicy
 from drm_copilot_discovery.references import index_references
 from drm_copilot_discovery.snapshot import SnapshotFile
+from drm_copilot_discovery.source_snapshots import prepare_snapshot_export
 from drm_copilot_discovery.transport_manifest import (
     bind_transport,
     replica_aliases,
     transport_digest,
 )
 
-from tests.discovery_runtime.draft_test_support import add_feature, draft_case
 from tests.discovery_runtime.evidence_test_support import request_for
 from tests.discovery_runtime.mutation_test_support import capture, grants_for
 from tests.discovery_runtime.mutation_test_support import (
     mutation_catalog as mutation_catalog,
 )
+from tests.discovery_runtime.source_snapshot_test_support import (
+    changed_header,
+    evidence_capture,
+    export_fault,
+    export_request,
+    transport_case,
+    unit_transport,
+    with_files,
+)
+from tests.discovery_runtime.source_snapshot_test_support import (
+    source_capture as source_capture,
+)
 from tests.discovery_runtime.test_references import immutable
-from tests.discovery_runtime.test_snapshot_io import PROFILE_PATH
-from tests.schemas.discovery.v2_schema_test_support import as_object, load_fixture
+from tests.schemas.discovery.v2_schema_test_support import as_object
 
 if TYPE_CHECKING:
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace
-    from drm_copilot_discovery.transport_manifest import TransportRoute
-
-    from tests.discovery_runtime.test_snapshot_io import MemoryStore
-
-
-def transport_case(
-    catalog: SchemaCatalog,
-) -> tuple[MemoryStore, CapturedWorkspace, TransportRoute, tuple[MutationChange, ...]]:
-    """Create a fresh truthful feature/question graph and exact export envelope."""
-    store, baseline = draft_case(catalog)
-    profile = as_object(json.loads(store.files[PROFILE_PATH]))
-    as_object(profile["repository"])["revision"] = "a" * 40
-    store.put(PROFILE_PATH, json.dumps(profile).encode())
-    baseline = add_feature(store, catalog, "alpha")
-    path = (
-        baseline.snapshot.profile.artifacts["source_snapshots"]
-        + "/export-alpha/manifest.json"
-    )
-    parent = path.rsplit("/", 1)[0]
-    document = load_fixture("source-snapshot-manifest")
-    document.update(
-        id="export-alpha",
-        source_repository={
-            "id": baseline.snapshot.profile.repository.id,
-            "revision": "a" * 40,
-        },
-        artifacts=[
-            dict(
-                artifact_kind=item.expected_kind,
-                id=str(item.document["id"]),
-                schema_version="2.0.0",
-                path=item.path,
-                sha256=baseline.snapshot.file(item.path).sha256,
-                size=len(baseline.snapshot.file(item.path).content),
-            )
-            for item in baseline.snapshot.artifacts
-            if item.document is not None
-        ],
-        payloads=[],
-    )
-    as_object(document["transport"]).update(
-        artifact_count=len(baseline.snapshot.artifacts), payload_count=0
-    )
-    document["manifest_sha256"] = transport_digest(immutable(document))
-    route = bind_transport(
-        path, canonical_json(immutable(document)), catalog=catalog, limits=ParseLimits()
-    )
-    contents = {
-        parent + "/" + item.path: item.content
-        for item in baseline.snapshot.manifest.files
-        if item.path != PROFILE_PATH
-    }
-    contents[path] = route.manifest.content
-    changes = tuple(
-        MutationChange(
-            artifact_kind=member.grant.artifact_kind,
-            artifact_id=member.grant.artifact_id,
-            path=member.grant.path,
-            content=contents[member.grant.path],
-            expected_sha256=None,
-        )
-        for member in route.members
-    )
-    return store, baseline, route, changes
-
-
-def unit_transport(catalog: SchemaCatalog) -> TransportRoute:
-    """Bind small inert byte declarations for isolated envelope validation cases."""
-    document = load_fixture("source-snapshot-manifest")
-    document["artifacts"] = [
-        dict(
-            artifact_kind=kind,
-            id=identifier,
-            schema_version="2.0.0",
-            path=path,
-            sha256=sha256(b"{}").hexdigest(),
-            size=2,
-        )
-        for kind, identifier, path in (
-            ("feature-contract", "alpha", "contracts/alpha.json"),
-            ("unspecified-behavior-collection", "questions", "questions.json"),
-        )
-    ]
-    document["payloads"] = []
-    as_object(document["transport"]).update(artifact_count=2, payload_count=0)
-    document["manifest_sha256"] = transport_digest(immutable(document))
-    return bind_transport(
-        "docs/migration/discovery/source-snapshots/export-alpha/manifest.json",
-        canonical_json(immutable(document)),
-        catalog=catalog,
-        limits=ParseLimits(),
-    )
-
-
-def changed_header(
-    route: TransportRoute, updates: dict[str, object], *, digest: bool = True
-) -> bytes:
-    """Produce independent hostile envelopes without mutating the original route."""
-    document = as_object(json.loads(route.manifest.content))
-    document.update(updates)
-    if digest:
-        document["manifest_sha256"] = transport_digest(immutable(document))
-    return canonical_json(immutable(document))
 
 
 def test_manifest_binds_exact_bytes_and_excludes_only_importer_verification(
@@ -453,3 +360,116 @@ def test_transport_rejects_incomplete_or_forged_bindings(
         route.check(route.members[0].grant, b"substituted")
     with pytest.raises(ValueError, match="complete declared"):
         route.check_files((route.manifest,))
+
+
+def test_export_projection_is_deterministic_complete_and_read_only(
+    source_capture: CapturedWorkspace,
+) -> None:
+    """Selected contracts keep unknown claims and bring their linked questions."""
+    original = source_capture.snapshot.sha256
+    first = prepare_snapshot_export(source_capture, export_request())
+    assert first == prepare_snapshot_export(source_capture, export_request())
+    assert len(first.changes) == 3
+    assert first.route.source.revision == "a" * 40
+    assert first.route.manifest.path.endswith("/release-alpha/manifest.json")
+    assert first.route.document["manifest_sha256"] == transport_digest(
+        first.route.document
+    )
+    transport = as_object(
+        as_object(json.loads(first.route.manifest.content))["transport"]
+    )
+    assert transport["verification_status"] == "pending"
+    for member, change in zip(first.route.members, first.changes, strict=True):
+        if member.origin is not None:
+            assert change.content == source_capture.snapshot.file(member.origin).content
+    assert source_capture.snapshot.sha256 == original
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "source",
+        "test",
+        "runtime",
+        "observation",
+        "documentation",
+        "decision",
+        "inventory",
+    ],
+)
+def test_export_retains_verified_evidence_and_exact_payload_bytes(
+    source_capture: CapturedWorkspace,
+    kind: str,
+) -> None:
+    """A transported checksum binds the same bytes as accepted local evidence."""
+    baseline = evidence_capture(source_capture, kind)
+    proposal = prepare_snapshot_export(baseline, export_request())
+    payloads = cast("tuple[object, ...]", proposal.route.document["payloads"])
+    assert len(payloads) == 1
+    proof = next(
+        item for item in proposal.changes if item.artifact_kind == "evidence-reference"
+    )
+    payload = next(
+        item for item in proposal.changes if item.artifact_kind == "evidence-payload"
+    )
+    record = as_object(json.loads(proof.content))
+    assert as_object(record["checksum"])["value"] == sha256(payload.content).hexdigest()
+    assert record["revision"] == ("a" * 40 if kind in {"source", "test"} else None)
+    assert len(proposal.changes) == 5
+
+
+@pytest.mark.parametrize(
+    "fault", ["empty", "duplicate", "missing", "imported", "unresolved", "malformed"]
+)
+def test_export_rejects_invalid_selection_or_incomplete_source_closure(
+    source_capture: CapturedWorkspace,
+    fault: str,
+) -> None:
+    """Export cannot hide an absent, malformed, foreign or unresolved dependency."""
+    baseline, request = export_fault(source_capture, fault)
+    with pytest.raises(MutationError):
+        prepare_snapshot_export(baseline, request)
+
+
+@pytest.mark.parametrize("fault", ["checksum", "missing-object"])
+def test_export_never_substitutes_unverified_or_working_tree_source_bytes(
+    source_capture: CapturedWorkspace,
+    fault: str,
+) -> None:
+    """Checksum failures and unavailable immutable objects cannot enter a bundle."""
+    baseline = evidence_capture(source_capture, "source")
+    objects = baseline.snapshot.repository_files
+    if fault == "checksum":
+        objects = tuple(replace(item, content=b"different") for item in objects)
+    else:
+        objects = ()
+    baseline = replace(
+        baseline, snapshot=replace(baseline.snapshot, repository_files=objects)
+    )
+    with pytest.raises(MutationError, match="locally verified"):
+        prepare_snapshot_export(baseline, export_request())
+
+
+def test_export_repeat_binds_original_hash_and_conflicting_bytes_are_not_replaced(
+    source_capture: CapturedWorkspace,
+) -> None:
+    """Repeated projection skips identical immutable files and rejects replacements."""
+    proposal = prepare_snapshot_export(source_capture, export_request())
+    files = tuple(
+        SnapshotFile(path=item.path, content=item.content, category="source-snapshot")
+        for item in proposal.changes
+    )
+    baseline = with_files(
+        source_capture, (*source_capture.snapshot.manifest.files, *files)
+    )
+    repeated = prepare_snapshot_export(baseline, export_request())
+    assert all(
+        item.expected_sha256 == sha256(item.content).hexdigest()
+        for item in repeated.changes
+    )
+    changed = replace(files[0], content=b"changed")
+    baseline = with_files(
+        baseline, (*source_capture.snapshot.manifest.files, changed, *files[1:])
+    )
+    with pytest.raises(MutationError, match="destination bytes"):
+        prepare_snapshot_export(baseline, export_request())

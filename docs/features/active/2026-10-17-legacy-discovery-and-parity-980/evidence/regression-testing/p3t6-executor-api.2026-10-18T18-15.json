@@ -1,0 +1,343 @@
+{
+  "timestamp": "2026-10-18T18:15:13.217589+00:00",
+  "task": "P3-T6 API review",
+  "acceptance_baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "checks": [
+    {
+      "name": "frozen_api_source",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "deterministic_export",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "closure_contains_contract_and_unresolved_collection",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_preserves_all_authored_bytes_and_states",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_header_last_and_complete_counts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_identity_and_digest_bound",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_rejects_empty",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SELECTION: Select distinct nonempty artifacts"
+      }
+    },
+    {
+      "name": "export_rejects_duplicate",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SELECTION: Select distinct nonempty artifacts"
+      }
+    },
+    {
+      "name": "export_rejects_missing",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SELECTION: Select one captured source artifact"
+      }
+    },
+    {
+      "name": "export_rejects_imported",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SOURCE: Export only this repository's local artifacts"
+      }
+    },
+    {
+      "name": "export_rejects_unresolved",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_REFERENCE: Source dependency is unresolved"
+      }
+    },
+    {
+      "name": "export_rejects_malformed",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_INPUT: Selected source artifact is malformed"
+      }
+    },
+    {
+      "name": "export_rejects_path_escape_id",
+      "passed": true,
+      "detail": {
+        "type": "PathPolicyError",
+        "message": "PATH_SYNTAX: 'docs/migration/discovery/source-snapshots/../escape/manifest.json': Use a nonempty workspace-relative POSIX path."
+      }
+    },
+    {
+      "name": "export_rejects_invalid_attribution",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport manifest is malformed or uses an unsupported schema"
+      }
+    },
+    {
+      "name": "export_requires_immutable_pin",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "A full lowercase Git revision is required"
+      }
+    },
+    {
+      "name": "export_repeat_binds_identical_original_sha",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "export_never_replaces_changed_destination",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_CONFLICT: Immutable destination bytes already differ"
+      }
+    },
+    {
+      "name": "pinned_source_payload_bytes_retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "missing_immutable_object_cannot_fall_back_to_worktree",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_EVIDENCE: Export requires locally verified evidence"
+      }
+    },
+    {
+      "name": "changed_immutable_object_fails_checksum",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_EVIDENCE: Export requires locally verified evidence"
+      }
+    },
+    {
+      "name": "both_runtime_capture_locations_exported",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "missing_secondary_runtime_bytes_rejected",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_EVIDENCE: Export requires locally verified evidence"
+      }
+    },
+    {
+      "name": "import_uses_custom_root",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "import_preserves_two_target_clients",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "importer_attribution_is_explicit_and_digest_stable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "import_preserves_original_member_bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "target_cannot_export",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_ROLE: Only a configured source role can export"
+      }
+    },
+    {
+      "name": "source_only_cannot_import",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_ROLE: Only a target role can import"
+      }
+    },
+    {
+      "name": "import_rejects_foreign_id",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SOURCE: Transport does not match a configured immutable source"
+      }
+    },
+    {
+      "name": "import_rejects_foreign_revision",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_SOURCE: Transport does not match a configured immutable source"
+      }
+    },
+    {
+      "name": "import_path_cannot_escape",
+      "passed": true,
+      "detail": {
+        "type": "PathPolicyError",
+        "message": "PATH_SYNTAX: '../manifest.json': Use a nonempty workspace-relative POSIX path."
+      }
+    },
+    {
+      "name": "import_rejects_changed_schema_version",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport manifest is malformed or uses an unsupported schema"
+      }
+    },
+    {
+      "name": "import_rejects_changed_manifest_sha256",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport manifest checksum differs"
+      }
+    },
+    {
+      "name": "import_rejects_changed_member",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport member identity, size or checksum differs"
+      }
+    },
+    {
+      "name": "import_rejects_missing_member",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport requires its exact complete declared file set"
+      }
+    },
+    {
+      "name": "import_rejects_undeclared_member",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport requires its exact complete declared file set"
+      }
+    },
+    {
+      "name": "configured_manifest_location_is_authoritative",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "identical_import_preserves_original_attribution_and_sha",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "changed_import_never_overwrites_existing_member",
+      "passed": true,
+      "detail": {
+        "type": "ValueError",
+        "message": "Transport member identity, size or checksum differs"
+      }
+    },
+    {
+      "name": "duplicate_existing_import_identity_rejected",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_CONFLICT: Transport identity is duplicated"
+      }
+    },
+    {
+      "name": "existing_manifest_cannot_override_configured_destination",
+      "passed": true,
+      "detail": {
+        "type": "MutationError",
+        "message": "SNAPSHOT_CONFLICT: Existing transport identity differs"
+      }
+    },
+    {
+      "name": "combined_identity_reuses_existing_export_without_replacement",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "source_and_target_baselines_remain_unchanged",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all_bound_source_and_fixture_bytes_unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "passed": 44,
+  "failed": 0,
+  "elapsed_seconds": 16.62,
+  "before_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "6222b7135dce93869b02e9e00276d31b4f648dc3c9b42e4b5c8fdb8f8d904ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "f70fba9b394490881f2e6c0e8d05fd9011b810ae15339dfe18a84c2ffef19f0f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "d5ba8ec85f7e1937aa38d687cfe506a7001c814513257140cee8bfb280e181e5",
+    "tests/discovery_runtime/test_snapshot_export.py": "cc1b079ebf51af27e0bfccd032c5b668eadd295d024caafcf79dca82ba8ce261",
+    "tests/discovery_runtime/test_snapshot_import.py": "e983600a0df7477dd3618a41db96b62539dc17904c8ef6f6c8f7a99ee424b077",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "34215fb4d2499575ad59857d302dfdddd8f59c050e3cae7e1e809b0c8aef6aa9",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d"
+  },
+  "after_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "6222b7135dce93869b02e9e00276d31b4f648dc3c9b42e4b5c8fdb8f8d904ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": "f70fba9b394490881f2e6c0e8d05fd9011b810ae15339dfe18a84c2ffef19f0f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "d5ba8ec85f7e1937aa38d687cfe506a7001c814513257140cee8bfb280e181e5",
+    "tests/discovery_runtime/test_snapshot_export.py": "cc1b079ebf51af27e0bfccd032c5b668eadd295d024caafcf79dca82ba8ce261",
+    "tests/discovery_runtime/test_snapshot_import.py": "e983600a0df7477dd3618a41db96b62539dc17904c8ef6f6c8f7a99ee424b077",
+    "tests/discovery_runtime/source_snapshot_test_support.py": "34215fb4d2499575ad59857d302dfdddd8f59c050e3cae7e1e809b0c8aef6aa9",
+    "tests/discovery_runtime/draft_test_support.py": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+    "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+    "tests/discovery_runtime/mutation_test_support.py": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d"
+  },
+  "limits": "Pure API boundary and actual loader captures only. Actual planner/writer publication is worker-owned composed proof; no task acceptance."
+}
