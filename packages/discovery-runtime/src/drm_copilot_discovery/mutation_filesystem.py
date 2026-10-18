@@ -155,7 +155,7 @@ class NativeDirectory:
                 stack.enter_context(pin_windows_path(self.path / name, directory=False))
             descriptor = os.open(
                 self._name(name),
-                os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0),
+                os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0),
                 dir_fd=self.descriptor,
             )
             stack.callback(os.close, descriptor)
@@ -178,7 +178,7 @@ class NativeDirectory:
         """Write every staged byte before flushing; zero/short writes cannot pass."""
         descriptor = os.open(
             self._name(name),
-            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0),
             0o600,
             dir_fd=self.descriptor,
         )

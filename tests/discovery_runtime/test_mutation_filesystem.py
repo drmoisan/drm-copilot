@@ -424,3 +424,61 @@ def test_native_metadata_keeps_complete_names_and_nonfollowing_identity(
     result = provider.metadata("." if kind == "directory" else "file")
     assert result.kind == kind
     assert result.children == (("a", "z") if kind == "directory" else ())
+
+
+@pytest.mark.parametrize(
+    "content", [b"a\nb\n", b"a\r\nb\r\n", b"a\x1ab", b"\x00\xff\n\r\n\x1a"]
+)
+@pytest.mark.parametrize("binary_flag", [None, 0x8000])
+def test_native_descriptor_flags_preserve_binary_bytes(
+    content: bytes, binary_flag: int | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Byte publication and bounded reads disable host text translation explicitly."""
+    stored = bytearray()
+    flags: list[int] = []
+    closed: list[int] = []
+    if binary_flag is None:
+        monkeypatch.delattr(os, "O_BINARY", raising=False)
+    else:
+        monkeypatch.setattr(os, "O_BINARY", binary_flag, raising=False)
+
+    def opening(name: str, mode: int, *args: object, **kwargs: object) -> int:
+        """Require the platform binary bit for both actual descriptor operations."""
+        assert mode & (binary_flag or 0) == (binary_flag or 0)
+        flags.append(mode)
+        return 71
+
+    def writing(descriptor: int, data: bytes) -> int:
+        """Persist the exact bytes supplied through the binary descriptor seam."""
+        assert descriptor == 71
+        stored.extend(data)
+        return len(data)
+
+    def reading(descriptor: int, count: int) -> bytes:
+        """Consume fresh in-memory bytes under the requested bounded read size."""
+        assert descriptor == 71
+        result = bytes(stored[:count])
+        del stored[:count]
+        return result
+
+    @contextmanager
+    def pin(path: Path, *, directory: bool) -> Generator[os.stat_result, None, None]:
+        """Substitute only the native pin while exercising real read/stage logic."""
+        yield stat_value(directory=directory)
+
+    monkeypatch.setattr(filesystem, "pin_windows_path", pin)
+    monkeypatch.setattr(os, "open", opening)
+    monkeypatch.setattr(os, "write", writing)
+    monkeypatch.setattr(os, "read", reading)
+    monkeypatch.setattr(os, "fsync", constant(None))
+    monkeypatch.setattr(os, "fstat", constant(stat_value()))
+    monkeypatch.setattr(os, "close", closed.append)
+    directory = NativeDirectory(Path("anchor"), 5, "7:11")
+    directory.stage("binary", content)
+    assert bytes(stored) == content
+    assert directory.read("binary", limit=len(content)) == content
+    assert flags == [
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | (binary_flag or 0),
+        os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | (binary_flag or 0),
+    ]
+    assert closed == [71, 71]
