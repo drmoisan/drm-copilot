@@ -1,0 +1,123 @@
+{
+  "task": "P1-T2",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 14,
+  "canonical_resources": 7,
+  "wheel_resource_members": 8,
+  "manifest_sha256": "329dcc48c2bc145b4ecb61f62cefa348d81bbae39ca163eed7c0fef5a3316605",
+  "wheel_sha256": "d24139d8de67ad5ae4aa81487e4fc79b66be3741e6f3171790c2f6e309de380e",
+  "previous_task_paths_unchanged": 26,
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": 215,
+    "scripts/dev_tools/build_discovery_runtime.py": 408,
+    "tests/discovery_runtime/test_resources.py": 262,
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": 249,
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": 195
+  },
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": {
+      "covered_branches": 34,
+      "covered_lines": 103,
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 34,
+      "num_partial_branches": 0,
+      "num_statements": 103,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "scripts/dev_tools/build_discovery_runtime.py": {
+      "covered_branches": 98,
+      "covered_lines": 209,
+      "excluded_lines": 11,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 98,
+      "num_partial_branches": 0,
+      "num_statements": 209,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "16ac2ac4b9cdeb266926264145e8a6922f42c108",
+      "sha256": "d1ab85401e74c881cf418420204f2e7a03a15a8e9a174497db629f5122363c7c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "81ba8a78a8c18cfe5c29c8d7aa02c01717c5e5c2",
+      "sha256": "329dcc48c2bc145b4ecb61f62cefa348d81bbae39ca163eed7c0fef5a3316605"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "git_blob": "4900a739e7647150976bc029e8ae70809b8af5d8",
+      "sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "git_blob": "e14f02f82a44948ef1a46ed477c92c584ac4816c",
+      "sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "git_blob": "03bf2de401b1868e25c67e7d3daaacee7870ba70",
+      "sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "git_blob": "0a72f0ce208d46862ca59354d78482e7b5dcb317",
+      "sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "git_blob": "fb4f89760f9ae8d98c9e6eb27fe07455b9217f5b",
+      "sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "git_blob": "745ae5f92541e772fb9e5dff09b400ca275e8316",
+      "sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "git_blob": "58452b3e8a57ef89ef462a85e1f8414d57cfda8c",
+      "sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "git_blob": "65e1419a4d75657591af50a5b9d286339a1a7839",
+      "sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086"
+    },
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "git_blob": "acf461b633c3450cdd7f7eb84652b69b513038ae",
+      "sha256": "4173504dee2aa98740b705c4113cc427f6fa713e1c1fb3761a79d902b7eb062e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_resources.py",
+      "git_blob": "2f9eac2560d53d31da9db0e6632f3fddce1b5f42",
+      "sha256": "6e36c3ba139ec722b72515259612db11efd4ce7c33d2f47d10ba0aeacb646cb5"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "git_blob": "0e9f01cd531a39adf6a7423ebb72c0ec5f232c8a",
+      "sha256": "0af7d7f5f70237f8433fed50c270ce1afe8c51c68ea16596e6c245ef1e68ba5a"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "git_blob": "e46de48c893545447b8ba33b24b414bd56001f50",
+      "sha256": "75d2e0dbfeddbc07e8310bc37b78449a41fd48529e4cacfb6aa635011fa23c8d"
+    }
+  ]
+}

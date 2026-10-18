@@ -1,0 +1,22 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:24:17.926549+00:00",
+  "initial_report_directory_exists": true,
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "41503c6427c7b86e93c8df94a46b6743f24a6d4ab620774a88e5a4a9938ef046",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "47d7612f2cf6a11742ad76145074feb4eb06b76a684bbfa9489cb9eca52f7bca"
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "41503c6427c7b86e93c8df94a46b6743f24a6d4ab620774a88e5a4a9938ef046",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "47d7612f2cf6a11742ad76145074feb4eb06b76a684bbfa9489cb9eca52f7bca"
+  },
+  "source_stable": true,
+  "result": {
+    "name": "Valid paired JSON and Markdown report is a permitted artifact mutation",
+    "passed": true,
+    "writes": [
+      "docs/migration/discovery/reports/coverage-report.json",
+      "docs/migration/discovery/reports/coverage-report.md"
+    ]
+  }
+}

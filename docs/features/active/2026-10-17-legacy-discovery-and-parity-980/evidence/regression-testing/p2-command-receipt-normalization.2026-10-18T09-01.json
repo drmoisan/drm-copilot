@@ -1,0 +1,642 @@
+{
+  "schema_version": "1.0",
+  "normalization_written_at": "2026-10-18 09:01:25 UTC",
+  "normalization_stamp": "2026-10-18T09-01",
+  "command_execution_repeated": false,
+  "sources": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "sha256": "a7a3d91de1f9386ba69e17ef412541484aadb45628fb3743a334d3e31a4b76c3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "sha256": "42e9d934908981e0a74d52ee86b5a9c5ce1ff24bb992d9e0020a8f256413b023"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "sha256": "a4def32ddf07288da8a4f7b36de32a9914b2520bd082ff034404f9364ea0b257"
+    }
+  ],
+  "records": [
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 1,
+      "title": "p2t2-format-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-format-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-12",
+      "started": "2026-10-18T08:12:00.184064+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/references.py packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py tests/discovery_runtime/test_references.py tests/discovery_runtime/test_reference_uniqueness.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 2,
+      "title": "p2t2-lint-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-lint-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-12",
+      "started": "2026-10-18T08:12:06.228415+00:00",
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/references.py packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py tests/discovery_runtime/test_references.py tests/discovery_runtime/test_reference_uniqueness.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 3,
+      "title": "p2t2-types-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-types-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-12",
+      "started": "2026-10-18T08:12:11.796685+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 4,
+      "title": "p2t2-format-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-format-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-13",
+      "started": "2026-10-18T08:13:15.709059+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/references.py packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py tests/discovery_runtime/test_references.py tests/discovery_runtime/test_reference_uniqueness.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 5,
+      "title": "p2t2-lint-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-lint-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-13",
+      "started": "2026-10-18T08:13:22.629137+00:00",
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/references.py packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py tests/discovery_runtime/test_references.py tests/discovery_runtime/test_reference_uniqueness.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 6,
+      "title": "p2t2-types-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-types-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-13",
+      "started": "2026-10-18T08:13:28.173850+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 7,
+      "title": "p2t2-tests-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-tests-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-13",
+      "started": "2026-10-18T08:13:42.391781+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_references.py tests/discovery_runtime/test_reference_uniqueness.py --cov=drm_copilot_discovery.references --cov=drm_copilot_discovery.reference_links --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p2t2-coverage.json",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 8,
+      "title": "p2t2-isolation-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-isolation-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-14",
+      "started": "2026-10-18T08:14:12.051914+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_reference_uniqueness.py tests/discovery_runtime/test_references.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 9,
+      "title": "p2t2-quality-tiers",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-quality-tiers.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-14",
+      "started": "2026-10-18T08:14:23.648012+00:00",
+      "command": "poetry run python -m scripts.dev_tools.check_quality_tiers --repo-root .",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 10,
+      "title": "p2t2-resource-contract",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-resource-contract.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-14",
+      "started": "2026-10-18T08:14:26.594601+00:00",
+      "command": "poetry run python -m scripts.dev_tools.build_discovery_runtime --stage-only --check",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 11,
+      "title": "p2t2-static-audit",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-static-audit.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-15",
+      "started": "2026-10-18T08:15:07.837843+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t2-static-audit.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-gates.2026-10-18T08-12.md",
+      "ordinal": 12,
+      "title": "p2t2-task-audit",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-task-audit.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-15",
+      "started": "2026-10-18T08:15:10.671631+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t2-task-audit.py 3",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 1,
+      "title": "p2t3-format-pass1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass1.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-27",
+      "started": "2026-10-18T08:27:46.525241+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 2,
+      "title": "p2t3-lint-pass1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass1.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-27",
+      "started": "2026-10-18T08:27:53.738718+00:00",
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 3,
+      "title": "p2t3-format-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-28",
+      "started": "2026-10-18T08:28:21.401158+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 4,
+      "title": "p2t3-format-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-28",
+      "started": "2026-10-18T08:28:51.166246+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 5,
+      "title": "p2t3-lint-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-28",
+      "started": "2026-10-18T08:28:54.617487+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 6,
+      "title": "p2t3-format-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:05.416591+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 7,
+      "title": "p2t3-lint-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:08.808355+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 8,
+      "title": "p2t3-types-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:11.759892+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 9,
+      "title": "p2t3-format-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:30.961243+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 10,
+      "title": "p2t3-lint-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:34.307436+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 11,
+      "title": "p2t3-types-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-29",
+      "started": "2026-10-18T08:29:37.225147+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 12,
+      "title": "p2t3-tests-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-30",
+      "started": "2026-10-18T08:29:50.736584+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py --cov=drm_copilot_discovery.evidence_rules --cov=drm_copilot_discovery.revision_rules --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p2t3-coverage.json",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 13,
+      "title": "p2t3-format-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-30",
+      "started": "2026-10-18T08:30:49.482592+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 14,
+      "title": "p2t3-lint-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-30",
+      "started": "2026-10-18T08:30:52.821420+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 15,
+      "title": "p2t3-types-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-31",
+      "started": "2026-10-18T08:30:55.687400+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 16,
+      "title": "p2t3-tests-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-31",
+      "started": "2026-10-18T08:31:11.373045+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py --cov=drm_copilot_discovery.evidence_rules --cov=drm_copilot_discovery.revision_rules --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p2t3-coverage.json",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 17,
+      "title": "p2t3-static-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-static-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-31",
+      "started": "2026-10-18T08:31:47.728700+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t3-static-audit.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 18,
+      "title": "p2t3-isolation-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-isolation-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-31",
+      "started": "2026-10-18T08:31:50.736239+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_revision_rules.py tests/discovery_runtime/test_evidence_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 19,
+      "title": "p2t3-quality-tiers-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-quality-tiers-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-32",
+      "started": "2026-10-18T08:32:11.766732+00:00",
+      "command": "poetry run python -m scripts.dev_tools.check_quality_tiers --repo-root .",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 20,
+      "title": "p2t3-package-contract-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-package-contract-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-32",
+      "started": "2026-10-18T08:32:14.614563+00:00",
+      "command": "poetry run python -m scripts.dev_tools.build_discovery_runtime --stage-only --check",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 21,
+      "title": "p2t3-audit-pass6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-audit-pass6.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-32",
+      "started": "2026-10-18T08:32:50.288858+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t3-task-audit.py 6",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 22,
+      "title": "p2t3-format-pass7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass7.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-33",
+      "started": "2026-10-18T08:33:49.513628+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 23,
+      "title": "p2t3-format-correction7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-correction7.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-34",
+      "started": "2026-10-18T08:33:59.735854+00:00",
+      "command": "poetry run black tests/discovery_runtime/test_evidence_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 24,
+      "title": "p2t3-format-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-34",
+      "started": "2026-10-18T08:34:02.969729+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 25,
+      "title": "p2t3-lint-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-34",
+      "started": "2026-10-18T08:34:06.148426+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 26,
+      "title": "p2t3-types-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-34",
+      "started": "2026-10-18T08:34:08.961619+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 27,
+      "title": "p2t3-tests-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-34",
+      "started": "2026-10-18T08:34:28.438220+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_evidence_rules.py tests/discovery_runtime/test_revision_rules.py --cov=drm_copilot_discovery.evidence_rules --cov=drm_copilot_discovery.revision_rules --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p2t3-coverage.json",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 28,
+      "title": "p2t3-static-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-static-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-35",
+      "started": "2026-10-18T08:35:11.665726+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t3-static-audit.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 29,
+      "title": "p2t3-isolation-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-isolation-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-35",
+      "started": "2026-10-18T08:35:14.879970+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_revision_rules.py tests/discovery_runtime/test_evidence_rules.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-gates.2026-10-18T08-27.md",
+      "ordinal": 30,
+      "title": "p2t3-audit-pass8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-audit-pass8.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-35",
+      "started": "2026-10-18T08:35:29.655286+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t3-task-audit.py 8",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 1,
+      "title": "p2t4-format-pass1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass1.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-44",
+      "started": "2026-10-18T08:44:36.722966+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 2,
+      "title": "p2t4-lint-pass1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass1.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-44",
+      "started": "2026-10-18T08:44:40.120615+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 3,
+      "title": "p2t4-types-pass1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass1.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-44",
+      "started": "2026-10-18T08:44:43.487879+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 4,
+      "title": "p2t4-format-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:07.441765+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 5,
+      "title": "p2t4-lint-pass2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass2.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:10.622513+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 6,
+      "title": "p2t4-format-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:22.398917+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 7,
+      "title": "p2t4-lint-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:25.807980+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 8,
+      "title": "p2t4-types-pass3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass3.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:28.915542+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 9,
+      "title": "p2t4-format-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-49",
+      "started": "2026-10-18T08:49:57.304221+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 10,
+      "title": "p2t4-lint-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:00.534733+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 11,
+      "title": "p2t4-types-pass4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass4.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:03.770584+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 1
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 12,
+      "title": "p2t4-format-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:29.134596+00:00",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 13,
+      "title": "p2t4-lint-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:32.781558+00:00",
+      "command": "poetry run ruff check --output-format concise packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 14,
+      "title": "p2t4-types-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:36.240914+00:00",
+      "command": "poetry run pyright",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 15,
+      "title": "p2t4-tests-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-tests-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-50",
+      "started": "2026-10-18T08:50:52.744487+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_observation_claims.py tests/discovery_runtime/test_runtime_claims.py --cov=drm_copilot_discovery.claim_rules --cov=drm_copilot_discovery.runtime_claim_rules --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p2t4-coverage.json",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 16,
+      "title": "p2t4-static-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-static-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-54",
+      "started": "2026-10-18T08:54:04.817082+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t4-static-audit.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 17,
+      "title": "p2t4-isolation-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-isolation-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-54",
+      "started": "2026-10-18T08:54:07.828591+00:00",
+      "command": "poetry run pytest -q -o addopts= tests/discovery_runtime/test_runtime_claims.py tests/discovery_runtime/test_observation_claims.py",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 18,
+      "title": "p2t4-quality-tiers-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-quality-tiers-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-54",
+      "started": "2026-10-18T08:54:26.100421+00:00",
+      "command": "poetry run python -m scripts.dev_tools.check_quality_tiers --repo-root .",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 19,
+      "title": "p2t4-packaging-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-packaging-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-54",
+      "started": "2026-10-18T08:54:29.093735+00:00",
+      "command": "poetry run python -m scripts.dev_tools.build_discovery_runtime --stage-only --check",
+      "exit_code": 0
+    },
+    {
+      "source": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-gates.2026-10-18T08-44.md",
+      "ordinal": 20,
+      "title": "p2t4-audit-pass5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-audit-pass5.2026-10-18T09-01.md",
+      "original_capture_timestamp": "2026-10-18T08-54",
+      "started": "2026-10-18T08:54:32.400165+00:00",
+      "command": "poetry run python SCRATCH/issue-980-p2t4-task-audit.py 5",
+      "exit_code": 0
+    }
+  ]
+}

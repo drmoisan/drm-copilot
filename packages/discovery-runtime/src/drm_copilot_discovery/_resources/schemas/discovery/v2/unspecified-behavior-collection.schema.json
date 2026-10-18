@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:unspecified-behavior-collection",
+  "title": "Discovery v2 unspecified behavior collection",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "records", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:unspecified-behavior-collection"},
+    "schema_version": {"const": "2.0.0"}, "artifact_kind": {"const": "unspecified-behavior-collection"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "records": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:unspecified-behavior"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:source-snapshot-manifest",
+  "title": "Discovery v2 immutable source snapshot manifest",
+  "description": "Local source export transport. Digest, byte identity and transport verification are recomputed by the importer; authored status is never authority.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "source_repository", "schema_versions", "tool", "artifacts", "payloads", "manifest_sha256", "transport", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:source-snapshot-manifest"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "source-snapshot-manifest"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "source_repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"},
+    "schema_versions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"const": "2.0.0"}},
+    "tool": {"$ref": "urn:drm-copilot:discovery:2.0.0:inventory-snapshot#/$defs/tool"},
+    "artifacts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/artifact"}},
+    "payloads": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/payload"}},
+    "manifest_sha256": {
+      "$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256",
+      "description": "SHA-256 of the canonical manifest content excluding manifest_sha256 and importer-owned transport verification; exact hashing is defined by the transport service."
+    },
+    "transport": {"$ref": "#/$defs/transport"},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["artifact_kind", "id", "schema_version", "path", "sha256", "size"],
+      "properties": {
+        "artifact_kind": {"enum": ["feature-contract", "evidence-reference", "runtime-characterization-scenario", "coverage-ledger", "inventory-snapshot", "scope", "unspecified-behavior", "product-decision", "unspecified-behavior-collection", "product-decision-collection"]},
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "schema_version": {"const": "2.0.0"},
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "payload": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "size"],
+      "properties": {
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "transport": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "exported_at", "exported_by", "verification_status", "verified_at", "verified_by", "artifact_count", "payload_count"],
+      "properties": {
+        "method": {"const": "local-files"},
+        "exported_at": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+        "exported_by": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/author_or_agent"},
+        "verification_status": {"enum": ["pending", "verified"]},
+        "verified_at": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"}, {"type": "null"}]},
+        "verified_by": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/author_or_agent"}, {"type": "null"}]},
+        "artifact_count": {"type": "integer", "minimum": 0},
+        "payload_count": {"type": "integer", "minimum": 0}
+      },
+      "if": {"properties": {"verification_status": {"const": "verified"}}, "required": ["verification_status"]},
+      "then": {"properties": {
+        "verified_at": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+        "verified_by": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/author_or_agent"}
+      }},
+      "else": {"properties": {"verified_at": {"type": "null"}, "verified_by": {"type": "null"}}}
+    }
+  }
+}

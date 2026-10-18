@@ -13,20 +13,23 @@ Purpose:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from typing import TYPE_CHECKING, cast
 
 import pytest
 
 import scripts.dev_tools.validate_discovery_artifacts as validator
-import scripts.dev_tools.validate_discovery_schema_artifacts as discovery_schema
+from tests.discovery_runtime.test_profile_v2 import profile_text
+from tests.scripts.dev_tools.test_validate_discovery_schema_artifacts import (
+    fixture_text,
+)
 from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_read_text_stub,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from pathlib import Path
 
     from _pytest.monkeypatch import MonkeyPatch
 
@@ -52,9 +55,7 @@ def test_main_profile_returns_zero_for_conforming_fixture(
     monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """A conforming profile fixture should exit 0 with a single stdout line."""
-    monkeypatch.setattr(
-        validator, "_read_text", build_read_text_stub("legacy_source_path: /x\n")
-    )
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(profile_text()))
 
     exit_code = validator.main(["profile", "ignored.yaml"])
 
@@ -63,7 +64,7 @@ def test_main_profile_returns_zero_for_conforming_fixture(
     assert captured.out.strip() == "profile validation passed: ignored.yaml"
 
 
-def test_main_profile_returns_one_for_missing_legacy_source_path(
+def test_main_profile_returns_one_for_missing_authoritative_profile_contract(
     monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """A profile fixture missing the required field should exit 1 with detail."""
@@ -75,72 +76,44 @@ def test_main_profile_returns_one_for_missing_legacy_source_path(
 
     assert exit_code == 1
     captured = capsys.readouterr()
-    assert "legacy_source_path" in captured.err
-
-
-def _permissive_feature_contract_schema(
-    _uri: str, _cache_dir: Path
-) -> dict[str, object]:
-    """Stand in for `load_schema` requiring `acceptance_criteria`."""
-    return {"type": "object", "required": ["acceptance_criteria"]}
+    assert "Expected exact schema_version 2.0.0" in captured.err
 
 
 def test_main_feature_contract_returns_zero_for_conforming_fixture(
     monkeypatch: MonkeyPatch,
 ) -> None:
-    """A conforming feature-contract fixture dispatched via the CLI should exit 0."""
+    """A real frozen feature contract dispatched through the CLI exits zero."""
     monkeypatch.setattr(
         validator,
         "_read_text",
-        build_read_text_stub(
-            '{"$schema": "https://example.test/feature-contract.schema.json", '
-            '"acceptance_criteria": []}'
-        ),
+        build_read_text_stub(fixture_text("feature-contract")),
     )
-    # The real schema-loading call happens inside
-    # validate_discovery_schema_artifacts._validate_against_schema, so that is
-    # the module whose `load_schema` binding must be patched for the patch to
-    # take effect (module-level name lookup is per-module, not per-importer).
-    monkeypatch.setattr(
-        discovery_schema, "load_schema", _permissive_feature_contract_schema
-    )
-    monkeypatch.setattr(validator, "load_schema", _permissive_feature_contract_schema)
 
-    exit_code = validator.main(["feature-contract", "ignored.json"])
-
-    assert exit_code == 0
+    assert validator.main(["feature-contract", "ignored.json"]) == 0
 
 
 def test_main_feature_contract_returns_one_for_non_conforming_fixture(
-    monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    monkeypatch: MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """A feature-contract fixture missing `acceptance_criteria` should exit 1."""
+    """The authoritative expected schema retains missing-acceptance diagnostics."""
+    document = cast("dict[str, object]", json.loads(fixture_text("feature-contract")))
+    del document["acceptance_criteria"]
     monkeypatch.setattr(
-        validator,
-        "_read_text",
-        build_read_text_stub(
-            '{"$schema": "https://example.test/feature-contract.schema.json"}'
-        ),
+        validator, "_read_text", build_read_text_stub(json.dumps(document))
     )
-    monkeypatch.setattr(
-        discovery_schema, "load_schema", _permissive_feature_contract_schema
-    )
-    monkeypatch.setattr(validator, "load_schema", _permissive_feature_contract_schema)
 
     exit_code = validator.main(["feature-contract", "ignored.json"])
 
     assert exit_code == 1
-    captured = capsys.readouterr()
-    assert "acceptance_criteria" in captured.err
+    assert "acceptance_criteria" in capsys.readouterr().err
 
 
 def test_main_all_returns_zero_when_path_conforms_to_at_least_one_type(
     monkeypatch: MonkeyPatch,
 ) -> None:
     """`all` should exit 0 when the path conforms to at least one type."""
-    monkeypatch.setattr(
-        validator, "_read_text", build_read_text_stub("legacy_source_path: /x\n")
-    )
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(profile_text()))
 
     exit_code = validator.main(["all", "ignored.yaml"])
 

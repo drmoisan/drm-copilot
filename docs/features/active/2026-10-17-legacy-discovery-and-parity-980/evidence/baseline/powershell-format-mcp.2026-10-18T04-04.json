@@ -1,0 +1,6 @@
+{
+  "tool": "run_poshqc_format",
+  "ok": true,
+  "workspace_root": "SCRATCH/issue-980-format-stage",
+  "limitation": "Invocation receipt only: the MCP result exposes neither process exit nor output. Actual results are recorded separately."
+}

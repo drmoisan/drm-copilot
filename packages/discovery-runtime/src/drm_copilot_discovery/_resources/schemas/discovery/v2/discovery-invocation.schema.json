@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:discovery-invocation",
+  "title": "Discovery v2 scoped invocation record",
+  "description": "Protected routing and lifecycle binding mirrored for diagnostics. Schema validation cannot create authority, activate a tool grant or replace native start attestation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "invocation_id",
+    "workspace",
+    "host",
+    "session_id",
+    "parent_agent_id",
+    "agent_id",
+    "role",
+    "skill_id",
+    "operation",
+    "gate_mode",
+    "selected_ids",
+    "selected_paths",
+    "scope_sha256",
+    "input_sha256",
+    "runtime",
+    "deployment",
+    "required_outputs",
+    "capability_ref",
+    "topology_receipt_ref",
+    "model_receipt_ref",
+    "production_write_count",
+    "state",
+    "created_at",
+    "start_attestation_ref",
+    "completion_receipt_ref"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:discovery-invocation"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"discovery-invocation"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "invocation_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "workspace": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+    "session_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "parent_agent_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "agent_id": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},{"type":"null"}]},
+    "role": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"},
+    "skill_id": {
+      "enum": [
+        "inventory-legacy-system",
+        "extract-feature-contract",
+        "characterize-runtime-behavior",
+        "reconcile-parity-matrix",
+        "review-discovery-coverage",
+        "adjudicate-unspecified-behavior",
+        "generate-acceptance-scenarios",
+        "initialize-discovery-workspace",
+        "validate-discovery-artifacts"
+      ]
+    },
+    "operation": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/operation"},
+    "gate_mode": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/mode"},
+    "selected_ids": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifiers"},
+    "selected_paths": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/paths"},
+    "scope_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "input_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "runtime": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"},
+    "deployment": {"$ref":"urn:drm-copilot:discovery:2.0.0:discovery-invocation#/$defs/deployment"},
+    "required_outputs": {"$ref":"urn:drm-copilot:discovery:2.0.0:required-output-manifest"},
+    "capability_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "topology_receipt_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "model_receipt_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "production_write_count": {"const":0},
+    "state": {"enum":["prepared","started","finalized","revoked"]},
+    "created_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "start_attestation_ref": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},{"type":"null"}]},
+    "completion_receipt_ref": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},{"type":"null"}]}
+  },
+  "$defs": {
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider","agent_name","model","reasoning_effort","profile_path","profile_sha256","complexity","execution_context"],
+      "properties": {
+        "provider": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "agent_name": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "model": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "reasoning_effort": {"enum":["low","medium","high","xhigh","max","ultra"]},
+        "profile_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "profile_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "complexity": {"enum":["C1","C2","C3","C4"]},
+        "execution_context": {"enum":["standalone","epic_preparation_child","epic_execution_child"]}
+      }
+    }
+  },
+  "allOf": [
+    {"if":{"properties":{"state":{"const":"prepared"}},"required":["state"]},"then":{"properties":{"agent_id":{"type":"null"},"start_attestation_ref":{"type":"null"},"completion_receipt_ref":{"type":"null"}}}},
+    {
+      "if": {"properties":{"state":{"enum":["started","finalized"]}},"required":["state"]},
+      "then": {
+        "properties": {"agent_id":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},"start_attestation_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"}}
+      }
+    },
+    {"if":{"properties":{"state":{"const":"started"}},"required":["state"]},"then":{"properties":{"completion_receipt_ref":{"type":"null"}}}},
+    {"if":{"properties":{"state":{"const":"finalized"}},"required":["state"]},"then":{"properties":{"completion_receipt_ref":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"}}}}
+  ]
+}

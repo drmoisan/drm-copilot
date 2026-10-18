@@ -1,0 +1,888 @@
+{
+  "task": "P2-T6",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "name": "valid captured configured inventory and ledger complete",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "valid claimed inventory and ledger structurally pass",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "missing selected ledger entry blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "actual_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_MISSING",
+          "pointer": "/components",
+          "message": "Selected inventory components are missing from the ledger."
+        }
+      ]
+    },
+    {
+      "name": "missing not-yet-authored ledger entry is an honest draft",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "duplicate ledger entries cannot satisfy exact once accounting",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_DUPLICATE"
+      ],
+      "actual_codes": [
+        "COVERAGE_DUPLICATE"
+      ],
+      "upstream_codes": [
+        "DUPLICATE_RECORD_ID"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_DUPLICATE",
+          "pointer": "/components/1",
+          "message": "A component appears more than once in the ledger."
+        }
+      ]
+    },
+    {
+      "name": "foreign ledger entry cannot replace selected component",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_FOREIGN_COMPONENT",
+        "COVERAGE_MISSING",
+        "COVERAGE_SCOPE"
+      ],
+      "actual_codes": [
+        "COVERAGE_FOREIGN_COMPONENT",
+        "COVERAGE_MISSING",
+        "COVERAGE_SCOPE"
+      ],
+      "upstream_codes": [
+        "REFERENCE_LINKAGE"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_MISSING",
+          "pointer": "/components",
+          "message": "Selected inventory components are missing from the ledger."
+        },
+        {
+          "code": "COVERAGE_FOREIGN_COMPONENT",
+          "pointer": "/components/0",
+          "message": "Ledger component is absent from its linked inventory."
+        },
+        {
+          "code": "COVERAGE_SCOPE",
+          "pointer": "/included_components",
+          "message": "Selected components are absent from the linked inventory."
+        }
+      ]
+    },
+    {
+      "name": "ledger symbol is bound to inventory detection",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_COMPONENT"
+      ],
+      "actual_codes": [
+        "COVERAGE_COMPONENT"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_COMPONENT",
+          "pointer": "/components/0",
+          "message": "Ledger component provenance differs from its inventory detection."
+        }
+      ]
+    },
+    {
+      "name": "undetermined runtime obligation blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_RUNTIME"
+      ],
+      "actual_codes": [
+        "COVERAGE_RUNTIME"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_RUNTIME",
+          "pointer": "/components/0",
+          "message": "Selected runtime need remains undetermined."
+        }
+      ]
+    },
+    {
+      "name": "undetermined runtime obligation remains structurally honest",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "declared runtime need requires characterization",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_RUNTIME"
+      ],
+      "actual_codes": [
+        "COVERAGE_RUNTIME"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_RUNTIME",
+          "pointer": "/components/0",
+          "message": "Runtime need requires a valid observed or passed scenario."
+        }
+      ]
+    },
+    {
+      "name": "uninspected unassigned component blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INCOMPLETE"
+      ],
+      "actual_codes": [
+        "COVERAGE_INCOMPLETE"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_INCOMPLETE",
+          "pointer": "/components/0",
+          "message": "Selected components require completed inspection/disposition."
+        }
+      ]
+    },
+    {
+      "name": "uninspected unassigned component remains a structural draft",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "blocked component prevents completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INCOMPLETE"
+      ],
+      "actual_codes": [
+        "COVERAGE_INCOMPLETE"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_INCOMPLETE",
+          "pointer": "/components/0",
+          "message": "Selected components require completed inspection/disposition."
+        }
+      ]
+    },
+    {
+      "name": "inspected supporting component with rationale completes",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "excluded component needs scope justification",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_EXCLUSION"
+      ],
+      "actual_codes": [
+        "COVERAGE_EXCLUSION"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_EXCLUSION",
+          "pointer": "/components/0",
+          "message": "Exclusion requires matching confirmed scope and rationale."
+        }
+      ]
+    },
+    {
+      "name": "scope justified excluded component can complete",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "stale scan configuration blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_CONFIGURATION"
+      ],
+      "actual_codes": [
+        "COVERAGE_CONFIGURATION"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIGURATION",
+          "pointer": "/scan_configuration_sha256",
+          "message": "Inventory scan configuration differs from the current profile."
+        }
+      ]
+    },
+    {
+      "name": "stale inventory remains structurally inspectable",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "captured source input omitted from inventory blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "actual_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_INPUTS",
+          "pointer": "/inventory_snapshot_refs",
+          "message": "Captured scan inputs are missing from the selected inventory."
+        }
+      ]
+    },
+    {
+      "name": "inventory input ordering is deterministic",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_FILES"
+      ],
+      "actual_codes": [
+        "COVERAGE_FILES"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_FILES",
+          "pointer": "/files",
+          "message": "Inventory file paths must be sorted and unique."
+        }
+      ]
+    },
+    {
+      "name": "duplicate input rows do not conceal accounting",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_FILES",
+        "COVERAGE_INPUTS"
+      ],
+      "actual_codes": [
+        "COVERAGE_FILES",
+        "COVERAGE_INPUTS"
+      ],
+      "upstream_codes": [
+        "REVISION_SOURCE_HASH"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_FILES",
+          "pointer": "/files",
+          "message": "Inventory file paths must be sorted and unique."
+        },
+        {
+          "code": "COVERAGE_FILES",
+          "pointer": "/files/3",
+          "message": "A scan input appears in more than one selected inventory."
+        },
+        {
+          "code": "COVERAGE_INPUTS",
+          "pointer": "/files/3",
+          "message": "Inspected scan input differs from the current captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "selected inventory exclusion requires scope rationale",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "actual_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_SCAN",
+          "pointer": "/files/0",
+          "message": "A selected scan input is unreadable or unjustifiably excluded."
+        }
+      ]
+    },
+    {
+      "name": "global scan failure blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "actual_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_SCAN",
+          "pointer": "/diagnostics/0",
+          "message": "An incomplete required scan prevents coverage completion."
+        }
+      ]
+    },
+    {
+      "name": "reported partial scan is structurally inspectable",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "unconfirmed scope blocks completion",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_CONFIRMATION"
+      ],
+      "actual_codes": [
+        "COVERAGE_CONFIRMATION"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "pointer": "/status",
+          "message": "Discovery completion requires confirmed scope."
+        }
+      ]
+    },
+    {
+      "name": "draft scope remains structurally honest",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "feature-only scope conservatively accounts for every inventory component",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "actual_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_MISSING",
+          "pointer": "/components",
+          "message": "Selected inventory components are missing from the ledger."
+        }
+      ]
+    },
+    {
+      "name": "feature-only scope accounting cannot depend on inventory array order",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "actual_codes": [
+        "COVERAGE_MISSING"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_MISSING",
+          "pointer": "/components",
+          "message": "Selected inventory components are missing from the ledger."
+        }
+      ]
+    },
+    {
+      "name": "feature-only selection cannot hide a failed input with no detected component",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "actual_codes": [
+        "COVERAGE_SCAN"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_SCAN",
+          "pointer": "/diagnostics/0",
+          "message": "An incomplete required scan prevents coverage completion."
+        },
+        {
+          "code": "COVERAGE_SCAN",
+          "pointer": "/files/0",
+          "message": "A selected scan input is unreadable or unjustifiably excluded."
+        }
+      ]
+    },
+    {
+      "name": "scope root matching uses path components rather than common prefixes",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "ledger inventory cannot exceed its scope inventory set",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INVENTORY"
+      ],
+      "actual_codes": [
+        "COVERAGE_INVENTORY"
+      ],
+      "upstream_codes": [
+        "REFERENCE_LINKAGE"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_INVENTORY",
+          "pointer": "/inventory_snapshot_refs",
+          "message": "Ledger and scope must resolve the same complete inventory set."
+        }
+      ]
+    },
+    {
+      "name": "explicit missing scope component is blocking",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_SCOPE"
+      ],
+      "actual_codes": [
+        "COVERAGE_SCOPE"
+      ],
+      "upstream_codes": [
+        "REFERENCE_LINKAGE"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_SCOPE",
+          "pointer": "/included_components",
+          "message": "Selected components are absent from the linked inventory."
+        }
+      ]
+    },
+    {
+      "name": "referenced test requires captured pinned bytes",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_TEST"
+      ],
+      "actual_codes": [
+        "COVERAGE_TEST"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_TEST",
+          "pointer": "/components/0/tests_found/0",
+          "message": "A referenced test requires captured bytes at the ledger pin."
+        }
+      ]
+    },
+    {
+      "name": "approval evidence cannot establish test relevance",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_TEST"
+      ],
+      "actual_codes": [
+        "COVERAGE_TEST"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_TEST",
+          "pointer": "/components/0/tests_found/0",
+          "message": "Test relevance requires local observation evidence."
+        }
+      ]
+    },
+    {
+      "name": "approval evidence cannot establish inspected coverage",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_EVIDENCE"
+      ],
+      "actual_codes": [
+        "COVERAGE_EVIDENCE"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_EVIDENCE",
+          "pointer": "/components/0",
+          "message": "Inspection and dispositions require local update evidence."
+        }
+      ]
+    },
+    {
+      "name": "scope confirmation requires usable linked proof",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_CONFIRMATION"
+      ],
+      "actual_codes": [
+        "COVERAGE_CONFIRMATION"
+      ],
+      "upstream_codes": [
+        "REFERENCE_MISSING"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "pointer": "/confirmed_by",
+          "message": "Confirmed scope requires owner, timestamp and local proof."
+        }
+      ]
+    },
+    {
+      "name": "captured profile exclusion is retained by an explicit inventory record",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "skipped input without an inventory exclusion remains incomplete",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "actual_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_INPUTS",
+          "pointer": "/inventory_snapshot_refs",
+          "message": "Captured scan inputs are missing from the selected inventory."
+        }
+      ]
+    },
+    {
+      "name": "pinned input hash mismatch fails coverage and revision composition",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "actual_codes": [
+        "COVERAGE_INPUTS"
+      ],
+      "upstream_codes": [
+        "REVISION_SOURCE_HASH"
+      ],
+      "findings": [
+        {
+          "code": "COVERAGE_INPUTS",
+          "pointer": "/files/0",
+          "message": "Inspected scan input differs from the current captured bytes."
+        }
+      ]
+    },
+    {
+      "name": "historical imported source inventory excludes current same-repository target inputs",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "empty unpinned initialized ledger and scope are structurally honest",
+      "passed": true,
+      "expected_codes": [],
+      "actual_codes": [],
+      "upstream_codes": [],
+      "findings": []
+    },
+    {
+      "name": "empty unpinned initialized ledger and scope cannot complete",
+      "passed": true,
+      "expected_codes": [
+        "COVERAGE_CONFIRMATION",
+        "COVERAGE_INVENTORY"
+      ],
+      "actual_codes": [
+        "COVERAGE_CONFIRMATION",
+        "COVERAGE_INVENTORY"
+      ],
+      "upstream_codes": [],
+      "findings": [
+        {
+          "code": "COVERAGE_INVENTORY",
+          "pointer": "/inventory_snapshot_refs",
+          "message": "Discovery completion requires pinned current inventory."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "pointer": "/status",
+          "message": "Discovery completion requires confirmed scope."
+        }
+      ]
+    },
+    {
+      "name": "scan configuration digest ignores unordered selector order",
+      "passed": true
+    },
+    {
+      "name": "scan digest excludes approval and revision policy metadata",
+      "passed": true
+    },
+    {
+      "name": "scan digest changes with analyzer selection options",
+      "passed": true
+    },
+    {
+      "name": "new runtime modules retain Python 3.10 grammar",
+      "passed": true
+    },
+    {
+      "name": "same-source observed runtime supports source coverage",
+      "coverage": [],
+      "upstream": [],
+      "passed": true
+    },
+    {
+      "name": "target runtime cannot satisfy source required characterization",
+      "coverage": [
+        "COVERAGE_RUNTIME"
+      ],
+      "upstream": [],
+      "passed": true
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t6.py",
+  "probe_scope": "Exact inventory-to-ledger accounting, scoped selections, captured inputs, exclusions, runtime and evidence requirements, draft distinction, imported-source isolation, configuration digests and supported Python syntax.",
+  "probe_production_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce"
+  },
+  "owned_paths": 4,
+  "unchanged_prior_paths": 189,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "248/248",
+  "coverage_branch_arcs": "140/140",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py": [
+      {
+        "name": "CoverageValidation",
+        "line": 30,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_CoverageRules",
+        "line": 40,
+        "covered_lines": 80,
+        "statements": 80
+      },
+      {
+        "name": "validate_coverage",
+        "line": 301,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "__init__",
+        "line": 43,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "runtime",
+        "line": 56,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "tests",
+        "line": 93,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "component",
+        "line": 123,
+        "covered_lines": 41,
+        "statements": 41
+      },
+      {
+        "name": "ledger",
+        "line": 271,
+        "covered_lines": 14,
+        "statements": 14
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": [
+      {
+        "name": "object_rows",
+        "line": 25,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "strings",
+        "line": 35,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_configuration",
+        "line": 44,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "inventory_configuration_digest",
+        "line": 60,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "excluded",
+        "line": 84,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "CoverageScope",
+        "line": 96,
+        "covered_lines": 13,
+        "statements": 13
+      },
+      {
+        "name": "_confirmation",
+        "line": 124,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "_inventory",
+        "line": 157,
+        "covered_lines": 37,
+        "statements": 37
+      },
+      {
+        "name": "select_coverage_scope",
+        "line": 274,
+        "covered_lines": 55,
+        "statements": 55
+      },
+      {
+        "name": "selects_path",
+        "line": 109,
+        "covered_lines": 7,
+        "statements": 7
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py": 340,
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": 428,
+    "tests/discovery_runtime/test_coverage_rules.py": 497,
+    "tests/discovery_runtime/test_coverage_scope.py": 490
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t6-coverage.2026-10-18T09-31.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t6-coverage-metrics.2026-10-18T09-31.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "git_blob": "f3a8d71c6858647728d0ccee86eafb90e91f8854",
+      "sha256": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "git_blob": "c80efcd24bc4a90c76b6f159af21bbb0023584e3",
+      "sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_rules.py",
+      "git_blob": "787d2bf334eb36f46238622d26683574039e4dd9",
+      "sha256": "ca0f54cb8d7b998e35defca37fd3dcf5599492f8e6173a2f024e9b3b56dc61fd"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_scope.py",
+      "git_blob": "1020a07db2734761ecd0bf2d87ea24fde51083f5",
+      "sha256": "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3"
+    }
+  ],
+  "probe_commands": [
+    "poetry run python SCRATCH/issue-980-probe-p2t6.py",
+    "poetry run python SCRATCH/issue-980-probe-p2t6-runtime.py"
+  ]
+}

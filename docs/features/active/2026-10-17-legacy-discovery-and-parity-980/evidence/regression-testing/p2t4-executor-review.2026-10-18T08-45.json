@@ -1,0 +1,29 @@
+{
+  "task": "P2-T4",
+  "source_sha256": "a41ec000435e0c7ac99568148c14d8de7259647b9052b1c251ac3c110be23a01",
+  "cases": [
+    {
+      "name": "verified feature with unlinked feature-wide open question",
+      "schema_valid": true,
+      "findings": []
+    },
+    {
+      "name": "source proof listed as runtime evidence beside valid source proof",
+      "schema_valid": true,
+      "findings": []
+    },
+    {
+      "name": "source-contract expectation with wholly unknown source contract",
+      "schema_valid": true,
+      "findings": []
+    },
+    {
+      "name": "prior-runtime basis with only current comparison run",
+      "schema_valid": true,
+      "findings": []
+    }
+  ],
+  "command": "poetry run python SCRATCH/issue-980-p2t4-boundary-probe.py",
+  "command_exit_code": 0,
+  "disposition": "Three structured consistency gaps; minimum prior-runtime provenance interpretation requested from coordinator. No task acceptance."
+}

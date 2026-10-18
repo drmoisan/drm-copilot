@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:unspecified-behavior",
+  "title": "Discovery v2 unspecified behavior",
+  "description": "Unresolved observations and explicit resolution basis. Verified historical facts and approved target policy remain separate.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "behavior_id", "feature_refs", "dimensions", "question", "evidence_refs", "competing_interpretations", "impact", "status", "decision_owner", "decision_ref", "decision", "rationale", "approved_target_behavior", "acceptance_test_implications", "resolution_basis", "resolution_evidence_refs", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:unspecified-behavior"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "unspecified-behavior"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "behavior_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "feature_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references", "minItems": 1},
+    "dimensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimensions"},
+    "question": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+    "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+    "competing_interpretations": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/interpretation"}},
+    "impact": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+    "status": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/unspecified-behavior-state"},
+    "decision_owner": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"}, {"type": "null"}]},
+    "decision_ref": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-reference"}, {"type": "null"}]},
+    "decision": {"$ref": "#/$defs/nullable-text"},
+    "rationale": {"$ref": "#/$defs/nullable-text"},
+    "approved_target_behavior": {"$ref": "#/$defs/nullable-text"},
+    "acceptance_test_implications": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}},
+    "resolution_basis": {"enum": [null, "approved-decision", "verified-observation"]},
+    "resolution_evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"enum": ["open", "under-review"]}}, "required": ["status"]},
+      "then": {"properties": {"resolution_basis": {"type": "null"}, "resolution_evidence_refs": {"maxItems": 0}, "decision": {"type": "null"}, "approved_target_behavior": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "resolved"}}, "required": ["status"]},
+      "then": {"properties": {"resolution_basis": {"enum": ["approved-decision", "verified-observation"]}, "rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "intentionally-unspecified"}}, "required": ["status"]},
+      "then": {"properties": {"resolution_basis": {"const": "approved-decision"}}}
+    },
+    {
+      "if": {"properties": {"resolution_basis": {"const": "approved-decision"}}, "required": ["resolution_basis"]},
+      "then": {"properties": {
+        "decision_ref": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/decision-reference"},
+        "decision_owner": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "decision": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "rationale": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "approved_target_behavior": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}
+      }}
+    },
+    {
+      "if": {"properties": {"resolution_basis": {"const": "verified-observation"}}, "required": ["resolution_basis"]},
+      "then": {"properties": {"resolution_evidence_refs": {"minItems": 1}, "decision_ref": {"type": "null"}, "decision": {"type": "null"}, "approved_target_behavior": {"type": "null"}}}
+    }
+  ],
+  "$defs": {
+    "nullable-text": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "interpretation": {
+      "type": "object", "additionalProperties": false, "required": ["id", "description", "evidence_refs", "confidence"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "description": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "confidence": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/confidence"}
+      }
+    }
+  }
+}

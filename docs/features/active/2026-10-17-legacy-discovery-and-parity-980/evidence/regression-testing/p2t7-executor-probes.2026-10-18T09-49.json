@@ -1,0 +1,921 @@
+{
+  "probes": 47,
+  "passed": 47,
+  "failed": 0,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": "b1eb5a1a1cb62f77a176c1e814e670d86b76df0006e2d107053275163133cf26"
+  },
+  "source_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": "b1eb5a1a1cb62f77a176c1e814e670d86b76df0006e2d107053275163133cf26"
+  },
+  "results": [
+    {
+      "name": "known source criterion supplies one ready target tuple",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "structural absence is incomplete without a false ready record",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "required feature cannot omit ready specifications",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/online."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/browser-example/browser/online."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "pending specification remains structurally valid",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "pending specification cannot discharge completion",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/online."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/browser-example/browser/online."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "changed Then cannot retain ready status",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/then",
+          "message": "Ready Then must exactly retain its known ready criterion expectation."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "stale canonical source digest blocks readiness",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/source_content_sha256",
+          "message": "Content digest differs from the referenced immutable inputs."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unknown client cannot claim ready target ownership",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/criterion_id",
+          "message": "Criterion does not apply to this scenario tuple."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "scenario cannot claim a different criterion platform",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/criterion_id",
+          "message": "Criterion does not apply to this scenario tuple."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "scenario cannot claim a different criterion mode",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/criterion_id",
+          "message": "Criterion does not apply to this scenario tuple."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unconfigured offline remains unknown without new obligations",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "global required offline cannot remain unspecified",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_UNSPECIFIED",
+          "pointer": "/offline",
+          "message": "Required applicability cannot remain absent or unspecified."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unconfigured mobile remains unknown without new obligations",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "global required mobile cannot remain unspecified",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_UNSPECIFIED",
+          "pointer": "/mobile",
+          "message": "Required applicability cannot remain absent or unspecified."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "configured online requires an explicit classification",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_MISSING",
+          "pointer": "/online",
+          "message": "Required behavior needs an explicit classification."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "empty child requirement list cannot remove the global trigger",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_UNSPECIFIED",
+          "pointer": "/trigger",
+          "message": "Required applicability cannot remain absent or unspecified."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "client-required unknown cannot hide beneath a verified summary False",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "CLAIM_SUMMARY",
+          "pointer": "/timing",
+          "message": "Verified summaries cannot hide unresolved required dimensions."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "client-required unknown cannot hide beneath a verified summary True",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "CLAIM_SUMMARY",
+          "pointer": "/timing",
+          "message": "Verified summaries cannot hide unresolved required dimensions."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "custom configured mode cannot be omitted",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/batch-mode."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/browser-example/browser/batch-mode."
+        }
+      ],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "custom mode is supplied by an explicit tuple",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha",
+        "scenario-batch"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 2,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "required offline not-applicable needs a scoped approval",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_DISPOSITION",
+          "pointer": "/offline",
+          "message": "Non-applicability needs rationale and scoped approval."
+        }
+      ],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/offline."
+        }
+      ],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": false,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "configured not-applicable dimension has an explicit approval",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha",
+        "scenario-decision"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 2,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "inherited global plus client platforms require all tuples",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */portable-example/browser/online."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/portable-example/browser/online."
+        }
+      ],
+      "ready": [
+        "scenario-alpha",
+        "scenario-portable"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 2,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "all inherited global plus client platforms are represented",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha",
+        "scenario-portable-browser",
+        "scenario-portable"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 3,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "scoped target decision does not create obligations for a different client",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha",
+        "scenario-decision",
+        "scenario-portable-browser",
+        "scenario-portable"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 4,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "decision cannot supply a ready result outside its client scope",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/criterion_id",
+          "message": "Ready expectation requires one eligible source or approved criterion."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "approved target criterion preserves an open optional legacy observation",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha",
+        "scenario-decision"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 2,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "no-scope cannot erase a required existing feature",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "pointer": "/disposition",
+          "message": "No-scope disposition cannot erase required migration features."
+        }
+      ],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "empty artifact set is structurally honest",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "empty artifact set does not establish completion",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "pointer": "",
+          "message": "Zero features require justified scope and full inventory."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "zero-feature supporting-only inventory has complete confirmed accounting",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "explicit justified no-scope retains complete captured inventory accounting",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "draft no-scope cannot claim completed discovery",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "pointer": "",
+          "message": "Zero features require justified scope and full inventory."
+        },
+        {
+          "code": "COVERAGE_CONFIRMATION",
+          "pointer": "/status",
+          "message": "Discovery completion requires confirmed scope."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "zero-feature scope cannot conceal an undispositioned component",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_SCOPE",
+          "pointer": "",
+          "message": "Zero features require justified scope and full inventory."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "approved whole-feature retirement does not demand target scenarios",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "draft required applicability remains honest in structural mode",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "superseded specification does not satisfy required acceptance",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: */browser-example/browser/online."
+        },
+        {
+          "code": "ACCEPTANCE_REQUIRED",
+          "pointer": "/acceptance_criteria",
+          "message": "Missing ready criterion/client/platform/mode: criterion-alpha/browser-example/browser/online."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "explicitly disabled scenario coverage does not manufacture ready records",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "disabled coverage does not excuse a false ready expectation",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/then",
+          "message": "Ready Then must exactly retain its known ready criterion expectation."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "client-required inference cannot hide beneath a verified summary",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "CLAIM_SUMMARY",
+          "pointer": "/timing",
+          "message": "Verified summaries cannot hide unresolved required dimensions."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [
+        "scenario-alpha"
+      ],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 1,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "ready criterion is not transferable to an explicitly excluded client",
+      "passed": true,
+      "dimension_findings": [],
+      "acceptance_findings": [
+        {
+          "code": "ACCEPTANCE_CLAIM",
+          "pointer": "/criterion_id",
+          "message": "Criterion does not apply to this scenario tuple."
+        }
+      ],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": true,
+        "acceptance_ok": false,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "not-applicable approval for another platform cannot waive the required dimension",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_DISPOSITION",
+          "pointer": "/offline",
+          "message": "Non-applicability needs rationale and scoped approval."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "proposed not-applicable disposition cannot waive inherited requirements",
+      "passed": true,
+      "dimension_findings": [
+        {
+          "code": "DIMENSION_DISPOSITION",
+          "pointer": "/offline",
+          "message": "Non-applicability needs rationale and scoped approval."
+        }
+      ],
+      "acceptance_findings": [],
+      "ready": [],
+      "upstream_codes": [],
+      "expected": {
+        "dimensions_ok": false,
+        "acceptance_ok": true,
+        "ready_count": 0,
+        "upstream_ok": true
+      },
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "source digest matches independent canonical JSON encoding",
+      "passed": true
+    },
+    {
+      "name": "repeated source references do not change the canonical digest",
+      "passed": true
+    },
+    {
+      "name": "dimension_rules.py uses supported Python 3.10 syntax",
+      "passed": true
+    },
+    {
+      "name": "acceptance_rules.py uses supported Python 3.10 syntax",
+      "passed": true
+    }
+  ]
+}

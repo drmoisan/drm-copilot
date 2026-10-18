@@ -1,0 +1,36 @@
+$schema: urn:drm-copilot:discovery:2.0.0:acceptance-specification
+schema_version: 2.0.0
+artifact_kind: acceptance-specification
+id: scenario-alpha
+scenario_id: scenario-alpha
+kind: target-acceptance
+feature_id: feature-alpha
+criterion_id: criterion-alpha
+client_id: client-alpha
+platform_id: desktop
+mode_id: online
+readiness: ready
+given: [The processor is idle.]
+when: Activate the processor.
+then: [The processor reports active state.]
+pending_reasons: []
+expectation_basis: verified-source
+source_contract_refs:
+  - artifact_kind: feature-contract
+    repository_id: synthetic-source
+    revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    artifact_path: feature-contracts/feature-alpha.yaml
+    artifact_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    feature_id: feature-alpha
+    schema_version: 2.0.0
+evidence_refs:
+  - {artifact_kind: evidence-reference, id: source-alpha}
+product_decision_refs: []
+tags:
+  - "@feature_feature-alpha"
+  - "@scenario_scenario-alpha"
+  - "@client_client-alpha"
+  - "@platform_desktop"
+  - "@mode_online"
+source_content_sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+extensions: {}

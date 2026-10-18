@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:runtime-characterization-scenario",
+  "title": "Discovery v2 runtime characterization scenario",
+  "description": "Repeatable observation plan and recorded executions. Unknown legacy expectations remain null; target decisions cannot manufacture a legacy comparison result.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "scenario_id", "feature_refs", "environment", "fixture", "preconditions", "action", "observation_plan", "pre_state_capture", "post_state_capture", "expected_result", "expected_result_basis", "result_status", "deviations", "evidence_refs", "repeatability", "confidence", "unresolved_findings", "runs", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:runtime-characterization-scenario"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "runtime-characterization-scenario"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "scenario_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "feature_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/feature-references", "minItems": 1},
+    "environment": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/$defs/environment"},
+    "fixture": {
+      "type": "object", "additionalProperties": false, "required": ["description", "setup_steps", "teardown_steps", "evidence_refs"],
+      "properties": {
+        "description": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "setup_steps": {"$ref": "#/$defs/statements"},
+        "teardown_steps": {"$ref": "#/$defs/statements"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"}
+      }
+    },
+    "preconditions": {"$ref": "#/$defs/statements", "minItems": 1},
+    "action": {
+      "type": "object", "additionalProperties": false, "required": ["description", "inputs"],
+      "properties": {
+        "description": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "inputs": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["name", "value"],
+          "properties": {"name": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "value": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/json-value"}}
+        }}
+      }
+    },
+    "observation_plan": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "dimension", "description"],
+        "properties": {
+          "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+          "dimension": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/dimension-id"},
+          "description": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}
+        }
+      }
+    },
+    "pre_state_capture": {"$ref": "#/$defs/capture"},
+    "post_state_capture": {"$ref": "#/$defs/capture"},
+    "expected_result": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+    "expected_result_basis": {"enum": ["unknown", "source-contract", "prior-runtime-observation"]},
+    "result_status": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/runtime-result"},
+    "deviations": {"$ref": "#/$defs/statements"},
+    "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+    "repeatability": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repeatability"},
+    "confidence": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/confidence"},
+    "unresolved_findings": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/unresolved-references"},
+    "runs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/run"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "allOf": [
+    {"$ref": "#/$defs/result-claims"},
+    {
+      "if": {"properties": {"expected_result_basis": {"const": "unknown"}}, "required": ["expected_result_basis"]},
+      "then": {"properties": {"expected_result": {"type": "null"}}},
+      "else": {"properties": {"expected_result": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+    },
+    {
+      "if": {"properties": {"result_status": {"enum": ["observed", "passed", "failed"]}}, "required": ["result_status"]},
+      "then": {"properties": {"runs": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"result_status": {"const": "passed"}}, "required": ["result_status"]},
+      "then": {"properties": {"unresolved_findings": {"maxItems": 0}, "runs": {"contains": {"properties": {"result_status": {"const": "passed"}}, "required": ["result_status"]}}}}
+    },
+    {
+      "if": {"properties": {"result_status": {"const": "failed"}}, "required": ["result_status"]},
+      "then": {"properties": {"runs": {"contains": {"properties": {"result_status": {"const": "failed"}}, "required": ["result_status"]}}}}
+    },
+    {
+      "if": {"properties": {"result_status": {"const": "not-run"}}, "required": ["result_status"]},
+      "then": {"properties": {"runs": {"maxItems": 0}, "post_state_capture": {"properties": {"observed_state": {"type": "null"}, "evidence_refs": {"maxItems": 0}}}}}
+    },
+    {
+      "if": {"properties": {"repeatability": {"enum": ["repeatable", "variable", "environment-dependent"]}}, "required": ["repeatability"]},
+      "then": {"properties": {"runs": {"minItems": 2}}}
+    }
+  ],
+  "$defs": {
+    "statements": {"type": "array", "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}},
+    "capture": {
+      "type": "object", "additionalProperties": false, "required": ["plan", "observed_state", "evidence_refs"],
+      "properties": {
+        "plan": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "observed_state": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"}
+      },
+      "if": {"properties": {"observed_state": {"type": "null"}}, "required": ["observed_state"]},
+      "then": {"properties": {"evidence_refs": {"maxItems": 0}}},
+      "else": {"properties": {"evidence_refs": {"minItems": 1}}}
+    },
+    "result-claims": {
+      "allOf": [
+        {
+          "if": {"properties": {"result_status": {"enum": ["passed", "failed"]}}, "required": ["result_status"]},
+          "then": {"properties": {"expected_result": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        },
+        {
+          "if": {"properties": {"result_status": {"enum": ["observed", "passed", "failed"]}}, "required": ["result_status"]},
+          "then": {"properties": {
+            "evidence_refs": {"minItems": 1},
+            "pre_state_capture": {"properties": {"observed_state": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "evidence_refs": {"minItems": 1}}},
+            "post_state_capture": {"properties": {"observed_state": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, "evidence_refs": {"minItems": 1}}}
+          }}
+        },
+        {
+          "if": {"properties": {"result_status": {"enum": ["blocked", "not-applicable"]}}, "required": ["result_status"]},
+          "then": {"properties": {"deviations": {"minItems": 1}}}
+        }
+      ]
+    },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "timestamp", "environment", "pre_state_capture", "post_state_capture", "observed_result", "expected_result", "result_status", "evidence_refs", "deviations"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "timestamp": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+        "environment": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/$defs/environment"},
+        "pre_state_capture": {"$ref": "#/$defs/capture"},
+        "post_state_capture": {"$ref": "#/$defs/capture"},
+        "observed_result": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "expected_result": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "result_status": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/runtime-result"},
+        "evidence_refs": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/evidence-references"},
+        "deviations": {"$ref": "#/$defs/statements"}
+      },
+      "allOf": [
+        {"$ref": "#/$defs/result-claims"},
+        {
+          "if": {"properties": {"result_status": {"enum": ["observed", "passed", "failed"]}}, "required": ["result_status"]},
+          "then": {"properties": {"observed_result": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}}}
+        }
+      ]
+    }
+  }
+}

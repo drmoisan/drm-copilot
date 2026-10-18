@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:extension-result-manifest",
+  "title": "Discovery v2 external analyzer result manifest",
+  "description": "Data-only transport from a separately invoked local adapter. Referenced inventory bytes must validate against the core inventory schema; this record cannot authorize execution or completeness.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "adapter", "repository", "input_manifest_sha256", "source_inputs", "result_files", "manifest_sha256", "generated_at", "generated_by", "diagnostics", "extensions"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:extension-result-manifest"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "extension-result-manifest"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "adapter": {"$ref": "urn:drm-copilot:discovery:2.0.0:inventory-snapshot#/$defs/tool"},
+    "repository": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"},
+    "input_manifest_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "source_inputs": {
+      "type": "array", "uniqueItems": true,
+      "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:source-snapshot-manifest#/$defs/payload"}
+    },
+    "result_files": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/result-file"}},
+    "manifest_sha256": {
+      "$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256",
+      "description": "SHA-256 of the canonical manifest excluding this field. Input and result byte hashes are independently checked before import."
+    },
+    "generated_at": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "generated_by": {"$ref": "urn:drm-copilot:discovery:2.0.0:evidence-reference#/properties/author_or_agent"},
+    "diagnostics": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:inventory-snapshot#/$defs/diagnostic"}},
+    "extensions": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/extensions"}
+  },
+  "anyOf": [
+    {"properties": {"result_files": {"minItems": 1}}},
+    {"properties": {"diagnostics": {"minItems": 1, "contains": {"properties": {"blocking": {"const": true}}, "required": ["blocking"]}}}}
+  ],
+  "$defs": {
+    "result-file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_kind", "id", "schema_version", "path", "sha256", "size"],
+      "properties": {
+        "artifact_kind": {"const": "inventory-snapshot"},
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "schema_version": {"const": "2.0.0"},
+        "path": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

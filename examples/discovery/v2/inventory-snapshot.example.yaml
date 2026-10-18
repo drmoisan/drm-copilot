@@ -1,0 +1,88 @@
+$schema: urn:drm-copilot:discovery:2.0.0:inventory-snapshot
+schema_version: 2.0.0
+artifact_kind: inventory-snapshot
+id: inventory-alpha
+repository: synthetic-source
+revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+tool: {id: discovery, version: 2.0.0}
+analyzers:
+  - {id: csharp-symbols, version: 2.0.0}
+scan_configuration_sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+files:
+  - path: src/Processor.cs
+    status: inspected
+    sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    size: 64
+    rationale: null
+    diagnostic_ids: []
+  - path: src/Unavailable.cs
+    status: unreadable
+    sha256: null
+    size: null
+    rationale: Source bytes were unavailable during this partial scan.
+    diagnostic_ids: [read-error-alpha]
+components:
+  - component_id: processor-alpha
+    component_type: type
+    source:
+      repository: synthetic-source
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      path: src/Processor.cs
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      symbol: Processor
+      line_range: {start: 1, end: 3}
+    analyzer: {id: csharp-symbols, version: 2.0.0}
+    classification: detected
+    confidence: high
+    properties:
+      - {name: declaration-kind, value: class}
+    extensions: {}
+findings:
+  - finding_id: reference-alpha
+    component_id: processor-alpha
+    kind: type-reference
+    source:
+      repository: synthetic-source
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      path: src/Processor.cs
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      symbol: Processor
+      line_range: {start: 2, end: 2}
+    analyzer: {id: csharp-symbols, version: 2.0.0}
+    classification: inferred
+    confidence: low
+    properties:
+      - {name: target-name, value: Service}
+    extensions: {}
+relationships:
+  - relationship_id: dependency-alpha
+    from_component_id: processor-alpha
+    to_component_id: null
+    target_description: Service is referenced but not bound by lexical analysis.
+    kind: type-reference
+    source:
+      repository: synthetic-source
+      revision: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      path: src/Processor.cs
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      line_range: {start: 2, end: 2}
+    analyzer: {id: csharp-symbols, version: 2.0.0}
+    classification: inferred
+    confidence: low
+    extensions: {}
+diagnostics:
+  - id: read-error-alpha
+    code: input-unreadable
+    severity: error
+    path: src/Unavailable.cs
+    message: Required source bytes were unavailable.
+    analyzer_id: csharp-symbols
+    blocking: true
+    extensions: {}
+exclusions:
+  - path_or_glob: vendor/**
+    rationale: Third-party implementation is outside the confirmed scope.
+capture:
+  timestamp: "2026-01-01T00:00:00Z"
+  author_or_agent: {kind: tool, id: discovery}
+extensions: {}

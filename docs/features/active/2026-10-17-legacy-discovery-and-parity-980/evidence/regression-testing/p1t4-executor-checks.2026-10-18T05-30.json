@@ -1,0 +1,195 @@
+{
+  "task": "P1-T4",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "owned_paths": 18,
+  "schemas": [
+    "feature-contract",
+    "evidence-reference",
+    "runtime-characterization-scenario"
+  ],
+  "fixtures": [
+    {
+      "kind": "feature-contract",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [],
+          "message": "{'$schema': 'urn:drm-copilot:discovery:2.0.0:feature-contract', 'schema_version': '2.0.0', 'artifact_kind': 'feature-contract', 'id': 'feature-alpha', 'feature_id': 'feature-alpha', 'name': 'Activate a configured processor', 'capability_group': 'processing', 'summary': 'A supplied operation transitions the synthetic processor from idle to active.', 'lifecycle': 'reviewed', 'observation_state': 'verified', 'trigger': {'observation_state': 'verified', 'statement': 'An operator requests activation.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'preconditions': {'observation_state': 'verified', 'statement': 'The processor is idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'inputs': {'observation_state': 'verified', 'statement': 'A configured operation identifier is supplied.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'observable_outputs': {'observation_state': 'verified', 'statement': 'State becomes active.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'side_effects': {'observation_state': 'verified', 'statement': 'The state is persisted.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'ordering': {'observation_state': 'verified', 'statement': 'Persist state before reporting activation.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'timing': {'observation_state': 'verified', 'statement': 'Acknowledgement follows persistence.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'cancellation': {'observation_state': 'verified', 'statement': 'Cancellation before acknowledgement leaves state idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'failure': {'observation_state': 'verified', 'statement': 'An invalid identifier returns an error and preserves state.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'offline': {'observation_state': 'verified', 'statement': 'The operation requires a connected service.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'mobile': {'observation_state': 'verified', 'statement': 'No portable client is represented in this synthetic fixture.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'alternate_clients': {'observation_state': 'verified', 'statement': 'One configured client is represented.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'environment_constraints': {'observation_state': 'verified', 'statement': 'A configured service endpoint is available.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'security_permissions': {'observation_state': 'verified', 'statement': 'The caller needs activation permission.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'state_transitions': {'disposition': 'present', 'behavior': {'observation_state': 'verified', 'statement': 'Activation changes idle state to active state.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'entries': [{'id': 'transition-alpha', 'before': {'observation_state': 'verified', 'statement': 'The processor is idle.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'action': {'observation_state': 'verified', 'statement': 'An activation request is submitted.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'after': {'observation_state': 'verified', 'statement': 'The processor is active.', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'unresolved_behavior_refs': [], 'confidence': 'high'}, 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}]}], 'rationale': None}, 'source_evidence_refs': [], 'runtime_evidence_refs': [], 'confidence': 'high', 'unresolved_behavior_refs': [], 'product_decision_status': 'not-required', 'product_decision_refs': [], 'target_relevance': 'required', 'required_dimensions': ['trigger', 'state_transitions', 'observable_outputs', 'failure'], 'acceptance_criteria': [{'id': 'criterion-alpha', 'readiness': 'ready', 'statement': 'Activating the configured processor updates its state.', 'expected_result': 'The processor state is active after acknowledgement.', 'pending_reason': None, 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'source-alpha'}], 'product_decision_refs': [], 'client_ids': ['client-alpha'], 'platforms': ['generic'], 'modes': ['online']}], 'extensions': {}} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "kind": "evidence-reference",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "checksum"
+          ],
+          "message": "{'algorithm': 'sha256', 'value': 'invalid-digest'} is not valid under any of the given schemas"
+        },
+        {
+          "path": [
+            "checksum",
+            "value"
+          ],
+          "message": "'invalid-digest' does not match '^[0-9a-f]{64}$(?![\\\\s\\\\S])'"
+        },
+        {
+          "path": [
+            "checksum",
+            "value"
+          ],
+          "message": "'invalid-digest' does not match '^[0-9a-f]{64}$(?![\\\\s\\\\S])'"
+        }
+      ]
+    },
+    {
+      "kind": "runtime-characterization-scenario",
+      "valid_example": true,
+      "invalid_fixture": [
+        {
+          "path": [
+            "expected_result"
+          ],
+          "message": "None is not of type 'string'"
+        },
+        {
+          "path": [
+            "unresolved_findings"
+          ],
+          "message": "[{'artifact_kind': 'unspecified-behavior', 'id': 'behavior-alpha'}] is expected to be empty"
+        },
+        {
+          "path": [
+            "runs"
+          ],
+          "message": "[{'id': 'run-alpha', 'timestamp': '2026-01-01T00:00:00Z', 'environment': {'id': 'environment-alpha', 'platform': 'generic', 'operating_mode': 'online', 'client_id': 'client-alpha', 'extensions': {}}, 'pre_state_capture': {'plan': 'Record processor state before activation.', 'observed_state': 'idle', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'pre-alpha'}]}, 'post_state_capture': {'plan': 'Record processor state after activation.', 'observed_state': 'active', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'post-alpha'}]}, 'observed_result': 'The processor state changed from idle to active.', 'expected_result': None, 'result_status': 'observed', 'evidence_refs': [{'artifact_kind': 'evidence-reference', 'id': 'runtime-alpha'}], 'deviations': []}] does not contain items matching the given schema"
+        }
+      ]
+    }
+  ],
+  "optional_dimensions_honestly_unknown_accepted": [
+    "offline",
+    "mobile"
+  ],
+  "independent_format_boundary_cases": 18,
+  "format_checkers_instance_local": true,
+  "packaged_resources": 13,
+  "unchanged_prior_paths": 50,
+  "coverage_lines": "312/312",
+  "coverage_branch_arcs": "132/132",
+  "new_or_changed_production_executable_lines": 0,
+  "line_counts": {
+    "examples/discovery/v2/evidence-reference.example.yaml": 27,
+    "examples/discovery/v2/feature-contract.example.yaml": 55,
+    "examples/discovery/v2/runtime-characterization-scenario.example.yaml": 43,
+    "packages/discovery-runtime/resource-manifest.json": 22,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 71,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json": 87,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json": 140,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json": 145,
+    "schemas/discovery/v2/evidence-reference.schema.json": 87,
+    "schemas/discovery/v2/feature-contract.schema.json": 140,
+    "schemas/discovery/v2/runtime-characterization-scenario.schema.json": 145,
+    "tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml": 27,
+    "tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml": 55,
+    "tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml": 43,
+    "tests/schemas/discovery/test_v2_format_schemas.py": 178,
+    "tests/schemas/discovery/test_v2_observation_schemas.py": 338,
+    "tests/schemas/discovery/test_v2_runtime_schemas.py": 201,
+    "tests/schemas/discovery/v2_schema_test_support.py": 204
+  },
+  "paths": [
+    {
+      "path": "examples/discovery/v2/evidence-reference.example.yaml",
+      "git_blob": "eb8237954ab615ab730aeae21868a6a1cc3e0153",
+      "sha256": "7a9c765daafc0850bd45f7d04b0cd1e2bbb26f5644473a8d1df79b7c3cb84c1f"
+    },
+    {
+      "path": "examples/discovery/v2/feature-contract.example.yaml",
+      "git_blob": "e1c6ffde7545502cb7fa976bb3152b1f40666fd6",
+      "sha256": "06648cd96f84279737d83c5c7f38663f98b53086e164068dd929d47016d2cc85"
+    },
+    {
+      "path": "examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "git_blob": "0523cffa32cb7be1b4bd7280fc619776cd4e1033",
+      "sha256": "15ea28f548302d2e15ec5a5ff02ae0180b6a70bf2e1dc9c3eb6aaa02e13fc0fc"
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "git_blob": "58fcb3348e7c4f67d45c173df8e1950ac0e50aff",
+      "sha256": "ef5b086109aafef6e1b30717ffcba6bb181fafe5fe9bbc74463cc37e1ca3fa45"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "git_blob": "684e0bca85f332822c2b70483a216bbb099e23ba",
+      "sha256": "46dc9ee7dc399ae4113d770fba0351bb1513c634c171aef19685615ddf202b06"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "git_blob": "9409f68ec378ba6a083d0759b87c025741962480",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "git_blob": "300b9b1b5dfae992e1c13a274c3c8927133693dc",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "git_blob": "5a841e256badcc3c4ccbf41626b50ddd1d20762f",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7"
+    },
+    {
+      "path": "schemas/discovery/v2/evidence-reference.schema.json",
+      "git_blob": "9409f68ec378ba6a083d0759b87c025741962480",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56"
+    },
+    {
+      "path": "schemas/discovery/v2/feature-contract.schema.json",
+      "git_blob": "300b9b1b5dfae992e1c13a274c3c8927133693dc",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0"
+    },
+    {
+      "path": "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "git_blob": "5a841e256badcc3c4ccbf41626b50ddd1d20762f",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "git_blob": "8dcb6d1acf0de1af85d8d902e7776245a80d28bd",
+      "sha256": "f851c553d251eae59ccca4db52e72ddb7819d3372f10c7f9f01daa5456715da3"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "git_blob": "e1a4e0877afd9e57f7223c5c0a93499b192f5fb2",
+      "sha256": "aac7afdea5d9e9720fca7ddc92dbd1e6a716a09092ced8a09c3d8ceeaaabc7f7"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "git_blob": "57befe9be1e257414dae54703076fff07d5541b1",
+      "sha256": "535759bdfd7be3e0b03d20d3104bd9e925cc78e0b90737bb93f460c36ad20df2"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_format_schemas.py",
+      "git_blob": "0066bb2b48280bd3ce706cdf86839a37c5a9d3ff",
+      "sha256": "df659dec838e0e86010a060d48f5615fcec940a2051aa396aa672f2fdf59d3bd"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_observation_schemas.py",
+      "git_blob": "65c864ccc0e56cf32856ed0fa3479d884b002430",
+      "sha256": "d847506e375c218341af537cd32cf3a7247dc3eb22cabc0cca92f597557299e0"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "git_blob": "a2b2bfe81dfa242cfe53f5a6076ae03f7b48b891",
+      "sha256": "c58b39e1384e6907bfb0644b932ac645ecfeeff3117156dd5050d3a4d5d0377f"
+    },
+    {
+      "path": "tests/schemas/discovery/v2_schema_test_support.py",
+      "git_blob": "03e199552187819a4c7b6f645918008ef7114259",
+      "sha256": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48"
+    }
+  ]
+}

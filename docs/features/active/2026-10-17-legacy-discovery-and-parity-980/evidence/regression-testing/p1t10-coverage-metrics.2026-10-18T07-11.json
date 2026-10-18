@@ -1,0 +1,1151 @@
+{
+  "all_owned_paths_staged": true,
+  "approved_prior_task_paths_changed": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py"
+  ],
+  "broad_tests_passed": 1008,
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 100.0,
+      "branches": 4,
+      "classification": "new production module",
+      "covered_branches": 4,
+      "covered_lines": 28,
+      "line_percent": 100.0,
+      "statements": 28
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": {
+      "baseline_branch_percent": 98.71794871794872,
+      "baseline_line_percent": 99.47368421052632,
+      "branch_percent": 98.78048780487805,
+      "branches": 82,
+      "classification": "explicit version dispatch",
+      "covered_branches": 81,
+      "covered_lines": 202,
+      "line_percent": 99.50738916256158,
+      "statements": 203
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 100.0,
+      "branches": 20,
+      "classification": "new production module",
+      "covered_branches": 20,
+      "covered_lines": 173,
+      "line_percent": 100.0,
+      "statements": 173
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "baseline_branch_percent": null,
+      "baseline_line_percent": null,
+      "branch_percent": 100.0,
+      "branches": 32,
+      "classification": "new production module",
+      "covered_branches": 32,
+      "covered_lines": 150,
+      "line_percent": 100.0,
+      "statements": 150
+    },
+    "scripts/dev_tools/validate_discovery_profile.py": {
+      "baseline_branch_percent": 100.0,
+      "baseline_line_percent": 100.0,
+      "branch_percent": 100.0,
+      "branches": 6,
+      "classification": "authoritative adapter replaces placeholder",
+      "covered_branches": 6,
+      "covered_lines": 18,
+      "line_percent": 100.0,
+      "statements": 18
+    }
+  },
+  "findings": [],
+  "focused_tests_passed": 578,
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py": 63,
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": 475,
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": 374,
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": 382,
+    "scripts/dev_tools/validate_discovery_profile.py": 39,
+    "tests/discovery_runtime/test_profile_dimensions.py": 333,
+    "tests/discovery_runtime/test_profile_v2.py": 340,
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": 168,
+    "tests/scripts/dev_tools/test_validate_discovery_profile.py": 66
+  },
+  "owned_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+    "scripts/dev_tools/validate_discovery_profile.py",
+    "tests/discovery_runtime/test_profile_dimensions.py",
+    "tests/discovery_runtime/test_profile_v2.py",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+    "tests/scripts/dev_tools/test_validate_discovery_profile.py"
+  ],
+  "owned_sha256": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py": "c21bdea03c45e6a4894983c8f6e395e0397a87b646acfed14af664e76a549eed",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+    "scripts/dev_tools/validate_discovery_profile.py": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2",
+    "tests/discovery_runtime/test_profile_dimensions.py": "0d67d5bcc558c5e02161f3281664b71a5cb9bc63ff9982d0011b52534d242378",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": "a5aec57d3d51baae4ff00c37bd14d8f18763da69e4d43a65e5f6a68aa17c9a6f",
+    "tests/scripts/dev_tools/test_validate_discovery_profile.py": "f0c7905112c236b181f328ded26215b7b14c90b60c5bcaea3962002541e0f16a"
+  },
+  "reversed_tests_passed": 123,
+  "staged_whitespace_exit_code": 0,
+  "task": "P1-T10",
+  "timestamp_utc": "2026-10-18T07-11",
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "unchanged_prior_paths": [
+    "examples/discovery/v2/acceptance-specification.example.yaml",
+    "examples/discovery/v2/coverage-ledger.example.yaml",
+    "examples/discovery/v2/domain-profile.example.yaml",
+    "examples/discovery/v2/evidence-reference.example.yaml",
+    "examples/discovery/v2/extension-result-manifest.example.yaml",
+    "examples/discovery/v2/feature-contract.example.yaml",
+    "examples/discovery/v2/implementation-record.example.yaml",
+    "examples/discovery/v2/inventory-snapshot.example.yaml",
+    "examples/discovery/v2/parity-matrix.example.yaml",
+    "examples/discovery/v2/product-decision-collection.example.yaml",
+    "examples/discovery/v2/product-decision.example.yaml",
+    "examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+    "examples/discovery/v2/scope.example.yaml",
+    "examples/discovery/v2/source-snapshot-manifest.example.yaml",
+    "examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+    "examples/discovery/v2/unspecified-behavior.example.yaml",
+    "packages/discovery-runtime/README.md",
+    "packages/discovery-runtime/pyproject.toml",
+    "packages/discovery-runtime/resource-manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+    "poetry.lock",
+    "pyproject.toml",
+    "quality-tiers.yml",
+    "schemas/discovery/v2/acceptance-specification.schema.json",
+    "schemas/discovery/v2/activation.schema.json",
+    "schemas/discovery/v2/capability-attestation.schema.json",
+    "schemas/discovery/v2/common.schema.json",
+    "schemas/discovery/v2/coverage-ledger.schema.json",
+    "schemas/discovery/v2/discovery-invocation.schema.json",
+    "schemas/discovery/v2/domain-profile.schema.json",
+    "schemas/discovery/v2/evidence-reference.schema.json",
+    "schemas/discovery/v2/extension-result-manifest.schema.json",
+    "schemas/discovery/v2/feature-contract.schema.json",
+    "schemas/discovery/v2/implementation-record.schema.json",
+    "schemas/discovery/v2/inventory-snapshot.schema.json",
+    "schemas/discovery/v2/migration-report.schema.json",
+    "schemas/discovery/v2/parity-matrix.schema.json",
+    "schemas/discovery/v2/product-decision-collection.schema.json",
+    "schemas/discovery/v2/product-decision.schema.json",
+    "schemas/discovery/v2/required-output-manifest.schema.json",
+    "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v2/scope.schema.json",
+    "schemas/discovery/v2/service-request.schema.json",
+    "schemas/discovery/v2/service-result.schema.json",
+    "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "schemas/discovery/v2/tool-authorization.schema.json",
+    "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+    "schemas/discovery/v2/unspecified-behavior.schema.json",
+    "schemas/discovery/v2/validation-receipt.schema.json",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "scripts/dev_tools/discovery/__init__.py",
+    "scripts/dev_tools/discovery/domain_profile.py",
+    "scripts/dev_tools/discovery/domain_profile_models.py",
+    "scripts/dev_tools/discovery/init_models.py",
+    "scripts/dev_tools/discovery/io.py",
+    "scripts/dev_tools/discovery/rendering.py",
+    "scripts/dev_tools/quality_tiers_contract.py",
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+    "tests/discovery_runtime/test_catalog.py",
+    "tests/discovery_runtime/test_findings.py",
+    "tests/discovery_runtime/test_package_contract.py",
+    "tests/discovery_runtime/test_parsing.py",
+    "tests/discovery_runtime/test_parsing_limits.py",
+    "tests/discovery_runtime/test_resources.py",
+    "tests/discovery_runtime/test_schema_formats.py",
+    "tests/discovery_runtime/test_schema_validation.py",
+    "tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+    "tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+    "tests/schemas/discovery/test_v2_acceptance_schemas.py",
+    "tests/schemas/discovery/test_v2_authority_schemas.py",
+    "tests/schemas/discovery/test_v2_common_schemas.py",
+    "tests/schemas/discovery/test_v2_control_schemas.py",
+    "tests/schemas/discovery/test_v2_decision_schemas.py",
+    "tests/schemas/discovery/test_v2_format_schemas.py",
+    "tests/schemas/discovery/test_v2_inventory_schemas.py",
+    "tests/schemas/discovery/test_v2_observation_schemas.py",
+    "tests/schemas/discovery/test_v2_profile_schemas.py",
+    "tests/schemas/discovery/test_v2_runtime_schemas.py",
+    "tests/schemas/discovery/test_v2_target_schemas.py",
+    "tests/schemas/discovery/test_v2_transport_schemas.py",
+    "tests/schemas/discovery/v2_control_test_support.py",
+    "tests/schemas/discovery/v2_schema_test_support.py",
+    "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+    "tests/scripts/dev_tools/discovery/test_init_models.py",
+    "tests/scripts/dev_tools/discovery/test_io.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py"
+  ],
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py": [
+      {
+        "covered_lines": 22,
+        "line": 17,
+        "line_percent": 100.0,
+        "name": "ActivationLocator",
+        "new_or_changed_unit": true,
+        "statements": 22
+      },
+      {
+        "covered_lines": 5,
+        "line": 26,
+        "line_percent": 100.0,
+        "name": "__init__",
+        "new_or_changed_unit": true,
+        "statements": 5
+      },
+      {
+        "covered_lines": 2,
+        "line": 41,
+        "line_percent": 100.0,
+        "name": "schema_version",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 46,
+        "line_percent": 100.0,
+        "name": "enabled",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 51,
+        "line_percent": 100.0,
+        "name": "profile_path",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 56,
+        "line_percent": 100.0,
+        "name": "required_runtime_major",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 3,
+        "line": 60,
+        "line_percent": 100.0,
+        "name": "require_profile_path",
+        "new_or_changed_unit": true,
+        "statements": 3
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": [
+      {
+        "covered_lines": 3,
+        "line": 86,
+        "line_percent": 75.0,
+        "name": "_type_name",
+        "new_or_changed_unit": false,
+        "statements": 4
+      },
+      {
+        "covered_lines": 2,
+        "line": 93,
+        "line_percent": 100.0,
+        "name": "_get",
+        "new_or_changed_unit": false,
+        "statements": 2
+      },
+      {
+        "covered_lines": 16,
+        "line": 98,
+        "line_percent": 100.0,
+        "name": "_load_yaml_mapping",
+        "new_or_changed_unit": false,
+        "statements": 16
+      },
+      {
+        "covered_lines": 15,
+        "line": 138,
+        "line_percent": 100.0,
+        "name": "_require_mapping",
+        "new_or_changed_unit": false,
+        "statements": 15
+      },
+      {
+        "covered_lines": 11,
+        "line": 161,
+        "line_percent": 100.0,
+        "name": "_require_str",
+        "new_or_changed_unit": false,
+        "statements": 11
+      },
+      {
+        "covered_lines": 7,
+        "line": 175,
+        "line_percent": 100.0,
+        "name": "_optional_str",
+        "new_or_changed_unit": false,
+        "statements": 7
+      },
+      {
+        "covered_lines": 19,
+        "line": 185,
+        "line_percent": 100.0,
+        "name": "_str_list",
+        "new_or_changed_unit": false,
+        "statements": 19
+      },
+      {
+        "covered_lines": 17,
+        "line": 214,
+        "line_percent": 100.0,
+        "name": "_optional_str_pairs",
+        "new_or_changed_unit": false,
+        "statements": 17
+      },
+      {
+        "covered_lines": 11,
+        "line": 242,
+        "line_percent": 100.0,
+        "name": "_require_profile_version",
+        "new_or_changed_unit": false,
+        "statements": 11
+      },
+      {
+        "covered_lines": 5,
+        "line": 258,
+        "line_percent": 100.0,
+        "name": "_reject_unknown_keys",
+        "new_or_changed_unit": false,
+        "statements": 5
+      },
+      {
+        "covered_lines": 13,
+        "line": 272,
+        "line_percent": 100.0,
+        "name": "_parse_legacy_source",
+        "new_or_changed_unit": false,
+        "statements": 13
+      },
+      {
+        "covered_lines": 11,
+        "line": 296,
+        "line_percent": 100.0,
+        "name": "_parse_target",
+        "new_or_changed_unit": false,
+        "statements": 11
+      },
+      {
+        "covered_lines": 11,
+        "line": 312,
+        "line_percent": 100.0,
+        "name": "_parse_technology_stack",
+        "new_or_changed_unit": false,
+        "statements": 11
+      },
+      {
+        "covered_lines": 11,
+        "line": 332,
+        "line_percent": 100.0,
+        "name": "_parse_artifacts",
+        "new_or_changed_unit": false,
+        "statements": 11
+      },
+      {
+        "covered_lines": 4,
+        "line": 348,
+        "line_percent": 100.0,
+        "name": "_format_errors",
+        "new_or_changed_unit": false,
+        "statements": 4
+      },
+      {
+        "covered_lines": 1,
+        "line": 357,
+        "line_percent": 100.0,
+        "name": "parse_domain_profile_text",
+        "new_or_changed_unit": true,
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 365,
+        "line_percent": 100.0,
+        "name": "parse_domain_profile_text",
+        "new_or_changed_unit": true,
+        "statements": 1
+      },
+      {
+        "covered_lines": 18,
+        "line": 372,
+        "line_percent": 100.0,
+        "name": "parse_domain_profile_text",
+        "new_or_changed_unit": true,
+        "statements": 18
+      },
+      {
+        "covered_lines": 1,
+        "line": 436,
+        "line_percent": 100.0,
+        "name": "load_domain_profile",
+        "new_or_changed_unit": true,
+        "statements": 1
+      },
+      {
+        "covered_lines": 1,
+        "line": 444,
+        "line_percent": 100.0,
+        "name": "load_domain_profile",
+        "new_or_changed_unit": true,
+        "statements": 1
+      },
+      {
+        "covered_lines": 8,
+        "line": 449,
+        "line_percent": 100.0,
+        "name": "load_domain_profile",
+        "new_or_changed_unit": true,
+        "statements": 8
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py": [
+      {
+        "covered_lines": 21,
+        "line": 84,
+        "line_percent": 100.0,
+        "name": "_Section",
+        "new_or_changed_unit": true,
+        "statements": 21
+      },
+      {
+        "covered_lines": 11,
+        "line": 116,
+        "line_percent": 100.0,
+        "name": "SystemProfile",
+        "new_or_changed_unit": true,
+        "statements": 11
+      },
+      {
+        "covered_lines": 14,
+        "line": 138,
+        "line_percent": 100.0,
+        "name": "RepositoryProfile",
+        "new_or_changed_unit": true,
+        "statements": 14
+      },
+      {
+        "covered_lines": 18,
+        "line": 167,
+        "line_percent": 100.0,
+        "name": "RelatedRepository",
+        "new_or_changed_unit": true,
+        "statements": 18
+      },
+      {
+        "covered_lines": 21,
+        "line": 200,
+        "line_percent": 100.0,
+        "name": "ClientProfile",
+        "new_or_changed_unit": true,
+        "statements": 21
+      },
+      {
+        "covered_lines": 8,
+        "line": 238,
+        "line_percent": 100.0,
+        "name": "RuntimeProfile",
+        "new_or_changed_unit": true,
+        "statements": 8
+      },
+      {
+        "covered_lines": 14,
+        "line": 255,
+        "line_percent": 100.0,
+        "name": "AnalyzerProfile",
+        "new_or_changed_unit": true,
+        "statements": 14
+      },
+      {
+        "covered_lines": 4,
+        "line": 289,
+        "line_percent": 100.0,
+        "name": "ArtifactRoots",
+        "new_or_changed_unit": true,
+        "statements": 4
+      },
+      {
+        "covered_lines": 13,
+        "line": 300,
+        "line_percent": 100.0,
+        "name": "GatePolicy",
+        "new_or_changed_unit": true,
+        "statements": 13
+      },
+      {
+        "covered_lines": 11,
+        "line": 324,
+        "line_percent": 100.0,
+        "name": "ProfileLimits",
+        "new_or_changed_unit": true,
+        "statements": 11
+      },
+      {
+        "covered_lines": 14,
+        "line": 348,
+        "line_percent": 100.0,
+        "name": "ProfileRequirements",
+        "new_or_changed_unit": true,
+        "statements": 14
+      },
+      {
+        "covered_lines": 10,
+        "line": 92,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "new_or_changed_unit": true,
+        "statements": 10
+      },
+      {
+        "covered_lines": 5,
+        "line": 107,
+        "line_percent": 100.0,
+        "name": "data",
+        "new_or_changed_unit": true,
+        "statements": 5
+      },
+      {
+        "covered_lines": 2,
+        "line": 122,
+        "line_percent": 100.0,
+        "name": "id",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 127,
+        "line_percent": 100.0,
+        "name": "name",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 132,
+        "line_percent": 100.0,
+        "name": "role",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 144,
+        "line_percent": 100.0,
+        "name": "id",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 149,
+        "line_percent": 100.0,
+        "name": "revision",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 154,
+        "line_percent": 100.0,
+        "name": "revision_policy",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 161,
+        "line_percent": 100.0,
+        "name": "vcs",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 174,
+        "line_percent": 100.0,
+        "name": "id",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 179,
+        "line_percent": 100.0,
+        "name": "role",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 184,
+        "line_percent": 100.0,
+        "name": "revision",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 189,
+        "line_percent": 100.0,
+        "name": "snapshot_manifest",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 194,
+        "line_percent": 100.0,
+        "name": "clients",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 207,
+        "line_percent": 100.0,
+        "name": "id",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 212,
+        "line_percent": 100.0,
+        "name": "target_repository",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 217,
+        "line_percent": 100.0,
+        "name": "platforms",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 222,
+        "line_percent": 100.0,
+        "name": "modes",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 227,
+        "line_percent": 100.0,
+        "name": "required_feature_dimensions",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 232,
+        "line_percent": 100.0,
+        "name": "applicability_defaults",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 244,
+        "line_percent": 100.0,
+        "name": "capability",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 249,
+        "line_percent": 100.0,
+        "name": "required_feature_ids",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 261,
+        "line_percent": 100.0,
+        "name": "enabled",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 266,
+        "line_percent": 100.0,
+        "name": "max_file_bytes",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 278,
+        "line_percent": 100.0,
+        "name": "ignored_paths",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 283,
+        "line_percent": 100.0,
+        "name": "extension_result_manifests",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 294,
+        "line_percent": 100.0,
+        "name": "__getitem__",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 5,
+        "line": 305,
+        "line_percent": 100.0,
+        "name": "required",
+        "new_or_changed_unit": true,
+        "statements": 5
+      },
+      {
+        "covered_lines": 2,
+        "line": 313,
+        "line_percent": 100.0,
+        "name": "planning_prerequisite",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 318,
+        "line_percent": 100.0,
+        "name": "mandatory_claim_rules",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 4,
+        "line": 332,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "new_or_changed_unit": true,
+        "statements": 4
+      },
+      {
+        "covered_lines": 2,
+        "line": 338,
+        "line_percent": 100.0,
+        "name": "parse_limits",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 10,
+        "line": 355,
+        "line_percent": 100.0,
+        "name": "__post_init__",
+        "new_or_changed_unit": true,
+        "statements": 10
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": [
+      {
+        "covered_lines": 4,
+        "line": 32,
+        "line_percent": 100.0,
+        "name": "ProfileError",
+        "new_or_changed_unit": true,
+        "statements": 4
+      },
+      {
+        "covered_lines": 36,
+        "line": 46,
+        "line_percent": 100.0,
+        "name": "_binding_findings",
+        "new_or_changed_unit": true,
+        "statements": 36
+      },
+      {
+        "covered_lines": 98,
+        "line": 144,
+        "line_percent": 100.0,
+        "name": "ProfileV2",
+        "new_or_changed_unit": true,
+        "statements": 98
+      },
+      {
+        "covered_lines": 2,
+        "line": 374,
+        "line_percent": 100.0,
+        "name": "parse_profile_v2",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 3,
+        "line": 35,
+        "line_percent": 100.0,
+        "name": "__init__",
+        "new_or_changed_unit": true,
+        "statements": 3
+      },
+      {
+        "covered_lines": 2,
+        "line": 52,
+        "line_percent": 100.0,
+        "name": "problem",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 9,
+        "line": 156,
+        "line_percent": 100.0,
+        "name": "__init__",
+        "new_or_changed_unit": true,
+        "statements": 9
+      },
+      {
+        "covered_lines": 2,
+        "line": 182,
+        "line_percent": 100.0,
+        "name": "id",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 187,
+        "line_percent": 100.0,
+        "name": "schema_version",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 192,
+        "line_percent": 100.0,
+        "name": "profile_version",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 197,
+        "line_percent": 100.0,
+        "name": "profile_state",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 3,
+        "line": 201,
+        "line_percent": 100.0,
+        "name": "require_configured",
+        "new_or_changed_unit": true,
+        "statements": 3
+      },
+      {
+        "covered_lines": 2,
+        "line": 218,
+        "line_percent": 100.0,
+        "name": "system",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 223,
+        "line_percent": 100.0,
+        "name": "repository",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 228,
+        "line_percent": 100.0,
+        "name": "repositories",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 239,
+        "line_percent": 100.0,
+        "name": "clients",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 250,
+        "line_percent": 100.0,
+        "name": "production_roots",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 255,
+        "line_percent": 100.0,
+        "name": "test_roots",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 260,
+        "line_percent": 100.0,
+        "name": "project_entry_points",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 265,
+        "line_percent": 100.0,
+        "name": "documentation_roots",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 270,
+        "line_percent": 100.0,
+        "name": "evidence_roots",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 275,
+        "line_percent": 100.0,
+        "name": "required_platforms",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 280,
+        "line_percent": 100.0,
+        "name": "required_modes",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 285,
+        "line_percent": 100.0,
+        "name": "required_feature_dimensions",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 290,
+        "line_percent": 100.0,
+        "name": "runtime",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 295,
+        "line_percent": 100.0,
+        "name": "analyzers",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 300,
+        "line_percent": 100.0,
+        "name": "artifacts",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 305,
+        "line_percent": 100.0,
+        "name": "completion_gates",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 310,
+        "line_percent": 100.0,
+        "name": "excluded_paths",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 315,
+        "line_percent": 100.0,
+        "name": "decision_owners",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 320,
+        "line_percent": 100.0,
+        "name": "extensions",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 2,
+        "line": 325,
+        "line_percent": 100.0,
+        "name": "extension_schemas",
+        "new_or_changed_unit": true,
+        "statements": 2
+      },
+      {
+        "covered_lines": 3,
+        "line": 332,
+        "line_percent": 100.0,
+        "name": "limits",
+        "new_or_changed_unit": true,
+        "statements": 3
+      },
+      {
+        "covered_lines": 8,
+        "line": 343,
+        "line_percent": 100.0,
+        "name": "requirements",
+        "new_or_changed_unit": true,
+        "statements": 8
+      }
+    ],
+    "scripts/dev_tools/validate_discovery_profile.py": [
+      {
+        "covered_lines": 12,
+        "line": 16,
+        "line_percent": 100.0,
+        "name": "validate_profile_text",
+        "new_or_changed_unit": true,
+        "statements": 12
+      }
+    ]
+  }
+}

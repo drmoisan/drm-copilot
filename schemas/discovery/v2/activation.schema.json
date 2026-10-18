@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:activation",
+  "title": "Discovery v2 activation locator",
+  "description": "The exact four-key workspace locator names configuration only. It cannot disable protected activation or carry permissions, receipts or success claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "enabled",
+    "profile_path",
+    "required_runtime_major"
+  ],
+  "properties": {
+    "schema_version": {"const":"2.0.0"},
+    "enabled": {"const":true},
+    "profile_path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+    "required_runtime_major": {"const":2}
+  }
+}

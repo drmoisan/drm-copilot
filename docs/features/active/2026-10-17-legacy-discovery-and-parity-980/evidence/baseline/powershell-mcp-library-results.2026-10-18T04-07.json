@@ -1,0 +1,14 @@
+{
+  "scope": "tests/scripts/claude-lib/discovery-validation",
+  "full_repository_baseline": false,
+  "junit": {
+    "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "junit_schema_4.xsd",
+    "name": "Pester",
+    "tests": "57",
+    "errors": "0",
+    "failures": "0",
+    "disabled": "0",
+    "time": "0.994"
+  },
+  "evidence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/powershell-mcp-library-junit.2026-10-18T04-07.xml"
+}

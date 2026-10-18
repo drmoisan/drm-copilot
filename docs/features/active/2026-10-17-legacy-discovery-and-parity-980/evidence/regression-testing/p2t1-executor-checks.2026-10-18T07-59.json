@@ -1,0 +1,769 @@
+{
+  "task": "P2-T1",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "case": "minimal profile raw bytes, role pin and explicit absence",
+      "passed": true
+    },
+    {
+      "case": "R1 runtime bin payload revision is application metadata",
+      "passed": true
+    },
+    {
+      "case": "R1 runtime json payload revision is application metadata",
+      "passed": true
+    },
+    {
+      "case": "R1 runtime yaml payload revision is application metadata",
+      "passed": true
+    },
+    {
+      "case": "R2 payload role cannot unselect pinned source",
+      "passed": true
+    },
+    {
+      "case": "both distinct runtime payload paths remain captured",
+      "passed": true
+    },
+    {
+      "case": "R3 directory enumeration order preserves digest",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed feature-contracts/duplicate.yaml remains captured",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed feature-contracts/wrong.json remains captured",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed hidden.bin remains captured",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed reports/unknown.json remains captured",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed evidence/unreferenced.json remains captured",
+      "passed": true
+    },
+    {
+      "case": "unrecognized or malformed source-snapshots/orphan.bin remains captured",
+      "passed": true
+    },
+    {
+      "case": "source exclusion cannot hide artifact files",
+      "passed": true
+    },
+    {
+      "case": "activation locator retained as exact bytes",
+      "passed": true
+    },
+    {
+      "case": "conflicting activation profile rejected",
+      "passed": true
+    },
+    {
+      "case": "extension documentation-root restriction src/extension.json",
+      "passed": true
+    },
+    {
+      "case": "extension documentation-root restriction docs-other/extension.json",
+      "passed": true
+    },
+    {
+      "case": "extension documentation-root restriction Docs/extension.json",
+      "passed": true
+    },
+    {
+      "case": "valid pinned local extension captured",
+      "passed": true
+    },
+    {
+      "case": "local extension pin mismatch rejected",
+      "passed": true
+    },
+    {
+      "case": "transported artifacts and payload exact-byte capture",
+      "passed": true
+    },
+    {
+      "case": "missing transported artifact rejects manifest-only claim",
+      "passed": true
+    },
+    {
+      "case": "related source manifest is restricted to configured transport root",
+      "passed": true
+    },
+    {
+      "case": "local adapter manifest captures result and source bytes",
+      "passed": true
+    },
+    {
+      "case": "local adapter cannot expand read roots",
+      "passed": true
+    },
+    {
+      "case": "snapshot freshness rejects bytes",
+      "passed": true
+    },
+    {
+      "case": "snapshot freshness rejects addition",
+      "passed": true
+    },
+    {
+      "case": "snapshot freshness rejects deletion",
+      "passed": true
+    },
+    {
+      "case": "snapshot freshness rejects replacement",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects count",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects depth",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects bytes",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects mutable",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects read",
+      "passed": true
+    },
+    {
+      "case": "bounded memory IO rejects alias",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability ordering",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability bytes",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability pin",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability missing",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability category",
+      "passed": true
+    },
+    {
+      "case": "manifest exact identity and immutability immutable",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read sha1",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read sha256",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read parent",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read link",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read hash",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read overflow",
+      "passed": true
+    },
+    {
+      "case": "local Git immutable read expression",
+      "passed": true
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t1.py",
+  "probe_production_hashes": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "78999a275d83aae7e5cc13136e3ff38f75f5ff5d4c36c6afc2749137a606c7a9"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+    }
+  ],
+  "owned_paths": 9,
+  "unchanged_prior_paths": 165,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "587/587",
+  "coverage_branch_arcs": "251/258",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": [
+      {
+        "name": "full_revision",
+        "line": 18,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "RepositoryIdentity",
+        "line": 26,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "RepositoryFile",
+        "line": 45,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "RepositoryReader",
+        "line": 66,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "GitCommand",
+        "line": 78,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "LocalGitReader",
+        "line": 90,
+        "covered_lines": 44,
+        "statements": 44
+      },
+      {
+        "name": "__post_init__",
+        "line": 32,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "to_dict",
+        "line": 39,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 52,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "sha256",
+        "line": 61,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "identity",
+        "line": 69,
+        "covered_lines": 1,
+        "statements": 1
+      },
+      {
+        "name": "read_file",
+        "line": 73,
+        "covered_lines": 1,
+        "statements": 1
+      },
+      {
+        "name": "__call__",
+        "line": 85,
+        "covered_lines": 1,
+        "statements": 1
+      },
+      {
+        "name": "__init__",
+        "line": 93,
+        "covered_lines": 7,
+        "statements": 7
+      },
+      {
+        "name": "_read",
+        "line": 120,
+        "covered_lines": 7,
+        "statements": 7
+      },
+      {
+        "name": "_verify_workspace",
+        "line": 129,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "identity",
+        "line": 139,
+        "covered_lines": 4,
+        "statements": 4
+      },
+      {
+        "name": "read_file",
+        "line": 149,
+        "covered_lines": 21,
+        "statements": 21
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": [
+      {
+        "name": "_digest",
+        "line": 44,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "repository_pins",
+        "line": 50,
+        "covered_lines": 12,
+        "statements": 12
+      },
+      {
+        "name": "SnapshotFile",
+        "line": 72,
+        "covered_lines": 15,
+        "statements": 15
+      },
+      {
+        "name": "ArtifactSnapshot",
+        "line": 116,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "InputManifest",
+        "line": 143,
+        "covered_lines": 23,
+        "statements": 23
+      },
+      {
+        "name": "DiscoverySnapshot",
+        "line": 197,
+        "covered_lines": 34,
+        "statements": 34
+      },
+      {
+        "name": "__post_init__",
+        "line": 79,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "sha256",
+        "line": 101,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "entry",
+        "line": 105,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 129,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "__post_init__",
+        "line": 155,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "_inputs",
+        "line": 173,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "sha256",
+        "line": 187,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "to_dict",
+        "line": 191,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "__post_init__",
+        "line": 209,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "ok",
+        "line": 240,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "sha256",
+        "line": 245,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "file",
+        "line": 264,
+        "covered_lines": 5,
+        "statements": 5
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": [
+      {
+        "name": "WorkspaceBytes",
+        "line": 35,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "SnapshotIO",
+        "line": 48,
+        "covered_lines": 136,
+        "statements": 136
+      },
+      {
+        "name": "within_roots",
+        "line": 264,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "document_format",
+        "line": 270,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "load_profile_inputs",
+        "line": 275,
+        "covered_lines": 31,
+        "statements": 31
+      },
+      {
+        "name": "__call__",
+        "line": 43,
+        "covered_lines": 1,
+        "statements": 1
+      },
+      {
+        "name": "__init__",
+        "line": 56,
+        "covered_lines": 19,
+        "statements": 19
+      },
+      {
+        "name": "missing_paths",
+        "line": 90,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "excluded_paths",
+        "line": 95,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "captured",
+        "line": 100,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_inspect",
+        "line": 104,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "_bootstrap",
+        "line": 115,
+        "covered_lines": 24,
+        "statements": 24
+      },
+      {
+        "name": "bind",
+        "line": 149,
+        "covered_lines": 11,
+        "statements": 11
+      },
+      {
+        "name": "inspect",
+        "line": 168,
+        "covered_lines": 10,
+        "statements": 10
+      },
+      {
+        "name": "read",
+        "line": 185,
+        "covered_lines": 23,
+        "statements": 23
+      },
+      {
+        "name": "enumerate",
+        "line": 210,
+        "covered_lines": 23,
+        "statements": 23
+      },
+      {
+        "name": "verify_unchanged",
+        "line": 246,
+        "covered_lines": 8,
+        "statements": 8
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": [
+      {
+        "name": "_Loader",
+        "line": 60,
+        "covered_lines": 183,
+        "statements": 183
+      },
+      {
+        "name": "load_snapshot",
+        "line": 470,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "__init__",
+        "line": 63,
+        "covered_lines": 13,
+        "statements": 13
+      },
+      {
+        "name": "_finding",
+        "line": 87,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_category",
+        "line": 98,
+        "covered_lines": 8,
+        "statements": 8
+      },
+      {
+        "name": "_read",
+        "line": 111,
+        "covered_lines": 9,
+        "statements": 9
+      },
+      {
+        "name": "_expect",
+        "line": 129,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "_classify",
+        "line": 147,
+        "covered_lines": 27,
+        "statements": 27
+      },
+      {
+        "name": "_parse",
+        "line": 187,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "_manifest",
+        "line": 229,
+        "covered_lines": 23,
+        "statements": 23
+      },
+      {
+        "name": "_evidence",
+        "line": 285,
+        "covered_lines": 17,
+        "statements": 17
+      },
+      {
+        "name": "load",
+        "line": 310,
+        "covered_lines": 46,
+        "statements": 46
+      },
+      {
+        "name": "_git",
+        "line": 435,
+        "covered_lines": 18,
+        "statements": 18
+      },
+      {
+        "name": "excluded",
+        "line": 340,
+        "covered_lines": 2,
+        "statements": 2
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": 178,
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": 270,
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": 340,
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": 486,
+    "tests/discovery_runtime/test_repository_reader.py": 220,
+    "tests/discovery_runtime/test_snapshot.py": 193,
+    "tests/discovery_runtime/test_snapshot_imports.py": 324,
+    "tests/discovery_runtime/test_snapshot_io.py": 277,
+    "tests/discovery_runtime/test_snapshot_loading.py": 423
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t1-coverage.2026-10-18T07-59.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t1-coverage-metrics.2026-10-18T07-59.json",
+  "initial_review": "evidence/regression-testing/p2t1-executor-review.2026-10-18T07-46.json",
+  "review_findings_corrected": [
+    "P2T1-R1",
+    "P2T1-R2",
+    "P2T1-R3"
+  ],
+  "initial_probe_expectation_corrections": [
+    "Case collision rejects before extension-root check without schema read",
+    "Catalog pin diagnostic uses checksum mismatch"
+  ],
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "git_blob": "478b20959275de55e1dab0e21a2fd0f9a98491c3",
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "git_blob": "03fe3327734efd5126140fd207c7df9a33f1a57a",
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "git_blob": "53de4aa1a3e9405693573fe8f1a3cc5b323166d7",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "git_blob": "b91aba9be1c82c216417440a736663fe2c4f9ee9",
+      "sha256": "78999a275d83aae7e5cc13136e3ff38f75f5ff5d4c36c6afc2749137a606c7a9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_repository_reader.py",
+      "git_blob": "0402d8420d7a91391a216b5eb0eba1036570c773",
+      "sha256": "d36b19679dce9dd7aa2a88e1f61635601d05b8d25e35115943e666d30448e95a"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot.py",
+      "git_blob": "7e2e5959a6cd7207b3eeeb026c808db666da9c58",
+      "sha256": "160a0fbcca35848b87fbc793d86db5aca3e8d935e27bc9c2293b0b0e20204482"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_imports.py",
+      "git_blob": "b234639d012e5308aa28a6a15541e68f8c972e68",
+      "sha256": "6922505d950c574395ea8ef7e0b6c18defa86614c35695df10e49712f8f3346c"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_io.py",
+      "git_blob": "ca01e77ec40d46ce4ab69eef4efa01836690ba86",
+      "sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading.py",
+      "git_blob": "591ae8635d9f73c32b3088df7321de73dbda8a80",
+      "sha256": "c615612ec23f74b476e390e78c64c55fa8322c01df00c4a86419026ebe7ee44a"
+    }
+  ],
+  "initial_probe": {
+    "passed": 45,
+    "failed": 2,
+    "failed_cases": [
+      {
+        "case": "extension documentation-root restriction Docs/extension.json",
+        "passed": false,
+        "exception": "AssertionError",
+        "message": "Expected diagnostic containing 'EXTENSION_SCHEMA_ROOT': PATH_COLLISION: 'docs': Remove duplicate or aliased paths."
+      },
+      {
+        "case": "local extension pin mismatch rejected",
+        "passed": false,
+        "exception": "AssertionError",
+        "message": "Expected diagnostic containing 'SHA-256': Extension schema checksum mismatch: docs/schemas/extension.json"
+      }
+    ],
+    "production_paths": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+        "sha256": "858b4830ef6341626de84882f1b00df736592b46d123f754f4f72c1d97852c15"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+        "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+        "sha256": "9d27e700750c248e72025a2cdb564e5a7f81cea8b77e813d0218d8e85125b3ae"
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+        "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+      }
+    ]
+  }
+}

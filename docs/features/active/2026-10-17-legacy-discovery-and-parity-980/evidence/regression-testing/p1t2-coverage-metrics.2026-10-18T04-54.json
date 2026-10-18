@@ -1,0 +1,78 @@
+{
+  "all_owned_paths_staged": true,
+  "authored_paths": [
+    "packages/discovery-runtime/resource-manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+    "tests/discovery_runtime/test_resources.py"
+  ],
+  "canonical_v1_changes": [],
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": {
+      "branch_percent": 100.0,
+      "branches": 34,
+      "classification": "new authored code",
+      "covered_branches": 34,
+      "covered_lines": 103,
+      "line_percent": 100.0,
+      "statements": 103
+    },
+    "scripts/dev_tools/build_discovery_runtime.py": {
+      "branch_percent": 100.0,
+      "branches": 98,
+      "classification": "new authored code",
+      "covered_branches": 98,
+      "covered_lines": 209,
+      "line_percent": 100.0,
+      "statements": 209
+    }
+  },
+  "findings": [],
+  "generated_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json"
+  ],
+  "line_counts": {
+    "packages/discovery-runtime/resource-manifest.json": 15,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": 41,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json": 139,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json": 102,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json": 183,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json": 127,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json": 123,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json": 156,
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json": 99,
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": 215,
+    "scripts/dev_tools/build_discovery_runtime.py": 408,
+    "tests/discovery_runtime/test_resources.py": 262,
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": 249,
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": 195
+  },
+  "owned_paths": [
+    "packages/discovery-runtime/resource-manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_resources.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "resource_manifest_sha256": "329dcc48c2bc145b4ecb61f62cefa348d81bbae39ca163eed7c0fef5a3316605",
+  "task": "P1-T2",
+  "timestamp_utc": "2026-10-18T04-54"
+}

@@ -1,0 +1,799 @@
+{
+  "task": "P2-T5",
+  "head": "58e5001c5907d74ee24f205690d891b4352fda23",
+  "independent_boundary_cases": [
+    {
+      "name": "valid configured owner and captured decision evidence",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "proposed cannot establish target policy",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "rejected cannot establish target policy",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unknown approval owner rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_APPROVAL"
+      ],
+      "expected_decision_codes": [
+        "DECISION_APPROVAL"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "source evidence cannot satisfy decision evidence policy",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "changed approval payload rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "missing approval payload rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_APPROVAL_EVIDENCE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unconfigured client rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_SCOPE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_SCOPE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unresolved scoped feature rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_SCOPE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_SCOPE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "overlapping same-key approvals conflict",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "different decision keys are independent",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "disjoint client_ids is independent",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "wildcard client_ids overlaps selected scope",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "disjoint platforms is independent",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "wildcard platforms overlaps selected scope",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "disjoint modes is independent",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "wildcard modes overlaps selected scope",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "disjoint dimensions is independent",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-alpha",
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "wildcard dimensions overlaps selected scope",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "approved complete successor replaces predecessor",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-beta"
+      ],
+      "expected_eligible": [
+        "decision-beta"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "proposed successor cannot remove approval",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "partial successor leaves predecessor and conflict",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT",
+        "DECISION_SUPERSESSION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_SUPERSESSION",
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "cross-key supersession rejected",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_SUPERSESSION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_SUPERSESSION"
+      ],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "approved directed cycle blocks both",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CONFLICT",
+        "DECISION_CYCLE"
+      ],
+      "expected_decision_codes": [
+        "DECISION_CYCLE",
+        "DECISION_CONFLICT"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "proposal self-cycle remains blocking",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_CYCLE",
+        "DECISION_SUPERSESSION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_SUPERSESSION",
+        "DECISION_CYCLE"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "common successor resolves prior overlapping approvals",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-gamma"
+      ],
+      "expected_eligible": [
+        "decision-gamma"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "whole-feature retirement has complete approval",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "scoped decision cannot retire entire feature",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_RETIREMENT"
+      ],
+      "expected_decision_codes": [
+        "DECISION_RETIREMENT"
+      ],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "unknown legacy facts retain an open-question obligation after target resolution",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": [
+        "CLAIM_UNRESOLVED"
+      ],
+      "expected_claim_codes": [
+        "CLAIM_UNRESOLVED"
+      ],
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "separate open legacy question retains uncertainty after target approval",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": [],
+      "expected_claim_codes": [],
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "resolved decision_owner must match approved record",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_OWNER",
+        "DECISION_RESOLUTION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_RESOLUTION",
+        "DECISION_OWNER"
+      ],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "resolved decision must match approved record",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "resolved approved_target_behavior must match approved record",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "eligible": [
+        "decision-alpha"
+      ],
+      "expected_eligible": [
+        "decision-alpha"
+      ],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "verified observation resolves without target approval",
+      "passed": true,
+      "decision_codes": [],
+      "expected_decision_codes": [],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "target decision cannot establish observed legacy resolution",
+      "passed": true,
+      "decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "expected_decision_codes": [
+        "DECISION_RESOLUTION"
+      ],
+      "eligible": [],
+      "expected_eligible": [],
+      "claim_codes": null,
+      "expected_claim_codes": null,
+      "reference_codes": [],
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "runtime source parses on supported Python 3.10",
+      "passed": true
+    },
+    {
+      "name": "1200-node valid history exceeds default Python recursion depth",
+      "passed": true,
+      "decision_records": 1200,
+      "eligible": [
+        "decision-1199"
+      ],
+      "findings": 0,
+      "elapsed_seconds": 0.633,
+      "snapshot_unchanged": true
+    },
+    {
+      "name": "decision findings preserve the configured parser diagnostic cap",
+      "passed": true,
+      "decision_records": 110,
+      "finding_limit": 100,
+      "reported_findings": 100,
+      "blocking_truncation_markers": 1,
+      "eligible": [],
+      "snapshot_unchanged": true
+    }
+  ],
+  "probe_command": "poetry run python SCRATCH/issue-980-probe-p2t5.py",
+  "probe_scope": "Scoped approval, unresolved resolution, supersession/conflicts, 1200-node history and bounded findings; structured fixtures use authoritative schema validation, and expanded bounds graphs use validated seed shapes.",
+  "probe_production_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65"
+  },
+  "normalized_command_receipts_verified": 62,
+  "owned_paths": 3,
+  "unchanged_prior_paths": 186,
+  "unchanged_frozen_v1_paths": [
+    "examples/discovery/v1/coverage-ledger.example.json",
+    "examples/discovery/v1/evidence-reference.example.json",
+    "examples/discovery/v1/feature-contract.example.json",
+    "examples/discovery/v1/parity-matrix.example.json",
+    "examples/discovery/v1/product-decision-record.example.json",
+    "examples/discovery/v1/runtime-characterization-scenario.example.json",
+    "examples/discovery/v1/unspecified-behavior-record.example.json",
+    "schemas/discovery/v1/coverage-ledger.schema.json",
+    "schemas/discovery/v1/evidence-reference.schema.json",
+    "schemas/discovery/v1/feature-contract.schema.json",
+    "schemas/discovery/v1/parity-matrix.schema.json",
+    "schemas/discovery/v1/product-decision-record.schema.json",
+    "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+    "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+    "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+    "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+    "tests/schemas/discovery/test_v1_fixtures.py",
+    "tests/schemas/discovery/test_v1_schema_documents.py",
+    "tests/scripts/dev_tools/discovery/test_package_exports.py"
+  ],
+  "coverage_lines": "183/183",
+  "coverage_branch_arcs": "75/76",
+  "unit_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": [
+      {
+        "name": "_key",
+        "line": 26,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_strings",
+        "line": 31,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "_feature",
+        "line": 41,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "DecisionScope",
+        "line": 47,
+        "covered_lines": 7,
+        "statements": 7
+      },
+      {
+        "name": "ApprovedDecision",
+        "line": 75,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "DecisionValidation",
+        "line": 83,
+        "covered_lines": 3,
+        "statements": 3
+      },
+      {
+        "name": "_reachable",
+        "line": 94,
+        "covered_lines": 9,
+        "statements": 9
+      },
+      {
+        "name": "_DecisionRules",
+        "line": 109,
+        "covered_lines": 131,
+        "statements": 131
+      },
+      {
+        "name": "validate_decisions",
+        "line": 455,
+        "covered_lines": 9,
+        "statements": 9
+      },
+      {
+        "name": "overlaps",
+        "line": 57,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "covers",
+        "line": 65,
+        "covered_lines": 2,
+        "statements": 2
+      },
+      {
+        "name": "__init__",
+        "line": 116,
+        "covered_lines": 6,
+        "statements": 6
+      },
+      {
+        "name": "features",
+        "line": 129,
+        "covered_lines": 5,
+        "statements": 5
+      },
+      {
+        "name": "scope",
+        "line": 137,
+        "covered_lines": 14,
+        "statements": 14
+      },
+      {
+        "name": "approval",
+        "line": 173,
+        "covered_lines": 19,
+        "statements": 19
+      },
+      {
+        "name": "declarations",
+        "line": 218,
+        "covered_lines": 18,
+        "statements": 18
+      },
+      {
+        "name": "reconcile",
+        "line": 255,
+        "covered_lines": 34,
+        "statements": 34
+      },
+      {
+        "name": "consumers",
+        "line": 354,
+        "covered_lines": 13,
+        "statements": 13
+      },
+      {
+        "name": "resolution",
+        "line": 390,
+        "covered_lines": 21,
+        "statements": 21
+      }
+    ]
+  },
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": 477,
+    "tests/discovery_runtime/test_decision_rules.py": 474,
+    "tests/discovery_runtime/test_decision_supersession.py": 357
+  },
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t5-coverage.2026-10-18T09-09.json",
+  "metrics": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t5-coverage-metrics.2026-10-18T09-09.json",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "git_blob": "364e087f13c4323f56bc289808dbef9a44807d87",
+      "sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65"
+    },
+    {
+      "path": "tests/discovery_runtime/test_decision_rules.py",
+      "git_blob": "8d7689376b5fc8b8bd7d0820941e9df90d31a054",
+      "sha256": "2ee1a59597f0b657629605ec2b75cc03b1cd6f8abee5835b64b14f87e719bf12"
+    },
+    {
+      "path": "tests/discovery_runtime/test_decision_supersession.py",
+      "git_blob": "3935477e8dbeb908bb39c3046a40d4629dca1ad8",
+      "sha256": "29fdeaefa361e8094b4026f7109ad8cb623ae786e61dfae99501f5a1d478a132"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:validation-receipt",
+  "title": "Discovery v2 protected validation receipt",
+  "description": "Trusted gateway record bound to exact inputs and native identity. Shape-valid workspace copies never grant authority. Root planning and analyst stop modes are disjoint.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "receipt_version", "receipt_ref", "workspace", "activation_sha256", "input_manifest", "runtime", "mode", "identity", "required_outputs", "output_valid", "validation_result", "findings", "issued_at", "writer"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:discovery:2.0.0:validation-receipt"},
+    "schema_version": {"const": "2.0.0"},
+    "artifact_kind": {"const": "validation-receipt"},
+    "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "receipt_version": {"const": "2.0.0"},
+    "receipt_ref": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "workspace": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "activation_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+    "input_manifest": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-result#/$defs/input-manifest"},
+    "runtime": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"},
+    "mode": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/mode"},
+    "identity": {"$ref": "#/$defs/principal"},
+    "required_outputs": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:required-output-manifest"}, {"type": "null"}]},
+    "output_valid": {"type": ["boolean", "null"]},
+    "validation_result": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/validation-outcome"},
+    "findings": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-result#/$defs/finding"}},
+    "issued_at": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "writer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "component", "host", "id", "build_sha256"],
+      "properties": {
+        "kind": {"const": "host-gateway"},
+        "component": {"enum": ["extension", "standalone-mcp"]},
+        "host": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "id": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "build_sha256": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+      }
+    }
+  },
+  "$defs": {
+    "principal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "host", "session_id", "agent_id", "request_id", "role", "invocation_id"],
+      "properties": {
+        "kind": {"enum": ["native-root", "discovery-agent"]},
+        "host": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "session_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "agent_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "request_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+        "role": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"}, {"type": "null"}]},
+        "invocation_id": {"anyOf": [{"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"}, {"type": "null"}]}
+      },
+      "if": {"properties": {"kind": {"const": "native-root"}}, "required": ["kind"]},
+      "then": {"properties": {"role": {"type": "null"}, "invocation_id": {"type": "null"}}},
+      "else": {"properties": {"role": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"}, "invocation_id": {"$ref": "urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"}}}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"identity": {"properties": {"kind": {"const": "native-root"}}, "required": ["kind"]}}, "required": ["identity"]},
+      "then": {"properties": {"mode": {"enum": ["structural", "discovery-complete", "parity-complete", "planning"]}, "required_outputs": {"type": "null"}, "output_valid": {"type": "null"}}},
+      "else": {"properties": {"mode": {"const": "agent-output"}, "required_outputs": {"$ref": "urn:drm-copilot:discovery:2.0.0:required-output-manifest"}, "output_valid": {"type": "boolean"}}}
+    },
+    {
+      "if": {"properties": {"validation_result": {"const": "pass"}}, "required": ["validation_result"]},
+      "then": {
+        "properties": {"findings": {"items": {"properties": {"severity": {"enum": ["warning", "info"]}}}}},
+        "allOf": [{"if": {"properties": {"identity": {"properties": {"kind": {"const": "discovery-agent"}}, "required": ["kind"]}}, "required": ["identity"]}, "then": {"properties": {"output_valid": {"const": true}}}}]
+      },
+      "else": {"properties": {"findings": {"minItems": 1, "contains": {"properties": {"severity": {"const": "error"}}, "required": ["severity"]}}}}
+    },
+    {
+      "if": {"properties": {"mode": {"enum": ["discovery-complete", "parity-complete"]}, "validation_result": {"const": "pass"}}, "required": ["mode", "validation_result"]},
+      "then": {"properties": {"input_manifest": {"properties": {"source_repositories": {"minItems": 1, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"}}}}}}
+    },
+    {
+      "if": {"properties": {"mode": {"const": "parity-complete"}, "validation_result": {"const": "pass"}}, "required": ["mode", "validation_result"]},
+      "then": {"properties": {"input_manifest": {"properties": {"target_repositories": {"minItems": 1, "items": {"$ref": "urn:drm-copilot:discovery:2.0.0:common#/$defs/repository-reference"}}}}}}
+    }
+  ]
+}

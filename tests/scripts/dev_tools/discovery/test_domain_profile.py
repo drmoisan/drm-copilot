@@ -11,23 +11,23 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
-from scripts.dev_tools.discovery import domain_profile as dp_module
-from scripts.dev_tools.discovery import domain_profile_models as models_module
-from scripts.dev_tools.discovery import profile_cli as cli_module
-from scripts.dev_tools.discovery.domain_profile import (
+from drm_copilot_discovery import domain_profile as dp_module
+from drm_copilot_discovery import domain_profile_models as models_module
+from drm_copilot_discovery.domain_profile import (
     DEFAULT_PROFILE_FILENAME,
     DomainProfileError,
     load_domain_profile,
     parse_domain_profile_text,
 )
-from scripts.dev_tools.discovery.domain_profile_models import (
+from drm_copilot_discovery.domain_profile_models import (
     ArtifactsConfig,
     DomainProfile,
     LegacySourceConfig,
     TargetConfig,
     TechnologyStackConfig,
 )
+
+from scripts.dev_tools.discovery import profile_cli as cli_module
 
 # A valid minimal profile (required fields only), in YAML flow style.
 VALID_MINIMAL = (

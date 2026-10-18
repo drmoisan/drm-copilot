@@ -1,0 +1,50 @@
+# The quoted gate value must be rejected; coercing it could disable enforcement.
+$schema: urn:drm-copilot:discovery:2.0.0:domain-profile
+schema_version: 2.0.0
+artifact_kind: domain-profile
+id: profile-invalid
+profile_version: 2
+profile_state: draft
+system: {id: system-example, name: Example system, role: legacy-source}
+repository: {id: source-example, vcs: git, revision: null, revision_policy: pinned}
+production_roots: []
+test_roots: []
+project_entry_points: []
+documentation_roots: [docs]
+evidence_roots: [docs/migration/discovery/evidence]
+repositories: []
+clients: []
+required_platforms: []
+required_modes: [online]
+required_feature_dimensions: []
+runtime: {capability: none, required_feature_ids: []}
+analyzers: {enabled: [repository], options: {}, ignored_paths: [], extension_result_manifests: []}
+excluded_paths: []
+artifacts:
+  root: docs/migration/discovery
+  profile: docs/migration/discovery/domain-profile.yaml
+  scope: docs/migration/discovery/scope.yaml
+  coverage_ledger: docs/migration/discovery/coverage-ledger.json
+  unspecified_behaviors: docs/migration/discovery/unspecified-behaviors.yaml
+  product_decisions: docs/migration/discovery/product-decisions.yaml
+  parity_matrix: docs/migration/discovery/parity-matrix.json
+  feature_contracts: docs/migration/discovery/feature-contracts
+  characterization: docs/migration/discovery/characterization
+  evidence: docs/migration/discovery/evidence
+  inventory: docs/migration/discovery/inventory
+  acceptance: docs/migration/discovery/acceptance
+  reports: docs/migration/discovery/reports
+  source_snapshots: docs/migration/discovery/source-snapshots
+  implementation_records: docs/migration/discovery/implementation-records
+completion_gates:
+  require_confirmed_scope: "true"
+  require_current_inventory: true
+  require_all_dispositions: true
+  require_feature_evidence: true
+  require_acceptance_scenarios: true
+  require_runtime_for_declared_features: true
+  block_on_unresolved_required_behavior: true
+  require_approved_deviations: true
+  planning_prerequisite: discovery-complete
+decision_owners: []
+extensions: {}

@@ -1,0 +1,3378 @@
+[
+  {
+    "path": ".claude/hooks/check-powershell-test-purity.ps1",
+    "sha256": "5956e53819c16cae29a63cc2a18e93fe1af7df19bc26fcbc0d8406c7bd375332"
+  },
+  {
+    "path": ".claude/hooks/check-python-test-purity.ps1",
+    "sha256": "ef9d047951ba912436e1dea53230aecf94e409f16c2103bfca00e1e15a6bbfde"
+  },
+  {
+    "path": ".claude/hooks/enforce-batch-budget-route.ps1",
+    "sha256": "21849d79ead2e319d881f94139a8d47aa312c7c3eb504f6274323f5d1f6bbb69"
+  },
+  {
+    "path": ".claude/hooks/enforce-checkpoint-monotonic.ps1",
+    "sha256": "d4f55a5d82fe1e8875edb554e18c8f25afa2444dec252324f55b4aa9164ad784"
+  },
+  {
+    "path": ".claude/hooks/enforce-completion-consistency.ps1",
+    "sha256": "ed5bf1fde524a37ab55765b708e900777c8dd7bcbef0efa7a9bd7313b30e8c48"
+  },
+  {
+    "path": ".claude/hooks/enforce-completion-helpers.ps1",
+    "sha256": "94b891d24dc521be9085771c72137d502066feadbe0b7ee66fa494aac9cedb43"
+  },
+  {
+    "path": ".claude/hooks/enforce-discovery-artifact-gate.ps1",
+    "sha256": "761afa1f4b88da88837908018f8a1e3468673abacb4568da087a923568c39bd5"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-invocation-origin.ps1",
+    "sha256": "7e4b07b164941f936334700f019be1e9117fdf23525089902c2d96ea601cb6e3"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-merge-gate-authorization.ps1",
+    "sha256": "08fb2de608b32eb0f830151c004f172cce9a83c40477a1a90a1c2112cf1129c3"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-merge-gate-command.ps1",
+    "sha256": "e34ead45920fce5ad5019a9c7334ef79b0ccf8fb7d0c21957edc678b545f1921"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-merge-gate-resolution.ps1",
+    "sha256": "1520f464ee4c42d396622cab2551753b9bce71b7c85493e9ac96155b2a8a0b61"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-merge-gate.ps1",
+    "sha256": "c69b8702ddbaa4de13a8d1f96116b2cb274b19139a63dbf496c9d630b6eb15bc"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-wave-barrier.ps1",
+    "sha256": "e8229e34e3d2c8f4798c7c95bad3a3678ffb883d3ec6d9b601f935cd064d5ec6"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
+    "sha256": "7fefa8c550e6fb01336c6bb639c545d83ec8e4e6763a54b860955188de37531d"
+  },
+  {
+    "path": ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
+    "sha256": "bcc358675e7e18ee74b05b397756947c44e266a3902b9b0dd6ae6abf1dff1e5d"
+  },
+  {
+    "path": ".claude/hooks/enforce-evidence-locations.ps1",
+    "sha256": "24fbb9d65cc817e79f911b67d5144fd4e98286f8761e80976fe665690892c91a"
+  },
+  {
+    "path": ".claude/hooks/enforce-feature-folder-order.ps1",
+    "sha256": "abd16d491bede4b4a9cbe3ee46f716557a7bf2def23767fa9c9fc4db982b92d1"
+  },
+  {
+    "path": ".claude/hooks/enforce-mermaid-validation.ps1",
+    "sha256": "1aa624095effc8431ddb6e92603319472a32b8ebea22e1f3cc9caa51ad902be4"
+  },
+  {
+    "path": ".claude/hooks/enforce-model-routing-receipt.ps1",
+    "sha256": "9cbf80ecde57ad88fa8728b7af94fc1ba0dfeae6b040b89f15e622a8796f42c9"
+  },
+  {
+    "path": ".claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "sha256": "b5f90ede98076d56bf45b96877f2c678bb36c0e898a23fd12b16ec1d6f27f541"
+  },
+  {
+    "path": ".claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "sha256": "67a1105a1bc526798fddc4f7de57fcac9279e196cba4576839bc1d53505aa9c2"
+  },
+  {
+    "path": ".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    "sha256": "73c78a09d941a6eedb91f7bf7bec30184fb95ceed46cb9074181b06efac8fffe"
+  },
+  {
+    "path": ".claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",
+    "sha256": "ebe9dce17c9779a47ab47eca1a0621c0b51a7f2d277da811528671339298dab6"
+  },
+  {
+    "path": ".claude/hooks/enforce-orchestration-preimplementation-gate.ps1",
+    "sha256": "023c1fca326856b5e8408b56ab1cba291e9753df1fd6ec3c3d2da03e3c97a893"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-abandon-gate.ps1",
+    "sha256": "629ccd4fa613a8f4d819cdb3f1d577f7a45b3d37240e484db238ee0272bc7c45"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1",
+    "sha256": "0d300e51be8899468af6115bfc88ea3edcd3281a04af60f8a68061e0f20bbb29"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-cohort-barrier.ps1",
+    "sha256": "df23dfe8d4978d1e9ac5746dc9a38fd8df42c56b282c898df1d930d627c22950"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-drift-gate-helpers.ps1",
+    "sha256": "5e3ff3162da2c49a5e51b6636aa0d5dc4e207016b1e58fb5e9b691016ae19bf2"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-drift-gate.ps1",
+    "sha256": "0d19b5826b672efc00872ebd7c71bd9b818d63c9b4c82e4c273e54084e736111"
+  },
+  {
+    "path": ".claude/hooks/enforce-parallel-worktree-removal-gate.ps1",
+    "sha256": "c2deea7d31fd02d14f89624cbb2e7a165d5a98edb2bb5326d578d67deda97d2d"
+  },
+  {
+    "path": ".claude/hooks/enforce-powershell-batch-budget.ps1",
+    "sha256": "a5573cd7af865229e2e598afdbc4920f8336386a87ebe713b7d73f4c21fbc0a0"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-command-allowlist.ps1",
+    "sha256": "952e15c2f42efb29de5fda1a047f9e6e81dbff1c6e4416dd5a4d811150ab59d3"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-skill-helpers.ps1",
+    "sha256": "8e333729d0867d3df8fe462bc55743696de3adad3daf8902f2f3b3bc6667dbc8"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-skill.artifact-root.ps1",
+    "sha256": "8ad849dffdbf24953b7528a245d4dc962f296461481a2a5df317ed62f052329b"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-skill.docs-only.ps1",
+    "sha256": "8d3d5f26bf6f623bbd670ebe80ebf0555fc9104306c81da146de29e892fd20cc"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
+    "sha256": "f47367ef0b7b360f5cf343d742c3086499365ea128e0a05ae363180e4c2ec266"
+  },
+  {
+    "path": ".claude/hooks/enforce-pr-author-skill.ps1",
+    "sha256": "328ae2aa5dc77a8d7387cfc463aa2395b856128c973097a9a843b6e2f9af6f01"
+  },
+  {
+    "path": ".claude/hooks/enforce-prd-feature-before-planner-helpers.ps1",
+    "sha256": "985768bdbc1707d94ed11be19e413333ea75e6534bf19d38b9ed2e5e6f33b2c9"
+  },
+  {
+    "path": ".claude/hooks/enforce-prd-feature-before-planner.ps1",
+    "sha256": "23d7659412b8700b1ee0aad1fe85d86136138282ce39dc98ea86c4db12f96f74"
+  },
+  {
+    "path": ".claude/hooks/enforce-promotion-mcp-only.ps1",
+    "sha256": "774c8d52c203fdede41852e8d44f701ebec6c1a1a7255b51526d16099425c7ca"
+  },
+  {
+    "path": ".claude/hooks/enforce-python-batch-budget.ps1",
+    "sha256": "3aab8b87129b3d473775d6eb95afa884ea21fe6b8ee8c06ea620e0e650f07fd8"
+  },
+  {
+    "path": ".claude/hooks/feature-folder-resolution.ps1",
+    "sha256": "8a5236f256d011867eaf2eb230e797e970e04e0aa15e02959e82abadaee632d3"
+  },
+  {
+    "path": ".claude/hooks/feature-review-coverage-thresholds.ps1",
+    "sha256": "7c22eda2c4fe2ad14a586aeef252ec8deb8c7b9c5e6e37a6139fcc5f7711e3fb"
+  },
+  {
+    "path": ".claude/hooks/hook-command-heredoc.ps1",
+    "sha256": "1f6cc67221337f9cdc977bc9122ecb6b68c16e97633ac8d735f694125489c8d2"
+  },
+  {
+    "path": ".claude/hooks/hook-command-invocation-operands.ps1",
+    "sha256": "2cb871fa89cc79f41c92a0288f794e568cab5c5e6bd0361ec7226df78d91071b"
+  },
+  {
+    "path": ".claude/hooks/hook-command-invocation.ps1",
+    "sha256": "a7ec95f8ea830740b40e0ab7c2556187cb1f32154ed12e9bd7bc00eb2d37665e"
+  },
+  {
+    "path": ".claude/hooks/hook-command-payload-powershell.ps1",
+    "sha256": "8d8ee3b39903eb09ffe91b51027f7f64126222e39e2cbea0478d3579cbeb95b5"
+  },
+  {
+    "path": ".claude/hooks/hook-command-payload.ps1",
+    "sha256": "8c833c86cc2e5f742e69935576257d71e876380ce1fba1d3da291134a2a439ee"
+  },
+  {
+    "path": ".claude/hooks/hook-command-scanner.ps1",
+    "sha256": "4e1796edc01ebc272ef3f95d007c767beb892c714c25055267bae73a1c362460"
+  },
+  {
+    "path": ".claude/hooks/hook-dependency-guard.ps1",
+    "sha256": "f19385c165de943dcbc6bc71345c9e4d8020d41669310bb4bad2e70f21e4b300"
+  },
+  {
+    "path": ".claude/hooks/hook-docs-only-diff.ps1",
+    "sha256": "f91347eadc891b83fd1d8d4d71cb1ac0cf43c4f9953a9978d73a3238f4aeac39"
+  },
+  {
+    "path": ".claude/hooks/persist-session-id.ps1",
+    "sha256": "ebc6c8299bf98d678fb25d1682cabd8dfdf42c87b956f2c283997860438731ac"
+  },
+  {
+    "path": ".claude/hooks/premortem-section.ps1",
+    "sha256": "ca31875e7a99fde3c082999eba603fc3eaef40c1c6bdb80bcdb4e5bdb8a52203"
+  },
+  {
+    "path": ".claude/hooks/subagentstop-envelope.ps1",
+    "sha256": "1c31e5f604c6ae1ac1249b47bc4af1ec43e4efad48a5b35ab3dff1e1bd897af5"
+  },
+  {
+    "path": ".claude/hooks/validate-bash.ps1",
+    "sha256": "77c3f188a4521a0d77698284e788c60b6ef66e4fd8493423944a0a3e88ae47e5"
+  },
+  {
+    "path": ".claude/hooks/validate-discovery-artifact-gate.ps1",
+    "sha256": "432f2ea05e32b0acb6095711b66db16dbba94e2443827fd9c218194a91b5a77e"
+  },
+  {
+    "path": ".claude/hooks/validate-executor-output.ps1",
+    "sha256": "5943a946fd31769478e2058400d8e92778dc4324daaba179b1ef48c4b992bde6"
+  },
+  {
+    "path": ".claude/hooks/validate-feature-review-coverage-metrics.ps1",
+    "sha256": "8b32fb949c68913117289a231b090781ce05edc28d3a7c3bdcef267228d5b195"
+  },
+  {
+    "path": ".claude/hooks/validate-feature-review-coverage-rules.ps1",
+    "sha256": "fe4840a00c71a98cef0170b492d4dcd8f7388c3e5f1790e50d871b1d2916f7de"
+  },
+  {
+    "path": ".claude/hooks/validate-feature-review-coverage.ps1",
+    "sha256": "425604e23e809be68ae877c19d3dafdc011cca59440472a97d5c939159b91a47"
+  },
+  {
+    "path": ".claude/hooks/validate-orchestrator-output-resolution.ps1",
+    "sha256": "242fbfc3431999d2754cf1ea6466f719642178c5d77e2db85bba0c70e9023fe7"
+  },
+  {
+    "path": ".claude/hooks/validate-orchestrator-output-routing.ps1",
+    "sha256": "1d248eadec534bb1bfbc1799ddaa5afc97439d008c83caf8a422b4a8b75a61e6"
+  },
+  {
+    "path": ".claude/hooks/validate-orchestrator-output.ps1",
+    "sha256": "e7742fa37e202613bf5caeb63e1d4ef9e8ae4bfcd9c2443ff48df73c8e1b65af"
+  },
+  {
+    "path": ".claude/hooks/validate-planner-output.ps1",
+    "sha256": "c2209ae8d0692bd55230e717ed4067c75f3e72ef06d6ea256cdf9320ef47391a"
+  },
+  {
+    "path": ".claude/hooks/validate-pr-author-output.ps1",
+    "sha256": "19152f41578ee372b9fbaa667f9126b2f9acf56d8c605d40b1b0cec0e8e7aabb"
+  },
+  {
+    "path": ".claude/hooks/validate-prd-feature-output.ps1",
+    "sha256": "354aa463d37db040ad623d773ca8e7931fd80495ff7c4a88ab9e85e05a30eb90"
+  },
+  {
+    "path": ".claude/hooks/validate-required-artifact-output.ps1",
+    "sha256": "38acdcdb66b59dd2be85e8c1fa79de86ca87768bee6f5100569c08c093b57a8e"
+  },
+  {
+    "path": ".claude/hooks/validate-task-researcher-output.ps1",
+    "sha256": "01b909ff493dc43d8340ae40d77f6098833963d67b567d3a002443028a26f760"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadius.psm1",
+    "sha256": "f571010210477f2cd43c6fd179de2b52a7466f1de272f9d66ec66cb2780c4276"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+    "sha256": "0a8e93c313d8d7ed47103e8d1c6421fd11ef44ffd2ec7c1a6e149d6ae578a304"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusConflict.psm1",
+    "sha256": "206cb1d1e927b8b29f0d8400604399136cfc0950da31619fd9f966129f2b411d"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+    "sha256": "825b45308e0be1e216854771f61d9e71ebb30e455fdc295309fbea07be5025b6"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+    "sha256": "d45805b91bd6f7f9bd79366687b2a08a4d291c47a7a951c3ee300dd4982411ae"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusNormalization.psm1",
+    "sha256": "8bf3b5d60267b8571aabda46f19c8463eee28adb4f1d790a456800f89bf4019e"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusScheduling.psm1",
+    "sha256": "71bb9ecec0b74103b7c706686db887aa8ff49925a37d691f96a9b8dba7e64a84"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusTokenShape.psm1",
+    "sha256": "a7e120467b3881e42947fc10e004a6bf1a1b99b66914d6aa4c7135a3193d7674"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+    "sha256": "b323355b234c8cf079265cb0484e17b38e59aaa94fac1c15a355d52ead45c2a1"
+  },
+  {
+    "path": ".claude/lib/blast-radius/BlastRadiusWriteIntent.psm1",
+    "sha256": "e0ba0aa43f80b497a94c3eefa8a7c98efbee7943e3c31697ab3237457c13a33e"
+  },
+  {
+    "path": ".claude/lib/ci-gate/Invoke-CiGateParser.ps1",
+    "sha256": "5e74827d1747e1f01dfe1aec39ca871f71d01e9fa1ba28ddacee2535cc3551bc"
+  },
+  {
+    "path": ".claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1",
+    "sha256": "ad2b4092bbbc3d14fe84624a07d3ff6ef1ea49d9a9d6c3df1027a89d98ffc649"
+  },
+  {
+    "path": ".claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1",
+    "sha256": "281ebd42aaa72bfafb105efb5b132eb3b4f8a188a78797f59839817565174782"
+  },
+  {
+    "path": ".claude/lib/codex-routing/CodexDeployment.psm1",
+    "sha256": "aa29eb2c8afc86ff8524530b1ef66a87ca018aaf4af8a8ddf3d0f2b1a69ed106"
+  },
+  {
+    "path": ".claude/lib/codex-routing/CodexTopology.psm1",
+    "sha256": "f7458ee4c3f46db9dfc2a4b38f333f1e61a6c5738c11b74d36ad587fbdc2affd"
+  },
+  {
+    "path": ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+    "sha256": "5750a0f66033ea0e52a3653e1944d55df934c38ed8f9945f1c96bf4defe71de5"
+  },
+  {
+    "path": ".claude/lib/hook-payload/HookPayload.psm1",
+    "sha256": "44a92fdd655e9e66fc4ba3230b082f40f81818d6708dabb508233ea0d1ca2782"
+  },
+  {
+    "path": ".claude/lib/mermaid/MermaidGrammar.psm1",
+    "sha256": "88620f78373e1122836fb8d7673b5d5d25296f774f670ed4373e5ea7cf76c541"
+  },
+  {
+    "path": ".claude/lib/mermaid/MermaidLineScanner.psm1",
+    "sha256": "d6ed232d4c2f06b698aedabfc4e5937dc6e08f9ab315c382c8a50e780c7c32a8"
+  },
+  {
+    "path": ".claude/lib/mermaid/MermaidMarkdownFences.psm1",
+    "sha256": "f4146f658aee1f60cb92c42145681cfa0ab2e28127549045e7617306d42ac2c0"
+  },
+  {
+    "path": ".claude/lib/mermaid/MermaidValidation.psm1",
+    "sha256": "045563c75300b09487d97c417cd1d9ae0c891b19c84950e8894ee66376edc166"
+  },
+  {
+    "path": ".claude/lib/model-routing/ModelRouting.psm1",
+    "sha256": "78bee574d9bbf2106d9231f56170f220e41956cec86dfcbc0832994a0e4d899c"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorState.psm1",
+    "sha256": "d5a6f20779ee3a82ec3220581ae88a10fe8723b68f1aebdabd0056683293422f"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1",
+    "sha256": "c7b546b0bcbfe6c04de3946ae2e010c533b35f746af25dd8f32b052275071da6"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1",
+    "sha256": "967adbdd0417b656e0afed8ff0f8b00566e76a53ada8de88a357b06ce9a083c2"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1",
+    "sha256": "63c537e62cc33c64f53d484ce756dd8ba08655e4fb7e07513961b00e352fb308"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1",
+    "sha256": "b8c60a6f9da27f746259084c873e0cf37dd3bdf57ed730519292390cf6c2fed8"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1",
+    "sha256": "d4a1653805ecb33edff12a61609f3bcb2972eddc034153ed88a779864aad4b8e"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1",
+    "sha256": "0d4a2da353ff1889abbadc3f0c9cbeb28594bbf4b89724b2a16296292be76f41"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1",
+    "sha256": "122e84327733516e920687c4ead647fe1dc09498ea800e56ab7abc0deaca43b3"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1",
+    "sha256": "9c1ee9591e938647f84e7257a33fd1a962bffa199c893ef9e6a10952c1168aea"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1",
+    "sha256": "c8b7d9751f621eedbb533fc2f90102cebd57ae7fc3474f9d82eb28cffa8ffa9a"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1",
+    "sha256": "e398084879b134d558721cd431fa0dc5c99926088d41f8575cc699e37954ecdd"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1",
+    "sha256": "0272cee5975326b1f5a54f9aa8ec0405b3e42e11bc9d95a8fb7d366ee5e01f1b"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1",
+    "sha256": "40b99f27aad351c04ca2d79bf67261013e0473060135cf2bb3bb8a0627381f40"
+  },
+  {
+    "path": ".claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1",
+    "sha256": "12c1e19061363005ad8a4a5d9eaef51d736d2c9b160c5a1db420e0aa819e5f18"
+  },
+  {
+    "path": ".claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1",
+    "sha256": "18d350ecd3cea9731f361aeb6e8933105603388aee86bd1a205a25f216540c4a"
+  },
+  {
+    "path": ".claude/lib/parallel-drift/ParallelDrift.psm1",
+    "sha256": "e2ee7d2a2b32438cbe41924da9c8eb07371390944f849498ef83d0d5b3dc041c"
+  },
+  {
+    "path": ".claude/lib/parallel-drift/ParallelDriftHalt.psm1",
+    "sha256": "1f7baafebc8f1840677abcffaa80fc41a32b0456c28fd67618d1387eaa8650fe"
+  },
+  {
+    "path": ".claude/lib/project-file-merge/ProjectFileMerge.psm1",
+    "sha256": "aa10179dc5881371c6a8d6032798913b0fc68e99506675f1f51cfa829456c23f"
+  },
+  {
+    "path": ".claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1",
+    "sha256": "0dd3d9978e9338bbdd506e7ceb982a2ff732048b0b0d7b2773360ee1100cc845"
+  },
+  {
+    "path": ".claude/lib/project-file-merge/Resolve-MergeableConflict.ps1",
+    "sha256": "65cde49b2984abbb569f4ee2dcb6d025899f7b64ea4dca6c599b7e2ffbd49603"
+  },
+  {
+    "path": ".claude/lib/requirements/GeneratedDocumentCounters.psm1",
+    "sha256": "d2fa4fe1aeae089997a45f501601bf5081c45821ae3ab8aa6c8a80bd019c5251"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/EpicScopeReadiness.psm1",
+    "sha256": "30ba3d84926953536018e7d473238cf52bb4900555dc177c81cf518bd74d88b1"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/EpicScopeResolution.psm1",
+    "sha256": "1169a3b25dd3298e836956319164c36da217a0a416852906970d1d381fd89f47"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/WorktreeItemResolution.psm1",
+    "sha256": "74e7a2cda251b1bedfc75560d9d7c049ec173047e7b6b130f79d6c2ccf5c53db"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/WorktreeResolution.psm1",
+    "sha256": "2d655a4cb47334f1e8075eb35dcebdec8cde5e21f4eaafaf0e7a68fc0b5d4c65"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/WorktreeRunResolution.psm1",
+    "sha256": "51ae914fb560c445e36d0330e7a599028a26de32c844ee4d5d7325fcd5aa70b4"
+  },
+  {
+    "path": ".claude/lib/worktree-resolution/WorktreeTargetResolution.psm1",
+    "sha256": "f56e976d7446ff888c01b0d06fddbf41cfb8924315934cd85fc8a9336f9e385d"
+  },
+  {
+    "path": ".codex/hooks/authorize-root-epic-invocation.ps1",
+    "sha256": "aa7f4e6741cdbdd89ff6214dba80a6227452305175973ea46ee43c8084a5ec08"
+  },
+  {
+    "path": ".codex/hooks/check-powershell-test-purity.ps1",
+    "sha256": "ded6e929f4e598f70e8917d8bd792881a4ed7eaebc99372fbbfcba41e64395eb"
+  },
+  {
+    "path": ".codex/hooks/check-python-test-purity.ps1",
+    "sha256": "dae4b59c18567def67bc887cab44c2889edaa59521b52124bd6348f447833aa8"
+  },
+  {
+    "path": ".codex/hooks/codex-agent-profile-attestation.ps1",
+    "sha256": "bda6f82afee6fd3c6cf0788ab9f303255acabb7efb7638cb2f57476527e9cee7"
+  },
+  {
+    "path": ".codex/hooks/codex-authority-store.ps1",
+    "sha256": "0a732df609aba62a4eb71a05002a8247f09a00ff5a097d14a26e4ccfcb7e9959"
+  },
+  {
+    "path": ".codex/hooks/codex-epic-child-launch-attestation.ps1",
+    "sha256": "f9e6ff273212998eabd89a1be5a9e1a05b47b584a1b93ea4a369c659fbbcc613"
+  },
+  {
+    "path": ".codex/hooks/codex-pretooluse-file-mapping.ps1",
+    "sha256": "4951858193773bcb4a36548b6f01cae40bd81412a723afacc4e9d12cb3899e7d"
+  },
+  {
+    "path": ".codex/hooks/enforce-batch-budget-route.ps1",
+    "sha256": "21849d79ead2e319d881f94139a8d47aa312c7c3eb504f6274323f5d1f6bbb69"
+  },
+  {
+    "path": ".codex/hooks/enforce-checkpoint-monotonic.ps1",
+    "sha256": "a8b70ac22ff84214236d16f827b6d875e70ad941806607c0f01d1abf002cbdf8"
+  },
+  {
+    "path": ".codex/hooks/enforce-codex-model-routing.ps1",
+    "sha256": "41bc222060fd17cbfe3302e41a2b883da77d51539bdfc0e6abf27c95103ba6c9"
+  },
+  {
+    "path": ".codex/hooks/enforce-completion-consistency.ps1",
+    "sha256": "9dae74007157c39574c8b87c7528ae91959c1d7f995fc7b713f1600068a584d3"
+  },
+  {
+    "path": ".codex/hooks/enforce-completion-helpers.ps1",
+    "sha256": "94b891d24dc521be9085771c72137d502066feadbe0b7ee66fa494aac9cedb43"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-child-worktree-binding.ps1",
+    "sha256": "d70c6d492d94f0636f3e79190f36a50b41e6ee4763bc5430b312e7ee4645ed26"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-merge-gate-command.ps1",
+    "sha256": "e34ead45920fce5ad5019a9c7334ef79b0ccf8fb7d0c21957edc678b545f1921"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-merge-gate.ps1",
+    "sha256": "ee11b3a41df465f64eb79c2c39540e56508bdc6dd83026ef4d5722455d2111b1"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-planning-only.ps1",
+    "sha256": "d27bae5f2358923ebe78cf78411661d62004511a3356c9841569be0661e7cf65"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-root-invocation.ps1",
+    "sha256": "2d33c1c9db8fa3e83c8d6727f54c5dcd998f9b5281cf5ae99b8832f2a80e8f06"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-wave-barrier.ps1",
+    "sha256": "23158ab98a50e6b672494180039df0c1c23823e8f4eca6a602dc88e023fb0318"
+  },
+  {
+    "path": ".codex/hooks/enforce-epic-worktree-removal-gate.ps1",
+    "sha256": "eb9f896bfd21c13a96bc98c56b46632c64fd7ada5861551f548cf7bc22a57d6e"
+  },
+  {
+    "path": ".codex/hooks/enforce-evidence-locations.ps1",
+    "sha256": "e8901c213dd5e37754dbd47cb15abe326b483e131a0883e116f6e382b61a3c37"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1",
+    "sha256": "89bb099cc73e800603c34dade4f80e73d1d9ccd4561e8454551f05eab174b6b5"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "sha256": "3eefbc73c1ce6960ab04be56f8c99364e4b54b1f3e33f6403036b10589a089f7"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "sha256": "67a1105a1bc526798fddc4f7de57fcac9279e196cba4576839bc1d53505aa9c2"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    "sha256": "ba443838cb7d1ca87075e8c2405ecfdd8ae454ee67390d7670bf620e078b7c26"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",
+    "sha256": "ebe9dce17c9779a47ab47eca1a0621c0b51a7f2d277da811528671339298dab6"
+  },
+  {
+    "path": ".codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
+    "sha256": "96ccbfdd2f4813a2c61ec219d12c2f69f318b19bc69c1aa925fdec131f8cb930"
+  },
+  {
+    "path": ".codex/hooks/enforce-powershell-batch-budget.ps1",
+    "sha256": "5d1049cce985837d88384e7706550ac896264088f6c1272ab0d396bb7de62e12"
+  },
+  {
+    "path": ".codex/hooks/enforce-promotion-mcp-only.ps1",
+    "sha256": "5f2a3241a9ab5b26c6118e71b530357be68276b401100a03c5170bfee3a921fc"
+  },
+  {
+    "path": ".codex/hooks/enforce-python-batch-budget.ps1",
+    "sha256": "a1f1ab834057921fce40835e19a92a228393c8576db48cc308197b08fc435ffd"
+  },
+  {
+    "path": ".codex/hooks/feature-folder-resolution.ps1",
+    "sha256": "8a5236f256d011867eaf2eb230e797e970e04e0aa15e02959e82abadaee632d3"
+  },
+  {
+    "path": ".codex/hooks/feature-review-coverage-thresholds.ps1",
+    "sha256": "7c22eda2c4fe2ad14a586aeef252ec8deb8c7b9c5e6e37a6139fcc5f7711e3fb"
+  },
+  {
+    "path": ".codex/hooks/hook-command-heredoc.ps1",
+    "sha256": "1f6cc67221337f9cdc977bc9122ecb6b68c16e97633ac8d735f694125489c8d2"
+  },
+  {
+    "path": ".codex/hooks/hook-command-invocation-operands.ps1",
+    "sha256": "2cb871fa89cc79f41c92a0288f794e568cab5c5e6bd0361ec7226df78d91071b"
+  },
+  {
+    "path": ".codex/hooks/hook-command-invocation.ps1",
+    "sha256": "a7ec95f8ea830740b40e0ab7c2556187cb1f32154ed12e9bd7bc00eb2d37665e"
+  },
+  {
+    "path": ".codex/hooks/hook-command-payload-powershell.ps1",
+    "sha256": "8d8ee3b39903eb09ffe91b51027f7f64126222e39e2cbea0478d3579cbeb95b5"
+  },
+  {
+    "path": ".codex/hooks/hook-command-payload.ps1",
+    "sha256": "8c833c86cc2e5f742e69935576257d71e876380ce1fba1d3da291134a2a439ee"
+  },
+  {
+    "path": ".codex/hooks/hook-command-scanner.ps1",
+    "sha256": "4e1796edc01ebc272ef3f95d007c767beb892c714c25055267bae73a1c362460"
+  },
+  {
+    "path": ".codex/hooks/hook-dependency-guard.ps1",
+    "sha256": "f19385c165de943dcbc6bc71345c9e4d8020d41669310bb4bad2e70f21e4b300"
+  },
+  {
+    "path": ".codex/hooks/hook-docs-only-diff.ps1",
+    "sha256": "f91347eadc891b83fd1d8d4d71cb1ac0cf43c4f9953a9978d73a3238f4aeac39"
+  },
+  {
+    "path": ".codex/hooks/record-subagent-routing-attestation.ps1",
+    "sha256": "df203e233cd824db0f549a4b3572c88296191d966f08a74e6052dac215eb7700"
+  },
+  {
+    "path": ".codex/hooks/validate-bash.ps1",
+    "sha256": "24b8e919c7961718823045aa614ac34c8b2a2eb6ebc2c3ef16bacf8d90e4b105"
+  },
+  {
+    "path": ".codex/hooks/validate-codex-subagent-routing.ps1",
+    "sha256": "8035e04a3c16b1f228ad1f1cf6c109c804c633196fa0724370e8e90edb7e4d5d"
+  },
+  {
+    "path": ".codex/hooks/validate-feature-review-coverage.ps1",
+    "sha256": "2cff26f8d245b96e92a66638866945c427aaa93291eeacfd7e6587323de1c822"
+  },
+  {
+    "path": ".codex/scripts/codex-routing-cli-common.ps1",
+    "sha256": "b9e2952a70f9e7b18dc424bb41cc84b16a0677e4732ce55110b12928842fd04d"
+  },
+  {
+    "path": ".codex/scripts/epic-child-launch-contract.ps1",
+    "sha256": "90577d152430ba740503c08415985d9b6d76cd844a7104b2ea215934fb76a77e"
+  },
+  {
+    "path": ".codex/scripts/epic-child-launch-runtime.ps1",
+    "sha256": "ae2d7e44334319daf87723b0d0db6cbb31ad567e358d26ecf947d2bc207c582c"
+  },
+  {
+    "path": ".codex/scripts/epic-child-persistence-runtime.ps1",
+    "sha256": "5d2efe656c3dfa8efddce4549d56ccc0ad3b81d8cb9000fe14bf3b6f7e7ce1a8"
+  },
+  {
+    "path": ".codex/scripts/epic-child-sandbox-preflight.ps1",
+    "sha256": "68a8fb9a52957dfd85a87385e9f11b35c6fa7c27e1578c93979b18b6680a6706"
+  },
+  {
+    "path": ".codex/scripts/launch-epic-child-wave.ps1",
+    "sha256": "8a856c6a81002156c3bf6979eef0461dddebbb78483098c4e3ea6f869fa3227e"
+  },
+  {
+    "path": ".codex/scripts/post-codex-worktree-session.ps1",
+    "sha256": "77f064fc8ee493b95ec0188e5d8a80ccca79bd007b1e3a0880cd6ff526aa496b"
+  },
+  {
+    "path": ".codex/scripts/Resolve-CodexDeployment.ps1",
+    "sha256": "71083e936934283935cd727291c43d5aaba1c7a3aa3e791b4590925065df6a6c"
+  },
+  {
+    "path": ".codex/scripts/Resolve-CodexTopology.ps1",
+    "sha256": "71a29fe96d7f70f73b4632ac7a3fab029d558ebcf2f75c8287a09c15b06ac578"
+  },
+  {
+    "path": ".codex/scripts/resume-epic-child.ps1",
+    "sha256": "338949853a96a8d31d66bd61cf0229888c5a5b3f82fe8e23dbdc3a1618374550"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/check-powershell-test-purity.ps1",
+    "sha256": "5956e53819c16cae29a63cc2a18e93fe1af7df19bc26fcbc0d8406c7bd375332"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/check-python-test-purity.ps1",
+    "sha256": "ef9d047951ba912436e1dea53230aecf94e409f16c2103bfca00e1e15a6bbfde"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-batch-budget-route.ps1",
+    "sha256": "21849d79ead2e319d881f94139a8d47aa312c7c3eb504f6274323f5d1f6bbb69"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-checkpoint-monotonic.ps1",
+    "sha256": "d4f55a5d82fe1e8875edb554e18c8f25afa2444dec252324f55b4aa9164ad784"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1",
+    "sha256": "ed5bf1fde524a37ab55765b708e900777c8dd7bcbef0efa7a9bd7313b30e8c48"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-helpers.ps1",
+    "sha256": "94b891d24dc521be9085771c72137d502066feadbe0b7ee66fa494aac9cedb43"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-discovery-artifact-gate.ps1",
+    "sha256": "761afa1f4b88da88837908018f8a1e3468673abacb4568da087a923568c39bd5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-invocation-origin.ps1",
+    "sha256": "7e4b07b164941f936334700f019be1e9117fdf23525089902c2d96ea601cb6e3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-authorization.ps1",
+    "sha256": "08fb2de608b32eb0f830151c004f172cce9a83c40477a1a90a1c2112cf1129c3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-command.ps1",
+    "sha256": "e34ead45920fce5ad5019a9c7334ef79b0ccf8fb7d0c21957edc678b545f1921"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-resolution.ps1",
+    "sha256": "1520f464ee4c42d396622cab2551753b9bce71b7c85493e9ac96155b2a8a0b61"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1",
+    "sha256": "c69b8702ddbaa4de13a8d1f96116b2cb274b19139a63dbf496c9d630b6eb15bc"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1",
+    "sha256": "e8229e34e3d2c8f4798c7c95bad3a3678ffb883d3ec6d9b601f935cd064d5ec6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
+    "sha256": "7fefa8c550e6fb01336c6bb639c545d83ec8e4e6763a54b860955188de37531d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-worktree-removal-gate.ps1",
+    "sha256": "bcc358675e7e18ee74b05b397756947c44e266a3902b9b0dd6ae6abf1dff1e5d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-evidence-locations.ps1",
+    "sha256": "24fbb9d65cc817e79f911b67d5144fd4e98286f8761e80976fe665690892c91a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-feature-folder-order.ps1",
+    "sha256": "abd16d491bede4b4a9cbe3ee46f716557a7bf2def23767fa9c9fc4db982b92d1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-mermaid-validation.ps1",
+    "sha256": "1aa624095effc8431ddb6e92603319472a32b8ebea22e1f3cc9caa51ad902be4"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1",
+    "sha256": "9cbf80ecde57ad88fa8728b7af94fc1ba0dfeae6b040b89f15e622a8796f42c9"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "sha256": "b5f90ede98076d56bf45b96877f2c678bb36c0e898a23fd12b16ec1d6f27f541"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "sha256": "67a1105a1bc526798fddc4f7de57fcac9279e196cba4576839bc1d53505aa9c2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    "sha256": "73c78a09d941a6eedb91f7bf7bec30184fb95ceed46cb9074181b06efac8fffe"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",
+    "sha256": "ebe9dce17c9779a47ab47eca1a0621c0b51a7f2d277da811528671339298dab6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1",
+    "sha256": "023c1fca326856b5e8408b56ab1cba291e9753df1fd6ec3c3d2da03e3c97a893"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-abandon-gate.ps1",
+    "sha256": "629ccd4fa613a8f4d819cdb3f1d577f7a45b3d37240e484db238ee0272bc7c45"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1",
+    "sha256": "0d300e51be8899468af6115bfc88ea3edcd3281a04af60f8a68061e0f20bbb29"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-cohort-barrier.ps1",
+    "sha256": "df23dfe8d4978d1e9ac5746dc9a38fd8df42c56b282c898df1d930d627c22950"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-drift-gate-helpers.ps1",
+    "sha256": "5e3ff3162da2c49a5e51b6636aa0d5dc4e207016b1e58fb5e9b691016ae19bf2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-drift-gate.ps1",
+    "sha256": "0d19b5826b672efc00872ebd7c71bd9b818d63c9b4c82e4c273e54084e736111"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-parallel-worktree-removal-gate.ps1",
+    "sha256": "c2deea7d31fd02d14f89624cbb2e7a165d5a98edb2bb5326d578d67deda97d2d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-powershell-batch-budget.ps1",
+    "sha256": "a5573cd7af865229e2e598afdbc4920f8336386a87ebe713b7d73f4c21fbc0a0"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-command-allowlist.ps1",
+    "sha256": "952e15c2f42efb29de5fda1a047f9e6e81dbff1c6e4416dd5a4d811150ab59d3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1",
+    "sha256": "8e333729d0867d3df8fe462bc55743696de3adad3daf8902f2f3b3bc6667dbc8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.artifact-root.ps1",
+    "sha256": "8ad849dffdbf24953b7528a245d4dc962f296461481a2a5df317ed62f052329b"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.docs-only.ps1",
+    "sha256": "8d3d5f26bf6f623bbd670ebe80ebf0555fc9104306c81da146de29e892fd20cc"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
+    "sha256": "f47367ef0b7b360f5cf343d742c3086499365ea128e0a05ae363180e4c2ec266"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1",
+    "sha256": "328ae2aa5dc77a8d7387cfc463aa2395b856128c973097a9a843b6e2f9af6f01"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1",
+    "sha256": "985768bdbc1707d94ed11be19e413333ea75e6534bf19d38b9ed2e5e6f33b2c9"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1",
+    "sha256": "23d7659412b8700b1ee0aad1fe85d86136138282ce39dc98ea86c4db12f96f74"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-promotion-mcp-only.ps1",
+    "sha256": "774c8d52c203fdede41852e8d44f701ebec6c1a1a7255b51526d16099425c7ca"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-python-batch-budget.ps1",
+    "sha256": "3aab8b87129b3d473775d6eb95afa884ea21fe6b8ee8c06ea620e0e650f07fd8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-folder-resolution.ps1",
+    "sha256": "8a5236f256d011867eaf2eb230e797e970e04e0aa15e02959e82abadaee632d3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-review-coverage-thresholds.ps1",
+    "sha256": "7c22eda2c4fe2ad14a586aeef252ec8deb8c7b9c5e6e37a6139fcc5f7711e3fb"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-heredoc.ps1",
+    "sha256": "1f6cc67221337f9cdc977bc9122ecb6b68c16e97633ac8d735f694125489c8d2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation-operands.ps1",
+    "sha256": "2cb871fa89cc79f41c92a0288f794e568cab5c5e6bd0361ec7226df78d91071b"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1",
+    "sha256": "a7ec95f8ea830740b40e0ab7c2556187cb1f32154ed12e9bd7bc00eb2d37665e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-payload-powershell.ps1",
+    "sha256": "8d8ee3b39903eb09ffe91b51027f7f64126222e39e2cbea0478d3579cbeb95b5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-payload.ps1",
+    "sha256": "8c833c86cc2e5f742e69935576257d71e876380ce1fba1d3da291134a2a439ee"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-scanner.ps1",
+    "sha256": "4e1796edc01ebc272ef3f95d007c767beb892c714c25055267bae73a1c362460"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-dependency-guard.ps1",
+    "sha256": "f19385c165de943dcbc6bc71345c9e4d8020d41669310bb4bad2e70f21e4b300"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1",
+    "sha256": "f91347eadc891b83fd1d8d4d71cb1ac0cf43c4f9953a9978d73a3238f4aeac39"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/persist-session-id.ps1",
+    "sha256": "ebc6c8299bf98d678fb25d1682cabd8dfdf42c87b956f2c283997860438731ac"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/premortem-section.ps1",
+    "sha256": "ca31875e7a99fde3c082999eba603fc3eaef40c1c6bdb80bcdb4e5bdb8a52203"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1",
+    "sha256": "1c31e5f604c6ae1ac1249b47bc4af1ec43e4efad48a5b35ab3dff1e1bd897af5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-bash.ps1",
+    "sha256": "77c3f188a4521a0d77698284e788c60b6ef66e4fd8493423944a0a3e88ae47e5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-discovery-artifact-gate.ps1",
+    "sha256": "432f2ea05e32b0acb6095711b66db16dbba94e2443827fd9c218194a91b5a77e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-executor-output.ps1",
+    "sha256": "5943a946fd31769478e2058400d8e92778dc4324daaba179b1ef48c4b992bde6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage-metrics.ps1",
+    "sha256": "8b32fb949c68913117289a231b090781ce05edc28d3a7c3bdcef267228d5b195"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage-rules.ps1",
+    "sha256": "fe4840a00c71a98cef0170b492d4dcd8f7388c3e5f1790e50d871b1d2916f7de"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1",
+    "sha256": "425604e23e809be68ae877c19d3dafdc011cca59440472a97d5c939159b91a47"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output-resolution.ps1",
+    "sha256": "242fbfc3431999d2754cf1ea6466f719642178c5d77e2db85bba0c70e9023fe7"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output-routing.ps1",
+    "sha256": "1d248eadec534bb1bfbc1799ddaa5afc97439d008c83caf8a422b4a8b75a61e6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output.ps1",
+    "sha256": "e7742fa37e202613bf5caeb63e1d4ef9e8ae4bfcd9c2443ff48df73c8e1b65af"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-planner-output.ps1",
+    "sha256": "c2209ae8d0692bd55230e717ed4067c75f3e72ef06d6ea256cdf9320ef47391a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-pr-author-output.ps1",
+    "sha256": "19152f41578ee372b9fbaa667f9126b2f9acf56d8c605d40b1b0cec0e8e7aabb"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-prd-feature-output.ps1",
+    "sha256": "354aa463d37db040ad623d773ca8e7931fd80495ff7c4a88ab9e85e05a30eb90"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-required-artifact-output.ps1",
+    "sha256": "38acdcdb66b59dd2be85e8c1fa79de86ca87768bee6f5100569c08c093b57a8e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-task-researcher-output.ps1",
+    "sha256": "01b909ff493dc43d8340ae40d77f6098833963d67b567d3a002443028a26f760"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadius.psm1",
+    "sha256": "f571010210477f2cd43c6fd179de2b52a7466f1de272f9d66ec66cb2780c4276"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusConfig.psm1",
+    "sha256": "0a8e93c313d8d7ed47103e8d1c6421fd11ef44ffd2ec7c1a6e149d6ae578a304"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusConflict.psm1",
+    "sha256": "206cb1d1e927b8b29f0d8400604399136cfc0950da31619fd9f966129f2b411d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+    "sha256": "825b45308e0be1e216854771f61d9e71ebb30e455fdc295309fbea07be5025b6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusGlob.psm1",
+    "sha256": "d45805b91bd6f7f9bd79366687b2a08a4d291c47a7a951c3ee300dd4982411ae"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusNormalization.psm1",
+    "sha256": "8bf3b5d60267b8571aabda46f19c8463eee28adb4f1d790a456800f89bf4019e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusScheduling.psm1",
+    "sha256": "71bb9ecec0b74103b7c706686db887aa8ff49925a37d691f96a9b8dba7e64a84"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusTokenShape.psm1",
+    "sha256": "a7e120467b3881e42947fc10e004a6bf1a1b99b66914d6aa4c7135a3193d7674"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusValidation.psm1",
+    "sha256": "b323355b234c8cf079265cb0484e17b38e59aaa94fac1c15a355d52ead45c2a1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1",
+    "sha256": "e0ba0aa43f80b497a94c3eefa8a7c98efbee7943e3c31697ab3237457c13a33e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1",
+    "sha256": "5e74827d1747e1f01dfe1aec39ca871f71d01e9fa1ba28ddacee2535cc3551bc"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1",
+    "sha256": "ad2b4092bbbc3d14fe84624a07d3ff6ef1ea49d9a9d6c3df1027a89d98ffc649"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1",
+    "sha256": "281ebd42aaa72bfafb105efb5b132eb3b4f8a188a78797f59839817565174782"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/CodexDeployment.psm1",
+    "sha256": "aa29eb2c8afc86ff8524530b1ef66a87ca018aaf4af8a8ddf3d0f2b1a69ed106"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/CodexTopology.psm1",
+    "sha256": "f7458ee4c3f46db9dfc2a4b38f333f1e61a6c5738c11b74d36ad587fbdc2affd"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/discovery-validation/DiscoveryValidation.psm1",
+    "sha256": "5750a0f66033ea0e52a3653e1944d55df934c38ed8f9945f1c96bf4defe71de5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/hook-payload/HookPayload.psm1",
+    "sha256": "44a92fdd655e9e66fc4ba3230b082f40f81818d6708dabb508233ea0d1ca2782"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/mermaid/MermaidGrammar.psm1",
+    "sha256": "88620f78373e1122836fb8d7673b5d5d25296f774f670ed4373e5ea7cf76c541"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/mermaid/MermaidLineScanner.psm1",
+    "sha256": "d6ed232d4c2f06b698aedabfc4e5937dc6e08f9ab315c382c8a50e780c7c32a8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/mermaid/MermaidMarkdownFences.psm1",
+    "sha256": "f4146f658aee1f60cb92c42145681cfa0ab2e28127549045e7617306d42ac2c0"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/mermaid/MermaidValidation.psm1",
+    "sha256": "045563c75300b09487d97c417cd1d9ae0c891b19c84950e8894ee66376edc166"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/model-routing/ModelRouting.psm1",
+    "sha256": "78bee574d9bbf2106d9231f56170f220e41956cec86dfcbc0832994a0e4d899c"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorState.psm1",
+    "sha256": "d5a6f20779ee3a82ec3220581ae88a10fe8723b68f1aebdabd0056683293422f"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1",
+    "sha256": "c7b546b0bcbfe6c04de3946ae2e010c533b35f746af25dd8f32b052275071da6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1",
+    "sha256": "967adbdd0417b656e0afed8ff0f8b00566e76a53ada8de88a357b06ce9a083c2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1",
+    "sha256": "63c537e62cc33c64f53d484ce756dd8ba08655e4fb7e07513961b00e352fb308"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1",
+    "sha256": "b8c60a6f9da27f746259084c873e0cf37dd3bdf57ed730519292390cf6c2fed8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1",
+    "sha256": "d4a1653805ecb33edff12a61609f3bcb2972eddc034153ed88a779864aad4b8e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1",
+    "sha256": "0d4a2da353ff1889abbadc3f0c9cbeb28594bbf4b89724b2a16296292be76f41"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1",
+    "sha256": "122e84327733516e920687c4ead647fe1dc09498ea800e56ab7abc0deaca43b3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1",
+    "sha256": "9c1ee9591e938647f84e7257a33fd1a962bffa199c893ef9e6a10952c1168aea"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1",
+    "sha256": "c8b7d9751f621eedbb533fc2f90102cebd57ae7fc3474f9d82eb28cffa8ffa9a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1",
+    "sha256": "e398084879b134d558721cd431fa0dc5c99926088d41f8575cc699e37954ecdd"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1",
+    "sha256": "0272cee5975326b1f5a54f9aa8ec0405b3e42e11bc9d95a8fb7d366ee5e01f1b"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1",
+    "sha256": "40b99f27aad351c04ca2d79bf67261013e0473060135cf2bb3bb8a0627381f40"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1",
+    "sha256": "12c1e19061363005ad8a4a5d9eaef51d736d2c9b160c5a1db420e0aa819e5f18"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1",
+    "sha256": "18d350ecd3cea9731f361aeb6e8933105603388aee86bd1a205a25f216540c4a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-drift/ParallelDrift.psm1",
+    "sha256": "e2ee7d2a2b32438cbe41924da9c8eb07371390944f849498ef83d0d5b3dc041c"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-drift/ParallelDriftHalt.psm1",
+    "sha256": "1f7baafebc8f1840677abcffaa80fc41a32b0456c28fd67618d1387eaa8650fe"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/project-file-merge/ProjectFileMerge.psm1",
+    "sha256": "aa10179dc5881371c6a8d6032798913b0fc68e99506675f1f51cfa829456c23f"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1",
+    "sha256": "0dd3d9978e9338bbdd506e7ceb982a2ff732048b0b0d7b2773360ee1100cc845"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/project-file-merge/Resolve-MergeableConflict.ps1",
+    "sha256": "65cde49b2984abbb569f4ee2dcb6d025899f7b64ea4dca6c599b7e2ffbd49603"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/requirements/GeneratedDocumentCounters.psm1",
+    "sha256": "d2fa4fe1aeae089997a45f501601bf5081c45821ae3ab8aa6c8a80bd019c5251"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeReadiness.psm1",
+    "sha256": "30ba3d84926953536018e7d473238cf52bb4900555dc177c81cf518bd74d88b1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1",
+    "sha256": "1169a3b25dd3298e836956319164c36da217a0a416852906970d1d381fd89f47"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeItemResolution.psm1",
+    "sha256": "74e7a2cda251b1bedfc75560d9d7c049ec173047e7b6b130f79d6c2ccf5c53db"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeResolution.psm1",
+    "sha256": "2d655a4cb47334f1e8075eb35dcebdec8cde5e21f4eaafaf0e7a68fc0b5d4c65"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeRunResolution.psm1",
+    "sha256": "51ae914fb560c445e36d0330e7a599028a26de32c844ee4d5d7325fcd5aa70b4"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1",
+    "sha256": "f56e976d7446ff888c01b0d06fddbf41cfb8924315934cd85fc8a9336f9e385d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/authorize-root-epic-invocation.ps1",
+    "sha256": "aa7f4e6741cdbdd89ff6214dba80a6227452305175973ea46ee43c8084a5ec08"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/check-powershell-test-purity.ps1",
+    "sha256": "ded6e929f4e598f70e8917d8bd792881a4ed7eaebc99372fbbfcba41e64395eb"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/check-python-test-purity.ps1",
+    "sha256": "dae4b59c18567def67bc887cab44c2889edaa59521b52124bd6348f447833aa8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-agent-profile-attestation.ps1",
+    "sha256": "bda6f82afee6fd3c6cf0788ab9f303255acabb7efb7638cb2f57476527e9cee7"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-authority-store.ps1",
+    "sha256": "0a732df609aba62a4eb71a05002a8247f09a00ff5a097d14a26e4ccfcb7e9959"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-epic-child-launch-attestation.ps1",
+    "sha256": "f9e6ff273212998eabd89a1be5a9e1a05b47b584a1b93ea4a369c659fbbcc613"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-pretooluse-file-mapping.ps1",
+    "sha256": "4951858193773bcb4a36548b6f01cae40bd81412a723afacc4e9d12cb3899e7d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-batch-budget-route.ps1",
+    "sha256": "21849d79ead2e319d881f94139a8d47aa312c7c3eb504f6274323f5d1f6bbb69"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-checkpoint-monotonic.ps1",
+    "sha256": "a8b70ac22ff84214236d16f827b6d875e70ad941806607c0f01d1abf002cbdf8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-codex-model-routing.ps1",
+    "sha256": "41bc222060fd17cbfe3302e41a2b883da77d51539bdfc0e6abf27c95103ba6c9"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1",
+    "sha256": "9dae74007157c39574c8b87c7528ae91959c1d7f995fc7b713f1600068a584d3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1",
+    "sha256": "94b891d24dc521be9085771c72137d502066feadbe0b7ee66fa494aac9cedb43"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-child-worktree-binding.ps1",
+    "sha256": "d70c6d492d94f0636f3e79190f36a50b41e6ee4763bc5430b312e7ee4645ed26"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate-command.ps1",
+    "sha256": "e34ead45920fce5ad5019a9c7334ef79b0ccf8fb7d0c21957edc678b545f1921"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1",
+    "sha256": "ee11b3a41df465f64eb79c2c39540e56508bdc6dd83026ef4d5722455d2111b1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-planning-only.ps1",
+    "sha256": "d27bae5f2358923ebe78cf78411661d62004511a3356c9841569be0661e7cf65"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-root-invocation.ps1",
+    "sha256": "2d33c1c9db8fa3e83c8d6727f54c5dcd998f9b5281cf5ae99b8832f2a80e8f06"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1",
+    "sha256": "23158ab98a50e6b672494180039df0c1c23823e8f4eca6a602dc88e023fb0318"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-worktree-removal-gate.ps1",
+    "sha256": "eb9f896bfd21c13a96bc98c56b46632c64fd7ada5861551f548cf7bc22a57d6e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-evidence-locations.ps1",
+    "sha256": "e8901c213dd5e37754dbd47cb15abe326b483e131a0883e116f6e382b61a3c37"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1",
+    "sha256": "89bb099cc73e800603c34dade4f80e73d1d9ccd4561e8454551f05eab174b6b5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
+    "sha256": "3eefbc73c1ce6960ab04be56f8c99364e4b54b1f3e33f6403036b10589a089f7"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "sha256": "67a1105a1bc526798fddc4f7de57fcac9279e196cba4576839bc1d53505aa9c2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    "sha256": "ba443838cb7d1ca87075e8c2405ecfdd8ae454ee67390d7670bf620e078b7c26"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",
+    "sha256": "ebe9dce17c9779a47ab47eca1a0621c0b51a7f2d277da811528671339298dab6"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
+    "sha256": "96ccbfdd2f4813a2c61ec219d12c2f69f318b19bc69c1aa925fdec131f8cb930"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-powershell-batch-budget.ps1",
+    "sha256": "5d1049cce985837d88384e7706550ac896264088f6c1272ab0d396bb7de62e12"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-promotion-mcp-only.ps1",
+    "sha256": "5f2a3241a9ab5b26c6118e71b530357be68276b401100a03c5170bfee3a921fc"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-python-batch-budget.ps1",
+    "sha256": "a1f1ab834057921fce40835e19a92a228393c8576db48cc308197b08fc435ffd"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/feature-folder-resolution.ps1",
+    "sha256": "8a5236f256d011867eaf2eb230e797e970e04e0aa15e02959e82abadaee632d3"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/feature-review-coverage-thresholds.ps1",
+    "sha256": "7c22eda2c4fe2ad14a586aeef252ec8deb8c7b9c5e6e37a6139fcc5f7711e3fb"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-heredoc.ps1",
+    "sha256": "1f6cc67221337f9cdc977bc9122ecb6b68c16e97633ac8d735f694125489c8d2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation-operands.ps1",
+    "sha256": "2cb871fa89cc79f41c92a0288f794e568cab5c5e6bd0361ec7226df78d91071b"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1",
+    "sha256": "a7ec95f8ea830740b40e0ab7c2556187cb1f32154ed12e9bd7bc00eb2d37665e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-payload-powershell.ps1",
+    "sha256": "8d8ee3b39903eb09ffe91b51027f7f64126222e39e2cbea0478d3579cbeb95b5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-payload.ps1",
+    "sha256": "8c833c86cc2e5f742e69935576257d71e876380ce1fba1d3da291134a2a439ee"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-scanner.ps1",
+    "sha256": "4e1796edc01ebc272ef3f95d007c767beb892c714c25055267bae73a1c362460"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-dependency-guard.ps1",
+    "sha256": "f19385c165de943dcbc6bc71345c9e4d8020d41669310bb4bad2e70f21e4b300"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1",
+    "sha256": "f91347eadc891b83fd1d8d4d71cb1ac0cf43c4f9953a9978d73a3238f4aeac39"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/record-subagent-routing-attestation.ps1",
+    "sha256": "df203e233cd824db0f549a4b3572c88296191d966f08a74e6052dac215eb7700"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-bash.ps1",
+    "sha256": "24b8e919c7961718823045aa614ac34c8b2a2eb6ebc2c3ef16bacf8d90e4b105"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-codex-subagent-routing.ps1",
+    "sha256": "8035e04a3c16b1f228ad1f1cf6c109c804c633196fa0724370e8e90edb7e4d5d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-feature-review-coverage.ps1",
+    "sha256": "2cff26f8d245b96e92a66638866945c427aaa93291eeacfd7e6587323de1c822"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-routing-cli-common.ps1",
+    "sha256": "b9e2952a70f9e7b18dc424bb41cc84b16a0677e4732ce55110b12928842fd04d"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-launch-contract.ps1",
+    "sha256": "90577d152430ba740503c08415985d9b6d76cd844a7104b2ea215934fb76a77e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-launch-runtime.ps1",
+    "sha256": "ae2d7e44334319daf87723b0d0db6cbb31ad567e358d26ecf947d2bc207c582c"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-persistence-runtime.ps1",
+    "sha256": "5d2efe656c3dfa8efddce4549d56ccc0ad3b81d8cb9000fe14bf3b6f7e7ce1a8"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-sandbox-preflight.ps1",
+    "sha256": "68a8fb9a52957dfd85a87385e9f11b35c6fa7c27e1578c93979b18b6680a6706"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-epic-child-wave.ps1",
+    "sha256": "8a856c6a81002156c3bf6979eef0461dddebbb78483098c4e3ea6f869fa3227e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/post-codex-worktree-session.ps1",
+    "sha256": "77f064fc8ee493b95ec0188e5d8a80ccca79bd007b1e3a0880cd6ff526aa496b"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/Resolve-CodexDeployment.ps1",
+    "sha256": "71083e936934283935cd727291c43d5aaba1c7a3aa3e791b4590925065df6a6c"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/Resolve-CodexTopology.ps1",
+    "sha256": "71a29fe96d7f70f73b4632ac7a3fab029d558ebcf2f75c8287a09c15b06ac578"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-epic-child.ps1",
+    "sha256": "338949853a96a8d31d66bd61cf0229888c5a5b3f82fe8e23dbdc3a1618374550"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/lib/codex-routing/CodexDeployment.psm1",
+    "sha256": "aa29eb2c8afc86ff8524530b1ef66a87ca018aaf4af8a8ddf3d0f2b1a69ed106"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/lib/codex-routing/CodexTopology.psm1",
+    "sha256": "f7458ee4c3f46db9dfc2a4b38f333f1e61a6c5738c11b74d36ad587fbdc2affd"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Analyzer.psm1",
+    "sha256": "783d32356df9dacf722526fb596de00b026f7acd5e150e0dbfa8f5361b0e9456"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Coverage.psm1",
+    "sha256": "b79301b94bb0d128aeb90c00a27006f3202a4577928131d457405908aa6aa5f5"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.CoverageMerge.psm1",
+    "sha256": "4d64e8527f2ffd5d2e94a7fdb3c3ab7014104afea6bd8e7c2f3e684cba3938b0"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.FileDiscovery.psm1",
+    "sha256": "dc752e700457051d2ed1474141e7d39d9742db8885bb0e525460bbcde49a2962"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psd1",
+    "sha256": "da90fd2162a31861494310d99cbd316799fc5e0e006ed18a8b1c76b6064b5031"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1",
+    "sha256": "706e0db2a6c40ef374e1e63b756e9c264d88ed3a15e1d1db6cf4d12fced09977"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.ScanConfig.psm1",
+    "sha256": "cb45ff74a17c84e6c41764c81b1f7aeedaf31624de38fd615dd9519dc2146244"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Shard.psm1",
+    "sha256": "82af2cc848b396a562dee49f2652e3874a1755349deb80dd5b6f68f09452e939"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1",
+    "sha256": "f656cc6cafea86883f8141b0da05151e4108b6c6e2af2ef826fe8158c5ffbbe1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1",
+    "sha256": "5f33f8e2c4224d2626d928a2a54453f2f4e991be920763dbeda1f0f12d95b1ee"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/powershell/PoshQC/settings/pssa.settings.psd1",
+    "sha256": "edb5605c525a12741d6943fb776c74aa1edb345f219dd4d240b9fae0e9b5148e"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/hello_pwsh.ps1",
+    "sha256": "89ca41da8d2e6aac1e0fc63a9c42932d603e64b869925d494d519d603f355f91"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/link-parent-child.ps1",
+    "sha256": "ef05391acf43171c8aa6670a9f5731250bcfdcffc7d23f6584aef0395796dec2"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/new-claude-worktree-session.ps1",
+    "sha256": "9d855ea19d3507c2623cb2ee2415980f411ae7b9b9383e269afefa8a8b04d95a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/new-potential-entry.ps1",
+    "sha256": "d13c8069874cb144fb750cabd4273c54096bcb86767304d12936180236cf77a1"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/run-poshqc-analyze-autofix.ps1",
+    "sha256": "30af94389edfd4d181a0710c09386cef11765b059406e244cdcae78122f961dd"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/run-poshqc-analyze.ps1",
+    "sha256": "2ab24c476cc0308d6d95551c7c035ffcce989e5f70c325d62272aa7ba06aa037"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/run-poshqc-format.ps1",
+    "sha256": "0a60b94e7cd94d0a1d281fb7938be8b2fe4e6649eb445c90bb35da43688e4401"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/run-poshqc-suite.ps1",
+    "sha256": "b876ed2cf60c9587bc7e7e579a437550367c6688d74e0e674122d5c068bf106a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/run-poshqc-test.ps1",
+    "sha256": "18ccddd4a3099afbfdeddf5440705cd31c9d9329c512e14a3210eb40c50d198a"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/sync-agents-from-instructions.ps1",
+    "sha256": "e2b2aaacf8b995378fc59d182acd7157355f11dc1f2c0f0bcfaa084526d25381"
+  },
+  {
+    "path": "extensions/drm-copilot/resources/templates/vscode-cli.helpers.ps1",
+    "sha256": "949278888ef86f7f48958a65c8916a988ac1dc5c673edff93369cf21f7df791b"
+  },
+  {
+    "path": "scripts/ci/CiChangeScope.psm1",
+    "sha256": "3b6e3a1d3188597cd06d6bc2199a952e38a6abf645ddc6f03df3a90ad6a6a7f6"
+  },
+  {
+    "path": "scripts/ci/Invoke-CiChangeScope.ps1",
+    "sha256": "d2ab3c51451490835117f805a24c61f178e5c14ddb56c70bdee784514e57b815"
+  },
+  {
+    "path": "scripts/dev-tools/activate.ps1",
+    "sha256": "a5b94cd12bdbe503e9e1b14df5949c98d319ad27414f94205852ddaaea435989"
+  },
+  {
+    "path": "scripts/dev-tools/bootstrap-host.ps1",
+    "sha256": "268b31ecce8c1f887ecb4610c581829d98c683d5ad6f7ac403bcfd500c385c74"
+  },
+  {
+    "path": "scripts/dev-tools/DrmCopilotPromptSupport.ps1",
+    "sha256": "d60570d0297c1e9c7c5682d120710acdd9144b2d284fc5c510fd85627b420d59"
+  },
+  {
+    "path": "scripts/dev-tools/Enter-DrmCopilotShell.ps1",
+    "sha256": "c4b22262c9d6387a1801c28579fa537c44d183bd3385f104c601ae8300557755"
+  },
+  {
+    "path": "scripts/dev-tools/format-powershell.ps1",
+    "sha256": "006d40b001d1ca248d1d968cd31827bffd826b309ec9b024da75a621e409f73d"
+  },
+  {
+    "path": "scripts/dev-tools/HostBootstrap.psm1",
+    "sha256": "e59e48018464339361d4a520863bdcca9eef44468ce50590cd3a9db02972355b"
+  },
+  {
+    "path": "scripts/dev-tools/HostBootstrapWorkspace.psm1",
+    "sha256": "09ca8cf9b71c34df91d7f578562f95c921a147691bdbbdfa1e12e637dce62a3a"
+  },
+  {
+    "path": "scripts/dev-tools/HostTooling.psm1",
+    "sha256": "74ee011c3e5f1e06e844f6692e02befa770cb08b4aaaa038e1acb55324a39a5f"
+  },
+  {
+    "path": "scripts/dev-tools/HostVerification.psm1",
+    "sha256": "46e87ee47558a3e223b59143df2f40487fea1525b90f1eb655ba818914b2677a"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-FullRelease.ps1",
+    "sha256": "a3ccfde5adcac556c93862d32cb9de33e4032fa237de7966c718941ce613ab72"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-FullReleaseFlow.CheckHelpers.ps1",
+    "sha256": "ee8e23e82e70cbaf9b1bf51343fd0f0b9efc366c0de3cc8bb582feba0beaf389"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-FullReleaseFlow.MergeWait.ps1",
+    "sha256": "6ff9e88ea7851dd88b8194c87ddd436d1488f6b85f0b3653eb5fe997c7ab2147"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-FullReleaseFlow.ps1",
+    "sha256": "cd6a43b719778256256b49ea98b3edd14422fd21d7ad26935e77dd66fd36e60f"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-MarketplacePublish.ps1",
+    "sha256": "0c5673939bc20e209380d93e90d9834dbf9e53829bf6a6b4d2c51a7a4281f250"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-ReleaseReconciliation.ps1",
+    "sha256": "96fd8e48cbcafc8abaf78c4cd074dac141548fd26550c831dad570485645935a"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-ReleaseTagPush.ps1",
+    "sha256": "e97f559df51a8b7f9211bef2f029eb00d44541df97af7ed90433661960894d84"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-ReleaseVerification.ps1",
+    "sha256": "f726c694337bb91d5e15bfbe891f4d634f0ed92aee1604c0f2e8d9f0ccb247c1"
+  },
+  {
+    "path": "scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1",
+    "sha256": "6de11ded7eb67e305cf4ba988c5a1c0525e4e2789e0e33e236bc2012e288fa42"
+  },
+  {
+    "path": "scripts/dev-tools/link-feature-docs.ps1",
+    "sha256": "47348dc537894e0faf14b1030910ebdf41f32cda069f2edd0faca6ab2a54a8bd"
+  },
+  {
+    "path": "scripts/dev-tools/link-parent-child.ps1",
+    "sha256": "ef05391acf43171c8aa6670a9f5731250bcfdcffc7d23f6584aef0395796dec2"
+  },
+  {
+    "path": "scripts/dev-tools/load-openai-key.ps1",
+    "sha256": "9d3dc2b42ea18a72799047495fe7f54689e61f514f730304ec4647fb582d489a"
+  },
+  {
+    "path": "scripts/dev-tools/new-claude-worktree-session.ps1",
+    "sha256": "9d855ea19d3507c2623cb2ee2415980f411ae7b9b9383e269afefa8a8b04d95a"
+  },
+  {
+    "path": "scripts/dev-tools/new-potential-entry.ps1",
+    "sha256": "1622c6e6f40968addf3a3ab1449b6dae78a331a5c610025cec3e9621feab58af"
+  },
+  {
+    "path": "scripts/dev-tools/publish-sideloaded-extension.ps1",
+    "sha256": "ef1b173b00681a8e254821297a49724dc694c50b5e1e6e99d00668e49e3e4165"
+  },
+  {
+    "path": "scripts/dev-tools/run-actionlint.ps1",
+    "sha256": "ba1bb2af6b042dd26f31ae1531a3160bca02f318337692e3a579db3b3c08d5bf"
+  },
+  {
+    "path": "scripts/dev-tools/run-pester.ps1",
+    "sha256": "5fad6c266ebacb59a81e9ce3497580661594b745c97da3ccf6d827a04e19a3be"
+  },
+  {
+    "path": "scripts/dev-tools/run-poshqc-suite.ps1",
+    "sha256": "b876ed2cf60c9587bc7e7e579a437550367c6688d74e0e674122d5c068bf106a"
+  },
+  {
+    "path": "scripts/dev-tools/run-psscriptanalyzer.ps1",
+    "sha256": "387654a7638ca9d679ba50bad1407bb43afac90754e1e6c1aeca60083375fc59"
+  },
+  {
+    "path": "scripts/dev-tools/SideloadedExtensionPublish.psm1",
+    "sha256": "68597dff34543f1fa6222df72623ee7dcfafa9ae8e9bb68b628b887dd4edc337"
+  },
+  {
+    "path": "scripts/dev-tools/sync-agents-from-instructions.ps1",
+    "sha256": "e2b2aaacf8b995378fc59d182acd7157355f11dc1f2c0f0bcfaa084526d25381"
+  },
+  {
+    "path": "scripts/dev-tools/tree.ps1",
+    "sha256": "d505ca4f4656ebadeb31c52f28e35291c0d905a0a7f03c0117c9bb861cc81f3b"
+  },
+  {
+    "path": "scripts/dev-tools/verify-host.ps1",
+    "sha256": "0f4f99e6e5c95854ba32f7a4cb6927347c5736406119a6dc0ca1e82dfeb7648e"
+  },
+  {
+    "path": "scripts/dev-tools/vscode-cli.helpers.ps1",
+    "sha256": "9a685c1665ba6643a94f434945d795fa226efaf863c070cba79ba42b7c691b3e"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/convert-poshqc-coverage.ps1",
+    "sha256": "d2ebd92b2a0c071a364486af5e38071723aefea6489147dc8c15d7d100b6379f"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.Analyzer.psm1",
+    "sha256": "783d32356df9dacf722526fb596de00b026f7acd5e150e0dbfa8f5361b0e9456"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.Coverage.psm1",
+    "sha256": "b79301b94bb0d128aeb90c00a27006f3202a4577928131d457405908aa6aa5f5"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1",
+    "sha256": "4d64e8527f2ffd5d2e94a7fdb3c3ab7014104afea6bd8e7c2f3e684cba3938b0"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.FileDiscovery.psm1",
+    "sha256": "dc752e700457051d2ed1474141e7d39d9742db8885bb0e525460bbcde49a2962"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.psd1",
+    "sha256": "da90fd2162a31861494310d99cbd316799fc5e0e006ed18a8b1c76b6064b5031"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.psm1",
+    "sha256": "706e0db2a6c40ef374e1e63b756e9c264d88ed3a15e1d1db6cf4d12fced09977"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.ScanConfig.psm1",
+    "sha256": "cb45ff74a17c84e6c41764c81b1f7aeedaf31624de38fd615dd9519dc2146244"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.Shard.psm1",
+    "sha256": "82af2cc848b396a562dee49f2652e3874a1755349deb80dd5b6f68f09452e939"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/PoshQC.Testing.psm1",
+    "sha256": "f656cc6cafea86883f8141b0da05151e4108b6c6e2af2ef826fe8158c5ffbbe1"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/settings/pester.runsettings.psd1",
+    "sha256": "5f33f8e2c4224d2626d928a2a54453f2f4e991be920763dbeda1f0f12d95b1ee"
+  },
+  {
+    "path": "scripts/powershell/PoshQC/settings/pssa.settings.psd1",
+    "sha256": "edb5605c525a12741d6943fb776c74aa1edb345f219dd4d240b9fae0e9b5148e"
+  },
+  {
+    "path": "scripts/powershell/Publish-DrmCopilotExtension.ps1",
+    "sha256": "5308f6115099a226cc98679cb4da7a28f6d205fa01fb370cfb8a26293d72d7e4"
+  },
+  {
+    "path": "tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1",
+    "sha256": "00ae22ccad7ea9b845f6fbab6681bc77e922944c47f77da9e24ed1ce1334551f"
+  },
+  {
+    "path": "tests/fixtures/poshqc-consumer/.claude/hooks/validate-bash.ps1",
+    "sha256": "2df6873895c5235053be34c83b7a46e0273d30e25338fd71512041eda4710952"
+  },
+  {
+    "path": "tests/fixtures/poshqc-consumer/scripts/Sample.psm1",
+    "sha256": "9cdfe806d88ac9ce610e4b2c2d2d24d2e8d6c16b92c9da6a27fb09756c6b3477"
+  },
+  {
+    "path": "tests/fixtures/poshqc-consumer/tests/scripts/Sample.Tests.ps1",
+    "sha256": "536ca49ffe15ebd13339d9d46c0845f209a36ed981c5d2878a0849e7a43d68c7"
+  },
+  {
+    "path": "tests/fixtures/shell_qc/scripts/pwsh_script.ps1",
+    "sha256": "254843f93831d8dffb88f99b9d302811fda519709be2dbad15cf1354dae67c08"
+  },
+  {
+    "path": "tests/scripts/ci/CiChangeScope.Tests.ps1",
+    "sha256": "599e40826c069918797ecaf25e09b65402291d2f71337029a4176a501759e664"
+  },
+  {
+    "path": "tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1",
+    "sha256": "7814c2a29d209c01c5f913dc80dfe8d87703198196d675bd52584b3a2d77ca84"
+  },
+  {
+    "path": "tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1",
+    "sha256": "26ca673ad7e35e22f40bd634ed7cf06ffffea78a813bcbe7d59d641e5cde62d5"
+  },
+  {
+    "path": "tests/scripts/ci/Invoke-CiChangeScopeMergeBase.Tests.ps1",
+    "sha256": "c075de358fceee4fe1ac77cfe9861779d367411d88a72353c759f200af943f93"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/check-powershell-test-purity.Tests.ps1",
+    "sha256": "09d755001edb9946b10eee5352fc9abd34dd8c2db4fdd432d45b9b120d0d02de"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/check-python-test-purity.Tests.ps1",
+    "sha256": "39e641d8a61c2229a8e32beaa3ead10d776af3bafaf6f7d17b5d2331933e0a35"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/CleanupWorktreeManifestGateMatrix.Tests.ps1",
+    "sha256": "343c5a2300a837d4202b17a2291d355f2d1e1629f59a90b7b791ac8cb2ef5f82"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-checkpoint-monotonic.Tests.ps1",
+    "sha256": "47f501dfb49a332c630d3c246b855844df0df385b47574c68bc4784b3f439846"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency-codex.Tests.ps1",
+    "sha256": "e0137130c0acfd8b6cdf237da6ecde05e85bcb8f0eca21cb5ff7ee1436534422"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.DefaultReader.Tests.ps1",
+    "sha256": "a6d6bdd914473611f5744edfcaeccc7a919823b13e532673b0d7378d95de7d86"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.EditSemantics.Tests.ps1",
+    "sha256": "903c86fd5328a3686dce6e163ac3e94e96da043402963be5f0e97467cda1a304"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1",
+    "sha256": "b8861c90d3a5d10d3f6b5b766cfa34183c5371ac611abf4dc4be0d654ec0a141"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.FailClosed.Tests.ps1",
+    "sha256": "89cc810e8a4b482461a8ac5ce85fcf96c5b12f648a202e8fd4d6f4da46b633ec"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1",
+    "sha256": "2e79dd323d095790c863e32c12b9ece70bdf2534ebd12b67655324eb06b1779a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1",
+    "sha256": "20d7859c6cc014b09a49881f4c0acf2d236c71e5dcb5107ccd5721f7cd2684f2"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-discovery-artifact-gate.Tests.ps1",
+    "sha256": "2ca5c6e400411159809464e77accafa299b2f9443c0d5ecab08164fe3932e02c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-discovery-artifact-gate.ValidatorDispatch.Tests.ps1",
+    "sha256": "ea243f08d746a3a23e21482cf0c701726c72ca15d68bbebb4184a7e100ed7dc4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-invocation-origin.Tests.ps1",
+    "sha256": "945ff5c18b61c0d49291d95220d2ec296912c393bcc431e81467556c605023c4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1",
+    "sha256": "8cb8dd3c8f09589c6c5632b3fb738323b51a7f0d8a006db7d3c23688c76cfcc6"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.AuthorizationFields.Tests.ps1",
+    "sha256": "a7847cff985b269d5d406dbf7909842c33c90c3faac30c08b26707d9974bda7e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.Coverage.Tests.ps1",
+    "sha256": "2a12e90ec0b7e251b3e5081ba78d03f46cbbabb1cf676d10f80cb6070501a2b4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1",
+    "sha256": "f13859845c8286a0fd3377f86b41623b1ac7cc37dff14214cab6842b61453bc8"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.ItemResolution.Tests.ps1",
+    "sha256": "fe7847893f9c0edb932f966f304858d3830bedcef04d9784a384aafc3c4b9a17"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.MergeQueue.Tests.ps1",
+    "sha256": "d4263ccb7573917c6b16d79cd7b20240e7d24b69535f943dbc852a3b1f7ce289"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1",
+    "sha256": "71825cc66b91ac144bcc3e8e3f590be16ab253cc94a5d37c9bb7d96acacfefaf"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1",
+    "sha256": "e472aa68d8bb3031f05bd52928fab3cea13c35f02cdd85b9bd5c91d4123e24da"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-merge-gate.WorktreeResolution.Tests.ps1",
+    "sha256": "7a61305526410afbd67ad4c3313d74471c50b2742133263e27e808068c10fe4c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-wave-barrier.FolderResolution.Tests.ps1",
+    "sha256": "8e242299cee61ead58b502dcf40413464b86e82485dbce3bc91f408f1b1ecc00"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-wave-barrier.Tests.ps1",
+    "sha256": "7ffdd8d53e2e5201841251f9b10b2d779682f18ea359f63e809588bd8940d9e8"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-wave-barrier.WorktreeResolution.Tests.ps1",
+    "sha256": "2b011780c463009e1ff3d5ab44f4374b5b4b9feff859b8824af97d2bfd1c7862"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Diagnostics.Tests.ps1",
+    "sha256": "f06277eb89fcf6f1cc48dacf03e4822e9074e477581f1e6216199bfdb0e0e923"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Issue824.Tests.ps1",
+    "sha256": "249ba2c4920a31fcf34aa7de5472a6d0dd951f5cff6979da25219bd4fc7aef57"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.ManifestBranch.Tests.ps1",
+    "sha256": "ddc9e11be4d5ed88a174b2791a84aa2b5e1f5c2642b2652682ca6769d8934cb9"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1",
+    "sha256": "73c698b25926b72bf97769729850dccbda21f8c335f1e09265eb92c4d1aefec4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1",
+    "sha256": "5a0c38f8e4255222c8143429384e25e7c6086207be41eaecca47810cc1b73dc5"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.WorktreeResolution.Tests.ps1",
+    "sha256": "34c57a1d07cb8c10ac5a373685ae21eba8c35aae5eb42024cc5aab074fa7b571"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-evidence-locations.Tests.ps1",
+    "sha256": "0bf06145b18574cfd14b7b48708186e20d227f8aeb33a4336b314e43e4336e6d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-feature-folder-order.Tests.ps1",
+    "sha256": "8195bbf1726b42d92b950581d657ea9361400b062563cc97da497ea8b9acff5a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Branches.Tests.ps1",
+    "sha256": "f828651c9ee4a6b3aa44cdcfffbeec238ae25d218833258baab5722e67ca7c8a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1",
+    "sha256": "d1b5fd74a00f0e3226570af6227390a6a83eae32bcdf58dd3c68e137d65b6439"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.HookReference.Tests.ps1",
+    "sha256": "1c03aabe00ade225f78150ca7d6057bd711c1b344d4c938abaad4080e0d9c592"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Memo.Tests.ps1",
+    "sha256": "7b77680566692a6f30fa0ef7dbfc9fb7ee202a59d6b04b136ebc392643a514fa"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Predicate.Tests.ps1",
+    "sha256": "a030b03571af2036b969a96c6c382704e280534e21acba9c671739504dc071d9"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Probe.Tests.ps1",
+    "sha256": "8fc19b8524a9de53ca35fb0afa3128f2d84b6c46ef35578af5c520eefa06e355"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1",
+    "sha256": "18a43dfb93eac1ef8caadf4ebcf1fdcf02c29deeba3eb19d88f292d1ed120b87"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-mermaid-validation.Tests.ps1",
+    "sha256": "95d0c187c62cf5d954939608f430d8defc21d9c001a4856385014cddf9961854"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-model-routing-receipt.EpicScope.Tests.ps1",
+    "sha256": "6132b350812d4d5977c0b3e8910ecbb9f27274eae8f743868e1c5137e5d65a1e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-model-routing-receipt.Tests.ps1",
+    "sha256": "f6f847f0240b505e73abb4ed491a8b4fa95cc689bb9f37c3878870457dfa8fec"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1",
+    "sha256": "7c02290192361b3758a1d572560bc78a949a9a31d7a77f3fbd01ee590483dd61"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1",
+    "sha256": "1516fc01db302212914bf7328b152d601fb68123fa6f112d3c8563f9a0a74a72"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classifier.Tests.ps1",
+    "sha256": "0cd4c73c53e8527eea75eaa5ef1620f241e0cd90b87c31bc5e08b6ca3aab8b97"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.ChainEscape.Tests.ps1",
+    "sha256": "325dd0876b46a3ac3455c5b415e25a84ebfd7530ed12a8292cdd6ba97af9b492"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.OperandNormalization.Tests.ps1",
+    "sha256": "d73cf503d66699fbeca3eb75c8c31de02156e629d8b6818b5452653e63fc3cbf"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1",
+    "sha256": "c2066dd1fa37f9adfbb91b0ebd86ea474033c4fd64a40236d1ff4dfe7a1b7f85"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.TargetFolder.Tests.ps1",
+    "sha256": "a2fb14554f870863a6ac51c83c3047c23c98064aa2adee26d50e08c55243f206"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1",
+    "sha256": "ec27ec95749567929301c7d6cb3dab1aca03f6432b6b67ab62cd3500c79e6b5c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1",
+    "sha256": "e5b3e5e2ccd9c41a6ba45539aa6356c39ee6130ec14fddf2428d9e6a7a7ffe20"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.PathNotLocal.Tests.ps1",
+    "sha256": "d79350b0d34f7c6712c3bff53e41db90f86904a2c0adb92c8208a2bf0f287532"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1",
+    "sha256": "5c1208d2e2ecc2bd0ba6a8b93163e094a48db0c29d4daeac83866f2e383c506f"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1",
+    "sha256": "658c680eabf09bb24976ddd89c6f3b10b0287aee8d769815a20a796392e3e719"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.C1bCoverage.Tests.ps1",
+    "sha256": "63aff4611f63fc6152a4a0a7a77bf67189b4fa3ffef066b2c15f956412c07dea"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1",
+    "sha256": "ec6c1fc0311afcb5dbd5ca6ddb1b3c6905e1ade104d527229241eaa4fb46dc5a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1",
+    "sha256": "9b492f1216a557a938218dd373132f08cdcac455b916cddbcec0b25731d3757d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1",
+    "sha256": "7cb7dec9e63f74a178c283a46371d2d208066d3b76bba6567cc836897c04aa3d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandBypass.Tests.ps1",
+    "sha256": "f1f9af9fe2219f2e220f00fa1428f383e8c2fccf8befa6649dbe42e74accb349"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1",
+    "sha256": "7ec1ac6df87099a070c27f70b75e27fc2a9f1bfef98f39979769a9b606bf443a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Cases.ps1",
+    "sha256": "a97147e962e8904126956b9a8faa2b4bc76f6bab160cfe4eb5a244941205815f"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Tests.ps1",
+    "sha256": "868578af56d83cf60d02ebedcda5638e52adc6477e1aca83d674b6abee9fcfb5"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1",
+    "sha256": "1cccf296c13425d27183d4a6d8b2efa6c45f35a736c100bfc8398b56df655ed5"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1",
+    "sha256": "91ecb725e89e8e63f22ffc932babf0724e4c077966f903dce0bd79796c13b075"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.WorktreeResolution.Tests.ps1",
+    "sha256": "7841ed5d07b2d2c0f7261ddc166b2156281545d5d2f2cb6deb449699d9890c9a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1",
+    "sha256": "2e2a9f43c947b8f4264e0af1c1c2ddb49ce9a3b19ebb14632c85b7e91fef1b30"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1",
+    "sha256": "3d5688a5ea5c299a4baae815200d8be8670a5bc1d8faa818cadd99f199f84926"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.FolderResolution.Tests.ps1",
+    "sha256": "920e4b918706dd08145c921475ef548603203e18161d9188d3f1b0a9f79e0407"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Payload.Tests.ps1",
+    "sha256": "059c3c48d4abf6d571fcc371a759168015d4b23822d485a7f72348feeb3456fe"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1",
+    "sha256": "da632078d0fc390f3a7175b816b0b26d078863efebe83eccd0a380b9b3b5bc9e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.WorktreeResolution.Tests.ps1",
+    "sha256": "5983a171d341a9a422fd8e359c9966266c22227e3dc49d51fe475d81e2326e51"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1",
+    "sha256": "1610b1e6abfaf1b352467dfa05ca9058f88684ff128b8836db59dcfdffa85a97"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-drift-gate.FolderResolution.Tests.ps1",
+    "sha256": "dca21090d7ea1ec2f9fe60590dd5fb9cabc67d4ed8422b3e48f224e8f2beae6c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1",
+    "sha256": "e180bd15983eeae8d8fc74edb6d9008c1e27330253053a7dceba4087b0a7367a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-drift-gate.WorktreeResolution.Tests.ps1",
+    "sha256": "d8b62f04260b58c638b312bcad84e892466583ace31568eb31c233d871cde6ec"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.EpicAuthorization.Tests.ps1",
+    "sha256": "fc956878c4bb6656e68b11efdc695b464c92d604e1ee0c00cb9c150bad8ca6d4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Issue824.Tests.ps1",
+    "sha256": "7e33d23e1a0024db847c41bbe30780c666fcc30a325c91e8a0d2e53886c02cc4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1",
+    "sha256": "0b809db7852b0f3c3b575d2c2a8e866a700af97ce72e02dc180c0fc9e40123ab"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1",
+    "sha256": "a3bca880fa830bb466edb10bd68b82624e36b4fa95ea67d42b2d9b2148ecdf2b"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1",
+    "sha256": "b347c83711e9ae44062b1771af42d08dc6b46973d7cf8d9d89c9f53066bb345d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1",
+    "sha256": "1436390db3e6d3ec8ba192cc4db316cde1a2f51b86e7f2877fddbb18b184a05e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1",
+    "sha256": "2a4edc37cca3e7f5319337ea1f1d269eca467b38c205948b2a50af83416d891d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1",
+    "sha256": "9da725db72a5775e93ce34e667da5f32ef8515315ffbc53523657ab176dec103"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.BodyNumber.Tests.ps1",
+    "sha256": "96d15a5698f8c67a6f05bc43cb45da89516a1ad46951e47fcdbe59b0813c1e17"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1",
+    "sha256": "e595e1ff5da5e7075764dc6b808b28ea2f5a4947575c290e2a139ad7818f0b3c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1",
+    "sha256": "d39e779506f3faeccd23c91285a5f79dc6cc4056aedc6f3a1c3901e4ed536065"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1",
+    "sha256": "4beaeffcad649fff9ad29d2ecffe823dde292ce084ad99a25dc304214b3464ed"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1",
+    "sha256": "3dc21eb6323950f20a2c25329cff8cce02a6b7de9755d463441bb20581c19681"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.TriggerScoping.Tests.ps1",
+    "sha256": "fea07edc8e7261cd61cb88608b7a22df65fb4a45265d507d9e4712802403fc3a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.EpicScope.Tests.ps1",
+    "sha256": "82a621caf27f2850da8b298126ab61e681d6faa5343c61895e61ff1eebde45d4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1",
+    "sha256": "b39c4f98b34f788505175daf7f957770e6e32ccc9eb75ad43cbd0990568ec4f0"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.ItemArtifactRoot.Tests.ps1",
+    "sha256": "96e89b6956dde9ca9fc4b97cdff8dc7a758510db7d276381ed14044a2d7259d4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1",
+    "sha256": "1faa2a0f46e7f1f931850c1722a3f98cde471472d055dbb85ab1cdef13746547"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.Payload.Tests.ps1",
+    "sha256": "77b1b80e2802eccd4b6a36d86ee4446bf775296071d4f7328418bbfb6104156b"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.TargetResolution.Tests.ps1",
+    "sha256": "19fd61dc3cfe6e90f6d8cb57d7d04389d43b711ae962a93ebbe03b85c022ee5d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.Tests.ps1",
+    "sha256": "5316ac04268ed8f1c6b9b24c39c3291d316ebd6c96c3272a5a4136e8435e1924"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1",
+    "sha256": "05417df27d4967628e3284a5f8b819772b2b59b9790df016bb9db5dafa5e2fab"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1",
+    "sha256": "178df37640028d3175ed23905aaba2c6873a11a3671681dcdc4bfd96775b9d83"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CallTarget.Tests.ps1",
+    "sha256": "ebd96872238b2c15ac5f1094a23a78826dcdaae84c14ad0b0fc3f276ec6a2bde"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CheckpointFolder.Tests.ps1",
+    "sha256": "b04407e2dd005fbdbf1d56193d1c68c478cd5087e628e38c4a4230363bc0854c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1",
+    "sha256": "57d9e83c56629bcc606231a9fe7abe9626d7b62c3759d28731b8429aa82990ab"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1",
+    "sha256": "f51c56a6da24cefa3cfced5566b6797c6632f4b7d13482db8b91f1d5aaf21cc2"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1",
+    "sha256": "263801fc3d43d17027964dd67f5e8b449248795cab26ecc7aee8c8fb76b8ae65"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1",
+    "sha256": "437393d27aad2dccd7643c7e95b885468364e53d12c1853e05a0281bd45a89fa"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-promotion-mcp-only.Issue824.Tests.ps1",
+    "sha256": "99c26e6e071a5371f0401f737740fb7f98834d09e9dd4a052d9f64625e95859d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1",
+    "sha256": "78b2e65a6d6dd5fdc6ab308789d875452a4e0d78ada8167d96b8df17932e6efc"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1",
+    "sha256": "114e42e5249718f04822535696e7796491f9d20956caadb852e675f13628bc08"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-python-batch-budget-routing.Tests.ps1",
+    "sha256": "d7ce8a35df15c4fef0c3e6f32d8064884b0233a71bb0af68e664bf4ea9067d81"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1",
+    "sha256": "706d96aa2240b475266b37371b19db2c70747c259624ef43bcf24cdcb242ebd4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1",
+    "sha256": "ac959cf8caffe808b1564c7fae68f4138c35ab0bb2cf27f9e3f3c36059ec1512"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/EpicStateIsolation.Compliance.Helpers.ps1",
+    "sha256": "d22dbbc52e4897a62b506a45858b86ac821ca655ef125769623ebb7159a58833"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1",
+    "sha256": "4d2f9d6ba187f52a75c9da0bb4826dd7ec5892ff8b116e8c5fa48f0294310384"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1",
+    "sha256": "4e1608a52d6af5635720ff8c7600a97c7afbb933ddb1aef58a31b22123397325"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/EpicStateIsolation.HookReference.Helpers.ps1",
+    "sha256": "af9310529ff17b900f92f0ef5e08e49763e7c045ab28fa2488c84aa780af854a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/feature-folder-resolution.Tests.ps1",
+    "sha256": "8e5e9f30ee561a7c3ce5456872bd0ef287bd4051e92b838cbe73c259301fcb8e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1",
+    "sha256": "61f634725d05460c4eec5d383b9d2a13daaba22b0904a47c0726a43afe9839d0"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1",
+    "sha256": "63eb78c0f635e8b0114de29ff0870ec6c989de26d0cd06ceff75d0dd67d64886"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-invocation-operands.Tests.ps1",
+    "sha256": "127679b54d737bb4fbd931a433bda1b11a3721371bc73859f770c0954d46174c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-invocation.Issue824.Tests.ps1",
+    "sha256": "f29d724482e566e553931b6d163a487adc8be4e700e9fcda1ac4bb0c15642db3"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1",
+    "sha256": "e28f5bcdaab37934249a9c19b8fe7afc78b91e35bacde1b041fb94222f817274"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1",
+    "sha256": "6f129de0779015dd38ece8987bb61e306002298fe9d264951886dec9fb8d682c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1",
+    "sha256": "4e92b91f8b39ae33c5b2b8f5c66f0d0643009aa5305fcce1eccba27b810c9e78"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-payload.Tests.ps1",
+    "sha256": "f8eea72d0b1d470242af6ccabf09096bfcece9ace23eaafb129bab84c6818482"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1",
+    "sha256": "9649b168e56e68ba871dd423a73c00cd30f53a8ac4f056efa0b73b4dbd8b73f8"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1",
+    "sha256": "11058f0d1d5a6e68b8008af35977d0e474fde96a42bb4b9fb25d5e726d07dbac"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1",
+    "sha256": "792c551286cb9a79a36f7eb715c987f42cdcef71b1322eaf89b0984c43d4cff0"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1",
+    "sha256": "8321e3fb2d7cccd9907f1965d7c8ab5309bbd8711fbfabb49e482245ad2c35ed"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-dependency-guard.Tests.ps1",
+    "sha256": "fe2346cae11ab9f072bf9f17e5a63823416eb2aa9fa99e316ed70f2e63d37908"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-docs-only-diff.BoundedNative.Tests.ps1",
+    "sha256": "631c6bbd0209f132a3ad95089dc6d80cbb2f6f12e7cb6edb8585a9b8bbe8beb1"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1",
+    "sha256": "ae252d136752d296e5cb575319bd707b69ef0f5efd8a2009f4a09aaac245be78"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1",
+    "sha256": "239b0a032a124c58ef63169ebbcac0c7b924abf68e8c167826b5fc795dfeefdf"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1",
+    "sha256": "69a8e494d74194031bdd96b2c5bdb99c49ce742cb90a474518d9a1fecbad628e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/persist-session-id.Tests.ps1",
+    "sha256": "a27623d2cd8e712eb5bd067eaaf0df5f411a6dd1ef489aa1c6981f2c37466c3f"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/premortem-section.Tests.ps1",
+    "sha256": "7ed7f158e056e908f7a010a94b797799fcecb035fe1b505a6287216ee9714f2e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1",
+    "sha256": "14e0439aa932db845dfe4d76f43b179fd0d231042fce89d240f6cbe8bb8b91fe"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1",
+    "sha256": "73f81c5d82267ddb621d8e544409f4c1d3e6de76587310ce9549e971168ea82a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1",
+    "sha256": "2a9d0b5e83c4c77fe66a7f2df3daddf483a52482184b83c78e9c779d8fe32df3"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/subagentstop-envelope-orchestrator-family.Registration.Tests.ps1",
+    "sha256": "bfce76a59d55e519ab7bc38c608ea59b9024ad0127ef19ddd6c6cb7486468125"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1",
+    "sha256": "0c87a0220dd376d3aa4a32e4d3aff521687ce8e133e0c12891e864001ca21c9b"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1",
+    "sha256": "74cd0f00273e31c8955c92bda8cc92f5b28905cc91b42d41094969cdcdbcfb90"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/SubagentStopEnvelope.Helpers.ps1",
+    "sha256": "470de6dbc32e21d03d40e8447d709793c011c6abc39bc222368492fed77a92b4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-bash.Tests.ps1",
+    "sha256": "00ec8892da57b8928b0bcb538ec690a667a3033f847ed8f32970a8fc8f2abfcc"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1",
+    "sha256": "e74af058d163d25d7808dfaaae4857450f2701aa30767ba9059a0549d9518126"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-discovery-artifact-gate.Dispatch.Tests.ps1",
+    "sha256": "aa0315d8acb8586fad6b6f179aeb9ae9ecb9448955f8c94cc23a3d7d62ddc3e4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-discovery-artifact-gate.Tests.ps1",
+    "sha256": "3def19c2d91e1771d03afe7dcebe5ed764257eef0825df0222b1a0625e598b45"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-discovery-artifact-gate.ValidatorDispatch.Tests.ps1",
+    "sha256": "0ce9090ac861e0a360d3e8fa22057800a9cec24392be2a153376d6a8e373853c"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-executor-output.Envelope.Tests.ps1",
+    "sha256": "e8c1363bbcd35498878144c744425e87be8afcf348201e58bc7fe0c8a5b757a2"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-executor-output.Preflight.Tests.ps1",
+    "sha256": "f4f0cbe742d275f565cc688a708eeb6e3ed63ec8ffe50b6fe60ec6db4011365d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-executor-output.Reentry.Tests.ps1",
+    "sha256": "ed82678545cd4dedf9e2642b1e3a15a290267c18da638be0f08dbebc1084d051"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-executor-output.Tests.ps1",
+    "sha256": "19dde032076146ac30d2307dc11a3426768f2fc403f4650a621c7a51acbd641a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1",
+    "sha256": "e8614946b81312cffcbf5f9c922f1c755aba190e094fbb7c03e3e938d856ed79"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-feature-review-coverage.E4.Helpers.ps1",
+    "sha256": "184c978e985e9230ac6e888663d5056dbdb44261aad34425ebb8f71dc49a5587"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1",
+    "sha256": "f29c15a3316b25518efa64782f482781baa95b5b0c128fe0c09dccadbee5f39a"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1",
+    "sha256": "ed64e5ece40d9bd7149de60bcf2be565caedd42f14c50f13a526efca325dbb25"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1",
+    "sha256": "be8838efbdd0fea9bcf3c266020c197d99badf641835cd0aa41e9ec1654b78ae"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output-resolution.Tests.ps1",
+    "sha256": "3ce9ad35e6dc3b29e935d1c115c778ba0d4caa3abfea2dd29b91866f1536f4e1"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.artifact-type-dispatch.Tests.ps1",
+    "sha256": "a426eea723ab15aa16bc4789b0aeacd26c00f282fdcdce943b2c2a1e6350269d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.Envelope.Tests.ps1",
+    "sha256": "e716acc8191e582e58d4e5085fa0988865480272be46ce628d340a3de65cc147"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.human-interaction.Tests.ps1",
+    "sha256": "2f2e1286462a08a7961a381dc75c0bf5991d5317d15635ba2d8cd40d47d028af"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.model-routing.Tests.ps1",
+    "sha256": "8c3f5b82cbf372ffcfa588c626141f2896d788c77ef955a38bc054267bb89bad"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.Reentry.Tests.ps1",
+    "sha256": "33209d57d2c6bf7612b489d978d4782894f7e7a8c4dba2b8839378d1e45e4597"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1",
+    "sha256": "2935c12609a80e426673455661d980b62c3c6bd1334d85f753239d154d0931c1"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.WaveBarrier.Tests.ps1",
+    "sha256": "d9d4cf24aa5edb935bce7d67520610f0c1d4fec81127bfa63273c7f87a8d477d"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-orchestrator-output.WorktreeResolution.Tests.ps1",
+    "sha256": "24158e84b54e4444b980fa3def1cf65985340a62c6e348123c64a5a7667a94b7"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-planner-output.Coverage.Tests.ps1",
+    "sha256": "e4c362dedc455dba2ffa532e417f4bf892f56cadca26ecad3f35145554ec2f2b"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-planner-output.PreMortem.Tests.ps1",
+    "sha256": "e3408331fe1445865f9b23697bf6f6ca25e10c439419f6d0f58c9b82a4e712f6"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-planner-output.Reentry.Tests.ps1",
+    "sha256": "d8404f2dfa6d3f597ae087e36ed29a1df80851df767ba847e8039772c06c1606"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-planner-output.Tests.ps1",
+    "sha256": "46d04bdc3c27b223edfcca1559769e59e5ee7f35ec32e1d0effb54101d4dd496"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-pr-author-output.Coverage.Tests.ps1",
+    "sha256": "ca353daa323756caf3526399b06616fe9920374545e912618c2b68f44ee701e5"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-pr-author-output.Tests.ps1",
+    "sha256": "eeed6ebfde6ec03941ab73fdd414cdbaa4b1bb1a52f1ffb59fac703c419a895f"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-prd-feature-output.Coverage.Tests.ps1",
+    "sha256": "4e7255bd49c69bd1ad0f984e6d773d8a8c6dc25611b6e03e0a177b10ff579ecc"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1",
+    "sha256": "00984f27bd0fada82176c0522735151b357b25a04e7bdd2f96334ecf9765fad4"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-required-artifact-output.Envelope.Tests.ps1",
+    "sha256": "c25b92581a7de7da73aec6287460b41a54dc5aecb2beb70502659a1ec6ab93b9"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-required-artifact-output.Reentry.Tests.ps1",
+    "sha256": "52e852200dbbecb6f5972fa36ef936285b0a4d5297efc7764064dfb25081e392"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-required-artifact-output.Tests.ps1",
+    "sha256": "e9079935da7c97d440b67e77b1bbbada570052e2f39e68e0d64a55294acc570e"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1",
+    "sha256": "717c3303a8008bd35e64995f1dcec10d31e6164dc9b15db310a3133b7a2905d7"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-task-researcher-output.PreMortem.Tests.ps1",
+    "sha256": "d4dee64b85dfd274c8796d8e125cc13615d4f516de19eef4f6b6cdc181ba4772"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/validate-task-researcher-output.Tests.ps1",
+    "sha256": "be7449716c92e72e5a0cbd055e66bd3aebf7884011745c19da9a2c2396f22d88"
+  },
+  {
+    "path": "tests/scripts/claude-hooks/WorktreeResolutionFixture.Helpers.ps1",
+    "sha256": "9c087caa43d8a82907aa651fc7e4c7db509c71e9872794207e819ca2d80774c0"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1",
+    "sha256": "c3715549398868becd0e20764d67686307c744370483c911da2add7ee7155d20"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1",
+    "sha256": "27a891f7918dadf76d10915d7bc37ecc62b721265e5751e9e37a3a5a21b26e1d"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1",
+    "sha256": "cd1eae0ec39e2d3fa01fddfba39d0c43ce13c9c53ef1e7af08b237dd043b29bf"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Manifest.Tests.ps1",
+    "sha256": "dc6ec013101473b1ead216c242663961e0c707672de6fb2c292ae65e9fcc63a8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1",
+    "sha256": "0483fbe6601a6bf9ce062172f37bbc9045d99a6535aeb2ad48f42c5cd13dc692"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Regression452.Tests.ps1",
+    "sha256": "b6baf530c492db1489eb729ad1ccce5559edb94d179188bfbe5f8d4b5a061ad5"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1",
+    "sha256": "f4470bcca6938018304b4b2fd83d9bc1b082dc5b4af91dbe6e4c11c9094d6781"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1",
+    "sha256": "9d836916edc1b4eb4057f54e094570205299f81a3986ed25192194e437171bd6"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadius.Validation.Tests.ps1",
+    "sha256": "4622edfc08ea4ca2c814d2631eb5774b526be9cbd90e90a7037d932d025fb6af"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusConfig.Tests.ps1",
+    "sha256": "2d85a431b39a64b2110d4f841d43a84818dbff1e2fd9b46f7b2c533a34c88ca0"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusConflict.OverlappingPairs.Tests.ps1",
+    "sha256": "89ce9a595cade171e4c62263580049e2ea89d31145157a3c00ec7064d33fa427"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusConflict.PathOverlap.Tests.ps1",
+    "sha256": "8d3e67d2f6b0a35257596dd9df49d491b93c6eca12788a5afca9492b095092a8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusConflict.Tests.ps1",
+    "sha256": "f0883c2286ad971ea38b6097bb37109f500d78e63658ca6766c97b852e0d6732"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusExtraction.Path.Tests.ps1",
+    "sha256": "f34ead3a9f6117461c5c460b606afe75a9915e479d6be28e8ee6040d6ecbdad8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusExtraction.Tests.ps1",
+    "sha256": "abc40da072bcbcc535338851f3f358c9a82c9c226458ea1978ae8b453329b2d0"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusGlob.RegexCache.Tests.ps1",
+    "sha256": "de9c0580afa2685b83ec56ae5eee7173d809a0e8766ec1cebe0583550cd9c205"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusGlob.Tests.ps1",
+    "sha256": "2731c6aa9973d22b46981a7a5e2ba35a6e9df7792efc6e31da9417047d411ba1"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1",
+    "sha256": "4627b40a3706e145235c83499f4a8be8119ed303b77b4e06ea78e0bca0e6a3b1"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.PairCost.Tests.ps1",
+    "sha256": "8817c68d07fb95c5bf4ddfd5bcfb621a795bb8f708d6b8cb4a52481805827f3d"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1",
+    "sha256": "c89c7357129bc38ba16eb92b940ea7e06399931db43ab7d71b1020712ef10e47"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1",
+    "sha256": "cc529f72c0cd251462bd4fd85747861077e719efc066044a9c995cfc0d68a915"
+  },
+  {
+    "path": "tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1",
+    "sha256": "d356e95f6fe48483c759f2620b42a3a67cd497f2f82832b8205024d0ed15d581"
+  },
+  {
+    "path": "tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1",
+    "sha256": "3dc8687f953cdc26765c229a1f4f57bb1871835c65d51238b8b0d2fb33db7e94"
+  },
+  {
+    "path": "tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1",
+    "sha256": "cc8715230e2a128742508fdeb617034b26a723aaad14685312c71cb171ba4ca1"
+  },
+  {
+    "path": "tests/scripts/claude-lib/ci-gate/Invoke-MergeConfirmationParser.Tests.ps1",
+    "sha256": "d81cacb0f9f17b0034b365e8b6bf11f62c8cf9ca865b76d7f8ba3190e3d45ab9"
+  },
+  {
+    "path": "tests/scripts/claude-lib/ci-gate/MergeConfirmationParser.Manifest.Tests.ps1",
+    "sha256": "f77286a6007758a7813154eeeb76ff4f5402424ec7147f260321788cce84569a"
+  },
+  {
+    "path": "tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1",
+    "sha256": "ec951c506c5218a1d1d024358d61b08a7ee4a11069e6c285788de3d17bca9b94"
+  },
+  {
+    "path": "tests/scripts/claude-lib/cleanup-manifest/CleanupWorktreeManifest.Tests.ps1",
+    "sha256": "d735ee569f403b77884b8da936bc1d3f9dd32205f8c5ac3fdc73b1628aae43a3"
+  },
+  {
+    "path": "tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1",
+    "sha256": "f68122927dcce4f1f4902f7d33d036b23c98f798cbda1a9a9bc6690b7a598e7e"
+  },
+  {
+    "path": "tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1",
+    "sha256": "59e0b6fabfc10be0e5dcfd38965a59c0eff21f15ea71e092c06c69c77757082c"
+  },
+  {
+    "path": "tests/scripts/claude-lib/codex-routing/CodexRouting.Manifest.Tests.ps1",
+    "sha256": "e99ff088355c115297fee117bd46c0c4d5381a1bd0e3e87fc95d0c2bbbe34abb"
+  },
+  {
+    "path": "tests/scripts/claude-lib/codex-routing/CodexTopology.Parity.Tests.ps1",
+    "sha256": "bd6cd4a611ed047051c5ba514ef0ebafed09909c19e5d699a6c109be573d1ca2"
+  },
+  {
+    "path": "tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Manifest.Tests.ps1",
+    "sha256": "d751b03dbdc9f1ce8787ba40d9a5a4a6a0d62b743fe095e8d3dfbcef2139afc8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1",
+    "sha256": "7039d89140e7b1c31396ef294d3cef1cf21746399540208893ff349efd99416d"
+  },
+  {
+    "path": "tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1",
+    "sha256": "466927c5d3ee59be6f7a7ed03c0d86fcd7f10f17cc5e2c15db9256a2364d257e"
+  },
+  {
+    "path": "tests/scripts/claude-lib/hook-payload/HookPayload.Tests.ps1",
+    "sha256": "2c65d2e854c39a30950bb4567b619d38178746dfa272fea290724c5f1e1b6400"
+  },
+  {
+    "path": "tests/scripts/claude-lib/mermaid/MermaidGrammar.Tests.ps1",
+    "sha256": "6f6e9679bcbae00672fc3a1d82b4d64da1c47e0928169d778656c2c453a500a5"
+  },
+  {
+    "path": "tests/scripts/claude-lib/mermaid/MermaidLineScanner.Tests.ps1",
+    "sha256": "3b83fe4fff333e583669cefbf74a84695a5a99dcb0e99f6b0b08191c2acf64e3"
+  },
+  {
+    "path": "tests/scripts/claude-lib/mermaid/MermaidMarkdownFences.Tests.ps1",
+    "sha256": "64dbb43b6ef5ff3b9d8cb7784bb8fad06b40f2223e6a352f2590de07b977f075"
+  },
+  {
+    "path": "tests/scripts/claude-lib/mermaid/MermaidValidation.Tests.ps1",
+    "sha256": "e98cd802d0fc669a86acb37e755151b04dd346def4d05a1c5f84e35f2149767c"
+  },
+  {
+    "path": "tests/scripts/claude-lib/mermaid/MermaidValidationAcceptMatrix.Tests.ps1",
+    "sha256": "63a262bd3eed2891b272479da44d22b939b073c11eb119045c5f8dc089dbc712"
+  },
+  {
+    "path": "tests/scripts/claude-lib/model-routing/Get-ComplexityFloor.Tests.ps1",
+    "sha256": "0690d1d9489fb87aff74ba56ad9232d4366bce23c6df0a8c9cfaf127f4fad0ca"
+  },
+  {
+    "path": "tests/scripts/claude-lib/model-routing/ModelRouting.Manifest.Tests.ps1",
+    "sha256": "739a92ae1294b94a6790b081ac20bbc3e65db6e4bf32fc156d51e12577b6dae6"
+  },
+  {
+    "path": "tests/scripts/claude-lib/model-routing/ModelRouting.Parity.Tests.ps1",
+    "sha256": "3233b9ac8f2686180558bef3e130ee54dc4d22fc61f211cefbcb8a617a6a741b"
+  },
+  {
+    "path": "tests/scripts/claude-lib/model-routing/Resolve-DelegationModel.Tests.ps1",
+    "sha256": "da0a83605a63fa25d40482ce4e2c083611d1342d16032b1c597c31270073b99d"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Manifest.Tests.ps1",
+    "sha256": "1a1c07c4666bc146c3a9c757bb8aa1aec3fe0b1e8d307f8c14c0ae1521b68ee4"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1",
+    "sha256": "cbc13389c82cc49e13a08df7aeeb04aaf754c49c4731e12ddc735810a08e2947"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorState.ValueContract.Tests.ps1",
+    "sha256": "0c16b08967317efc3f2aa7ff35bcd662ae6900a6562470b0b801eeec7a39fad1"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateBlockedReason.Backcompat.Tests.ps1",
+    "sha256": "d14067b0f3dc1a1a1ad48086a80b5938de890afa0703e5f8f5f7792b7be47fae"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateBlockedReason.Parity.Tests.ps1",
+    "sha256": "d82866e7f8c9ec3cb2b3a3de40a9a5bf0023209d46fc50c875aa831e1672dfe4"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateBlockedReason.Tests.ps1",
+    "sha256": "dc35f9d573236358916573ca96334017a2da57b2373ff5fa6c70b3380cf7b622"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCheckpointValue.Tests.ps1",
+    "sha256": "b9606c268f594f7a07157a7e8103df6dff8f52ad30254d3a5d282f3e0e897a13"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCodexModelReceipts.Tests.ps1",
+    "sha256": "0f7b852bcf2584642d25e9673c8aaa377c1377664e9df8d2e3a105a59b4404a7"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.Tests.ps1",
+    "sha256": "e2f7f7eab8c5ea2e730184ee17a444472d35325a83807de59296f21451e2ecd6"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCompletion.Tests.ps1",
+    "sha256": "aaaaccc8582531db4544a86f6ef47467adc780332f287f6ea8511732f4443dd5"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCompletionChecks.Tests.ps1",
+    "sha256": "74daa9f7e28728ee1db32562c3c81086539551347409b2f0d820c8f3de43c80d"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.Parity.Tests.ps1",
+    "sha256": "048c626db02fa1bd995f66cd00e4ea4b44a4b16139472244fb871c68565476a4"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.Tests.ps1",
+    "sha256": "82b6b1911b02dbe102fdfbfd087bba4fe36b93f3cc2bc53113d30f7cdf9aa9a8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Parity.Tests.ps1",
+    "sha256": "1123b8d6a8ce8f9ed33c9f05c029967b0f4587e4a0907a649ee66077f32f2c7a"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1",
+    "sha256": "2d14381b3b6f43fc00c8d7220cf5aa59a8ebfabfc1da0befc6bb34e7efdffdbc"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateModelReceipts.Tests.ps1",
+    "sha256": "a25c821fef0fbbd86c3d0c269ba93bc8567b1ba3357279cf6842ddc5d1a5d468"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1",
+    "sha256": "66911ddeebae4c64eddaadad771edbb1923600370b0ae931722c963e7989e877"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateReceipts.Tests.ps1",
+    "sha256": "bf6ca0054ed788bbc58ad2551eb89823a99f97d39042994f3ea88d66fa5699b7"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRemediationAccounting.Tests.ps1",
+    "sha256": "1fa1f9e10435d04534f087f9829dae54ddf55e0d330c2c4139f102e27e77e6b2"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRemediationLoop.Backcompat.Tests.ps1",
+    "sha256": "69155297a70385f81214553c76ba2b590aa454c069c0cb9136c2d2afb43b9544"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRemediationLoop.Parity.Tests.ps1",
+    "sha256": "9f30b25f1ea42e5d2dc689fcd2a23c46fd210149d75a8ec03eadb8a4670c4446"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRoutingContract.Tests.ps1",
+    "sha256": "8df4cbac68557e61bcf4810193db94cec9a11a0e4f4928f6fe3107336df45382"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRoutingMatrix.Tests.ps1",
+    "sha256": "79597e97626584fc8047b00858bf439622956f992c09bb43b6c54d80bc26dc15"
+  },
+  {
+    "path": "tests/scripts/claude-lib/orchestrator-state/OrchestratorStateUnconditional.Tests.ps1",
+    "sha256": "c24ae4fc77db47f0d6445eff135335554387fd7d4c65468ef7da16adf7fe147f"
+  },
+  {
+    "path": "tests/scripts/claude-lib/parallel-drift/Invoke-ParallelDriftDetection.Tests.ps1",
+    "sha256": "e036192e3517659ca2f5f1a2fe3b1e56ac19da85d902a964d14cd770a6b65a77"
+  },
+  {
+    "path": "tests/scripts/claude-lib/parallel-drift/ParallelDrift.Manifest.Tests.ps1",
+    "sha256": "3ac32fe717865b3e4d36e820aa722e69f938571ee35b7a7cfae67595bfe600b6"
+  },
+  {
+    "path": "tests/scripts/claude-lib/parallel-drift/ParallelDrift.Parity.Tests.ps1",
+    "sha256": "6f12d09788f9998f4d25e4f48b61dd228271a352d849aae363e55f8ce9ec547a"
+  },
+  {
+    "path": "tests/scripts/claude-lib/parallel-drift/ParallelDrift.Tests.ps1",
+    "sha256": "76771da0163152d96d34e20ae55113aec129ef4139b38b1931e50b81739dd5a9"
+  },
+  {
+    "path": "tests/scripts/claude-lib/parallel-drift/ParallelDriftHalt.Tests.ps1",
+    "sha256": "dccffe90f665a251a75783034276ce9a6e9c346fdb94a9840110e41fff405c04"
+  },
+  {
+    "path": "tests/scripts/claude-lib/project-file-merge/ProjectFileMerge.Manifest.Tests.ps1",
+    "sha256": "9c98f49df95895208ff10c673a64a14f1815e6d1b64c34042b64f88b02582b36"
+  },
+  {
+    "path": "tests/scripts/claude-lib/project-file-merge/ProjectFileMerge.Tests.ps1",
+    "sha256": "48e1a481ea5721abb0258e61dd797d21ea7924bdef1b181969facbda994ede71"
+  },
+  {
+    "path": "tests/scripts/claude-lib/project-file-merge/ProjectFileMergeGrammar.Tests.ps1",
+    "sha256": "8f3e5615fb0068cea30f4d3f27080b4b58224655c8ccd96b8fd1834271999a64"
+  },
+  {
+    "path": "tests/scripts/claude-lib/project-file-merge/Resolve-MergeableConflict.Tests.ps1",
+    "sha256": "e843494fb0a7a2dd71726f897e95a233484a12e4bdeef081aef980f12339f561"
+  },
+  {
+    "path": "tests/scripts/claude-lib/requirements/GeneratedDocumentCounters.Tests.ps1",
+    "sha256": "ad46bcb543d33f251b6efd5357815de6efbe49b94886aa8d069debc086d713e8"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/EpicScopeReadiness.Tests.ps1",
+    "sha256": "9c27dc000036b2b6523a3410832b335f0e62be7e5879b6f5576f5d2e6dd628c2"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.RunTarget.Tests.ps1",
+    "sha256": "c469ffe6ed368e9cda3f074d8ffd5c70a400d57db7525bccbe0d62688d885daf"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1",
+    "sha256": "6019409e35dc1a0fc4c6d9d2286944d5dca56434e78f8e62282026b8e34f0430"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeItemResolution.PrNumber.Tests.ps1",
+    "sha256": "8db564d5cd103b9bf8c04607f1dc940bb218aec7a561e6464666670614326c98"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeItemResolution.Tests.ps1",
+    "sha256": "3ae843a8123633c8a0ae5c76a4531fb2aa0f270471459148edd35839573bc2ae"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1",
+    "sha256": "71908f009de280bc436bd2747420edc9152d8dfc2680f96ed271be9f132a0dca"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Tests.ps1",
+    "sha256": "4e084200af7b258a65c4ff4c99464d6449d5188c22db2422b1563b52fe79c540"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Record.Tests.ps1",
+    "sha256": "a634c1a0a75e5a4424296e7b8a85be309f6a9b0ed1e13bcb4d923e952dca970e"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Signal.Tests.ps1",
+    "sha256": "708cb5b7363cc40f8be23da8b62cc246e8d995fbca6f4d69ddfa08e4433af52c"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Tests.ps1",
+    "sha256": "9244b69f1602b22a23e181fcf73e3b2a19cf44c589bb34f1b82023c0db9eee63"
+  },
+  {
+    "path": "tests/scripts/claude-lib/worktree-resolution/WorktreeTargetResolution.Tests.ps1",
+    "sha256": "9f089803f1267928029e972e4964b1f3d554df8f1086bd487c1c1903b577e339"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1",
+    "sha256": "c1563ec974c81f5a0c1f8c15f1e87e1ee11cf102dadbdef5756cafd2be3dfe87"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1",
+    "sha256": "939e7e35e1797350d77f65720541311eede0696e863e2feb611059cefac46eff"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/claude-runtime-structure.Tests.ps1",
+    "sha256": "1d6f9d278cbe3dd0c9b6586c3917058be4b6c102ae4e7a45812b9869d9e546f8"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/claude-settings.Tests.ps1",
+    "sha256": "5bde61371a35c84d9028f09560261387cb29426661cf76cab0b4a9d1f3afc052"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/enforcement-hooks-checkpoint-path-explicit.Tests.ps1",
+    "sha256": "15158f564d19a65bfb6cb257596621945eed48d465a0d137a2fd7c31f3da7677"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1",
+    "sha256": "ee702a34f87b0fa385fa4e92670e6839612ee2d217655762b37bceaf80495143"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Allowlist.Helpers.ps1",
+    "sha256": "992e126e82dc28ca8237e7d6edfdef2f8cf1e0511b67585f39d23631364bf8f3"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1",
+    "sha256": "07f72989dc4bace901960623981dc412d8366aeb8349741f4ccf4e409bc89588"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1",
+    "sha256": "e688506dd85252cc14e1a47cf33e158bad7928538f352cc2f8f5cf3b964f754c"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1",
+    "sha256": "337153ea0e2db4e88aa80719c4ee43f6fefaf4f7a8e3757214dac95d711d6919"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/hook-import-failure-exemptions.Guard.Tests.ps1",
+    "sha256": "df4082e5cab4280d092dafbb8acd5cb99cc0e1322853dbb23d560433b87374e1"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1",
+    "sha256": "558d2f0ee5be926056b942d6665c5d0d19f98799b65e373611d01384aa36a8e3"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1",
+    "sha256": "b9998e468ba47b66d4cd56c6fd97bb9ba98c2fc870e3da393fa4fe7c4a03e7fe"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/HookGuardShape.Helpers.ps1",
+    "sha256": "3fd82b2b446fba9dbd659db57ef4cdc57dd68a84bc62b9ddd84ad9d5a2e8ebfb"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/HookImportFailureExemptions.Helpers.ps1",
+    "sha256": "1fce6183636b0bf4ece10c51be9d413c6c7a1890607f05fd7fc35146ad304d19"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1",
+    "sha256": "11b955d2664cdedc0cb03b0e9ffcba801406728b519e673d410d4ae6227b30bb"
+  },
+  {
+    "path": "tests/scripts/claude-runtime/test-name-uniqueness.Tests.ps1",
+    "sha256": "b613aaffc1212944818aa449971cc7741d451f6aa548c331df9f940f697dbcdb"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-batch-budget-hooks.Tests.ps1",
+    "sha256": "51203bbbf8f11c89313d1716be42b5098d9c7049c08063e7ebd40cf1b7148c65"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-batch-budget-route-parity.Tests.ps1",
+    "sha256": "960b671421f656509916e7c57bb0573c351f26c8ce2886b81367624a5e394180"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1",
+    "sha256": "cb74b35b570b5eaa41e85d04dcdf84cf0772a4d03b6ff8a762d8f529ca63d35c"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-completion-consistency-hook.Tests.ps1",
+    "sha256": "ffaf7bd8e45d28c947eafa34e9f3ee37958f72e1208be0d426f500ffbddea145"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-detached-head-transport.Tests.ps1",
+    "sha256": "2ef3bf1707775bf69b86f0d7fe157674c1a6a4653126c90b6e4d977d8e3e78ad"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-epic-child-launch-attestation.Coverage.Tests.ps1",
+    "sha256": "e78618f15413e25ecd6933e461dda3174b606822953767cdda77024188e642f8"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1",
+    "sha256": "da7aac2a86a52777d3da19cd7576b2267264de3cb9844c8b077240317c43c0f4"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-evidence-and-checkpoint-hooks.Tests.ps1",
+    "sha256": "8ed804f1f619b00f05b5fb6c6da676a0126103d64be7e080c0036c806a1c69d1"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-planning-only-hook.Tests.ps1",
+    "sha256": "39ef94b0e1c33876f998f39b6756a9dd0babf911050ffd2b2db974f412b6e0e6"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1",
+    "sha256": "f81e215417ddc8e959b5086ae3d36aac3dd43b2832e60ce42aa3018007bf3693"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-powershell-batch-budget-routing.Tests.ps1",
+    "sha256": "fae4e87f91351d77fba48695de7dde6c0085c65cd8ae906a65cef3567ec1af19"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1",
+    "sha256": "d769156dd10eadd66d02bc61c4c0ef2fb3fe84872e29b4277e6d225ecc9b2cb1"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-pretooluse-file-mapping.Tests.ps1",
+    "sha256": "e2493dec41f0d480896343de3e5eb095bec0d9f38a90c0a325402af080cca3d1"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1",
+    "sha256": "61492a477d3eb5722c729bee332ef8a0d69785f656b4510245834af400c4c793"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1",
+    "sha256": "15fc88b3fa9a4c47663c92c258f400f408e578d2d6abf8f8fdd82f8529c59af7"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-python-batch-budget-routing.Tests.ps1",
+    "sha256": "ef48ca9d4b87467f51dd882d8c8f7200a29575b059a3c7537117ecea167471b5"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-test-purity-hooks.Tests.ps1",
+    "sha256": "e74d6b2419c2f159d11f0cef703da4ac3da83adf404c813b6781a436e69e55c3"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/codex-worktree-binding-hook.Tests.ps1",
+    "sha256": "5e36ec9c75b7984cb41681a6a9521f18d6c7ffd113a12f4dca2237c0f9a6575c"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-codex-model-routing.Coverage.Tests.ps1",
+    "sha256": "15d088f126790d11322e77e01011e258579b30edbf62d3fe04089b7351dfd08d"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-completion-consistency-default-reader.Tests.ps1",
+    "sha256": "80c8f5a82fd6aff77fe8257c0d513ec57280db8c500853eb0a257ddd556dbce2"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-completion-consistency-edit-semantics.Tests.ps1",
+    "sha256": "3999ac14f12a20cd1b7e5df587482da94693a3a2345722a3503d06ac89487a5b"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-completion-consistency-edit-target.Tests.ps1",
+    "sha256": "4205d8f3677299f8c5619eeceac4c8743305400f69a3e427a11313a8d1eb715a"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-completion-consistency-epic-scope.Tests.ps1",
+    "sha256": "01333526e8fdcf4cc81e44cc85abb382a140c76a9e26db38f6013afe14356e59"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-completion-consistency-fail-closed.Tests.ps1",
+    "sha256": "89b16ade5c86d9e0570edac0e355c5e4de07b1c331c44b825a98313fb373db17"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-authorization.Tests.ps1",
+    "sha256": "418bc63563e5c741945bd06b515010beae660b6bd3113afcea058c02aaa5e892"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-command.Tests.ps1",
+    "sha256": "300ab6ed80f817f936a78dce492fc4406f03cbffd605b8a703adf42a0f7e49d3"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-decision-surface.Tests.ps1",
+    "sha256": "dba8f07bf5285a11ce0a89acaf0d4d9ef62b1e83ac705fba8acf19b230c90ee2"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-docs-only.Tests.ps1",
+    "sha256": "aa23272f07f09b9a0b387504b1796becda07cb3cde5feff9b9c61ec9e6ff7df8"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-merge-queue.Tests.ps1",
+    "sha256": "4dc294b0905dd165c253e83138a3e28361a0c07e1e1d782455cd0bff7f80abdc"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1",
+    "sha256": "9d6e272992e0c4215e4431cd653d8281d5bae211977059c559168876ebfe9e3f"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-root-invocation.Coverage.Tests.ps1",
+    "sha256": "b35636ec2441264d75f79f1c6d01158f1a3d012ff87d7ae4894836971a48e10d"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-wave-barrier.Coverage.Tests.ps1",
+    "sha256": "4c24650a2c520dcb4d663b30a5ad46628d2e45f714d69e60cc6b56eb305555d8"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1",
+    "sha256": "13d2ea97e0ebac39d94da5c74f20daa84a44a55d7acf315c45bd8812930bf8fd"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-issue824.Tests.ps1",
+    "sha256": "c78229cafa12157456b1b69f5aa21709434b9575b89ce990a51b8fe93727d4a6"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1",
+    "sha256": "55a85bac9ce5540b196aa68486209a98d272c335c064774ec7d58ad2fae70bc5"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Helpers.ps1",
+    "sha256": "af33eed1b6a1de2f3620e1998c7d7494ab9eb37cb3fc95db771bbbbbea392dff"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Selectors.Tests.ps1",
+    "sha256": "0440cb03afae2256ac7014ba0d11801d6d32557923a716378852114341b93920"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1",
+    "sha256": "963833c0935b1f21eb3ebaefba425c77b4bbfc664810b14e43bde6e34a3ed1f4"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-resolution.Tests.ps1",
+    "sha256": "7395f7bd2d152f9b68570ec27b22310d63f6d39297cb44aef82a5e7cae7be63a"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope-targets.Tests.ps1",
+    "sha256": "b8deb621311fe38a25ea68f979fc3c10c92ea48fb692d8cb416c04d37baff6bf"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Decision.Tests.ps1",
+    "sha256": "95989231b6c629c4c904d67083fbbe6ec91d3864bf59abc2091621f67ce95150"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1",
+    "sha256": "b6568b9b30d6caa0ef588018c60f34a348357a2fd03723310e18a30c160be998"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.TargetFolder.Tests.ps1",
+    "sha256": "5b2ed1d61fb9764ee5c4996de5cdb010a77193a51e1a6b29fec6f4b7c460e054"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1",
+    "sha256": "8cf7b503fd9b4b3ed73f1b37c6b71fe5088457cf1eb72dde961cd9ed8aa7cc9e"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-routing.Tests.ps1",
+    "sha256": "0841184e22d3101b467b6c9a21f52fb42314e7009c4bba426b18ea904f15fd11"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-operand-bypass.Tests.ps1",
+    "sha256": "0b2ce704d0bb531d61266cc2658da7be898d60b556fc85769d48c5702336d62e"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1",
+    "sha256": "0cf0a495d82c501ae48f741ca0d0e430e7e88223c815ab0fd4e48cda9c4cb754"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-promotion-mcp-only-decision-surface.Tests.ps1",
+    "sha256": "656a43781025058d0ae337b31dccc8f68cd88bbd082050a0476a398d9acb414f"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1",
+    "sha256": "190b93fedb4477669727324226a6b09fd94ffc6a0f76d596bcbd31c8ecfe4a93"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-child-launch-attestation.Tests.ps1",
+    "sha256": "39bc52383c5b6189232ae2b3307beed77c8c4d429c125a1c97777372df204da7"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1",
+    "sha256": "bf3e9e4b19070df8e56616a8f8f4821d1743f6c5f086e65319bb1d1376de7912"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1",
+    "sha256": "f31585632242ccb2e847f30fa22560754a4b0a4bb75b7d5c84b9243409245029"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1",
+    "sha256": "3708d6f05358def3825134967f54457e783f9dc9557da4a5a455310e148d9620"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-provenance.Tests.ps1",
+    "sha256": "c7d7da3556db716513f380514a8b89b7df2e97e427746082722f8b51d4d77f5d"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/epic-wave-launch-binding.Tests.ps1",
+    "sha256": "97a90ed0e4aba4efeb589174e1ed81b81de51d04b0489031f6ba012cc8b809b3"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/feature-folder-resolution.Tests.ps1",
+    "sha256": "51aa3912746468c31d2459b0a8b8e6ef5f0fba53a1f7c81863f9b9b26d51d867"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1",
+    "sha256": "b373db2a4dacc16ca7bc61bfd882a0858648665de7b90a158409b5d4b3d7179f"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/feature-review-coverage-thresholds.Tests.ps1",
+    "sha256": "856367fbfca4e01d3fe912c233c442a1da4878ce62c80ae77a7e48a912b79dbe"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1",
+    "sha256": "4477c3dd92431b02c84d7792cced87d1fdb85a09a8a6543703bf7c368180e5b1"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1",
+    "sha256": "fb3cba44270d0908cf125bb0ad484c7cfa1f250a49921e8e15e22207b5a9df62"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1",
+    "sha256": "26dfb8b54fabd49ab303b1c022fcabe92cad5be20992a5881b048fac7f0bbec2"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-dependency-guard.Tests.ps1",
+    "sha256": "e268b3f7264b9a069bc143baebfae0ac51781c168f7ad91d93ccf007f936f7ce"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1",
+    "sha256": "f8563cdf49bce829ff67a837312d63db67880d3efcc6358a82eb884c85fb39d3"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1",
+    "sha256": "9bb10276fdc87b40da9bb116e61ddc5efca448bccda78f27c9ed8ed259ea1993"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1",
+    "sha256": "e43942b2c35e57e8cb5d3eae7b8d6d43f6a8241bf933e9f72948be1d7ece52a4"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/model-profile-attestation.Tests.ps1",
+    "sha256": "8e3bb38434595fc1b61ebdc975822122b288ad374245b1c676c097e3a48e4d3c"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/subagent-attestation-command.Tests.ps1",
+    "sha256": "276c80afb3792c4154691d38351a35b11475833512f0bd46107e7490f8cbc60c"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/subagent-attestation-persistence.Tests.ps1",
+    "sha256": "0b62de5d8497aac218876291d8e8438492ca7daa78ae15e1754d13b093144337"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1",
+    "sha256": "047efd866089c2cfe1b557815fce69046c5df9fc7994bca23f309bd9c188d210"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1",
+    "sha256": "380b44d065b833377a916f804ec874a2ee23217950aaa9fb5c5202dc2bab6956"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/validate-codex-subagent-routing.Coverage.Tests.ps1",
+    "sha256": "784d5267bf388fcc0099a8dc634fc688f945b11e6a411066687c11fde94a837b"
+  },
+  {
+    "path": "tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1",
+    "sha256": "69dd00f50de8b828631782d6ac6654875ed74eaa76fc526cf9502468bb52a952"
+  },
+  {
+    "path": "tests/scripts/codex-scripts/codex-routing-cli-common.Tests.ps1",
+    "sha256": "4767c252f74ffe54bdb1c327415225d9df1fa53d2dab54dbe9a371721eda1935"
+  },
+  {
+    "path": "tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1",
+    "sha256": "62054f0b8e8489d09cbd88ce8f008e36817010eef688fa7a684a57b7d8a20ec0"
+  },
+  {
+    "path": "tests/scripts/dev-tools/activate.Tests.ps1",
+    "sha256": "d48da1e8342df94ffdec55fad6481a37e389601515d0bd4f10b513cc7acea984"
+  },
+  {
+    "path": "tests/scripts/dev-tools/agents-attribution.Tests.ps1",
+    "sha256": "66b1ecc7761564be03cc57ec5d55463a87d09fd3324102d9f928a53ecfe0ed0c"
+  },
+  {
+    "path": "tests/scripts/dev-tools/bootstrap-host.Tests.ps1",
+    "sha256": "1111eaa7a5e2bbfb532f30c20c276a2d64a17ec4bdc972e1e9bc77e7b6549099"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1",
+    "sha256": "961de41b02e596286e47ecc3c65d98816f983e05553753a2501cc9ac27c6e861"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1",
+    "sha256": "ad8141e9b7775ca28a5efa1a0483f97a403e17085575acc1aa473ba337c89bf7"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostBootstrap.Tests.ps1",
+    "sha256": "5351eb78f716ca1d31b33b5c058da528e6ac7cbe005f93a3c30d2c392fd89dd2"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1",
+    "sha256": "1abba6f0e5bce2709a4457f23c205d9dded821f2a6523a6aa25bf5e737775244"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostTooling.Tests.ps1",
+    "sha256": "7d49f52916d2dda08a572b6f6aadec7d77498bc93333902d381734e3daf614fa"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostVerification.Invoke.Tests.ps1",
+    "sha256": "8d526d1fe8722c75dffa700f7fff2b97b0cdc02ca5e85eb62cfa39676878629b"
+  },
+  {
+    "path": "tests/scripts/dev-tools/HostVerification.Tests.ps1",
+    "sha256": "d549eaacf70ed4cfbb76c77f5c2c82bb92b784c7eaa09a76a5cab2391c2d6bd2"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullRelease.Tests.ps1",
+    "sha256": "65a62c76949667aa7c8b79dd2652b60c3dc1a6ad7231e1d8fa983c28b19cb835"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullReleaseFlow.AdditionalFailurePaths.Tests.ps1",
+    "sha256": "848731eed9773824d350d54049da79d7803a30186360fa89fbb3fa79350b1589"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullReleaseFlow.CheckHelpers.Tests.ps1",
+    "sha256": "e940abdd5c8e233c27106bf1f4a28926d725a4b8c724ec42c58f1941ebdaf3e2"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullReleaseFlow.ChecksWait.Tests.ps1",
+    "sha256": "272ad3dab82fadd78b96665680e961eac7913da9fc0e4ac4e8a346a41be48217"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullReleaseFlow.MergeWait.Tests.ps1",
+    "sha256": "d456cd6e2d95c2faf32598788c625d4651cc2e7ec6a8a48a9e078db0316094c1"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-FullReleaseFlow.Tests.ps1",
+    "sha256": "d13549f7b71ca9459a14da85c33e8384cb95d365c00b220b36afdf76fb9205f7"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-MarketplacePublish.Tests.ps1",
+    "sha256": "204ee8355dea7c91258bfebd89008d6b9755171123c29138e7105761ad22dc35"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-ReleaseReconciliation.Tests.ps1",
+    "sha256": "a68461339c00e58ea7de259de810dab2c414c1f18db88baaab5379260be3c4cd"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1",
+    "sha256": "dc7ed486800b38317097f7d0b9089bf7964daa14633c400d6621d76067c08f86"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-ReleaseTagPushCallSiteBudgets.Tests.ps1",
+    "sha256": "ff533f343d8570b58c0f8723ed2b19ce1fd6ebee040774470e40202b8dd2c3d6"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1",
+    "sha256": "15ea25dbbad69623ac21539ec8e29be41fcde57120953de799cc56c16d9fb6a2"
+  },
+  {
+    "path": "tests/scripts/dev-tools/Invoke-ReleaseVerificationHelpers.Tests.ps1",
+    "sha256": "1c06c5be69aeeeb67ae1f59a668fbed04c71d000446994999dad35c01f9a6a2b"
+  },
+  {
+    "path": "tests/scripts/dev-tools/link-feature-docs.Tests.ps1",
+    "sha256": "dbe942782c33a146b247f3227658ed36585175f4804726113b2dd66a359b52c8"
+  },
+  {
+    "path": "tests/scripts/dev-tools/link-parent-child.Tests.ps1",
+    "sha256": "851eee0b7eea32b779d402e9b1be41af6c772eef2ce88dee9b499c7cbcffd018"
+  },
+  {
+    "path": "tests/scripts/dev-tools/new-claude-worktree-session.Tests.ps1",
+    "sha256": "116f5e5061a2ffc56a899288f3554f1b0db7782a412a21c45f8598bd04bc07a9"
+  },
+  {
+    "path": "tests/scripts/dev-tools/new-potential-entry.TemplateRoot.Tests.ps1",
+    "sha256": "0b06177053be3c09daf84a6fe8f9aba57357ae18ac38c4da47e53964704e7114"
+  },
+  {
+    "path": "tests/scripts/dev-tools/new-potential-entry.Tests.ps1",
+    "sha256": "741a4d20a86311ab728e91e9bacd1635f30bd11b8a72dfb72dd2e5e4c6900008"
+  },
+  {
+    "path": "tests/scripts/dev-tools/post-codex-worktree-session.Tests.ps1",
+    "sha256": "3acb5bd5aeece93d1123d17b7d835f9001578c4ef02084056c5dd935b5faae5b"
+  },
+  {
+    "path": "tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1",
+    "sha256": "acab86fe44f8494e0493c1ab107b3febd079566d4be942e5c37467132932c537"
+  },
+  {
+    "path": "tests/scripts/dev-tools/run-actionlint.Tests.ps1",
+    "sha256": "2efc536bcee461754cdc80b9630026a4a8528ff4bafbc8d06bffb608d0eae42a"
+  },
+  {
+    "path": "tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1",
+    "sha256": "cb4fb3863d4e628205ebcd3d38b18916f4978784e4011cf728f7d68714ba2244"
+  },
+  {
+    "path": "tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1",
+    "sha256": "b5152fafa46722ca7b5720313ff9336d8f10f38b00989a92c0d66be71263aaa4"
+  },
+  {
+    "path": "tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1",
+    "sha256": "6c1eb5f9b197a334bc5032449037987305dacc834b9957f8682bd5c05ccdeb0f"
+  },
+  {
+    "path": "tests/scripts/dev-tools/tree.Tests.ps1",
+    "sha256": "be511cbc477a9590d3d5b8ccea01cadb941e9690574b6bf2ca52bb173b15d51a"
+  },
+  {
+    "path": "tests/scripts/dev-tools/verify-host.Tests.ps1",
+    "sha256": "615fad753d4d522437f9917aeeaccc6d9af5e8dbf91f87da57f6fc5fbcb79a28"
+  },
+  {
+    "path": "tests/scripts/host-tools.manifest.Tests.ps1",
+    "sha256": "a55d392791fbc0cd6e8c3e087d17190d8a68a1b671dd577b06978a3c57fa1377"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/Get-PoshQCFileList.Excludes.Tests.ps1",
+    "sha256": "fcb238d538a6cc1559836200d654921daf1743b12bc30ec5a0a143414f062aed"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1",
+    "sha256": "a1f16a27d66ed2c6b46bc7e6ab1b2673ab9f5a5371f847b0231e9066fbe239da"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.Coverage.Tests.ps1",
+    "sha256": "1093bf540df7aa096e562625552dd3908880754014d500ca047572f1f6f3a814"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.CoverageConfig.Tests.ps1",
+    "sha256": "3751927c043612baaee00a2dbd788af98c5571565e2b443474b06a90c3d6c4ef"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1",
+    "sha256": "f21a756240c8d72bde4c55b744c2eff6f1cd6b52216eaf091cb8cc623885962d"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1",
+    "sha256": "b154ac913b0ca2762a4a8ce9c0ccc957496aae517d9056e4be51dfa666ceae5c"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1",
+    "sha256": "433f1023783ab84556f76f0e60763278d974147c05edf161379a324222cf048f"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1",
+    "sha256": "1e54f3515462d59a9c0b1b120036393b414a34ca6b0b059a740375160d1f26a7"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.ScanConfig.Tests.ps1",
+    "sha256": "2b269220483f0758f02f438e22b67da7bc734629eae99d7e50e449b84556cc44"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1",
+    "sha256": "19965c2a56077083772fdf61d0588987cee1202b1220b2777e83c0e04fd4793b"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1",
+    "sha256": "23f7f6c4679bbeeff04703061ee93b4be10a2ccbf5258da2883fcb893789a0ff"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1",
+    "sha256": "b35e416a236bb9c53a220ecd04daf1a7f3d56b2e7e9c74413656d0ba218ccbf7"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingCoveragePruning.Tests.ps1",
+    "sha256": "ad167e1218be92637f750f73efa26be4b8a4ed94c79ddece9f298e7f8e05dfb8"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeConfigPaths.Tests.ps1",
+    "sha256": "67cfb9e4f770087dd1561c604bfc3e38f0f89f9269379a83c2ac78c98722d9b6"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeSummary.Tests.ps1",
+    "sha256": "f4a5022e9aff530003988628e2a0060c0da7a965bcf75ee0c0c5133b279d8dbb"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1",
+    "sha256": "c69de4c66bdc62fee34c8778b11e5c178d0ba04b46f056ab2b2d5f9a715f06c1"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1",
+    "sha256": "0f7ff44224f3890345c244b208a76dbb8a35e8c777744ccf4c9e58d2da69a80b"
+  },
+  {
+    "path": "tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1",
+    "sha256": "e8c936a3cf605f365eba856a676600d04bf390032b479b995eb80fff1f48e5e8"
+  },
+  {
+    "path": "tests/scripts/powershell/Publish-DrmCopilotExtension.Tests.ps1",
+    "sha256": "9fb55263d2c7ee88b4376f8b1fd11c356092039ed72d39924334ef144b9e1043"
+  },
+  {
+    "path": "tests/scripts/powershell/Support/TestHelpers.ps1",
+    "sha256": "a34aaf2ec86d84cfd1f0548250d42cd936ca50a50d07ede128472e1f58a91371"
+  },
+  {
+    "path": "tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1",
+    "sha256": "8cd16472722eb12b84e5f2d363558107c26b2d858f88d5d46b30a5fb67d9c683"
+  },
+  {
+    "path": "tests/scripts/workflows/CiWorkflow.Tests.ps1",
+    "sha256": "e2345c3f04b45acdd96fe956263a5847b03804c0509bf27ee8fe7a7036cb016e"
+  },
+  {
+    "path": "tests/scripts/workflows/PoshQcWorkflow.Tests.ps1",
+    "sha256": "d23fc669df0080122da0413fc59cfafb5374294112d527933587c3fe271430fe"
+  },
+  {
+    "path": "tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1",
+    "sha256": "def4527c7ebee2120d081c24f818f47347d7760fd5a825c5b977ab98961d8dee"
+  },
+  {
+    "path": "tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1",
+    "sha256": "27bdeb1d7a439967c9a054aa2a64f3e2f0e645579f5fc2312e266b480dc8afcb"
+  }
+]

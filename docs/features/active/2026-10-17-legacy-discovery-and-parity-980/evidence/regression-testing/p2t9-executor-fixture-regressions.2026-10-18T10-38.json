@@ -1,0 +1,224 @@
+{
+  "task": "P2-T9",
+  "timestamp": "2026-10-18T10:38:31.732968+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "c467c6ed0f777019ab10a5e325b46f04709d862fa283323bc99a83ef1af9e88e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "b42c97b76b581334c1e86416765e582a1bbce7a6fe435acf50460a2b4f901a80",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "204ee849d2ea8957fb02b9865c337067fb20bebead98ecf7a093713ff29eb364",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "9b466c523da0ff0143c8dadaaad0ac0077320f4451e41ac4f9c01f92ee464564"
+  },
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "c467c6ed0f777019ab10a5e325b46f04709d862fa283323bc99a83ef1af9e88e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "b42c97b76b581334c1e86416765e582a1bbce7a6fe435acf50460a2b4f901a80",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "91690a47a5af622f56605f8109ede0748ab9c6ad84e04e7c1f52c55b23096b71",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "6080f5b7de0b58c0c67016ed11608d646c6d22b721ab68a155caef671d182d35"
+  },
+  "source_stable": false,
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "name": "feature evidence switch True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "COMPLETION_EVIDENCE",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required features need retained source observation evidence.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "feature evidence switch False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "required open legacy question with approved target switch True",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "DIMENSION_UNRESOLVED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature-alpha.json",
+          "pointer": "/timing",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required legacy observation remains unresolved.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "COMPLETION_UNRESOLVED",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/unspecified-behaviors.yaml",
+          "pointer": "/records/0/status",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Required legacy behavior remains unresolved.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    },
+    {
+      "name": "required open legacy question with approved target switch False",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "mode": "discovery-complete",
+      "output_valid": null,
+      "validation_result": "pass",
+      "findings": []
+    },
+    {
+      "name": "disabled completion switches cannot waive claim evidence integrity",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "mode": "planning",
+      "output_valid": null,
+      "validation_result": "fail",
+      "findings": [
+        {
+          "code": "EVIDENCE_CHECKSUM",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/evidence/target-run.json",
+          "pointer": "/path",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The captured payload does not match the declared SHA-256 checksum.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "EVIDENCE_CHECKSUM",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/evidence/target-run.json",
+          "pointer": "/runtime_artifact/path",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "The captured payload does not match the declared SHA-256 checksum.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/implementation-records/implementation-alpha.json",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Implementation needs matching target bytes/client/test proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Parity claims need independently evidenced target implementation.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_VERIFICATION",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Missing target proof: browser-example/browser/online.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/failure",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/observable_outputs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/online",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/state_transitions",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/dimensions/trigger",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_DIMENSION_PROOF",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/online",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Dimension results need independent contextual target proof.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        },
+        {
+          "code": "PARITY_IMPLEMENTATION_LINK",
+          "severity": "error",
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "pointer": "/entries/0/target_implementation_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "message": "Implementation links need matching feature/client/bytes.",
+          "next_action": "Correct the identity or supply the artifact, then validate again."
+        }
+      ]
+    }
+  ]
+}

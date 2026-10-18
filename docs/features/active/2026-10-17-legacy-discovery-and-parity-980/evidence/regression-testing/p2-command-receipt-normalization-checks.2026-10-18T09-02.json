@@ -1,0 +1,507 @@
+{
+  "status": "pass",
+  "source_files_unchanged": 3,
+  "command_receipts": 62,
+  "successful_command_records": 51,
+  "failed_command_records": 11,
+  "command_execution_repeated": false,
+  "comparison": "Exact original block after restoring capture timestamp and removing only normalization metadata; inter-block separator blank lines excluded.",
+  "records": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-format-pass2.2026-10-18T09-01.md",
+      "title": "p2t2-format-pass2",
+      "original_block_sha256": "0cae098b1cde7979c2df9f11ef2389b536a4aa4f383b504e3c1cf913281a87fc",
+      "receipt_sha256": "e198f1119daf5a3756035bfb6dbed03f3d2c3d0beb2ce8d4d9f0d4221e59817e",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-lint-pass2.2026-10-18T09-01.md",
+      "title": "p2t2-lint-pass2",
+      "original_block_sha256": "5d98f2a01972becc1568a96b0ad80e333e8755a543ec9c0f5018098c19783bb9",
+      "receipt_sha256": "ddd6c6042491f140e6df828cfb08f8d018a88207837a1e0f93fb7ea2ffda7ca6",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-types-pass2.2026-10-18T09-01.md",
+      "title": "p2t2-types-pass2",
+      "original_block_sha256": "064c1f0ce47e97661a623e4760a6fc0a1463a43699af9c0482bcfc650a7e374e",
+      "receipt_sha256": "98fd9d593d59e207fc2df3931c56c49c26c6351b6b47663839f09ad56a34613c",
+      "captured_output_sha256": "83d2249bf4a909c3da1af31d4cd56337905084c9260a121f186164909760c6e0",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-format-pass3.2026-10-18T09-01.md",
+      "title": "p2t2-format-pass3",
+      "original_block_sha256": "2c4dfe209271c8fba6e086bb754f9ca76a11d3b73aee6135df6b63131e858442",
+      "receipt_sha256": "09e88c746234b6024579ccdebe47e8c87488d79aada6034c25f34bca982ec373",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-lint-pass3.2026-10-18T09-01.md",
+      "title": "p2t2-lint-pass3",
+      "original_block_sha256": "849ac14dca052f9f586fcd62d57542c481674a3fd138e8d5c44e66f8beda0e66",
+      "receipt_sha256": "cdec4ac5639dd97783cac08938d6d3ecc440b179bb87cd203a63ffd43e4fb675",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-types-pass3.2026-10-18T09-01.md",
+      "title": "p2t2-types-pass3",
+      "original_block_sha256": "f8da756e8b1b651cdde0ca640a92a582a2e6f028891a6058fa66b73b7c4f3508",
+      "receipt_sha256": "f258e08f7dc4ed0ba42d771e8a7351bf51aac9516d2a8a31f43c29bfcd21d848",
+      "captured_output_sha256": "36355e352c9da65c3e7243c53196ef636392fc40b628d231fb0c9ecf6d92d30b",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-tests-pass3.2026-10-18T09-01.md",
+      "title": "p2t2-tests-pass3",
+      "original_block_sha256": "8731ad4fd41725ad236113bcdacae72fa084f8bc535de6a0800d3cec5947e09e",
+      "receipt_sha256": "f671af247b67909b4259bab03065660fd1139e99058e07297690392d83084644",
+      "captured_output_sha256": "67019372828cb2a00640f907b4d395eefe423ea3f3bc6411f56b83e62de9f5cf",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-isolation-pass3.2026-10-18T09-01.md",
+      "title": "p2t2-isolation-pass3",
+      "original_block_sha256": "3cde2ebaef257983f08b79446e073974fb406046994ae31c7bd284da3c655cdf",
+      "receipt_sha256": "691b3b1fea2a000557d524d05ef5d15a6fb372306ddce0c5a9bae451526d658b",
+      "captured_output_sha256": "435dfbd455cc9d8d13af296b8736baf024d0924764de8e84691d8b569ce4f879",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-quality-tiers.2026-10-18T09-01.md",
+      "title": "p2t2-quality-tiers",
+      "original_block_sha256": "b93e30184ecabc57e0263e2c5c1a705b83f922eb146ec0dce783776a6abbae36",
+      "receipt_sha256": "5cecf8bb42f1a1e0652c0c2b11294ec1d09ba825b241d00a8619bc7ae04e9401",
+      "captured_output_sha256": "3b5425814bfec90830467bf90dcf86aff06359bcd45862269c729b54844613c2",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-resource-contract.2026-10-18T09-01.md",
+      "title": "p2t2-resource-contract",
+      "original_block_sha256": "a966dc466263428f1b8db42013f301bff6197c0994ac51158b906f72f22d2684",
+      "receipt_sha256": "03f6a8973c997f909f4476df5293d6aab05dcc0cc1a2260a98abe45c6f1b7ea7",
+      "captured_output_sha256": "7f59f431d4288bba01ba4f01fc675a385938ed3100e904d78c31876177f81f75",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-static-audit.2026-10-18T09-01.md",
+      "title": "p2t2-static-audit",
+      "original_block_sha256": "dd4b25c51b958857defa1e8a9d1f2e1ffd0a68036464b5a89e86ff333f96e060",
+      "receipt_sha256": "6952e8992ab527560661b37f529d97c566ca5113c2ee51316a2994fb1c609c70",
+      "captured_output_sha256": "3ac68adbaa77fbdd33103f3075376355b36bc83cbeeaaa7a0f2327025fdcaa62",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-task-audit.2026-10-18T09-01.md",
+      "title": "p2t2-task-audit",
+      "original_block_sha256": "48a8b1f98884556bb829117440234b6a1eb421cd1f911c679a6d36b9ccae8e5d",
+      "receipt_sha256": "1be371435f1f31fec64213371f081f4e5628994b7d49862271c541de4eb59a41",
+      "captured_output_sha256": "b3136d7176badd03f15bdf7ceb5a678acd3ddbec5ca679334ccf970c65204a15",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass1.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass1",
+      "original_block_sha256": "33775c4b362eed7f7bddf1aa3eff6bde6398c399c4efb1262a1875e27b00e4a6",
+      "receipt_sha256": "be8a3da220740ae1ad08c3d52e38d1426ee098e3a7cc7c21879a6f7d87209c70",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass1.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass1",
+      "original_block_sha256": "2a8e7cbdb57b2163bdf086f2f23353aab7b00d8014c1aeb5ceb78db0259564ea",
+      "receipt_sha256": "5bcd84d595f5ac28030aa95f3e379cac81b960879c89ebde193ccc23c1562ce1",
+      "captured_output_sha256": "792e93163a118dc579cc13a2571a9ee73715bcc451006e091141db4abef9e6f3",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass2.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass2",
+      "original_block_sha256": "1b67762b2fcefe652e34c0daedbb5db7b64f3c9532ff1bbaed0f781d0f5d0b37",
+      "receipt_sha256": "d6330b58205803a36c3e053d5eacf71489fe781530787a5890508665c1c059f3",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass3.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass3",
+      "original_block_sha256": "13ee8816e3088912f876c2b3fae68ddea7c72a767754453b94e3b9817a34ac1f",
+      "receipt_sha256": "8e4d7a4c959fc645919e505130173e248abc84ab6180e16c8d7ed8e4cb48c457",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass3.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass3",
+      "original_block_sha256": "9a4fe93d55ca38cdb36a8c614351a2754bd9833beb69476ce63bac2c75fe83e9",
+      "receipt_sha256": "0886603f9d011e3662d2bac22ca7da8bf650d92b5ce4db56b699bf30decaf25c",
+      "captured_output_sha256": "61b24a03ea2d1d2ea5b55578a107290e80e3b83ff1ac63eb307faac6130254c0",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass4.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass4",
+      "original_block_sha256": "6593034da6be3053f7bd1ed6e63eff7f54a175a9375c38bf3639d7e0139e1202",
+      "receipt_sha256": "5f89815ea74646777447b52634a7a7e4bd22f04726505c53f3a113bb4598e01a",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass4.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass4",
+      "original_block_sha256": "8ffd7c2f057a3eeed81e41a3b82b1d546802832c5493e86bcc71f98845287f76",
+      "receipt_sha256": "e2c963a36222bfc6eb9270f81cd51cf17e5754e2d52804172e4dd3ef772dab07",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass4.2026-10-18T09-01.md",
+      "title": "p2t3-types-pass4",
+      "original_block_sha256": "f1efbb3ce120eeee2a27cc1c4bbbd5217f1629825509fc859cddf279094d4005",
+      "receipt_sha256": "6823e8dc8133f541a54d3be6ed4da6fcd34c3ff475f1d8a29a92af1cccfc471f",
+      "captured_output_sha256": "21470935c52eac90591aeda3f41831e173b9af71f17e433150f50423bdda8dc8",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass5.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass5",
+      "original_block_sha256": "bb543137edfe5270a2816365827e6a96c5535bf81c44a00db5ed8ed9d3a00251",
+      "receipt_sha256": "f2ff1d8a65ed24f1e82e3f8e06b9bd82a220da2694a0e742c65cb1600d1c3c7d",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass5.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass5",
+      "original_block_sha256": "1e59ee1bf776056211222599f4cf32e8efef5344f10ea7ca277269802111c3f5",
+      "receipt_sha256": "0236ccc70c7864cf80f461605510bfc9859450813bcb4186da72ea68fc715399",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass5.2026-10-18T09-01.md",
+      "title": "p2t3-types-pass5",
+      "original_block_sha256": "b69c45c17cc6d95c42e92ef4e9255e4cd9fd30724073cd28793ef3131fa10a44",
+      "receipt_sha256": "9e78b245b47291a99a352df94301e08cb6ea49a1aa96a4f502dce2ebc0f27295",
+      "captured_output_sha256": "36355e352c9da65c3e7243c53196ef636392fc40b628d231fb0c9ecf6d92d30b",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass5.2026-10-18T09-01.md",
+      "title": "p2t3-tests-pass5",
+      "original_block_sha256": "6f10fa5600564b00593d662ecb1d173769194c7301f868ff4121ae06e7a414b0",
+      "receipt_sha256": "cf7a4d9df4cc1501dcd64588ec94ba78d23eba0d034167568ba013ac69831ad6",
+      "captured_output_sha256": "979ef3faef819bc738ae7ae4856cb801bdb9203ca85b4cc9be43cca20c9ebade",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass6",
+      "original_block_sha256": "1fef2e4c838b64502a2d37c32d718201b5f103c4102d9d2c2189435ab539c265",
+      "receipt_sha256": "48508b66f316ea8188ba231cfdae3531b91234817995337bb4386e3fc243f97f",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass6",
+      "original_block_sha256": "99923381e356cda576d92273bdfda39d80eb1c0cda8e7e3fce125c157a6fb671",
+      "receipt_sha256": "90190612f0187e817e0e35bb6dbc0d11bd595e34d8e1c9e894c14d57b809877a",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-types-pass6",
+      "original_block_sha256": "3cd67190614e483777834e53b6f1e223ef2d3fe049e291a428df16253e1c7621",
+      "receipt_sha256": "1e4cdfcb1f41f157b00cb46792e0cb487e6ebd48293b9175bf2bb98eb4031967",
+      "captured_output_sha256": "36355e352c9da65c3e7243c53196ef636392fc40b628d231fb0c9ecf6d92d30b",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-tests-pass6",
+      "original_block_sha256": "529d3db97ec71446c0f2939e0bc06af17059199d96ad75611601c7ea60e94dba",
+      "receipt_sha256": "058810d7d9b115533b2e81f0394e8fb8d5adf2ef809ca2bad5911cb529c546d3",
+      "captured_output_sha256": "9638b03e90e016774f033516c48e7e5e474c81c7f6d7a5337d0ed06e7e508c04",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-static-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-static-pass6",
+      "original_block_sha256": "56e26fdec0da06d47fbfcd769e0c8b10c71c43a6cabd658dd6a93c9deb329288",
+      "receipt_sha256": "3b39a234f57a259d1be0cd08586341e767a6d9149542fff42a75d1e74241dbe7",
+      "captured_output_sha256": "922698fdd7fa6e7c82437c6c3c922491ce67387c4b74a6b0711e65ac698698ab",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-isolation-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-isolation-pass6",
+      "original_block_sha256": "2e6222398a7491dd8652f149f28fe69c8f960576277b5d5dbea0f35a3b133747",
+      "receipt_sha256": "8b59ec06f8ebfa415998420ffe7cb3387b07c28727550793df78fc004a34f3cc",
+      "captured_output_sha256": "46614414e9be6f3040870bd355803e897ac67198c70757b9d349bc7902aded80",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-quality-tiers-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-quality-tiers-pass6",
+      "original_block_sha256": "045f18b0ae45528f0dcd6b053492a84a8519fc067691805941ed1ca8e13de0d5",
+      "receipt_sha256": "2d28e67327a1ef0ec014025e392564ff28c91423e499e7838906b5af5d8937b8",
+      "captured_output_sha256": "3b5425814bfec90830467bf90dcf86aff06359bcd45862269c729b54844613c2",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-package-contract-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-package-contract-pass6",
+      "original_block_sha256": "5e018c3a7c7b0d6a0b50bfae27778aa76467fb0aba64c683e2a703693adf2742",
+      "receipt_sha256": "21ddf1aaa4e127f8dd21d9cf711b42cd939415c8583730f2710636781eca2f67",
+      "captured_output_sha256": "7f59f431d4288bba01ba4f01fc675a385938ed3100e904d78c31876177f81f75",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-audit-pass6.2026-10-18T09-01.md",
+      "title": "p2t3-audit-pass6",
+      "original_block_sha256": "fdeb1d3be870b6d74101eb585a60374df06d1668c0f8b55cef3b9d94bb632223",
+      "receipt_sha256": "4f20d87c3ef2c269cdcbed14ac5517c4a6e908537e84b37dcfc7811aa304dae2",
+      "captured_output_sha256": "f81c580e148ca1ae1f8a58b3996ac162f4b301b8be478c35b7e068bb0bbb6686",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass7.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass7",
+      "original_block_sha256": "6eb9ca353ad66134af68e20fac214d2300146e8869e75ef7b121902b10c07f06",
+      "receipt_sha256": "f3b93f3db23bef04c0ce21650b02486e321551137c5883870a1b45efe3353071",
+      "captured_output_sha256": "cd9b704c85695d76d9e68d2a8f0d4e472a9a841860b277b3892c94c114c629a2",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-correction7.2026-10-18T09-01.md",
+      "title": "p2t3-format-correction7",
+      "original_block_sha256": "97da5df4436c752bdefe00c1c2574bd24029908d464543a03f3bb1213c6b0871",
+      "receipt_sha256": "a7d8c724d4a780ccf7a56088d274581f978ed75ac0d56e0cceedb01a0c8c40a1",
+      "captured_output_sha256": "36b5e840cdabdf50f6b164c49c851130fa00860459f3412beee59242294aca19",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-format-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-format-pass8",
+      "original_block_sha256": "153eb589fea9612552aefa689daa22192cc3e97a192169dd2cbc993a9d405cde",
+      "receipt_sha256": "39385843efdc8cd68345bf2f611d4824dee1c58670bee6f25dad021dac72e6f6",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-lint-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-lint-pass8",
+      "original_block_sha256": "8f33a0988820003525185c99a2c47fe2df6eeec3859fecde3b67b593db609f43",
+      "receipt_sha256": "fcacf827a18bfb4dd8f7cbe9015b534e26fc094dbb5d6e265a450484681c5fd2",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-types-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-types-pass8",
+      "original_block_sha256": "9b6275136ef2292bbcb7eb0858abbe3a0116bd533ed59475fa04a9aa9b55adf7",
+      "receipt_sha256": "69b84ec81bffbaeac3e9d2b1f2b753baa0c3df4e300c860c918caa9e8b6abb4c",
+      "captured_output_sha256": "36355e352c9da65c3e7243c53196ef636392fc40b628d231fb0c9ecf6d92d30b",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-tests-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-tests-pass8",
+      "original_block_sha256": "9b81540da43c3992f5bab39570200570e431639664324167a6c0983a58715aaa",
+      "receipt_sha256": "095a6e68c28bc8880786867928e4a43458e3c3d22dd226c958db763ffaace73d",
+      "captured_output_sha256": "79cd961474f6386320d6b549cf4d02623c881be2b4ca711d7fa16d8492dd7bc4",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-static-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-static-pass8",
+      "original_block_sha256": "bfb8b3a0938834db64fb71387fb8fb4ce2f546f6ba0ef72a3fcd508fe2255947",
+      "receipt_sha256": "77b713499c7dbb3ee385eab17644bf6dac64cce632e21d9f627060a808b37865",
+      "captured_output_sha256": "da54c00e79f862bf9614a918097360d70a7dec2081bc327215c952294080b960",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-isolation-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-isolation-pass8",
+      "original_block_sha256": "9f72a9fc9ee116315d4b7fa33ba846c5afb616b8b9ce2a4c119fb07b1b7f5dd1",
+      "receipt_sha256": "267d924df88c24d5bb82f0ce28e6dd8c6bfb1c9dc7894e852c04e7391070836b",
+      "captured_output_sha256": "a1a6117402b8c41f304f33ce54c654cf94014faac45beccd99de40583248a4cc",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t3-audit-pass8.2026-10-18T09-01.md",
+      "title": "p2t3-audit-pass8",
+      "original_block_sha256": "6e4ac5f7b602539fe774afc37bdc721b00494d04a2db7785e072385856a6beb2",
+      "receipt_sha256": "c158aea1259052c205764ec3c31765d03f2105b14f71443a2e5bfcc183d091ae",
+      "captured_output_sha256": "0e6cbf990d328f6806e22ea06295ab6d57f5843548005f4f09bdce7ea3d23ece",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass1.2026-10-18T09-01.md",
+      "title": "p2t4-format-pass1",
+      "original_block_sha256": "a582d05d3198088b7e042a833e18cf1820c7b7d3f166dc7a3212514d7f50b860",
+      "receipt_sha256": "c1b38f3862a20883218859db751dc0147a473b8804d1901e89eeb9e34041b0d6",
+      "captured_output_sha256": "e47c472f5cca0967f97e613fad6619db93a12dd8430a0df321c782a5357a7db6",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass1.2026-10-18T09-01.md",
+      "title": "p2t4-lint-pass1",
+      "original_block_sha256": "842249391b8505a963e4c5f305ec239d49d56813f2effbf6ee7f74b1dad91216",
+      "receipt_sha256": "7eb24a2632226ed2ce1c9d335ffa4ac8e7486d4efbd825976f1402c8f6f35210",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass1.2026-10-18T09-01.md",
+      "title": "p2t4-types-pass1",
+      "original_block_sha256": "21f0a86f33ba2fb38a1a2d20cfc6019842b360772c8b9e02dcb8c2654582f365",
+      "receipt_sha256": "4e0453a9a1b7721d072415d4613e3bb9090d7f5f4d318c28920feef684c1d0fa",
+      "captured_output_sha256": "5cd31e77bda915857911cf888afcf5d5439ef36a61488f1e1ddec01e1b2457d4",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass2.2026-10-18T09-01.md",
+      "title": "p2t4-format-pass2",
+      "original_block_sha256": "2c748796c497c5613e8bd5f5aa3d0ef3b2192b0e415ff145013d92a1e32dc41f",
+      "receipt_sha256": "8c766d96270d2ab1307114e421df03e49ea71a3849b2e5299b620156c73c5154",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass2.2026-10-18T09-01.md",
+      "title": "p2t4-lint-pass2",
+      "original_block_sha256": "b201fc9bd8a77d5d82dcdfc720995cd63d62ed0fcacf7d5fff59c61342cb23eb",
+      "receipt_sha256": "267edd0931050a3c65c6e6714c038dd59a35a4e74930e21c3e7425ca34c09376",
+      "captured_output_sha256": "59dd99ac6d3462ee532ad052216c5ca155c244d49af1413332a592430b08ec4c",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass3.2026-10-18T09-01.md",
+      "title": "p2t4-format-pass3",
+      "original_block_sha256": "b917a55b8cdbe38ff55aa03fc1b46cc7b09e3b633e713272ee40503ab85d0e6b",
+      "receipt_sha256": "882813e2b42273ddd699dae3e66db0848983ae1082e5249a713c289fed882e69",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass3.2026-10-18T09-01.md",
+      "title": "p2t4-lint-pass3",
+      "original_block_sha256": "7b0e1ac412b2746bba5dcb2e6d0616c02b1f99a5bcc51543ced643904130d9b6",
+      "receipt_sha256": "3fed8ad4f9b722b385114c9bd0d2c532e7bdd2a88e1f880151eac402a1fedc6a",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass3.2026-10-18T09-01.md",
+      "title": "p2t4-types-pass3",
+      "original_block_sha256": "815131e74928bada5b61629acc6007a4bfd3542c5fa55a9b0c37f85922046601",
+      "receipt_sha256": "3c482e44d9820b9b102bb1a870700f7ce2d57558ae12ac90cce5e500f73626da",
+      "captured_output_sha256": "1d328bb42f764fdae43d44fac2ac071f0bd6344b38f3e1832f48c04936f63360",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass4.2026-10-18T09-01.md",
+      "title": "p2t4-format-pass4",
+      "original_block_sha256": "4a6e787dc7535e85c3ecafa852c36f99073c6c9c5960a0c9908f363b66e6aeae",
+      "receipt_sha256": "1c4da14d83c272d251c4aaa487135e29c1e7c1dff57b35038235124f80b7ab7b",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass4.2026-10-18T09-01.md",
+      "title": "p2t4-lint-pass4",
+      "original_block_sha256": "a202dbf61f86245a54595d1aa254b476c039eb07b3c7ed832f6f887f16c1f6d5",
+      "receipt_sha256": "13efe70d3f7298ca259c9ae6907685cc36b4c1a92e2423f3b6d7921f07d1dc7a",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass4.2026-10-18T09-01.md",
+      "title": "p2t4-types-pass4",
+      "original_block_sha256": "fbdfdd92cec7468e69c49494e99aa37faa4521d70df715950e6d207107bcb6b9",
+      "receipt_sha256": "6350cd60b311de315f1d48038051da922810c9fc3c7be574e060d6676deb700d",
+      "captured_output_sha256": "5d372222c3af66d808047feb9256a29ab87e42f70022d04e09b77e62bd952449",
+      "exit_code": 1
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-format-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-format-pass5",
+      "original_block_sha256": "3a70aafae11f6617f080c9d5a742dd9f69bf19dbf081c5d9cf094e6eee5801d2",
+      "receipt_sha256": "9c5daa1f321e3de5e4184278e9a78b344bfb6b07726b31c3f69c07ce4e13a86f",
+      "captured_output_sha256": "62d44f70d6786db26860c098e6e98f14af3a1e283a0620a2b30c35141b60a460",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-lint-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-lint-pass5",
+      "original_block_sha256": "7186f44980872c7db1114987e93be288b9928213c8c9952cc38bdac3b6a09bb3",
+      "receipt_sha256": "d0eb3b4cef590677eac5d0cec515e8b71e23d49c9b8caa64e38c67028ebc6b12",
+      "captured_output_sha256": "53303514e36501543a9b74c312f4ab1b5195ea31d4c6efa0c2284c75cf98c85e",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-types-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-types-pass5",
+      "original_block_sha256": "2da3ec94730d0a147bf96021b051c78b92a33fc00eca4c7b3a65f94835c10925",
+      "receipt_sha256": "096efe61f03afd846adc2ab28c6479b501ca896d9f2319d6f615b2d054a12775",
+      "captured_output_sha256": "36355e352c9da65c3e7243c53196ef636392fc40b628d231fb0c9ecf6d92d30b",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-tests-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-tests-pass5",
+      "original_block_sha256": "7d1635f6a734aabeacd9d9c06aa2577acf0cc1960a79fc2210ddc6d91a6e340f",
+      "receipt_sha256": "490c0157538ef92572f61617fb940a5a8ee8a54bbbb3b540ffde240d4751bd1d",
+      "captured_output_sha256": "5412542df1eae2de0409fec31ac8f2fc53b903634d7aaa40b8e4ec905b898a70",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-static-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-static-pass5",
+      "original_block_sha256": "d6db8cf089b0804f70f780109f6bbaeddf68c358643a45c80a2f7b7843273b69",
+      "receipt_sha256": "0f6dd7cabd678a9d169aca4ffca49b29a253f3aa4773f8207dc3ffecd0693371",
+      "captured_output_sha256": "64bb48d805c65855b093f1225df32137c78ab9e427f018996ec7348abe6f36cb",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-isolation-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-isolation-pass5",
+      "original_block_sha256": "f80dd24af24724322bf3f10789558a7508d4850cb092f967e181482235115cf9",
+      "receipt_sha256": "2fb616bf30275ccab804c16d61ed4ec7a3190ee56a4e02fe083a440035ec62f0",
+      "captured_output_sha256": "0adbc74c28ce8bbd2c8bae54c9c310366a5726145c45acdb4d2ad48a8221faf1",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-quality-tiers-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-quality-tiers-pass5",
+      "original_block_sha256": "b4e1db79d4896d8d709d8818e767fc0bdfc074a11d169091a718291daa6fd572",
+      "receipt_sha256": "715c9f979d75e40b78d08d581f9f2bd82b1a3b1b466b9f4df845ba8765cefa10",
+      "captured_output_sha256": "3b5425814bfec90830467bf90dcf86aff06359bcd45862269c729b54844613c2",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-packaging-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-packaging-pass5",
+      "original_block_sha256": "81b62544fd19b9744b119d2c38bc674fdc12faa6d84e1195c490ebf9f9ba9c3f",
+      "receipt_sha256": "2b9a8031ff08241f3b1a5cca71aee059af156c32a9b2fd9cfa997ff3a31fe52d",
+      "captured_output_sha256": "7f59f431d4288bba01ba4f01fc675a385938ed3100e904d78c31876177f81f75",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t4-audit-pass5.2026-10-18T09-01.md",
+      "title": "p2t4-audit-pass5",
+      "original_block_sha256": "5293e335c3acaf7368a343240212cab85ad812bc188d090ccbea9a228e891116",
+      "receipt_sha256": "f7085e7ace00541d7331c0a258b8e02b42bc810e3f34b782338fb2fefe5d5262",
+      "captured_output_sha256": "c072fca036dcea2614bffaacca634c5c9bc85f5d751398b1c02b25833b915199",
+      "exit_code": 0
+    }
+  ]
+}

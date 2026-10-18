@@ -1,0 +1,29 @@
+{
+  "task": "P2-T9",
+  "timestamp": "2026-10-18T10:32:59.107685+00:00",
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "32b6f4e154465c4972242d005fc81cd8f4258feb90662279caaa715b30916059",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "ddde93a7b251ee9b4799c70271fe2244c907cf36b04f411048cddd3d870b2112",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py": "96e1ced622afc6894d9dd32a1ab88f36b5498da362273f91deb371d5700939c9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "560c5ea056b9ce50b518b1f3fde3322e7ab8492e7c59ab69e04e0b68a3aff25f"
+  },
+  "source_stable": true,
+  "baseline_valid": true,
+  "baseline_findings": [],
+  "expected_output_valid": true,
+  "output_valid": false,
+  "validation_result": "fail",
+  "findings": [
+    {
+      "code": "REPORT_RESULT",
+      "severity": "error",
+      "artifact_path": "docs/migration/discovery/reports/previous-review.json",
+      "pointer": "",
+      "related_ids": [],
+      "related_paths": [],
+      "message": "Report fields disagree with recomputed input results.",
+      "next_action": "Correct the complete inputs and validate the exact requested mode."
+    }
+  ],
+  "report_unchanged": true
+}

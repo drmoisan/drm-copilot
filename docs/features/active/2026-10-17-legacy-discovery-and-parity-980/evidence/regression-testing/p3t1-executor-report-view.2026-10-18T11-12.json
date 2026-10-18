@@ -1,0 +1,19 @@
+{
+  "task": "P3-T1",
+  "timestamp": "2026-10-18T11:12:36.561983+00:00",
+  "source_hashes_initial": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "4f22c6fe6e755d5033b0cdab0967fe03ecc7dc1a024543369089b4aaff7bf12e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "a5f2d3b0a4162ccda77fb5671c45eded1a2c19f5619ae9f490f0069fc70f4bca"
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "4f22c6fe6e755d5033b0cdab0967fe03ecc7dc1a024543369089b4aaff7bf12e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "a5f2d3b0a4162ccda77fb5671c45eded1a2c19f5619ae9f490f0069fc70f4bca"
+  },
+  "source_stable": true,
+  "result": {
+    "name": "Valid paired JSON and Markdown report is a permitted artifact mutation",
+    "passed": false,
+    "exception": "MutationError",
+    "message": "MUTATION_IDENTITY: Proposed artifact kind/ID differs"
+  }
+}
