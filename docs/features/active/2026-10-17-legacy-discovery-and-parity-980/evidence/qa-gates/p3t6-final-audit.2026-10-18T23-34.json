@@ -1,0 +1,2960 @@
+{
+  "written_at_utc": "2026-10-18T23:34:29.468926+00:00",
+  "task": "P3-T6",
+  "stage": "final",
+  "baseline": "27753e5f8b9a6cd1d85b9d1d28d2999800af209a",
+  "head": "3bd1dadeab42799fc7afd9fa151130775417f352",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "git_blob": "3fe1584d43f14dbda600c5c3d7efbfbd9080bc0f",
+      "physical_lines": 483,
+      "index_git_blob": "3fe1584d43f14dbda600c5c3d7efbfbd9080bc0f",
+      "index_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "git_blob": "5baa5aeaa9ed58a8cb5bf1f6cfee624e3b1267a7",
+      "physical_lines": 426,
+      "index_git_blob": "5baa5aeaa9ed58a8cb5bf1f6cfee624e3b1267a7",
+      "index_sha256": "0a3b2c3b8f4f504693b934630c9d942e397e9d924a371730b13a8557ac9667ee",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "git_blob": "d7221711d92cb187ed69b02fc930744c4aaa1549",
+      "physical_lines": 437,
+      "index_git_blob": "d7221711d92cb187ed69b02fc930744c4aaa1549",
+      "index_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "git_blob": "efda855183af4b16b7b58d5f777de62da5edd346",
+      "physical_lines": 436,
+      "index_git_blob": "efda855183af4b16b7b58d5f777de62da5edd346",
+      "index_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "git_blob": "5542fa8c66aba5771d293fa0a420bc4026c947a5",
+      "physical_lines": 290,
+      "index_git_blob": "5542fa8c66aba5771d293fa0a420bc4026c947a5",
+      "index_sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "git_blob": "4d6cc646470ce2644ab288e8f3d693d71c563b07",
+      "physical_lines": 476,
+      "index_git_blob": "4d6cc646470ce2644ab288e8f3d693d71c563b07",
+      "index_sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_export.py",
+      "sha256": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+      "git_blob": "50c4f624bbf2dd80436373e60403c315be7be9a9",
+      "physical_lines": 489,
+      "index_git_blob": "50c4f624bbf2dd80436373e60403c315be7be9a9",
+      "index_sha256": "dc9a098ed9d114b7c59bda93b69b142282428ec40fb33b2cf92752d146665b98",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_import.py",
+      "sha256": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+      "git_blob": "a0a320d230d480375bf7c4d8ffb300b45ac0408e",
+      "physical_lines": 489,
+      "index_git_blob": "a0a320d230d480375bf7c4d8ffb300b45ac0408e",
+      "index_sha256": "6e27fd525291f93d23f6931a6a1cff0352c53ccaff9d418a2e0762fbc6faecbe",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "tests/discovery_runtime/source_snapshot_test_support.py",
+      "sha256": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+      "git_blob": "56f7ce509f1ea4bd091bf67f76ecb04dd787edbb",
+      "physical_lines": 460,
+      "index_git_blob": "56f7ce509f1ea4bd091bf67f76ecb04dd787edbb",
+      "index_sha256": "db0c1c1110212437ead67bbfe014a7958571db219a788af746efe6e231e6250a",
+      "index_equals_worktree": false,
+      "only_checkout_line_endings_differ": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "git_blob": "347dc56776482d3e4200f416f31419c31f2c9cb8",
+      "physical_lines": 75,
+      "index_git_blob": "347dc56776482d3e4200f416f31419c31f2c9cb8",
+      "index_sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    }
+  ],
+  "prior_count": 255,
+  "unchanged_prior_count": 251,
+  "authorized_prior_changes": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "prior_sha256": "7a0cc867f3ff62760bab97c290207e11744f50f37e9ae9c41bfd5115bb3b9015",
+      "current_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "disposition": "Explicit P3-T6 prerequisite authorization; current coverage and affected regression suite required."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "prior_sha256": "f0b02a3f2d685fbf69681e37e89786ec8e1a1991ee10a8447bd25a60ca6efc1c",
+      "current_sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "disposition": "Explicit P3-T6 prerequisite authorization; current coverage and affected regression suite required."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "prior_sha256": "e12502eaf48dbb337def7288141e9f331b7d3ee76d05ac66d153583ad0444b96",
+      "current_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "disposition": "Explicit P3-T6 prerequisite authorization; current coverage and affected regression suite required."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "prior_sha256": "3d71c88775f69f014982ebb35e79ecc05ba3c21bb9d015184de61291ce3444b0",
+      "current_sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "disposition": "Explicit P3-T6 prerequisite authorization; current coverage and affected regression suite required."
+    }
+  ],
+  "frozen_count": 24,
+  "tests": {
+    "pass3": {
+      "tests": "434",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "755.504",
+      "timestamp": "2026-10-18T14:56:23.744439-04:00"
+    },
+    "reverse3": {
+      "tests": "434",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "321.813",
+      "timestamp": "2026-10-18T15:09:01.828846-04:00"
+    },
+    "pass3-contracts": {
+      "tests": "475",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "24.284",
+      "timestamp": "2026-10-18T15:14:24.964391-04:00"
+    }
+  },
+  "coverage_audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-pass3-coverage-audit.2026-10-18T19-09.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+  "test_bindings": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-test-bindings.2026-10-18T23-34.json",
+  "ordered_sequence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-ordered-sequence.2026-10-18T23-34.json",
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "covered_lines": 135,
+      "lines": 136,
+      "line_percent": 99.26470588235294,
+      "covered_branches": 35,
+      "branches": 36,
+      "branch_percent": 97.22222222222223
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "covered_lines": 161,
+      "lines": 163,
+      "line_percent": 98.77300613496932,
+      "covered_branches": 63,
+      "branches": 66,
+      "branch_percent": 95.45454545454545
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "covered_lines": 156,
+      "lines": 156,
+      "line_percent": 100.0,
+      "covered_branches": 84,
+      "branches": 84,
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "covered_lines": 169,
+      "lines": 171,
+      "line_percent": 98.83040935672514,
+      "covered_branches": 82,
+      "branches": 84,
+      "branch_percent": 97.61904761904762
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": {
+      "covered_lines": 150,
+      "lines": 152,
+      "line_percent": 98.6842105263158,
+      "covered_branches": 50,
+      "branches": 52,
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": {
+      "covered_lines": 112,
+      "lines": 115,
+      "line_percent": 97.3913043478261,
+      "covered_branches": 45,
+      "branches": 48,
+      "branch_percent": 93.75
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": [
+      {
+        "name": "capture_workspace",
+        "start": 43,
+        "end": 79,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationWriter",
+        "start": 82,
+        "end": 106,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationPrimitives",
+        "start": 109,
+        "end": 129,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "GuardedMutationWriter",
+        "start": 132,
+        "end": 200,
+        "covered": 27,
+        "statements": 27,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationArtifact",
+        "start": 204,
+        "end": 211,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationResult",
+        "start": 215,
+        "end": 228,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_artifact",
+        "start": 231,
+        "end": 245,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_same_state",
+        "start": 248,
+        "end": 255,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_after_write",
+        "start": 258,
+        "end": 290,
+        "covered": 12,
+        "statements": 12,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "commit_mutation",
+        "start": 293,
+        "end": 437,
+        "covered": 47,
+        "statements": 48,
+        "percent": 97.91666666666667,
+        "missing": [
+          384
+        ]
+      },
+      {
+        "name": "inspect",
+        "start": 59,
+        "end": 65,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "capture",
+        "start": 93,
+        "end": 95,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "invalidate_authority",
+        "start": 97,
+        "end": 102,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "atomic_write",
+        "start": 104,
+        "end": 106,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "guard",
+        "start": 117,
+        "end": 119,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "create_exclusive",
+        "start": 121,
+        "end": 123,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "replace_if_digest",
+        "start": 125,
+        "end": 129,
+        "covered": 1,
+        "statements": 1,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 135,
+        "end": 145,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "capture",
+        "start": 147,
+        "end": 149,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "invalidate_authority",
+        "start": 151,
+        "end": 153,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "atomic_write",
+        "start": 155,
+        "end": 200,
+        "covered": 18,
+        "statements": 18,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": [
+      {
+        "name": "MutationError",
+        "start": 41,
+        "end": 49,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationChange",
+        "start": 53,
+        "end": 79,
+        "covered": 12,
+        "statements": 12,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "CapturedWorkspace",
+        "start": 83,
+        "end": 126,
+        "covered": 24,
+        "statements": 25,
+        "percent": 96.0,
+        "missing": [
+          126
+        ]
+      },
+      {
+        "name": "PlannedWrite",
+        "start": 130,
+        "end": 136,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "MutationPlan",
+        "start": 140,
+        "end": 153,
+        "covered": 8,
+        "statements": 8,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_PinnedReader",
+        "start": 156,
+        "end": 178,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_Overlay",
+        "start": 181,
+        "end": 235,
+        "covered": 23,
+        "statements": 23,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "project_snapshot",
+        "start": 238,
+        "end": 269,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_mutation",
+        "start": 272,
+        "end": 426,
+        "covered": 52,
+        "statements": 53,
+        "percent": 98.11320754716981,
+        "missing": [
+          397
+        ]
+      },
+      {
+        "name": "__init__",
+        "start": 44,
+        "end": 49,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 66,
+        "end": 79,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 94,
+        "end": 104,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "inspect",
+        "start": 106,
+        "end": 126,
+        "covered": 15,
+        "statements": 16,
+        "percent": 93.75,
+        "missing": [
+          126
+        ]
+      },
+      {
+        "name": "__init__",
+        "start": 159,
+        "end": 164,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "identity",
+        "start": 166,
+        "end": 168,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read_file",
+        "start": 170,
+        "end": 178,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 188,
+        "end": 225,
+        "covered": 16,
+        "statements": 16,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "inspect",
+        "start": 227,
+        "end": 229,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "read",
+        "start": 231,
+        "end": 235,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": [
+      {
+        "name": "_absolute",
+        "start": 85,
+        "end": 113,
+        "covered": 12,
+        "statements": 12,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_overlaps",
+        "start": 116,
+        "end": 118,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_reserved_output",
+        "start": 121,
+        "end": 139,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "PathPolicy",
+        "start": 142,
+        "end": 483,
+        "covered": 131,
+        "statements": 131,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__init__",
+        "start": 153,
+        "end": 182,
+        "covered": 12,
+        "statements": 12,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_validate_layout",
+        "start": 184,
+        "end": 237,
+        "covered": 18,
+        "statements": 18,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_inspect",
+        "start": 239,
+        "end": 279,
+        "covered": 20,
+        "statements": 20,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_walk",
+        "start": 281,
+        "end": 362,
+        "covered": 29,
+        "statements": 29,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "validate_configuration",
+        "start": 364,
+        "end": 399,
+        "covered": 20,
+        "statements": 20,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "resolve_read",
+        "start": 401,
+        "end": 421,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "resolve_write",
+        "start": 423,
+        "end": 463,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "revalidate_write",
+        "start": 465,
+        "end": 483,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": [
+      {
+        "name": "ArtifactRecord",
+        "start": 58,
+        "end": 79,
+        "covered": 14,
+        "statements": 14,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ReferenceResolution",
+        "start": 83,
+        "end": 90,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "ReferenceIndex",
+        "start": 94,
+        "end": 249,
+        "covered": 56,
+        "statements": 57,
+        "percent": 98.24561403508773,
+        "missing": [
+          200
+        ]
+      },
+      {
+        "name": "_records",
+        "start": 252,
+        "end": 301,
+        "covered": 21,
+        "statements": 21,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_duplicates",
+        "start": 304,
+        "end": 327,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_local_duplicates",
+        "start": 330,
+        "end": 363,
+        "covered": 19,
+        "statements": 20,
+        "percent": 95.0,
+        "missing": [
+          335
+        ]
+      },
+      {
+        "name": "index_references",
+        "start": 366,
+        "end": 436,
+        "covered": 27,
+        "statements": 27,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "id",
+        "start": 67,
+        "end": 69,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "repository",
+        "start": 72,
+        "end": 74,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "path",
+        "start": 77,
+        "end": 79,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 105,
+        "end": 125,
+        "covered": 14,
+        "statements": 14,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "candidates",
+        "start": 127,
+        "end": 141,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "resolve",
+        "start": 143,
+        "end": 221,
+        "covered": 24,
+        "statements": 25,
+        "percent": 96.0,
+        "missing": [
+          200
+        ]
+      },
+      {
+        "name": "_replica_targets",
+        "start": 223,
+        "end": 249,
+        "covered": 10,
+        "statements": 10,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": [
+      {
+        "name": "SnapshotExport",
+        "start": 39,
+        "end": 49,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "SnapshotImport",
+        "start": 53,
+        "end": 63,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "SnapshotProposal",
+        "start": 67,
+        "end": 75,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_closure",
+        "start": 78,
+        "end": 142,
+        "covered": 28,
+        "statements": 28,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_payloads",
+        "start": 145,
+        "end": 186,
+        "covered": 19,
+        "statements": 20,
+        "percent": 95.0,
+        "missing": [
+          181
+        ]
+      },
+      {
+        "name": "_proposal",
+        "start": 189,
+        "end": 219,
+        "covered": 11,
+        "statements": 11,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "prepare_snapshot_export",
+        "start": 222,
+        "end": 306,
+        "covered": 18,
+        "statements": 19,
+        "percent": 94.73684210526316,
+        "missing": [
+          253
+        ]
+      },
+      {
+        "name": "_captured_transport",
+        "start": 309,
+        "end": 328,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "prepare_snapshot_import",
+        "start": 331,
+        "end": 406,
+        "covered": 27,
+        "statements": 27,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_snapshot_export",
+        "start": 409,
+        "end": 424,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_snapshot_import",
+        "start": 427,
+        "end": 442,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "export_snapshot",
+        "start": 445,
+        "end": 459,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "import_snapshot",
+        "start": 462,
+        "end": 476,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": [
+      {
+        "name": "transport_digest",
+        "start": 26,
+        "end": 49,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "TransportMember",
+        "start": 53,
+        "end": 63,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "TransportRoute",
+        "start": 67,
+        "end": 112,
+        "covered": 21,
+        "statements": 21,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "bind_transport",
+        "start": 115,
+        "end": 212,
+        "covered": 37,
+        "statements": 40,
+        "percent": 92.5,
+        "missing": [
+          126,
+          143,
+          158
+        ]
+      },
+      {
+        "name": "replica_aliases",
+        "start": 215,
+        "end": 290,
+        "covered": 32,
+        "statements": 32,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "allows",
+        "start": 79,
+        "end": 86,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "check",
+        "start": 88,
+        "end": 95,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "check_files",
+        "start": 97,
+        "end": 105,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "revalidate",
+        "start": 107,
+        "end": 112,
+        "covered": 3,
+        "statements": 3,
+        "percent": 100.0,
+        "missing": []
+      }
+    ]
+  },
+  "minimum_callable": 92.5,
+  "baseline_comparisons": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage.2026-10-18T12-38.json",
+      "baseline": {
+        "covered_branches": 31,
+        "covered_lines": 130,
+        "excluded_lines": 22,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 32,
+        "num_partial_branches": 1,
+        "num_statements": 131,
+        "percent_branches_covered": 96.875,
+        "percent_branches_covered_display": "97",
+        "percent_covered": 98.77300613496932,
+        "percent_covered_display": "99",
+        "percent_statements_covered": 99.23664122137404,
+        "percent_statements_covered_display": "99"
+      },
+      "line_delta": 0.028064660978898814,
+      "branch_delta": 0.34722222222222854,
+      "covered_line_delta": 5,
+      "covered_branch_delta": 4,
+      "mapped_previous_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t1-coverage.2026-10-18T12-38.json",
+      "baseline": {
+        "covered_branches": 53,
+        "covered_lines": 147,
+        "excluded_lines": 7,
+        "missing_branches": 3,
+        "missing_lines": 2,
+        "num_branches": 56,
+        "num_partial_branches": 3,
+        "num_statements": 149,
+        "percent_branches_covered": 94.64285714285714,
+        "percent_branches_covered_display": "95",
+        "percent_covered": 97.5609756097561,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.65771812080537,
+        "percent_statements_covered_display": "99"
+      },
+      "line_delta": 0.1152880141639514,
+      "branch_delta": 0.8116883116883145,
+      "covered_line_delta": 14,
+      "covered_branch_delta": 10,
+      "mapped_previous_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p1t11-coverage.2026-10-18T07-30.json",
+      "baseline": {
+        "covered_branches": 82,
+        "covered_lines": 153,
+        "excluded_lines": 3,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 82,
+        "num_partial_branches": 0,
+        "num_statements": 153,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "line_delta": 0.0,
+      "branch_delta": 0.0,
+      "covered_line_delta": 3,
+      "covered_branch_delta": 2,
+      "mapped_previous_line_regressions": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "raw": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t2-coverage.2026-10-18T08-15.json",
+      "baseline": {
+        "covered_branches": 74,
+        "covered_lines": 152,
+        "excluded_lines": 3,
+        "missing_branches": 2,
+        "missing_lines": 2,
+        "num_branches": 76,
+        "num_partial_branches": 2,
+        "num_statements": 154,
+        "percent_branches_covered": 97.36842105263158,
+        "percent_branches_covered_display": "97",
+        "percent_covered": 98.26086956521739,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.7012987012987,
+        "percent_statements_covered_display": "99"
+      },
+      "line_delta": 0.1291106554264445,
+      "branch_delta": 0.2506265664160452,
+      "covered_line_delta": 17,
+      "covered_branch_delta": 8,
+      "mapped_previous_line_regressions": []
+    }
+  },
+  "changed_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "executable_lines": [
+        160,
+        161,
+        165,
+        186,
+        187
+      ],
+      "covered": [
+        160,
+        161,
+        165,
+        186,
+        187
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          168
+        ],
+        [
+          186,
+          187
+        ],
+        [
+          186,
+          192
+        ]
+      ],
+      "covered_branches": [
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          168
+        ],
+        [
+          186,
+          187
+        ],
+        [
+          186,
+          192
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "executable_lines": [
+        136,
+        153,
+        290,
+        291,
+        292,
+        295,
+        299,
+        300,
+        305,
+        310,
+        348,
+        349,
+        350,
+        351
+      ],
+      "covered": [
+        136,
+        153,
+        290,
+        291,
+        292,
+        295,
+        299,
+        300,
+        305,
+        310,
+        348,
+        349,
+        350,
+        351
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          290,
+          291
+        ],
+        [
+          290,
+          317
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          295
+        ],
+        [
+          300,
+          305
+        ],
+        [
+          300,
+          310
+        ],
+        [
+          348,
+          349
+        ],
+        [
+          348,
+          354
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          354
+        ]
+      ],
+      "covered_branches": [
+        [
+          290,
+          291
+        ],
+        [
+          290,
+          317
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          295
+        ],
+        [
+          300,
+          305
+        ],
+        [
+          300,
+          310
+        ],
+        [
+          348,
+          349
+        ],
+        [
+          348,
+          354
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          354
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "executable_lines": [
+        168,
+        436,
+        442,
+        444,
+        448,
+        449
+      ],
+      "covered": [
+        168,
+        436,
+        442,
+        444,
+        448,
+        449
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          436,
+          437
+        ],
+        [
+          436,
+          442
+        ],
+        [
+          442,
+          444
+        ],
+        [
+          442,
+          448
+        ]
+      ],
+      "covered_branches": [
+        [
+          436,
+          437
+        ],
+        [
+          436,
+          442
+        ],
+        [
+          442,
+          444
+        ],
+        [
+          442,
+          448
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "executable_lines": [
+        23,
+        100,
+        120,
+        175,
+        176,
+        223,
+        233,
+        239,
+        240,
+        242,
+        243,
+        245,
+        246,
+        248,
+        249,
+        373,
+        382,
+        388,
+        394
+      ],
+      "covered": [
+        23,
+        100,
+        120,
+        175,
+        176,
+        223,
+        233,
+        239,
+        240,
+        242,
+        243,
+        245,
+        246,
+        248,
+        249,
+        373,
+        382,
+        388,
+        394
+      ],
+      "missing": [],
+      "line_percent": 100.0,
+      "branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          179
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          242
+        ],
+        [
+          242,
+          243
+        ],
+        [
+          242,
+          245
+        ],
+        [
+          245,
+          246
+        ],
+        [
+          245,
+          249
+        ],
+        [
+          394,
+          395
+        ],
+        [
+          394,
+          434
+        ]
+      ],
+      "covered_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          179
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          242
+        ],
+        [
+          242,
+          243
+        ],
+        [
+          242,
+          245
+        ],
+        [
+          245,
+          246
+        ],
+        [
+          245,
+          249
+        ],
+        [
+          394,
+          395
+        ],
+        [
+          394,
+          434
+        ]
+      ],
+      "branch_percent": 100.0
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": {
+      "executable_lines": [
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        38,
+        39,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        78,
+        86,
+        87,
+        88,
+        89,
+        91,
+        92,
+        95,
+        96,
+        99,
+        100,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        111,
+        115,
+        120,
+        121,
+        127,
+        133,
+        134,
+        135,
+        136,
+        141,
+        142,
+        145,
+        153,
+        154,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172,
+        173,
+        180,
+        181,
+        185,
+        186,
+        189,
+        197,
+        198,
+        200,
+        201,
+        204,
+        205,
+        206,
+        207,
+        210,
+        219,
+        222,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        238,
+        248,
+        250,
+        251,
+        252,
+        253,
+        256,
+        257,
+        270,
+        296,
+        297,
+        306,
+        309,
+        311,
+        312,
+        317,
+        323,
+        325,
+        328,
+        331,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        349,
+        350,
+        352,
+        360,
+        362,
+        369,
+        370,
+        372,
+        378,
+        379,
+        380,
+        387,
+        390,
+        392,
+        393,
+        398,
+        399,
+        400,
+        406,
+        409,
+        417,
+        418,
+        427,
+        435,
+        436,
+        445,
+        455,
+        462,
+        472
+      ],
+      "covered": [
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        38,
+        39,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        78,
+        86,
+        87,
+        88,
+        89,
+        91,
+        92,
+        95,
+        96,
+        99,
+        100,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        111,
+        115,
+        120,
+        121,
+        127,
+        133,
+        134,
+        135,
+        136,
+        141,
+        142,
+        145,
+        153,
+        154,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        166,
+        167,
+        168,
+        169,
+        170,
+        172,
+        173,
+        180,
+        185,
+        186,
+        189,
+        197,
+        198,
+        200,
+        201,
+        204,
+        205,
+        206,
+        207,
+        210,
+        219,
+        222,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        238,
+        248,
+        250,
+        251,
+        252,
+        256,
+        257,
+        270,
+        296,
+        297,
+        306,
+        309,
+        311,
+        312,
+        317,
+        323,
+        325,
+        328,
+        331,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        349,
+        350,
+        352,
+        360,
+        362,
+        369,
+        370,
+        372,
+        378,
+        379,
+        380,
+        387,
+        390,
+        392,
+        393,
+        398,
+        399,
+        400,
+        406,
+        409,
+        417,
+        418,
+        427,
+        435,
+        436,
+        445,
+        455,
+        462,
+        472
+      ],
+      "missing": [
+        181,
+        253
+      ],
+      "line_percent": 98.6842105263158,
+      "branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          88
+        ],
+        [
+          91,
+          92
+        ],
+        [
+          91,
+          100
+        ],
+        [
+          95,
+          96
+        ],
+        [
+          95,
+          99
+        ],
+        [
+          102,
+          103
+        ],
+        [
+          102,
+          142
+        ],
+        [
+          105,
+          106
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          107,
+          111
+        ],
+        [
+          107,
+          115
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          127
+        ],
+        [
+          133,
+          102
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          134,
+          133
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          141
+        ],
+        [
+          156,
+          157
+        ],
+        [
+          156,
+          186
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          166
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          172,
+          156
+        ],
+        [
+          172,
+          173
+        ],
+        [
+          180,
+          185
+        ],
+        [
+          200,
+          201
+        ],
+        [
+          200,
+          219
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          210
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          234
+        ],
+        [
+          250,
+          251
+        ],
+        [
+          250,
+          270
+        ],
+        [
+          252,
+          256
+        ],
+        [
+          341,
+          342
+        ],
+        [
+          341,
+          343
+        ],
+        [
+          345,
+          346
+        ],
+        [
+          345,
+          349
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          372
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          392
+        ],
+        [
+          380,
+          387
+        ],
+        [
+          380,
+          390
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          252,
+          253
+        ]
+      ],
+      "covered_branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          88
+        ],
+        [
+          91,
+          92
+        ],
+        [
+          91,
+          100
+        ],
+        [
+          95,
+          96
+        ],
+        [
+          95,
+          99
+        ],
+        [
+          102,
+          103
+        ],
+        [
+          102,
+          142
+        ],
+        [
+          105,
+          106
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          107,
+          111
+        ],
+        [
+          107,
+          115
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          120,
+          127
+        ],
+        [
+          133,
+          102
+        ],
+        [
+          133,
+          134
+        ],
+        [
+          134,
+          133
+        ],
+        [
+          134,
+          135
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          141
+        ],
+        [
+          156,
+          157
+        ],
+        [
+          156,
+          186
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          166
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          172,
+          156
+        ],
+        [
+          172,
+          173
+        ],
+        [
+          180,
+          185
+        ],
+        [
+          200,
+          201
+        ],
+        [
+          200,
+          219
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          210
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          234
+        ],
+        [
+          250,
+          251
+        ],
+        [
+          250,
+          270
+        ],
+        [
+          252,
+          256
+        ],
+        [
+          341,
+          342
+        ],
+        [
+          341,
+          343
+        ],
+        [
+          345,
+          346
+        ],
+        [
+          345,
+          349
+        ],
+        [
+          369,
+          370
+        ],
+        [
+          369,
+          372
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          392
+        ],
+        [
+          380,
+          387
+        ],
+        [
+          380,
+          390
+        ]
+      ],
+      "branch_percent": 96.15384615384616
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py": {
+      "executable_lines": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        26,
+        32,
+        34,
+        42,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        76,
+        77,
+        79,
+        82,
+        88,
+        91,
+        92,
+        95,
+        97,
+        99,
+        100,
+        101,
+        102,
+        104,
+        105,
+        107,
+        109,
+        112,
+        115,
+        124,
+        125,
+        126,
+        127,
+        135,
+        136,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        190,
+        202,
+        204,
+        209,
+        210,
+        215,
+        222,
+        223,
+        224,
+        226,
+        227,
+        231,
+        232,
+        233,
+        240,
+        243,
+        245,
+        247,
+        248,
+        249,
+        258,
+        259,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        275,
+        276,
+        278,
+        280,
+        281,
+        282,
+        283,
+        285,
+        290
+      ],
+      "covered": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        26,
+        32,
+        34,
+        42,
+        49,
+        52,
+        53,
+        60,
+        61,
+        62,
+        63,
+        66,
+        67,
+        74,
+        75,
+        76,
+        77,
+        79,
+        82,
+        88,
+        91,
+        92,
+        95,
+        97,
+        99,
+        100,
+        101,
+        102,
+        104,
+        105,
+        107,
+        109,
+        112,
+        115,
+        124,
+        125,
+        127,
+        135,
+        136,
+        139,
+        140,
+        141,
+        142,
+        144,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        156,
+        157,
+        159,
+        160,
+        161,
+        162,
+        163,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        190,
+        202,
+        204,
+        209,
+        210,
+        215,
+        222,
+        223,
+        224,
+        226,
+        227,
+        231,
+        232,
+        233,
+        240,
+        243,
+        245,
+        247,
+        248,
+        249,
+        258,
+        259,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        275,
+        276,
+        278,
+        280,
+        281,
+        282,
+        283,
+        285,
+        290
+      ],
+      "missing": [
+        126,
+        143,
+        158
+      ],
+      "line_percent": 97.3913043478261,
+      "branches": [
+        [
+          92,
+          -88
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          104,
+          -97
+        ],
+        [
+          104,
+          105
+        ],
+        [
+          109,
+          -107
+        ],
+        [
+          109,
+          112
+        ],
+        [
+          125,
+          127
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          139
+        ],
+        [
+          142,
+          144
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          152,
+          156
+        ],
+        [
+          152,
+          157
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          165,
+          166
+        ],
+        [
+          165,
+          190
+        ],
+        [
+          167,
+          168
+        ],
+        [
+          167,
+          169
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          204,
+          209
+        ],
+        [
+          204,
+          210
+        ],
+        [
+          226,
+          227
+        ],
+        [
+          226,
+          259
+        ],
+        [
+          227,
+          231
+        ],
+        [
+          227,
+          232
+        ],
+        [
+          247,
+          226
+        ],
+        [
+          247,
+          248
+        ],
+        [
+          249,
+          247
+        ],
+        [
+          249,
+          258
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          263,
+          276
+        ],
+        [
+          264,
+          265
+        ],
+        [
+          264,
+          266
+        ],
+        [
+          266,
+          267
+        ],
+        [
+          266,
+          268
+        ],
+        [
+          278,
+          280
+        ],
+        [
+          278,
+          290
+        ],
+        [
+          282,
+          278
+        ],
+        [
+          282,
+          283
+        ],
+        [
+          125,
+          126
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          157,
+          158
+        ]
+      ],
+      "covered_branches": [
+        [
+          92,
+          -88
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          104,
+          -97
+        ],
+        [
+          104,
+          105
+        ],
+        [
+          109,
+          -107
+        ],
+        [
+          109,
+          112
+        ],
+        [
+          125,
+          127
+        ],
+        [
+          135,
+          136
+        ],
+        [
+          135,
+          139
+        ],
+        [
+          142,
+          144
+        ],
+        [
+          147,
+          148
+        ],
+        [
+          147,
+          149
+        ],
+        [
+          152,
+          156
+        ],
+        [
+          152,
+          157
+        ],
+        [
+          157,
+          159
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          165,
+          166
+        ],
+        [
+          165,
+          190
+        ],
+        [
+          167,
+          168
+        ],
+        [
+          167,
+          169
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          204,
+          209
+        ],
+        [
+          204,
+          210
+        ],
+        [
+          226,
+          227
+        ],
+        [
+          226,
+          259
+        ],
+        [
+          227,
+          231
+        ],
+        [
+          227,
+          232
+        ],
+        [
+          247,
+          226
+        ],
+        [
+          247,
+          248
+        ],
+        [
+          249,
+          247
+        ],
+        [
+          249,
+          258
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          263,
+          276
+        ],
+        [
+          264,
+          265
+        ],
+        [
+          264,
+          266
+        ],
+        [
+          266,
+          267
+        ],
+        [
+          266,
+          268
+        ],
+        [
+          278,
+          280
+        ],
+        [
+          278,
+          290
+        ],
+        [
+          282,
+          278
+        ],
+        [
+          282,
+          283
+        ]
+      ],
+      "branch_percent": 93.75
+    }
+  },
+  "integration": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-final-composed.2026-10-18T23-34.json",
+  "integration_checks": [
+    {
+      "name": "actual export prospective graph",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "export dry run has no writes or invalidation",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "export creates exact bytes with manifest last",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "source original bytes preserved",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "new-destination import complete graph with staging retained",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "import dry run preserves directories bytes and authority",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "partial failure is explicit and manifest remains absent",
+      "passed": true,
+      "details": [
+        "created",
+        "conflict"
+      ]
+    },
+    {
+      "name": "partial import recovery preserves existing member and creates missing files",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "staged input and unrelated profile bytes preserved",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identical repeated import performs no publication",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "staged byte change invalidates a previously valid import plan",
+      "passed": true,
+      "details": [
+        "Finding(code='MUTATION_FAILED', message='MUTATION_STALE: Complete input state changed; reload', next_action='Reload all inputs, inspect partial/uncertain paths, and revalidate before retrying.', severity='error', artifact_path=None, pointer='', related_ids=(), related_paths=())"
+      ]
+    }
+  ],
+  "integration_elapsed_seconds": 123.40642499999376,
+  "integration_source_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "tests/discovery_runtime/test_snapshot_export.py",
+    "tests/discovery_runtime/test_snapshot_import.py",
+    "tests/discovery_runtime/source_snapshot_test_support.py"
+  ],
+  "integration_binding_disposition": "The unchanged composed harness binds all nine consumed task files. The added isolated replica-resolution test is not consumed by that harness; forward/reverse and ordered sequence bind all ten owned paths.",
+  "staged_task": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+    "tests/discovery_runtime/source_snapshot_test_support.py",
+    "tests/discovery_runtime/test_snapshot_export.py",
+    "tests/discovery_runtime/test_snapshot_import.py",
+    "tests/discovery_runtime/test_snapshot_replica_resolution.py"
+  ],
+  "findings": [],
+  "gate_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-architecture.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-contracts.2026-10-18T19-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-coverage-check.2026-10-18T19-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-format.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-integration.2026-10-18T19-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-lint.2026-10-18T18-56.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-reverse.2026-10-18T19-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-tests.2026-10-18T19-08.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t6-pass3-types.2026-10-18T18-56.md"
+  ],
+  "limits": [
+    "No new native provider; bounded composed proof uses existing guarded writer with fresh memory stores.",
+    "Cooperative serialized updates, optimistic freshness and per-file publication do not provide kernel digest CAS or multi-file atomicity.",
+    "Source captures never discover sibling checkouts or fetch remote revisions. Host context/grant routing and installed CLI proof remain later plan tasks.",
+    "Exact same-pin exported copies remain immutable; diverging local bytes remain conflicting identities rather than silently replacing transport.",
+    "Full P11 property/mutation inventory remains pending."
+  ]
+}
