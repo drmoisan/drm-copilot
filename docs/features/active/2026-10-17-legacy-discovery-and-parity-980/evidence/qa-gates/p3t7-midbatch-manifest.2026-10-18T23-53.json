@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-10-18T23-53",
+  "baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "status": "frozen-checked-wip-not-accepted",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_v1.py",
+      "sha256": "c14a70f50b54a584eb5946c8740f20d378e6073cad4991a59d2f450da1b3a57a",
+      "physical_lines": 395
+    }
+  ],
+  "pending": [
+    "missing-context and empty-field cases",
+    "model/path/collision boundary tests",
+    "per-module/class/function/changed-line coverage",
+    "native bounded composition",
+    "final ordered seven-stage task gates",
+    "independent task verification"
+  ]
+}
