@@ -1,0 +1,130 @@
+{
+  "written_at_utc": "2026-10-18T17:19:54.496359+00:00",
+  "label": "pass1",
+  "source_binding": {
+    "started_at_utc": "2026-10-18T17:17:42.565661+00:00",
+    "ended_at_utc": "2026-10-18T17:19:53.052598+00:00",
+    "elapsed_seconds": 130.4869394999987,
+    "pytest_exit": 0,
+    "source_hashes_before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_hashes_after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "tests/discovery_runtime/test_evidence_linking.py": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "tests/discovery_runtime/test_evidence_payloads.py": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "tests/discovery_runtime/evidence_test_support.py": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3"
+    },
+    "source_stable": true,
+    "reverse": false
+  },
+  "metrics": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": {
+      "covered_lines": 108,
+      "lines": 108,
+      "line_percent": 100.0,
+      "covered_branches": 38,
+      "branches": 38,
+      "branch_percent": 100.0
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py": [
+      {
+        "name": "EvidencePayload",
+        "start": 31,
+        "end": 45,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "EvidenceLink",
+        "start": 49,
+        "end": 92,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_default_path",
+        "start": 95,
+        "end": 116,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_append_link",
+        "start": 119,
+        "end": 141,
+        "covered": 15,
+        "statements": 15,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_linked_document",
+        "start": 144,
+        "end": 185,
+        "covered": 13,
+        "statements": 13,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "evidence_changes",
+        "start": 188,
+        "end": 283,
+        "covered": 30,
+        "statements": 30,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_evidence_link",
+        "start": 286,
+        "end": 320,
+        "covered": 8,
+        "statements": 8,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "link_evidence",
+        "start": 323,
+        "end": 343,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 41,
+        "end": 45,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 66,
+        "end": 92,
+        "covered": 6,
+        "statements": 6,
+        "percent": 100.0,
+        "missing": []
+      }
+    ]
+  },
+  "minimum_callable": 100.0,
+  "findings": []
+}

@@ -231,7 +231,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test unique stable IDs, custom roots, missing feature links, unknown required dimensions, multi-feature scenario linkage, nullable unknown expectations, zero synthetic approval/evidence, collisions, and dry-run.
   - Acceptance: New artifacts are structurally truthful drafts; unknown behavior has linked unresolved records and cannot become verified or passed merely through creation.
 
-- [ ] [P3-T5] Register and link verifiable evidence to an authorized artifact.
+- [x] [P3-T5] Register and link verifiable evidence to an authorized artifact.
   - Files and behavior: Create R/evidence_linking.py and PT/test_{evidence_linking,evidence_payloads}.py; register evidence records and supplied local payloads, then link the specified artifact through the shared validated mutation contract.
   - Tests and proof: Cover source/test/runtime/manual/decision evidence, immutable pins/checksums, allowed payload roots, duplicate IDs, checksum mismatch, path escape, stale destination digest, missing artifact, unrelated link preservation, and partial failure reporting.
   - Acceptance: A successful evidence link identifies exact local evidence and preserves the original observation/approval state; malformed or unverified evidence cannot upgrade a claim.
