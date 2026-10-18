@@ -1,0 +1,35 @@
+{
+  "timestamp_utc": "2026-10-18T13:27:52.721718+00:00",
+  "results": [
+    {
+      "name": "unchanged-handoff-control",
+      "passed": true,
+      "reached_new_mutation_plan": true,
+      "raw_input_digest_unchanged": true,
+      "metadata_changed": false,
+      "error": null
+    },
+    {
+      "name": "changed-parent-handoff",
+      "passed": true,
+      "reached_new_mutation_plan": false,
+      "raw_input_digest_unchanged": true,
+      "metadata_changed": true,
+      "error": "Physical bootstrap inputs differ from the validated proposal"
+    }
+  ],
+  "passed": 2,
+  "total": 2,
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "7064bdcdb2bcd241420e1070ff6ae7a00f4b7453b3de09d5eca2340b73627f6e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "final_source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "7064bdcdb2bcd241420e1070ff6ae7a00f4b7453b3de09d5eca2340b73627f6e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "ee42b463f6cabd0f827b58a6f9a3bac3585ce346ddfabf9f66b6e5e5b1f6ea76",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "ac5e428a06a555c587e82cf1d010edd7c6b869b78409a4e4c1832ab6ed70ee77"
+  },
+  "source_stable": true,
+  "seam_note": "Real plan and guarded bootstrap retained; only completed preparation is reused. Sentinel at plan_mutation proves whether changed parent identity is rejected before adopting a new mutation baseline; ordinary artifact writes do not run."
+}

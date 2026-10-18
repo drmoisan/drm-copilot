@@ -94,17 +94,20 @@ class InitializationRequest:
                 "Supply source roots or explicitly select draft_configuration"
             )
         relative_path(self.artifact_root)
+        # Normalize each caller-owned root group before profile rendering.
         for name in ("production_roots", "test_roots", "documentation_roots"):
             object.__setattr__(self, name, check_path_collisions(getattr(self, name)))
         overrides = tuple(sorted(self.artifact_overrides))
         if len(dict(overrides)) != len(overrides):
             raise ValueError("Artifact overrides require unique keys")
+        # Reject unsafe spellings before any override can become a destination.
         for _, path in overrides:
             relative_path(path)
         object.__setattr__(self, "artifact_overrides", overrides)
 
     def artifact_paths(self) -> JsonObject:
         """Project destinations; ProfileV2 remains responsible for semantic checks."""
+        # Derive the closed template and directory destinations from one root.
         paths: dict[str, JsonValue] = {
             "root": self.artifact_root,
             "profile": self.artifact_root + "/domain-profile.yaml",
@@ -117,6 +120,7 @@ class InitializationRequest:
                 for key in _DIRECTORIES
             },
         }
+        # Explicit overrides may select named destinations but cannot add kinds.
         for key, value in self.artifact_overrides:
             if key not in paths or key == "root":
                 raise ValueError(
@@ -145,6 +149,7 @@ class InitializationTemplates:
     ) -> InitializationTemplates:
         """Read declared package resources through an injectable bounded parser seam."""
         documents: list[tuple[str, JsonObject]] = []
+        # Parse the complete declared set before any draft is rendered.
         for name in TEMPLATE_NAMES:
             parsed = parse_document(read(TEMPLATE_ROOT + "/" + name), format="yaml")
             if parsed.value is None:
@@ -157,11 +162,14 @@ class InitializationTemplates:
 
         def substitute(value: JsonValue) -> JsonValue:
             """Recursively retain structure and reject missing named template values."""
+            # Recurse through structures; only complete string slots substitute.
             if isinstance(value, JsonObject):
+                # Preserve member names while replacing their typed child values.
                 return JsonObject(
                     tuple((key, substitute(child)) for key, child in value.members)
                 )
             if isinstance(value, tuple):
+                # Array order remains the template's declared order.
                 return tuple(substitute(child) for child in value)
             if (
                 isinstance(value, str)
@@ -248,6 +256,7 @@ def require_compatible(request: InitializationRequest, profile: ProfileV2) -> No
             profile.artifacts["profile"],
             "Existing profile conflicts with requested documentation roots",
         )
+    # Preserve unspecified profile settings while honoring explicit destinations.
     for key in ("root", "profile", *(key for key, _ in request.artifact_overrides)):
         if profile.artifacts[cast("ArtifactKey", key)] != paths[key]:
             raise InitializationConflict(
@@ -270,9 +279,11 @@ def artifact_values(profile: ProfileV2, *, scope_id: str) -> dict[str, JsonValue
         "unresolved_id": "unresolved-" + profile.system.id,
         "decisions_id": "decisions-" + profile.system.id,
         "parity_id": "parity-" + profile.system.id,
+        # Role selection determines which honest pins belong to each side.
         "source_repositories": tuple(
             JsonObject(tuple(pin.to_dict().items())) for pin in source
         ),
+        # Target pins remain null when local identity has no observed revision.
         "target_repositories": tuple(
             JsonObject(tuple(pin.to_dict().items())) for pin in target
         ),
@@ -300,6 +311,7 @@ class InitializationCapture:
             or self.profile_missing != other.profile_missing
         ):
             before, after = dict(self.physical_metadata), dict(other.physical_metadata)
+            # Prefer concrete changed paths in the typed conflict response.
             paths = sorted(
                 path
                 for path in before.keys() | after.keys()
@@ -373,6 +385,7 @@ class ProposalInputs:
             proposed = set(self.directories)
             if self.profile_missing:
                 proposed.add(self.profile_path)
+            # Add immediate proposed children without inventing source entries.
             names = {
                 item[len(prefix) :].split("/")[0]
                 for item in proposed
@@ -430,12 +443,14 @@ class InitializationConflict(ValueError):
         findings: tuple[Finding, ...] = (),
     ) -> None:
         """Retain a compatible ValueError and deterministic typed conflict outputs."""
+        # Accepted validator paths take precedence over the caller's fallback path.
         paths = tuple(
             sorted(
                 {item.artifact_path for item in findings if item.artifact_path}
                 or {path}
             )
         )
+        # Stable ordering gives callers deterministic structured conflict output.
         self.outputs = tuple(
             InitializationOutput(path=item, kind=kind, status="conflict")
             for item in paths

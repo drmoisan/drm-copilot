@@ -37,6 +37,7 @@ def test_domain_neutrality_templates_contain_no_disallowed_tokens() -> None:
         *EXPECTED_TEMPLATE_RELATIVE_PATHS,
         *(Path("v2") / name for name in TEMPLATE_NAMES),
     )
+    # Apply the same frozen domain-neutrality contract to every declared template.
     for path in paths:
         assert not DISALLOWED_TOKEN_PATTERN.search(
             (_TEMPLATE_ROOT / path).read_text(encoding="utf-8")
@@ -59,6 +60,7 @@ def test_rendered_v2_drafts_use_only_caller_identity_and_empty_knowledge(
     )
     profile = ProfileV2(content, catalog=initialization_catalog)
     values = artifact_values(profile, scope_id="scope-" + request.system_id)
+    # Render each role-capable artifact from the same explicit consumer identity.
     outputs = (
         content,
         *(
@@ -71,6 +73,7 @@ def test_rendered_v2_drafts_use_only_caller_identity_and_empty_knowledge(
     assert profile.repository.id == request.repository_id
     assert profile.required_modes == ("online",)
     assert profile.clients == () and profile.repositories == ()
+    # Caller-owned identity must remain independent of every example domain.
     for output in outputs:
         assert not DISALLOWED_TOKEN_PATTERN.search(output.decode())
         assert "example" not in output.decode().lower()

@@ -11,6 +11,7 @@ from drm_copilot_discovery.init_flow import (
     initialize_workspace,
     plan_initialization,
 )
+from drm_copilot_discovery.init_io import BootstrapResult, InitializationIO
 from drm_copilot_discovery.init_projection import (
     InitializationRequest,
     InitializationTemplates,
@@ -31,12 +32,23 @@ from tests.discovery_runtime.initialization_test_support import (
     initialization_catalog as initialization_catalog,
 )
 from tests.discovery_runtime.initialization_test_support import (
+    initialization_plan as initialization_plan,
+)
+from tests.discovery_runtime.initialization_test_support import (
     initialization_templates as initialization_templates,
 )
+from tests.discovery_runtime.mutation_test_support import constant
 
 if TYPE_CHECKING:
+    from contextlib import AbstractContextManager
+    from pathlib import Path
+
     from drm_copilot_discovery.catalog import SchemaCatalog
+    from drm_copilot_discovery.init_flow import InitializationPlan
+    from drm_copilot_discovery.mutation_filesystem import Directory
+    from drm_copilot_discovery.mutation_plan import CapturedWorkspace
     from drm_copilot_discovery.profile_models import ArtifactKey, SystemRole
+    from drm_copilot_discovery.snapshot_io import WorkspaceBytes
 
 
 @pytest.mark.parametrize("role", ["legacy-source", "modernization-target", "combined"])
@@ -54,6 +66,7 @@ def test_each_role_projects_a_complete_honest_structural_draft(
     plan = plan_initialization(request, io=case.io, templates=initialization_templates)
     snapshot = plan.mutation.prospective
     paths = request.artifact_paths()
+    # Exact role-specific output closure excludes fabricated feature artifacts.
     expected = {
         str(paths[key])
         for key in (
@@ -299,3 +312,116 @@ def test_wrong_local_git_repository_identity_is_rejected(
             request_for(), io=case.io, templates=initialization_templates
         )
     assert case.disk.store.files == {}
+
+
+def test_local_adapter_wires_only_injected_native_boundaries(
+    initialization_catalog: SchemaCatalog,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Local wiring retains trusted primitives without opening a real workspace."""
+    case = InitializationCase(initialization_catalog)
+    provider = case.disk.provider()
+    monkeypatch.setattr(
+        "drm_copilot_discovery.init_io.LocalMutationPrimitives", constant(provider)
+    )
+
+    def open_directory(path: Path) -> AbstractContextManager[Directory]:
+        """Resolve the fixed workspace root to a fresh retained memory handle."""
+        assert path.as_posix() == case.disk.root
+        return case.disk.open()
+
+    monkeypatch.setattr(
+        "drm_copilot_discovery.init_io.open_local_directory", open_directory
+    )
+    io = InitializationIO.local(
+        workspace_root=case.disk.root,
+        lock_path="external-lock",
+        catalog=initialization_catalog,
+        invalidate_authority=case.invalidate,
+    )
+    assert io.primitives is provider and io.catalog is initialization_catalog
+    with io.open_directory() as directory:
+        assert directory.identity() == case.disk.store.metadata(".").identity
+    assert case.disk.held == 0 and case.disk.store.files == {}
+
+
+@pytest.mark.parametrize(
+    "failure", ["reconstruction", "bootstrap", "graph", "revocation"]
+)
+def test_commit_failure_dispositions_preserve_guarded_boundary(
+    initialization_catalog: SchemaCatalog,
+    initialization_plan: InitializationPlan,
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+) -> None:
+    """Inject failed stage results to verify orchestration without repeating I/O."""
+    case, plan = InitializationCase(initialization_catalog), initialization_plan
+    accepted = plan.capture.proposal_base
+    monkeypatch.setattr(
+        "drm_copilot_discovery.init_flow.plan_initialization", constant(plan)
+    )
+    bootstrap = BootstrapResult(
+        ok=failure != "bootstrap",
+        created=(),
+        uncertain=("docs/uncertain",) if failure == "bootstrap" else (),
+        authority_invalidated=failure != "revocation",
+        error="bootstrap interrupted" if failure == "bootstrap" else None,
+        physical=accepted,
+    )
+    monkeypatch.setattr(case.io, "bootstrap", constant(bootstrap))
+    monkeypatch.setattr(case.io, "physical_capture", constant(accepted))
+    monkeypatch.setattr(
+        "drm_copilot_discovery.init_flow.plan_mutation",
+        constant(replace(plan.mutation, prospective=accepted.snapshot)),
+    )
+    # Each case fails at its named stage before ordinary artifact publication.
+    if failure in {"reconstruction", "revocation"}:
+        plan = replace(plan, profile_bytes=b"changed proposed profile")
+    if failure == "revocation":
+
+        def fail_revoke() -> None:
+            """Expose invalidation failure without granting a completed result."""
+            raise OSError("protected state unavailable")
+
+        case.io.invalidate_authority = fail_revoke
+
+    result = commit_initialization(plan, io=case.io)
+
+    assert not result.ok and case.disk.store.files == {} and case.disk.held == 0
+    assert result.authority_invalidated is (failure != "revocation")
+    expected = {
+        "reconstruction": "validated reconstruction",
+        "bootstrap": "bootstrap interrupted",
+        "graph": "Physical creation graph differs",
+        "revocation": "authority invalidation failed: protected state unavailable",
+    }
+    assert expected[failure] in str(result.error)
+    assert result.uncertain_paths == bootstrap.uncertain
+
+
+def test_capture_rechecks_physical_bytes_after_virtual_loader_returns(
+    initialization_catalog: SchemaCatalog,
+    initialization_plan: InitializationPlan,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A final changed-byte read fails even when the loader returned its snapshot."""
+    case, plan = InitializationCase(initialization_catalog), initialization_plan
+    path = "application/code.txt"
+    case.disk.store.put(path, b"original")
+
+    def loaded(**arguments: object) -> CapturedWorkspace:
+        """Record one real read, then simulate a change after loader consistency."""
+        read = cast("WorkspaceBytes", arguments["read_bytes"])
+        assert read(path, limit=8) == b"original"
+        case.disk.store.files[path] = b"modified"
+        return plan.capture.proposal_base
+
+    monkeypatch.setattr("drm_copilot_discovery.init_io.capture_workspace", loaded)
+    with pytest.raises(OSError, match="Initialization bytes changed after capture"):
+        case.io.capture(
+            profile_path=plan.capture.proposal_base.snapshot.profile.artifacts[
+                "profile"
+            ],
+            profile_bytes=plan.profile_bytes,
+        )
+    assert case.revocations == 0 and case.disk.held == 0

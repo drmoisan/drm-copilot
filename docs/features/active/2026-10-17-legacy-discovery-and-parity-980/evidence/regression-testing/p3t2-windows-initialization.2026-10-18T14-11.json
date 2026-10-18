@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-10-18T14-11",
+  "platform": "nt",
+  "checks": [
+    {
+      "name": "dry-run-no-files-directories-activation-receipts",
+      "elapsed_seconds": 10.565
+    },
+    {
+      "name": "first-combined-create-including-parity-and-empty-directories",
+      "elapsed_seconds": 74.481
+    },
+    {
+      "name": "honest-null-draft-pin",
+      "elapsed_seconds": 2.353
+    },
+    {
+      "name": "created-graph-structural-pass",
+      "elapsed_seconds": 1.721
+    },
+    {
+      "name": "created-draft-completion-fails",
+      "elapsed_seconds": 1.74
+    },
+    {
+      "name": "repeat-force-preserves-all-bytes-and-skips",
+      "elapsed_seconds": 46.038
+    },
+    {
+      "name": "typed-profile-conflict-before-write",
+      "elapsed_seconds": 2.391
+    },
+    {
+      "name": "native-handle-lock-and-stage-cleanup",
+      "elapsed_seconds": 0.004
+    }
+  ],
+  "count": 8,
+  "failure": null,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "63177775e6c9e3c1604e71720edcb2c12b8d2d860055fbe74ebb18d4423c863d"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+    "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py": "63177775e6c9e3c1604e71720edcb2c12b8d2d860055fbe74ebb18d4423c863d"
+  },
+  "source_stable": true,
+  "scratch_name": "issue-980-p3t2-native-1c2e8938a81c4becbf507b40e375caab",
+  "guarantee": "Cooperative serialization; optimistic full-input freshness; exclusive create and per-file atomic publication; no kernel digest CAS or multi-file transaction."
+}
