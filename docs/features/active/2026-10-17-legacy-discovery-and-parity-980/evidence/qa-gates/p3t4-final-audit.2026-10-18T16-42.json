@@ -1,0 +1,358 @@
+{
+  "written_at_utc": "2026-10-18T16:42:14.041806+00:00",
+  "task": "P3-T4",
+  "stage": "final",
+  "baseline": "c114f98583599ebd5ee02281ece3524b2909fa51",
+  "head": "eb172ab85c40738f0cacaa7635a96a8b0f37a8de",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "sha256": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "git_blob": "9914ebe3fe91eb286c3a9db3626dd866bfcb8b43",
+      "physical_lines": 396,
+      "index_git_blob": "9914ebe3fe91eb286c3a9db3626dd866bfcb8b43",
+      "index_sha256": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "sha256": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "git_blob": "2655c4d999cc79933cf9e72af2e2f0ebe5e114b1",
+      "physical_lines": 231,
+      "index_git_blob": "2655c4d999cc79933cf9e72af2e2f0ebe5e114b1",
+      "index_sha256": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_contracts.py",
+      "sha256": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "git_blob": "30c14e3859692f9169dcb606ec7167939bc5dfb0",
+      "physical_lines": 431,
+      "index_git_blob": "30c14e3859692f9169dcb606ec7167939bc5dfb0",
+      "index_sha256": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_scenarios.py",
+      "sha256": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "git_blob": "d84dc26a53d2bb3bf4add5a528ed7149c42d92a3",
+      "physical_lines": 378,
+      "index_git_blob": "d84dc26a53d2bb3bf4add5a528ed7149c42d92a3",
+      "index_sha256": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    },
+    {
+      "path": "tests/discovery_runtime/draft_test_support.py",
+      "sha256": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+      "git_blob": "ffba64c7b5752ee733012d7f2ce5847342d5c0b7",
+      "physical_lines": 126,
+      "index_git_blob": "ffba64c7b5752ee733012d7f2ce5847342d5c0b7",
+      "index_sha256": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+      "index_equals_worktree": true,
+      "only_checkout_line_endings_differ": false
+    }
+  ],
+  "prior_count": 246,
+  "frozen_count": 24,
+  "tests": {
+    "pass2": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "78",
+      "time": "710.437",
+      "timestamp": "2026-10-18T12:23:32.013007-04:00",
+      "hostname": "Megalodon4"
+    },
+    "reverse2": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "78",
+      "time": "304.116",
+      "timestamp": "2026-10-18T12:35:25.355801-04:00",
+      "hostname": "Megalodon4"
+    },
+    "pass2-contracts": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "551",
+      "time": "6.317",
+      "timestamp": "2026-10-18T12:40:30.656116-04:00",
+      "hostname": "Megalodon4"
+    }
+  },
+  "coverage_audit": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-pass2-coverage-audit.2026-10-18T16-35.json",
+  "raw_coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-final-raw-coverage.2026-10-18T16-42.json",
+  "test_bindings": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-final-test-bindings.2026-10-18T16-42.json",
+  "ordered_sequence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t4-final-ordered-sequence.2026-10-18T16-42.json",
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": {
+      "covered_lines": 119,
+      "lines": 120,
+      "line_percent": 99.16666666666667,
+      "covered_branches": 37,
+      "branches": 38,
+      "branch_percent": 97.36842105263158
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": {
+      "covered_lines": 50,
+      "lines": 50,
+      "line_percent": 100.0,
+      "covered_branches": 14,
+      "branches": 14,
+      "branch_percent": 100.0
+    }
+  },
+  "callable_ranges": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py": [
+      {
+        "name": "draft_object",
+        "start": 30,
+        "end": 36,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "draft_header",
+        "start": 39,
+        "end": 51,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "draft_reference",
+        "start": 54,
+        "end": 56,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "merge_draft_fields",
+        "start": 59,
+        "end": 74,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "open_question",
+        "start": 77,
+        "end": 110,
+        "covered": 5,
+        "statements": 5,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "append_questions",
+        "start": 113,
+        "end": 159,
+        "covered": 16,
+        "statements": 17,
+        "percent": 94.11764705882354,
+        "missing": [
+          145
+        ]
+      },
+      {
+        "name": "ContractDraft",
+        "start": 163,
+        "end": 191,
+        "covered": 9,
+        "statements": 9,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_link_observation",
+        "start": 194,
+        "end": 213,
+        "covered": 14,
+        "statements": 14,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "_link_transitions",
+        "start": 216,
+        "end": 241,
+        "covered": 17,
+        "statements": 17,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "contract_changes",
+        "start": 244,
+        "end": 352,
+        "covered": 32,
+        "statements": 32,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_contract",
+        "start": 355,
+        "end": 373,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "create_contract",
+        "start": 376,
+        "end": 396,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 177,
+        "end": 191,
+        "covered": 4,
+        "statements": 4,
+        "percent": 100.0,
+        "missing": []
+      }
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py": [
+      {
+        "name": "ScenarioDraft",
+        "start": 32,
+        "end": 67,
+        "covered": 11,
+        "statements": 11,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "scenario_changes",
+        "start": 70,
+        "end": 188,
+        "covered": 26,
+        "statements": 26,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "plan_scenario",
+        "start": 191,
+        "end": 209,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "create_scenario",
+        "start": 212,
+        "end": 231,
+        "covered": 2,
+        "statements": 2,
+        "percent": 100.0,
+        "missing": []
+      },
+      {
+        "name": "__post_init__",
+        "start": 45,
+        "end": 67,
+        "covered": 7,
+        "statements": 7,
+        "percent": 100.0,
+        "missing": []
+      }
+    ]
+  },
+  "minimum_callable": 94.11764705882354,
+  "integration": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-composed-integration.2026-10-18T16-41.json",
+  "integration_checks": [
+    {
+      "name": "dry-run-no-effects",
+      "passed": true
+    },
+    {
+      "name": "contract-exclusive-create-exact-bytes",
+      "passed": true
+    },
+    {
+      "name": "contract-invalidates-once",
+      "passed": true
+    },
+    {
+      "name": "scenario-create-and-collection-cas-exact-bytes",
+      "passed": true
+    },
+    {
+      "name": "scenario-has-no-execution-or-evidence",
+      "passed": true
+    },
+    {
+      "name": "original-artifacts-preserved",
+      "passed": true
+    },
+    {
+      "name": "guard-and-parent-handles-released",
+      "passed": true
+    },
+    {
+      "name": "truthful-draft-is-not-complete",
+      "passed": true
+    },
+    {
+      "name": "existing-id-collision-preserves-bytes-and-revocation",
+      "passed": true
+    },
+    {
+      "name": "source-stable",
+      "passed": true
+    }
+  ],
+  "integration_timings": {
+    "contract_preview_seconds": 4.516668900003424,
+    "contract_commit_seconds": 19.527445300002,
+    "scenario_commit_seconds": 28.404962800006615
+  },
+  "staged_task": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+    "tests/discovery_runtime/draft_test_support.py",
+    "tests/discovery_runtime/test_draft_contracts.py",
+    "tests/discovery_runtime/test_draft_scenarios.py"
+  ],
+  "findings": [],
+  "limits": [
+    "No new native provider; composed proof uses existing guarded writer and local primitives with memory OS seams.",
+    "Trusted context/grant and native permitted-route wiring remain later host/service work.",
+    "Full installed CLI/host proof and exhaustive property/mutation inventory remain P11 work."
+  ],
+  "gate_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-architecture.2026-10-18T16-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-contracts.2026-10-18T16-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-coverage-check.2026-10-18T16-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-format.2026-10-18T16-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-integration.2026-10-18T16-41.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-lint.2026-10-18T16-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-reverse.2026-10-18T16-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-tests.2026-10-18T16-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t4-pass2-types.2026-10-18T16-23.md"
+  ]
+}
