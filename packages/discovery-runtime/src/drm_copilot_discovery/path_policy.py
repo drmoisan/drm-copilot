@@ -27,6 +27,7 @@ from drm_copilot_discovery.profile_v2 import ProfileV2
 if TYPE_CHECKING:
     from drm_copilot_discovery.path_models import PathMetadataReader
     from drm_copilot_discovery.profile_models import ArtifactKey
+    from drm_copilot_discovery.transport_manifest import TransportRoute
 
 # Canonical native/configuration/framework locations cannot be artifact outputs.
 PROTECTED_PATHS = (
@@ -156,6 +157,7 @@ class PathPolicy:
         workspace_root: str,
         metadata: PathMetadataReader,
         protected_paths: tuple[str, ...] = (),
+        transport: TransportRoute | None = None,
     ) -> None:
         """Bind a validated profile and caller-owned protections; never write."""
         if not isinstance(cast("object", profile), ProfileV2):
@@ -163,6 +165,7 @@ class PathPolicy:
         self._profile = profile
         self._workspace = _absolute(workspace_root)
         self._metadata = metadata
+        self._transport = transport
         # Only the parent artifact root may contain another configured output.
         self._locations = {
             cast("ArtifactKey", key): cast("str", value)
@@ -430,14 +433,22 @@ class PathPolicy:
         location = next(
             (key for kind, key in OUTPUT_LOCATIONS if kind == grant.artifact_kind), None
         )
-        if location is None:
+        if location is None and self._transport is None:
             raise PathPolicyError(
                 "PATH_GRANT",
                 path,
                 "This artifact kind has no controlled write location.",
             )
-        root = self._locations[location]
-        allowed = path == root if location in FILE_KEYS else path.startswith(root + "/")
+        if self._transport is not None:
+            # Only the root-owned mutation route supplies a reconstructed transport.
+            allowed = self._transport.allows(
+                grant, root=self._locations["source_snapshots"]
+            )
+        else:
+            root = self._locations[cast("ArtifactKey", location)]
+            allowed = (
+                path == root if location in FILE_KEYS else path.startswith(root + "/")
+            )
         if not allowed or _reserved_output(path):
             raise PathPolicyError(
                 "PATH_WRITE_DENIED",
