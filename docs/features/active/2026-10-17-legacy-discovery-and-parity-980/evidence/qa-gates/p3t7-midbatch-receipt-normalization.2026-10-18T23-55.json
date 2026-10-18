@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-10-18T23-55",
+  "status": "presentation-only",
+  "tests_rerun": false,
+  "source_test_bytes_unchanged": true,
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-midbatch-black.2026-10-18T23-53.md",
+      "old_sha256": "7cce48fff7f2debaebbfb647d9d52dd3872645b823b72cfb529d368f9bd584d4",
+      "new_sha256": "3c1e2988e38124eec2b47787e6540f09c9d5932193e6fbe3d7d63614b8898779",
+      "change": "Trim trailing blank lines only; preserve command and result"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-midbatch-ruff.2026-10-18T23-53.md",
+      "old_sha256": "f14c616be2e16bd99b61728c4a3a330f9048dfb18531094f4b6c14e4a06f637d",
+      "new_sha256": "4ba61182b3a08cca21b6737f7def31baff80e9062b2b9d2611823fe41053068a",
+      "change": "Trim trailing blank lines only; preserve command and result"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-midbatch-pyright.2026-10-18T23-53.md",
+      "old_sha256": "0317c1b960446fa3546e8436d5e0a423f4d01adf4a476f5521f6f75056f0d3ed",
+      "new_sha256": "5c59f2a2ce83ffa9e8fc716baadcd896de78201fd03a8ce1086fb9e086ea9329",
+      "change": "Trim trailing blank lines only; preserve command and result"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-midbatch-pytest.2026-10-18T23-53.md",
+      "old_sha256": "4c885a8c1c1ec93d7ccd31664d8287aa9b6bb643bb91bbd502253ba95af15101",
+      "new_sha256": "7d578a873d217951782ed33ea77b3f26389bf2c7d1fd569f3b6cd0e3edd798b6",
+      "change": "Trim trailing blank lines only; preserve command and result"
+    }
+  ]
+}
