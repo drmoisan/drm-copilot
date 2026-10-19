@@ -1,0 +1,26 @@
+{
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T02:19:38.549146+00:00",
+  "scope": "One rendered Markdown receipt only; trailing spaces removed.",
+  "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+  "original_sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733",
+  "normalized_sha256": "7999d2fb12c18b3853bd789e410be3c584e9878e80d86d07caec1777cb5d8ad0",
+  "original_retained_at": "SCRATCH/p4t1-loader-whitespace-original.2026-10-19T02-02.md",
+  "transformation": "re.sub(rb'[ \\t]+(?=\\r?\\n|$)', b'', original); then rstrip(b'\\r\\n') + b'\\r\\n' to retain one final CRLF",
+  "bytes_removed": 3,
+  "execution_facts_unchanged": true,
+  "source_test_raw_json_changes": false,
+  "gates_rerun": false,
+  "prior_binding_preserved": "evidence/qa-gates/p4t1-executor-loader-final-bindings.2026-10-19T02-12.json",
+  "stage1_sha256": "e8a775519ce9f3151dd1f7662f3e1157e4dc870f6f0d641a365b7db948dd9a61",
+  "stage1_original_retained_at": "SCRATCH/p4t1-loader-whitespace-stage1.2026-10-19T02-19.md",
+  "stage1_remaining_issue": "Staging identified one extra blank line at EOF after the trailing-space-only correction.",
+  "whitespace_check_exit_code": 0,
+  "whitespace_check_output": "warning: in the working copy of 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md', CRLF will be replaced by LF the next time Git touches it\n",
+  "initial_no_index_check": {
+    "exit_code": 1,
+    "output": "warning: in the working copy of 'WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p4t1-loader-final-pyright.2026-10-19T02-02.md', CRLF will be replaced by LF the next time Git touches it\n",
+    "interpretation": "No whitespace diagnostics; Git no-index indicated differing files with exit 1 and a CRLF normalization warning. Replaced zero-code assumption with ordinary git diff --check and explicit byte assertions."
+  },
+  "eof_confirmation_timestamp": "2026-10-19T02:21:17.219239+00:00"
+}

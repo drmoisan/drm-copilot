@@ -1,0 +1,33 @@
+{
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T01:52:29.918539+00:00",
+  "assessment": "static interface inspection; no behavioral regression executed",
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": {
+      "sha256": "78999a275d83aae7e5cc13136e3ff38f75f5ff5d4c36c6afc2749137a606c7a9",
+      "physical_lines": 486
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": {
+      "sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": {
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "physical_lines": 458
+    }
+  },
+  "finding": "Pinned local documentation inventory rows are not requested by the loader and are lost on mutation projection reload.",
+  "recommended_boundary": "Schema-valid local inventory source rows, bounded to already captured configured inputs; imported inventories remain transport-backed.",
+  "preserved_invariants": [
+    "No blanket pinning of documentation",
+    "No weakening of immutable source proof",
+    "No live Git reads from project_snapshot",
+    "No implicit foreign or neighboring repository selection",
+    "No accepted rule or authority changes"
+  ],
+  "implementation_owner": "Parent-authorized separate specialist; analyzer worker retains analyzer files"
+}

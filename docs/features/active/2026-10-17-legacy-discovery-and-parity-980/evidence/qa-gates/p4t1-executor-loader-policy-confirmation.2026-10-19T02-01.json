@@ -1,0 +1,39 @@
+{
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T02:01:35.661233+00:00",
+  "review": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-loader-review.2026-10-19T02-00.json",
+  "review_sha256": "266de443725f7b4c864d083dbcdce485fa52d7c4e52cc6cb032fb14d6e54f6cd",
+  "freeze": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-policy-candidate-manifest.2026-10-19T02-00.json",
+  "freeze_sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "physical_lines": 496,
+      "reviewed_original_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "executable_ast_sha256": "db01815eb3e8986d1a7a235f1356d063acf7a41281c49253243d29bd06c4a974",
+      "executable_equivalent": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+      "sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "physical_lines": 71,
+      "reviewed_original_sha256": "52e51eff8a1882ec233fc7e06e268918924d4cb407a7836076f90a4d73f57777",
+      "executable_ast_sha256": "f2288bb88e08a70fbd4310d68ff49711849b65253acba92cad3296b54f449437",
+      "executable_equivalent": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+      "sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "physical_lines": 353,
+      "reviewed_original_sha256": "531469bfde10fd8abb7c8b5278157be9485469781bca2db9af218c4021a7713d",
+      "executable_ast_sha256": "aa1eb20bfa6739a54705af3b8ed4cf9237a054d56575b1415960f5d8a64181ba",
+      "executable_equivalent": true
+    }
+  ],
+  "policy_repair": "P4T1-LOADER-R1 resolved by typed argument/return/exception/effect contracts and decision comments",
+  "semantic_findings": [],
+  "policy_findings": [],
+  "behavioral_reruns": 0,
+  "status": "REVIEW_READY_FOR_FINAL_GATES"
+}

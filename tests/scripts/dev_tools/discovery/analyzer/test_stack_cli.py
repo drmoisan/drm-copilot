@@ -71,10 +71,10 @@ def _patch_loader(monkeypatch: pytest.MonkeyPatch, profile: DomainProfile) -> No
 class TestSuccessPaths:
     """Success-path behavior shared by both entry points."""
 
-    def test_success_writes_instances(
+    def test_success_keeps_default_run_read_only(
         self, entry: EntryPoint, mem_fs_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A valid run exits 0 and writes at least one instance."""
+        """A valid run exits 0 without creating artifacts."""
         # Arrange
         source_root = mem_fs_path / "consumer"
         out_root = mem_fs_path / "out"
@@ -91,9 +91,7 @@ class TestSuccessPaths:
 
         # Assert
         assert code == 0
-        written = list(out_root.iterdir())
-        assert written
-        assert all(p.name.endswith(".json") for p in written)
+        assert not out_root.exists()
 
     def test_json_summary(
         self,
@@ -120,7 +118,7 @@ class TestSuccessPaths:
 
         # Assert
         assert code == 0
-        assert summary["record_count"] == len(summary["written_paths"])
+        assert summary["written_paths"] == []
         assert summary["record_count"] >= 1
 
     def test_output_dir_override(
@@ -142,9 +140,9 @@ class TestSuccessPaths:
             schema_path=mem_fs_path / "schemas" / "s.json",
         )
 
-        # Assert: instances land under the override root, not the profile root.
+        # Assert: selecting an output root alone does not authorize publication.
         assert code == 0
-        assert list(override_out.iterdir())
+        assert not override_out.exists()
         assert not profile_out.exists()
 
 

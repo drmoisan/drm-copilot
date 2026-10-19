@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 
@@ -21,6 +21,7 @@ from scripts.dev_tools.discovery.domain_profile_models import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from pathlib import Path
 
 
 def _fixed_clock() -> str:
@@ -64,13 +65,16 @@ def test_default_clock_produces_iso_8601_timestamp(
     schema_path = mem_fs_path / "schemas" / "evidence-reference.schema.json"
 
     # Act (no clock injected -> production default provider runs)
-    exit_code = cli.main(["profile.yaml"], schema_path=schema_path)
+    with patch.object(cli, "run_analyzer", wraps=cli.run_analyzer) as run:
+        exit_code = cli.main(["profile.yaml"], schema_path=schema_path)
 
     # Assert
     assert exit_code == 0
-    written = next(iter((mem_fs_path / "out").iterdir()))
-    document = json.loads(written.read_text(encoding="utf-8"))
-    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", document["captured_at"])
+    assert run.call_count == 1
+    assert re.match(
+        r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", run.call_args.args[1].captured_at
+    )
+    assert not (mem_fs_path / "out").exists()
 
 
 def test_module_entry_point_imports_cli_main() -> None:
@@ -104,17 +108,17 @@ def test_help_exits_zero() -> None:
 # Exit-code group: successful run over an in-memory tree.
 
 
-def test_valid_run_exit_0_writes_instances_and_json_summary(
+def test_valid_run_exit_0_is_read_only_with_json_summary(
     mem_fs_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """A valid run returns 0, writes instances, and prints a --json summary."""
+    """A valid run returns detected counts without implicitly publishing records."""
     # Arrange
     source_root = mem_fs_path / "src"
     (source_root).mkdir(parents=True, exist_ok=True)
     (source_root / "a.txt").write_text("aaa", encoding="utf-8")
-    (source_root / "app.solution").write_text("s", encoding="utf-8")
+    (source_root / "app.sln").write_text("s", encoding="utf-8")
     profile = _profile(str(source_root), str(mem_fs_path / "out"))
     monkeypatch.setattr(cli, "load_domain_profile", _stub_loader(profile))
     schema_path = mem_fs_path / "schemas" / "evidence-reference.schema.json"
@@ -128,9 +132,8 @@ def test_valid_run_exit_0_writes_instances_and_json_summary(
     assert exit_code == 0
     summary = json.loads(capsys.readouterr().out)
     assert summary["record_count"] == 2
-    assert len(summary["written_paths"]) == 2
-    for written in summary["written_paths"]:
-        assert Path(written).exists()
+    assert summary["written_paths"] == []
+    assert not (mem_fs_path / "out").exists()
 
 
 def test_valid_run_output_dir_override(
@@ -147,16 +150,17 @@ def test_valid_run_output_dir_override(
     schema_path = mem_fs_path / "schemas" / "evidence-reference.schema.json"
 
     # Act
-    exit_code = cli.main(
-        ["profile.yaml", "--output-dir", str(override)],
-        clock=_fixed_clock,
-        schema_path=schema_path,
-    )
+    with patch.object(cli, "run_analyzer", wraps=cli.run_analyzer) as run:
+        exit_code = cli.main(
+            ["profile.yaml", "--output-dir", str(override)],
+            clock=_fixed_clock,
+            schema_path=schema_path,
+        )
 
     # Assert
     assert exit_code == 0
-    written = list(override.iterdir())
-    assert len(written) == 1
+    assert run.call_args.args[1].artifact_root == override
+    assert not override.exists()
 
 
 # Exit-code group: domain / analyzer errors map to exit code 1.

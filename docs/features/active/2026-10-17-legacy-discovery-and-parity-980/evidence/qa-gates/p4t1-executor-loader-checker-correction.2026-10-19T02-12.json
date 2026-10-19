@@ -1,0 +1,24 @@
+{
+  "recorded_at": "2026-10-19T02:12:09.927257+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t1-loader-final-binding.py",
+  "exit_code": 1,
+  "initial_script_sha256": "edf8ca6d963dbbca629e26dc1ad64e4517a4833460c02e30016d7670a98d47b5",
+  "preserved_script": "SCRATCH/issue-980-p4t1-loader-final-binding-initial.py",
+  "error": "AssertionError: executed_branches at line 96",
+  "mapped_old_only": [
+    [
+      404,
+      423
+    ]
+  ],
+  "final_only": [
+    [
+      404,
+      414
+    ]
+  ],
+  "unchanged_missing_branches": 6,
+  "cause": "Approved straight-line helper call at line 414 changes the existing loop exit destination before the previous next statement at line 423.",
+  "correction_requires": "AST equivalence after removing only approved import/call; both destinations covered; no other branch delta.",
+  "no_behavioral_gate_failure": true
+}

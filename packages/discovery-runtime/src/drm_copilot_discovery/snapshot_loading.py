@@ -25,6 +25,7 @@ from drm_copilot_discovery.snapshot import (
     SnapshotFile,
     repository_pins,
 )
+from drm_copilot_discovery.snapshot_inventory_inputs import local_inventory_requests
 from drm_copilot_discovery.snapshot_io import (
     document_format,
     load_profile_inputs,
@@ -410,6 +411,15 @@ class _Loader:
                 self._read(path, "artifact")
             else:
                 self._read(path, self.categories[path])
+        self.git_requests.update(
+            local_inventory_requests(
+                self.artifacts.values(),
+                valid_paths=self.valid,
+                captured_paths=paths,
+                categories=self.categories,
+                local=self.local,
+            )
+        )
         checkout, objects = self._git()
         self.io.verify_unchanged()
         sources, targets = repository_pins(self.profile)
