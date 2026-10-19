@@ -1,0 +1,240 @@
+{
+  "acceptance_mapping": "Only P4-T5 is complete. No new aggregate analyzer or public-surface AC is fully delivered; source ACs remain 13/66.",
+  "bounded_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-repair-confirmation.2026-10-19T08-03.json",
+    "sha256": "9bd62c044c3d95cc50d752355ee4a96491854d9f09cefdd7278ccf08f9972699"
+  },
+  "checked_repair_commit": "5de4c099aa565874c2427a6a71a2a81488cf4ef0",
+  "command": "poetry run python SCRATCH/issue-980-p4t5-final-reconcile.py",
+  "documents_before": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "0ad30d9ecb0b9bd24be2d13359e9083a3df11b6e79cc1f4dd459fd57ed709ac6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344"
+    }
+  ],
+  "exit_code": 0,
+  "final_receipts": [
+    {
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "exit_code": 0,
+      "label": "format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-format-080649.2026-10-19T08-06.json",
+        "sha256": "70606534487f84bea8f8835f013cf2ddf852992276d5a0f23640c0050513e1b5"
+      },
+      "seconds": 0.337754,
+      "stage": 1
+    },
+    {
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "exit_code": 0,
+      "label": "lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-lint-080649.2026-10-19T08-06.json",
+        "sha256": "3d1710efdff9051c989408abe4a96a2f8a7b3d63ed7677b2a89b3798e2bc229b"
+      },
+      "seconds": 0.104882,
+      "stage": 2
+    },
+    {
+      "command": "poetry run python -m pyright",
+      "exit_code": 0,
+      "label": "types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-types-080701.2026-10-19T08-07.json",
+        "sha256": "812654078d5a46b76957326ef7ab6a9540731f7521184d3b99f2fa949900bcd6"
+      },
+      "seconds": 11.588563,
+      "stage": 3
+    },
+    {
+      "command": "poetry run python SCRATCH\\issue-980-architecture.py SCRATCH\\p4t5-repaired-combined-candidate.json",
+      "exit_code": 0,
+      "label": "architecture",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-architecture-080701.2026-10-19T08-07.json",
+        "sha256": "b4ff807d4ae14ab008c6705d115f9c6ef31829e6286a738eedf27c04a4224d01"
+      },
+      "seconds": 0.134201,
+      "stage": 4
+    },
+    {
+      "command": "poetry run python -m pytest -v -o addopts= tests/discovery_runtime/analyzer/test_registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py --cov=drm_copilot_discovery.analyzer.api_access --cov=drm_copilot_discovery.analyzer.api_syntax --cov=drm_copilot_discovery.analyzer.filesystem_access --cov=drm_copilot_discovery.analyzer.registry_access --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/p4t5-final-access-coverage.raw.json",
+      "exit_code": 0,
+      "label": "tests-access-reverse",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-tests-access-reverse-080845.2026-10-19T08-08.json",
+        "sha256": "f164f4774a256dd7df81ec7f823a4da3e1247a32f6b8833b85f6b2040885442e"
+      },
+      "seconds": 104.335976,
+      "stage": 5
+    },
+    {
+      "command": "poetry run python -m pytest -v -o addopts= tests/discovery_runtime/analyzer/test_com_candidates.py tests/discovery_runtime/analyzer/test_com_interop.py --cov=drm_copilot_discovery.analyzer.com_interop --cov=drm_copilot_discovery.analyzer.com_syntax --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/p4t5-final-com-coverage.raw.json",
+      "exit_code": 0,
+      "label": "tests-com-reverse",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-tests-com-reverse-080919.2026-10-19T08-09.json",
+        "sha256": "7f3bbf3237d5e55c1780188dd0fc2cd7aab7777b6fccaecb5e7e3cbc09c69a51"
+      },
+      "seconds": 33.38429,
+      "stage": 5
+    },
+    {
+      "command": "poetry run python -m pytest -q -o addopts= --no-cov tests/schemas/discovery/test_v2_inventory_schemas.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "exit_code": 0,
+      "label": "contracts",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-contracts-080920.2026-10-19T08-09.json",
+        "sha256": "5d6871e428f21e80976893924b1c4722c94e522e8e6a4f5467da6a5a085f3946"
+      },
+      "seconds": 1.561519,
+      "stage": 6
+    },
+    {
+      "command": "poetry run python SCRATCH\\issue-980-native.py SCRATCH\\p4t5-final-native-result.raw.json",
+      "exit_code": 0,
+      "label": "native",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-native-080922.2026-10-19T08-09.json",
+        "sha256": "1585e0789d1aa61ebf9c18eaa6f5b53bddcdd5a5e67ccb1e09d28ec5681e77fd"
+      },
+      "seconds": 2.103879,
+      "stage": 7
+    }
+  ],
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-handoff.2026-10-19T08-10.json",
+    "sha256": "e7f3050a2efb160041f7b5b90659a73150ffe3e812649b132fe97bb2a0fd39d4"
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-reconciliation-harness.2026-10-19T08-17.txt",
+    "sha256": "d0d5daa25810ce70cc8b5438230a6aac4ad7bb1bfd1a0c5a7ab38058208d8fd6"
+  },
+  "mutations": "Only this result and inert harness; plan checkoff is separately performed with the file-edit tool.",
+  "publication_time_utc": "2026-10-19T08:17:05.326694+00:00",
+  "qualifications": [
+    "All executed harnesses decoded from canonical base64 and matched scratch raw bytes; LF companions checked separately.",
+    "Original review timestamp qualification and the corrected coverage-field checker diagnostic remain in the retained confirmation.",
+    "Earlier COM focused receipts contain sanitized combined output; the final loop additionally binds separate raw streams.",
+    "No public registry/CLI exposure, coding-agent host proof or non-Windows execution is claimed."
+  ],
+  "raw_harness_bindings": [
+    {
+      "exact_base64_and_scratch_match": true,
+      "lf_sha256": "0e5d572f7e47decde387962005edf942d032e76b1ac527aa1444d892e8672fe9",
+      "path": "SCRATCH/issue-980-architecture.py",
+      "raw_crlf_count": 0,
+      "raw_sha256": "0e5d572f7e47decde387962005edf942d032e76b1ac527aa1444d892e8672fe9",
+      "role": "final-gate-harness"
+    },
+    {
+      "exact_base64_and_scratch_match": true,
+      "lf_sha256": "5fb2ece4ac241137fd29b66908ee23117691de020ff4b0cbdb90ab860ad03135",
+      "path": "SCRATCH/issue-980-final-gates.py",
+      "raw_crlf_count": 0,
+      "raw_sha256": "5fb2ece4ac241137fd29b66908ee23117691de020ff4b0cbdb90ab860ad03135",
+      "role": "final-gate-harness"
+    },
+    {
+      "exact_base64_and_scratch_match": true,
+      "lf_sha256": "96ddbdad6f15b04ce6eaaf0330eb4d46339654157a7a6b7dc5da3a6f31830784",
+      "path": "SCRATCH/issue-980-native.py",
+      "raw_crlf_count": 0,
+      "raw_sha256": "96ddbdad6f15b04ce6eaaf0330eb4d46339654157a7a6b7dc5da3a6f31830784",
+      "role": "final-gate-harness"
+    },
+    {
+      "exact_base64_and_scratch_match": true,
+      "lf_sha256": "e21eea239c89f8d14a40f883226b88da39eb76f54e4a2cb785cb59771d215b6c",
+      "path": "SCRATCH/issue-980-final-handoff.py",
+      "raw_crlf_count": 0,
+      "raw_sha256": "e21eea239c89f8d14a40f883226b88da39eb76f54e4a2cb785cb59771d215b6c",
+      "role": "handoff-binding-only"
+    }
+  ],
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json",
+    "sha256": "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726"
+  },
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "streams": "working=index=checked-repair-commit"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "streams": "working=index=checked-repair-commit"
+    }
+  ],
+  "started_at": "2026-10-19T08:17:04.590542+00:00",
+  "status": "PASS_READY_FOR_PLAN_CHECKOFF",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T08-17",
+  "verification": {
+    "behavioral_replays": 0,
+    "branches": [
+      182,
+      182
+    ],
+    "contract_cases": 206,
+    "native_assertions": 11,
+    "preserved_predecessor_streams": 45,
+    "ranges": 27,
+    "statements": [
+      432,
+      432
+    ],
+    "unit_cases": 317
+  }
+}
