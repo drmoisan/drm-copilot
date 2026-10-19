@@ -1,0 +1,41 @@
+{
+  "batch": "scanners",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T04:39:23.679713+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-scanners-lint-043923.2026-10-19T04-39.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-scanners-lint-043923.2026-10-19T04-39.stdout.txt",
+      "sha256": "27c54788f9bc8261c9ed736bab3bbc886c3349336c9dd3e3216aa1e2119d933d"
+    }
+  },
+  "seconds": 0.112084,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "2e256142837f507563b5e310cf0479d1d7b723cb0dcb1e67a077117c297966dd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "58b489aba0f058e35e44192d24e59f7cdc306e4e7b746972f58ace9ddb3af23d",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "fb4b244f1d7e290d4a387527aa416f6d4a0a88919c879788d7f6e2ba8f3d3786",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "2e256142837f507563b5e310cf0479d1d7b723cb0dcb1e67a077117c297966dd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "58b489aba0f058e35e44192d24e59f7cdc306e4e7b746972f58ace9ddb3af23d",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "fb4b244f1d7e290d4a387527aa416f6d4a0a88919c879788d7f6e2ba8f3d3786",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T04:39:23.567629+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_declarations.py:23:89\n   |\n21 |     (\n22 |         \"public private protected internal static sealed abstract partial readonly \"\n23 |         \"ref unsafe new virtual override file extern async required const volatile fixed\"\n   |                                                                                         ^\n24 |     ).split()\n25 | )\n   |\n\nFound 1 error.\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-39"
+}

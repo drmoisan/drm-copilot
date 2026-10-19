@@ -1,0 +1,43 @@
+{
+  "batch": "repair",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T05:05:55.278727+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-repair-lint-050555.2026-10-19T05-05.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-repair-lint-050555.2026-10-19T05-05.stdout.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "seconds": 0.103864,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T05:05:55.174863+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05-05"
+}

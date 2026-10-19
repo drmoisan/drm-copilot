@@ -1,0 +1,41 @@
+{
+  "batch": "scanners",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:42:25.381405+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-scanners-types-044225.2026-10-19T04-42.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-scanners-types-044225.2026-10-19T04-42.stdout.txt",
+      "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+    }
+  },
+  "seconds": 1.084832,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T04:42:24.296573+00:00",
+  "stderr": "",
+  "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-42"
+}

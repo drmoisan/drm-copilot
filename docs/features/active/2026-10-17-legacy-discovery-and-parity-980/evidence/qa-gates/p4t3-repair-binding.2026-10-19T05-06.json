@@ -1,0 +1,37 @@
+{
+  "batch": "repair",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-repair-coverage.2026-10-19T05-06.json",
+    "sha256": "42099e90adcb6065cadb20098e462eb20ce62852ab1b2b35124e229ca7e632e3"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-format-050555.2026-10-19T05-05.json",
+      "sha256": "4ab9c6a23ed72dcb0104a6d1034c746635fa8c628befd172dd45e3c4cc5710be"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-lint-050555.2026-10-19T05-05.json",
+      "sha256": "4a9a8e9e023ccc706bde71fce8cc044bb17fe14adea32f48a3644518b0370668"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-types-050556.2026-10-19T05-05.json",
+      "sha256": "1862a3f714a46c29459126d5db7d0c9437ccca9e367d73ca255faed66a795e20"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-repair-tests-050628.2026-10-19T05-06.json",
+      "sha256": "e54bb38eb3f1625db6733c49056968c70effc02044ff7d4c22546552ebee91c2"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05-06"
+}

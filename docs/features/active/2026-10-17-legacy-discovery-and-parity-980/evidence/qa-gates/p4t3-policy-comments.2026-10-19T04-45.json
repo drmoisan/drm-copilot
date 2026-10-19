@@ -1,0 +1,54 @@
+{
+  "changes": [
+    {
+      "after_sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+      "lines": 350,
+      "original": "SCRATCH/comments-before-csharp_declarations.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py"
+    },
+    {
+      "after_sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+      "lines": 132,
+      "original": "SCRATCH/comments-before-event_subscriptions.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py"
+    },
+    {
+      "after_sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+      "lines": 460,
+      "original": "SCRATCH/comments-before-dotnet_inventory.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py"
+    },
+    {
+      "after_sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "22c0d93a5d905db9cead5614c3db7a35e50927957db91808a93d8b7078d1b573",
+      "lines": 221,
+      "original": "SCRATCH/comments-before-test_csharp_tokens.py",
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py"
+    },
+    {
+      "after_sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "17c7777bf2afdcf1893ba30437815c1fdb74296d83910baa19c9b6f0d6c52877",
+      "lines": 470,
+      "original": "SCRATCH/comments-before-test_csharp_declarations.py",
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py"
+    },
+    {
+      "after_sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "ast_equivalent_including_docstrings": true,
+      "before_sha256": "6659dce5add476f13d5baaab425d500bdfab4ebb994e5faaa45398e1d60d1ed0",
+      "lines": 179,
+      "original": "SCRATCH/comments-before-test_event_subscriptions.py",
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py"
+    }
+  ],
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-45"
+}

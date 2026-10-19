@@ -1,0 +1,41 @@
+{
+  "batch": "scanners",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T04:39:55.007550+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-scanners-lint-043955.2026-10-19T04-39.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-scanners-lint-043955.2026-10-19T04-39.stdout.txt",
+      "sha256": "3b87a99971ab64442d08195eba73493c10ecbe7db12d3640f3f186ed669598ee"
+    }
+  },
+  "seconds": 0.109791,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f507e6d51b48cfe8d8a4c682f6c1fddbad177a4dd1896787d4e57db37c379881",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "c996e08f705d6b1953420935961ed16c24464c038fc5e235682726c0f13109b0",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "7aa152a82e17e149de5c53db9998aac857efc335f6a4c2b287c10825b5263b73",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "f507e6d51b48cfe8d8a4c682f6c1fddbad177a4dd1896787d4e57db37c379881",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "fa84b4d4bd80b6f16a235be47f05c457dc95266da1cdf8bfe0f123e4a925ba13",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "c996e08f705d6b1953420935961ed16c24464c038fc5e235682726c0f13109b0",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "7aa152a82e17e149de5c53db9998aac857efc335f6a4c2b287c10825b5263b73",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T04:39:54.897759+00:00",
+  "stderr": "",
+  "stdout": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_event_subscriptions.py:3:1\n   |\n 1 |   \"\"\"Keep possible handler assignments distinct from compiler/runtime event proof.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from typing import TYPE_CHECKING, cast\n 6 | |\n 7 | | import pytest\n 8 | | from drm_copilot_discovery.analyzer.dotnet_inventory import (\n 9 | |     EventSubscriptionAnalyzer,\n10 | |     classify_text,\n11 | | )\n12 | | from drm_copilot_discovery.analyzer.emitter import inventory_result\n13 | | from drm_copilot_discovery.analyzer.findings import row\n14 | | from drm_copilot_discovery.analyzer.event_subscriptions import subscription_candidates\n15 | |\n16 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import capture, properties\n17 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog\n   | |____________________________________________________________________________________^\n18 |\n19 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nFound 1 error.\n[*] 1 fixable with the `--fix` option.\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-39"
+}
