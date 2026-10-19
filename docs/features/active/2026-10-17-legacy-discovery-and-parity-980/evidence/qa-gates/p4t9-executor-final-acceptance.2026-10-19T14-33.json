@@ -1,0 +1,206 @@
+{
+  "Timestamp": "2026-10-19T14-33",
+  "Command": ".venv/Scripts/python.exe SCRATCH/p4t9-publish-acceptance.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "P4-T9 accepted; 41/84 tasks, 17/66 source acceptance criteria in both authoritative files.",
+  "task": "P4-T9",
+  "task_status": "PASS",
+  "acceptance": "ACCEPTED",
+  "findings": [],
+  "open_checks": [],
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-pass2.2026-10-19T14-29.json",
+    "sha256": "e480a8d2a75aaacf02fa894addb74a8715bf8f52e1b2d3e07c95e560d0a8ed27",
+    "bytes": 8096
+  },
+  "owner_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-handoff.2026-10-19T14-20.json",
+    "sha256": "5fb8315ae602489b3645e46277b5f0bb5a508632f15d606354598dc8b3cdbc0d",
+    "bytes": 25992
+  },
+  "owner_stage_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-stage-closure.2026-10-19T14-21.json",
+    "sha256": "41dc914d78d1c12986202bfad3c9f924db0d671294045a3279b8dd0fd5f6e266",
+    "bytes": 30251
+  },
+  "reused_phase4_acceptances": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-final-acceptance.2026-10-19T03-03.json",
+      "sha256": "db9b2afae71c99fce428bacf5564892f4049f6b840b9cac5d91ee52c5fc1e2e2",
+      "bytes": 1958
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-final-acceptance.2026-10-19T04-13.json",
+      "sha256": "07db39406edc93729d3f2ff8d193c03e2e44a646753954ac42d107625deee630",
+      "bytes": 8435
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-acceptance.2026-10-19T05-30.json",
+      "sha256": "7093e9092e3d859b28c822dcaf6dfe7296285b1ca74214371d6cd510b0c1b35f",
+      "bytes": 11432
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-final-acceptance.2026-10-19T06-52.json",
+      "sha256": "525a1e294703011e85cd9508a2be6681bd556ebad025b4eee0dfa403fe5d1ac0",
+      "bytes": 10327
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-acceptance.2026-10-19T08-18.json",
+      "sha256": "f830a17f28ed0a12de7328cc3e03271c453609ef4cdc7f1266127149c4943e7b",
+      "bytes": 6111
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-acceptance.2026-10-19T09-35.json",
+      "sha256": "ee119c0427b6b920e987dd0abe8b2c8e6ccec555accd3527b1e543f31f3a054c",
+      "bytes": 5055
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-acceptance.2026-10-19T11-14.json",
+      "sha256": "4b70896c9536df3bd02372ab3c38f39979eff6e2c39c46fcc5c23026f315a125",
+      "bytes": 1915
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance.2026-10-19T12-34.json",
+      "sha256": "5cc45174601a3ef12c426aec43be1f69990cecfab873f7e86314b99e0914968f",
+      "bytes": 4721
+    }
+  ],
+  "coverage": {
+    "covered_lines": 686,
+    "num_statements": 686,
+    "covered_branches": 300,
+    "num_branches": 300,
+    "named_ranges": 55,
+    "modules": 6
+  },
+  "tests": {
+    "unit": 354,
+    "contracts": 177,
+    "native_windows_git": 20
+  },
+  "quality": "All seven ordered stages passed after the retained static-comment correction: scoped Black/Ruff, whole-repository Pyright, architecture, three reversed unit batches, affected contracts, native composition.",
+  "source_and_evidence_identity": {
+    "current_bindings": 142,
+    "predecessors": 93,
+    "source_test_streams": 15,
+    "owner_evidence_paths": 73,
+    "raw_streams": 30,
+    "qualification": "Emitter has the sole authorized comment relocation; executable AST is identical. Final proof records separate working/index/commit identities. No implementation or tests were rerun for acceptance."
+  },
+  "checker_qualification": "The initial reconciliation assumed stage_paths included the closure itself. Actual metadata is 72 files plus include_closure_itself, totaling 73. Only that checker assumption changed; exact initial checker/diagnostic and final passing checker remain preserved.",
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance-payload.2026-10-19T14-33.json",
+    "sha256": "f73092ca83a2d84dd7b4d623f75cebba43c066ff5c7405ffa3a548e8bda0bc8a",
+    "bytes": 18524
+  },
+  "checkoff_files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "a88cda293074d0992bf4b583993d05be524e4fd4aa4ea04164bbcf1ae1b0bd43",
+      "bytes": 100092,
+      "before_sha256": "f3ddf24cf8904e74c98c8ae2126e4bf4849ca4a890a3e56e9078317a389af5cc",
+      "git_lf_sha256": "0d3d1ad1115c13b36a142a527929f117ee8a972f826b4d30e120a594a1a2be6f",
+      "crlf_preserved": true,
+      "counts": {
+        "complete": 41,
+        "total": 84,
+        "remaining": 43
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "6cfbda32f4569ea599e2a337f39cb19dbe76a141eff9e18dc4866132e18e3743",
+      "bytes": 111610,
+      "before_sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+      "git_lf_sha256": "6cfbda32f4569ea599e2a337f39cb19dbe76a141eff9e18dc4866132e18e3743",
+      "crlf_preserved": true,
+      "counts": {
+        "complete": 17,
+        "total": 66,
+        "remaining": 49
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "sha256": "9e4fee44ba97836140c1ad4a5edc40480bb719b288825b29db7d76e1e33d32b0",
+      "bytes": 11870,
+      "before_sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+      "git_lf_sha256": "9e4fee44ba97836140c1ad4a5edc40480bb719b288825b29db7d76e1e33d32b0",
+      "crlf_preserved": true,
+      "counts": {
+        "complete": 17,
+        "total": 66,
+        "remaining": 49
+      }
+    }
+  ],
+  "new_source_ac_checkoffs": [
+    {
+      "id": "AC-33",
+      "criterion": "Output is deterministic and machine-readable.",
+      "verification": "Accepted Phase 4 analyzers emit canonical structured inventories with stable identities/order and explicit input digests; final fixed-registry composition and repeated native external merge retain deterministic machine-readable results.",
+      "sources": [
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\spec.md",
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\user-story.md"
+      ]
+    },
+    {
+      "id": "AC-34",
+      "criterion": "Findings include source references.",
+      "verification": "Accepted analyzer findings retain captured repository/revision/path/source anchors; final external-result validation rejects altered manifest/member hashes and unbound source claims while retaining documentation in accounting.",
+      "sources": [
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\spec.md",
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\user-story.md"
+      ]
+    },
+    {
+      "id": "AC-35",
+      "criterion": "Facts are distinguished from inference.",
+      "verification": "Accepted lexical adapters distinguish detected syntax from inferred relevance and unresolved binding; final imported results preserve supplied confidence, diagnostics and uninspected/unassigned coverage without promotion.",
+      "sources": [
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\spec.md",
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\user-story.md"
+      ]
+    },
+    {
+      "id": "AC-36",
+      "criterion": "Analyzer fixtures and tests exist.",
+      "verification": "All nine analyzer tasks now have accepted synthetic fixtures and focused unit/negative/boundary tests. The final task adds 354 executed cases and 177 affected contracts; previously accepted analyzer populations are reused without replay.",
+      "sources": [
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\spec.md",
+        "docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\user-story.md"
+      ]
+    }
+  ],
+  "counts": {
+    "plan": {
+      "complete": 41,
+      "total": 84,
+      "remaining": 43
+    },
+    "spec": {
+      "complete": 17,
+      "total": 66,
+      "remaining": 49
+    },
+    "user_story": {
+      "complete": 17,
+      "total": 66,
+      "remaining": 49
+    }
+  },
+  "phase4_handoff": "Reuse the worker's public interface and Phase 4 handoff. P6-T1 external import publication must reconstruct the merge from CapturedWorkspace and pass existing mutation authority; this task introduces no publication bypass.",
+  "limitations": [
+    "Native proof covers local Windows/Git capture, loading, validation and merge; publication was not attempted.",
+    "Installed-agent-host and non-Windows acceptance remain pending.",
+    "Analyzers retain documented finite lexical/declaration semantics; syntax and inferred relationships are not runtime proof.",
+    "Service/CLI/MCP/extension publication and whole-feature quality/review remain later plan work."
+  ],
+  "next_five": [
+    "P5-T1",
+    "P5-T2",
+    "P5-T3",
+    "P5-T4",
+    "P5-T5"
+  ]
+}

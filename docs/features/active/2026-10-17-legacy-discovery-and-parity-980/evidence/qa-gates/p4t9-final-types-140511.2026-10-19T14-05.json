@@ -1,0 +1,26 @@
+{
+  "binding_after_sha256": "556d73647ec7a7a78b8719c6fcb1fe4c549636ede85e69eb8f1fbdc03adc052e",
+  "binding_before_sha256": "556d73647ec7a7a78b8719c6fcb1fe4c549636ede85e69eb8f1fbdc03adc052e",
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-preparation.2026-10-19T14-04.json",
+  "candidate_sha256": "8e793d4f3df4d9284a4d951f9a6594b24a203faa768ecb4128aaa16de0208dc3",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -m pyright",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T14:05:11.640702+00:00",
+  "label": "types",
+  "raw_stderr": {
+    "bytes": 0,
+    "path": "SCRATCH/issue-980-p4t9-final-types-140511.2026-10-19T14-05.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "bytes": 194,
+    "path": "SCRATCH/issue-980-p4t9-final-types-140511.2026-10-19T14-05.stdout.txt",
+    "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+  },
+  "seconds": 13.361832,
+  "stage": 3,
+  "started_at": "2026-10-19T14:04:58.278870+00:00",
+  "stderr": "",
+  "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "timestamp": "2026-10-19T14-05"
+}

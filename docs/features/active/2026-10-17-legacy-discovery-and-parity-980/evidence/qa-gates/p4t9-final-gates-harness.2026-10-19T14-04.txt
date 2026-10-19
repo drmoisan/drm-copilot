@@ -1,0 +1,158 @@
+"""Run the released P4-T9 sequence once, binding every stage to exact frozen inputs."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+manifest_path = Path(sys.argv[1])
+manifest = json.loads(manifest_path.read_bytes())
+assert manifest['execution_released'] and manifest['coordinator_release_receipt']
+assert len(manifest['subset_manifests']) == 3 and manifest['review_references']
+for reference in manifest['subset_manifests'] + manifest['review_references'] + [manifest['baseline']]:
+    assert hashlib.sha256(Path(reference['path']).read_bytes()).hexdigest() == reference['sha256'], reference['path']
+expected = {item['path']: item['sha256'] for item in manifest['files']}
+code = list(expected)
+assert len(code) == 15
+bound = {item['path']: item['sha256'] for item in manifest['bindings']}
+assert all(bound[path] == digest for path, digest in expected.items())
+harnesses = {scratch / name: digest for name, digest in manifest['harnesses'].items()}
+baseline = json.loads(Path(manifest['baseline']['path']).read_bytes())
+baseline_coverage = {item['path']: item for item in baseline['coverage_baselines']}
+receipts, coverage_batches, all_nodes = [], [], []
+start = datetime.datetime.now(datetime.timezone.utc)
+
+
+def binding():
+    """Verify source, test, dependency, schema and retained predecessor bytes."""
+    actual = {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in bound}
+    assert actual == bound, 'A bound source/test/dependency changed'
+    assert all(hashlib.sha256(path.read_bytes()).hexdigest() == digest for path, digest in harnesses.items())
+    return hashlib.sha256(json.dumps(actual, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def portable(value):
+    """Render paths portably while retaining exact originals separately."""
+    for path, label in ((root, 'WORKSPACE'), (scratch, 'SCRATCH')):
+        for spelling in (str(path), path.as_posix()):
+            value = re.sub(re.escape(spelling), lambda match: label, value, flags=re.I)
+    return value
+
+
+def write(path, value):
+    """Create LF evidence without overwriting a prior receipt."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+def run(number, label, arguments, *, module=True):
+    """Capture one real command and its exact separate output streams."""
+    before = binding()
+    begun = datetime.datetime.now(datetime.timezone.utc)
+    env = dict(os.environ)
+    env.update(PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1',
+               COVERAGE_FILE=str(scratch / ('issue-980-p4t9-final-' + label + '.coverage')))
+    command = [sys.executable, *(['-m'] if module else []), *map(str, arguments)]
+    result = subprocess.run(command, capture_output=True, env=env)
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    stamp = finished.strftime('%Y-%m-%dT%H-%M')
+    stem = 'p4t9-final-' + label + '-' + finished.strftime('%H%M%S') + '.' + stamp
+    stdout, stderr = scratch / ('issue-980-' + stem + '.stdout.txt'), scratch / ('issue-980-' + stem + '.stderr.txt')
+    stdout.write_bytes(result.stdout)
+    stderr.write_bytes(result.stderr)
+    after = binding()
+    document = {'stage': number, 'label': label, 'timestamp': stamp, 'started_at': begun.isoformat(),
+        'finished_at': finished.isoformat(), 'seconds': (finished - begun).total_seconds(),
+        'command': portable(subprocess.list2cmdline(command)), 'exit_code': result.returncode,
+        'binding_before_sha256': before, 'binding_after_sha256': after,
+        'candidate_manifest': manifest_path.as_posix(), 'candidate_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        'stdout': portable(result.stdout.decode('utf-8', errors='replace')),
+        'stderr': portable(result.stderr.decode('utf-8', errors='replace')),
+        'raw_stdout': {'path': 'SCRATCH/' + stdout.name, 'sha256': hashlib.sha256(result.stdout).hexdigest(), 'bytes': len(result.stdout)},
+        'raw_stderr': {'path': 'SCRATCH/' + stderr.name, 'sha256': hashlib.sha256(result.stderr).hexdigest(), 'bytes': len(result.stderr)}}
+    path = qa / (stem + '.json')
+    write(path, document)
+    markdown = f'# P4-T9 final {label}\n\nTimestamp: {stamp}\nCommand: `{document["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Stage {number} of 7; exact command, stream hashes, elapsed time and unchanged bindings are in the adjacent JSON.\n\n```text\n{document["stdout"]}{document["stderr"]}\n```\n'
+    path.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines()).rstrip() + '\n', encoding='utf-8', newline='\n')
+    receipts.append({'stage': number, 'label': label, 'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'exit_code': result.returncode})
+    write(qa / ('p4t9-final-progress-' + start.strftime('%H%M%S') + '-' + label + '.' + stamp + '.json'),
+          {'receipts': receipts, 'binding_sha256': after})
+    print(json.dumps({'stage': number, 'label': label, 'exit_code': result.returncode, 'seconds': document['seconds'], 'receipt': path.as_posix()}), flush=True)
+    if result.returncode or before != after:
+        print((document['stdout'][-8000:] + document['stderr'][-8000:]).encode('ascii', errors='backslashreplace').decode(), flush=True)
+        raise SystemExit(result.returncode or 1)
+    return document
+
+
+def coverage_gate(filename, data):
+    """Enforce module/class/callable floors and accepted baseline/changed-line gates."""
+    assert data['summary']['percent_statements_covered'] >= 90, filename
+    assert data['summary']['percent_branches_covered'] >= 75, filename
+    prior = baseline_coverage.get(filename)
+    if prior:
+        for key in ('percent_statements_covered', 'percent_branches_covered'):
+            assert data['summary'][key] >= prior['summary'][key], (filename, key)
+    # No current measured callable has an approved coverage-floor exemption.
+    for family in ('functions', 'classes'):
+        for name, unit in data.get(family, {}).items():
+            if unit['summary']['num_statements']:
+                assert unit['summary']['percent_statements_covered'] >= 90, (filename, name)
+            if prior:
+                for old in prior['units']:
+                    if old['kind'] == family and old['name'] == name:
+                        assert unit['summary']['percent_statements_covered'] >= old['summary']['percent_statements_covered'], (filename, name, 'baseline')
+    diff = subprocess.run(['git', 'diff', '--no-ext-diff', '--unified=0', manifest['accepted_baseline'], 'HEAD', '--', filename], capture_output=True, check=True).stdout.decode()
+    changed = set()
+    for line, count in re.findall(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@', diff, flags=re.M):
+        changed.update(range(int(line), int(line) + (int(count) if count else 1)))
+    assert not set(data['missing_lines']) & changed, (filename, 'changed lines lack coverage')
+
+
+binding()
+for path in code:
+    subprocess.run(['git', 'ls-files', '--error-unmatch', '--', path], capture_output=True, check=True)
+run(1, 'format', ['black', '--check', *code])
+run(2, 'lint', ['ruff', 'check', *code])
+run(3, 'types', ['pyright'])
+run(4, 'architecture', [scratch / 'issue-980-p4t9-final-architecture.py', manifest_path], module=False)
+# Each subset runs in a separate process; module order reverses its retained forward proof.
+for batch in ('registry', 'shared', 'core'):
+    test_modules = list(reversed(manifest['forward_test_module_order'][batch]))
+    coverage_raw = scratch / ('issue-980-p4t9-final-' + batch + '-coverage.raw.json')
+    extra = ['--cov-config=' + str(scratch / 'issue-980-p4t9-final-registry-coverage.ini')] if batch == 'registry' else []
+    receipt = run(5, 'tests-' + batch + '-reverse', ['pytest', '-v', '-o', 'addopts=', *test_modules,
+        *['--cov=' + name for name in manifest['coverage_targets'][batch]], *extra,
+        '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + coverage_raw.as_posix()])
+    nodes = re.findall(r'^(tests/.+?) PASSED(?:\s|$)', receipt['stdout'], flags=re.M)
+    assert len(nodes) == manifest['expected_test_counts'][batch] and len(set(nodes)) == len(nodes), (batch, len(nodes))
+    assert set(nodes) == set(manifest['prior_node_order'][batch]), (batch, 'changed case population')
+    all_nodes.extend(nodes)
+    coverage = json.loads(coverage_raw.read_bytes())
+    coverage['files'] = {portable(path).replace('\\', '/'): data for path, data in coverage['files'].items()}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    path = qa / ('p4t9-final-' + batch + '-coverage.' + stamp + '.json')
+    write(path, coverage)
+    assert set(coverage['files']) == set(manifest['production_paths'][batch]), (batch, list(coverage['files']))
+    for filename, data in coverage['files'].items():
+        coverage_gate(filename, data)
+    coverage_batches.append({'batch': batch, 'coverage_path': path.as_posix(), 'coverage_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+        'raw_coverage': {'path': 'SCRATCH/' + coverage_raw.name, 'sha256': hashlib.sha256(coverage_raw.read_bytes()).hexdigest()},
+        'test_module_order': test_modules, 'test_nodes': nodes})
+assert len(all_nodes) == len(set(all_nodes)) == 354
+contracts = run(6, 'contracts', ['pytest', '-v', '-o', 'addopts=', '--no-cov', *manifest['contract_selection']])
+contract_nodes = re.findall(r'^(tests/.+?) PASSED(?:\s|$)', contracts['stdout'], flags=re.M)
+assert len(contract_nodes) == len(set(contract_nodes)) == 177
+assert not set(contract_nodes) & set(all_nodes)
+finished = datetime.datetime.now(datetime.timezone.utc)
+stage_path = qa / ('p4t9-final-stages1-6.' + finished.strftime('%Y-%m-%dT%H-%M') + '.json')
+write(stage_path, {'task': 'P4-T9', 'candidate_manifest': manifest_path.as_posix(), 'candidate_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+    'started_at': start.isoformat(), 'finished_at': finished.isoformat(), 'receipts': receipts,
+    'binding_sha256': binding(), 'coverage_batches': coverage_batches, 'test_nodes': all_nodes,
+    'contract_nodes': contract_nodes, 'test_node_count': len(all_nodes), 'contract_node_count': len(contract_nodes),
+    'native_pending': True, 'scope_qualification': manifest['qualifications']})
+print(json.dumps({'stages1_6': stage_path.as_posix(), 'cases': len(all_nodes), 'contracts': len(contract_nodes), 'stage7': 'separate native readiness release required'}), flush=True)

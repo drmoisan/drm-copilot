@@ -293,7 +293,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Retain generic Ribbon XML/callback, interop/lifecycle/COM/API marker fixtures with secure XML and shared generic COM detector; verify disabled imports, explicit profile consent, and absence of product IDs/semantics.
   - Acceptance: Core package imports, templates, schemas, roles, and ordinary inventories contain no optional-domain behavior; the existing optional adapter works only when explicitly selected and permitted.
 
-- [ ] [P4-T9] Import local analyzer extension results as validated data.
+- [x] [P4-T9] Import local analyzer extension results as validated data.
   - Files and behavior: Create R/extension_results.py and PT/test_{extension_results,extension_inventory_merge}.py; expose the Analyzer protocol and fixed built-in registry from R/analyzer/__init__.py.
   - Tests and proof: Test manifest/schema/provenance/path validation, incomplete coverage diagnostics, collisions, declared adapter identity, deterministic merges, and rejection of executable/module/shell fields from profiles.
   - Acceptance: Consumers can contribute separately produced inventory results without modifying core code or causing configuration-driven code execution; imported findings cannot weaken accounting or confidence rules.

@@ -1,0 +1,19 @@
+{
+  "binding_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.json",
+      "sha256": "589385ab3ba82ac823e31694b600d8afb6b371624056b97155f93390f3799835",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.json",
+      "sha256": "b52817c0d8d448cfc2fda1e983903f43bd79915096e8728cf0dfe5b45d43c066",
+      "stage": 2
+    }
+  ]
+}

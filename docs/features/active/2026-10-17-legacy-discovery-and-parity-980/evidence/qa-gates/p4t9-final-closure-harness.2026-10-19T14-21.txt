@@ -1,0 +1,33 @@
+"""Freeze only this worker's final evidence paths after successful handoff."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+handoff_path = Path(sys.argv[1])
+handoff = json.loads(handoff_path.read_bytes())
+assert handoff['state'] == 'EXECUTOR_ACCEPTANCE_PENDING'
+assert handoff['test_cases']['total'] == 354 and handoff['test_cases']['native_assertions'] == 20
+copy = qa / ('p4t9-final-closure-harness.' + stamp + '.txt')
+assert not copy.exists()
+copy.write_bytes(Path(__file__).read_bytes())
+paths = sorted(path for path in qa.glob('p4t9-final-*') if path.is_file())
+files = []
+for path in paths:
+    raw = path.read_bytes()
+    assert b'\r' not in raw, path
+    assert raw.endswith(b'\n') and not raw.endswith(b'\n\n'), path
+    assert all(line.rstrip() == line for line in raw.splitlines()), path
+    files.append({'path': path.as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)})
+closure = qa / ('p4t9-final-stage-closure.' + stamp + '.json')
+assert not closure.exists()
+value = {'task': 'P4-T9', 'timestamp': stamp, 'handoff': {'path': handoff_path.as_posix(), 'sha256': hashlib.sha256(handoff_path.read_bytes()).hexdigest()},
+    'stage_paths': [item['path'] for item in files], 'files': files, 'count_without_self': len(files),
+    'include_closure_itself': closure.as_posix(), 'readable_preflight': {'carriage_returns': 0, 'trailing_whitespace_lines': 0, 'terminal_blank_lines': 0},
+    'scope': 'Only workspace_operations p4t9-final-* evidence, including initial failure, restart, native preparation, raw archive and handoff. Source repair and reviewer files have separate owner manifests.',
+    'source_test_mutations': False, 'tests_rerun': False, 'git_mutations': False}
+closure.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': closure.as_posix(), 'sha256': hashlib.sha256(closure.read_bytes()).hexdigest(), 'stage_count_including_closure': len(files) + 1}))

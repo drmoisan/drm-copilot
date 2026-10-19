@@ -81,10 +81,10 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 ### Analyzers
 - [x] A generic repository/project inventory analyzer exists.
 - [x] At least one meaningful C#/.NET analyzer exists.
-- [ ] Output is deterministic and machine-readable.
-- [ ] Findings include source references.
-- [ ] Facts are distinguished from inference.
-- [ ] Analyzer fixtures and tests exist.
+- [x] Output is deterministic and machine-readable.
+- [x] Findings include source references.
+- [x] Facts are distinguished from inference.
+- [x] Analyzer fixtures and tests exist.
 ### CLI, extension, and MCP
 - [ ] Python is the authoritative implementation layer.
 - [ ] CLI commands are documented and tested.

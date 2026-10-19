@@ -1,0 +1,60 @@
+{
+  "assertion_count": 20,
+  "assertions": [
+    "pre-output actual capture retains four original source/test/documentation inputs",
+    "configured manifest and result members receive actual loader categories",
+    "actual loading preserves original raw member and source hashes",
+    "actual local Git capture preserves every retained source identity and byte stream",
+    "extension input digest excludes transport outputs while complete capture changes",
+    "public fixed dispatch selects configured built-ins without importing optional code",
+    "inert validation binds exact manifest/member bytes and independent input digest",
+    "merge preserves every authoritative core row and diagnostic unchanged",
+    "merge preserves complete input accounting including documentation",
+    "external observations retain confidence and unresolved target without binding claims",
+    "adapter identity and version remain explicit alongside fixed built-ins",
+    "ledger proposals remain uninspected and unassigned",
+    "identical retained capture produces deterministic inventory and ledger bytes",
+    "wrong result member hash is rejected from retained raw data",
+    "wrong manifest self-digest is rejected",
+    "core component identity collisions fail before merged output is returned",
+    "executable manifest fields are rejected without importing or executing their value",
+    "documentation remains accounted but cannot become an extension source claim",
+    "all read-only captures and validations preserve source/artifact/Git bytes and state",
+    "no optional implementation was imported by generic extension validation"
+  ],
+  "command": ".venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-native-ready.py",
+  "earlier_unexecuted_native": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-harness.2026-10-19T14-04.txt",
+    "sha256": "0f5557b3f01376fe04a79a8e8921b575fe33caed1e43b5e4b4f590a7033e8007"
+  },
+  "execution_contract": "Run native-gate only after released final stages 1-6 passed against the same repaired candidate. Native stage requires explicit coordinator release.",
+  "exit_code": 0,
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-harness.2026-10-19T14-09.txt",
+      "scratch_name": "issue-980-p4t9-final-native.py",
+      "sha256": "f2391ab860a36af6cffb296002dabcc552ef47e7ae2603b1cab2efe402b83761"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-gate-harness.2026-10-19T14-09.txt",
+      "scratch_name": "issue-980-p4t9-final-native-gate.py",
+      "sha256": "c3e0da1f779be85a4902f710f7cc8df346291c24842c2a08e3e8bb0566c9d0bd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-ready-harness.2026-10-19T14-09.txt",
+      "scratch_name": "issue-980-p4t9-final-native-ready.py",
+      "sha256": "c5f26c7a592cbb3f877e04899d1a43e91721534cb3b0ee3ab3752ba13facf1e5"
+    }
+  ],
+  "preconditions": [
+    "Synthetic committed four-file source/test/docs fixture outside the repository",
+    "Configured profile keeps the same selection and manifest path before and after output setup",
+    "Actual capture_workspace/load_snapshot and bounded LocalGitReader/pin_inventory_sources",
+    "Original source and complete fixture/Git bytes hashed at the read-only boundary"
+  ],
+  "preparation_delta": "Corrected only failure rendering to the accepted Finding.artifact_path field; no native execution occurred.",
+  "qualification": "No publication planner/writer, optional import, plugin execution, installed-host or non-Windows claim. Negative variants change immutable retained bytes only.",
+  "status": "PREPARED_NOT_EXECUTED",
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T14-09"
+}
