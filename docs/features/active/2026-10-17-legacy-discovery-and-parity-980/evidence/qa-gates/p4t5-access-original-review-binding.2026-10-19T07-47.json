@@ -1,0 +1,45 @@
+{
+  "original_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json",
+  "original_manifest_sha256": "e5a06ce35585e0549cd182c355decbbd451a7c23ed7f9f4cd8ce5ec4596a5dfd",
+  "original_probe_harness": "evidence/qa-gates/p4t5-executor-candidate-probe-harness.2026-10-19T07-34.txt",
+  "original_probe_results": "evidence/qa-gates/p4t5-executor-candidate-probes.2026-10-19T07-34.json",
+  "recorded_at": "2026-10-19T07:47:58.740264+00:00",
+  "review": "evidence/qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json",
+  "review_sha256": "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726",
+  "source_copies": [
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/api_access.py.txt",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011"
+    },
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/api_syntax.py.txt",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8"
+    },
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/filesystem_access.py.txt",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5"
+    },
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/registry_access.py.txt",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c"
+    },
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/test_filesystem_access.py.txt",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7"
+    },
+    {
+      "original_copy": "SCRATCH/access-reviewed-original/test_registry_access.py.txt",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+    }
+  ],
+  "source_mutations": 0,
+  "state": "ORIGINAL_REVIEWED_BYTES_PRESERVED_BEFORE_AUTHORIZED_R1_R2_REPAIR",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-47"
+}

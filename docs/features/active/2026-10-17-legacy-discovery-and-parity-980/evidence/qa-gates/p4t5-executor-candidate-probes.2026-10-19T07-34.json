@@ -1,0 +1,285 @@
+{
+  "case_count": 11,
+  "cases": [
+    {
+      "actual_count": 1,
+      "case": "com-attribute-positive",
+      "expectation_met": true,
+      "expected_count": 1,
+      "input": "[ComImport] interface C {}",
+      "input_sha256": "6e57b0c02f07987383abbc99ec616dccdfec5721318c6287eb759be9db28d5a4",
+      "observed": [
+        {
+          "detection_kind": "com_attribute",
+          "extra": [
+            [
+              "offset",
+              1
+            ],
+            [
+              "end_offset",
+              10
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "ComImport",
+          "symbol_kind": "attribute"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "com-call-positive",
+      "expectation_met": true,
+      "expected_count": 1,
+      "input": "Marshal.IsComObject(value);",
+      "input_sha256": "f3ba17236560a3fdc113d3e557ae7a5bb997c0e0c1b30ec4e6d3909c249e3aea",
+      "observed": [
+        {
+          "detection_kind": "marshal_call",
+          "extra": [
+            [
+              "offset",
+              0
+            ],
+            [
+              "end_offset",
+              19
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "Marshal.IsComObject",
+          "symbol_kind": "call"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "collection-argument",
+      "expectation_met": false,
+      "expected_count": 0,
+      "input": "class C { void M() { int ComImport = 1; Take([ComImport]); } void Take(int[] values) {} }",
+      "input_sha256": "0558606b1e03653c0fe41afddb67c3696a0522dd929856e99e7b26e1c3d8968b",
+      "observed": [
+        {
+          "detection_kind": "com_attribute",
+          "extra": [
+            [
+              "offset",
+              46
+            ],
+            [
+              "end_offset",
+              55
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "ComImport",
+          "symbol_kind": "attribute"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "second-collection-argument",
+      "expectation_met": false,
+      "expected_count": 0,
+      "input": "class C { void M() { int ComVisible = 1; Take(0, [ComVisible]); } void Take(int n, int[] values) {} }",
+      "input_sha256": "1f748166e471ce8ec1bece3cffdd9b311f1dadfee948a5a3291846e3e854985f",
+      "observed": [
+        {
+          "detection_kind": "com_attribute",
+          "extra": [
+            [
+              "offset",
+              50
+            ],
+            [
+              "end_offset",
+              60
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "ComVisible",
+          "symbol_kind": "attribute"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "explicit-com-member-declaration",
+      "expectation_met": false,
+      "expected_count": 0,
+      "input": "interface Marshal { bool IsComObject(object x); } class C : Marshal { bool Marshal.IsComObject(object x) { return false; } }",
+      "input_sha256": "653cbd5f8aa4fc8ecfdc051dc8779ef48bf48b8a4f7bda4f4cb89750ced368d8",
+      "observed": [
+        {
+          "detection_kind": "marshal_call",
+          "extra": [
+            [
+              "offset",
+              75
+            ],
+            [
+              "end_offset",
+              94
+            ],
+            [
+              "end_line",
+              1
+            ],
+            [
+              "binding",
+              "unresolved"
+            ]
+          ],
+          "line": 1,
+          "path": "src/probe.cs",
+          "symbol": "Marshal.IsComObject",
+          "symbol_kind": "call"
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "explicit-file-member-declaration",
+      "expectation_met": false,
+      "expected_count": 0,
+      "input": "interface File { void Open(); } class C : File { void File.Open() {} }",
+      "input_sha256": "5fa08adc26689c2516c14c93558f81c2b71d6641b78b91b78d79e62fffc3e42f",
+      "observed": [
+        {
+          "api": "System.IO.File.Open",
+          "end": 63,
+          "end_line": 1,
+          "line": 1,
+          "operation": "invocation",
+          "start": 54
+        }
+      ]
+    },
+    {
+      "actual_count": 1,
+      "case": "explicit-registry-member-declaration",
+      "expectation_met": false,
+      "expected_count": 0,
+      "input": "interface Registry { object GetValue(); } class C : Registry { object Registry.GetValue() { return null; } }",
+      "input_sha256": "ffd3461db65b56376fb0791c5b6d166d4cece637e3cfedf75b5fc73ef6024592",
+      "observed": [
+        {
+          "api": "Microsoft.Win32.Registry.GetValue",
+          "end": 87,
+          "end_line": 1,
+          "line": 1,
+          "operation": "invocation",
+          "start": 70
+        }
+      ]
+    },
+    {
+      "case": "capacity-type-bool-True",
+      "expectation_met": false,
+      "max_sites": true,
+      "rejected": false,
+      "result_count": 0
+    },
+    {
+      "case": "capacity-type-bool-False",
+      "expectation_met": false,
+      "max_sites": false,
+      "rejected": false,
+      "result_count": 0
+    },
+    {
+      "case": "capacity-type-float-0.5",
+      "expectation_met": false,
+      "max_sites": 0.5,
+      "rejected": false,
+      "result_count": 0
+    },
+    {
+      "allocation_scope": "One 64 MiB-plus-one input string; real masking was replaced by an immediate sentinel, with no timing assertion.",
+      "case": "public-source-limit-precedes-masking",
+      "code": null,
+      "error_type": "MaskReached",
+      "expectation_met": false,
+      "input_characters": 67108865,
+      "mask_calls": [
+        67108865
+      ]
+    }
+  ],
+  "command": "poetry run python SCRATCH/issue-980-p4t5-candidate-probes.py",
+  "exit_code": 0,
+  "failed_expectations": 9,
+  "finished_at": "2026-10-19T07:34:01.120078+00:00",
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-probe-harness.2026-10-19T07-34.txt",
+    "sha256": "99d10fa29a632e2fe2cd4233fc926b1cce800d4b4a8f261b9ea0df7c3cf6f38d"
+  },
+  "manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json",
+      "sha256": "7cb5dc86803a76495cec0e9501a9b5553e992c99a1bf71bbb1ce9422c805d2b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json",
+      "sha256": "e5a06ce35585e0549cd182c355decbbd451a7c23ed7f9f4cd8ce5ec4596a5dfd"
+    }
+  ],
+  "primary_syntax_references": [
+    "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/collection-expressions",
+    "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces"
+  ],
+  "scope": "Independent bounded memory-only probes; failed expectations are review findings, not a clean test-gate claim.",
+  "source_before_and_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": "4ddaeea981fd1442761276eb5a97fe1e0445dc7b3381fe7e83e1db9cc003977e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": "92b74102568f7aca3ef2f2d0d46531bffa0ca03f28d155045ffb8be7b3cfb20c",
+    "tests/discovery_runtime/analyzer/test_com_interop.py": "9ee41392d4b043e3e35f392387f87ee87a0f8b48067fc0b9e9fac0a4f1186e70",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "started_at": "2026-10-19T07:34:01.105096+00:00",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-34"
+}

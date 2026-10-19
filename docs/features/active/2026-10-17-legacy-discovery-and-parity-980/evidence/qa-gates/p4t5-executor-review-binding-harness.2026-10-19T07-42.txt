@@ -1,0 +1,150 @@
+"""Bind the already reviewed P4-T5 candidate without executing application code."""
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+ROOT = Path.cwd()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+EVIDENCE = FEATURE / "evidence"
+OUT = EVIDENCE / "qa-gates"
+ACCESS_SCRATCH = Path.home() / "AppData/Local/Temp/issue-980-p4t5"
+START = datetime.now(timezone.utc)
+STAMP = START.strftime("%Y-%m-%dT%H-%M")
+
+
+def digest(data):
+    return sha256(data).hexdigest()
+
+
+def load(path):
+    return json.loads((ROOT / path).read_bytes())
+
+
+def ref(path):
+    return {"path": str(path).replace("\\", "/"), "sha256": digest((ROOT / path).read_bytes())}
+
+
+def check_ref(value):
+    assert digest((ROOT / value["path"]).read_bytes()) == value["sha256"], value["path"]
+
+
+def source_map(value):
+    return {path: item["sha256"] if isinstance(item, dict) else item for path, item in value.items()}
+
+
+def all_refs(value):
+    if isinstance(value, dict):
+        if "path" in value and "sha256" in value and value["path"].startswith("docs/"):
+            check_ref(value)
+        for item in value.values():
+            all_refs(item)
+    elif isinstance(value, list):
+        for item in value:
+            all_refs(item)
+
+
+access_path = OUT / "p4t5-access-candidate-freeze.2026-10-19T07-30.json"
+com_path = EVIDENCE / "regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json"
+supplement_path = EVIDENCE / "regression-testing/p4t5-com-harness-supplement.2026-10-19T07-30.json"
+probe_path = OUT / "p4t5-executor-candidate-probes.2026-10-19T07-34.json"
+expected_manifests = {
+    str(access_path): "e5a06ce35585e0549cd182c355decbbd451a7c23ed7f9f4cd8ce5ec4596a5dfd",
+    str(com_path): "7cb5dc86803a76495cec0e9501a9b5553e992c99a1bf71bbb1ce9422c805d2b7",
+    str(supplement_path): "d49c64dc3ad17d745bb1a5856812676f78b23bbd71db183972c3a4c4a059ba63",
+    str(probe_path): "6504b78d3b627259799ccefbbbcd798a8f8eae8ce41c1be7ced36289f2a7cb71",
+}
+for path, expected in expected_manifests.items():
+    assert digest((ROOT / path).read_bytes()) == expected, path
+access, com, supplement, probes = [load(p) for p in expected_manifests]
+for document in (access, com, supplement, probes):
+    all_refs(document)
+for item in supplement["harnesses"]:
+    assert digest((ROOT / item["path"]).read_bytes()) == item["snapshot_sha256"] == item["raw_sha256"]
+
+files = access["files"] + com["source_files"]
+assert len(files) == 9
+source_rows = []
+for item in files:
+    path = item["path"]
+    data = (ROOT / path).read_bytes()
+    assert digest(data) == item["sha256"], path
+    assert b"\r" not in data and len(data.splitlines()) <= 500, path
+    index = subprocess.check_output(["git", "show", ":" + path])
+    head = subprocess.check_output(["git", "show", "HEAD:" + path])
+    assert data == index == head, path
+    attrs = subprocess.check_output(["git", "check-attr", "text", "eol", "--", path], text=True).strip()
+    assert "text: auto" in attrs and "eol: lf" in attrs
+    source_rows.append({"path": path, "sha256": digest(data), "index_sha256": digest(index),
+                        "head_sha256": digest(head), "lines": len(data.splitlines()), "attributes": attrs})
+
+stage_results = []
+for label, entries, rows in (("access", access["ordered_receipts"], access["files"]),
+                             ("COM", com["ordered_focused_gates"], com["source_files"])):
+    expected_sources = {row["path"]: row["sha256"] for row in rows}
+    prior_end = None
+    for entry in entries:
+        check_ref(entry)
+        receipt = load(entry["path"])
+        assert receipt["exit_code"] == 0
+        assert source_map(receipt["source_before"]) == expected_sources == source_map(receipt["source_after"])
+        start = datetime.fromisoformat(receipt.get("started_at", receipt.get("started")))
+        end = datetime.fromisoformat(receipt.get("finished_at", receipt.get("finished")))
+        assert start <= end and (prior_end is None or prior_end <= start)
+        prior_end = end
+        for stream in receipt.get("raw", {}).values():
+            raw_path = ACCESS_SCRATCH / stream["path"].replace("SCRATCH/", "", 1)
+            assert digest(raw_path.read_bytes()) == stream["sha256"], stream["path"]
+        output = receipt.get("stdout", receipt.get("output", ""))
+        if entry["stage"] in {"tests", "unit"}:
+            assert ("156 passed" if label == "access" else "111 passed") in output
+        stage_results.append({"subset": label, "stage": entry["stage"], "receipt": ref(entry["path"]),
+                              "exit_code": 0, "source_bindings": len(expected_sources),
+                              "started": start.isoformat(), "finished": end.isoformat()})
+
+ranges = load(access["coverage_ranges"]["path"])
+check_ref(ranges["coverage"])
+access_raw = ACCESS_SCRATCH / ranges["coverage"]["raw_path"].replace("SCRATCH/", "", 1)
+assert digest(access_raw.read_bytes()) == ranges["coverage"]["raw_sha256"]
+access_coverage = load(ranges["coverage"]["path"])
+com_coverage = load(com["coverage"]["path"])
+structure = load(com["coverage_structure"]["path"])
+assert access_coverage["totals"] == ranges["totals"]
+assert access_coverage["totals"]["num_statements"] == 212 == access_coverage["totals"]["covered_lines"]
+assert access_coverage["totals"]["num_branches"] == 82 == access_coverage["totals"]["covered_branches"]
+assert com_coverage["totals"]["num_statements"] == 170 == com_coverage["totals"]["covered_lines"]
+assert com_coverage["totals"]["num_branches"] == 74 == com_coverage["totals"]["covered_branches"]
+for unit in ranges["units"]:
+    assert unit["covered_statements"] == unit["statements"] and unit["covered_branches"] == unit["branches"]
+for group in (structure["callable_summaries"], structure["class_summaries"]):
+    for summary in group.values():
+        assert summary["covered_lines"] == summary["num_statements"]
+        assert summary["covered_branches"] == summary["num_branches"]
+assert len(ranges["units"]) == 15
+assert len(structure["callable_summaries"]) == 8 and len(structure["class_summaries"]) == 1
+assert probes["case_count"] == 11 and probes["failed_expectations"] == 9
+assert all((ROOT / item["path"]).read_bytes() == subprocess.check_output(["git", "show", ":" + item["path"]]) for item in files)
+
+harness_path = OUT / ("p4t5-executor-review-binding-harness." + STAMP + ".txt")
+assert not harness_path.exists()
+harness_path.write_bytes(Path(__file__).read_bytes())
+result = {
+    "task": "P4-T5", "timestamp": STAMP, "started_at": START.isoformat(),
+    "finished_at": datetime.now(timezone.utc).isoformat(),
+    "command": "poetry run python SCRATCH/issue-980-p4t5-review-binding.py", "exit_code": 0,
+    "status": "BINDINGS_PASS_CANDIDATE_HAS_FINDINGS", "head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+    "harness": ref(harness_path), "manifests": [ref(path) for path in expected_manifests],
+    "sources": source_rows, "focused_stages": stage_results,
+    "coverage": {"access": {"lines": [212, 212], "branches": [82, 82], "ranges": 15},
+                 "com": {"lines": [170, 170], "branches": [74, 74], "ranges": 9}},
+    "reuse": "267 existing focused cases reused; no tests rerun. The shared baseline and 45 predecessor bindings remain referenced, without another predecessor implementation review.",
+    "output_qualification": "Access raw stdout/stderr and coverage digests verified. COM focused receipts contain the harness's path-sanitized combined command output; they are not claimed as separate unsanitized raw streams.",
+    "diagnostics": "Original baseline, ordering-assertion, COM failure-path and harness-detector diagnostics remain in the immutable supplied evidence; no history rewritten.",
+    "probe_counts": {"positive_controls": 2, "reproduced_failed_expectations": 9, "open_behavioral_probes": 0},
+    "mutations": "Only this verification result and its inert harness snapshot; no source, tests, plan, AC, checkpoint or Git writes.",
+}
+output_path = OUT / ("p4t5-executor-review-binding." + STAMP + ".json")
+assert not output_path.exists()
+output_path.write_bytes((json.dumps(result, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+print(json.dumps({"result": ref(output_path), "harness": ref(harness_path), "sources": 9, "stages": 8, "status": result["status"]}))

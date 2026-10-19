@@ -1,0 +1,56 @@
+"""Preserve the reviewed COM candidate before its approved cohesive module split."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+source = repo / "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py"
+destination = source.with_name("com_syntax.py")
+assert not destination.exists()
+freeze_path = feature / "evidence/regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json"
+freeze = json.loads(freeze_path.read_bytes())
+preserved = scratch / ("issue-980-p4t5-com-reviewed-" + stamp)
+preserved.mkdir(exist_ok=False)
+for item in freeze["source_files"]:
+    content = (repo / item["path"]).read_bytes()
+    assert hashlib.sha256(content).hexdigest() == item["sha256"]
+    (preserved / Path(item["path"]).name).write_bytes(content)
+record = {"timestamp": stamp, "absent_path": destination.relative_to(repo).as_posix(),
+          "routing_receipt": "workspace_operations_p4t5_com_syntax_split", "scope": "Pure C# COM candidates; explicit re-export preserves the existing public API.",
+          "baseline": "evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+          "baseline_sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7",
+          "frozen_pre_repair_manifest": freeze_path.relative_to(repo).as_posix(),
+          "frozen_pre_repair_sha256": hashlib.sha256(freeze_path.read_bytes()).hexdigest(),
+          "original_streams": freeze["source_files"], "preserved_directory": "SCRATCH/" + preserved.name,
+          "source_changes_before_absence_check": False, "plan_ac_checkpoint_git_mutations": False}
+prefix = feature / ("evidence/baseline/p4t5-com-syntax-split-absence." + stamp)
+Path(str(prefix) + ".json").write_bytes((json.dumps(record, indent=2) + "\n").encode())
+Path(str(prefix) + ".md").write_bytes(("# P4-T5 COM syntax split absence\n\nTimestamp: " + stamp +
+    "\nCommand: python SCRATCH/issue-980-p4t5-com-syntax-split.py\nEXIT_CODE: 0\nOutput Summary: Approved new pure syntax module was absent before creation; three reviewed streams were preserved exactly.\n\n"
+    "Only `packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py` is added to the existing ownership. "
+    "The fixed C# allowlists and candidate scanner move together; `com_interop.com_source_candidates` remains an explicit re-export. "
+    "XML, retained-input provenance and inventory projection remain in `com_interop.py`. This provides space for bounded R1 context discrimination without compressing the existing 496-line module. "
+    "R3 adds intent comments without changing assertions. The paired JSON binds the immutable shared baseline and reviewed source streams.\n").encode())
+text = source.read_text("utf-8")
+constants_start = text.index("_ATTRIBUTES =")
+constants_end = text.index("_PROJECT_SUFFIXES =")
+functions_start = text.index("def _qualified(")
+functions_end = text.index("def _local(")
+header = ('"""Recognize bounded generic COM syntax without compiler binding or I/O."""\n\n'
+          'from __future__ import annotations\n\n'
+          'from drm_copilot_discovery.analyzer.csharp_tokens import (\n'
+          '    SourceScanError, Token, tokenize_csharp,\n)\n'
+          'from drm_copilot_discovery.analyzer.source_text import (\n'
+          '    Detection, strip_comments_and_strings,\n)\n\n')
+destination.write_bytes((header + text[constants_start:constants_end] + "\n\n" + text[functions_start:functions_end]).encode())
+remainder = text[:constants_start] + text[constants_end:functions_start] + text[functions_end:]
+remainder = remainder.replace("    Token,\n", "").replace("    tokenize_csharp,\n", "").replace("    strip_comments_and_strings,\n", "")
+needle = "from drm_copilot_discovery.analyzer.csharp_tokens import ("
+remainder = remainder.replace(needle, "from drm_copilot_discovery.analyzer.com_syntax import (\n    com_source_candidates as com_source_candidates,\n)\n" + needle)
+source.write_bytes(remainder.encode())
+print(prefix.relative_to(repo).as_posix())
+print("Created cohesive pure syntax module; no tests executed or predecessor paths changed.")

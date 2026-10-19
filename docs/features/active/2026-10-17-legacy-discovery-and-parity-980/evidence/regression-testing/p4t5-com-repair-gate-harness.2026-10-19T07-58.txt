@@ -1,0 +1,60 @@
+"""Record an isolated COM-subset command without modifying another owner's scope."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+sys.stdout.reconfigure(encoding="utf-8")
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+stage, label, *command = sys.argv[1:]
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py",
+]
+
+def bindings():
+    return {path: ({"sha256": hashlib.sha256((repo / path).read_bytes()).hexdigest(),
+                   "physical_lines": len((repo / path).read_text("utf-8").splitlines())}
+                  if (repo / path).exists() else {"exists": False}) for path in paths}
+
+def sanitize(value):
+    for path, replacement in [(scratch, "SCRATCH"), (repo, ".")]:
+        for spelling in {str(path), path.as_posix(), str(path.resolve()), path.resolve().as_posix()}:
+            value = re.sub(re.escape(spelling), lambda match: replacement, value, flags=re.I)
+    return value
+
+before = bindings()
+started = datetime.datetime.now(datetime.timezone.utc)
+timer = time.monotonic()
+environment = dict(os.environ, PYTHONIOENCODING="utf-8", COVERAGE_FILE=str(scratch / "issue-980-p4t5-com-repair-coverage.sqlite"))
+result = subprocess.run(command, cwd=repo, env=environment, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+duration = round(time.monotonic() - timer, 3)
+finished = datetime.datetime.now(datetime.timezone.utc)
+stamp = finished.strftime("%Y-%m-%dT%H-%M")
+output = sanitize(result.stdout)
+record = {"stage": stage, "label": label, "started": started.isoformat(), "finished": finished.isoformat(),
+          "command": sanitize(subprocess.list2cmdline(command)), "exit_code": result.returncode,
+          "duration_seconds": duration, "source_before": before, "source_after": bindings(), "output": output,
+          "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2", "scope": "P4-T5 COM subset only"}
+prefix = feature / "evidence/regression-testing" / (label + "." + stamp)
+json_path, md_path = Path(str(prefix) + ".json"), Path(str(prefix) + ".md")
+if json_path.exists() or md_path.exists():
+    raise ValueError("A gate receipt must not replace an earlier attempt")
+json_path.write_bytes((json.dumps(record, indent=2) + "\n").encode("utf-8"))
+rendered = "\n".join(line.rstrip() for line in output.splitlines()).rstrip()
+md_path.write_bytes(("# " + label + "\n\nTimestamp: " + stamp + "\nCommand: " + record["command"] +
+                    "\nEXIT_CODE: " + str(result.returncode) + "\nOutput Summary: " +
+                    ("PASS" if result.returncode == 0 else "FAIL") + " scoped COM stage " + stage +
+                    "; duration " + str(duration) + " seconds. Exact bytes and original command output are in the paired JSON.\n\n```text\n" + rendered + "\n```\n").encode("utf-8"))
+print(output, end="")
+print("Receipt: " + json_path.relative_to(repo).as_posix())
+sys.exit(result.returncode)

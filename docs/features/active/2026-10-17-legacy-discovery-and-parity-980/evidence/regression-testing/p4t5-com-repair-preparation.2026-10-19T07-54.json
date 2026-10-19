@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-10-19T07-54",
+  "command": "poetry run python SCRATCH/issue-980-p4t5-com-repair-prepare.py",
+  "exit_code": 0,
+  "scope_absence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-com-syntax-split-absence.2026-10-19T07-50.json",
+  "source_and_structure": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356,
+      "definitions_with_docstrings": 6,
+      "loops_with_intent_comments": 5,
+      "retained_test_definitions": []
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "sha256": "090ab06c27dd4cf28dd5cc5acda1cbc30a750d45a018a723e0959c4aeb4aecef",
+      "physical_lines": 228,
+      "definitions_with_docstrings": 6,
+      "loops_with_intent_comments": 5,
+      "retained_test_definitions": []
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "15187a37e17ac9ef617cb9b650881dce416cd3d9516478d547779b9d264b104f",
+      "physical_lines": 364,
+      "definitions_with_docstrings": 13,
+      "loops_with_intent_comments": 0,
+      "retained_test_definitions": [
+        "serialized",
+        "test_direct_com_selection_is_schema_valid_and_never_claims_execution",
+        "test_original_encoding_and_physical_anchor_are_preserved",
+        "test_missing_pin_read_failures_exclusions_and_unrelated_inputs_are_honest",
+        "test_adapter_sanitizes_encoding_size_and_parser_failures",
+        "test_aggregate_budgets_discard_partial_output",
+        "test_failed_reads_still_consume_the_aggregate_record_budget",
+        "test_retained_pin_budgets_fail_before_projection",
+        "test_indexed_pin_candidates_preserve_exact_identity_and_duplicate_semantics",
+        "test_projection_determinism_redaction_and_no_file_io"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "b470e2528f8f0ba0a59112e208de4f33ce919f3fd8142be3188999b4697d4d4a",
+      "physical_lines": 428,
+      "definitions_with_docstrings": 18,
+      "loops_with_intent_comments": 1,
+      "retained_test_definitions": [
+        "test_known_attribute_candidates_keep_exact_span_without_values",
+        "test_call_families_distinguish_lookup_activation_and_lifetime",
+        "test_non_com_or_masked_lookalikes_do_not_become_candidates",
+        "test_masked_earlier_guid_cannot_replace_the_actual_candidate_anchor",
+        "test_invalid_source_fails_without_partial_candidates",
+        "test_invalid_candidate_capacity_rejected_at_each_public_seam",
+        "test_token_and_candidate_limits_reject_before_partial_output",
+        "test_source_text_limit_rejects_before_masking_allocation",
+        "test_repeated_multiline_calls_keep_independent_exact_spans",
+        "test_project_structural_limits_reject_before_candidate_publication",
+        "test_project_items_keep_declared_boolean_and_condition_presence",
+        "test_project_duplicates_and_unresolved_metadata_remain_separate",
+        "test_comments_assembly_references_and_properties_are_not_com_items",
+        "test_unsafe_or_malformed_project_fails_without_partial_declarations",
+        "test_generated_layouts_preserve_fixed_candidates_without_values"
+      ]
+    }
+  ],
+  "retained_original_cases": 111,
+  "new_regression_and_control_cases": 26,
+  "test_assertion_removals": 0,
+  "new_gate": {
+    "path": "SCRATCH/issue-980-p4t5-com-repair-gate.py",
+    "sha256": "220edb6547ccf1139e4b0b6c6400397302094000167265350f0aebaae54546f7"
+  },
+  "baseline_replayed": false,
+  "no_other_implementation_paths_changed": true
+}

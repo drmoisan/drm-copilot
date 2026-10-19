@@ -1,0 +1,184 @@
+{
+  "case_counts": {
+    "added": 24,
+    "passed": 180,
+    "retained": 156
+  },
+  "changed_scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+    "tests/discovery_runtime/analyzer/test_registry_access.py"
+  ],
+  "complete_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json",
+    "sha256": "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726"
+  },
+  "coverage_delta": {
+    "branches_after": 94,
+    "branches_before": 82,
+    "statements_after": 226,
+    "statements_before": 212,
+    "uncovered_after": 0,
+    "uncovered_before": 0
+  },
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-repair-coverage-ranges.2026-10-19T07-56.json",
+    "sha256": "018b54e35230d6beb2237cb188ff7d9476b52b1bac30698c7ee8349d54d98b99"
+  },
+  "delta": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-repair-delta.2026-10-19T07-56.txt",
+    "sha256": "aaa7e0b25921b6583df5fb87b764b7baa1a040883a0a85e5e85d230ea482e8b9"
+  },
+  "files": [
+    {
+      "filtered_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 284,
+      "original_sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "working_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc"
+    },
+    {
+      "filtered_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 267,
+      "original_sha256": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+      "working_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02"
+    },
+    {
+      "filtered_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 134,
+      "original_sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "working_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7"
+    },
+    {
+      "filtered_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 56,
+      "original_sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "working_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff"
+    },
+    {
+      "filtered_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_filesystem_access.py: text: auto\ntests/discovery_runtime/analyzer/test_filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 471,
+      "original_sha256": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+      "working_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3"
+    },
+    {
+      "filtered_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry_access.py: text: auto\ntests/discovery_runtime/analyzer/test_registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 470,
+      "original_sha256": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35",
+      "working_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b"
+    }
+  ],
+  "focused_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-binding.2026-10-19T07-53.json",
+    "sha256": "79a001acae8561bb8332a98a876a7dca61ec969e3d7fba113180504be7d1dc24"
+  },
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-focused-harness.2026-10-19T07-56.txt",
+      "sha256": "084e7b28649c0a62530f9ab893613febf3c94ef4c790f8c3128cbbb3ed1f0b3c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-repair-freeze-harness.2026-10-19T07-56.txt",
+      "sha256": "0ac589b3583f14d16e4d6ebc96b0b95757752f8c3b1255af43c375370785ad01"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-preserve-review-harness.2026-10-19T07-56.txt",
+      "sha256": "079bac7dd616af695a69a6679488eba4ed8f0c7ba1039d97eac3ef29da8458fa"
+    }
+  ],
+  "limitations": [
+    "Bounded lexical candidate recognition does not resolve compiler bindings or runtime behavior.",
+    "No COM files, accepted predecessor modules, public registry, plan, AC, checkpoint or Git state were changed.",
+    "The combined final seven-stage sequence remains withheld pending confirmation and parent release."
+  ],
+  "ordered_receipts": [
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-format-075202.2026-10-19T07-52.md",
+        "sha256": "cd142e663f8f7bbe42412eaa450fd18bc0a2dce12e541697f0e3abb38793921b"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-format-075202.2026-10-19T07-52.json",
+      "seconds": 0.335675,
+      "sha256": "47703350d304bcd626765b7d3c3695736aa7ce2abc8ba9fa33cc66b0b7e81fea",
+      "stage": "format"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-lint-075202.2026-10-19T07-52.md",
+        "sha256": "2640f92cd02d66d4f342d78c018a16d7c37e8f1b57a822594ce2d86636f3905a"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-lint-075202.2026-10-19T07-52.json",
+      "seconds": 0.109611,
+      "sha256": "ffe31a9e1361de296255e5da43dc0dc1bc96c18b24ed5a0874f9820918837df2",
+      "stage": "lint"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-types-075203.2026-10-19T07-52.md",
+        "sha256": "929156249dcf8de5e69f2f9143734687fe035aa2274f726a5178f4808a09d39a"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-types-075203.2026-10-19T07-52.json",
+      "seconds": 1.020105,
+      "sha256": "cafd4625502021070a384eb85fda51638f17461cbb44763ad84e2849934f2098",
+      "stage": "types"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-tests-075350.2026-10-19T07-53.md",
+        "sha256": "1f951658271d44e59f878c5ed4968bc686559a3300946e98ee3ddd8e66017985"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-tests-075350.2026-10-19T07-53.json",
+      "seconds": 107.170477,
+      "sha256": "be9345bd75c56295839de7090498d10b2c049fd1dca6e4abb8884e0913b32608",
+      "stage": "tests"
+    }
+  ],
+  "original_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json",
+    "sha256": "e5a06ce35585e0549cd182c355decbbd451a7c23ed7f9f4cd8ce5ec4596a5dfd"
+  },
+  "original_preservation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-original-review-binding.2026-10-19T07-47.json",
+    "sha256": "8f391c14edf91f0ce040fc262c928576c28a0a30b274f5f9f03aa0178c556419"
+  },
+  "preserved_predecessor_count": 45,
+  "regressions": {
+    "counted_work_cases": 3,
+    "declaration_and_projection_cases": 8,
+    "intercepted_preallocation_cases": 13
+  },
+  "repairs": {
+    "R1": "The existing single delimiter pass stores parenthesis pairs; a constant-time body/arrow check excludes explicit member declarations while retaining nested calls and exact inferred source anchors.",
+    "R2": "Exact int/range guards for both public capacities and the 67108864 decoded-character limit precede masking/tokenization; failures expose fixed SourceScanError codes."
+  },
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+    "sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+  },
+  "state": "ACCESS_REPAIR_FROZEN_CONFIRMATION_PENDING",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-56"
+}

@@ -1,0 +1,215 @@
+--- reviewed/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py
++++ repaired/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py
+@@ -80,24 +80,30 @@
+     end_line: int
+ 
+ 
+-def _balanced(tokens: tuple[Token, ...]) -> None:
+-    """Check bounded token delimiters in one pass; return None or SourceScanError.
++def _balanced(tokens: tuple[Token, ...]) -> dict[int, int]:
++    """Check delimiters once and return opening-to-closing parenthesis positions.
+ 
+     tokens is the already bounded immutable lexical stream. No source text is
+     retained or evaluated; incomplete syntax fails before any candidate is built.
+-    """
+-    stack: list[str] = []
++    SourceScanError rejects mismatches; returned int indexes avoid suffix rescans.
++    """
++    stack: list[tuple[str, int]] = []
++    parentheses: dict[int, int] = {}
+     closing = {")": "(", "]": "[", "}": "{"}
+     # Each delimiter is pushed/popped at most once, with no suffix rescans.
+-    for token in tokens:
++    for index, token in enumerate(tokens):
++        # Validate nesting before retaining a pair for declaration discrimination.
+         if token.value in {"(", "[", "{"}:
+-            stack.append(token.value)
+-        elif token.value in closing and (
+-            not stack or stack.pop() != closing[token.value]
+-        ):
+-            raise SourceScanError("source-delimiter", "Source delimiters mismatch")
++            stack.append((token.value, index))
++        elif token.value in closing:
++            if not stack or stack[-1][0] != closing[token.value]:
++                raise SourceScanError("source-delimiter", "Source delimiters mismatch")
++            opening, start = stack.pop()
++            if opening == "(":
++                parentheses[start] = index
+     if stack:
+         raise SourceScanError("source-delimiter", "Source delimiters are incomplete")
++    return parentheses
+ 
+ 
+ def _recognize(
+@@ -162,15 +168,22 @@
+     """Return bounded fixed-name candidates from C# text and immutable surface.
+ 
+     max_tokens (int, 1..100000) and max_sites (int, 0..100000) bound tokens/records.
++    Both capacities require exact int values; bool and fractional values fail.
++    Text has at most 67108864 decoded characters, checked before allocating masks.
+     Comments, string/interpolation contents and directives cannot create evidence.
+     SourceScanError reports size/token/delimiter/record limits without partial
+-    success. Traversal is linear in token count; at most eight names are retained
+-    per chain. No I/O, source evaluation or argument collection occurs.
+-    """
+-    if not 0 <= max_sites <= 100000:
++    success. Explicit member bodies are declarations, not invocation candidates.
++    Traversal is linear in token count; at most eight names are retained per chain.
++    No I/O, source evaluation or argument collection occurs.
++    """
++    if type(cast("object", max_sites)) is not int or not 0 <= max_sites <= 100000:
+         raise SourceScanError("source-record-limit", "Invalid candidate record limit")
++    if type(cast("object", max_tokens)) is not int or not 1 <= max_tokens <= 100000:
++        raise SourceScanError("source-token-limit", "Invalid token limit")
++    if len(text) > 67108864:
++        raise SourceScanError("source-limit", "C# text exceeds its character limit")
+     tokens = tokenize_csharp(strip_comments_and_strings(text), max_tokens=max_tokens)
+-    _balanced(tokens)
++    parentheses = _balanced(tokens)
+     sites: list[AccessSite] = []
+     index = 0
+     # Consume every maximal dotted chain once, including overlong rejected chains.
+@@ -220,11 +233,16 @@
+         )
+         if matched is None:
+             continue
++        operation, leaf = matched
++        # Paired delimiters distinguish method bodies without rescanning arguments.
++        if operation == "invocation":
++            after = parentheses[index] + 1
++            if after < len(tokens) and tokens[after].value in {"{", "=>"}:
++                continue
+         if len(sites) >= max_sites:
+             raise SourceScanError(
+                 "source-record-limit", "Candidate record limit exceeded"
+             )
+-        operation, leaf = matched
+         first = tokens[start - 1] if constructor else token
+         # All emitted name parts originate in the finite adapter allowlist.
+         api = ".".join(
+--- reviewed/tests/discovery_runtime/analyzer/test_filesystem_access.py
++++ repaired/tests/discovery_runtime/analyzer/test_filesystem_access.py
+@@ -7,6 +7,7 @@
+ from typing import TYPE_CHECKING, cast
+ 
+ import pytest
++from drm_copilot_discovery.analyzer import api_syntax
+ from drm_copilot_discovery.analyzer.api_syntax import access_sites
+ from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+ from drm_copilot_discovery.analyzer.emitter import inventory_result
+@@ -417,3 +418,54 @@
+     assert not result.components and not result.findings
+     assert len(result.diagnostics) == 1
+     assert result.diagnostics[0]["code"] == "analysis-work-limit"
++
++
++class OversizedText(str):
++    """Report an over-limit length without allocating a large test payload."""
++
++    def __len__(self) -> int:
++        """Return an int above the decoded-character bound; no mutation or I/O."""
++        return 67108865
++
++
++@pytest.mark.parametrize(
++    "capacity,maximum,code",
++    [
++        ("sites", True, "source-record-limit"),
++        ("sites", False, "source-record-limit"),
++        ("sites", 0.5, "source-record-limit"),
++        ("sites", None, "source-record-limit"),
++        ("sites", "1", "source-record-limit"),
++        ("tokens", True, "source-token-limit"),
++        ("tokens", False, "source-token-limit"),
++        ("tokens", 0.5, "source-token-limit"),
++        ("tokens", None, "source-token-limit"),
++        ("tokens", "1", "source-token-limit"),
++        ("tokens", 0, "source-token-limit"),
++        ("tokens", 100001, "source-token-limit"),
++        ("text", None, "source-limit"),
++    ],
++)
++def test_public_bounds_reject_before_masking_or_token_allocation(
++    monkeypatch: pytest.MonkeyPatch, capacity: str, maximum: object, code: str
++) -> None:
++    """Patch masking; str capacity/code and object maximum select invalid inputs.
++
++    Returns None; every failure must precede mask/token work and redact source text.
++    The length-reporting string avoids a large allocation in this unit test.
++    """
++
++    def prohibited_mask(text: str) -> str:
++        """Reject any mask request for str text with AssertionError; no allocation."""
++        raise AssertionError("Masking must not run for invalid public bounds")
++
++    monkeypatch.setattr(api_syntax, "strip_comments_and_strings", prohibited_mask)
++    source = OversizedText("VALUE_SENTINEL") if capacity == "text" else "VALUE_SENTINEL"
++    with pytest.raises(SourceScanError) as error:
++        access_sites(
++            source,
++            FILESYSTEM_SURFACE,
++            max_sites=cast("int", maximum) if capacity == "sites" else 100000,
++            max_tokens=cast("int", maximum) if capacity == "tokens" else 100000,
++        )
++    assert error.value.code == code and "VALUE_SENTINEL" not in str(error.value)
+--- reviewed/tests/discovery_runtime/analyzer/test_registry_access.py
++++ repaired/tests/discovery_runtime/analyzer/test_registry_access.py
+@@ -388,6 +388,9 @@
+         "File.Open();" * 40,
+         "using Alias = " + "Name." * 40 + "Type;",
+         "Registry.CurrentUser." + "Member." * 40 + "Call();",
++        "class C : File { void File.Open() {} }" * 40,
++        "class C : File { void File.Open() { File.Open(); } }" * 20,
++        "File.Open(" * 20 + "value" + ")" * 20 + ";",
+     ],
+ )
+ def test_aggregate_token_work_is_linear_for_long_and_repeated_chains(
+@@ -420,3 +423,48 @@
+     with pytest.raises(SourceScanError) as error:
+         access_sites("File.Open(); File.Open();", FILESYSTEM_SURFACE, max_tokens=8)
+     assert error.value.code == "source-token-limit"
++
++
++@pytest.mark.parametrize("family", ["filesystem", "registry"])
++@pytest.mark.parametrize("body", ["empty", "arrow", "nested", "nested-arrow"])
++def test_explicit_interface_declarations_preserve_only_real_call_sites(
++    catalog: SchemaCatalog, family: str, body: str
++) -> None:
++    """Catalog and str family/body separate declarations from body invocations.
++
++    Returns None; both original review inputs and expression bodies produce no
++    false type/call claim. Nested genuine calls retain exact offsets and inference.
++    """
++    # Keep the exact reviewed interface declarations while varying only the body.
++    if family == "filesystem":
++        prefix = "interface File { void Open(); } class C : File { void "
++        method = "File.Open"
++        empty = "{}"
++        invocation = "File.Open();"
++        surface = FILESYSTEM_SURFACE
++        analyzer = FilesystemAccessAnalyzer()
++    else:
++        prefix = (
++            "interface Registry { object GetValue(); } class C : Registry { object "
++        )
++        method = "Registry.GetValue"
++        empty = "{ return null; }"
++        invocation = "return Registry.GetValue();"
++        surface = REGISTRY_SURFACE
++        analyzer = RegistryAccessAnalyzer()
++    # Body and arrow terminators identify declarations independently of binding.
++    bodies = {
++        "empty": empty,
++        "arrow": "=> throw new Exception();",
++        "nested": "{ " + invocation + " }",
++        "nested-arrow": "=> " + method + "();",
++    }
++    source = prefix + method + "() " + bodies[body] + " }"
++    sites = access_sites(source, surface)
++    result = analyzer.analyze(capture(catalog, (("src/a.cs", source.encode()),)))
++    assert len(sites) == len(result.findings) == int(body.startswith("nested"))
++    if sites:
++        assert sites[0].start == source.rindex(method)
++        assert sites[0].end == sites[0].start + len(method)
++        assert result.findings[0]["classification"] == "inferred"
++        assert result.findings[0]["confidence"] == "medium"
