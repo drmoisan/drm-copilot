@@ -1,0 +1,37 @@
+{
+  "batch": "provenance",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-coverage.2026-10-19T07-28.json",
+    "raw_path": "SCRATCH/p4t5-access-provenance-coverage.raw.json",
+    "raw_sha256": "3503cb4d8ea9debda42b69f05a036713e042145681b487ece416c27c8aa08c97",
+    "sha256": "574c467c65e4235849bf5a3068ba23fdde30e5a272137d256a3a4e7f7f37e1bf"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072710.2026-10-19T07-27.json",
+      "sha256": "c746d1c3e5a123cd0c249625521d002d5cc4c76656fff2d47df80346f05790de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072710.2026-10-19T07-27.json",
+      "sha256": "f1e78a084285a6966963a7be267396361f5b3af8a962c6f4c6b0857aa37cb6c3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-types-072711.2026-10-19T07-27.json",
+      "sha256": "770ceef1d581d51f5e6749d94089d09946f0101a66944271b6ad67d5170f5fe6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-tests-072850.2026-10-19T07-28.json",
+      "sha256": "8a65b6cfa2dfdf1e49580495a432a1d56a1a943f224178f772fca8f578756037"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-28"
+}

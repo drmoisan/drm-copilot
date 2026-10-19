@@ -1,0 +1,39 @@
+{
+  "batch": "development",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T07:16:50.103618+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-development-lint-071650.2026-10-19T07-16.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-development-lint-071650.2026-10-19T07-16.stdout.txt",
+      "sha256": "9d0fdc151c4b6bb591c14474a30ea09c3f5915721ce68e52d71473d0b6cb4b5c"
+    }
+  },
+  "seconds": 0.106391,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "5d35a5422f3d106acf804e746028d1fe4ddca0b3e2c76ddf819db5b4bb556838",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "c87490366a08a09c5301eaf7aa31f6cc055edc921ba46c801f926e38957a5864",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "b4da400b44b214e8000d550ae6e523ebe5ad878d6c9a808e9eb843a5271936a6",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "819d0b232155a4d1cbd6dc4b8cec23ba9a615d0666a032661e4af4613cba9a17",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "862ff627566ce0e3087e60bc20ec49e0ef82605191eaabc6b38f6ddc9274e1d9"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "5d35a5422f3d106acf804e746028d1fe4ddca0b3e2c76ddf819db5b4bb556838",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "c87490366a08a09c5301eaf7aa31f6cc055edc921ba46c801f926e38957a5864",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "b4da400b44b214e8000d550ae6e523ebe5ad878d6c9a808e9eb843a5271936a6",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "819d0b232155a4d1cbd6dc4b8cec23ba9a615d0666a032661e4af4613cba9a17",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "862ff627566ce0e3087e60bc20ec49e0ef82605191eaabc6b38f6ddc9274e1d9"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T07:16:49.997227+00:00",
+  "stderr": "",
+  "stdout": "I001 [*] Import block is un-sorted or un-formatted\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_access.py:9:1\n   |\n 7 |   \"\"\"\n 8 |\n 9 | / from __future__ import annotations\n10 | |\n11 | | from typing import TYPE_CHECKING\n12 | |\n13 | | from drm_copilot_discovery.analyzer.csharp_tokens import (\n14 | |     SourceScanError,\n15 | |     decode_source,\n16 | | )\n17 | | from drm_copilot_discovery.analyzer.findings import (\n18 | |     diagnostic,\n19 | |     pinned_matches,\n20 | |     row,\n21 | |     source_reference,\n22 | |     stable_id,\n23 | |     tool,\n24 | | )\n25 | | from drm_copilot_discovery.analyzer.models import Analysis\n26 | | from drm_copilot_discovery.analyzer.api_syntax import (\n27 | |     ApiSurface,\n28 | |     AccessSite,\n29 | |     access_sites,\n30 | | )\n31 | | from drm_copilot_discovery.models import JsonObject\n   | |___________________________________________________^\n32 |\n33 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nE501 Line too long (127 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_access.py:46:89\n   |\n44 |         code,\n45 |         path,\n46 |         \"Check captured C# syntax, immutable provenance and configured limits; runtime values and error details are withheld.\",\n   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n47 |         analyzer=identifier,\n48 |     )\n   |\n\nE501 Line too long (159 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_access.py:156:89\n    |\n154 | \u2026\n155 | \u2026\n156 | \u2026es, aliases, conditional compilation, runtime targets and platform applicability remain unresolved.\",\n    |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n157 | \u2026\n158 | \u2026\n    |\n\nE501 Line too long (94 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\api_syntax.py:164:89\n    |\n162 |     \"\"\"Return bounded fixed-name candidates from C# text and immutable surface.\n163 |\n164 |     max_tokens (int, 1..100000) and max_sites (int, 0..100000) bound tokens/records. Comments,\n    |                                                                                         ^^^^^^\n165 |     all string/interpolation contents and directives cannot create API evidence.\n166 |     SourceScanError reports size/token/delimiter/record limits without partial\n    |\n\nE501 Line too long (89 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\registry_access.py:46:89\n   |\n45 | class RegistryAccessAnalyzer:\n46 |     \"\"\"Project unresolved registry candidates without accessing the platform registry.\"\"\"\n   |                                                                                         ^\n47 |\n48 |     identifier = \"registry-access\"\n   |\n\nE501 Line too long (117 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_filesystem_access.py:156:89\n    |\n154 |     Returns None; candidates remain inferred even when runtime usage is uncertain.\n155 |     \"\"\"\n156 |     source = b\"using File = Custom; class File { void Open() {} }\\n#if DISABLED\\nFile.Open();\\n#endif\\n@File.Open();\"\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n157 |     result = FilesystemAccessAnalyzer().analyze(\n158 |         capture(catalog, ((\"src/a.cs\", source),))\n    |\n\nE501 Line too long (107 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_access.py:274:89\n    |\n272 |     projected: list[str] = []\n273 |     original = cast(\n274 |         \"Callable[[InventoryCapture, InventoryInput, ApiSurface, tuple[AccessSite, ...], bool], Analysis]\",\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^\n275 |         vars(api_access)[\"_project\"],\n276 |     )\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_access.py:347:89\n    |\n346 | class CountedTokens:\n347 |     \"\"\"Wrap immutable tokens with a local access counter for deterministic work tests.\"\"\"\n    |                                                                                         ^\n348 |\n349 |     def __init__(self, values: tuple[Token, ...]) -> None:\n    |\n\nFound 8 errors.\n[*] 1 fixable with the `--fix` option.\n",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-16"
+}

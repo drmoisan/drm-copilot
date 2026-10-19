@@ -1,0 +1,15 @@
+{
+  "accepted_commit": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "accepted_commit_exists": false,
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+    "sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+  },
+  "coverage_baseline": "new module; no previous executable statements",
+  "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+  "routing_receipt": "inventory_analyzers_p4t5_shared_access_helper",
+  "scope": "fixed typed API rules and pure bounded scanner/projection; existing two tests cover helper",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-06",
+  "working_exists": false
+}

@@ -1,0 +1,16 @@
+{
+  "portable_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-initial-ordering-failure-coverage.2026-10-19T07-20.json",
+    "sha256": "6e57c9fa931cae24e06986cf9f5c73da6607bb3575c51c7b68b9a130cef18548"
+  },
+  "raw_coverage": {
+    "path": "SCRATCH/p4t5-access-initial-ordering-failure-coverage.raw.json",
+    "sha256": "12d725fa7bfb42a4f7a493932286088e31d833c519cb6de2297f939da8b94ad7"
+  },
+  "repair": "Compare complete finding rows in the existing emitter finding_id order; production bytes unchanged.",
+  "result": "148 passed, 3 ordering assertions failed",
+  "retained_test": "SCRATCH/p4t5-access-initial-ordering-test.py.txt",
+  "retained_test_sha256": "b9eb53a6355930694000e328bde037db5dbd6c5f5e08f96b092f3e3bbdcb49db",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-20"
+}

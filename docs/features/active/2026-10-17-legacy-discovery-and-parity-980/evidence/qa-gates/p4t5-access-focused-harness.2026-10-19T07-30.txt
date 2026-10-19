@@ -1,0 +1,74 @@
+"""Retain scoped P4-T5 development checks without changing lifecycle state."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+evidence = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence'
+production = ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/' + name + '.py' for name in ('api_access', 'api_syntax', 'filesystem_access', 'registry_access')]
+test_paths = ['tests/discovery_runtime/analyzer/test_' + name + '.py' for name in ('filesystem_access', 'registry_access')]
+paths = production + test_paths
+fixtures = []
+batch = sys.argv[1]
+apply_format = '--apply-format' in sys.argv
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+def hashes():
+    return {path: sha((root / path).read_bytes()) for path in paths + [path.relative_to(root).as_posix() for path in fixtures]}
+
+def portable(value):
+    for path, label in ((root, 'WORKSPACE'), (scratch, 'SCRATCH')):
+        value = re.sub(re.escape(str(path)), label, value, flags=re.IGNORECASE)
+        value = re.sub(re.escape(path.as_posix()), label, value, flags=re.IGNORECASE)
+    return value
+
+receipts = []
+
+def run(stage, args):
+    before = hashes()
+    started = datetime.datetime.now(datetime.timezone.utc)
+    command = [sys.executable, '-m', *args]
+    environment = dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', COVERAGE_FILE=str(scratch / (batch + '.coverage')))
+    result = subprocess.run(command, capture_output=True, env=environment)
+    finish = datetime.datetime.now(datetime.timezone.utc)
+    stamp = finish.strftime('%Y-%m-%dT%H-%M')
+    stem = 'p4t5-access-' + batch + '-' + stage + '-' + finish.strftime('%H%M%S') + '.' + stamp
+    raw = {}
+    for label, content in (('stdout', result.stdout), ('stderr', result.stderr)):
+        destination = scratch / (stem + '.' + label + '.txt')
+        destination.write_bytes(content)
+        raw[label] = {'path': 'SCRATCH/' + destination.name, 'sha256': sha(content)}
+    document = {'task': 'P4-T5', 'batch': batch, 'stage': stage, 'timestamp': stamp, 'started_at': started.isoformat(), 'finished_at': finish.isoformat(), 'seconds': (finish-started).total_seconds(), 'command': portable('poetry run python -m ' + subprocess.list2cmdline(args)), 'exit_code': result.returncode, 'source_before': before, 'source_after': hashes(), 'raw': raw, 'stdout': portable(result.stdout.decode('utf-8', errors='replace')), 'stderr': portable(result.stderr.decode('utf-8', errors='replace'))}
+    kind = 'regression-testing' if stage == 'tests' else 'qa-gates'
+    destination = evidence / kind / (stem + '.json')
+    destination.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+    markdown = f'# P4-T5 {batch} {stage}\n\nTimestamp: {stamp}\nCommand: `{document["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Scoped development check with exact source bindings and raw diagnostics retained in JSON.\n\n```text\n{document["stdout"]}{document["stderr"]}\n```\n'
+    destination.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines())+'\n', encoding='utf-8', newline='\n')
+    receipts.append({'path': destination.relative_to(root).as_posix(), 'sha256': sha(destination.read_bytes())})
+    print(json.dumps({'stage': stage, 'exit_code': result.returncode, 'seconds': document['seconds'], 'receipt': destination.relative_to(root).as_posix()}), flush=True)
+    if result.returncode or document['source_after'] != before:
+        print((document['stdout'] + document['stderr']).encode('ascii', errors='backslashreplace').decode('ascii'))
+        raise SystemExit(result.returncode or 1)
+
+run('format', ['black', *([] if apply_format else ['--check']), *paths])
+run('lint', ['ruff', 'check', *paths])
+run('types', ['pyright', *paths])
+coverage = scratch / ('p4t5-access-' + batch + '-coverage.raw.json')
+run('tests', ['pytest', '-q', '-o', 'addopts=', *test_paths, *['--cov=drm_copilot_discovery.analyzer.'+name for name in ('api_access', 'api_syntax', 'filesystem_access', 'registry_access')], '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + str(coverage)])
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+destination = evidence / 'regression-testing' / ('p4t5-access-' + batch + '-coverage.' + stamp + '.json')
+data = json.loads(coverage.read_bytes())
+data['files'] = {portable(key).replace('\\', '/'): value for key, value in data['files'].items()}
+destination.write_text(json.dumps(data, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+document = {'task': 'P4-T5', 'batch': batch, 'timestamp': stamp, 'sources': hashes(), 'receipts': receipts, 'coverage': {'path': destination.relative_to(root).as_posix(), 'sha256': sha(destination.read_bytes()), 'raw_path': 'SCRATCH/' + coverage.name, 'raw_sha256': sha(coverage.read_bytes())}}
+binding = evidence / 'qa-gates' / ('p4t5-access-' + batch + '-binding.' + stamp + '.json')
+binding.write_text(json.dumps(document, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+print(json.dumps({'binding': binding.relative_to(root).as_posix(), 'sha256': sha(binding.read_bytes()), 'coverage': data['totals']}), flush=True)
