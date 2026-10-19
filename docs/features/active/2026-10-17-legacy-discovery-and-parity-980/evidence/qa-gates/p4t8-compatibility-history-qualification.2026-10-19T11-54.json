@@ -1,0 +1,116 @@
+{
+  "preliminary_structure_rendering": {
+    "correction": "Two comments added before focused4; executable behavior unchanged. Current complete passing structure receipt and exact focused4 hashes are bound.",
+    "observed_findings": [
+      {
+        "issue": "Immediate intent comment before the enclosing JSON statement containing a comprehension.",
+        "line_before_comment": 151,
+        "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py"
+      },
+      {
+        "issue": "Immediate intent comment before adapter-list assertion.",
+        "line_before_comment": 78,
+        "path": "tests/discovery_runtime/analyzer/test_registry.py"
+      }
+    ],
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-structure.2026-10-19T11-48.json",
+    "qualification": "An initial failing structural rendering and the corrected pass used the same 11:48-minute filename; the pass superseded that preliminary JSON. Original failing JSON bytes are unavailable. The observed two findings are preserved below; no test result was overwritten."
+  },
+  "retained_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused1-format-114255.2026-10-19T11-42.json",
+      "sha256": "a1aa5b3d3495ad43ef6da3756ae3887446d849b55b5d8022c87c0e5d8a5960fd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused1-lint-114255.2026-10-19T11-42.json",
+      "sha256": "cad6d42782649cdaccafead4b0ff229f1a045dc1d45d8625c1cbbcc55dc14e77"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused2-format-114346.2026-10-19T11-43.json",
+      "sha256": "17759af5e4224027046a96ec6fa95635cae9acda5d633d07cc0ea159071c2400"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused2-lint-114347.2026-10-19T11-43.json",
+      "sha256": "eb74a201023da697715b760006c9df5c8c11095b225ac55b031d310034284f4b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused2-types-114348.2026-10-19T11-43.json",
+      "sha256": "acd84bfde3154d4956f3a1b6c3bce1496f95840da97af9984536acb51e1e4f3d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused3-format-114403.2026-10-19T11-44.json",
+      "sha256": "170a446f6a3262a8ae4bf20be910e40764b0f5119e45d24fbbf778ace3b011f0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused3-lint-114403.2026-10-19T11-44.json",
+      "sha256": "0f33e39608e1c71f5b4898fde159e47ae763e0233ce04a4228632fe79e9a3eaa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused3-types-114404.2026-10-19T11-44.json",
+      "sha256": "a7116cf7316b9a857d0e96f9362cc8d71d3e12ed24885784bbfd1ca0a5f1dde3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-format-114843.2026-10-19T11-48.json",
+      "sha256": "67faf52ee7525566594d8541cc58ca91edd04ed8c58e462a41644826e9c59ea2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-lint-114843.2026-10-19T11-48.json",
+      "sha256": "a5e4b5276bf4ef8782b0106bb712795ef78f1062b4dc4d08a95628516ce1a436"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-types-114845.2026-10-19T11-48.json",
+      "sha256": "e2d0265ee1481a7c3dfc036366ac6b991d0242bc6428e4ec5cc0e795f225324a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-format1-format-114244.2026-10-19T11-42.json",
+      "sha256": "0290046cec2735f4becbbe1422e3e4cc1808a3a341afb844835f9517b568f702"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-format2-format-114340.2026-10-19T11-43.json",
+      "sha256": "ea6e6da85267f0edcc6244afc8331ca639d7648af6d3554fb648aad39f370fa5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-format3-format-114728.2026-10-19T11-47.json",
+      "sha256": "5ef2a0022484533cd3ae6544e823d6d132100bc4701e7d7086921d115f789ab1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-focused3-tests-114512.2026-10-19T11-45.json",
+      "sha256": "be08b00fa1def60d63f352a811c86510036f3279eb8619de0815df68e46b9cd0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-focused4-tests-114915.2026-10-19T11-49.json",
+      "sha256": "c2fde72812d45b9cb40a88d732ea2d4205229fa4a2f32839da2f3ee50de4aa29"
+    }
+  ],
+  "semantic_expectation_corrections": [
+    {
+      "before": "Original accepted test expected Microsoft.Office.Interop.Word.",
+      "behavior": "Reference assembly label",
+      "candidate_error": "First compatibility draft expected generic Reference, causing one focused3 failure.",
+      "correction": "Restore original validated literal assembly name; no public-label change."
+    },
+    {
+      "approved_boundary": "P4-T8 reuses accepted P4-T5 generic COM fixed grammar, which omits AddRef and arbitrary members.",
+      "before": "Legacy regex classified every Marshal member.",
+      "behavior": "Marshal.AddRef",
+      "correction": "Retain AddRef and CustomMember as explicit unsupported negatives, retain ReleaseComObject and add FinalReleaseComObject positive controls."
+    }
+  ],
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-54",
+  "tool_diagnostic_qualification": "Observed tool responses retained here as factual descriptions; exact original tool-call bytes were not separately archived and are not hash-claimed.",
+  "tool_diagnostics": [
+    {
+      "diagnostic": "invalid patch: multiple operations target the same file",
+      "effect": "First combined delete/add patch was rejected without source mutation; corrected to Update File."
+    },
+    {
+      "diagnostic": "PROMOTION_MCP_ONLY_BLOCKED",
+      "effect": "Shell source-write command was rejected before mutation; parent authorized ordinary apply_patch. No policy change or hook bypass."
+    },
+    {
+      "diagnostic": "Failed to write file scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "effect": "A prior patch in the tool batch had succeeded. Remaining owned updates were retried normally; this was not a zero-mutation batch."
+    }
+  ]
+}

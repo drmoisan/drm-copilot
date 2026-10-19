@@ -1,0 +1,20 @@
+"""Inspect exact owned source/test size and callable contracts before gates."""
+import ast
+import json
+from pathlib import Path
+
+root = Path.cwd()
+state = json.loads((root / 'artifacts/orchestration/orchestrator-state.json').read_bytes())
+paths = state['execution_progress']['p4t8_progress']['ownership']['inventory_analyzers']
+for name in paths:
+    text = (root / name).read_text(encoding='utf-8')
+    tree = ast.parse(text)
+    missing = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            doc = ast.get_docstring(node) or ''
+            if not doc or not ('return' in doc.lower()):
+                missing.append([node.lineno, node.name, 'missing return contract'])
+        elif isinstance(node, ast.ClassDef) and not ast.get_docstring(node):
+            missing.append([node.lineno, node.name, 'missing class contract'])
+    print(json.dumps({'path': name, 'lines': len(text.splitlines()), 'missing': missing}))

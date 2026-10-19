@@ -1,0 +1,199 @@
+{
+  "status": "CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES",
+  "task": "P4-T8",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-combined-review.py",
+  "exit_code": 0,
+  "authority_receipt": "atomic_execution_p4t8_candidate_review",
+  "native_authority_valid": true,
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "observed_head": "cc4762c30f5b26ec1561e1eb0041d641a56ee352",
+  "accepted_baseline": "e5223d18ca0cfb92653efa75b56e6c5ec079b817",
+  "optional_checked_wip": "cc4762c30f5b26ec1561e1eb0041d641a56ee352",
+  "optional_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.json",
+    "sha256": "2abbe88ae82f0ec18e78078d01ecbf48bb08d859739386d5922ce6ec1a9561e6"
+  },
+  "optional_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-optional-freeze.2026-10-19T11-52.json",
+    "sha256": "bc5e0282808ff51b21ca2973ec78d908be376a450ee157341344754500090ad1"
+  },
+  "compatibility_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-freeze.2026-10-19T11-54.json",
+    "sha256": "1af156a5062951f276ae2de4dc2177fec5febbb6699978f204aef323ba9cc06d"
+  },
+  "reviewed_current_source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py",
+      "sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py",
+      "sha256": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py",
+      "sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py",
+      "sha256": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_adapter.py",
+      "sha256": "da2e28c4be44e289d14ec951d3b85dc3412832dcfde413428041505e90834c06"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_limits.py",
+      "sha256": "4d215605cccff4dc9f25bd4443f8398ab885b5dd08c3a6445e5045643f8f4bcb"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2006.xml.txt",
+      "sha256": "43b8d8fa0caf93e6725f747b54be09f346de052255962b4cbcf2fc3bdd00a97f"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2009.xml.txt",
+      "sha256": "1aef9447cd9809c5629a9f672744c7507ab1cd6759c1a9763b45b7369f5c36a2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "3664e41b738e962ed9a3035f2c81af44c62b6a855e16f4437cb21db5bb95c24a"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "sha256": "48957ece4f9ebdbc66b99a7efadf3c3d916a1e7bef3dd83ec609bd502c91571b"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py",
+      "sha256": "c0add50ff7f90b0cb4d8596abd6a5b5b26588d0d4dcb176eab701af5cdb5eaa9"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "370eb179db31ae629a817ad79dbdd92470c330430e4440d8515eecb6b3098fd8"
+    }
+  ],
+  "compatibility_checks": [
+    "The entire enabled analyzer set is checked before the fixed lazy optional import; ordinary inventory does not activate the optional domain.",
+    "Typed configured consent precedes shim dispatch and source processing; finite keyword capacities are forwarded unchanged.",
+    "Legacy v1 adapter/CLI paths refuse before profile, file, clock or schema I/O; main_dotnet retains its prior behavior.",
+    "Pattern forwarding is a fixed data-only allowlist with canonical object identity, not a dynamic execution registry.",
+    "Neutrality assertions permit only exact selection/import branches and retain negative injection controls.",
+    "Original assembly identity is restored; AddRef/arbitrary Marshal members are explicit unsupported negatives under the accepted generic grammar.",
+    "Intent contracts, bounded file sizes, memory-only test seams and new/changed coverage were reviewed."
+  ],
+  "compatibility_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-format-114843.2026-10-19T11-48.json",
+      "sha256": "67faf52ee7525566594d8541cc58ca91edd04ed8c58e462a41644826e9c59ea2",
+      "stage": "format",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-lint-114843.2026-10-19T11-48.json",
+      "sha256": "a5e4b5276bf4ef8782b0106bb712795ef78f1062b4dc4d08a95628516ce1a436",
+      "stage": "lint",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-focused4-types-114845.2026-10-19T11-48.json",
+      "sha256": "e2d0265ee1481a7c3dfc036366ac6b991d0242bc6428e4ec5cc0e795f225324a",
+      "stage": "types",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-focused4-tests-114915.2026-10-19T11-49.json",
+      "sha256": "c2fde72812d45b9cb40a88d732ea2d4205229fa4a2f32839da2f3ee50de4aa29",
+      "stage": "tests",
+      "exit_code": 0
+    }
+  ],
+  "retained_focused_proof": {
+    "optional": {
+      "cases": 100,
+      "statements": "305/305",
+      "branches": "126/126",
+      "ranges": 18
+    },
+    "compatibility": {
+      "cases": 166,
+      "statements": "134/137",
+      "branches": "20/20",
+      "ranges": 22
+    }
+  },
+  "evidence_reconciliation": {
+    "compatibility_raw_payloads_decoded_and_hashed": 34,
+    "compatibility_payload_split": "32 command streams and 2 coverage payloads",
+    "optional_original_streams_decoded_and_hashed": 4,
+    "optional_presentation_inverses": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-optional-focused4-pytest.2026-10-19T11-40.json",
+        "original_sha256": "e82bec4558e3e3f6fffc7b0e906bb4da05f7569da663a1710637aa6192b90619",
+        "exact_inverse": true,
+        "substitutions": 6
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-optional-focused4-pytest.2026-10-19T11-40.md",
+        "original_sha256": "150c2342e1eb4c46a27a88f2f6c8705f614dad9a7a6c59fd4beeea5e23d9ba4b",
+        "exact_inverse": true,
+        "substitutions": 6
+      }
+    ],
+    "history_qualification": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-compatibility-history-qualification.2026-10-19T11-54.json",
+      "sha256": "075f131050f0589398c5acb2a64a0f6071c81cc4351ff21f06205b15f5185abc"
+    },
+    "coverage_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-coverage-ranges.2026-10-19T11-54.json",
+      "sha256": "9c3ec2f6f2b19fbb7b2589e35a68ae377d0c290edf60244d28e73abbe0aae8b0"
+    }
+  },
+  "qualifications": [
+    "The preliminary 11:48 structural JSON was overwritten by its passing rendering. Its original bytes are unavailable; two observed comment findings are retained factually. No test result was overwritten.",
+    "Three unchanged CLI clock/schema statements remain uncovered; no full-coverage claim is made for those legacy helpers.",
+    "Optional initial failed evidence is losslessly preserved; readable views replace only six exact synthetic runs and independently invert to the original bytes.",
+    "Compatibility freeze index/accepted-commit identities describe the predecessor until coordinator staging; current working bytes are independently bound here.",
+    "All earlier semantic reviews, predecessor bindings and focused suites are reused without replay. No new behavioral probe was required.",
+    "The first receipt checker stopped before publication with KeyError: receipt because two coverage payloads have no command-receipt key. Only its archive-key assumption was corrected; the original checker and observed diagnostic are preserved in the companion correction record."
+  ],
+  "findings": [],
+  "open_behavioral_probes": [],
+  "new_behavioral_runs": 0,
+  "recommended_final_gate_scope": [
+    "Scoped Black then Ruff, whole-repository Pyright, bounded architecture/consent/import checks.",
+    "Two isolated reversed-order batches: 100 optional and 166 compatibility cases, preserving existing node identities and measured coverage.",
+    "Actual affected contracts and bounded Windows/Git capture, consent, lazy-selection and v1-refusal composition; retain deferred host/non-Windows qualifications."
+  ],
+  "pending": [
+    "One clean ordered combined final gate sequence and independent receipt-only task acceptance.",
+    "P4-T9 remaining registry exposure; installed coding-agent-host and non-Windows proof remain deferred."
+  ],
+  "plan_accepted": "39/84",
+  "source_ac_accepted": "13/66",
+  "task_or_ac_checkoff": false,
+  "timestamp": "2026-10-19T12-08",
+  "published_utc": "2026-10-19T12:08:45.349304+00:00"
+}

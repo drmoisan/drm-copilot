@@ -75,18 +75,29 @@ def test_registry_loads_only_explicit_core_adapters(
     with monkeypatch.context() as context:
         context.setattr(builtins, "__import__", observe_import)
         selected = select_analyzers(profile)
+    # Core selection must retain exactly its original adapter identity.
     assert [adapter.identifier for adapter in selected] == ["repository"]
     assert seen and set(seen) == {"drm_copilot_discovery.profile_v2"}
 
 
-@pytest.mark.parametrize("enabled", [[], ["dotnet"], ["repository", "csharp-symbols"]])
+@pytest.mark.parametrize(
+    "enabled",
+    [
+        [],
+        ["dotnet"],
+        ["repository", "csharp-symbols"],
+        ["office-vsto", "dotnet"],
+        ["office-vsto", "csharp-symbols"],
+    ],
+)
 def test_registry_rejects_unavailable_selections_without_fallback(
-    analyzer_catalog: SchemaCatalog, enabled: list[str]
+    analyzer_catalog: SchemaCatalog, enabled: list[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Unimplemented adapter identifiers never silently produce a partial inventory.
 
     Parameters: analyzer_catalog (SchemaCatalog): immutable installed schema
-    fixture. enabled (list[str]): explicit configured adapter names.
+    fixture. enabled (list[str]): explicit configured adapter names. monkeypatch
+    (pytest.MonkeyPatch) observes the pre-import boundary.
 
     Returns None. Raises AssertionError when the asserted contract differs; uses
     only test-local memory and immutable schema fixtures.
@@ -100,7 +111,105 @@ def test_registry_rejects_unavailable_selections_without_fallback(
             "extension_result_manifests": [],
         },
     )
+    original = builtins.__import__
+
+    def observe(
+        name: str,
+        globals: dict[str, object] | None = None,
+        locals: dict[str, object] | None = None,
+        fromlist: tuple[str, ...] = (),
+        level: int = 0,
+    ) -> ModuleType:
+        """Reject optional imports while forwarding builtins import parameters.
+
+        name (str), globals/locals (dict[str, object] | None), fromlist
+        (tuple[str, ...]) and level (int) retain import semantics. Returns
+        ModuleType or raises AssertionError for premature optional loading.
+        The patched importer is restored by pytest; no filesystem mutation.
+        """
+        assert ".analyzer.optional" not in name
+        return original(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", observe)
     with pytest.raises(ValueError, match="Unavailable analyzer"):
+        select_analyzers(profile)
+
+
+@pytest.mark.parametrize(
+    "enabled",
+    [["office-vsto"], ["repository", "office-vsto"], ["office-vsto", "repository"]],
+)
+def test_registry_selects_only_consented_fixed_optional_adapter(
+    analyzer_catalog: SchemaCatalog,
+    enabled: list[str],
+) -> None:
+    """Resolve the fixed optional adapter in deterministic identifier order.
+
+    analyzer_catalog (SchemaCatalog) supplies immutable schemas; enabled
+    (list[str]) selects supported IDs. Returns None; AssertionError signals wrong
+    identity/order. Uses pure configuration and fixed imports; performs no I/O.
+    """
+    profile = inventory_profile(
+        analyzer_catalog,
+        analyzers={
+            "enabled": enabled,
+            "options": {},
+            "ignored_paths": [],
+            "extension_result_manifests": [],
+        },
+    )
+    selected = select_analyzers(profile)
+    # Every declared ID produces exactly its own fixed implementation.
+    assert [item.identifier for item in selected] == sorted(enabled)
+    optional = selected[0]
+    assert optional.identifier == "office-vsto"
+    assert (
+        type(optional).__module__
+        == "drm_copilot_discovery.analyzer.optional.vsto_office"
+    )
+
+
+def test_registry_rejects_wrong_profile_type() -> None:
+    """Reject an unvalidated object before reading selectors or importing code.
+
+    No parameters. Returns None; AssertionError signals a missing fixed ValueError.
+    Uses an opaque object in memory and performs no I/O.
+    """
+    with pytest.raises(ValueError, match="validated ProfileV2"):
+        select_analyzers(cast("ProfileV2", object()))
+
+
+def test_registry_requires_configured_consent_before_any_import(
+    analyzer_catalog: SchemaCatalog,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject a draft profile before optional selection can import anything.
+
+    analyzer_catalog (SchemaCatalog) constructs the draft; monkeypatch
+    (pytest.MonkeyPatch) traps imports. Returns None; AssertionError signals
+    premature loading or a missing ProfileError. Pure after fixture construction.
+    """
+    profile = inventory_profile(
+        analyzer_catalog,
+        profile_state="draft",
+        analyzers={
+            "enabled": ["office-vsto"],
+            "options": {},
+            "ignored_paths": [],
+            "extension_result_manifests": [],
+        },
+    )
+
+    def forbidden(*args: object, **kwargs: object) -> ModuleType:
+        """Reject import args/kwargs (object) with AssertionError; never return.
+
+        No I/O or state mutation; represents the pre-consent import boundary.
+        """
+        del args, kwargs
+        raise AssertionError("Draft selection must fail before importing")
+
+    monkeypatch.setattr(builtins, "__import__", forbidden)
+    with pytest.raises(ProfileError):
         select_analyzers(profile)
 
 

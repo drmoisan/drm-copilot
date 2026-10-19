@@ -1,0 +1,198 @@
+"""Bind the retained P4-T8 candidate review and exact evidence without test execution."""
+from pathlib import Path
+import base64
+import datetime as dt
+import gzip
+import hashlib
+import json
+import subprocess
+
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+EVIDENCE = FEATURE / 'evidence'
+QA = EVIDENCE / 'qa-gates'
+REGRESSION = EVIDENCE / 'regression-testing'
+sha = lambda data: hashlib.sha256(data).hexdigest()
+
+
+def checked(path, expected=None):
+    raw = Path(path).read_bytes()
+    if expected is not None:
+        assert sha(raw) == expected, str(path)
+    return json.loads(raw)
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': sha(Path(path).read_bytes())}
+
+
+def resolve(record):
+    return checked(record['path'], record['sha256'])
+
+
+def source_hashes(mapping):
+    return {path: value if isinstance(value, str) else value['sha256'] for path, value in mapping.items()}
+
+
+optional_path = REGRESSION / 'p4t8-optional-freeze.2026-10-19T11-52.json'
+compatibility_path = REGRESSION / 'p4t8-compatibility-freeze.2026-10-19T11-54.json'
+optional = checked(optional_path, 'bc5e0282808ff51b21ca2973ec78d908be376a450ee157341344754500090ad1')
+compatibility = checked(compatibility_path, '1af156a5062951f276ae2de4dc2177fec5febbb6699978f204aef323ba9cc06d')
+retained_review = QA / 'p4t8-executor-optional-review.2026-10-19T11-55.json'
+assert checked(retained_review, '2abbe88ae82f0ec18e78078d01ecbf48bb08d859739386d5922ce6ec1a9561e6')['findings'] == []
+scope = optional['source_files'] + optional['fixtures'] + compatibility['source_bindings']
+assert len(scope) == 18
+for item in scope:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256'], item['path']
+    if Path(item['path']).suffix == '.py':
+        assert len(Path(item['path']).read_bytes().splitlines()) <= 500, item['path']
+
+authority_path = Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json'
+authority = checked(authority_path)
+profile_sha = sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes())
+assert authority['profile_sha256'] == profile_sha == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+assert all(authority[key] is True for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+
+# Reconcile the four preserved raw streams and the two exact presentation inverses.
+archive = resolve(optional['lossless_failure_archive'])
+qualification = resolve(optional['readable_failure_qualification'])
+decoded = {}
+for entry in archive['entries']:
+    compressed = base64.b64decode(entry['payload'], validate=True)
+    assert sha(compressed) == entry['compressed_sha256']
+    original = gzip.decompress(compressed)
+    assert len(original) == entry['original_bytes'] and sha(original) == entry['original_sha256']
+    decoded[entry['original_sha256']] = original
+assert len(decoded) == 4
+marker = qualification['marker'].encode()
+run = b'x' * 2200000
+inverse_results = []
+for change in qualification['changes']:
+    readable = Path(change['path']).read_bytes()
+    assert sha(readable) == change['readable_sha256'] and len(readable) == change['readable_bytes']
+    assert readable.count(marker) == change['exact_run_substitutions'] == 6
+    assert readable.replace(marker, run) == decoded[change['original_sha256']]
+    inverse_results.append({'path': change['path'], 'original_sha256': change['original_sha256'], 'exact_inverse': True, 'substitutions': 6})
+
+# Verify the new compatibility proof and its exact raw streams, without rerunning it.
+binding = resolve(compatibility['focused_binding'])
+assert source_hashes(binding['sources']) == {item['path']: item['sha256'] for item in compatibility['source_bindings']}
+stream_archive = resolve(compatibility['raw_streams'])
+streams = {}
+for entry in stream_archive['streams']:
+    raw = base64.b64decode(entry['base64'], validate=True)
+    assert sha(raw) == entry['sha256'], entry['path']
+    streams[(entry.get('receipt'), entry.get('stream', entry['path']))] = (entry, raw)
+assert len(streams) == 34
+receipts = []
+last_finish = None
+for expected_stage, entry in zip(('format', 'lint', 'types', 'tests'), binding['receipts'], strict=True):
+    receipt = resolve(entry)
+    assert receipt['exit_code'] == 0 and receipt['stage'] == expected_stage
+    assert source_hashes(receipt['source_before']) == source_hashes(receipt['source_after']) == source_hashes(binding['sources'])
+    assert receipt['shared_before'] == receipt['shared_after']
+    for path, digest in source_hashes(receipt['shared_after']).items():
+        assert sha(Path(path).read_bytes()) == digest, path
+    start = dt.datetime.fromisoformat(receipt['started_at'])
+    finish = dt.datetime.fromisoformat(receipt['finished_at'])
+    assert start <= finish and (last_finish is None or last_finish <= start)
+    last_finish = finish
+    for channel, raw_ref in receipt['raw'].items():
+        raw_entry, raw = streams[(entry['path'], channel)]
+        assert raw_entry['sha256'] == raw_ref['sha256'] and raw_entry['path'] == raw_ref['path']
+    if expected_stage == 'tests':
+        assert receipt['test_node_order'] == compatibility['test_node_order']
+        assert len(receipt['test_node_order']) == len(set(receipt['test_node_order'])) == 166
+        assert b'166 passed' in streams[(entry['path'], 'stdout')][1]
+    receipts.append({'path': entry['path'], 'sha256': entry['sha256'], 'stage': expected_stage, 'exit_code': 0})
+for entry in compatibility['harnesses']:
+    assert sha(Path(entry['path']).read_bytes()) == entry['sha256']
+assert sha((QA / 'p4t8-compatibility-freeze-harness.2026-10-19T11-54.txt').read_bytes()) == '6c61bdf23da7edea3187f904b4775071c4790e599fd3f93394d34b37ccb66518'
+coverage = resolve(binding['coverage'])
+assert sha(streams[(None, binding['coverage']['raw_path'])][1]) == binding['coverage']['raw_sha256']
+ranges = resolve(compatibility['coverage_ranges'])
+assert len(ranges['units']) == 22
+totals = coverage['totals']
+assert (totals['covered_lines'], totals['num_statements'], totals['covered_branches'], totals['num_branches']) == (134, 137, 20, 20)
+resolve(compatibility['structure'])
+history = resolve(compatibility['history_qualification'])
+assert len(history['preliminary_structure_rendering']['observed_findings']) == 2
+
+head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+command = 'poetry run python SCRATCH/issue-980-p4t8-combined-review.py'
+result = {
+    'status': 'CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES', 'task': 'P4-T8', 'command': command, 'exit_code': 0,
+    'authority_receipt': 'atomic_execution_p4t8_candidate_review', 'native_authority_valid': True, 'profile_sha256': profile_sha,
+    'observed_head': head, 'accepted_baseline': 'e5223d18ca0cfb92653efa75b56e6c5ec079b817',
+    'optional_checked_wip': 'cc4762c30f5b26ec1561e1eb0041d641a56ee352',
+    'optional_review': ref(retained_review), 'optional_freeze': ref(optional_path), 'compatibility_freeze': ref(compatibility_path),
+    'reviewed_current_source_bindings': [{'path': item['path'], 'sha256': item['sha256']} for item in scope],
+    'compatibility_checks': [
+        'The entire enabled analyzer set is checked before the fixed lazy optional import; ordinary inventory does not activate the optional domain.',
+        'Typed configured consent precedes shim dispatch and source processing; finite keyword capacities are forwarded unchanged.',
+        'Legacy v1 adapter/CLI paths refuse before profile, file, clock or schema I/O; main_dotnet retains its prior behavior.',
+        'Pattern forwarding is a fixed data-only allowlist with canonical object identity, not a dynamic execution registry.',
+        'Neutrality assertions permit only exact selection/import branches and retain negative injection controls.',
+        'Original assembly identity is restored; AddRef/arbitrary Marshal members are explicit unsupported negatives under the accepted generic grammar.',
+        'Intent contracts, bounded file sizes, memory-only test seams and new/changed coverage were reviewed.',
+    ],
+    'compatibility_receipts': receipts,
+    'retained_focused_proof': {'optional': {'cases': 100, 'statements': '305/305', 'branches': '126/126', 'ranges': 18}, 'compatibility': {'cases': 166, 'statements': '134/137', 'branches': '20/20', 'ranges': 22}},
+    'evidence_reconciliation': {'compatibility_raw_payloads_decoded_and_hashed': 34, 'compatibility_payload_split': '32 command streams and 2 coverage payloads', 'optional_original_streams_decoded_and_hashed': 4, 'optional_presentation_inverses': inverse_results, 'history_qualification': compatibility['history_qualification'], 'coverage_ranges': compatibility['coverage_ranges']},
+    'qualifications': [
+        'The preliminary 11:48 structural JSON was overwritten by its passing rendering. Its original bytes are unavailable; two observed comment findings are retained factually. No test result was overwritten.',
+        'Three unchanged CLI clock/schema statements remain uncovered; no full-coverage claim is made for those legacy helpers.',
+        'Optional initial failed evidence is losslessly preserved; readable views replace only six exact synthetic runs and independently invert to the original bytes.',
+        'Compatibility freeze index/accepted-commit identities describe the predecessor until coordinator staging; current working bytes are independently bound here.',
+        'All earlier semantic reviews, predecessor bindings and focused suites are reused without replay. No new behavioral probe was required.',
+        'The first receipt checker stopped before publication with KeyError: receipt because two coverage payloads have no command-receipt key. Only its archive-key assumption was corrected; the original checker and observed diagnostic are preserved in the companion correction record.',
+    ],
+    'findings': [], 'open_behavioral_probes': [], 'new_behavioral_runs': 0,
+    'recommended_final_gate_scope': ['Scoped Black then Ruff, whole-repository Pyright, bounded architecture/consent/import checks.', 'Two isolated reversed-order batches: 100 optional and 166 compatibility cases, preserving existing node identities and measured coverage.', 'Actual affected contracts and bounded Windows/Git capture, consent, lazy-selection and v1-refusal composition; retain deferred host/non-Windows qualifications.'],
+    'pending': ['One clean ordered combined final gate sequence and independent receipt-only task acceptance.', 'P4-T9 remaining registry exposure; installed coding-agent-host and non-Windows proof remain deferred.'],
+    'plan_accepted': '39/84', 'source_ac_accepted': '13/66', 'task_or_ac_checkoff': False,
+}
+
+
+def publish(stem, suffix, payload):
+    now = dt.datetime.now(dt.timezone.utc)
+    stamp = now.strftime('%Y-%m-%dT%H-%M')
+    path = QA / (stem + '.' + stamp + suffix)
+    assert not path.exists(), str(path)
+    if isinstance(payload, dict):
+        payload = {**payload, 'timestamp': stamp, 'published_utc': now.isoformat()}
+        data = (json.dumps(payload, indent=2) + '\n').encode()
+    else:
+        data = payload
+    assert b'\r' not in data and data.endswith(b'\n') and not data.endswith(b'\n\n')
+    assert all(line.rstrip() == line for line in data.splitlines())
+    path.write_bytes(data)
+    return path
+
+
+proof = publish('p4t8-executor-candidate-review', '.json', result)
+stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+markdown = publish('p4t8-executor-candidate-review', '.md', (
+    f'# P4-T8 consolidated candidate review\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n'
+    'Output Summary: CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES. No findings or open behavioral probes.\n\n'
+    'The completed optional review is retained. The ten compatibility paths satisfy configured-consent, whole-enabled-set validation, fixed lazy dispatch, data-only forwarding and v1 no-I/O refusal boundaries. All 18 current source/test/fixture hashes match their frozen manifests. No behavioral tests or predecessor review were repeated.\n\n'
+    'Retained focused proof: 100 optional cases (305/305 statements, 126/126 branches, 18 ranges) and 166 compatibility cases (134/137 statements, 20/20 branches, 22 ranges). Three unchanged CLI helper statements remain uncovered. All four clean compatibility receipts and 34 raw payloads are bound. The four optional failed-output originals decode exactly; both shortened views invert exactly after six literal synthetic-run substitutions.\n\n'
+    'The preliminary 11:48 structural JSON was overwritten by the passing rendering. Original failed JSON bytes are unavailable; the two observed comment findings remain factual history. No test result was overwritten or lost bytes asserted as preserved.\n\n'
+    'Next: one clean ordered final sequence with the two existing isolated batches, affected contracts and bounded native composition. P4-T8 is not checked off; counts remain 39/84 tasks and 13/66 AC. P4-T9 general registry exposure and installed-host/non-Windows proof remain deferred.\n'
+).encode())
+harness = publish('p4t8-executor-candidate-review-harness', '.txt', Path(__file__).read_bytes())
+original_checker = Path(__file__).with_name('issue-980-p4t8-combined-review-initial-checker.py').read_bytes()
+correction = publish('p4t8-executor-receipt-checker-correction', '.json', {
+    'task': 'P4-T8', 'initial_exit_code': 1, 'initial_command': command,
+    'observed_diagnostic': "KeyError: 'receipt' at line 84, indexing entry['receipt'] for an archived coverage payload.",
+    'diagnostic_qualification': 'Observed tool diagnostic transcribed here; no claim of a separately captured original stdout/stderr stream.',
+    'correction': 'Use command receipt/stream identity when present and retained coverage path identity otherwise; all 34 original payload hashes remain checked.',
+    'original_executed_checker_sha256': sha(original_checker), 'original_executed_checker_base64': base64.b64encode(original_checker).decode(),
+    'corrected_executed_checker': ref(harness), 'behavioral_runs': 0, 'source_test_edits': False,
+})
+new_paths = [proof, markdown, harness, correction]
+now = dt.datetime.now(dt.timezone.utc)
+staging = QA / ('p4t8-executor-candidate-staging.' + now.strftime('%Y-%m-%dT%H-%M') + '.json')
+manifest = {'task': 'P4-T8', 'status': result['status'], 'files': [ref(p) for p in new_paths], 'stage_paths': [p.as_posix() for p in new_paths + [staging]], 'prior_optional_review_already_committed': ref(retained_review), 'source_test_plan_ac_checkpoint_git_mutations': False}
+actual = publish('p4t8-executor-candidate-staging', '.json', manifest)
+assert actual == staging
+print(json.dumps({'status': result['status'], 'review': ref(proof), 'markdown': ref(markdown), 'harness': ref(harness), 'staging': ref(staging), 'new_paths': manifest['stage_paths'], 'counts': ['39/84', '13/66']}))
