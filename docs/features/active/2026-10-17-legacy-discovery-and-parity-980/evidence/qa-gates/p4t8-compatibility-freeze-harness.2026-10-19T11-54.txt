@@ -1,0 +1,206 @@
+"""Freeze already executed compatibility evidence without rerunning tests."""
+import ast
+import base64
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+evidence = feature / 'evidence'
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+baseline_path = evidence / 'baseline/p4t8-shared-baseline.2026-10-19T11-23.json'
+binding_path = evidence / 'qa-gates/p4t8-compatibility-focused4-binding.2026-10-19T11-49.json'
+structure_path = evidence / 'qa-gates/p4t8-compatibility-structure.2026-10-19T11-48.json'
+binding = json.loads(binding_path.read_bytes())
+baseline = json.loads(baseline_path.read_bytes())
+structure = json.loads(structure_path.read_bytes())
+coverage = json.loads((root / binding['coverage']['path']).read_bytes())
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+def emit(kind, stem, data):
+    path = evidence / kind / (stem + '.' + stamp + '.json')
+    with path.open('xb') as stream:
+        stream.write((json.dumps(data, indent=2, sort_keys=True) + '\n').encode('utf-8'))
+    return path
+
+def markdown(kind, stem, text):
+    path = evidence / kind / (stem + '.' + stamp + '.md')
+    with path.open('xb') as stream:
+        stream.write(('\n'.join(line.rstrip() for line in text.splitlines())+'\n').encode('utf-8'))
+    return path
+
+def git(*args):
+    return subprocess.run(['git', *args], capture_output=True, check=True).stdout
+
+sources = []
+for path, expected in binding['sources'].items():
+    content = (root / path).read_bytes()
+    assert sha(content) == expected, path
+    index = subprocess.run(['git', 'show', ':' + path], capture_output=True)
+    committed = subprocess.run(['git', 'show', baseline['head'] + ':' + path], capture_output=True)
+    sources.append({'path': path, 'sha256': expected, 'lines': len(content.splitlines()),
+                    'working_git_object': git('hash-object', '--no-filters', path).decode().strip(),
+                    'filtered_git_object': git('hash-object', '--path=' + path, path).decode().strip(),
+                    'index_sha256': sha(index.stdout) if index.returncode == 0 else None,
+                    'baseline_commit_sha256': sha(committed.stdout) if committed.returncode == 0 else None,
+                    'qualification': 'Working candidate; index and accepted commit remain the predecessor until parent stages.'})
+for path, expected in binding['shared_sources'].items():
+    assert sha((root / path).read_bytes()) == expected, path
+assert not structure['issues']
+assert all(item['executable_ast_equal'] for item in structure['cli_preservation'])
+assert {item['path']: item['sha256'] for item in structure['scope']} == binding['sources']
+
+receipts = [json.loads((root / item['path']).read_bytes()) for item in binding['receipts']]
+assert [item['stage'] for item in receipts] == ['format', 'lint', 'types', 'tests']
+assert all(item['exit_code'] == 0 for item in receipts)
+assert all(item['source_before'] == item['source_after'] == binding['sources'] for item in receipts)
+assert all(item['shared_before'] == item['shared_after'] == binding['shared_sources'] for item in receipts)
+nodes = receipts[-1]['test_node_order']
+assert len(nodes) == len(set(nodes)) == 166
+
+unit_rows = []
+module_rows = []
+baseline_coverage = json.loads((root / baseline['coverage']['path']).read_bytes())
+old_modules = {key.replace('\\', '/'): value for key, value in baseline_coverage['files'].items()}
+for path, data in coverage['files'].items():
+    tree = ast.parse((root / path).read_bytes())
+    definitions = {}
+    def visit(items, parent=''):
+        for node in items:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                name = parent + node.name
+                definitions[name] = {'start': node.lineno, 'end': node.end_lineno}
+                visit(node.body, name + '.')
+    visit(tree.body)
+    module_rows.append({'path': path, 'summary': data['summary'], 'missing_lines': data['missing_lines'],
+                        'baseline_summary': old_modules[path]['summary'],
+                        'statement_percentage_delta': data['summary']['percent_statements_covered']-old_modules[path]['summary']['percent_statements_covered']})
+    for kind in ('classes', 'functions'):
+        for name, unit in data[kind].items():
+            if not name:
+                continue
+            unchanged = path.endswith('/stack_cli.py') and name in ('_utc_now', '_default_schema_path', '_build_parser', '_run', 'main_dotnet')
+            status = 'unchanged-executable-cli' if unchanged else 'changed-or-new'
+            if not unit['summary']['num_statements']:
+                status = 'protocol-only-no-executable-statements'
+            elif not unchanged:
+                assert unit['summary']['percent_statements_covered'] >= 90, (path, name)
+            unit_rows.append({'path': path, 'kind': kind, 'name': name, 'range': definitions[name],
+                              'status': status, 'summary': unit['summary'], 'missing_lines': unit['missing_lines'],
+                              'executed_branches': unit.get('executed_branches', []), 'missing_branches': unit.get('missing_branches', [])})
+coverage_path = emit('regression-testing', 'p4t8-compatibility-coverage-ranges',
+                    {'task': 'P4-T8', 'timestamp': stamp, 'coverage': binding['coverage'],
+                     'modules': module_rows, 'units': unit_rows,
+                     'qualification': 'Three uncovered statements are unchanged _utc_now and _default_schema_path bodies; their executable AST and baseline gaps are retained. Relocated detector coverage belongs to the optional owner.'})
+
+harnesses = []
+for stem in ('focused', 'precheck', 'structure'):
+    path = scratch / ('issue-980-compatibility-' + stem + '.py')
+    destination = evidence / 'qa-gates' / ('p4t8-compatibility-' + stem + '-harness.' + stamp + '.txt')
+    with destination.open('xb') as stream:
+        stream.write(path.read_bytes())
+    harnesses.append({'scratch_path': 'SCRATCH/' + path.name, **ref(destination)})
+
+streams = []
+historical_receipts = []
+for kind in ('qa-gates', 'regression-testing'):
+    for path in sorted((evidence / kind).glob('p4t8-compatibility-*.json')):
+        data = json.loads(path.read_bytes())
+        if 'stage' not in data or 'raw' not in data:
+            continue
+        historical_receipts.append(ref(path))
+        assert data['harness']['sha256'] == harnesses[0]['sha256'], path
+        for label, item in data['raw'].items():
+            content = (scratch / Path(item['path']).name).read_bytes()
+            assert sha(content) == item['sha256'], item['path']
+            streams.append({'receipt': path.relative_to(root).as_posix(), 'stream': label,
+                            'path': item['path'], 'sha256': item['sha256'], 'base64': base64.b64encode(content).decode('ascii')})
+for name in ('p4t8-compatibility-focused3-coverage.raw.json', 'p4t8-compatibility-focused4-coverage.raw.json'):
+    content = (scratch / name).read_bytes()
+    streams.append({'path': 'SCRATCH/' + name, 'sha256': sha(content), 'base64': base64.b64encode(content).decode('ascii')})
+raw_path = emit('qa-gates', 'p4t8-compatibility-lossless-streams',
+                {'task': 'P4-T8', 'timestamp': stamp, 'encoding': 'base64 preserves original raw bytes, including host paths; rendered receipts are portable', 'streams': streams})
+
+history = {
+    'task': 'P4-T8', 'timestamp': stamp, 'retained_receipts': historical_receipts,
+    'tool_diagnostics': [
+        {'diagnostic': 'invalid patch: multiple operations target the same file', 'effect': 'First combined delete/add patch was rejected without source mutation; corrected to Update File.'},
+        {'diagnostic': 'PROMOTION_MCP_ONLY_BLOCKED', 'effect': 'Shell source-write command was rejected before mutation; parent authorized ordinary apply_patch. No policy change or hook bypass.'},
+        {'diagnostic': 'Failed to write file scripts/dev_tools/discovery/analyzer/stack_cli.py', 'effect': 'A prior patch in the tool batch had succeeded. Remaining owned updates were retried normally; this was not a zero-mutation batch.'}
+    ],
+    'tool_diagnostic_qualification': 'Observed tool responses retained here as factual descriptions; exact original tool-call bytes were not separately archived and are not hash-claimed.',
+    'preliminary_structure_rendering': {
+        'path': structure_path.relative_to(root).as_posix(),
+        'qualification': 'An initial failing structural rendering and the corrected pass used the same 11:48-minute filename; the pass superseded that preliminary JSON. Original failing JSON bytes are unavailable. The observed two findings are preserved below; no test result was overwritten.',
+        'observed_findings': [
+            {'path': 'scripts/dev_tools/discovery/analyzer/stack_cli.py', 'line_before_comment': 151, 'issue': 'Immediate intent comment before the enclosing JSON statement containing a comprehension.'},
+            {'path': 'tests/discovery_runtime/analyzer/test_registry.py', 'line_before_comment': 78, 'issue': 'Immediate intent comment before adapter-list assertion.'}
+        ],
+        'correction': 'Two comments added before focused4; executable behavior unchanged. Current complete passing structure receipt and exact focused4 hashes are bound.'
+    },
+    'semantic_expectation_corrections': [
+        {'behavior': 'Reference assembly label', 'before': 'Original accepted test expected Microsoft.Office.Interop.Word.', 'candidate_error': 'First compatibility draft expected generic Reference, causing one focused3 failure.', 'correction': 'Restore original validated literal assembly name; no public-label change.'},
+        {'behavior': 'Marshal.AddRef', 'before': 'Legacy regex classified every Marshal member.', 'approved_boundary': 'P4-T8 reuses accepted P4-T5 generic COM fixed grammar, which omits AddRef and arbitrary members.', 'correction': 'Retain AddRef and CustomMember as explicit unsupported negatives, retain ReleaseComObject and add FinalReleaseComObject positive controls.'}
+    ]
+}
+history_path = emit('qa-gates', 'p4t8-compatibility-history-qualification', history)
+
+mapping = [
+    {'old': 'Ribbon generation, root, extensibility, masking and fixture detections', 'disposition': 'Preserved with explicit configured profile and complete secure XML documents; original malformed two-root fixture retained as a rejection test.'},
+    {'old': 'COM attributes, namespace targets, ProgID lookup marker, project reference metadata', 'disposition': 'Preserved finite syntax labels. Safe assembly identifiers retained; GUID/ProgID arguments and COM target values are withheld.'},
+    {'old': 'Unrestricted standalone Guid and arbitrary Marshal members', 'disposition': 'Explicit unsupported negatives under approved secure generic COM reuse; no runtime or binding claim.'},
+    {'old': 'v1 parse/classify/map/emit, unreachable-root and include/exclude execution', 'disposition': 'Deliberate approved migration boundary: all four v1 stages now fail before any input or filesystem access. Runtime capture routing/exclusion/error semantics are owned and tested by the canonical v2 adapter.'},
+    {'old': 'v1 schema-valid emission and deterministic filesystem publication', 'disposition': 'No unguarded legacy publication remains. Canonical v2 adapter returns Analysis; sibling runtime tests own schema/provenance/determinism/no-I/O composition. Full guarded publication remains separate accepted infrastructure.'},
+    {'old': 'main_dotnet execution and errors', 'disposition': 'Five helper/entrypoint executable ASTs unchanged; all actual legacy .NET caller controls retained.'},
+    {'old': '14 inert pattern exports', 'disposition': 'Fixed-name lazy forwarding returns the canonical identical object for every export; unknown names fail before import.'},
+    {'old': 'Core neutrality checks', 'disposition': 'Core source remains scanned. Only exact registry selector/import/constructor AST metadata is removed; injected comments, arbitrary data and optional-branch business logic are explicitly rejected.'}
+]
+handoff = f'''# P4-T8 compatibility subset handoff
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-compatibility-freeze.py`
+EXIT_CODE: 0
+Output Summary: Frozen focused subset; consolidated review and final task gates remain pending.
+
+The ten owned source/test paths pass Black, Ruff, scoped Pyright and 166 focused cases. Exact commands, case order, elapsed times and borrowed optional hashes are retained in the focused4 binding. Four measured modules cover 134/137 statements and 20/20 branch destinations. All new or changed executable class/callable ranges are fully covered. The three baseline-uncovered CLI helper statements remain unchanged; no repository-wide coverage claim is made.
+
+The legacy analyzer requires an explicit configured profile and v2 capture for execution. Classifier positional path/text signatures and fixed data exports remain available through guarded lazy forwarding. The old v1 pipeline and CLI fail before profile/source I/O with a migration diagnostic. Runtime selection validates the complete enabled set before the fixed optional import; broader registry publication remains P4-T9.
+
+The original validated assembly label is preserved. AddRef remains an explicit unsupported negative because the approved generic COM grammar has a finite method set; ReleaseComObject and FinalReleaseComObject remain positive controls. The original malformed Ribbon fixture is unchanged. No consumer-specific semantics were added.
+
+The history qualification records original failed checks, tool failures and one superseded preliminary structure rendering accurately. It makes no original-byte claim for unavailable tool output or overwritten preliminary JSON. Current passing source/coverage bindings remain exact.
+
+This is a Windows focused development proof. Whole-repository type checking, full task architecture/contracts/native composition, independent consolidated acceptance, registry publication and native coding-agent-host proof remain pending or assigned elsewhere. Sources and evidence are frozen for parent staging and review; no task or acceptance-criterion checkoff was performed.
+'''
+handoff_path = markdown('regression-testing', 'p4t8-compatibility-handoff', handoff)
+manifest_path = evidence / 'regression-testing' / ('p4t8-compatibility-freeze.' + stamp + '.json')
+manifest_md = manifest_path.with_suffix('.md')
+all_evidence = sorted(path for path in evidence.rglob('p4t8-compatibility-*') if path.is_file())
+manifest = {
+    'task': 'P4-T8', 'timestamp': stamp, 'written_at': now.isoformat(), 'state': 'FOCUSED_SUBSET_FROZEN_REVIEW_PENDING',
+    'accepted_head': baseline['head'], 'current_head': git('rev-parse', 'HEAD').decode().strip(),
+    'baseline': ref(baseline_path), 'source_bindings': sources, 'shared_sources': binding['shared_sources'],
+    'focused_binding': ref(binding_path), 'coverage_ranges': ref(coverage_path), 'structure': ref(structure_path),
+    'harnesses': harnesses, 'raw_streams': ref(raw_path), 'history_qualification': ref(history_path),
+    'behavior_mapping': mapping, 'handoff': ref(handoff_path), 'test_count': len(nodes),
+    'test_node_order': nodes, 'stage_seconds': {item['stage']: item['seconds'] for item in receipts},
+    'git_attributes': git('check-attr', 'text', 'eol', '--', *binding['sources']).decode().splitlines(),
+    'evidence': [ref(path) for path in all_evidence],
+    'stage_paths': sorted([*binding['sources'], *[path.relative_to(root).as_posix() for path in all_evidence], manifest_path.relative_to(root).as_posix(), manifest_md.relative_to(root).as_posix()]),
+    'limitations': ['No final task acceptance or AC checkoff', 'No broad predecessor rerun', 'No native coding-agent-host or non-Windows execution proof', 'Other adapter registry IDs remain blocked until P4-T9', 'Legacy v1 optional execution deliberately requires migration to v2 capture']
+}
+with manifest_path.open('xb') as stream:
+    stream.write((json.dumps(manifest, indent=2, sort_keys=True)+'\n').encode('utf-8'))
+markdown('regression-testing', 'p4t8-compatibility-freeze',
+         f'# P4-T8 compatibility freeze\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-compatibility-freeze.py`\nEXIT_CODE: 0\nOutput Summary: 166 focused cases pass; ten owned files frozen for consolidated review.\n\nManifest SHA-256: `{sha(manifest_path.read_bytes())}`. The JSON enumerates exact source, dependency, evidence, coverage-range and stage-path bindings. {len(unit_rows)} class/callable coverage ranges are retained. Final task gates and acceptance remain pending.\n')
+print(json.dumps({'manifest': ref(manifest_path), 'handoff': ref(handoff_path), 'paths_to_stage': len(manifest['stage_paths']), 'case_count': len(nodes), 'unit_ranges': len(unit_rows), 'max_source_lines': max(item['lines'] for item in sources)}))

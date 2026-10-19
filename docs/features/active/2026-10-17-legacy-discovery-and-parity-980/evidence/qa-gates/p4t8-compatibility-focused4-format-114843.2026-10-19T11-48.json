@@ -1,0 +1,63 @@
+{
+  "batch": "focused4",
+  "command": "poetry run python -m black --check scripts/dev_tools/discovery/analyzer/vsto_office.py scripts/dev_tools/discovery/analyzer/vsto_patterns.py scripts/dev_tools/discovery/analyzer/stack_cli.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py tests/discovery_runtime/analyzer/test_registry.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T11:48:43.754173+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-compatibility-focused.py",
+    "sha256": "537ab1a5d6cdda4e298c4eac255c155cf0db11d19745b8a84f2dd4f378caf4cc"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t8-compatibility-focused4-format-114843.2026-10-19T11-48.stderr.txt",
+      "sha256": "24aba9953343a8dd29dfdc605afdc5a582b63555d831a5727aceea33a9abe913"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t8-compatibility-focused4-format-114843.2026-10-19T11-48.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.620186,
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c"
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff",
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678",
+    "scripts/dev_tools/discovery/analyzer/vsto_office.py": "3664e41b738e962ed9a3035f2c81af44c62b6a855e16f4437cb21db5bb95c24a",
+    "scripts/dev_tools/discovery/analyzer/vsto_patterns.py": "48957ece4f9ebdbc66b99a7efadf3c3d916a1e7bef3dd83ec609bd502c91571b",
+    "tests/discovery_runtime/analyzer/test_registry.py": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py": "c0add50ff7f90b0cb4d8596abd6a5b5b26588d0d4dcb176eab701af5cdb5eaa9",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "370eb179db31ae629a817ad79dbdd92470c330430e4440d8515eecb6b3098fd8"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff",
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678",
+    "scripts/dev_tools/discovery/analyzer/vsto_office.py": "3664e41b738e962ed9a3035f2c81af44c62b6a855e16f4437cb21db5bb95c24a",
+    "scripts/dev_tools/discovery/analyzer/vsto_patterns.py": "48957ece4f9ebdbc66b99a7efadf3c3d916a1e7bef3dd83ec609bd502c91571b",
+    "tests/discovery_runtime/analyzer/test_registry.py": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py": "c0add50ff7f90b0cb4d8596abd6a5b5b26588d0d4dcb176eab701af5cdb5eaa9",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "370eb179db31ae629a817ad79dbdd92470c330430e4440d8515eecb6b3098fd8"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T11:48:43.133987+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n10 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-48"
+}

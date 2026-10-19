@@ -1,39 +1,9 @@
-"""Shared console entry points for the stack-specific analyzers.
+"""Preserve the .NET CLI while rejecting unconsented optional legacy execution.
 
-Purpose:
-    Provide the ``dev.discovery.dotnet`` and ``dev.discovery.vsto`` commands.
-    Both delegate to one shared ``_run`` helper that loads a domain profile,
-    builds the run context, drives the analyzer end-to-end, and writes one
-    Evidence Reference instance per detection. The argparse surface and exit-code
-    contract mirror ``dev.discovery.inventory`` (#363).
-
-Coordination note (recorded, not a blocker):
-    #363's ``cli.py`` does not factor its profile-load / context-build / run /
-    summary flow into a reusable helper (its ``main`` is bound to
-    ``InventoryAnalyzer``). This module therefore implements a local ``_run``
-    helper rather than copying that flow into duplicated modules. The preferred
-    resolution is to propose extracting a reusable CLI-flow helper into #363 at
-    integration-branch time; that refactor proposal is an open coordination item.
-
-Responsibilities:
-    - Parse the flat argument surface (optional positional ``profile`` path,
-      ``--output-dir``, ``--json``).
-    - Delegate loading and validation to ``load_domain_profile`` (imported here so
-      tests can patch it at this module boundary, per the python.md rule).
-    - Map errors to exit codes: ``0`` success; ``1`` on ``DomainProfileError`` or
-      ``AnalyzerError`` caught only at the CLI boundary; ``2`` argparse usage
-      error (raised by argparse as ``SystemExit(2)``).
-
-Invariants / Constraints:
-    - Only ``DomainProfileError`` and ``AnalyzerError`` are caught; there is no
-      broad exception handler.
-    - ``captured_at`` is produced by an injected clock (defaulting to a UTC
-      wall-clock provider) so runs are deterministic under test.
-
-Side Effects:
-    Reads the profile file (via ``load_domain_profile``), reads the consumer
-    source tree, writes Evidence Reference instances, and prints to stdout and
-    stderr.
+The .NET command keeps its profile/context/pipeline flow and injected I/O seams.
+The optional command keeps argument parsing only, then reports the required v2
+capture route before profile loading, filesystem construction or source access.
+Neither command eagerly imports the optional implementation.
 """
 
 from __future__ import annotations
@@ -54,7 +24,6 @@ from scripts.dev_tools.discovery.analyzer.pipeline import (
     RealAnalyzerFileSystem,
     run_analyzer,
 )
-from scripts.dev_tools.discovery.analyzer.vsto_office import VstoOfficeAnalyzer
 from scripts.dev_tools.discovery.domain_profile import (
     DEFAULT_PROFILE_FILENAME,
     load_domain_profile,
@@ -71,12 +40,19 @@ if TYPE_CHECKING:
 
 
 def _utc_now() -> str:
-    """Return the current UTC time as a schema-conforming ISO-8601 timestamp."""
+    """Return str UTC ISO-8601 time from the host clock; no arguments or writes.
+
+    This default provider has no expected contract errors; tests inject a clock.
+    """
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _default_schema_path() -> Path:
-    """Return the repository path of the discovery v1 Evidence Reference schema."""
+    """Return Path of the repository's v1 schema without reading its contents.
+
+    No arguments. Resolves this module path; OSError propagates on resolution
+    failures. No writes or optional imports.
+    """
     repo_root = Path(__file__).resolve().parents[4]
     return repo_root / "schemas" / "discovery" / "v1" / "evidence-reference.schema.json"
 
@@ -85,11 +61,11 @@ def _build_parser(prog: str) -> argparse.ArgumentParser:
     """Build the flat argparse surface shared by both entry points.
 
     Args:
-        prog: The program name used in usage and help output.
+        prog (str): The program name used in usage and help output.
 
     Returns:
-        A configured ``ArgumentParser`` whose surface matches
-        ``dev.discovery.inventory``.
+        argparse.ArgumentParser with the existing flat inventory argument shape.
+        No I/O or expected contract errors occur until parsing is requested.
     """
     parser = argparse.ArgumentParser(
         prog=prog,
@@ -126,16 +102,17 @@ def _run(
     """Load, run, and summarize one stack analyzer end-to-end.
 
     Args:
-        analyzer_factory: Builds the concrete analyzer from a filesystem seam.
-        prog: The program name for argparse.
-        argv: Argument vector; ``None`` uses ``sys.argv[1:]``.
-        clock: Injected timestamp provider for ``captured_at``.
-        fs: Injected filesystem seam; defaults to the real filesystem.
-        schema_path: Injected schema-file path; defaults to the repository schema.
+        analyzer_factory (Callable[[AnalyzerFileSystem], Analyzer]): Fixed factory.
+        prog (str): The program name for argparse.
+        argv (Sequence[str] | None): Arguments; None uses sys.argv[1:].
+        clock (Callable[[], str]): Timestamp provider for captured_at.
+        fs (AnalyzerFileSystem | None): I/O seam; None uses the real filesystem.
+        schema_path (Path | None): Schema path; None selects the repository schema.
 
     Returns:
-        ``0`` on success; ``1`` on a domain or analyzer error. Argparse raises
-        ``SystemExit(2)`` for usage errors before this returns.
+        int 0 on success or 1 on a domain/analyzer error. Argparse raises
+        SystemExit(0/2) for help/usage. Loads profile/source through existing seams,
+        delegates publication policy to run_analyzer, and prints the result.
     """
     parser = _build_parser(prog)
     args = parser.parse_args(argv)
@@ -168,8 +145,10 @@ def _run(
         return 1
     # Success output: a machine-readable summary with ``--json``, else a count.
     if args.json:
+        # Describe the completed pipeline result without granting additional writes.
         summary = {
             "record_count": len(result.records),
+            # Preserve the pipeline's explicit publication result in the CLI view.
             "written_paths": [str(path) for path in result.written_paths],
         }
         print(json.dumps(summary, sort_keys=True, indent=2))
@@ -185,7 +164,14 @@ def main_dotnet(
     fs: AnalyzerFileSystem | None = None,
     schema_path: Path | None = None,
 ) -> int:
-    """Run the .NET/C# inventory analyzer end-to-end (``dev.discovery.dotnet``)."""
+    """Delegate the unchanged .NET CLI flow through its injected boundaries.
+
+    argv (Sequence[str] | None) supplies arguments; clock (Callable[[], str])
+    supplies timestamps; fs (AnalyzerFileSystem | None) and schema_path
+    (Path | None) supply existing optional seams. Returns int 0/1; argparse raises
+    SystemExit for help/usage. Reads the profile/source and prints the pipeline
+    summary; publication behavior remains owned by the existing pipeline.
+    """
     return _run(
         lambda seam: DotnetInventoryAnalyzer(fs=seam),
         "dev.discovery.dotnet",
@@ -203,12 +189,21 @@ def main_vsto(
     fs: AnalyzerFileSystem | None = None,
     schema_path: Path | None = None,
 ) -> int:
-    """Run the VSTO/Office analyzer end-to-end (``dev.discovery.vsto``)."""
-    return _run(
-        lambda seam: VstoOfficeAnalyzer(fs=seam),
-        "dev.discovery.vsto",
-        argv,
-        clock=clock,
-        fs=fs,
-        schema_path=schema_path,
+    """Retain legacy CLI usage while requiring the consented v2 analysis route.
+
+    argv (Sequence[str] | None) supplies arguments or uses sys.argv. clock
+    (Callable[[], str]), fs (AnalyzerFileSystem | None) and schema_path
+    (Path | None) retain the historical call shape but are never accessed.
+    Returns 1 with a fixed migration error on stderr; argparse raises SystemExit
+    with 0 for help or 2 for invalid usage. No profile/source I/O, optional import,
+    clock invocation or filesystem construction occurs.
+    """
+    del clock, fs, schema_path
+    _build_parser("dev.discovery.vsto").parse_args(argv)
+    print(
+        "dev.discovery.vsto requires a v2 InventoryCapture and a configured "
+        "ProfileV2 enabling office-vsto; use VstoOfficeAnalyzer.analyze(capture). "
+        "No files were read or written.",
+        file=sys.stderr,
     )
+    return 1

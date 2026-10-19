@@ -1,0 +1,36 @@
+{
+  "task": "P4-T8",
+  "status": "CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.json",
+      "sha256": "ad62b8f8e9b77504aa956f00e7fdaeea94b016479ee042ac1654099dd110bc45"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.md",
+      "sha256": "c9f72c1a9fd5f20f9eeaab18186d25750ae5355e9a4051105bdedd1bb5901835"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review-harness.2026-10-19T12-08.txt",
+      "sha256": "c7a25844814bc63c4a9ee0c2734d6b62ea00f667858d865852c8ff46044fc61b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-receipt-checker-correction.2026-10-19T12-08.json",
+      "sha256": "55807d5402bc9957e876a67a10b62b688539fd627739462212bc87451ea5da27"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review-harness.2026-10-19T12-08.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-receipt-checker-correction.2026-10-19T12-08.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-staging.2026-10-19T12-08.json"
+  ],
+  "prior_optional_review_already_committed": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.json",
+    "sha256": "2abbe88ae82f0ec18e78078d01ecbf48bb08d859739386d5922ce6ec1a9561e6"
+  },
+  "source_test_plan_ac_checkpoint_git_mutations": false,
+  "timestamp": "2026-10-19T12-08",
+  "published_utc": "2026-10-19T12:08:45.351965+00:00"
+}

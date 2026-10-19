@@ -1,0 +1,912 @@
+{
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t8-compatibility-focused4-coverage.2026-10-19T11-49.json",
+    "raw_path": "SCRATCH/p4t8-compatibility-focused4-coverage.raw.json",
+    "raw_sha256": "01df5d85f8754a31045459585c29fccebbea1dc8730608633806b9cb5d2ea940",
+    "sha256": "d82f1bac8c628c9192662b1eb3f933fbb8cb6bdd6874e386ccccf8c175258ec4"
+  },
+  "modules": [
+    {
+      "baseline_summary": {
+        "covered_branches": 2,
+        "covered_lines": 14,
+        "excluded_lines": 8,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 14,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "missing_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "statement_percentage_delta": 0.0,
+      "summary": {
+        "covered_branches": 8,
+        "covered_lines": 23,
+        "excluded_lines": 7,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 23,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "baseline_summary": {
+        "covered_branches": 2,
+        "covered_lines": 49,
+        "excluded_lines": 3,
+        "missing_branches": 0,
+        "missing_lines": 3,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 52,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 94.44444444444444,
+        "percent_covered_display": "94",
+        "percent_statements_covered": 94.23076923076923,
+        "percent_statements_covered_display": "94"
+      },
+      "missing_lines": [
+        47,
+        56,
+        57
+      ],
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "statement_percentage_delta": 0.21367521367521647,
+      "summary": {
+        "covered_branches": 2,
+        "covered_lines": 51,
+        "excluded_lines": 3,
+        "missing_branches": 0,
+        "missing_lines": 3,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 54,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 94.64285714285714,
+        "percent_covered_display": "95",
+        "percent_statements_covered": 94.44444444444444,
+        "percent_statements_covered_display": "94"
+      }
+    },
+    {
+      "baseline_summary": {
+        "covered_branches": 54,
+        "covered_lines": 123,
+        "excluded_lines": 4,
+        "missing_branches": 6,
+        "missing_lines": 11,
+        "num_branches": 60,
+        "num_partial_branches": 4,
+        "num_statements": 134,
+        "percent_branches_covered": 90.0,
+        "percent_branches_covered_display": "90",
+        "percent_covered": 91.23711340206185,
+        "percent_covered_display": "91",
+        "percent_statements_covered": 91.7910447761194,
+        "percent_statements_covered_display": "92"
+      },
+      "missing_lines": [],
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "statement_percentage_delta": 8.208955223880594,
+      "summary": {
+        "covered_branches": 8,
+        "covered_lines": 52,
+        "excluded_lines": 5,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 52,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "baseline_summary": {
+        "covered_branches": 0,
+        "covered_lines": 16,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 16,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "missing_lines": [],
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "statement_percentage_delta": 0.0,
+      "summary": {
+        "covered_branches": 2,
+        "covered_lines": 8,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 8,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    }
+  ],
+  "qualification": "Three uncovered statements are unchanged _utc_now and _default_schema_path bodies; their executable AST and baseline gaps are retained. Relocated detector coverage belongs to the optional owner.",
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-54",
+  "units": [
+    {
+      "executed_branches": [],
+      "kind": "classes",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "InventoryAdapter",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "range": {
+        "end": 36,
+        "start": 18
+      },
+      "status": "protocol-only-no-executable-statements",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "InventoryAdapter.analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "range": {
+        "end": 36,
+        "start": 29
+      },
+      "status": "protocol-only-no-executable-statements",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 1,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "InventoryAdapter.identifier",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "range": {
+        "end": 27,
+        "start": 22
+      },
+      "status": "protocol-only-no-executable-statements",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 1,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          50,
+          51
+        ],
+        [
+          50,
+          52
+        ],
+        [
+          55,
+          56
+        ],
+        [
+          55,
+          60
+        ],
+        [
+          62,
+          64
+        ],
+        [
+          62,
+          72
+        ],
+        [
+          64,
+          65
+        ],
+        [
+          64,
+          71
+        ]
+      ],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "select_analyzers",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "range": {
+        "end": 72,
+        "start": 39
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 8,
+        "covered_lines": 14,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 14,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_build_parser",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 90,
+        "start": 60
+      },
+      "status": "unchanged-executable-cli",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 5,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 5,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [
+        56,
+        57
+      ],
+      "name": "_default_schema_path",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 57,
+        "start": 50
+      },
+      "status": "unchanged-executable-cli",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 2,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          147,
+          149
+        ],
+        [
+          147,
+          156
+        ]
+      ],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_run",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 157,
+        "start": 93
+      },
+      "status": "unchanged-executable-cli",
+      "summary": {
+        "covered_branches": 2,
+        "covered_lines": 22,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 22,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [
+        47
+      ],
+      "name": "_utc_now",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 47,
+        "start": 42
+      },
+      "status": "unchanged-executable-cli",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 1,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 0.0,
+        "percent_covered_display": "0",
+        "percent_statements_covered": 0.0,
+        "percent_statements_covered_display": "0"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "main_dotnet",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 182,
+        "start": 160
+      },
+      "status": "unchanged-executable-cli",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 1,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 1,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "main_vsto",
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "range": {
+        "end": 209,
+        "start": 185
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          196,
+          197
+        ],
+        [
+          196,
+          198
+        ],
+        [
+          198,
+          199
+        ],
+        [
+          198,
+          200
+        ]
+      ],
+      "kind": "classes",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 241,
+        "start": 162
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 4,
+        "covered_lines": 17,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 17,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.__init__",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 185,
+        "start": 175
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          196,
+          197
+        ],
+        [
+          196,
+          198
+        ],
+        [
+          198,
+          199
+        ],
+        [
+          198,
+          200
+        ]
+      ],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.analyze",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 205,
+        "start": 187
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 4,
+        "covered_lines": 7,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 7,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.classify",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 221,
+        "start": 215
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.emit",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 241,
+        "start": 232
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.map",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 230,
+        "start": 223
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "VstoOfficeAnalyzer.parse",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 213,
+        "start": 207
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 2,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 2,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          45,
+          46
+        ],
+        [
+          45,
+          49
+        ],
+        [
+          50,
+          51
+        ],
+        [
+          50,
+          55
+        ]
+      ],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_require_consent",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 55,
+        "start": 37
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 4,
+        "covered_lines": 6,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "num_statements": 6,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "classify_csharp",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 87,
+        "start": 58
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "classify_project",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 159,
+        "start": 126
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "classify_xml",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "range": {
+        "end": 123,
+        "start": 90
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 3,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 3,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "executed_branches": [
+        [
+          54,
+          55
+        ],
+        [
+          54,
+          56
+        ]
+      ],
+      "kind": "functions",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "__getattr__",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "range": {
+        "end": 58,
+        "start": 47
+      },
+      "status": "changed-or-new",
+      "summary": {
+        "covered_branches": 2,
+        "covered_lines": 4,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "num_statements": 4,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    }
+  ]
+}

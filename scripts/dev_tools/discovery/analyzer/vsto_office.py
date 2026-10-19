@@ -1,451 +1,241 @@
-"""The VSTO/Office analyzer (Ribbon-XML and COM-interop detection).
+"""Keep legacy optional-analyzer names behind explicit v2 configuration consent.
 
-Purpose:
-    Implement a concrete stack-specific ``Analyzer`` (structural, no base class,
-    no registry) that detects VSTO ribbon customization and COM-interop usage
-    across C#, ribbon-XML, and project files, emitting one Evidence Reference v1
-    instance per detection via the reused #363 emitter.
-
-File routing:
-    Within the include/exclude-filtered candidate set, ``.cs`` files are scanned
-    over comment/string-stripped text, ``.xml`` files over unstripped text, and
-    ``*proj`` files over unstripped XML. The pattern tables live in
-    ``vsto_patterns`` so this module stays under the 500-line file-size limit.
-
-Heuristic scope (normative):
-    This analyzer is a heuristic textual evidence scanner, not a compiler.
-    Detections record an observed textual pattern at a file/line anchor. The
-    Office interop application name is captured as data into
-    ``metadata.interop_target`` and never branched on, which keeps the analyzer
-    consumer-neutral while remaining Office-stack-aware.
-
-Invariants / Constraints:
-    - ``parse`` performs the only I/O; ``classify`` is pure; ``map`` reads file
-      bytes (cached per path) for integrity hashing via the seam.
-    - ``classify`` isinstance-narrows to ``TextParseResult`` and ``map`` to
-      ``DetectionResult``, raising ``AnalyzerError`` on the plain base type.
-    - Enumeration is deterministic; ids are pure functions of the detection.
-
-Side Effects:
-    Stage methods read and write only through the injected filesystem seam.
+Pure classifiers retain positional path/text calls, but require a configured
+profile selecting office-vsto. Legacy filesystem pipelines cannot establish
+immutable provenance and therefore fail before reading or writing anything.
 """
 
 from __future__ import annotations
 
-import hashlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-from scripts.dev_tools.discovery.analyzer import vsto_patterns as patterns
-from scripts.dev_tools.discovery.analyzer.emitter import serialize_record
-from scripts.dev_tools.discovery.analyzer.inventory import AnalyzerError, filter_paths
-from scripts.dev_tools.discovery.analyzer.pipeline import RealAnalyzerFileSystem
-from scripts.dev_tools.discovery.analyzer.source_text import (
-    Detection,
-    DetectionResult,
-    TextParseResult,
-    build_evidence_record,
-    numbered_lines,
-    strip_comments_and_strings,
-)
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.inventory import AnalyzerError
+from drm_copilot_discovery.analyzer.models import InventoryCapture
+from drm_copilot_discovery.profile_v2 import ProfileV2
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from scripts.dev_tools.discovery.analyzer.models import (
+    from drm_copilot_discovery.analyzer.models import (
+        Analysis,
         AnalyzerContext,
         ClassifyResult,
         EvidenceRecord,
         ParseResult,
     )
-    from scripts.dev_tools.discovery.analyzer.pipeline import AnalyzerFileSystem
+    from drm_copilot_discovery.analyzer.pipeline import AnalyzerFileSystem
+    from drm_copilot_discovery.analyzer.source_text import Detection
 
-_ANALYZER_NAME = "vsto-office"
-_ID_PREFIX = "vsto"
-_TOOL = "dev.discovery.vsto"
+_MIGRATION_ERROR = (
+    "Legacy vsto-office execution requires a v2 InventoryCapture and a configured "
+    "ProfileV2 enabling office-vsto; use analyze(capture). "
+    "No files were read or written."
+)
 
 
-def _detect_ribbon_xml(path: str, lineno: int, line: str) -> list[Detection]:
-    """Detect ribbon customUI patterns on one unstripped XML line (pure)."""
-    detections: list[Detection] = []
-    # Each customUI namespace URI is a distinct schema-generation signal; record
-    # the matched URI so downstream consumers can tell the generations apart.
-    for generation, uri in patterns.CUSTOMUI_URIS:
-        if uri in line:
-            detections.append(
-                Detection(
-                    path=path,
-                    line=lineno,
-                    detection_kind="ribbon_xml",
-                    symbol=f"customui-{generation}",
-                    symbol_kind="element",
-                    extra=(("customui_schema", uri),),
-                )
-            )
-    # The opening ``<customUI`` root element is the corroborating signal.
-    if patterns.CUSTOMUI_ELEMENT_RE.search(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="ribbon_xml",
-                symbol="customUI",
-                symbol_kind="element",
-            )
+def _require_consent(profile: ProfileV2 | None) -> ProfileV2:
+    """Validate consent before importing optional implementation code.
+
+    profile (ProfileV2 | None) is the caller's explicit validated configuration.
+    Returns the configured ProfileV2 selecting office-vsto. Raises SourceScanError
+    with office-consent for missing/incorrect/disabled profiles, or ProfileError
+    for a draft. Performs no I/O, imports or source processing.
+    """
+    if not isinstance(profile, ProfileV2):
+        raise SourceScanError(
+            "office-consent", "Supply a configured ProfileV2 enabling office-vsto."
         )
-    return detections
-
-
-def _detect_ribbon_cs(path: str, lineno: int, line: str) -> list[Detection]:
-    """Detect ribbon-extensibility patterns on one stripped C# line (pure)."""
-    detections: list[Detection] = []
-    # IRibbonExtensibility (bare or namespace-qualified) is the interface signal.
-    if patterns.IRIBBON_RE.search(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="ribbon_extensibility",
-                symbol="IRibbonExtensibility",
-                symbol_kind="interface",
-            )
+    profile.require_configured()
+    if "office-vsto" not in profile.analyzers.enabled:
+        raise SourceScanError(
+            "office-consent",
+            "Enable office-vsto explicitly in the configured ProfileV2.",
         )
-    # GetCustomUI is the single method of IRibbonExtensibility.
-    if patterns.GETCUSTOMUI_RE.search(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="ribbon_extensibility",
-                symbol="GetCustomUI",
-                symbol_kind="method",
-            )
-        )
-    # The designer ribbon model bypasses GetCustomUI, so it is a required signal.
-    if patterns.DESIGNER_RIBBON_LITERAL in line:
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="ribbon_extensibility",
-                symbol=patterns.DESIGNER_RIBBON_LITERAL,
-                symbol_kind="element",
-            )
-        )
-    return detections
+    return profile
 
 
-def _detect_com_attributes(
-    path: str, lineno: int, stripped: str, original: str
+def classify_csharp(
+    path: str,
+    text: str,
+    *,
+    profile: ProfileV2 | None = None,
+    max_tokens: int = 100000,
+    max_candidates: int = 100000,
 ) -> list[Detection]:
-    """Detect COM interop attributes on one line (pure).
+    """Forward a consented C# text call to the canonical bounded classifier.
 
-    Attribute presence is confirmed on the stripped line so a commented or
-    stringized attribute cannot match; the GUID value, which lives inside a
-    string literal blanked by the stripper, is captured from the original line
-    only after that confirmation.
+    path (str) is a relative source name; text (str) is retained decoded content.
+    profile (ProfileV2 | None) supplies explicit configured consent. max_tokens
+    and max_candidates (int) are positive capacities limited by that profile.
+    Returns list[Detection] of syntax facts/inferences, never runtime proof.
+    Raises SourceScanError for invalid input/consent, ValueError for capacities,
+    PathPolicyError for invalid paths, or ProfileError for
+    drafts. Imports only the fixed optional implementation after consent; no I/O.
     """
-    detections: list[Detection] = []
-    # Walk the attribute table; each entry confirms one interop attribute name.
-    for attribute_name, pattern in patterns.COM_ATTRIBUTE_RES:
-        if pattern.search(stripped) is None:
-            continue
-        extra: tuple[tuple[str, str | int], ...] = ()
-        # The GUID value is only available in the unstripped original line.
-        if attribute_name == "Guid":
-            guid_match = patterns.GUID_CAPTURE_RE.search(original)
-            if guid_match is not None:
-                extra = (("com_guid", guid_match.group(1)),)
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="com_attribute",
-                symbol=attribute_name,
-                symbol_kind="element",
-                extra=extra,
-            )
-        )
-    return detections
+    configured = _require_consent(profile)
+    from drm_copilot_discovery.analyzer.optional.vsto_office import (
+        classify_csharp as classify,
+    )
+
+    return classify(
+        path,
+        text,
+        profile=configured,
+        max_tokens=max_tokens,
+        max_candidates=max_candidates,
+    )
 
 
-def _detect_com_usage(path: str, lineno: int, line: str) -> list[Detection]:
-    """Detect Marshal/ProgID/interop-using patterns on one stripped line (pure)."""
-    detections: list[Detection] = []
-    # Marshal member calls: capture the member with no fixed allow-list.
-    for marshal_match in patterns.MARSHAL_RE.finditer(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="marshal_call",
-                symbol=marshal_match.group("member"),
-                symbol_kind="method",
-            )
-        )
-    # ProgID activation via Type.GetTypeFromProgID(.
-    if patterns.PROGID_RE.search(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="progid_activation",
-                symbol="GetTypeFromProgID",
-                symbol_kind="method",
-            )
-        )
-    # Office interop using: capture the application name as data, never branch it.
-    using_match = patterns.INTEROP_USING_RE.match(line)
-    if using_match is not None:
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="interop_using",
-                symbol=using_match.group("full"),
-                symbol_kind="namespace",
-                extra=(("interop_target", using_match.group("app")),),
-            )
-        )
-    return detections
+def classify_xml(
+    path: str,
+    text: str,
+    *,
+    profile: ProfileV2 | None = None,
+    max_bytes: int = 67108864,
+    max_elements: int = 100000,
+    max_depth: int = 64,
+    max_candidates: int = 100000,
+) -> list[Detection]:
+    """Forward consented complete XML to the canonical secure classifier.
 
-
-def _detect_project(path: str, lineno: int, line: str) -> list[Detection]:
-    """Detect project-file COM references on one unstripped line (pure)."""
-    detections: list[Detection] = []
-    # ``<COMReference Include="...">`` captures the Include value as the symbol.
-    com_match = patterns.COMREFERENCE_RE.search(line)
-    if com_match is not None:
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="com_reference",
-                symbol=com_match.group("include"),
-                symbol_kind="assembly",
-            )
-        )
-    # ``<EmbedInteropTypes>`` marks an embedded interop type.
-    if patterns.EMBEDINTEROP_RE.search(line):
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="com_reference",
-                symbol="EmbedInteropTypes",
-                symbol_kind="element",
-            )
-        )
-    # An interop assembly ``<Reference Include="Microsoft.Office.Interop.*">``.
-    assembly_match = patterns.INTEROP_ASSEMBLY_RE.search(line)
-    if assembly_match is not None:
-        detections.append(
-            Detection(
-                path=path,
-                line=lineno,
-                detection_kind="com_reference",
-                symbol=assembly_match.group("include"),
-                symbol_kind="assembly",
-            )
-        )
-    return detections
-
-
-def classify_csharp(path: str, text: str) -> list[Detection]:
-    """Detect ribbon and COM C# patterns in one file's text (pure; strips first).
-
-    Args:
-        path: Consumer-relative POSIX path used as the detection anchor.
-        text: Raw C# source text.
-
-    Returns:
-        Ordered detections for the file.
+    path (str) is a relative name; text (str) is caller-retained decoded XML.
+    profile (ProfileV2 | None) supplies configured consent. max_bytes,
+    max_elements, max_depth and max_candidates (int) are positive byte, element,
+    nesting and output capacities, constrained by the profile. Returns
+    list[Detection]. Raises SourceScanError for consent/input, ValueError for
+    capacities, PathPolicyError for invalid paths, ProfileError
+    for drafts, or XmlInputError for invalid XML. Imports lazily; performs no I/O.
     """
-    stripped = strip_comments_and_strings(text)
-    detections: list[Detection] = []
-    # Scan each line over both the stripped text (for pattern presence) and the
-    # original text (for GUID value capture), which share line numbering.
-    for (lineno, stripped_line), (_, original_line) in zip(
-        numbered_lines(stripped), numbered_lines(text), strict=True
-    ):
-        detections.extend(_detect_ribbon_cs(path, lineno, stripped_line))
-        detections.extend(
-            _detect_com_attributes(path, lineno, stripped_line, original_line)
-        )
-        detections.extend(_detect_com_usage(path, lineno, stripped_line))
-    return detections
+    configured = _require_consent(profile)
+    from drm_copilot_discovery.analyzer.optional.vsto_office import (
+        classify_xml as classify,
+    )
+
+    return classify(
+        path,
+        text,
+        profile=configured,
+        max_bytes=max_bytes,
+        max_elements=max_elements,
+        max_depth=max_depth,
+        max_candidates=max_candidates,
+    )
 
 
-def classify_xml(path: str, text: str) -> list[Detection]:
-    """Detect ribbon customUI patterns in one XML file's text (pure; unstripped)."""
-    detections: list[Detection] = []
-    # Ribbon XML is scanned unstripped; XML has no C# comment/string semantics.
-    for lineno, line in numbered_lines(text):
-        detections.extend(_detect_ribbon_xml(path, lineno, line))
-    return detections
+def classify_project(
+    path: str,
+    text: str,
+    *,
+    profile: ProfileV2 | None = None,
+    max_bytes: int = 67108864,
+    max_elements: int = 100000,
+    max_depth: int = 64,
+    max_candidates: int = 100000,
+) -> list[Detection]:
+    """Forward consented project XML without evaluating imports or properties.
 
+    path (str) is a relative project name; text (str) contains the complete XML.
+    profile (ProfileV2 | None) supplies configured consent. max_bytes,
+    max_elements, max_depth and max_candidates (int) limit bytes, elements,
+    nesting and output within profile capacities. Returns list[Detection]. Raises
+    SourceScanError for consent/input, ValueError for capacities, PathPolicyError
+    for invalid paths, ProfileError for drafts, or
+    XmlInputError for invalid XML. Imports lazily; no I/O or build evaluation.
+    """
+    configured = _require_consent(profile)
+    from drm_copilot_discovery.analyzer.optional.vsto_office import (
+        classify_project as classify,
+    )
 
-def classify_project(path: str, text: str) -> list[Detection]:
-    """Detect project-file COM references in one file's text (pure; unstripped)."""
-    detections: list[Detection] = []
-    # Project XML is scanned unstripped for COM-reference elements.
-    for lineno, line in numbered_lines(text):
-        detections.extend(_detect_project(path, lineno, line))
-    return detections
-
-
-def _classify_one(path: str, text: str) -> list[Detection]:
-    """Route one file to the detector matching its kind (pure)."""
-    # Routing table: extension decides which unstripped/stripped scan applies.
-    if path.endswith(".cs"):
-        return classify_csharp(path, text)
-    if path.endswith(".xml"):
-        return classify_xml(path, text)
-    if path.endswith("proj"):
-        return classify_project(path, text)
-    return []
+    return classify(
+        path,
+        text,
+        profile=configured,
+        max_bytes=max_bytes,
+        max_elements=max_elements,
+        max_depth=max_depth,
+        max_candidates=max_candidates,
+    )
 
 
 class VstoOfficeAnalyzer:
-    """VSTO/Office analyzer implementing the #363 ``Analyzer`` protocol.
+    """Preserve legacy construction while requiring an immutable v2 capture.
 
-    Purpose:
-        Detect VSTO ribbon customization and COM-interop usage across C#,
-        ribbon-XML, and project files, emitting one Evidence Reference instance
-        per detection.
-
-    Usage:
-        Constructed by the CLI and handed to ``run_analyzer(analyzer, ctx, fs)``.
-
-    Invariants:
-        ``parse`` is the only I/O stage; ``classify`` is pure; ``map`` reads file
-        bytes (cached per path) via the seam.
-
-    Args:
-        fs: Filesystem seam used by ``parse`` and ``map``; defaults to the real
-            filesystem implementation.
+    Construct with the historical optional fs positional argument and optional
+    keyword profile, then call analyze(capture). The filesystem argument is never
+    accessed or defaulted. A supplied profile adds a consent check; the canonical
+    adapter always checks capture consent. Legacy pipeline stages always reject.
+    No state other than the optional immutable profile is retained; no I/O occurs.
     """
 
-    name = _ANALYZER_NAME
+    name = "vsto-office"
+    identifier = "office-vsto"
 
-    def __init__(self, fs: AnalyzerFileSystem | None = None) -> None:
-        self._fs: AnalyzerFileSystem = (
-            fs if fs is not None else RealAnalyzerFileSystem()
+    def __init__(
+        self, fs: AnalyzerFileSystem | None = None, *, profile: ProfileV2 | None = None
+    ) -> None:
+        """Retain an optional profile without creating or accessing a filesystem.
+
+        fs (AnalyzerFileSystem | None) is an ignored compatibility argument.
+        profile (ProfileV2 | None) is checked at analyze time. Returns None,
+        mutating only this instance; performs no I/O or optional imports.
+        """
+        del fs
+        self._profile = profile
+
+    def analyze(self, capture: InventoryCapture) -> Analysis:
+        """Delegate the exact capture after checking all supplied consent.
+
+        capture (InventoryCapture) retains immutable bytes, pins and profile.
+        Returns canonical Analysis without publishing. Raises AnalyzerError for
+        a wrong capture type, SourceScanError for missing consent, or ProfileError
+        for drafts; canonical analysis may return fixed diagnostics. Imports the
+        fixed implementation lazily and performs no filesystem operations.
+        """
+        if not isinstance(cast("object", capture), InventoryCapture):
+            raise AnalyzerError(_MIGRATION_ERROR)
+        if self._profile is not None:
+            _require_consent(self._profile)
+        _require_consent(capture.profile)
+        from drm_copilot_discovery.analyzer.optional.vsto_office import (
+            VstoOfficeAnalyzer as CanonicalAnalyzer,
         )
-        self._ctx: AnalyzerContext | None = None
 
-    def _require_ctx(self) -> AnalyzerContext:
-        """Return the stashed run context, failing if ``parse`` did not run."""
-        if self._ctx is None:
-            raise AnalyzerError("analyzer context is unavailable; parse must run first")
-        return self._ctx
+        return CanonicalAnalyzer().analyze(capture)
 
     def parse(self, ctx: AnalyzerContext) -> ParseResult:
-        """Walk the tree, select routed candidates, and read their text.
+        """Reject ctx (AnalyzerContext) before traversal; never return ParseResult.
 
-        Args:
-            ctx: The resolved run context.
-
-        Returns:
-            A ``TextParseResult`` of ordered ``.cs``/``.xml``/``*proj`` paths and
-            their text.
-
-        Raises:
-            AnalyzerError: When the source root is unreachable or not a directory.
+        Raises fixed AnalyzerError requiring v2 capture. No I/O or mutation.
         """
-        self._ctx = ctx
-        root = ctx.source_root
-        if not self._fs.exists(root) or not self._fs.is_dir(root):
-            raise AnalyzerError(f"source root is not reachable: {root}")
-        ordered = tuple(
-            sorted(
-                file_path.relative_to(root).as_posix()
-                for file_path in self._fs.walk_files(root)
-            )
-        )
-        filtered = filter_paths(ordered, ctx.include, ctx.exclude)
-        # Select the three routed file kinds; other files are ignored.
-        candidates = tuple(
-            path
-            for path in filtered
-            if path.endswith(".cs") or path.endswith(".xml") or path.endswith("proj")
-        )
-        file_texts = tuple(
-            (path, self._fs.read_bytes(root / path).decode("utf-8", errors="replace"))
-            for path in candidates
-        )
-        return TextParseResult(paths=candidates, file_texts=file_texts)
+        del ctx
+        raise AnalyzerError(_MIGRATION_ERROR)
 
     def classify(self, parsed: ParseResult) -> ClassifyResult:
-        """Route and scan each file's text into typed detections (pure).
+        """Reject parsed (ParseResult); never return a v1 ClassifyResult.
 
-        Args:
-            parsed: The parse result; must be a ``TextParseResult``.
-
-        Returns:
-            A ``DetectionResult`` carrying every detection.
-
-        Raises:
-            AnalyzerError: When ``parsed`` is a plain ``ParseResult``.
+        Raises fixed AnalyzerError requiring v2 capture. No I/O or mutation.
         """
-        if not isinstance(parsed, TextParseResult):
-            raise AnalyzerError(
-                "vsto-office classify requires a TextParseResult carrying file "
-                "text; received a plain ParseResult"
-            )
-        detections: list[Detection] = []
-        # Route each candidate file by kind and accumulate its detections.
-        for path, text in parsed.file_texts:
-            detections.extend(_classify_one(path, text))
-        return DetectionResult(units=(), detections=tuple(detections))
+        del parsed
+        raise AnalyzerError(_MIGRATION_ERROR)
 
     def map(self, classified: ClassifyResult) -> tuple[EvidenceRecord, ...]:
-        """Build one Evidence Reference record per detection (reads bytes).
+        """Reject classified (ClassifyResult); never fabricate v1 evidence.
 
-        Args:
-            classified: The classify result; must be a ``DetectionResult``.
-
-        Returns:
-            One ``EvidenceRecord`` per detection.
-
-        Raises:
-            AnalyzerError: When ``classified`` is a plain ``ClassifyResult``.
+        Returns no tuple[EvidenceRecord, ...]; raises fixed AnalyzerError requiring
+        v2 capture before hashing or reading bytes. No I/O or mutation.
         """
-        if not isinstance(classified, DetectionResult):
-            raise AnalyzerError(
-                "vsto-office map requires a DetectionResult; received a plain "
-                "ClassifyResult"
-            )
-        ctx = self._require_ctx()
-        # Cache per-file content hashes so repeated detections in one file do not
-        # trigger repeated reads.
-        hash_cache: dict[str, str] = {}
-        records: list[EvidenceRecord] = []
-        for detection in classified.detections:
-            if detection.path not in hash_cache:
-                content = self._fs.read_bytes(ctx.source_root / detection.path)
-                hash_cache[detection.path] = hashlib.sha256(content).hexdigest()
-            records.append(
-                build_evidence_record(
-                    analyzer_name=_ANALYZER_NAME,
-                    id_prefix=_ID_PREFIX,
-                    tool=_TOOL,
-                    description=patterns.DESCRIPTIONS[detection.detection_kind],
-                    detection=detection,
-                    captured_at=ctx.captured_at,
-                    digest=hash_cache[detection.path],
-                )
-            )
-        return tuple(records)
+        del classified
+        raise AnalyzerError(_MIGRATION_ERROR)
 
     def emit(
         self, records: tuple[EvidenceRecord, ...], fs: AnalyzerFileSystem
     ) -> tuple[Path, ...]:
-        """Write one Evidence Reference instance per record via the seam."""
-        ctx = self._require_ctx()
-        written: list[Path] = []
-        for record in records:
-            instance_path = ctx.artifact_root / f"{record.id}.json"
-            text = serialize_record(record, instance_path, ctx.schema_path)
-            fs.write_text(instance_path, text)
-            written.append(instance_path)
-        return tuple(written)
+        """Reject records (tuple[EvidenceRecord, ...]) and fs (AnalyzerFileSystem).
+
+        Returns no tuple[Path, ...]; raises fixed AnalyzerError requiring v2
+        capture. Neither argument is inspected; no I/O or mutation occurs.
+        """
+        del records, fs
+        raise AnalyzerError(_MIGRATION_ERROR)
