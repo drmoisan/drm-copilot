@@ -1,0 +1,31 @@
+{
+  "batch": "tokenizer",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:30:39.033132+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-tokenizer-types-043039.2026-10-19T04-30.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-tokenizer-types-043039.2026-10-19T04-30.stdout.txt",
+      "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+    }
+  },
+  "seconds": 0.983526,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T04:30:38.049606+00:00",
+  "stderr": "",
+  "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-30"
+}

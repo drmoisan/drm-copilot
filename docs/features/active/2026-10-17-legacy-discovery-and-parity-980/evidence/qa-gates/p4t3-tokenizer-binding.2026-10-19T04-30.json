@@ -1,0 +1,31 @@
+{
+  "batch": "tokenizer",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-tokenizer-coverage.2026-10-19T04-30.json",
+    "sha256": "cf20089fac0824bf41e7298a65bd3a9d10069e62ce80196437dfc8ee7925da92"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-format-043037.2026-10-19T04-30.json",
+      "sha256": "c1b10d5f65dece85221b974feee64300608469f5f4cf75988a3f8259c583fa47"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-lint-043038.2026-10-19T04-30.json",
+      "sha256": "025ba57f38ef7261db6d107477746c54ffd0f2836789259d73b4fafb3bf861c2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-types-043039.2026-10-19T04-30.json",
+      "sha256": "b02b12d1003854ce187b636ac841eb99c6f65eb16d1141e2c9a4b0441b62848b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-tokenizer-tests-043039.2026-10-19T04-30.json",
+      "sha256": "f46272c29399c5514e88f183e37954058df478140bcfece19c7bcd21f9f01296"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f"
+  },
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-30"
+}

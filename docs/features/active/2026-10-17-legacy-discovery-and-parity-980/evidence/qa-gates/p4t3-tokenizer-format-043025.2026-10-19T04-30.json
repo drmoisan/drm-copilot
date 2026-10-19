@@ -1,0 +1,31 @@
+{
+  "batch": "tokenizer",
+  "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:30:25.022211+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-tokenizer-format-043025.2026-10-19T04-30.stderr.txt",
+      "sha256": "42952929f98ff284b84ffc33f5fca4e517620f9b2ceb3fca1375e504affa8195"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-tokenizer-format-043025.2026-10-19T04-30.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.321888,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "d6be63fc9d505dcb61ad0d2620347ffa29450a3a9a0541fdcf96387db73511db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "d6be63fc9d505dcb61ad0d2620347ffa29450a3a9a0541fdcf96387db73511db"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T04:30:24.700323+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n2 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-30"
+}

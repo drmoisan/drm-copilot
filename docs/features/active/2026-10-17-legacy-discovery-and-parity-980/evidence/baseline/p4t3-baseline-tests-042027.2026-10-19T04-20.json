@@ -1,0 +1,58 @@
+{
+  "command": "poetry run python -m pytest -q -o addopts= tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py --cov=scripts.dev_tools.discovery.analyzer.source_text --cov=scripts.dev_tools.discovery.analyzer.dotnet_inventory --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-baseline-coverage.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:20:27.621054+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-baseline-tests-042027.2026-10-19T04-20.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-baseline-tests-042027.2026-10-19T04-20.stdout.txt",
+      "sha256": "d3c688e2cca8dc253e70d4a4207c8a80bec0496648587da4bde16e8b07825ced"
+    }
+  },
+  "seconds": 1.410264,
+  "source_after": {
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+    "scripts/dev_tools/discovery/analyzer/vsto_office.py": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+    "tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e",
+    "tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8",
+    "tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7",
+    "tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524",
+    "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3",
+    "tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+  },
+  "source_before": {
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+    "scripts/dev_tools/discovery/analyzer/stack_cli.py": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+    "scripts/dev_tools/discovery/analyzer/vsto_office.py": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+    "tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e",
+    "tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8",
+    "tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7",
+    "tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524",
+    "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3",
+    "tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T04:20:26.210790+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 46%]\r\n........................................................................ [ 92%]\r\n...........                                                              [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                       Stmts   Miss Branch BrPart  Cover   Missing\r\n------------------------------------------------------------------------------------------------------\r\nscripts\\dev_tools\\discovery\\analyzer\\dotnet_inventory.py     126     12     44      4    89%   144, 166, 332, 403, 425-432\r\nscripts\\dev_tools\\discovery\\analyzer\\source_text.py          144      0     52      2    99%   82->102, 168->198\r\n------------------------------------------------------------------------------------------------------\r\nTOTAL                                                        270     12     96      6    95%\r\nCoverage JSON written to file SCRATCH\\p4t3-baseline-coverage.raw.json\r\n155 passed in 0.56s\r\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-20"
+}
