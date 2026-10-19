@@ -1,0 +1,247 @@
+{
+  "timestamp": "2026-10-19T07-27",
+  "command": "python SCRATCH/issue-980-p4t5-com-freeze.py",
+  "exit_code": 0,
+  "source_manifest": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "4ddaeea981fd1442761276eb5a97fe1e0445dc7b3381fe7e83e1db9cc003977e",
+      "physical_lines": 496,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "4ddaeea981fd1442761276eb5a97fe1e0445dc7b3381fe7e83e1db9cc003977e",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "9ee41392d4b043e3e35f392387f87ee87a0f8b48067fc0b9e9fac0a4f1186e70",
+      "physical_lines": 341,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "9ee41392d4b043e3e35f392387f87ee87a0f8b48067fc0b9e9fac0a4f1186e70",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_interop.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_interop.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "92b74102568f7aca3ef2f2d0d46531bffa0ca03f28d155045ffb8be7b3cfb20c",
+      "physical_lines": 348,
+      "crlf_count": 0,
+      "lf_normalized_sha256": "92b74102568f7aca3ef2f2d0d46531bffa0ca03f28d155045ffb8be7b3cfb20c",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: eol: lf"
+      ],
+      "index_binding": "Not staged by this worker; normalized digest is a projection only."
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-coverage.2026-10-19T07-27.json",
+    "sha256": "ac5f54d92bc89e72e337af8ecead3412bdea59cf6b537fc108ada414f8a19b41"
+  },
+  "module_summary": {
+    "covered_lines": 170,
+    "num_statements": 170,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 3,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 74,
+    "num_partial_branches": 0,
+    "covered_branches": 74,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "callable_summaries": {
+    "_qualified": {
+      "covered_lines": 4,
+      "num_statements": 4,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 2,
+      "num_partial_branches": 0,
+      "covered_branches": 2,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "_kind": {
+      "covered_lines": 8,
+      "num_statements": 8,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 6,
+      "num_partial_branches": 0,
+      "covered_branches": 6,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "com_source_candidates": {
+      "covered_lines": 32,
+      "num_statements": 32,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 20,
+      "num_partial_branches": 0,
+      "covered_branches": 20,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "_local": {
+      "covered_lines": 6,
+      "num_statements": 6,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 4,
+      "num_partial_branches": 0,
+      "covered_branches": 4,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "com_project_candidates": {
+      "covered_lines": 26,
+      "num_statements": 26,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 16,
+      "num_partial_branches": 0,
+      "covered_branches": 16,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "_failure": {
+      "covered_lines": 1,
+      "num_statements": 1,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "covered_branches": 0,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "_project": {
+      "covered_lines": 15,
+      "num_statements": 15,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 4,
+      "num_partial_branches": 0,
+      "covered_branches": 4,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "ComInteropAnalyzer.analyze": {
+      "covered_lines": 54,
+      "num_statements": 54,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 22,
+      "num_partial_branches": 0,
+      "covered_branches": 22,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    }
+  },
+  "class_summaries": {
+    "ComInteropAnalyzer": {
+      "covered_lines": 54,
+      "num_statements": 54,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 22,
+      "num_partial_branches": 0,
+      "covered_branches": 22,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    }
+  },
+  "structures": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "definitions": 9,
+      "explicit_loops": 8,
+      "missing_docstrings": [],
+      "loops_without_intent_comments": [],
+      "physical_lines": 496,
+      "no_temporary_test_files": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "definitions": 12,
+      "explicit_loops": 0,
+      "missing_docstrings": [],
+      "loops_without_intent_comments": [],
+      "physical_lines": 341,
+      "no_temporary_test_files": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "definitions": 15,
+      "explicit_loops": 1,
+      "missing_docstrings": [],
+      "loops_without_intent_comments": [],
+      "physical_lines": 348,
+      "no_temporary_test_files": true
+    }
+  ],
+  "changed_lines": "All executable production lines are new at the accepted baseline and all are covered.",
+  "retained_predecessors": 45,
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+    "sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+  },
+  "limits": "Focused subset only; repository-wide totals, isolation, contracts, integration and consolidated review remain for the combined final sequence."
+}

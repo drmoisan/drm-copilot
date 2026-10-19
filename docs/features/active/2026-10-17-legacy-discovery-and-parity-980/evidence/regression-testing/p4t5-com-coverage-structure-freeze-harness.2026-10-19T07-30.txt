@@ -1,0 +1,207 @@
+"""Freeze the checked COM subset without modifying implementation or Git state."""
+
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+evidence = feature / "evidence"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+command = "python SCRATCH/issue-980-p4t5-com-freeze.py"
+paths = (
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py",
+)
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def write(path, content):
+    if path.exists():
+        raise ValueError("Refusing to replace a freeze artifact: " + path.name)
+    path.write_bytes(content.encode("utf-8"))
+
+
+def json_write(path, value):
+    write(path, json.dumps(value, indent=2, ensure_ascii=False) + "\n")
+
+
+def metadata(path):
+    content = path.read_bytes()
+    return {"path": path.relative_to(repo).as_posix(), "sha256": sha(content)}
+
+
+def markdown(title, summary, body):
+    return (f"# {title}\n\nTimestamp: {stamp}\nCommand: {command}\n"
+            "EXIT_CODE: 0\nOutput Summary: " + summary + "\n\n" + body.rstrip() + "\n")
+
+
+baseline_path = evidence / "baseline/p4t5-shared-baseline.2026-10-19T06-59.json"
+assert sha(baseline_path.read_bytes()) == "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+baseline = json.loads(baseline_path.read_bytes())
+preserved = [entry["path"] for entry in baseline["preserved_files"]
+             if sha((repo / entry["path"]).read_bytes()) == entry["sha256"]]
+assert len(preserved) == len(baseline["preserved_files"]) == 45
+sources = []
+structures = []
+for name in paths:
+    path = repo / name
+    content = path.read_bytes()
+    text = content.decode("utf-8")
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))]
+    missing_docs = [node.name for node in definitions if not ast.get_docstring(node)]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.AsyncFor, ast.While))]
+    missing_intent = [node.lineno for node in loops if not lines[node.lineno - 2].strip().startswith("#")]
+    assert len(lines) <= 500 and not missing_docs and not missing_intent, name
+    assert not re.search(r"(?i)\b(?:tmp_path|tmpdir|tempfile|NamedTemporaryFile)\b", text), name
+    if name == paths[0]:
+        assert not re.search(r"(?i)\b(?:TaskMaster|TMW|Outlook|VSTO|MAPI)\b", text)
+        assert not re.search(r"\b(?:read_bytes|write_bytes|subprocess|socket|requests|eval|exec)\s*\(", text)
+    attrs = subprocess.run(["git", "check-attr", "--all", "--", name], check=True, capture_output=True, text=True).stdout.strip().splitlines()
+    sources.append({"path": name, "sha256": sha(content), "physical_lines": len(lines),
+                    "crlf_count": content.count(b"\r\n"), "lf_normalized_sha256": sha(content.replace(b"\r\n", b"\n")),
+                    "git_attributes": attrs, "index_binding": "Not staged by this worker; normalized digest is a projection only."})
+    structures.append({"path": name, "definitions": len(definitions), "explicit_loops": len(loops),
+                       "missing_docstrings": missing_docs, "loops_without_intent_comments": missing_intent,
+                       "physical_lines": len(lines), "no_temporary_test_files": True})
+
+# Retain the original failure exactly before removing only host environment dumps.
+failed_prefix = evidence / "regression-testing/p4t5-com-focused2-unit.2026-10-19T07-14"
+failed_json = Path(str(failed_prefix) + ".json")
+failed_md = Path(str(failed_prefix) + ".md")
+raw_directory = scratch / ("issue-980-p4t5-com-failure-originals-" + stamp)
+raw_directory.mkdir(exist_ok=False)
+normalization = []
+original_result = json.loads(failed_json.read_bytes())
+result_fields = {key: value for key, value in original_result.items() if key != "output"}
+for path in (failed_json, failed_md):
+    original = path.read_bytes()
+    (raw_directory / path.name).write_bytes(original)
+    if path.suffix == ".json":
+        data = json.loads(original)
+        output_lines = data["output"].splitlines(keepends=True)
+        redacted = [index + 1 for index, line in enumerate(output_lines) if line.startswith("self = environ(")]
+        data["output"] = "".join("self = environ(<host-local environment omitted>)\r\n" if index + 1 in redacted else line
+                                 for index, line in enumerate(output_lines))
+        assert {key: value for key, value in data.items() if key != "output"} == result_fields
+        replacement = (json.dumps(data, indent=2) + "\n").encode()
+    else:
+        output_lines = original.decode().splitlines(keepends=True)
+        redacted = [index + 1 for index, line in enumerate(output_lines) if line.startswith("self = environ(")]
+        replacement = "".join("self = environ(<host-local environment omitted>)\n" if index + 1 in redacted else line
+                              for index, line in enumerate(output_lines)).encode()
+    assert len(redacted) == 2
+    path.write_bytes(replacement)
+    normalization.append({"path": path.relative_to(repo).as_posix(), "original_sha256": sha(original),
+                          "published_sha256": sha(replacement), "redacted_lines": redacted,
+                          "line_number_space": "decoded output" if path.suffix == ".json" else "Markdown file",
+                          "original_preserved": "SCRATCH/" + raw_directory.name + "/" + path.name})
+normalization_path = evidence / f"regression-testing/p4t5-com-failure-path-normalization.{stamp}.json"
+json_write(normalization_path, {"timestamp": stamp, "command": command, "exit_code": 0,
+                               "changes": normalization, "unchanged_result_fields": result_fields,
+                               "behavioral_tests_rerun": False, "source_bytes_unchanged": True})
+write(evidence / f"regression-testing/p4t5-com-failure-path-normalization.{stamp}.md",
+      markdown("P4-T5 COM failure evidence path normalization",
+               "Two environment-repr lines per presentation were redacted; all original bytes were preserved under SCRATCH.",
+               "The original Windows setup and teardown failure diagnostics remain intact. Only host-local environment representations were replaced; "
+               "exit code, command, actual times, duration, source hashes, test result, assertion traceback and error messages are unchanged. "
+               "The paired JSON binds exact original and published hashes and line positions. This is evidence sanitization, not Git normalization or a behavioral correction. "
+               "All three source/test files and all passing command receipts remain unchanged. No test was rerun for this normalization."))
+
+coverage_bytes = (scratch / "issue-980-p4t5-com-coverage.json").read_bytes()
+coverage = json.loads(coverage_bytes)
+coverage_path = evidence / f"regression-testing/p4t5-com-coverage.{stamp}.json"
+assert not coverage_path.exists()
+coverage_path.write_bytes(coverage_bytes)
+assert len(coverage["files"]) == 1
+measured = next(iter(coverage["files"].values()))
+assert measured["summary"]["covered_lines"] == measured["summary"]["num_statements"] == 170
+assert measured["summary"]["covered_branches"] == measured["summary"]["num_branches"] == 74
+assert measured["missing_lines"] == measured["missing_branches"] == []
+callables = {name: data["summary"] for name, data in measured["functions"].items() if name}
+classes = {name: data["summary"] for name, data in measured["classes"].items() if name}
+assert all(row["covered_lines"] == row["num_statements"] for row in (*callables.values(), *classes.values()))
+ordered = []
+for label in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t5-com-focused4-" + label + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    for source in sources:
+        assert receipt["source_before"][source["path"]]["sha256"] == source["sha256"]
+        assert receipt["source_after"][source["path"]]["sha256"] == source["sha256"]
+    ordered.append({**metadata(path), "stage": label, "started": receipt["started"],
+                    "finished": receipt["finished"], "duration_seconds": receipt["duration_seconds"]})
+assert all(first["finished"] <= second["started"] for first, second in zip(ordered, ordered[1:]))
+analysis_path = evidence / f"regression-testing/p4t5-com-coverage-structure.{stamp}.json"
+json_write(analysis_path, {"timestamp": stamp, "command": command, "exit_code": 0, "source_manifest": sources,
+                          "coverage": metadata(coverage_path), "module_summary": measured["summary"],
+                          "callable_summaries": callables, "class_summaries": classes, "structures": structures,
+                          "changed_lines": "All executable production lines are new at the accepted baseline and all are covered.",
+                          "retained_predecessors": 45, "baseline": metadata(baseline_path),
+                          "limits": "Focused subset only; repository-wide totals, isolation, contracts, integration and consolidated review remain for the combined final sequence."})
+write(evidence / f"regression-testing/p4t5-com-coverage-structure.{stamp}.md",
+      markdown("P4-T5 COM coverage and structure",
+               "PASS: 170/170 lines, 74/74 branches; every new callable and class is 100% covered; 45 predecessor streams preserved.",
+               "The paired JSON maps measured coverage to exact working bytes and every callable/class. All three files remain at or below 500 physical lines, "
+               "every function/class has a docstring, and every explicit loop has an immediately preceding intent comment. The scoped checks found no temporary-file test facilities "
+               "or external-I/O calls in the analyzer. A bounded manual pass checked candidate/provenance transformations, branch intent, fixed redaction and pure API contracts. "
+               "The raw coverage artifact preserves its original local-clock metadata; UTC execution timing is taken from the paired command receipt. "
+               "This focused result does not claim completion of the combined final gates or repository-wide coverage."))
+
+handoff_path = evidence / f"regression-testing/p4t5-com-wip-handoff.{stamp}.md"
+write(handoff_path, markdown("P4-T5 checked COM subset handoff",
+     "FROZEN_READY for a scoped WIP commit; 111 focused tests passed. P4-T5 acceptance remains pending.",
+     "## Scope and baseline\n\nOnly the three source/test paths in the paired freeze manifest are owned. "
+     "Accepted baseline is `957908053625c5a22099bafe5b6fd3dde2aedde2`; the shared baseline and test-split absence supplement are retained. "
+     "No accepted production/test stream was changed, no predecessor suite replayed, no policy/schema/registry/checkpoint/plan/AC/Git write occurred.\n\n"
+     "## Behavior and decisions\n\n`ComInteropAnalyzer` operates independently of dotnet selection. "
+     "`com_source_candidates` and `com_project_candidates` return the existing `Detection` carrier. "
+     "Source candidates distinguish attributes, type lookup, object lookup, activation candidates, lifetime calls and other known COM marshaling. "
+     "All source bindings/execution remain unverified; GUID alone, ordinary activation, arbitrary marshaling and DllImport alone are insufficient. "
+     "Secure project declarations retain operation, condition presence and explicit true/false/unresolved EmbedInteropTypes; values, raw conditions, GUID arguments and target paths are omitted.\n\n"
+     "Pins have an independent `source_files` count cap and `document_bytes` aggregate byte cap, including duplicate/unused pins. "
+     "The bounded path index forwards each group to the accepted exact repository/revision/path/byte verifier. "
+     "Selected input bytes and conservative output reservation each have separate document_bytes budgets; record capacity is reserved before candidate allocation. "
+     "Exhaustion discards partial output and yields fixed diagnostics. No optional imports, external execution or I/O are introduced.\n\n"
+     "## Focused verification\n\nBlack, Ruff, scoped Pyright and 111 tests passed in one unchanged-byte ordered sequence. "
+     "Pytest reported 29.70 seconds; complete command elapsed times are in the exact receipts. Module coverage is 170/170 lines and 74/74 branches, "
+     "with 100% on all eight callables and the analyzer class. Tests cover redaction, anchors, encoding/pins, duplicate provenance, independent work/output limits, "
+     "XML safety, inert conditions, false booleans, lookalikes, deterministic layouts and no file I/O. Earlier failed diagnostics and autoformat receipts remain preserved.\n\n"
+     "## Remaining work and deliberate compatibility limits\n\nThe inventory owner runs the one combined final seven-stage sequence after the consolidated executor review. "
+     "Registry/CLI/MCP exposure and optional caller rewiring remain in their planned tasks. P4-T8 must migrate optional callers deliberately: core does not recover raw GUID arguments "
+     "or preserve the old raw-line GUID search, and it rejects malformed/comment-only project fragments. Static candidate spelling is not compiler binding; aliases, preprocessing, "
+     "generic invocation forms, conditions and runtime platform behavior remain unresolved. This is a checked WIP boundary, not final task/feature acceptance.\n\n"
+     "## Primary semantic references\n\n"
+     "- [MSBuild common project items](https://learn.microsoft.com/en-us/visualstudio/msbuild/common-msbuild-project-items?view=visualstudio)\n"
+     "- [Type.GetTypeFromProgID](https://learn.microsoft.com/en-us/dotnet/api/system.type.gettypefromprogid?view=net-9.0)\n"
+     "- [Activator.CreateComInstanceFrom](https://learn.microsoft.com/en-us/dotnet/api/system.activator.createcominstancefrom?view=netframework-4.8.1)\n"
+     "- [Marshal.FinalReleaseComObject](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.finalreleasecomobject?view=net-9.0)\n"))
+
+# Enumerate only this owner's artifacts; never include the parallel access work.
+artifact_paths = sorted(path for kind in ("baseline", "regression-testing")
+                        for path in (evidence / kind).glob("p4t5-com-*") if path.is_file())
+freeze_path = evidence / f"regression-testing/p4t5-com-wip-freeze.{stamp}.json"
+manifest = {"timestamp": stamp, "status": "FROZEN_READY", "accepted_baseline": baseline["head"],
+            "scope": "P4-T5 COM subset; combined task acceptance pending", "source_files": sources,
+            "baseline": metadata(baseline_path), "retained_predecessor_count": 45, "ordered_focused_gates": ordered,
+            "coverage": metadata(coverage_path), "coverage_structure": metadata(analysis_path),
+            "evidence_files": [metadata(path) for path in artifact_paths], "handoff": metadata(handoff_path),
+            "tests": {"passed": 111, "failed": 0}, "stage_paths": list(paths) + [path.relative_to(repo).as_posix() for path in artifact_paths]
+                           + [freeze_path.relative_to(repo).as_posix()],
+            "final_gate_pending": ["consolidated review", "combined ordered seven-stage gates", "independent task acceptance"],
+            "git_mutations": False, "source_mutations": False}
+json_write(freeze_path, manifest)
+assert all(sha((repo / source["path"]).read_bytes()) == source["sha256"] for source in sources)
+print(json.dumps({"freeze": metadata(freeze_path), "source_files": sources, "evidence_count": len(artifact_paths) + 1,
+                  "stage_count": len(manifest["stage_paths"]), "handoff": metadata(handoff_path)}, indent=2))

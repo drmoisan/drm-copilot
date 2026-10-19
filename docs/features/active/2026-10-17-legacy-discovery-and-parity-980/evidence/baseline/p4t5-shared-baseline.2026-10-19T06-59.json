@@ -1,0 +1,579 @@
+{
+  "actual_profile": {
+    "path": ".codex/agents/python-typed-engineer-c4.toml",
+    "sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "git_status": {
+    "clean": true,
+    "raw_path": "SCRATCH/baseline-git-status.raw.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-shared-baseline-harness.2026-10-19T06-59.txt",
+    "sha256": "bb62f9cdb8e0d34009a68f9e269725838ead6e8bf6f62a0bab16a0917079a17b"
+  },
+  "head": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "initial_binder_correction": {
+    "cause": "Existing accepted CRLF working bytes normalize to LF in Git; bind actual attributes and separate stream hashes rather than assume raw equality.",
+    "failure": "AssertionError: scripts/dev_tools/discovery/analyzer/source_text.py",
+    "harness": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-initial-baseline-harness.2026-10-19T06-59.txt",
+      "sha256": "8f02ead63f28fe5915b4089bf6bdb7576f6dcca016fd3520ec017ac8198465b7"
+    },
+    "source_mutation": false
+  },
+  "native_authority": "Parent reverified existing native routing/launch/provenance; worker matched fresh receipt and current profile bytes.",
+  "owned_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+    "tests/discovery_runtime/analyzer/test_registry_access.py"
+  ],
+  "parallel_owner": "/root/legacy_discovery_orchestrator/workspace_operations",
+  "parallel_owner_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py"
+  ],
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "sha256": "0ad30d9ecb0b9bd24be2d13359e9083a3df11b6e79cc1f4dd459fd57ed709ac6"
+  },
+  "planned_absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+    "tests/discovery_runtime/analyzer/test_registry_access.py",
+    "tests/discovery_runtime/analyzer/test_com_interop.py"
+  ],
+  "preserved_files": [
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "physical_lines": 291,
+      "sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "physical_lines": 440,
+      "sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "physical_lines": 401,
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "physical_lines": 189,
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "physical_lines": 460,
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "physical_lines": 462,
+      "sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "physical_lines": 228,
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "physical_lines": 132,
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "physical_lines": 142,
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "physical_lines": 311,
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "physical_lines": 293,
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "physical_lines": 144,
+      "sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "physical_lines": 330,
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "physical_lines": 252,
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "physical_lines": 156,
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "physical_lines": 170,
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "physical_lines": 418,
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "physical_lines": 382,
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "physical_lines": 12,
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "physical_lines": 26,
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "stream_relation": "CRLF-to-LF-only"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "physical_lines": 451,
+      "sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "physical_lines": 87,
+      "sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py",
+      "physical_lines": 468,
+      "sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "physical_lines": 336,
+      "sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py",
+      "physical_lines": 117,
+      "sha256": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "physical_lines": 470,
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "physical_lines": 221,
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "physical_lines": 472,
+      "sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "physical_lines": 179,
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "physical_lines": 248,
+      "sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "physical_lines": 205,
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "physical_lines": 259,
+      "sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "physical_lines": 9,
+      "sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "physical_lines": 1,
+      "sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "physical_lines": 13,
+      "sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "physical_lines": 3,
+      "sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "physical_lines": 16,
+      "sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "physical_lines": 10,
+      "sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "physical_lines": 6,
+      "sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "physical_lines": 7,
+      "sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "physical_lines": 7,
+      "sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8",
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "physical_lines": 6,
+      "sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "physical_lines": 413,
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "physical_lines": 142,
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "stream_relation": "identical"
+    },
+    {
+      "attributes": {
+        "eol": "lf",
+        "text": "auto"
+      },
+      "commit_sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "physical_lines": 486,
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "stream_relation": "identical"
+    }
+  ],
+  "quality_baseline": {
+    "new_path_executable_baseline": "Absent: six planned files do not exist in working tree or accepted commit. No pre-existing executable units to measure.",
+    "required_post_change": "Scoped focused loops, one combined candidate review, then one combined seven-stage final loop and executor acceptance.",
+    "ruff_pyright_tests_coverage": "Accepted dependency proofs retained by exact working/commit bytes and prior manifests. No accepted suite was replayed."
+  },
+  "recorded_at": "2026-10-19T06:59:57.725588+00:00",
+  "retained_previous_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t4-baseline-binding.2026-10-19T05-38.json",
+    "sha256": "bf962d9c9ea871d01c867d41566f60d9f5e36999871d1ca1b3c1713853cce7ba"
+  },
+  "retained_previous_final": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-handoff.2026-10-19T06-43.json",
+    "sha256": "3ec7b97f6031bf122f192656f49faff77d0aa4750e489e9eb462f0e7b732ce53"
+  },
+  "routing_receipt": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p4t5_filesystem_registry",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T5_filesystem_registry",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "scope": "Only P4-T5. Filesystem/registry owner and generic COM owner remain disjoint. No public registry edits or optional caller rewiring.",
+  "state": "BASELINE_READY_NO_PRODUCTION_MUTATIONS",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T06-59"
+}

@@ -1,0 +1,40 @@
+{
+  "stage": "2",
+  "label": "p4t5-com-focused1-lint",
+  "started": "2026-10-19T07:13:07.055600+00:00",
+  "finished": "2026-10-19T07:13:08.247731+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 1,
+  "duration_seconds": 1.192,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "670c25c517323fd0c8818c714df4d2bd68c3b88ba6dd9dc0dc12cd709d9c1d66",
+      "physical_lines": 477
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "16c2896215517fca021684417228dd5a32972bc1677efe32f30fc705b7ffd239",
+      "physical_lines": 224
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e236ab229568320d3ef39afa4d6a8c3a6cb545cd2371017571bc218204790ad",
+      "physical_lines": 298
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "670c25c517323fd0c8818c714df4d2bd68c3b88ba6dd9dc0dc12cd709d9c1d66",
+      "physical_lines": 477
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "16c2896215517fca021684417228dd5a32972bc1677efe32f30fc705b7ffd239",
+      "physical_lines": 224
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e236ab229568320d3ef39afa4d6a8c3a6cb545cd2371017571bc218204790ad",
+      "physical_lines": 298
+    }
+  },
+  "output": "E501 Line too long (175 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\com_interop.py:306:89\n    |\n304 | \u2026\n305 | \u2026\n306 | \u2026, preprocessing, conditions, binding and runtime execution remain unresolved. Argument values are withheld.\",\n    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n307 | \u2026\n308 | \u2026\n    |\n\nE501 Line too long (115 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:132:89\n    |\n130 |     Neither earlier nor adjacent GUID argument values are retained in candidates.\n131 |     \"\"\"\n132 |     source = 'var x = \"[Guid(OLD_SECRET)]\"; /* [ComImport] */\\r\\n[ComImport, Guid(\"NEW_SECRET\")] interface Real {}'\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n133 |     result = com_source_candidates(\"src/sample.cs\", source)\n134 |     assert len(result) == 1 and result[0].symbol == \"ComImport\"\n    |\n\nE501 Line too long (278 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:199:89\n    |\n197 | \u2026\n198 | \u2026\n199 | \u2026\"><ItemGroup Condition=\"VALUE_SENTINEL\">\\n<{element} Include=\"VALUE_SENTINEL\"><Guid>VALUE_SENTINEL</Guid><EmbedInteropTypes>{value}</EmbedInteropTypes></{element}></ItemGroup></Project>'.encode()\n    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n200 | \u2026\n201 | \u2026 == 2\n    |\n\nE501 Line too long (389 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:213:89\n    |\n211 | \u2026.\n212 | \u2026\n213 | \u2026ndition=\"secret\">false</EmbedInteropTypes></COMReference><COMReference Update=\"A\" Remove=\"B\"><EmbedInteropTypes>true</EmbedInteropTypes><EmbedInteropTypes>false</EmbedInteropTypes></COMReference><COMFileReference Remove=\"C\"/></ItemGroup><ItemDefinitionGroup><COMReference/></ItemDefinitionGroup></Project>'\n    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n214 | \u2026\n215 | \u2026\n    |\n\nE501 Line too long (137 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:241:89\n    |\n239 | \u2026\n240 | \u2026secret\"/> --></Project>',\n241 | \u2026e=\"secret\"><EmbedInteropTypes>true</EmbedInteropTypes></Reference></ItemGroup></Project>',\n    |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n242 | \u2026>secret</COMReference></PropertyGroup></Project>\",\n243 | \u2026\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:293:89\n    |\n291 |             \"<Project>\"\n292 |             + newline\n293 |             + '<ItemGroup><COMReference Include=\"VALUE_SENTINEL\"/></ItemGroup></Project>'\n    |                                                                                         ^\n294 |         ).encode()\n295 |         assert com_project_candidates(\"src/a.csproj\", xml) == com_project_candidates(\n    |\n\nE501 Line too long (93 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_interop.py:101:89\n    |\n 99 |     payload = (\n100 |         bom\n101 |         + '\\r\\nSystem.Runtime.InteropServices.Marshal.IsComObject(\"VALUE_SENTINEL\");'.encode(\n    |                                                                                         ^^^^^\n102 |             encoding\n103 |         )\n    |\n\nFound 7 errors.\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}
