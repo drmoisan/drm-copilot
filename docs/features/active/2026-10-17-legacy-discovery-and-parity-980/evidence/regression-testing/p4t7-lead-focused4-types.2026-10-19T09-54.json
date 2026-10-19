@@ -1,0 +1,45 @@
+{
+  "stage": "types",
+  "label": "p4t7-lead-focused4-types",
+  "started": "2026-10-19T09:54:55.396666+00:00",
+  "finished": "2026-10-19T09:54:57.358850+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+  "exit_code": 0,
+  "duration_seconds": 1.962,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a",
+      "physical_lines": 453
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a",
+      "physical_lines": 453
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused4-types-095457.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused4-types-095457.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared dependency contract only"
+}

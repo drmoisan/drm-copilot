@@ -1,0 +1,45 @@
+{
+  "stage": "lint-fix",
+  "label": "p4t7-lead-import-fix",
+  "started": "2026-10-19T09:53:29.621505+00:00",
+  "finished": "2026-10-19T09:53:30.772528+00:00",
+  "command": "poetry run ruff check --fix --select I tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+  "exit_code": 0,
+  "duration_seconds": 1.151,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "57f1584508117d8608c691fd27cdc45cf22fb0e8205c49582bc4757c5f9e6007",
+      "physical_lines": 491
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "ad94f078d9c331d79bf610474f81a20f1f601b992c96a28a3b12676ebbe63c45",
+      "physical_lines": 454
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "57f1584508117d8608c691fd27cdc45cf22fb0e8205c49582bc4757c5f9e6007",
+      "physical_lines": 491
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a",
+      "physical_lines": 453
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-import-fix-095330.stdout.bin",
+      "raw_sha256": "7f008fb2788c7f2940cefc44184afce3de6b176b5a2c877888b40f3d3ea75f20",
+      "raw_bytes": 150,
+      "presentation": "\nFixed 1 error:\n- tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 1 error (1 fixed, 0 remaining).\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-import-fix-095330.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared dependency contract only"
+}

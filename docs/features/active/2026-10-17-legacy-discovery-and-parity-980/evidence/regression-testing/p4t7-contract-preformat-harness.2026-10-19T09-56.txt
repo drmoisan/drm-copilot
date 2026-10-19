@@ -1,0 +1,9 @@
+"""Measure Black's prospective line count before installing the formatting result."""
+import black
+from pathlib import Path
+
+for name in ("packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py", "tests/discovery_runtime/analyzer/test_dependency_inputs.py"):
+    path = Path(name)
+    text = black.format_file_contents(path.read_text("utf-8"), fast=False, mode=black.Mode())
+    print(name, "current", len(path.read_text("utf-8").splitlines()), "formatted", len(text.splitlines()))
+    Path(__file__).with_name("issue-980-p4t7-" + path.name + ".candidate.txt").write_bytes(text.encode())

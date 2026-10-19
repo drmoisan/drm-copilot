@@ -1,0 +1,124 @@
+"""Freeze the verified shared parser contract without executing behavioral suites."""
+import ast
+import base64
+import datetime
+import hashlib
+import inspect
+import json
+from pathlib import Path
+import re
+import subprocess
+
+from drm_copilot_discovery.analyzer import dependency_inputs as api
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence")
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+command = "poetry run python SCRATCH/issue-980-p4t7-lead-freeze.py"
+paths = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+         "tests/discovery_runtime/analyzer/test_dependency_inputs.py"]
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def write(path, raw):
+    assert not path.exists(), path.name
+    path.write_bytes(raw)
+
+
+def json_write(path, value):
+    write(path, (json.dumps(value, indent=2) + "\n").encode())
+
+
+baseline_path = evidence / "baseline/p4t7-shared-baseline.2026-10-19T09-44.json"
+assert sha(baseline_path.read_bytes()) == "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+baseline = json.loads(baseline_path.read_bytes())
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in baseline["preserved_files"])
+sources = []
+for name in paths:
+    raw = Path(name).read_bytes()
+    text = raw.decode()
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))]
+    assert len(lines) <= 500 and all(ast.get_docstring(node) for node in definitions)
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops)
+    assert re.search(r"\b(?:tmp_path|tmpdir|tempfile|subprocess|requests|socket)\b", text) is None
+    sources.append({"path": name, "sha256": sha(raw), "physical_lines": len(lines),
+                    "lf_normalized_sha256": sha(raw.replace(b"\r\n", b"\n")), "crlf_count": raw.count(b"\r\n"),
+                    "git_attributes": subprocess.check_output(["git", "check-attr", "--all", "--", name], text=True).splitlines(),
+                    "definitions_with_docstrings": len(definitions), "loops_with_immediate_intent_comments": len(loops)})
+ordered = []
+for stage in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t7-lead-focused4-" + stage + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    assert all(receipt["source_before"][item["path"]]["sha256"] == receipt["source_after"][item["path"]]["sha256"] == item["sha256"] for item in sources)
+    for stream in receipt["streams"].values():
+        raw = (scratch / Path(stream["scratch_identifier"]).name).read_bytes()
+        assert sha(raw) == stream["raw_sha256"]
+    ordered.append({**reference(path), "stage": stage, "started": receipt["started"], "finished": receipt["finished"], "duration_seconds": receipt["duration_seconds"]})
+assert all(left["finished"] <= right["started"] for left, right in zip(ordered, ordered[1:]))
+stdout = receipt["streams"]["stdout"]["presentation"]
+nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", stdout, flags=re.M)
+assert len(nodes) == len(set(nodes)) == 152 and "152 passed" in stdout
+coverage_raw = (scratch / "issue-980-p4t7-lead-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+assert len(coverage["files"]) == 1
+data = next(iter(coverage["files"].values()))
+assert not data["missing_lines"] and not data["missing_branches"]
+ranges = {"functions": {key: row["summary"] for key, row in data["functions"].items() if key},
+          "classes": {key: row["summary"] for key, row in data["classes"].items() if key}}
+assert all(row["covered_lines"] == row["num_statements"] for category in ranges.values() for row in category.values())
+coverage_path = evidence / f"regression-testing/p4t7-lead-coverage.{stamp}.json"
+write(coverage_path, coverage_raw)
+signatures = {name: str(inspect.signature(getattr(api, name))) for name in
+              ("DependencyLimits", "DependencyAnchor", "DependencyValue", "DependencyCandidate", "DependencyResult", "DependencyBudget", "DependencyInputError", "safe_identifier", "dependency_value")}
+signatures.update({"DependencyBudget." + name: str(inspect.signature(getattr(api.DependencyBudget, name))) for name in ("decode", "reserve", "note", "add", "result")})
+contract = evidence / f"regression-testing/p4t7-lead-contract.{stamp}.md"
+body = "\n".join(f"- `{name}{signature}`" for name, signature in signatures.items())
+write(contract, (f"# P4-T7 frozen parser contract\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+    "Output Summary: verified shared seam only; 152 in-memory cases, 221/221 statements and 108/108 branches.\n\n"
+    "Parsers accept captured immutable bytes plus `DependencyLimits`, then return `DependencyResult` or raise `DependencyInputError`. They do not create Analysis rows, IDs, provenance, confidence, evaluated resolution or execution claims.\n\n"
+    + body + "\n\n"
+    "The three candidate kinds are `declaration`, `locked-package` and `declared-lock-edge`. `version` is the declaration/current locked value; `requested` is separate. `role` preserves finite parser-selected groups, XML elements or lock labels. `operation` is `reference`, `include`, `update` or `remove`. `owner` is only a safe package spelling, never a resolved record target. `condition_present` records presence only. Extras are safe identifiers; marker names use the fixed standard vocabulary. No raw condition or marker expression is retained.\n\n"
+    "Anchor locations are closed constants. JSON permits the root, `/dependencies`, `/devDependencies`, `/optionalDependencies`, `/peerDependencies` and `/packages`, with no line claim. XML permits `PackageReference`, `PackageVersion`, `Version`, `VersionOverride` and `package`, preserving the accepted parser-reported line. Text permits `requirements`, `options.install_requires` and `options.extras_require`, with a physical line. Occurrence is positive and parser-defined; JSON normalized member order must not be described as physical source order. Container anchors deliberately omit all package-location keys, including safe-looking ones. No hashes of redacted keys or values may enter identities.\n\n"
+    "Each parser creates one `DependencyBudget`. `decode` checks retained byte count before physical CRLF/CR/LF counting and strict UTF-8 decoding; a UTF-8 BOM is accepted. Parsers pass `max_nodes`/`max_depth` into accepted JSON/XML parsers and reserve traversal/index work before their own allocations. `reserve` independently charges nonnegative nodes, candidate slots and text bytes. `add` reserves its own candidate and extras/marker slots; callers must not double-reserve that candidate. Raw selected UTF-8 text is charged before sanitization. Every retained ASCII string includes its two JSON quote bytes in the same text budget, and a distinct diagnostic is charged once. This is a conservative parser text/work budget; complete Analysis rows, keys, numeric values, arrays, diagnostics and serialized output are separately budgeted by integration.\n\n"
+    "Any limit exhaustion invalidates result access and must discard the complete parser population. Invalid UTF-8 or surrogate-selected strings also invalidate result access. Parser shape or unsupported-format failures must be raised with a fixed code, never the underlying exception text; a caller must not catch a blocking error and return earlier candidates. Repeated diagnostics are a sorted set in parser results and later aggregate by `(code, path, analyzer)`.\n\n"
+    "Fixed codes: `dependency-limit`, `dependency-malformed`, `dependency-encoding`, `dependency-unsupported`, `dependency-redacted`, `dependency-ambiguous`, `dependency-binding-unresolved`. Public contract misuse raises fixed ValueError. Safe values retain a bounded literal/constraint/tag, or null plus `missing`, `dynamic`, `url`, `vcs`, `local`, `workspace`, `alias` or `unsupported`. This finite grammar does not evaluate semver, PEP508 or MSBuild.\n\n"
+    "The scoped toolchain passed on identical frozen bytes. Initial formatting/import/docstring diagnostics are retained; no unit assertion failed. A final comment-only clarification was followed by the clean focused4 loop. One consolidated task review and final ordered suite remain. Native dispatch, registry exposure, complete feature acceptance and other platforms are not claimed.\n").encode())
+harnesses = []
+for filename in ("issue-980-p4t7-contract-preformat.py", "issue-980-p4t7-lead-gate.py", Path(__file__).name):
+    raw = (scratch / filename).read_bytes()
+    assert not re.search(rb"[A-Za-z]:[\\/]", raw)
+    snapshot = evidence / f"regression-testing/{filename.removeprefix('issue-980-').removesuffix('.py')}-harness.{stamp}.txt"
+    write(snapshot, raw.replace(b"\r\n", b"\n"))
+    harnesses.append({"scratch_identifier": "SCRATCH/" + filename, "raw_sha256": sha(raw),
+                      "raw_base64": base64.b64encode(raw).decode(), "readable_snapshot": reference(snapshot), "crlf_count": raw.count(b"\r\n")})
+harness_path = evidence / f"regression-testing/p4t7-lead-executed-harnesses.{stamp}.json"
+json_write(harness_path, {"timestamp": stamp, "harnesses": harnesses, "qualification": "Exact raw bytes are base64-bound; readable snapshots normalize CRLF to LF only."})
+evidence_files = sorted((evidence / "regression-testing").glob("p4t7-lead-*"))
+evidence_files += sorted((evidence / "regression-testing").glob("p4t7-contract-*"))
+freeze = evidence / f"regression-testing/p4t7-lead-shared-freeze.{stamp}.json"
+manifest = {"status": "FROZEN_READY", "timestamp": stamp, "command": command, "exit_code": 0,
+            "accepted_baseline": baseline["head"], "shared_baseline": reference(baseline_path), "source_files": sources,
+            "ordered_focused_gates": ordered, "coverage": reference(coverage_path), "coverage_ranges": ranges,
+            "test_nodes_in_execution_order": nodes, "test_count": 152, "public_signatures": signatures,
+            "parser_contract": reference(contract), "executed_harnesses": reference(harness_path),
+            "evidence_files": [reference(path) for path in evidence_files],
+            "stage_paths": paths + [path.as_posix() for path in evidence_files] + [freeze.as_posix()],
+            "pending": ["parent checked WIP commit and parser release", "format parser implementations and central integration", "consolidated task review and final ordered gates"],
+            "scope_qualification": "Only dependency_inputs.py and its test are implemented. The eight other approved paths remain absent.",
+            "predecessor_streams_preserved": 62, "changed_line_coverage": "100%; new module has no prior executable baseline.",
+            "unreceipted_advisory": "An initial Black --check planning inspection reported would-reformat before the retained preparation run; it was not represented as a passing gate.",
+            "source_test_edits_during_freeze": False, "behavioral_reruns_during_freeze": False, "git_mutations": False}
+assert all(not Path(item["path"]).exists() for item in baseline["absent_paths"] if item["path"] not in paths)
+json_write(freeze, manifest)
+print(json.dumps({"freeze": reference(freeze), "contract": reference(contract), "source_files": sources, "stage_count": len(manifest["stage_paths"]), "coverage": data["summary"], "measured_ranges": sum(len(value) for value in ranges.values())}, indent=2))
