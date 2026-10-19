@@ -1,0 +1,221 @@
+{
+  "base_commit": "132a8be5c2088926e92b20df33bd17ee57d9f987",
+  "baseline": "New configuration module and tests have no predecessor executable coverage. Accepted unchanged P4-T3 full Pyright and scoped format/lint/test proof retained; accepted P4-T2 XML proof retained. No existing suite was rerun.",
+  "decisions": [
+    "JSON requires an object root; arrays are explicit unsupported roots.",
+    "INI requires sections, strict duplicates, no interpolation, case-preserved names and exact explicit/default/inherited distinction.",
+    "XML configuration, settings and SettingsFile roots have finite declaration allowlists; unknown settings roots fail.",
+    "Only identifiers/structural paths/anchors/kinds/unresolved applicability escape parsers; no values, condition expressions, raw parser errors or read-error rationales.",
+    "No registry wiring or parser dependency added."
+  ],
+  "fixture_root": "tests/fixtures/discovery_analyzers/configuration",
+  "new_absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+    "tests/discovery_runtime/analyzer/test_configuration.py"
+  ],
+  "predecessor_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py",
+      "retained_proof": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "retained_proof": "Accepted predecessor task boundary; no edits or suite rerun.",
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    }
+  ],
+  "proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+      "sha256": "4a2c3d7ccc0b81be030d6f1611051c2ccc88296e8b838dbe2d7a6a7aa1a44be5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+      "sha256": "affe16f6f18ffd44bee4f3ad5e76564288a2b94e1d6b6c6018d1e4da37a56b6d"
+    }
+  ],
+  "routing_receipt": "inventory_analyzers_p4t4_execution",
+  "selected_inputs": {
+    "ini": [
+      "*.ini"
+    ],
+    "json": [
+      "appsettings.json",
+      "appsettings.<nonempty-qualifier>.json",
+      "settings.json",
+      "config.json"
+    ],
+    "unsupported": [
+      "*.toml"
+    ],
+    "xml": [
+      "*.config",
+      "*.settings",
+      "settings.xml",
+      "configuration.xml"
+    ]
+  },
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T05:38:38.156747+00:00"
+}

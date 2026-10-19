@@ -1,0 +1,225 @@
+{
+  "critical_branch_assessment": "No known unresolved critical behavior. Redaction, public error chains, duplicate/malformed syntax, key/depth/byte/output limits, provenance and excluded/unreadable accounting have passing regressions. Uncovered branch destinations consist of three negative XML placement alternatives and the three listed defensive/line-bound failures; no 100-percent claim is made.",
+  "evidence": [
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t4-baseline-binding.2026-10-19T05-38.json",
+      "sha256": "bf962d9c9ea871d01c867d41566f60d9f5e36999871d1ca1b3c1713853cce7ba"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t4-baseline-binding.2026-10-19T05-38.md",
+      "sha256": "dcca560e2578adacac85e4f0924f090d7227f29d0711b914d86fdfb27b044584"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-baseline-harness.2026-10-19T05-55.txt",
+      "sha256": "ff57997661079fd76ff255072d60e9cdb8731d2a8d477234ab1999c533afe9bb"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-1-format-055121.2026-10-19T05-51.json",
+      "sha256": "73a02a4a52a3c2aad72b61748c10ec466b36f0de1ba978758565de5ab07c1084"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-1-format-055121.2026-10-19T05-51.md",
+      "sha256": "020e57ebc62be3889ad585dbf836790e4dbeee3a5f384235d6108ff7ae2cae97"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-1-lint-055121.2026-10-19T05-51.json",
+      "sha256": "5e7500b429fbba9ed84bebed2e3ab91baa55c1b16b3b1adc3350897f69385a05"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-1-lint-055121.2026-10-19T05-51.md",
+      "sha256": "074ae2ba492f9de30dae40255bf07fe141e683fe6ea8226750a5da97b118c5ac"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-format-055137.2026-10-19T05-51.json",
+      "sha256": "343b5e86b1b47d40886e415f0a2363a2b4f80bee23f9606aea3bb632c03149a0"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-format-055137.2026-10-19T05-51.md",
+      "sha256": "5cbadf2e574e12b625a0fae54c8fb85027986e04aaafee359b3771aeb18137e5"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-lint-055137.2026-10-19T05-51.json",
+      "sha256": "35f318cd8b7f1163f4e71212e050219b650a87aed51e35f87f60b52bbe75b8d2"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-lint-055137.2026-10-19T05-51.md",
+      "sha256": "f25e2427b3ef8f8c34b321553f5a61ce897b2b0e3638a6ca3803a50e248bbf4e"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-types-055138.2026-10-19T05-51.json",
+      "sha256": "02f346bc2538429a83cae687297195150bb0a569f3d76554f058c5ba210bbe7e"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-2-types-055138.2026-10-19T05-51.md",
+      "sha256": "7d05bcfa1586931ff0749986e1abf7362392c5016b70d5bd69e4f381a7a4d895"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-binding.2026-10-19T05-52.json",
+      "sha256": "8e3ba4d0b17240c6d3d5bc5ec75ec71d5ec55b85f8ce38595a5b7cb8ad87e6b9"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-format-055208.2026-10-19T05-52.json",
+      "sha256": "b4301b76de61b57556d39b59f4bc9ed0025a233be6a6d2a8a5431983a7a6b4bd"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-format-055208.2026-10-19T05-52.md",
+      "sha256": "0cb41dd67185615c03f6e7c822af2d5733eff4d0d01c4126291dbbef716efa46"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-lint-055209.2026-10-19T05-52.json",
+      "sha256": "4d626964075eee4f72f6edbf40b3eb9fa70540fc5d5c476dfb8e0ce3516989ba"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-lint-055209.2026-10-19T05-52.md",
+      "sha256": "adbfe8d1ff1d6b8915142344726e67eda9d66db0b40fad0d985c0355a569228b"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-types-055209.2026-10-19T05-52.json",
+      "sha256": "6a5ea89dd4c728e989eac9fa09bbac14b18fa7720f5b7a482a4014b9a088456d"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-types-055209.2026-10-19T05-52.md",
+      "sha256": "2dbbfd793ecececa0f6de8b142cc3df3cc35ca574bef39faceef727dd854854c"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-harness.2026-10-19T05-55.txt",
+      "sha256": "23ffca04dd9bc71313fab80778b8cbef04da55d99dff063dbc70154487ad5ce8"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+      "sha256": "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.md",
+      "sha256": "b37f131e101c5141df5df5a30a7c3a001ba03de8c95878e1db89ae7d471e7f57"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-freeze-harness.2026-10-19T05-55.txt",
+      "sha256": "c690bd8c2ef4d12f6edd0c3d8f191102204dfebb45e6630006758447ddcfe067"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-initial-format-format-055115.2026-10-19T05-51.json",
+      "sha256": "d79931fbe05958bcbf6218ad3a5e20353212024f6e311b1cf81d772aaa41fcca"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-initial-format-format-055115.2026-10-19T05-51.md",
+      "sha256": "1d5f5423571ef372e52dc622d4feb2671d6c339c095b22754c6793086af342f4"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-focused-3-coverage.2026-10-19T05-52.json",
+      "sha256": "dad9a3a6992f138b1321c961ece6a8d78f2aa4590b92bf3ee5ed94669b5a8de4"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-focused-3-tests-055247.2026-10-19T05-52.json",
+      "sha256": "b66241ba612cf3d6a87a1895ed03bef7ffc0c87568526a745757acbdaca667f7"
+    },
+    {
+      "lf_only": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-focused-3-tests-055247.2026-10-19T05-52.md",
+      "sha256": "3fb0e9d9eb7ab75b493ca05b2efa1f56fcf495ab0ab2ca140115f579856fac68"
+    }
+  ],
+  "freeze": "evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+  "harnesses": [
+    {
+      "byte_identical": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-harness.2026-10-19T05-55.txt",
+      "raw_path": "SCRATCH/issue-980-focused.py",
+      "raw_sha256": "23ffca04dd9bc71313fab80778b8cbef04da55d99dff063dbc70154487ad5ce8",
+      "sha256": "23ffca04dd9bc71313fab80778b8cbef04da55d99dff063dbc70154487ad5ce8",
+      "transformation": "CRLF to LF only; exact program text otherwise preserved"
+    },
+    {
+      "byte_identical": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-freeze-harness.2026-10-19T05-55.txt",
+      "raw_path": "SCRATCH/issue-980-freeze.py",
+      "raw_sha256": "c690bd8c2ef4d12f6edd0c3d8f191102204dfebb45e6630006758447ddcfe067",
+      "sha256": "c690bd8c2ef4d12f6edd0c3d8f191102204dfebb45e6630006758447ddcfe067",
+      "transformation": "CRLF to LF only; exact program text otherwise preserved"
+    },
+    {
+      "byte_identical": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-baseline-harness.2026-10-19T05-55.txt",
+      "raw_path": "SCRATCH/issue-980-baseline.py",
+      "raw_sha256": "ff57997661079fd76ff255072d60e9cdb8731d2a8d477234ab1999c533afe9bb",
+      "sha256": "ff57997661079fd76ff255072d60e9cdb8731d2a8d477234ab1999c533afe9bb",
+      "transformation": "CRLF to LF only; exact program text otherwise preserved"
+    }
+  ],
+  "recorded_at": "2026-10-19T05:55:23.109982+00:00",
+  "remaining": "Independent candidate review and final ordered gates are still required; no acceptance checkoff.",
+  "state": "CHECKED_WIP_EVIDENCE_ONLY",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T05-55",
+  "uncovered_branches": [
+    [
+      169,
+      192
+    ],
+    [
+      178,
+      180
+    ],
+    [
+      186,
+      192
+    ],
+    [
+      279,
+      280
+    ],
+    [
+      340,
+      341
+    ],
+    [
+      343,
+      344
+    ]
+  ],
+  "uncovered_statements": [
+    {
+      "description": "Fixed 100000-physical-line INI allocation guard; ordinary byte/key/depth limits covered.",
+      "line": 280,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "description": "Defensive fail-closed mismatch between lexical default names and ConfigParser defaults.",
+      "line": 341,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "description": "Defensive fail-closed mismatch between lexical section names and ConfigParser options.",
+      "line": 344,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    }
+  ]
+}

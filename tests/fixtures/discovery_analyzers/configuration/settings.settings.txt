@@ -1,0 +1,3 @@
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="VALUE_SENTINEL_PROFILE">
+  <Settings><Setting Name="Display" Type="VALUE_SENTINEL_TYPE" Scope="VALUE_SENTINEL_SCOPE"><Value Profile="VALUE_SENTINEL_PROFILE">VALUE_SENTINEL_TEXT</Value></Setting></Settings>
+</SettingsFile>
