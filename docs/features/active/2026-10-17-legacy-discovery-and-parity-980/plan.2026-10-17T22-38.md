@@ -278,7 +278,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test recognized file/directory/stream APIs, generic registry APIs/platform applicability, COM attributes/references/activation/marshal declarations, masked false positives, and unresolved runtime paths.
   - Acceptance: Static candidates are labeled inferred where appropriate and source-referenced; generic interop analysis is usable without loading any optional platform module.
 
-- [ ] [P4-T6] Map declared UI callbacks and inferred test references.
+- [x] [P4-T6] Map declared UI callbacks and inferred test references.
   - Files and behavior: Create R/analyzer/{ui_callbacks,test_references}.py and PT/analyzer/test_{ui_callbacks,test_references}.py with synthetic XAML/XML/code/test-project inputs.
   - Tests and proof: Cover declared callback attributes, code-behind links, unresolved symbols, test-project references, lexical production type references, ambiguous names, and negative cases that must not become coverage or test-pass claims.
   - Acceptance: Explicit declaration links and inferred test relevance are distinguishable; no finding claims runtime execution or behavioral test coverage.

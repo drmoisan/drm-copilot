@@ -1,0 +1,103 @@
+"""Publish the completed single P4-T6 candidate review from retained proof."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+BINDING = QA / "p4t6-executor-candidate-binding.2026-10-19T09-15.json"
+EXPECTED = "f2580ca269f112a97bb21344f9d5185cf58c7b34d90836f20793067e55ab7af4"
+
+
+def sha(data: bytes) -> str:
+    """Return exact byte SHA-256; no normalization or external effects."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def stamp() -> str:
+    """Read the actual host UTC write minute for the next evidence artifact."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+assert sha(BINDING.read_bytes()) == EXPECTED
+binding = json.loads(BINDING.read_bytes())
+# The source stays frozen through publication of the complete finding set.
+for item in binding["source_bindings"]:
+    assert sha(Path(item["path"]).read_bytes()) == item["working_sha256"]
+archives = []
+# Preserve the first successful metadata check while replacing host-specific literals.
+for original in sorted((Path(__file__).parent / "p4t6-binding-originals").iterdir()):
+    name = original.name
+    raw = original.read_bytes()
+    archives.append({"path": "SCRATCH/p4t6-binding-originals/" + name, "sha256": sha(raw)})
+checks = [
+    "The finite WPF namespace, roots, elements and event pairs emit declaration facts. Opaque resources/templates/custom subtrees remain uninterpreted; conventional retained code-behind relevance is inferred with null target, explicit ambiguity and unresolved binding/execution.",
+    "Configured test roots establish test scope; production and entrypoint ownership take precedence. Literal construction and typeof/default/sizeof contexts provide inferred relevance, including same-name ambiguity, without behavioral coverage or passing-test claims.",
+    "Direct MSBuild ItemGroup ProjectReference operations remain syntax facts. Update/Remove, expressions, wildcards and inherited conditions do not become activated edges; raw expressions and conditions are withheld.",
+    "Retained immutable input bytes and exact repository/revision/path/content pin matching determine provenance. Source references use the accepted cached InventoryInput digest; no repeated source reads or per-finding payload rehash is introduced.",
+    "Scope matching, pins, selected input, lexical index, parse/token work, projected records and encoded text have finite independent bounds. Aggregate exhaustion discards partial claims behind fixed diagnostics. Duplicate pins preserve any-exact-match semantics.",
+    "Occurrence-based source anchors and IDs preserve duplicates and deterministic input ordering. C# offsets retain literal spelling and physical lines; XML anchors explicitly retain accepted parser precision.",
+    "Seven reviewed files remain within 500 lines, with intent docstrings/comments and isolated deterministic tests. The implementation imports accepted primitives only, performs no publication or runtime/compiler operations, and does not expose a registry before P4-T9.",
+    "The two focused ordered loops remain bound to exact reviewed bytes: 107 UI cases and 138 test-reference cases. Raw coverage, 26 named class/callable ranges and all executed harness snapshots reconcile; no worker suite or predecessor review was replayed.",
+    "Three additional memory-only output probes covered maximum supported UI class/handler names with long ASCII/BMP/astral paths. Every canonical UTF-8 result remained within its prospective text reservation; the concrete concern is closed.",
+]
+final_gates = [
+    "Scoped Black --check then Ruff over the seven frozen source/test files.",
+    "Whole-repository Pyright and the established scoped architecture, optional-import, I/O, test-isolation and file-size checks.",
+    "Two isolated reversed-module unit batches: UI limits before UI callbacks (107 cases), and test-reference syntax before adapter tests (138 cases), with all three production modules measured and per-range/changed-line coverage retained.",
+    "Applicable inventory-v2/schema/resource/quality-tier and actual dependent neutrality contracts, using the established selector rather than replaying earlier analyzer suites.",
+    "Bounded synthetic Windows/Git capture and immutable inventory composition for both adapters. Verify exact pins, deterministic results, inferred null targets, uninspected/unassigned ledger seeds and no UI/compiler/network execution or source mutation. Host and non-Windows verification remain later tasks.",
+]
+name = stamp()
+harness = QA / f"p4t6-executor-review-publication-harness.{name}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+name = stamp()
+review_path = QA / f"p4t6-executor-candidate-review.{name}.json"
+review = {
+    "timestamp": name, "recorded_at": datetime.now(timezone.utc).isoformat(), "task": "P4-T6",
+    "command": "poetry run python SCRATCH/issue-980-p4t6-publish-review.py", "exit_code": 0,
+    "status": "CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES", "scope": [r["path"] for r in binding["source_bindings"]],
+    "combined_head": binding["combined_head"], "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+    "binding": {"path": BINDING.as_posix(), "sha256": EXPECTED}, "subset_manifests": binding["manifests"],
+    "checks": checks, "findings": [], "open_behavioral_probes": [], "open_evidence_discrepancies": [],
+    "coverage": binding["coverage"], "known_uncovered_lines": {"test_references.py": [257, 358, 392], "test_reference_syntax.py": [55]},
+    "qualification": [
+        "Candidate review only: final ordered gates, native composition and independent task acceptance are still pending. No task or AC checkbox changed; counts remain 37/84 and 13/66.",
+        "The original UI 103-pass/3-failure anchor expectations and test-reference initial diagnostics remain preserved. Parser-reported line semantics were accepted explicitly; no predecessor parser was modified.",
+        binding["tests"]["node_order_qualification"],
+        "UI focused receipts retain combined sanitized command output; test-reference receipts retain separately hashed raw streams. These evidence formats are not conflated.",
+        "The first successful binding check had machine-specific path literals in its harness. Its exact receipt and harness were archived under session SCRATCH. Only path discovery changed to portable environment/home references; the bounded metadata check passed again without behavioral execution.",
+        "The first review publication command exited 1 because the hygiene assertion matched its own literal forbidden-path pattern in the saved harness (line 100, AssertionError). Its complete three output files remain byte-preserved in the archive. The check now constructs the same forbidden bytes from separate constants; no behavioral check, review finding or source changed.",
+        binding["inspection_diagnostic"],
+    ],
+    "original_binding_archive": archives, "limitations": binding["limitations"], "proposed_final_gate_scope": final_gates,
+    "publication_harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())},
+    "next_five_tasks": ["P4-T7", "P4-T8", "P4-T9", "P5-T1", "P5-T2"],
+}
+review_path.write_bytes((json.dumps(review, indent=2, ensure_ascii=True) + "\n").encode())
+name = stamp()
+markdown = QA / f"p4t6-executor-candidate-review.{name}.md"
+body = f"""# P4-T6 consolidated candidate review
+
+Timestamp: {name}
+Command: poetry run python SCRATCH/issue-980-p4t6-publish-review.py
+EXIT_CODE: 0
+Output Summary: CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES. No actionable finding or open probe. Seven source/test files remain frozen at `{binding['combined_head']}`.
+
+This is the single consolidated review of the UI and test-reference subsets. The accepted baseline is `6804041b88ea80e386948a0327dca8f0d7a89471`; original subset manifests retain their own creation/head qualifications. The exact [binding receipt]({BINDING.name}) reconciles current working/index/commit bytes, both focused loops, raw coverage and retained harnesses. The [machine-readable review]({review_path.name}) records the complete finding set, qualifications and recommended final sequence.
+
+"""
+body += "\n".join("- " + item for item in checks) + "\n\n"
+body += "The UI subset passed 107 tests with 164/164 statements and 58/58 branches. Test-reference proof passed 138 tests with 218/222 statements and 92/96 branches. All 26 named class/callable ranges exceed the required 90% statement threshold. The four unexecuted defensive guards remain explicitly listed in the frozen range report; no 100% claim is made for that subset. The three independent UI output probes passed. No successful worker suite or predecessor implementation review was repeated.\n\n"
+body += "Findings: none. Open behavioral probes: none. Open evidence discrepancies: none. Initial binding/publication artifacts remain byte-preserved in SCRATCH. Portable path discovery replaced host-specific checker literals; the publication checker then rejected its own forbidden-path pattern. That checker-only self-match was corrected without changing the finding set. The exact qualifications and original digests are retained in the machine-readable review. No source, test, worker evidence or behavioral result changed.\n\n"
+body += "Recommended final sequence:\n\n" + "\n".join(f"{i}. {item}" for i, item in enumerate(final_gates, 1)) + "\n\n"
+body += "Final task acceptance is pending. Plan/AC/checkpoint/Git and production/test bytes were not modified. Counts remain 37/84 tasks and 13/66 source ACs. Registry exposure remains P4-T9; actual UI execution, test coverage, compiler binding, native coding-agent host behavior and non-Windows execution are unproved.\n\nCurrent phase: P4-T6 final-gate readiness. Next five tasks: P4-T7 local dependencies; P4-T8 optional platform analyzer consent; P4-T9 validated extension results; P5-T1 discovery coverage; P5-T2 parity totals.\n"
+markdown.write_bytes(body.encode())
+# Publication must not introduce trailing whitespace or machine-specific path literals.
+for path in (review_path, markdown, harness):
+    data = path.read_bytes()
+    assert b"\r" not in data and data.endswith(b"\n") and not data.endswith(b"\n\n")
+    assert not any(line.rstrip() != line for line in data.splitlines())
+    assert b"C:" + b"/Users/" not in data and b"C:" + b"\\Users\\" not in data
+print(json.dumps({"status": review["status"], "json": {"path": review_path.as_posix(), "sha256": sha(review_path.read_bytes())}, "markdown": {"path": markdown.as_posix(), "sha256": sha(markdown.read_bytes())}, "findings": 0, "open_probes": 0, "counts": {"tasks": "37/84", "source_ac": "13/66"}}))

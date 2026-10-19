@@ -1,0 +1,86 @@
+{
+  "authority": "workspace_operations_p4t6_final_gates / S5_P4T6_final_ordered_gates",
+  "candidate": {
+    "path": "SCRATCH/issue-980-p4t6-final-candidate.released.2026-10-19T09-20.json",
+    "sha256": "b63df42849acff02e68362a466e63c15e71300c85fcd0396352a3f032b3f72b8"
+  },
+  "command": "poetry run python SCRATCH/issue-980-p4t6-final-release.py",
+  "exit_code": 0,
+  "gate_execution": false,
+  "git_mutation": false,
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-preparation.2026-10-19T09-13.json",
+    "sha256": "b3ce1ac6cbafd8c775ac7d48b1c675b5d1a4be20dae8bee08336cb32e2eb74d8"
+  },
+  "prepared_harnesses": [
+    {
+      "executed": false,
+      "lines": 142,
+      "path": "SCRATCH/issue-980-p4t6-final-gates.py",
+      "sha256": "b1c21d12cea503271205acc82e50273cb46cb69e728bc3771ca8ac2488e3dc6e",
+      "syntax_parse": "passed"
+    },
+    {
+      "executed": false,
+      "lines": 55,
+      "path": "SCRATCH/issue-980-p4t6-final-architecture.py",
+      "sha256": "de680fc2311fe73eca09b5d728d16290acd585ca1824c4d9cc2cf31bfe45c681",
+      "syntax_parse": "passed"
+    },
+    {
+      "executed": false,
+      "lines": 176,
+      "path": "SCRATCH/issue-980-p4t6-final-native.py",
+      "sha256": "523889f46a863abb75127da79d23d1c6437cf3cbe2a8bc2f8c48b6cfd4f11ed7",
+      "syntax_parse": "passed"
+    },
+    {
+      "executed": false,
+      "lines": 148,
+      "path": "SCRATCH/issue-980-p4t6-final-handoff.py",
+      "sha256": "512fd7e831081121141d2575d535c50789e110bc7278bd44ac45f98671050258",
+      "syntax_parse": "passed"
+    }
+  ],
+  "release_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-release-harness.2026-10-19T09-20.txt",
+    "sha256": "e139070543fdfb855f039a85413dbcc8762ff665a6cd8309da152bb9a55529b2"
+  },
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-review.2026-10-19T09-18.json",
+    "sha256": "38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_test_references.py",
+      "sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+      "sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de"
+    }
+  ],
+  "source_test_mutation": false,
+  "state": "RELEASED_READY_TO_EXECUTE",
+  "timestamp": "2026-10-19T09-20"
+}

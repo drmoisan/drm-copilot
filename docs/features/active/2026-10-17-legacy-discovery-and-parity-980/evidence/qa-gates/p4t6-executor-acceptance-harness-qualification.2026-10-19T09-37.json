@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-10-19T09-37",
+  "published_utc": "2026-10-19T09:37:26.2199226+00:00",
+  "task": "P4-T6",
+  "task_status": "PASS",
+  "exit_code": 0,
+  "command": "PowerShell exact-byte preservation and placeholder-only representation comparison; no behavioral execution.",
+  "qualification": "The immutable 09:35 acceptance executed_publication_harness field references a readable representation whose two timestamp placeholders were rendered. It is not raw executed identity. This supplemental exact snapshot supplies that identity; acceptance, plan checkoff, source/test bytes and prior gate results are unchanged.",
+  "original_acceptance": {
+    "sha256": "ee119c0427b6b920e987dd0abe8b2c8e6ccec555accd3527b1e543f31f3a054c",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-acceptance.2026-10-19T09-35.json"
+  },
+  "rendered_representation": {
+    "rendered_timestamp": "2026-10-19T09-35",
+    "rendered_write_time": "2026-10-19T09:35:49.634080+00:00",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-acceptance-harness.2026-10-19T09-35.txt",
+    "sha256": "ae131d8bff9276ed59ea136ad4151971acfc52fa5d8f4f6bc2ded8cc5a2fd8a9",
+    "exact_placeholder_only_mapping_verified": true
+  },
+  "exact_executed_harness": {
+    "raw_preserved": true,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-acceptance-executed-harness.2026-10-19T09-37.txt",
+    "sha256": "e34e03b447a5e56eaa8af3bdbdd0746209dff3fc1b3b266a9319d39d8d40f114",
+    "original": "SCRATCH/issue-980-p4t6-accept.py"
+  },
+  "originals_modified": false,
+  "behavioral_reruns": 0,
+  "plan": "38/84",
+  "acceptance_criteria": "13/66"
+}
