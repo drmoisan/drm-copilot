@@ -1,0 +1,45 @@
+{
+  "stage": "lint",
+  "label": "p4t7-lead-focused2-lint",
+  "started": "2026-10-19T09:53:14.453624+00:00",
+  "finished": "2026-10-19T09:53:15.608897+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+  "exit_code": 1,
+  "duration_seconds": 1.155,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "57f1584508117d8608c691fd27cdc45cf22fb0e8205c49582bc4757c5f9e6007",
+      "physical_lines": 491
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "752092e9edbdb3f5a483d6895a6cc326f6ebf2965e4edbcd32f3a0b6884d617e",
+      "physical_lines": 454
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "57f1584508117d8608c691fd27cdc45cf22fb0e8205c49582bc4757c5f9e6007",
+      "physical_lines": 491
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "752092e9edbdb3f5a483d6895a6cc326f6ebf2965e4edbcd32f3a0b6884d617e",
+      "physical_lines": 454
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused2-lint-095315.stdout.bin",
+      "raw_sha256": "59410adc3435ac10f6c409735350449730890ba06c8c12c695b232f44374fca0",
+      "raw_bytes": 1630,
+      "presentation": "E501 Line too long (91 > 88)\n --> tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py:1:89\n  |\n1 | \"\"\"Exercise the shared dependency parser contract entirely with immutable memory values.\"\"\"\n  |                                                                                         ^^^\n2 |\n3 | from dataclasses import FrozenInstanceError, replace\n  |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py:3:1\n   |\n 1 |   \"\"\"Exercise the shared dependency parser contract entirely with immutable memory values.\"\"\"\n 2 |\n 3 | / from dataclasses import FrozenInstanceError, replace\n 4 | | from typing import Protocol, cast\n 5 | |\n 6 | | import pytest\n 7 | |\n 8 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n 9 | |     DependencyAnchor,\n10 | |     DependencyBudget,\n11 | |     DependencyCandidate,\n12 | |     DependencyInputError,\n13 | |     DependencyLimits,\n14 | |     DependencyResult,\n15 | |     DependencyValue,\n16 | |     Ecosystem,\n17 | |     dependency_value,\n18 | |     safe_identifier,\n19 | | )\n   | |_^\n   |\nhelp: Organize imports\n\nE501 Line too long (90 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py:44:89\n   |\n43 | def add(budget: DependencyBudget, **changes: object) -> None:\n44 |     \"\"\"Append a valid declaration or injected malformed values; mutate only its budget.\"\"\"\n   |                                                                                         ^^\n45 |     values: dict[str, object] = {\n46 |         \"kind\": \"declaration\",\n   |\n\nFound 3 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused2-lint-095315.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared dependency contract only"
+}

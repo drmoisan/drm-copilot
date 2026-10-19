@@ -1,0 +1,45 @@
+{
+  "stage": "format",
+  "label": "p4t7-lead-focused1-format",
+  "started": "2026-10-19T09:52:58.084728+00:00",
+  "finished": "2026-10-19T09:52:59.934204+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+  "exit_code": 0,
+  "duration_seconds": 1.849,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "abd8adf0b28385481863c217d62312f2e01192b7a7b8f01b8fd24007c0afc184",
+      "physical_lines": 490
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "752092e9edbdb3f5a483d6895a6cc326f6ebf2965e4edbcd32f3a0b6884d617e",
+      "physical_lines": 454
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "57f1584508117d8608c691fd27cdc45cf22fb0e8205c49582bc4757c5f9e6007",
+      "physical_lines": 491
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "752092e9edbdb3f5a483d6895a6cc326f6ebf2965e4edbcd32f3a0b6884d617e",
+      "physical_lines": 454
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused1-format-095259.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-lead-focused1-format-095259.stderr.bin",
+      "raw_sha256": "d1fe986c6a470b7cae89f8558018c1603cecce72911406c1273fb118142e4796",
+      "raw_bytes": 166,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted, 1 file left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared dependency contract only"
+}
