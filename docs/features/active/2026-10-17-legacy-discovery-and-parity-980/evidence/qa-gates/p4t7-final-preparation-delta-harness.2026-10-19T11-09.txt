@@ -1,0 +1,46 @@
+"""Correct one unexecuted native profile assumption while preserving prepared bytes."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+scratch = Path(__file__).parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+prior = qa / 'p4t7-final-preparation.2026-10-19T10-58.json'
+record = json.loads(prior.read_bytes())
+native = scratch / 'issue-980-p4t7-final-native.py'
+raw = native.read_bytes()
+expected = next(item for item in record['prepared_harnesses'] if item['path'].endswith('-native.py'))
+assert hashlib.sha256(raw).hexdigest() == expected['sha256']
+preserved = scratch / 'issue-980-p4t7-final-native.prepared-original.py'
+assert not preserved.exists()
+preserved.write_bytes(raw)
+text = raw.decode().replace("small['limits']['artifact_records'] = 2", "small.setdefault('limits', {})['artifact_records'] = 2")
+assert text != raw.decode()
+updated = (text.rstrip() + '\n').encode()
+assert b'\r' not in updated
+ast.parse(updated)
+native.write_bytes(updated)
+expected['sha256'] = hashlib.sha256(updated).hexdigest()
+assert all(hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256'] for item in record['source_files'])
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+record.update(timestamp=stamp, command='poetry run python SCRATCH/issue-980-p4t7-final-preparation-delta.py',
+    prior_preparation={'path': prior.as_posix(), 'sha256': hashlib.sha256(prior.read_bytes()).hexdigest()},
+    preparation_delta={'reason': 'The example omits optional limits; create the object before assigning the synthetic small-output capacity.',
+        'original_unexecuted_native': {'path': 'SCRATCH/' + preserved.name, 'sha256': hashlib.sha256(raw).hexdigest()},
+        'updated_unexecuted_native': {'path': 'SCRATCH/' + native.name, 'sha256': hashlib.sha256(updated).hexdigest()},
+        'assumptions_audited': ['All seven format fixtures match the reviewed public parser selectors and retained focused positives',
+            'Profile role/repository/client/root/analyzer shape follows the accepted P4-T6 native composition',
+            'Git byte pins use -text and core.autocrlf=false; profile writes precede state capture',
+            'Small output limit has a reserved fixed blocker and never requires successful publication',
+            'Unknown installed/evaluated state, redacted values and null graph targets match the accepted central projection',
+            'inventory_result and expected closed-registry refusal use unchanged public contracts'],
+        'gate_execution': False, 'source_test_mutation': False},
+    delta_harness={'path': 'SCRATCH/' + Path(__file__).name, 'sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
+path = qa / ('p4t7-final-preparation.' + stamp + '.json')
+assert not path.exists()
+path.write_bytes((json.dumps(record, indent=2) + '\n').encode())
+path.with_suffix('.md').write_bytes((f'# P4-T7 final preparation update\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: PREPARED_NOT_EXECUTED. One unexecuted native fixture now creates the optional limits object before assigning its small-output capacity. Original native bytes and the prior preparation are preserved.\n\nAll 14 frozen source/test streams remain unchanged. The same seven stages, five isolated batches (557 cases), six measured modules and 16 native assertions remain planned. Remaining profile/capture/parser/output assumptions were checked against accepted interfaces and retained focused fixtures; no behavior or final gate was executed. Review and explicit coordinator release are still required.\n').encode())
+print(json.dumps({'preparation': {'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()},
+    'native': expected, 'original_native': record['preparation_delta']['original_unexecuted_native']}, indent=2))

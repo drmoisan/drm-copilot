@@ -1,0 +1,387 @@
+{
+  "bounded_confirmation": null,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-candidate-binding.2026-10-19T11-09.json",
+    "sha256": "5f520dc34c988a2f786f9a595eeae06e7df4d8b99c43b95efe2a7f61bf543730"
+  },
+  "changed_line_coverage": "All six newly added production modules have 100% measured statements/branches; changed responsibilities retain or improve their frozen focused baseline. No predecessor file changed.",
+  "checked_candidate_commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-coverage-ranges.2026-10-19T11-09.json",
+    "sha256": "266419900281eafa1010fb5118b4d5a6775106bdef971969da3b61060c706a46"
+  },
+  "executed_harnesses": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-executed-harnesses.2026-10-19T11-09.json",
+    "sha256": "fef80f0460e8d8217fd8d6246612d3063f5cead6cb324ff6e084d49d4e6f346f"
+  },
+  "limitations": [
+    "Finite package.json, npm lock/shrinkwrap v2/v3, requirements/setup.cfg, MSBuild declarations, packages.config and NuGet lock v1 syntax only.",
+    "Installed state, effective resolution, graph binding, conditions and execution remain unverified or unresolved.",
+    "Unsafe locations, versions, conditions and marker values are redacted; metadata never supplies an evaluated graph.",
+    "Dispatch and successful publication remain P4-T9; the native proof verifies expected closed-registry refusal.",
+    "Native Windows Python/Git only; no installed coding-agent host, non-Windows, package installation/restore/execution proof.",
+    "Independent task/AC acceptance remains executor-owned."
+  ],
+  "native_result": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-native-result.2026-10-19T11-09.json",
+    "sha256": "2aa20fdb45246ac1b9692d4251ca0c5780e21b2324901f48b6c12be2029b5527"
+  },
+  "ordered_receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-format-110739.2026-10-19T11-07.md",
+        "sha256": "d6b907b2c45aec6836f74cc89cc08c3d584e555d4277634ee0f61792a6ca0843"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-format-110739.2026-10-19T11-07.json",
+      "seconds": 0.32601,
+      "sha256": "0613249f580ca2a4918e46379b3f1e870801bf39cb39572927395ebf02920e6e",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-lint-110739.2026-10-19T11-07.md",
+        "sha256": "78aa4f4474cf160e1543f64d17c2872644386cecf217a150aa15bb6e61324a4b"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-lint-110739.2026-10-19T11-07.json",
+      "seconds": 0.102125,
+      "sha256": "9141f3d7f42690e419b7c951de4639ff29912c83331c14371fdf68bacb8dd340",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-types-110751.2026-10-19T11-07.md",
+        "sha256": "973e3d3db07cb4eb7334f1e4902e71ce21bc2c60cc83096b25ba61281517bf70"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-types-110751.2026-10-19T11-07.json",
+      "seconds": 12.273669,
+      "sha256": "8cfbe5123da3f9aa763980e639b5ace304c2850086458662760d2ff422fa0ed0",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-architecture-110752.2026-10-19T11-07.md",
+        "sha256": "2f9d4b5a47c900961823415169c68d9fd31804c593a09420e065dd125b965fbc"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-architecture-110752.2026-10-19T11-07.json",
+      "seconds": 0.215202,
+      "sha256": "8260aa2be1ee4cbf86e6f85f37456130a395475434bd513ed7a16c322909b67a",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-shared-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-shared-reverse-110753.2026-10-19T11-07.md",
+        "sha256": "54bcc6ca3066976587fbd60224023c3fbb4a4ffda9d102274487a63cae956bfc"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-shared-reverse-110753.2026-10-19T11-07.json",
+      "seconds": 1.494969,
+      "sha256": "13959eb76c966a1d546416495467515ca9b7ce313cf959c86df1f218024c5f95",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-node-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-node-reverse-110754.2026-10-19T11-07.md",
+        "sha256": "3c6c2b4f9bc8ff5f83412e7ae55fc2b5dde6c6182af711d1472ae5da4231a0ec"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-node-reverse-110754.2026-10-19T11-07.json",
+      "seconds": 1.002396,
+      "sha256": "5aadd51d6d641eced166e5d31633a7e5c9243f161b1d49c7e9801b46567bf004",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-python-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-python-reverse-110755.2026-10-19T11-07.md",
+        "sha256": "c5f8d8a847c9edc8eba379e5375564e11def141985496742cad64ebce1e16471"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-python-reverse-110755.2026-10-19T11-07.json",
+      "seconds": 0.829683,
+      "sha256": "8c68ebe9e5fbea7685412c861b2a760aa165d0c5a77f739929eec79e59d6e39a",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-dotnet-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-dotnet-reverse-110756.2026-10-19T11-07.md",
+        "sha256": "3e2979885c7438ad5b8ad56710cbf5c53902b8ca111a90caee2e2a88a20247b2"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-dotnet-reverse-110756.2026-10-19T11-07.json",
+      "seconds": 0.815107,
+      "sha256": "7c448fff8240e8c02b7c640878a8197cc4a90f28fb482cec3d37f11d4e84ec84",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-integration-reverse",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-integration-reverse-110903.2026-10-19T11-09.md",
+        "sha256": "dac7802ed96d5c24cac272413b3031626ecfad0d630a857109eec61fcd22081f"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-tests-integration-reverse-110903.2026-10-19T11-09.json",
+      "seconds": 67.419081,
+      "sha256": "a8edb0e702aaae1ead0ca3fa1f545f2a60b00d511d07599914018ae760f72d10",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-contracts-110905.2026-10-19T11-09.md",
+        "sha256": "c73f6cccca980bdd47df187563714f55981e759e8d40f93ed4bcb59500096454"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-contracts-110905.2026-10-19T11-09.json",
+      "seconds": 1.620746,
+      "sha256": "cf0f540a6cb8f9331361d12d71f0824a8d65ee4a46e28bd9460038c2c5a81092",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-native-110909.2026-10-19T11-09.md",
+        "sha256": "eb9d5a8e85a491c6ab6fe98024e9ae216fbcb96b1f37bd24b1f22e2c969f8a53"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-native-110909.2026-10-19T11-09.json",
+      "seconds": 4.317599,
+      "sha256": "7bdbe11f5403bd5a4723122992c4ec56244123d90ada0d23d5fb72c11f8c6f42",
+      "stage": 7
+    }
+  ],
+  "ordered_stages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-ordered-stages.2026-10-19T11-09.json",
+    "sha256": "05ebc2ff8e52fc6fac5fdbb9aa617efbfbea47cf20410a68aa275f0434573aaf"
+  },
+  "overall_repository_coverage": "Not remeasured for this atomic task; the feature-wide gate remains outstanding. This receipt claims the complete six-module task population only.",
+  "preserved_predecessors": 62,
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.json",
+    "sha256": "0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1"
+  },
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "source_files": [
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "filtered_git_blob": "9e15746c6c4f68e63652251b508d791fad8d9aba",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py: eol: lf",
+      "index_sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "lines": 500,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "stream_relation": "identical",
+      "working_git_blob": "9e15746c6c4f68e63652251b508d791fad8d9aba"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "filtered_git_blob": "20006e21815e32873f08cdaf546a5ac1373b9b22",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py: eol: lf",
+      "index_sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "lines": 208,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "stream_relation": "identical",
+      "working_git_blob": "20006e21815e32873f08cdaf546a5ac1373b9b22"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "filtered_git_blob": "6b6372eae725508cdd6a752e1bffa0573d3bb9a3",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_inputs.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_inputs.py: eol: lf",
+      "index_sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "lines": 375,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "stream_relation": "identical",
+      "working_git_blob": "6b6372eae725508cdd6a752e1bffa0573d3bb9a3"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "filtered_git_blob": "047729067b48d6ef043af5cd722ec7bba1e8793d",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_input_limits.py: eol: lf",
+      "index_sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "lines": 366,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "stream_relation": "identical",
+      "working_git_blob": "047729067b48d6ef043af5cd722ec7bba1e8793d"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "filtered_git_blob": "6921e3c63619034c9906718ba6911255277190fc",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py: eol: lf",
+      "index_sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "lines": 299,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "stream_relation": "identical",
+      "working_git_blob": "6921e3c63619034c9906718ba6911255277190fc"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "filtered_git_blob": "95f4b642fb5db2030aa59eac9c714dfd7ee0105e",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_node.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_node.py: eol: lf",
+      "index_sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "lines": 398,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "stream_relation": "identical",
+      "working_git_blob": "95f4b642fb5db2030aa59eac9c714dfd7ee0105e"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "filtered_git_blob": "88a619bc48dfd118888438592588b87482fdfd5f",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_node_limits.py: eol: lf",
+      "index_sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "lines": 145,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "stream_relation": "identical",
+      "working_git_blob": "88a619bc48dfd118888438592588b87482fdfd5f"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "filtered_git_blob": "907a10b12231648bb714025ab5bffd5272f97be5",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py: eol: lf",
+      "index_sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "lines": 311,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "stream_relation": "identical",
+      "working_git_blob": "907a10b12231648bb714025ab5bffd5272f97be5"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+      "filtered_git_blob": "2b8588ca104d1c0e28b24f79861aaee64ee0669c",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_python.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_python.py: eol: lf",
+      "index_sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+      "lines": 473,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+      "stream_relation": "identical",
+      "working_git_blob": "2b8588ca104d1c0e28b24f79861aaee64ee0669c"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "filtered_git_blob": "6ed769900d2e1e8939ce936e613416e404ad7766",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py: eol: lf",
+      "index_sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "lines": 365,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "stream_relation": "identical",
+      "working_git_blob": "6ed769900d2e1e8939ce936e613416e404ad7766"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "filtered_git_blob": "f3414a8f5e972ca0253e85a7df84287042e4a3d4",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_dotnet.py: eol: lf",
+      "index_sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "lines": 465,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "stream_relation": "identical",
+      "working_git_blob": "f3414a8f5e972ca0253e85a7df84287042e4a3d4"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "filtered_git_blob": "e66741836c41514518dd4c9c92ba5ab135746925",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py: eol: lf",
+      "index_sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "lines": 467,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "stream_relation": "identical",
+      "working_git_blob": "e66741836c41514518dd4c9c92ba5ab135746925"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "filtered_git_blob": "d3e0415e8010265b1bf7e26f6c50b98c178e294e",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependencies.py: text: auto\ntests/discovery_runtime/analyzer/test_dependencies.py: eol: lf",
+      "index_sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "lines": 467,
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "stream_relation": "identical",
+      "working_git_blob": "d3e0415e8010265b1bf7e26f6c50b98c178e294e"
+    },
+    {
+      "commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+      "commit_sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "filtered_git_blob": "9412616db823548b87add1700c8e6ed70b6d8e89",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py: eol: lf",
+      "index_sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "lines": 339,
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "stream_relation": "identical",
+      "working_git_blob": "9412616db823548b87add1700c8e6ed70b6d8e89"
+    }
+  ],
+  "state": "EXECUTOR_ACCEPTANCE_PENDING",
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+      "sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.json",
+      "sha256": "d8bc7e62f27dadfa1093122e36482de9da1e0016f41c405516743c2e66ed1642"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json",
+      "sha256": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-freeze.2026-10-19T10-30.json",
+      "sha256": "02e7fa6de5f8a895a1738777e1effcba1e973ade848b17347f3ce2e916956f96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-freeze.2026-10-19T10-53.json",
+      "sha256": "28975f0cd0dd00c11c1595135e9832ae502a8039c1c0d990c1b5ae034e5e4266"
+    }
+  ],
+  "task": "P4-T7",
+  "test_cases": {
+    "contracts": 215,
+    "dotnet": 73,
+    "integration": 66,
+    "native_assertions": 16,
+    "node": 111,
+    "python": 116,
+    "shared": 191,
+    "total": 557
+  },
+  "timestamp": "2026-10-19T11-09",
+  "toolchain_deltas": {
+    "new_lint_findings": 0,
+    "new_test_failures": 0,
+    "new_type_diagnostics": 0
+  }
+}

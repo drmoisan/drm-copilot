@@ -1,0 +1,28 @@
+{
+  "candidate_manifest": "SCRATCH/issue-980-p4t7-final-candidate.released.2026-10-19T11-07.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-format-110739.2026-10-19T11-07.json",
+      "sha256": "0613249f580ca2a4918e46379b3f1e870801bf39cb39572927395ebf02920e6e",
+      "stage": 1
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+    "tests/discovery_runtime/analyzer/test_dependencies.py": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d"
+  }
+}

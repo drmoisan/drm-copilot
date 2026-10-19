@@ -1,0 +1,88 @@
+{
+  "ac_count": {
+    "checked": 13,
+    "total": 66
+  },
+  "ac_sources_unchanged": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344"
+    }
+  ],
+  "authority": {
+    "native_routing_launch_provenance": true,
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "receipt": "atomic_execution_p4t7_final_acceptance"
+  },
+  "behavioral_runs": 0,
+  "candidate_commit": "b63840c3b00736a33ec14169b63a8ea68aa827f1",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-final-reconcile.py WORKER_SCRATCH",
+  "coverage_totals": {
+    "covered_branches": 414,
+    "covered_lines": 824,
+    "num_branches": 414,
+    "num_statements": 824
+  },
+  "exit_code": 0,
+  "findings": [],
+  "finished_at": "2026-10-19T11:14:31.468176+00:00",
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-handoff.2026-10-19T11-09.json",
+    "sha256": "0bb22689574e3acdc8eaba593593c2bbaa23640637ba4e9cb3223219514726f8"
+  },
+  "harness_snapshots": 11,
+  "limitations": [
+    "Finite package.json, npm lock/shrinkwrap v2/v3, requirements/setup.cfg, MSBuild declarations, packages.config and NuGet lock v1 syntax only.",
+    "Installed state, effective resolution, graph binding, conditions and execution remain unverified or unresolved.",
+    "Unsafe locations, versions, conditions and marker values are redacted; metadata never supplies an evaluated graph.",
+    "Dispatch and successful publication remain P4-T9; the native proof verifies expected closed-registry refusal.",
+    "Native Windows Python/Git only; no installed coding-agent host, non-Windows, package installation/restore/execution proof."
+  ],
+  "measured_ranges": 63,
+  "normalization": "Exact current working/index/committed sources are identical. Decoded raw harnesses match LF-readable companions after CRLF-to-LF only. Raw stdout/stderr match sanitized receipt text; original coverage bytes are preserved and their only structured presentation change is file-path normalization.",
+  "open_checks": [],
+  "plan_before": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "sha256": "2578a9e5b7ceb61df8fd6b43ad624d744d1536b4760f3f5448d50f951dae1750"
+  },
+  "preserved_predecessor_working_streams": 62,
+  "receipt_count": 11,
+  "retained_reviews": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json",
+      "sha256": "89fa8d3c97da9343e8b83d855ce6d8dc8ca28f758b6e7ef2489ddbd0de7beac0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.json",
+      "sha256": "226d6b3885d34e6bfe53dcda7f98c3f48318704a3dbfb6230d7257f4027b7208"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.json",
+      "sha256": "0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1"
+    }
+  ],
+  "reuse": "Complete shared/Node, Python/NET and central integration reviews reused; no implementation review, suite or probe replay. AC-33 through AC-36 retain later optional-adapter/registry/integration scope and stay unchecked.",
+  "source_working_index_commit_streams": 14,
+  "started_at": "2026-10-19T11:14:29.877375+00:00",
+  "status": "PASS",
+  "task": "P4-T7",
+  "test_cases": {
+    "contracts": 215,
+    "dotnet": 73,
+    "integration": 66,
+    "native_assertions": 16,
+    "node": 111,
+    "python": 116,
+    "shared": 191,
+    "total": 557
+  },
+  "timestamp": "2026-10-19T11-14",
+  "worker_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-staging.2026-10-19T11-10.json",
+    "sha256": "de47bfecbb0826d2976f51ee080e247b6ae208bde2998d2e7670fcc4aae9dbcf"
+  }
+}

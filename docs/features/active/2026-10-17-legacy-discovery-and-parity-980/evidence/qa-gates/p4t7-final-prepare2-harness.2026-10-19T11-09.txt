@@ -1,0 +1,111 @@
+"""Bind five frozen P4-T7 subsets and nonexecuting combined gate preparation."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root, scratch = Path.cwd(), Path(__file__).parent
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+regression, qa = feature / 'evidence/regression-testing', feature / 'evidence/qa-gates'
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def save(path, value):
+    assert not path.exists(), path
+    path.write_bytes((json.dumps(value, indent=2) + '\n').encode())
+
+
+names = {
+    'shared': 'p4t7-shared-repair-freeze.2026-10-19T10-28.json',
+    'node': 'p4t7-node-freeze.2026-10-19T10-24.json',
+    'python': 'p4t7-python-repair-freeze.2026-10-19T10-32.json',
+    'dotnet': 'p4t7-dotnet-repair-freeze.2026-10-19T10-30.json',
+    'integration': 'p4t7-integration-freeze.2026-10-19T10-53.json',
+}
+subsets = {key: json.loads((regression / name).read_bytes()) for key, name in names.items()}
+files = []
+for key in ('shared', 'node', 'python', 'dotnet', 'integration'):
+    value = subsets[key]
+    if key in ('shared', 'integration'):
+        selected = value['source_files']
+    elif key == 'node':
+        selected = value['files']
+    elif key == 'python':
+        selected = [{'path': path, 'sha256': entry['sha256']} for path, entry in value['bindings'].items() if Path(path).name in ('dependency_python.py', 'test_dependency_python.py')]
+    else:
+        selected = value['source_test']
+    files.extend({'path': entry['path'], 'sha256': entry['sha256']} for entry in selected)
+assert len(files) == len({entry['path'] for entry in files}) == 14
+assert all(sha(Path(entry['path']).read_bytes()) == entry['sha256'] for entry in files)
+node_range_ref = subsets['node']['coverage_ranges']
+assert sha(Path(node_range_ref['path']).read_bytes()) == node_range_ref['sha256']
+node_ranges = json.loads(Path(node_range_ref['path']).read_bytes())
+prior_nodes = {
+    'shared': subsets['shared']['test_nodes_in_execution_order'],
+    'node': node_ranges['test_node_order'],
+    'python': subsets['python']['nodes'],
+    'dotnet': subsets['dotnet']['nodes'],
+    'integration': subsets['integration']['test_nodes_in_execution_order'],
+}
+counts = {'shared': 191, 'node': 111, 'python': 116, 'dotnet': 73, 'integration': 66}
+assert all(len(nodes) == len(set(nodes)) == counts[key] for key, nodes in prior_nodes.items())
+forward_order = {key: list(dict.fromkeys(node.split('::', 1)[0] for node in nodes)) for key, nodes in prior_nodes.items()}
+baseline_path = feature / 'evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json'
+baseline = json.loads(baseline_path.read_bytes())
+assert sha(baseline_path.read_bytes()) == '9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17'
+assert all(sha(Path(entry['path']).read_bytes()) == entry['sha256'] for entry in baseline['preserved_files'])
+head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+candidate = {'task': 'P4-T7', 'preparation_only': True, 'execution_released': False, 'coordinator_release_receipt': None,
+    'head_at_preparation': head, 'accepted_baseline': baseline['head'], 'baseline': ref(baseline_path), 'files': files,
+    'subset_manifests': [ref(regression / name) for name in names.values()], 'review': None, 'confirmation': None,
+    'expected_test_counts': counts, 'forward_test_module_order': forward_order, 'prior_node_order': prior_nodes,
+    'release_requirements': ['All 14 source/test streams remain identical', 'Existing scoped reviews and final integration review are bound',
+        'Any required bounded repair confirmation is bound', 'Coordinator explicitly releases execution with a fresh routing receipt']}
+candidate_path = scratch / 'issue-980-p4t7-final-candidate.preparation2.json'
+save(candidate_path, candidate)
+harnesses, native_checks = [], []
+for name in ('gates', 'architecture', 'native'):
+    path = scratch / ('issue-980-p4t7-final-' + name + '.py')
+    raw = path.read_bytes()
+    tree = ast.parse(raw)
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert len(raw.splitlines()) <= 500 and not re.search(rb'(?<![A-Za-z])[A-Za-z]:[\\/]', raw)
+    harnesses.append({'path': 'SCRATCH/' + path.name, 'sha256': sha(raw), 'lines': len(raw.splitlines()), 'syntax_parse': 'passed', 'executed': False})
+    if name == 'native':
+        native_checks = [node.args[0].value for node in ast.walk(tree) if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == 'check' and isinstance(node.args[0], ast.Constant)]
+assert len(native_checks) == 16
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+record = {'task': 'P4-T7', 'timestamp': stamp, 'state': 'PREPARED_NOT_EXECUTED', 'source_head': head,
+    'command': 'poetry run python SCRATCH/issue-980-p4t7-final-prepare2.py', 'exit_code': 0,
+    'authority': 'workspace_operations_p4t7_integration_resume / S5_P4T7_dependency_integration_resume; preparation only',
+    'profile_sha256': '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6',
+    'prepared_harnesses': harnesses, 'preparation_harness': {'path': 'SCRATCH/' + Path(__file__).name, 'sha256': sha(Path(__file__).read_bytes())},
+    'adaptation_harness': {'path': 'SCRATCH/issue-980-p4t7-final-adapt.py', 'sha256': sha((scratch / 'issue-980-p4t7-final-adapt.py').read_bytes())},
+    'candidate_manifest': {'path': 'SCRATCH/' + candidate_path.name, 'sha256': sha(candidate_path.read_bytes())},
+    'source_files': files, 'subset_manifests': candidate['subset_manifests'], 'shared_baseline': ref(baseline_path),
+    'retained_prior_preparation': ref(qa / 'p4t6-final-preparation.2026-10-19T09-13.json'),
+    'retained_successful_publication_proof': ref(qa / 'p4t1-final-native-result.2026-10-19T02-54.json'),
+    'stages': ['Scoped Black on 14 files', 'Scoped Ruff on the same files', 'Whole-repository Pyright',
+        'Architecture, size, docstrings/loops, purity, neutrality and isolation',
+        'Five isolated reverse-module-order batches, 557 cases, six modules and every class/callable measured',
+        'Actual inventory schema, quality tier/classification, package metadata/tooling and domain-neutrality contracts',
+        'Sixteen native Windows/Git retained-byte composition assertions and expected closed-registry refusal'],
+    'forward_test_module_order': forward_order, 'expected_test_counts': counts, 'native_assertions': native_checks,
+    'output_contract': 'Preserve exact stdout/stderr, source/predecessor hashes, actual UTC command times and durations, raw coverage, full node populations/order and exact executed LF harness snapshots. No final gate execution is authorized by this preparation.',
+    'pending': candidate['release_requirements'], 'gate_execution': False, 'source_test_mutation': False, 'git_mutation': False,
+    'limits': 'No installation, restore, dependency execution or evaluated graph. Native Windows Python/Git only; no coding-agent host or non-Windows claim. Adapter dispatch and successful publication remain P4-T9.'}
+path = qa / ('p4t7-final-preparation.' + stamp + '.json')
+save(path, record)
+markdown = f'# P4-T7 final gate preparation\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: PREPARED_NOT_EXECUTED. Three LF-only scratch harnesses parse and bind all 14 source/test files; no gate or native fixture was run.\n\nThe retained P4-T6 mechanics are adapted to five frozen subsets: shared191, Node111, Python116, .NET73 and integration66 cases (557 total). Separate reverse-module-order processes retain exact case populations and measure six production modules plus every class/callable. Scoped Black/Ruff precede whole-repository Pyright, architecture/size/purity/isolation, tests, actual affected contracts and 16 native Windows/Git assertions.\n\nThe native fixture uses all seven supported format selectors with CRLF, Unicode, redacted locations/conditions/markers and exact Git provenance. It checks syntax-kind separation, unresolved graph relevance, unknown installation/execution state, requested versus observed versions, missing pins, bounded aggregate failure, schema-valid deterministic identity, unassigned ledger proposals, expected closed-registry refusal and preserved source/Git state. No install, restore or package execution occurs. Successful dispatch/publication remains P4-T9; earlier publication evidence is retained by reference.\n\nAll source/test and passing subset evidence remains frozen. The final review, any bounded confirmation and explicit coordinator release are required before execution. The candidate manifest has execution_released=false. Exact streams, command timings, coverage and executed harness bytes will be retained by the final run/handoff.\n'
+path.with_suffix('.md').write_bytes(markdown.encode())
+print(json.dumps({'preparation': ref(path), 'markdown': ref(path.with_suffix('.md')), 'harnesses': harnesses, 'candidate': record['candidate_manifest'], 'source_count': len(files), 'expected_cases': sum(counts.values()), 'native_assertions': len(native_checks)}, indent=2))

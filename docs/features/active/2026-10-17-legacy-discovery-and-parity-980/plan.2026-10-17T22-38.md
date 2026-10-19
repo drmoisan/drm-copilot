@@ -283,7 +283,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover declared callback attributes, code-behind links, unresolved symbols, test-project references, lexical production type references, ambiguous names, and negative cases that must not become coverage or test-pass claims.
   - Acceptance: Explicit declaration links and inferred test relevance are distinguishable; no finding claims runtime execution or behavioral test coverage.
 
-- [ ] [P4-T7] Inventory local declared dependencies.
+- [x] [P4-T7] Inventory local declared dependencies.
   - Files and behavior: Create R/analyzer/dependencies.py and PT/analyzer/test_dependencies.py with synthetic Node package/lock, Python requirements/setup configuration, and .NET package/lock/project inputs.
   - Tests and proof: Cover pinned/unpinned versions, conditions/markers, direct versus declared lock relationships, malformed/unsupported manifests, duplicate ordering, and secret/token redaction; no package install/restore/network lookup.
   - Acceptance: Each supported ecosystem yields deterministic source-linked declarations and clear limitations; unsupported formats are diagnostics rather than fabricated evaluated dependencies.
