@@ -241,7 +241,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Exercise source revision/contract/evidence hashes, local transport manifests, foreign identities, unsupported versions, changed bytes, duplicate or conflicting imports, no-overwrite/dry-run, combined-repository identities, and multiple target clients.
   - Acceptance: Target references resolve only to locally imported bytes matching the declared immutable source identity; no sibling checkout, remote fetch, or silent snapshot replacement occurs.
 
-- [ ] [P3-T7] Migrate valid v1 artifacts into an explicit new v2 draft root.
+- [x] [P3-T7] Migrate valid v1 artifacts into an explicit new v2 draft root.
   - Files and behavior: Create R/{migration_v1,migration_models}.py and PT/test_{migration_v1,migration_unknowns}.py; preserve v1 source files and emit the versioned mapping report.
   - Tests and proof: Test each v1 artifact kind, deterministic old/new ID/hash mapping, unresolved missing dimensions/pins/approval/expectations, namespaced unmapped metadata, collisions, invalid v1 input, unsupported migration versions, and dry-run.
   - Acceptance: Migration never overwrites originals, activates automatically, or invents confidence/approvals/parity; the projected v2 result is structurally valid and incomplete obligations remain visible.

@@ -1,0 +1,330 @@
+{
+  "timestamp": "2026-10-19T00:43:56.940097+00:00",
+  "task": "P3-T7",
+  "status": "worker-complete-awaiting-independent-acceptance",
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478
+    }
+  },
+  "ordered_gate_receipts": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-format.2026-10-19T00-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-lint.2026-10-19T00-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-types.2026-10-19T00-25.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-architecture.2026-10-19T00-29.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-unit.2026-10-19T00-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-reverse.2026-10-19T00-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-contracts.2026-10-19T00-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-native.2026-10-19T00-43.json"
+  ],
+  "raw_evidence_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-source-manifest.2026-10-19T00-43.json",
+  "coverage": {
+    "ok": true,
+    "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+    "files": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+        "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "covered_lines": 76,
+        "measured_lines": 76,
+        "physical_lines": 326,
+        "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+        "units": [
+          {
+            "unit": "migrated_id:34",
+            "kind": "FunctionDef",
+            "covered": 4,
+            "total": 4,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "legacy_features:45",
+            "kind": "FunctionDef",
+            "covered": 7,
+            "total": 7,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_parsed:61",
+            "kind": "FunctionDef",
+            "covered": 5,
+            "total": 5,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_draft_changes:72",
+            "kind": "FunctionDef",
+            "covered": 3,
+            "total": 3,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_scenario:84",
+            "kind": "FunctionDef",
+            "covered": 7,
+            "total": 7,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_decision:144",
+            "kind": "FunctionDef",
+            "covered": 4,
+            "total": 4,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_evidence:183",
+            "kind": "FunctionDef",
+            "covered": 4,
+            "total": 4,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "convert_artifact:213",
+            "kind": "FunctionDef",
+            "covered": 32,
+            "total": 32,
+            "line_percent": 100.0,
+            "missing": []
+          }
+        ]
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+        "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "covered_lines": 96,
+        "measured_lines": 96,
+        "physical_lines": 358,
+        "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+        "units": [
+          {
+            "unit": "MigrationSource:28",
+            "kind": "ClassDef",
+            "covered": 11,
+            "total": 11,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "MigrationBinding:57",
+            "kind": "ClassDef",
+            "covered": 10,
+            "total": 10,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "MigrationRequest:94",
+            "kind": "ClassDef",
+            "covered": 22,
+            "total": 22,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "ConvertedArtifact:149",
+            "kind": "ClassDef",
+            "covered": 6,
+            "total": 6,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "MigrationPlan:163",
+            "kind": "ClassDef",
+            "covered": 6,
+            "total": 6,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "MigrationResult:178",
+            "kind": "ClassDef",
+            "covered": 9,
+            "total": 9,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "mapping_report:196",
+            "kind": "FunctionDef",
+            "covered": 11,
+            "total": 11,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "publication_report:297",
+            "kind": "FunctionDef",
+            "covered": 12,
+            "total": 12,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "__post_init__:40",
+            "kind": "FunctionDef",
+            "covered": 6,
+            "total": 6,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "__post_init__:70",
+            "kind": "FunctionDef",
+            "covered": 5,
+            "total": 5,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "__post_init__:107",
+            "kind": "FunctionDef",
+            "covered": 15,
+            "total": 15,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "lambda:121",
+            "kind": "Lambda",
+            "covered": 1,
+            "total": 1,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "lambda:140",
+            "kind": "Lambda",
+            "covered": 1,
+            "total": 1,
+            "line_percent": 100.0,
+            "missing": []
+          }
+        ]
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+        "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "covered_lines": 131,
+        "measured_lines": 131,
+        "physical_lines": 413,
+        "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+        "units": [
+          {
+            "unit": "_sources:51",
+            "kind": "FunctionDef",
+            "covered": 24,
+            "total": 24,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_document:109",
+            "kind": "FunctionDef",
+            "covered": 5,
+            "total": 5,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_append:122",
+            "kind": "FunctionDef",
+            "covered": 10,
+            "total": 10,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "_project:147",
+            "kind": "FunctionDef",
+            "covered": 26,
+            "total": 26,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "plan_migration:212",
+            "kind": "FunctionDef",
+            "covered": 20,
+            "total": 20,
+            "line_percent": 100.0,
+            "missing": []
+          },
+          {
+            "unit": "commit_migration:293",
+            "kind": "FunctionDef",
+            "covered": 34,
+            "total": 34,
+            "line_percent": 100.0,
+            "missing": []
+          }
+        ]
+      }
+    ],
+    "failures": []
+  },
+  "forward_reverse_case_count": 75,
+  "native": {
+    "ok": true,
+    "checks": [
+      "all seven kinds form a structurally valid draft",
+      "dry run preserves exact original tree and authority",
+      "native guarded publication reports every created artifact",
+      "original bytes survive native publication",
+      "persisted report remains an immutable projection",
+      "mapped output hashes match exact native bytes",
+      "exact repeat skips publication without changing bytes",
+      "repeat preserves identical immutable mapping",
+      "different existing output fails without overwrite",
+      "controlled native partial publication returns failure",
+      "partial failure retains uncertainty and originals",
+      "persisted report never claims partial completion",
+      "migration never activates the draft root"
+    ],
+    "duration_seconds": 598.365,
+    "platform": "win32",
+    "native_provider": "InitializationIO.local",
+    "partial_failure": "Injected final primitive refusal; other operations use native provider",
+    "scratch": "SCRATCH",
+    "source_files": 7
+  },
+  "scope_limits": [
+    "No P3-T8 work",
+    "No activation or schema changes",
+    "No whole-feature completion claim",
+    "Full repository aggregate gates remain P11"
+  ]
+}

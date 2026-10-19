@@ -1,0 +1,5673 @@
+{
+  "task": "P3-T7",
+  "through_stage": 7,
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "head": "3c027872a2e0d2ed379f674780f536a74c158ab2",
+  "baseline_manifest_sha256": "5a22816e56f7c3d34bc580d51c176403d47eaa95fdae53f1056a604aa4ab3447",
+  "current": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326
+    }
+  },
+  "index_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "working_sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "index_sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py: eol: lf"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "working_sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "index_sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/migration_models.py: eol: lf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_v1.py",
+      "working_sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "index_sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/discovery_runtime/test_migration_v1.py: text: auto\ntests/discovery_runtime/test_migration_v1.py: eol: lf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_unknowns.py",
+      "working_sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "index_sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/discovery_runtime/test_migration_unknowns.py: text: auto\ntests/discovery_runtime/test_migration_unknowns.py: eol: lf"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "working_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "index_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py: eol: lf"
+    }
+  ],
+  "syntax": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "old_sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "current_sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "callable_or_class_count": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "old_sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "current_sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "callable_or_class_count": 11
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_v1.py",
+      "old_sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "current_sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "callable_or_class_count": 15
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_unknowns.py",
+      "old_sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "current_sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "callable_or_class_count": 17
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "old_sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "current_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "callable_or_class_count": 8
+    }
+  ],
+  "frozen": [
+    {
+      "path": "examples/discovery/v1/coverage-ledger.example.json",
+      "working_sha256": "6cd282071a6471b2b5fa2ea833f56305a1c9bb4b048f9a2e4fd8cfb204822db2",
+      "canonical_sha256": "6cd282071a6471b2b5fa2ea833f56305a1c9bb4b048f9a2e4fd8cfb204822db2",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/coverage-ledger.example.json: text: auto\nexamples/discovery/v1/coverage-ledger.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/evidence-reference.example.json",
+      "working_sha256": "09e45d8206e75750a70ab0b117d18dd1919dd644da8fb31d4a0be97df01b1c57",
+      "canonical_sha256": "09e45d8206e75750a70ab0b117d18dd1919dd644da8fb31d4a0be97df01b1c57",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/evidence-reference.example.json: text: auto\nexamples/discovery/v1/evidence-reference.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/feature-contract.example.json",
+      "working_sha256": "8d2a0fac431a654f8305be32438e84fea08d1470349e8470321596d9da8936ec",
+      "canonical_sha256": "8d2a0fac431a654f8305be32438e84fea08d1470349e8470321596d9da8936ec",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/feature-contract.example.json: text: auto\nexamples/discovery/v1/feature-contract.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/parity-matrix.example.json",
+      "working_sha256": "e9c77f0aa623ea808e3bb0d60ebef92c6e677e22f9fe84798adc8d103e68013f",
+      "canonical_sha256": "e9c77f0aa623ea808e3bb0d60ebef92c6e677e22f9fe84798adc8d103e68013f",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/parity-matrix.example.json: text: auto\nexamples/discovery/v1/parity-matrix.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/product-decision-record.example.json",
+      "working_sha256": "23e66b7a6789373fcc19ab911a1fbc47596ea41e96d87fb6ac9e101b3525f9ee",
+      "canonical_sha256": "23e66b7a6789373fcc19ab911a1fbc47596ea41e96d87fb6ac9e101b3525f9ee",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/product-decision-record.example.json: text: auto\nexamples/discovery/v1/product-decision-record.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "working_sha256": "51bdafe4723199f9476c52a9bc34085b936cfa7abea5be9e42e114db76504c85",
+      "canonical_sha256": "51bdafe4723199f9476c52a9bc34085b936cfa7abea5be9e42e114db76504c85",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/runtime-characterization-scenario.example.json: text: auto\nexamples/discovery/v1/runtime-characterization-scenario.example.json: eol: lf"
+    },
+    {
+      "path": "examples/discovery/v1/unspecified-behavior-record.example.json",
+      "working_sha256": "ac69833dea481c45ba55bf28964a579024167e6568d1ef991d80240a20e851e0",
+      "canonical_sha256": "ac69833dea481c45ba55bf28964a579024167e6568d1ef991d80240a20e851e0",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "examples/discovery/v1/unspecified-behavior-record.example.json: text: auto\nexamples/discovery/v1/unspecified-behavior-record.example.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/coverage-ledger.schema.json",
+      "working_sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
+      "canonical_sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/coverage-ledger.schema.json: text: auto\nschemas/discovery/v1/coverage-ledger.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/evidence-reference.schema.json",
+      "working_sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a",
+      "canonical_sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/evidence-reference.schema.json: text: auto\nschemas/discovery/v1/evidence-reference.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/feature-contract.schema.json",
+      "working_sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54",
+      "canonical_sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/feature-contract.schema.json: text: auto\nschemas/discovery/v1/feature-contract.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/parity-matrix.schema.json",
+      "working_sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399",
+      "canonical_sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/parity-matrix.schema.json: text: auto\nschemas/discovery/v1/parity-matrix.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/product-decision-record.schema.json",
+      "working_sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb",
+      "canonical_sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/product-decision-record.schema.json: text: auto\nschemas/discovery/v1/product-decision-record.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "working_sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df",
+      "canonical_sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/runtime-characterization-scenario.schema.json: text: auto\nschemas/discovery/v1/runtime-characterization-scenario.schema.json: eol: lf"
+    },
+    {
+      "path": "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "working_sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62",
+      "canonical_sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "schemas/discovery/v1/unspecified-behavior-record.schema.json: text: auto\nschemas/discovery/v1/unspecified-behavior-record.schema.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "working_sha256": "af56c5fa4fd2145e8742c0f9d6b99ddef733c5cf18e141c29a0a46ee8dd4f9d9",
+      "canonical_sha256": "af56c5fa4fd2145e8742c0f9d6b99ddef733c5cf18e141c29a0a46ee8dd4f9d9",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "working_sha256": "d59a7162d54e16d7bf972b563ffd4cf7b94797014fcabd25c40b55fd5e7af3dc",
+      "canonical_sha256": "d59a7162d54e16d7bf972b563ffd4cf7b94797014fcabd25c40b55fd5e7af3dc",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "working_sha256": "7bf4a79aab51e41618bd4e8fb25e601d8ac77ae5323e0c880d0d4ecbcfa5b820",
+      "canonical_sha256": "7bf4a79aab51e41618bd4e8fb25e601d8ac77ae5323e0c880d0d4ecbcfa5b820",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/feature-contract.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "working_sha256": "fc70c080f6cfccf6367e1435774fd01fb7be023392af7655fcc664a4a1eb7f23",
+      "canonical_sha256": "fc70c080f6cfccf6367e1435774fd01fb7be023392af7655fcc664a4a1eb7f23",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "working_sha256": "9c6aaa8e65a1bbc807f2b3ba78d7a2c2f68f28378b6059f14bca1b39bb2580ec",
+      "canonical_sha256": "9c6aaa8e65a1bbc807f2b3ba78d7a2c2f68f28378b6059f14bca1b39bb2580ec",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "working_sha256": "702f2da5e6c224ec0a7d68ee3c7d8190fd577679150019d9cf82d815e2d521a7",
+      "canonical_sha256": "702f2da5e6c224ec0a7d68ee3c7d8190fd577679150019d9cf82d815e2d521a7",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "working_sha256": "977d8ec8b034f33c95d52f9b8d455a1ef2998fd616c5733d6cddf3fd740d3567",
+      "canonical_sha256": "977d8ec8b034f33c95d52f9b8d455a1ef2998fd616c5733d6cddf3fd740d3567",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json: text: auto\ntests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json: eol: lf"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v1_fixtures.py",
+      "working_sha256": "4efb6295f93a10ae715708aa0d986179b3248de896a603f41336bceb22439baa",
+      "canonical_sha256": "4efb6295f93a10ae715708aa0d986179b3248de896a603f41336bceb22439baa",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/schemas/discovery/test_v1_fixtures.py: text: auto\ntests/schemas/discovery/test_v1_fixtures.py: eol: lf"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v1_schema_documents.py",
+      "working_sha256": "c2ef8fea0897216dcc8b0cb4767502ed49f2e5a05bb167642007a5dc236514c8",
+      "canonical_sha256": "c2ef8fea0897216dcc8b0cb4767502ed49f2e5a05bb167642007a5dc236514c8",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/schemas/discovery/test_v1_schema_documents.py: text: auto\ntests/schemas/discovery/test_v1_schema_documents.py: eol: lf"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "working_sha256": "41a2d85d2b5a06d7bfb74b27e0c2915c35afa5b2e565bbbec7ba9982c0e034c6",
+      "canonical_sha256": "41a2d85d2b5a06d7bfb74b27e0c2915c35afa5b2e565bbbec7ba9982c0e034c6",
+      "exact": true,
+      "declared_crlf_to_lf": true,
+      "git_attributes": "tests/scripts/dev_tools/discovery/test_package_exports.py: text: auto\ntests/scripts/dev_tools/discovery/test_package_exports.py: eol: lf"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-architecture.2026-10-19T00-29.json",
+      "sha256": "170de392ed93ad5d400a6a722dd2119723fda96f9da612cd98403cb8ce7bb5c3",
+      "stage": 4,
+      "started": "2026-10-19T00:29:37.683462+00:00",
+      "finished": "2026-10-19T00:29:39.332182+00:00",
+      "duration_seconds": 1.649,
+      "command": "poetry run python SCRATCH/issue-980-p3t7-architecture.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-contracts.2026-10-19T00-33.json",
+      "sha256": "c2a8c146796cedf92462654535b5b95a838c57622fabe64d3b92838993adb723",
+      "stage": 6,
+      "started": "2026-10-19T00:33:07.879902+00:00",
+      "finished": "2026-10-19T00:33:14.248590+00:00",
+      "duration_seconds": 6.369,
+      "command": "poetry run pytest -o addopts=-ra tests/schemas/discovery/test_v1_schema_documents.py tests/schemas/discovery/test_v1_fixtures.py tests/schemas/discovery/test_v2_common_schemas.py tests/schemas/discovery/test_v2_control_schemas.py tests/discovery_runtime/test_resources.py -q --no-cov"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+      "sha256": "df6524339c920e386d40a2a78a1c417132b4450af2c8347b27890dd5dd080007",
+      "stage": 5,
+      "started": "2026-10-19T00:31:57.814439+00:00",
+      "finished": "2026-10-19T00:31:59.063059+00:00",
+      "duration_seconds": 1.249,
+      "command": "poetry run python SCRATCH/issue-980-p3t7-coverage-audit.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-format.2026-10-19T00-24.json",
+      "sha256": "5854b61eaf550034027eab5582b98f148f28046445b6bf3230c7cf2ca8a709f5",
+      "stage": 1,
+      "started": "2026-10-19T00:24:47.995296+00:00",
+      "finished": "2026-10-19T00:24:49.772488+00:00",
+      "duration_seconds": 1.777,
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-lint.2026-10-19T00-24.json",
+      "sha256": "91b110c28b63bc1ed58dc9b0106ab404b4318cd3174b63e26c0e330dddda879b",
+      "stage": 2,
+      "started": "2026-10-19T00:24:52.433996+00:00",
+      "finished": "2026-10-19T00:24:53.588631+00:00",
+      "duration_seconds": 1.155,
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py tests/discovery_runtime/test_migration_v1.py tests/discovery_runtime/test_migration_unknowns.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-reverse.2026-10-19T00-32.json",
+      "sha256": "19d4dc7dc61c032252dca877ab55b44cff488f8b014cd383f702ab7b5883d147",
+      "stage": 5,
+      "started": "2026-10-19T00:32:01.581127+00:00",
+      "finished": "2026-10-19T00:32:49.212823+00:00",
+      "duration_seconds": 47.632,
+      "command": "poetry run python SCRATCH/issue-980-p3t7-tests.py reverse --no-cov"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-types.2026-10-19T00-25.json",
+      "sha256": "82138faf5ca1c30ec27638f88b3080641d2cee3b187974de013f4f3ea8af93f3",
+      "stage": 3,
+      "started": "2026-10-19T00:24:56.212025+00:00",
+      "finished": "2026-10-19T00:25:07.716360+00:00",
+      "duration_seconds": 11.504,
+      "command": "poetry run pyright"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-unit.2026-10-19T00-31.json",
+      "sha256": "553d9c90ec3ea291780a4df933910a05f812aec444ea2462338bfc0f6a4f6f98",
+      "stage": 5,
+      "started": "2026-10-19T00:29:52.184974+00:00",
+      "finished": "2026-10-19T00:31:46.291743+00:00",
+      "duration_seconds": 114.107,
+      "command": "poetry run python SCRATCH/issue-980-p3t7-tests.py forward --cov=drm_copilot_discovery.migration_models --cov=drm_copilot_discovery.migration_conversion --cov=drm_copilot_discovery.migration_v1 --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p3t7-final-coverage.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-native.2026-10-19T00-43.json",
+      "sha256": "3d940a43961ed5ac5ac2d5bbd471683fe7dc72cd7ee394dcab66eff5413c04ca",
+      "stage": 7,
+      "started": "2026-10-19T00:33:16.807283+00:00",
+      "finished": "2026-10-19T00:43:16.847882+00:00",
+      "duration_seconds": 600.041,
+      "command": "poetry run python SCRATCH/issue-980-p3t7-native.py . SCRATCH SCRATCH/issue-980-p3t7-final-native.json"
+    }
+  ],
+  "raw_coverage_sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9",
+  "coverage": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "summary": {
+        "covered_lines": 76,
+        "num_statements": 76,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 26,
+        "num_partial_branches": 0,
+        "covered_branches": 26,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "ranges": [
+        {
+          "name": "migrated_id",
+          "start": 34,
+          "end": 42,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "legacy_features",
+          "start": 45,
+          "end": 58,
+          "covered": 7,
+          "total": 7
+        },
+        {
+          "name": "_parsed",
+          "start": 61,
+          "end": 69,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "_draft_changes",
+          "start": 72,
+          "end": 81,
+          "covered": 3,
+          "total": 3
+        },
+        {
+          "name": "_scenario",
+          "start": 84,
+          "end": 141,
+          "covered": 7,
+          "total": 7
+        },
+        {
+          "name": "_decision",
+          "start": 144,
+          "end": 180,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "_evidence",
+          "start": 183,
+          "end": 210,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "convert_artifact",
+          "start": 213,
+          "end": 326,
+          "covered": 32,
+          "total": 32
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "summary": {
+        "covered_lines": 96,
+        "num_statements": 96,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 5,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 22,
+        "num_partial_branches": 0,
+        "covered_branches": 22,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "ranges": [
+        {
+          "name": "MigrationSource",
+          "start": 28,
+          "end": 53,
+          "covered": 10,
+          "total": 10
+        },
+        {
+          "name": "MigrationBinding",
+          "start": 57,
+          "end": 90,
+          "covered": 9,
+          "total": 9
+        },
+        {
+          "name": "MigrationRequest",
+          "start": 94,
+          "end": 145,
+          "covered": 21,
+          "total": 21
+        },
+        {
+          "name": "ConvertedArtifact",
+          "start": 149,
+          "end": 159,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "MigrationPlan",
+          "start": 163,
+          "end": 174,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "MigrationResult",
+          "start": 178,
+          "end": 193,
+          "covered": 8,
+          "total": 8
+        },
+        {
+          "name": "mapping_report",
+          "start": 196,
+          "end": 294,
+          "covered": 11,
+          "total": 11
+        },
+        {
+          "name": "publication_report",
+          "start": 297,
+          "end": 358,
+          "covered": 12,
+          "total": 12
+        },
+        {
+          "name": "__post_init__",
+          "start": 40,
+          "end": 53,
+          "covered": 6,
+          "total": 6
+        },
+        {
+          "name": "__post_init__",
+          "start": 70,
+          "end": 90,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "__post_init__",
+          "start": 107,
+          "end": 145,
+          "covered": 15,
+          "total": 15
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "summary": {
+        "covered_lines": 131,
+        "num_statements": 131,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 6,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 46,
+        "num_partial_branches": 0,
+        "covered_branches": 46,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "ranges": [
+        {
+          "name": "_sources",
+          "start": 51,
+          "end": 106,
+          "covered": 24,
+          "total": 24
+        },
+        {
+          "name": "_document",
+          "start": 109,
+          "end": 119,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "_append",
+          "start": 122,
+          "end": 144,
+          "covered": 10,
+          "total": 10
+        },
+        {
+          "name": "_project",
+          "start": 147,
+          "end": 209,
+          "covered": 26,
+          "total": 26
+        },
+        {
+          "name": "plan_migration",
+          "start": 212,
+          "end": 290,
+          "covered": 20,
+          "total": 20
+        },
+        {
+          "name": "commit_migration",
+          "start": 293,
+          "end": 413,
+          "covered": 34,
+          "total": 34
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "accepted baseline",
+      "passed": true,
+      "detail": "e58a61428bdf98a97f66f57f08793a743eff28f2"
+    },
+    {
+      "name": "predecessor path count",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen path count",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "preserved working bytes: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "accepted Git blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/coverage-ledger.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/evidence-reference.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/feature-contract.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/parity-matrix.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/product-decision-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: examples/discovery/v1/unspecified-behavior-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/schemas/discovery/test_v1_fixtures.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/schemas/discovery/test_v1_schema_documents.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "frozen baseline: tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current index binding: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical size: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": 413
+    },
+    {
+      "name": "definition docstrings: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit-loop intent comments: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "production executable AST: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current index binding: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical size: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": 358
+    },
+    {
+      "name": "definition docstrings: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit-loop intent comments: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "production executable AST: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "current index binding: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical size: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": 496
+    },
+    {
+      "name": "definition docstrings: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit-loop intent comments: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current index binding: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical size: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": 478
+    },
+    {
+      "name": "definition docstrings: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit-loop intent comments: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "current index binding: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "physical size: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": 326
+    },
+    {
+      "name": "definition docstrings: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "explicit-loop intent comments: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "production executable AST: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "test definition names preserved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "test executable AST preserved including relocation",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "receipt success: p3t7-pass3-architecture.2026-10-19T00-29.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-architecture.2026-10-19T00-29.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-architecture.2026-10-19T00-29.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-contracts.2026-10-19T00-33.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-contracts.2026-10-19T00-33.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-contracts.2026-10-19T00-33.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-format.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-format.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-format.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-lint.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-lint.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-lint.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-reverse.2026-10-19T00-32.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-reverse.2026-10-19T00-32.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-reverse.2026-10-19T00-32.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-types.2026-10-19T00-25.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-types.2026-10-19T00-25.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-types.2026-10-19T00-25.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt success: p3t7-pass3-unit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt before binding: p3t7-pass3-unit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "receipt after binding: p3t7-pass3-unit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordered stages represented through 6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ordered stage chronology",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module lines: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module branches: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module lines: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module branches: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module lines: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new module branches: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all three production modules measured",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final manifest accepted baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final source manifest",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final working bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final exact index bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final working bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final exact index bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final working bytes: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final exact index bytes: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final working bytes: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final exact index bytes: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final working bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final exact index bytes: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final predecessor bytes: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/coverage-ledger.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/evidence-reference.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/feature-contract.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/parity-matrix.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/product-decision-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: examples/discovery/v1/unspecified-behavior-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/schemas/discovery/test_v1_fixtures.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/schemas/discovery/test_v1_schema_documents.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final frozen bytes: tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-raw-coverage.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-coverage-detail.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-forward-nodes.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-reverse-nodes.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-native-result.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final raw evidence: p3t7-final-ordered-stages.2026-10-19T00-43.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final live harness: issue-980-p3t7-gate.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-gate.py",
+      "passed": false,
+      "detail": null
+    },
+    {
+      "name": "final live harness: issue-980-p3t7-tests.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-tests.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final live harness: issue-980-p3t7-coverage-audit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-coverage-audit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final live harness: issue-980-p3t7-architecture.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-architecture.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "final live harness: issue-980-p3t7-native.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-native.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "native stage-seven exit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "native before binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "native after binding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "native after all previous stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "native complete 13 checks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "75 distinct forward cases",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "exact reverse order",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "forward and reverse exact test bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "only approved node relocation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same stage-six raw coverage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all measured callable/class ranges: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all measured callable/class ranges: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all measured callable/class ranges: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "27 measured callable/class ranges",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-architecture.2026-10-19T00-29.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-contracts.2026-10-19T00-33.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-coverage-audit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-format.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-lint.2026-10-19T00-24.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-reverse.2026-10-19T00-32.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-types.2026-10-19T00-25.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchanged retained stage receipt: docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-unit.2026-10-19T00-31.json",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "findings": [
+    {
+      "name": "unchanged reviewed harness: issue-980-p3t7-gate.py",
+      "passed": false,
+      "detail": null
+    }
+  ],
+  "started": "2026-10-19T00:44:29.880829+00:00",
+  "finished": "2026-10-19T00:44:30.095810+00:00",
+  "retained_stage_six_check_count": 610,
+  "retained_stage_six_result_sha256": "df2904c6b7e2ff3611ad360714592090547aac3a23e693bc9d4880ceed748d1a",
+  "final_source_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-source-manifest.2026-10-19T00-43.json",
+    "sha256": "1d90649c37af14bac5f00e3c06c9219bf8f0be8b24ce98fedadcddacf3e8329e"
+  },
+  "native": {
+    "ok": true,
+    "checks": [
+      "all seven kinds form a structurally valid draft",
+      "dry run preserves exact original tree and authority",
+      "native guarded publication reports every created artifact",
+      "original bytes survive native publication",
+      "persisted report remains an immutable projection",
+      "mapped output hashes match exact native bytes",
+      "exact repeat skips publication without changing bytes",
+      "repeat preserves identical immutable mapping",
+      "different existing output fails without overwrite",
+      "controlled native partial publication returns failure",
+      "partial failure retains uncertainty and originals",
+      "persisted report never claims partial completion",
+      "migration never activates the draft root"
+    ],
+    "duration_seconds": 598.365,
+    "platform": "win32",
+    "native_provider": "InitializationIO.local",
+    "partial_failure": "Injected final primitive refusal; other operations use native provider",
+    "scratch": "SCRATCH",
+    "source_files": 7
+  },
+  "measured_units": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "units": [
+        {
+          "name": "migrated_id",
+          "kind": "FunctionDef",
+          "start": 34,
+          "end": 42,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "legacy_features",
+          "kind": "FunctionDef",
+          "start": 45,
+          "end": 58,
+          "covered": 7,
+          "total": 7
+        },
+        {
+          "name": "_parsed",
+          "kind": "FunctionDef",
+          "start": 61,
+          "end": 69,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "_draft_changes",
+          "kind": "FunctionDef",
+          "start": 72,
+          "end": 81,
+          "covered": 3,
+          "total": 3
+        },
+        {
+          "name": "_scenario",
+          "kind": "FunctionDef",
+          "start": 84,
+          "end": 141,
+          "covered": 7,
+          "total": 7
+        },
+        {
+          "name": "_decision",
+          "kind": "FunctionDef",
+          "start": 144,
+          "end": 180,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "_evidence",
+          "kind": "FunctionDef",
+          "start": 183,
+          "end": 210,
+          "covered": 4,
+          "total": 4
+        },
+        {
+          "name": "convert_artifact",
+          "kind": "FunctionDef",
+          "start": 213,
+          "end": 326,
+          "covered": 32,
+          "total": 32
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "units": [
+        {
+          "name": "MigrationSource",
+          "kind": "ClassDef",
+          "start": 27,
+          "end": 53,
+          "covered": 11,
+          "total": 11
+        },
+        {
+          "name": "MigrationBinding",
+          "kind": "ClassDef",
+          "start": 56,
+          "end": 90,
+          "covered": 10,
+          "total": 10
+        },
+        {
+          "name": "MigrationRequest",
+          "kind": "ClassDef",
+          "start": 93,
+          "end": 145,
+          "covered": 22,
+          "total": 22
+        },
+        {
+          "name": "ConvertedArtifact",
+          "kind": "ClassDef",
+          "start": 148,
+          "end": 159,
+          "covered": 6,
+          "total": 6
+        },
+        {
+          "name": "MigrationPlan",
+          "kind": "ClassDef",
+          "start": 162,
+          "end": 174,
+          "covered": 6,
+          "total": 6
+        },
+        {
+          "name": "MigrationResult",
+          "kind": "ClassDef",
+          "start": 177,
+          "end": 193,
+          "covered": 9,
+          "total": 9
+        },
+        {
+          "name": "mapping_report",
+          "kind": "FunctionDef",
+          "start": 196,
+          "end": 294,
+          "covered": 11,
+          "total": 11
+        },
+        {
+          "name": "publication_report",
+          "kind": "FunctionDef",
+          "start": 297,
+          "end": 358,
+          "covered": 12,
+          "total": 12
+        },
+        {
+          "name": "__post_init__",
+          "kind": "FunctionDef",
+          "start": 40,
+          "end": 53,
+          "covered": 6,
+          "total": 6
+        },
+        {
+          "name": "__post_init__",
+          "kind": "FunctionDef",
+          "start": 70,
+          "end": 90,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "__post_init__",
+          "kind": "FunctionDef",
+          "start": 107,
+          "end": 145,
+          "covered": 15,
+          "total": 15
+        },
+        {
+          "name": "lambda",
+          "kind": "Lambda",
+          "start": 121,
+          "end": 121,
+          "covered": 1,
+          "total": 1
+        },
+        {
+          "name": "lambda",
+          "kind": "Lambda",
+          "start": 140,
+          "end": 140,
+          "covered": 1,
+          "total": 1
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "units": [
+        {
+          "name": "_sources",
+          "kind": "FunctionDef",
+          "start": 51,
+          "end": 106,
+          "covered": 24,
+          "total": 24
+        },
+        {
+          "name": "_document",
+          "kind": "FunctionDef",
+          "start": 109,
+          "end": 119,
+          "covered": 5,
+          "total": 5
+        },
+        {
+          "name": "_append",
+          "kind": "FunctionDef",
+          "start": 122,
+          "end": 144,
+          "covered": 10,
+          "total": 10
+        },
+        {
+          "name": "_project",
+          "kind": "FunctionDef",
+          "start": 147,
+          "end": 209,
+          "covered": 26,
+          "total": 26
+        },
+        {
+          "name": "plan_migration",
+          "kind": "FunctionDef",
+          "start": 212,
+          "end": 290,
+          "covered": 20,
+          "total": 20
+        },
+        {
+          "name": "commit_migration",
+          "kind": "FunctionDef",
+          "start": 293,
+          "end": 413,
+          "covered": 34,
+          "total": 34
+        }
+      ]
+    }
+  ],
+  "final_raw_evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-raw-coverage.2026-10-19T00-43.json",
+      "sha256": "196c2d8d38682c8f79c9b1fa842beecc3ed3d7c2f4fd1e94bc1c616cc1f5bba9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-coverage-detail.2026-10-19T00-43.json",
+      "sha256": "0341faea84a5a00b97d4de4cf9659da7a4b3c27566ded3db65c2a09626c5eaeb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-forward-nodes.2026-10-19T00-43.json",
+      "sha256": "cf66bdd6851285af4d1e29ee161e0d2ea56db9139a1652e0e35b14479306764a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-reverse-nodes.2026-10-19T00-43.json",
+      "sha256": "f68bc72d64d0c69b72908b4a13967976923800b1a40cdfe155c827fa421b3cad"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-native-result.2026-10-19T00-43.json",
+      "sha256": "1f85a141e866ad99ad584a61e65e8c3aeb034035cf7be094b31f7f8b01915d35"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-final-ordered-stages.2026-10-19T00-43.json",
+      "sha256": "5a453a754ba4025f21cd56ccec7667e9c229d39e6a38083810468a07aa4254a9"
+    }
+  ],
+  "final_script_bindings": [
+    {
+      "path": "SCRATCH/issue-980-p3t7-gate.py",
+      "sha256": "6e2824285ae403501e0aeec22ee1c6d4efa00bf211e4faf772c0bfcd8b7e56da"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-tests.py",
+      "sha256": "f5afabb3d100ce225e5a515a6df0ff82e322ea58a9f3e128c55e4ef03f8d2840"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-coverage-audit.py",
+      "sha256": "e7f792f9dee19b2b35beac0b68de4b15df700209e67df0fdb4e1276aa064afd7"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-architecture.py",
+      "sha256": "00ade34e466af292f935a19bd48237d6235ce2ea184e187b39a368f9c15e59fc"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-native.py",
+      "sha256": "e1b467ca331db88bb3145f692514ad387de82c2701d2d3cfc4a2d771736cc8a9"
+    }
+  ],
+  "native_harness_review": "Retained semantic inspection; exact script unchanged from pass2",
+  "forward_case_count": 75,
+  "reverse_case_count": 75,
+  "documentation_review": "p3t7-executor-documentation-repair.2026-10-19T00-25.json",
+  "authority_delegation": "atomic_execution_p3t7_after_checked_wip2"
+}
