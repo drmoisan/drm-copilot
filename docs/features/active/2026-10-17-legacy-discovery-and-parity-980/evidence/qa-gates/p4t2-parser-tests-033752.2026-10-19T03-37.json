@@ -1,0 +1,34 @@
+{
+  "command": "poetry run pytest -o addopts= tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py --cov=drm_copilot_discovery.analyzer.xml_input --cov=drm_copilot_discovery.analyzer.solution_input --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-coverage.2026-10-19T03-37.json",
+  "duration_seconds": 1.978,
+  "exit_code": 0,
+  "finished_at": "2026-10-19T03:37:52.130535+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-parser-tests-033752.2026-10-19T03-37.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-parser-tests-033752.2026-10-19T03-37.stdout.txt",
+    "sha256": "dc89fcd47a2ca50cd47e561b5b2d23bd5156d38682a255440b1ad898ea83a9fa"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+  },
+  "stage": "parser-tests",
+  "started_at": "2026-10-19T03:37:50.153722+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollected 115 items\r\n\r\ntests\\discovery_runtime\\analyzer\\test_xml_input.py ..................... [ 18%]\r\n................................................                         [ 60%]\r\ntests\\discovery_runtime\\analyzer\\test_solution_input.py ................ [ 73%]\r\n..............................                                           [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                              Stmts   Miss Branch BrPart  Cover   Missing\r\n-----------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\solution_input.py      63      0     34      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\xml_input.py          101      0     32      0   100%\r\n-----------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                               164      0     66      0   100%\r\nCoverage JSON written to file docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-coverage.2026-10-19T03-37.json\r\n============================= 115 passed in 0.27s =============================\r\n",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-37"
+}

@@ -1,0 +1,157 @@
+{
+  "all_scoped_code_paths_absent": true,
+  "dependency": {
+    "lxml_installed": [
+      6,
+      0,
+      2,
+      0
+    ],
+    "new_dependencies": []
+  },
+  "fixture_root": "tests/fixtures/discovery_analyzers/dotnet",
+  "head": "5db172f2bc104cfa0e7372f4f7b014a4d4d0ec99",
+  "preparation": {
+    "agent_id": "01a15189-2cb5-76a1-9a3a-158c5eb7513e",
+    "attestation_key": "8c04f3a3fe50ba17fbccaeea1ac48b0e041f0d2d43733042fe4427dff9d50221",
+    "code_or_test_mutations": false,
+    "completed_at": "2026-10-19T02:22:36.0362505Z",
+    "declaration_contract": [
+      ".sln/.slnx/project/props/targets syntax, namespaces and literal declarations",
+      "ProjectReference/PackageReference/Reference/COMReference, framework declarations, imports/SDK",
+      "Include/Update/Remove/Exclude and condition chains including enclosing groups",
+      "Project-relative slash variants/parent traversal/wildcards/macros/foreign-looking targets inert text, never followed",
+      "Detected declarations separate from unresolved activation/evaluated dependency/runtime graph",
+      "Closed rows: scalar values in properties; structured conditions in namespaced extensions",
+      "Unresolved relationship targets use null to_component_id and target_description",
+      "No duplicate repository component IDs; diagnostic identity code/path/analyzer must be aggregated when repeated",
+      "Preserve missing/mismatched Git proof diagnostics/confidence; source_reference alone does not prove pin"
+    ],
+    "dependencies": "No P4-T2 mutations before P4-T1 accepted commit; any P4-T1 protocol change must be reconciled",
+    "evidence_root": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other",
+    "fixture_matrix": [
+      "Solutions/folders/malformed lines/separators/spaces/unresolved targets",
+      "slnx/project/legacy namespace/C#/F#/VB XML",
+      "Props/targets/nested conditions/imports/package/project/COM/macros/duplicate declarations",
+      "BOM/encodings/CRLF/multiline anchors/exact byte hashes",
+      "Internal/external/parameter entities and DTD/file/HTTP targets; malformed/depth/byte/record limits; normal escapes",
+      "Excluded/unreadable/nonmatching/missing/mismatched provenance/deterministic ordering/composed schema"
+    ],
+    "implementation_authorized": false,
+    "interfaces": [
+      "InventoryAdapter.identifier/analyze(InventoryCapture)->Analysis",
+      "InventoryCapture.profile/inputs/exclusions/repository_files",
+      "InventoryInput.file.content/cached sha256",
+      "Analysis components/findings/relationships/diagnostics immutable JsonObject",
+      "row/stable_id/tool/source_reference/pinned_matches/diagnostic"
+    ],
+    "limit": "Two production files appear feasible; inspect500line limits before expanded spans; old lexical dotnet_inventory reservedP4T3",
+    "native_attestation_verified": true,
+    "new_prerequisites": [],
+    "owner": "/root/legacy_discovery_orchestrator/source_inspection_preparation",
+    "registration": {
+      "adapter_id": "dotnet",
+      "current_registry": "repository only",
+      "direct_adapter_tests_only": true,
+      "existing_rejection_test": "test_registry_rejects_unavailable_selections_without_fallback",
+      "exposure_owner": "P4-T9",
+      "separate_p4t3_ids": [
+        "csharp-symbols",
+        "event-subscriptions"
+      ]
+    },
+    "reuse": "inventory_profile, immutable catalog fixtures, InventoryInput,SnapshotFile,RepositoryFile; no temporary files or processes",
+    "scope": [
+      "R/analyzer/xml_input.py",
+      "R/analyzer/dotnet_projects.py",
+      "PT/analyzer/test_xml_input.py",
+      "PT/analyzer/test_dotnet_projects.py",
+      "tests/fixtures/discovery_analyzers/dotnet/"
+    ],
+    "started_at": "2026-10-19T02:18:46.9167448Z",
+    "status": "PREPARATION_READY",
+    "xml_contract": [
+      "Existing lxml>=5.3.0; no new dependency; no reusable secure helper in inspected sources",
+      "In-memory retained bytes only; explicit resolve_entities=false/load_dtd=false/no_network=true/dtd_validation=false/attribute_defaults=false/recover=false/huge_tree=false",
+      "Explicitly reject DTD/custom entities across encodings; predefined escapes allowed; parser-local denying resolver if needed",
+      "No path parse/XInclude/schema network/import evaluation; no decompress=false assumption across dependency range",
+      "Bounds before parsing and on declaration/depth counts; aggregate emitter bounds do not replace local bounds",
+      "sourceline is declaration anchor only; no fabricated closing spans"
+    ]
+  },
+  "prior_coverage": "Not applicable to new modules; all accepted predecessor bytes and proofs are retained unchanged.",
+  "retained_predecessor": {
+    "contracts": 310,
+    "coverage": {
+      "covered_branches": 120,
+      "covered_lines": 467,
+      "excluded_lines": 58,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 120,
+      "num_partial_branches": 0,
+      "num_statements": 467,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "native_checks": 13,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+    "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad",
+    "source_hashes": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "scripts/dev_tools/discovery/analyzer/emitter.py": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "scripts/dev_tools/discovery/analyzer/inventory.py": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "scripts/dev_tools/discovery/analyzer/models.py": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "scripts/dev_tools/discovery/analyzer/pipeline.py": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "tests/discovery_runtime/analyzer/test_input_capture.py": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "tests/discovery_runtime/analyzer/test_registry.py": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "tests/discovery_runtime/analyzer/test_repository.py": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "tests/scripts/dev_tools/discovery/analyzer/test_models.py": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    },
+    "tests": 243
+  },
+  "routing": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p4t2",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T2_implementation",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+    "tests/discovery_runtime/analyzer/test_xml_input.py",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py"
+  ],
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03:19:54.185081+00:00"
+}
