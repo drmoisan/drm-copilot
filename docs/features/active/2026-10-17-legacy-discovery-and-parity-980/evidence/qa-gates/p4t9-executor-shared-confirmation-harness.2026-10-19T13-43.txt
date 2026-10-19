@@ -1,0 +1,152 @@
+"""Confirm only the shared class/fixture repair and its completed frozen proof."""
+from pathlib import Path
+import ast
+import base64
+import datetime as dt
+import hashlib
+import json
+
+F = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+E = F / 'evidence'
+Q = E / 'qa-gates'
+sha = lambda raw: hashlib.sha256(raw).hexdigest()
+
+
+def load(path, digest=None):
+    raw = Path(path).read_bytes()
+    assert digest is None or sha(raw) == digest, str(path)
+    return json.loads(raw)
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': sha(Path(path).read_bytes())}
+
+
+def walk(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
+
+def publish(stem, suffix, value):
+    now = dt.datetime.now(dt.timezone.utc)
+    path = Q / (stem + '.' + now.strftime('%Y-%m-%dT%H-%M') + suffix)
+    assert not path.exists()
+    raw = ((json.dumps({**value, 'published_utc': now.isoformat()}, indent=2) + '\n').encode() if isinstance(value, dict) else value)
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert all(line == line.rstrip() for line in raw.splitlines())
+    path.write_bytes(raw)
+    return path
+
+
+route_id = 'atomic_execution_p4t9_shared_repair_confirmation'
+routes = [item for item in walk(load('artifacts/orchestration/orchestrator-state.json')) if item.get('delegation_id') == route_id and item.get('deployment_agent')]
+assert len(routes) == 1
+route = routes[0]
+profile_hash = sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes())
+assert (route['deployment_agent'], route['model'], route['model_reasoning_effort'], route['profile_sha256']) == ('atomic-executor-c4', 'gpt-6-astra', 'max', profile_hash)
+assert profile_hash == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+authority = load(Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json')
+assert authority['profile_sha256'] == profile_hash and all(authority[key] is True for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+freeze_path = E / 'regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json'
+freeze = load(freeze_path, 'f0fb0b997ccc8ea45540bd30a09e87d4b905a69b50ecde6ec28236299a79db76')
+sources = {item['path']: item['sha256'] for item in freeze['source_bindings']}
+assert len(sources) == 5 and len(freeze['stage_paths']) == 70
+for path, digest in sources.items():
+    assert sha(Path(path).read_bytes()) == digest, path
+for item in freeze['evidence']:
+    assert ref(item['path']) == item
+for path, digest in freeze['dependencies'].items():
+    assert sha(Path(path).read_bytes()) == digest, path
+binding = load(**{'path': freeze['focused_binding']['path'], 'digest': freeze['focused_binding']['sha256']})
+archive = load(freeze['raw_streams']['path'], freeze['raw_streams']['sha256'])
+streams = {}
+for item in archive['streams']:
+    raw = base64.b64decode(item['base64'], validate=True)
+    assert sha(raw) == item['sha256']
+    streams[item['path'].replace('\\', '/')] = raw
+receipts = []
+last = None
+for item in binding['receipts']:
+    receipt = load(item['path'], item['sha256'])
+    assert receipt['exit_code'] == 0 and receipt['source_before'] == receipt['source_after'] == sources
+    start, finish = (dt.datetime.fromisoformat(receipt[key]) for key in ('started_at', 'finished_at'))
+    assert start <= finish and (last is None or last <= start)
+    last = finish
+    for output in receipt['raw'].values():
+        assert sha(streams[output['path'].replace('\\', '/')]) == output['sha256']
+    receipts.append(item)
+    if item == binding['receipts'][-1]:
+        stdout = streams[receipt['raw']['stdout']['path'].replace('\\', '/')].decode('utf-8')
+        assert '133 passed' in stdout
+        cursor = 0
+        for node in freeze['test_node_order']:
+            cursor = stdout.index(node + ' PASSED', cursor) + len(node)
+assert len(receipts) == 5 and freeze['test_count'] == len(freeze['test_node_order']) == 133
+ranges = load(freeze['coverage_ranges']['path'], freeze['coverage_ranges']['sha256'])
+coverage = load(binding['coverage']['path'], binding['coverage']['sha256'])
+raw_coverage = streams[binding['coverage']['raw_path'].replace('\\', '/')]
+assert sha(raw_coverage) == binding['coverage']['raw_sha256']
+raw_report = json.loads(raw_coverage)
+totals = {key: sum(item['summary'][key] for item in ranges['modules']) for key in ('covered_lines', 'num_statements', 'covered_branches', 'num_branches')}
+assert tuple(totals.values()) == (287, 287, 124, 124)
+assert len(ranges['units']) == 19 and all(not item['missing_lines'] and not item['missing_branches'] for item in ranges['units'])
+for item in ranges['modules']:
+    matched = [value for path, value in raw_report['files'].items() if path.replace('\\', '/').endswith(item['path'])]
+    assert len(matched) == 1 and matched[0]['summary'] == item['summary']
+
+repair = ranges['repair']
+old = Path(repair['pre_repair_source']['path']).read_bytes()
+assert sha(old) == repair['pre_repair_source']['sha256'] == '32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf'
+projection_path = Path('packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py')
+current = projection_path.read_bytes()
+assert sha(current) == '67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a'
+before, after = ast.parse(old), ast.parse(current)
+old_class = next(node for node in before.body if isinstance(node, ast.ClassDef) and node.name == '_Budget')
+new_class = next(node for node in after.body if isinstance(node, ast.ClassDef) and node.name == '_Budget')
+assert ast.get_docstring(old_class) != ast.get_docstring(new_class)
+old_class.body = old_class.body[1:]
+new_class.body = new_class.body[1:]
+assert ast.dump(before, include_attributes=False) == ast.dump(after, include_attributes=False)
+fixture_path = Path('tests/discovery_runtime/test_extension_input_limits.py')
+fixture = fixture_path.read_text(encoding='utf-8')
+block = '    # An explicit limits policy itself adds a mapping to profiles that omit it.\n    final_shape = row(\n        **(dict(initial.profile.document) | {"limits": row(artifact_records=1)})\n    )\n'
+assert fixture.count(block) == 1
+prior_fixture = fixture.replace(block, '').replace('mappings(final_shape) + 2', 'mappings(initial.profile.document) + 2').encode()
+assert sha(prior_fixture) == '5c9ba9e1a04fa5ba05a02d37b548c67851840d314306689a22637e1ff25eeae5'
+assert 'assert len(created) == 2' in fixture
+for path in (projection_path, Path('packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py')):
+    assert not any(isinstance(node, ast.ImportFrom) and node.module in {'drm_copilot_discovery.extension_validation', 'drm_copilot_discovery.extension_results'} for node in ast.walk(ast.parse(path.read_bytes())))
+
+result = {
+    'status': 'SHARED_R1_CONFIRMED_READY_FOR_CHECKED_COMMIT', 'task': 'P4-T9', 'authority_receipt': route_id, 'native_authority_valid': True,
+    'freeze': ref(freeze_path), 'prior_review': repair['review'], 'owner_stage_paths': 70, 'bindings': sources,
+    'closed_findings': ['P4T9-R1'], 'remaining_findings_outside_scope': ['P4T9-R2', 'P4T9-R3'], 'findings': [], 'open_probes': [],
+    'repair': {'class_contract': 'Purpose, operation-local usage/flow, scope, fixed capacities/decreasing counters, failure behavior, attributes and side effects now satisfy the enumerated class rule.', 'production_ast_equal_except_class_docstring': True, 'prior_source': repair['pre_repair_source'], 'prior_bytes_qualification': repair['prior_byte_reconstruction'], 'fixture': 'Only final-profile mapping-count setup changed; reconstructed exact original hash matches focused8, and the same two-created-rows assertion passes in the retained precheck and full batch.'},
+    'proof': {'receipts': receipts, 'cases': 133, 'coverage': totals, 'measured_ranges': 19, 'lossless_streams': len(streams), 'new_behavioral_runs': 0},
+    'commit_closure': 'Shared imports use accepted package APIs and the already committed registry metadata API; neither shared production module imports the uncommitted core validator/results. Generic emitter row-text limitations remain qualified in the owner handoff; core merge preflight is separate.',
+    'git_qualification': 'Working bytes are independently verified here. Owner freeze records the pre-staging index and filtered identities separately; no working/index equality or new commit is asserted by this review.',
+    'no_mutations': ['production', 'tests', 'plan', 'acceptance criteria', 'checkpoint', 'git'],
+    'counts': {'accepted_tasks': 40, 'total_tasks': 84, 'accepted_ac': 13, 'total_ac': 66},
+}
+proof = publish('p4t9-executor-shared-repair-confirmation', '.json', result)
+stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+markdown = publish('p4t9-executor-shared-repair-confirmation', '.md', (
+    '# P4-T9 shared repair confirmation\n\n'
+    f'Timestamp: {stamp}\nCommand: poetry run python SCRATCH/issue-980-p4t9-shared-confirm.py\nEXIT_CODE: 0\n'
+    'Output Summary: SHARED_R1_CONFIRMED_READY_FOR_CHECKED_COMMIT; no remaining shared finding or open probe.\n\n'
+    'R1 is closed. The class contract now states lifecycle, scope, invariants and effects; executable AST is identical after removing only that class docstring. Exact pre-repair source reconstruction is hash-verified and explicitly qualified as reconstruction. The capacity fixture preserves the same rejection and two-row assertion while counting the final limits mapping.\n\n'
+    'The five working streams, owner evidence and raw focused receipts reconcile: ordered static gates, exact fixture precheck and 133 cases; 287/287 statements, 124/124 branches and all 19 measured ranges covered. No behavioral run was repeated.\n\n'
+    'Shared modules depend only on accepted package APIs and committed registry metadata, with no uncommitted core-validator import. Their independent checked commit can proceed. Core R2/R3 confirmation and complete P4-T9 final gates remain pending. No task or AC checkoff; counts remain 40/84 and 13/66.\n'
+).encode())
+harness = publish('p4t9-executor-shared-confirmation-harness', '.txt', Path(__file__).read_bytes())
+paths = [proof, markdown, harness]
+stage_minute = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+stage_path = Q / f'p4t9-executor-shared-confirmation-staging.{stage_minute}.json'
+stage = publish('p4t9-executor-shared-confirmation-staging', '.json', {'status': result['status'], 'files': [ref(path) for path in paths], 'stage_paths': [path.as_posix() for path in paths + [stage_path]]})
+assert stage == stage_path
+print(json.dumps({'status': result['status'], 'proof': ref(proof), 'markdown': ref(markdown), 'staging': ref(stage)}))

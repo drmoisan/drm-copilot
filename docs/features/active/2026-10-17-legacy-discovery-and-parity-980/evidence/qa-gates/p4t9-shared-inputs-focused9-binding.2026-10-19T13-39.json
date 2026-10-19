@@ -1,0 +1,52 @@
+{
+  "batch": "focused9",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-coverage.2026-10-19T13-39.json",
+    "raw_path": "SCRATCH/p4t9-shared-inputs-focused9-coverage.raw.json",
+    "raw_sha256": "f45c316165f4611829f82346d5c951e492322264461af4a5ff1aa505ef9174cb",
+    "sha256": "73371df895ffdda758597830021f3a7da501932bc38461d47b880204a9ba3166"
+  },
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "initial_sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+    "tests/discovery_runtime/test_extension_input_limits.py": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+    "tests/discovery_runtime/test_extension_inputs.py": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.json",
+      "sha256": "a7a5025881c329c444e79fb5ee1022025b6f5c8b4e86787586ba78f6923c82b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.json",
+      "sha256": "6d8796c9c760ec3f5873b78eb9a5737dd970898a0a0c5e32e3e97a25f9be871a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.json",
+      "sha256": "06c91fdba6911076ca5f6da9b52beba78825996d9560b07ffb166c2784f5e5e8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.json",
+      "sha256": "cef415b686c94bbcc4fa451547c3c26211c17a3aa3ae45134ceeabbb7e87fb07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.json",
+      "sha256": "d1d27c2de2cda9869ea206728095ffe858bb6c7a4fae79c7d0c2fef3f045feb3"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+    "tests/discovery_runtime/test_extension_input_limits.py": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+    "tests/discovery_runtime/test_extension_inputs.py": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+  },
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-39"
+}

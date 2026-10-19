@@ -1,0 +1,51 @@
+"""Measure only numeric conversion order at the frozen extension budget boundary."""
+from pathlib import Path
+import builtins
+import datetime as dt
+import hashlib
+import json
+
+from drm_copilot_discovery import extension_validation as subject
+
+expected = {
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py': '42f5da1edf150ee820a1b0541a5494a1e0d979f5a4110e20f721833302403402',
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py': '950fd2457bbf31485850df691ad3bf51061a080692308bf7b1567722eeb285bc',
+    'tests/discovery_runtime/test_extension_results.py': 'eb7cdf2dd054ada3888d1d41aa8944f3ecd19493c6da11ded6fdcc19c8fd35e4',
+    'tests/discovery_runtime/test_extension_inventory_merge.py': '776622f246644044d55b75dd0d99ee9c0b1f943949581adc3623747e3b2ba3af',
+}
+for name, digest in expected.items():
+    assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest
+
+original = builtins.str
+calls = []
+
+
+class ObservedString(original):
+    """Retain ordinary integer rendering while counting its allocated text length."""
+
+    def __new__(cls, value):
+        rendered = original(value)
+        calls.append(len(rendered))
+        return original.__new__(cls, rendered)
+
+
+results = []
+subject.str = ObservedString
+try:
+    for exponent, ceiling in ((2, 2), (1000, 10), (1000, 1002)):
+        calls.clear()
+        limiter = subject.ExtensionBudget(max_bytes=ceiling, max_records=1, max_nodes=2, max_depth=2)
+        try:
+            limiter.reserve(10 ** exponent)
+            status = 'accepted'
+        except subject.ExtensionResultError as error:
+            status = error.code
+        results.append({'decimal_digits': exponent + 1, 'configured_bytes': ceiling, 'numeric_rendering_lengths': calls.copy(), 'status': status})
+finally:
+    del subject.str
+
+assert results[0]['numeric_rendering_lengths'] == [3] and results[0]['status'] == 'EXTENSION_LIMIT'
+assert results[1]['numeric_rendering_lengths'] == [1001] and results[1]['status'] == 'EXTENSION_LIMIT'
+assert results[2]['numeric_rendering_lengths'] == [1001] and results[2]['status'] == 'accepted'
+assert all(hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest for name, digest in expected.items())
+print(json.dumps({'status': 'REPRODUCED_NUMERIC_ALLOCATION_BEFORE_BYTE_LIMIT', 'timestamp_utc': dt.datetime.now(dt.timezone.utc).isoformat(), 'bindings': expected, 'cases': results, 'timing_assertions': False, 'source_test_mutations': False}))

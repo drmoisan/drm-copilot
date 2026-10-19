@@ -1,0 +1,92 @@
+{
+  "status": "SHARED_R1_CONFIRMED_READY_FOR_CHECKED_COMMIT",
+  "task": "P4-T9",
+  "authority_receipt": "atomic_execution_p4t9_shared_repair_confirmation",
+  "native_authority_valid": true,
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json",
+    "sha256": "f0fb0b997ccc8ea45540bd30a09e87d4b905a69b50ecde6ec28236299a79db76"
+  },
+  "prior_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+    "sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5"
+  },
+  "owner_stage_paths": 70,
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+    "tests/discovery_runtime/test_extension_input_limits.py": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+    "tests/discovery_runtime/test_extension_inputs.py": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+  },
+  "closed_findings": [
+    "P4T9-R1"
+  ],
+  "remaining_findings_outside_scope": [
+    "P4T9-R2",
+    "P4T9-R3"
+  ],
+  "findings": [],
+  "open_probes": [],
+  "repair": {
+    "class_contract": "Purpose, operation-local usage/flow, scope, fixed capacities/decreasing counters, failure behavior, attributes and side effects now satisfy the enumerated class rule.",
+    "production_ast_equal_except_class_docstring": true,
+    "prior_source": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-pre-r1-source.2026-10-19T13-40.txt",
+      "sha256": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf"
+    },
+    "prior_bytes_qualification": "The preceding class docstring and capacity expression are reconstructed by this retained harness and hash-match the immutable focused8 source_after bindings; no claim of a separate pre-edit file capture is made.",
+    "fixture": "Only final-profile mapping-count setup changed; reconstructed exact original hash matches focused8, and the same two-created-rows assertion passes in the retained precheck and full batch."
+  },
+  "proof": {
+    "receipts": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.json",
+        "sha256": "a7a5025881c329c444e79fb5ee1022025b6f5c8b4e86787586ba78f6923c82b1"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.json",
+        "sha256": "6d8796c9c760ec3f5873b78eb9a5737dd970898a0a0c5e32e3e97a25f9be871a"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.json",
+        "sha256": "06c91fdba6911076ca5f6da9b52beba78825996d9560b07ffb166c2784f5e5e8"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.json",
+        "sha256": "cef415b686c94bbcc4fa451547c3c26211c17a3aa3ae45134ceeabbb7e87fb07"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.json",
+        "sha256": "d1d27c2de2cda9869ea206728095ffe858bb6c7a4fae79c7d0c2fef3f045feb3"
+      }
+    ],
+    "cases": 133,
+    "coverage": {
+      "covered_lines": 287,
+      "num_statements": 287,
+      "covered_branches": 124,
+      "num_branches": 124
+    },
+    "measured_ranges": 19,
+    "lossless_streams": 51,
+    "new_behavioral_runs": 0
+  },
+  "commit_closure": "Shared imports use accepted package APIs and the already committed registry metadata API; neither shared production module imports the uncommitted core validator/results. Generic emitter row-text limitations remain qualified in the owner handoff; core merge preflight is separate.",
+  "git_qualification": "Working bytes are independently verified here. Owner freeze records the pre-staging index and filtered identities separately; no working/index equality or new commit is asserted by this review.",
+  "no_mutations": [
+    "production",
+    "tests",
+    "plan",
+    "acceptance criteria",
+    "checkpoint",
+    "git"
+  ],
+  "counts": {
+    "accepted_tasks": 40,
+    "total_tasks": 84,
+    "accepted_ac": 13,
+    "total_ac": 66
+  },
+  "published_utc": "2026-10-19T13:43:05.359782+00:00"
+}

@@ -23,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from pathlib import PurePosixPath
 from typing import TYPE_CHECKING, cast
 
@@ -108,6 +109,67 @@ def _ordered(rows: tuple[JsonObject, ...], key: str) -> tuple[JsonObject, ...]:
     return tuple(sorted(rows, key=lambda item: cast("str", item[key])))
 
 
+def _analyzer_metadata(
+    capture: InventoryCapture,
+    analyzer_ids: tuple[str, ...],
+    extension_adapters: tuple[JsonObject, ...] | None,
+) -> tuple[JsonObject, ...]:
+    """Bind exact declared versions without allowing external built-in identities.
+
+    capture (InventoryCapture) supplies finite limits; analyzer_ids (tuple[str,
+    ...]) selects reserved identities; extension_adapters (tuple[JsonObject, ...]
+    | None) declares external id/version pairs. Returns sorted immutable metadata.
+    Raises ValueError for malformed, duplicate, unknown or reserved declarations
+    and resource overflow. No implementation loading, I/O or mutation occurs.
+    """
+    from drm_copilot_discovery.analyzer.registry import builtin_analyzer_identities
+
+    supplied = () if extension_adapters is None else extension_adapters
+    if type(analyzer_ids) is not tuple or type(supplied) is not tuple:
+        raise ValueError("Analyzer identities require immutable tuples")
+    if len(analyzer_ids) + len(supplied) > capture.profile.limits.artifact_records:
+        raise ValueError("Analyzer identities exceed the configured record limit")
+    # Metadata is the sole reserved-ID authority and does not load implementations.
+    reserved = {cast("str", item["id"]): item for item in builtin_analyzer_identities()}
+    selected: dict[str, JsonObject] = {}
+    remaining = capture.profile.limits.document_bytes
+    # Validate every fixed selector before retaining any external declaration.
+    for identifier in analyzer_ids:
+        if (
+            not isinstance(cast("object", identifier), str)
+            or len(identifier) > remaining
+        ):
+            raise ValueError("Invalid or oversized built-in analyzer identity")
+        remaining -= len(identifier)
+        if identifier not in reserved or identifier in selected:
+            raise ValueError("Unknown or duplicate built-in analyzer identity")
+        selected[identifier] = reserved[identifier]
+    # Bound retained JSON text before regex validation or metadata allocation.
+    for descriptor in supplied:
+        if (
+            not isinstance(cast("object", descriptor), JsonObject)
+            or len(descriptor) != 2
+        ):
+            raise ValueError("External analyzer metadata requires only id and version")
+        identifier, version = descriptor.get("id"), descriptor.get("version")
+        if not isinstance(identifier, str) or not isinstance(version, str):
+            raise ValueError("External analyzer id and version must be strings")
+        cost = 6 * (len(identifier) + len(version)) + 32
+        if cost > remaining:
+            raise ValueError("Analyzer identities exceed the configured byte limit")
+        remaining -= cost
+        # Reject malformed selectors without coercing versions or echoing payloads.
+        if not re.fullmatch(
+            r"[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*", identifier
+        ) or not any(not character.isspace() for character in version):
+            raise ValueError("External analyzer id or version is invalid")
+        if identifier in reserved or identifier in selected:
+            raise ValueError("External analyzer identity is reserved or duplicated")
+        selected[identifier] = descriptor
+    # Sort only the already bounded union; preserve each descriptor's exact version.
+    return tuple(selected[name] for name in sorted(selected))
+
+
 def inventory_result(
     capture: InventoryCapture,
     analyses: tuple[Analysis, ...],
@@ -116,6 +178,7 @@ def inventory_result(
     timestamp: str,
     author_or_agent: JsonObject,
     catalog: SchemaCatalog,
+    extension_adapters: tuple[JsonObject, ...] | None = None,
 ) -> InventoryResult:
     """Validate complete deterministic inventory JSON and separate ledger proposals.
 
@@ -126,10 +189,41 @@ def inventory_result(
     capture (InventoryCapture) supplies input hashes and configuration; analyses
     (tuple[Analysis, ...]) contains adapter rows. analyzer_ids (tuple[str, ...]),
     timestamp (str), author_or_agent (JsonObject), and catalog (SchemaCatalog) bind
-    implementation and provenance. Returns InventoryResult with immutable document
+    implementation and provenance. extension_adapters (tuple[JsonObject, ...] |
+    None) supplies exact external id/version declarations; None and () preserve
+    the built-in-only output. Returns InventoryResult with immutable document
     and ledger proposals. Raises ValueError for row, reference, limit or schema
     failures; performs no I/O or mutation.
     """
+    metadata = _analyzer_metadata(capture, analyzer_ids, extension_adapters)
+    if len(analyses) > capture.profile.limits.artifact_records:
+        raise ValueError("Analyzer batches exceed the configured record limit")
+    # Validate exact row ownership before aggregation allocates family-wide tuples.
+    identities = {cast("str", item["id"]): item for item in metadata}
+    remaining_records = capture.profile.limits.artifact_records
+    for analysis in analyses:
+        families = (analysis.components, analysis.findings, analysis.relationships)
+        remaining_records -= sum(map(len, families)) + len(analysis.diagnostics)
+        if remaining_records < 0:
+            raise ValueError("Analyzer result exceeds the configured record limit")
+        # Diagnostics have no analyzer field; source-bearing rows require a pair.
+        for family in families:
+            # Every row is checked once before a complete result can be exposed.
+            for item in family:
+                declaration = item.get("analyzer")
+                if not isinstance(declaration, JsonObject) or len(declaration) != 2:
+                    raise ValueError("Analyzer row requires exact id/version metadata")
+                identifier, version = declaration.get("id"), declaration.get("version")
+                if (
+                    not isinstance(identifier, str)
+                    or not isinstance(version, str)
+                    or len(identifier) + len(version)
+                    > capture.profile.limits.document_bytes
+                    or declaration != identities.get(identifier)
+                ):
+                    raise ValueError(
+                        "Analyzer row does not match a declared id/version"
+                    )
     # Aggregate each row family independently while rejecting duplicate identities.
     components = _ordered(
         tuple(item for analysis in analyses for item in analysis.components),
@@ -148,11 +242,6 @@ def inventory_result(
     diagnostics = _ordered(
         tuple(item for analysis in analyses for item in analysis.diagnostics), "id"
     )
-    if (
-        sum(map(len, (components, findings, relationships, diagnostics)))
-        > capture.profile.limits.artifact_records
-    ):
-        raise ValueError("Analyzer result exceeds the configured record limit")
     # References can bind only the components actually present in this result.
     component_ids = {item["component_id"] for item in components}
     # A detection may refer only to a component actually returned in this run.
@@ -162,6 +251,7 @@ def inventory_result(
             item.get("from_component_id"),
             item.get("to_component_id"),
         )
+        # Nullable unresolved targets are allowed; nonnull targets must be emitted.
         if any(
             value is not None and value not in component_ids for value in references
         ):
@@ -189,7 +279,7 @@ def inventory_result(
         repository=capture.profile.repository.id,
         revision=capture.profile.repository.revision,
         tool=tool("discovery-inventory"),
-        analyzers=tuple(tool(name) for name in sorted(analyzer_ids)),
+        analyzers=metadata,
         scan_configuration_sha256=inventory_configuration_digest(capture.profile),
         files=files,
         components=components,
@@ -223,6 +313,7 @@ def inventory_result(
     # Coverage proposals preserve detections without upgrading inspection state.
     return InventoryResult(
         document=document,
+        # Proposed coverage rows retain the existing uninspected/unassigned state.
         ledger_components=tuple(seed_component(item) for item in components),
         semantic_sha256=hashlib.sha256(canonical_json(values)).hexdigest(),
     )

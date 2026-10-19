@@ -1,0 +1,51 @@
+{
+  "batch": "focused5",
+  "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py tests/discovery_runtime/test_extension_inputs.py tests/discovery_runtime/test_extension_input_limits.py tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+  "dependencies_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "dependencies_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-10-19T13:09:58.776466+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-shared-inputs-focused.py",
+    "sha256": "244b9a2728fd848f053ccb8a3b827a6163a2c09df28190c36dc5adde5b455b7f"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.stderr.txt",
+      "sha256": "bdc2efdb2e2c21ef0091e7a07f3c60db6bfaad4d10138bf027b67adafe446f7f"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.323762,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "76fb19d9c2641774a8acc4ca6d2db7e00fe56cc04aed34c06e75b6d9e5e79e69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "f97d0d5978829ed253a5904a820b14c421bcb2070b660f1658b2bb22f9ca2ddd",
+    "tests/discovery_runtime/test_extension_input_limits.py": "823ab22247e67137264a87b04dd051257d45648a0e02d5af90e9c0bd6d2d4f56",
+    "tests/discovery_runtime/test_extension_inputs.py": "ff4c376d0344cb3bb992f305f242dd100cdd6a4c3ce24bcb262bef7aa91fdd7c"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "76fb19d9c2641774a8acc4ca6d2db7e00fe56cc04aed34c06e75b6d9e5e79e69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py": "f97d0d5978829ed253a5904a820b14c421bcb2070b660f1658b2bb22f9ca2ddd",
+    "tests/discovery_runtime/test_extension_input_limits.py": "823ab22247e67137264a87b04dd051257d45648a0e02d5af90e9c0bd6d2d4f56",
+    "tests/discovery_runtime/test_extension_inputs.py": "ff4c376d0344cb3bb992f305f242dd100cdd6a4c3ce24bcb262bef7aa91fdd7c"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T13:09:58.452704+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n5 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-09"
+}

@@ -1,0 +1,51 @@
+"""Move approved boundary cases without changing their statements or assertions."""
+from pathlib import Path
+import ast
+import hashlib
+import json
+
+root = Path.cwd()
+path = root / 'tests/discovery_runtime/test_extension_inputs.py'
+target = root / 'tests/discovery_runtime/test_extension_input_limits.py'
+assert not target.exists()
+original = path.read_text(encoding='utf-8')
+tree = ast.parse(original)
+names = {'test_projection_reserves_resources_before_complete_result_allocation', 'test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes', 'test_public_hash_inputs_require_validated_immutable_carriers', 'test_manifest_hash_preserves_supported_json_scalars'}
+lines = original.splitlines(keepends=True)
+segments = []
+removed = set()
+before = {}
+for node in tree.body:
+    if isinstance(node, ast.FunctionDef) and node.name in names:
+        start = min([node.lineno] + [value.lineno for value in node.decorator_list]) - 1
+        end = node.end_lineno
+        segments.append(''.join(lines[start:end]))
+        removed.update(range(start, end))
+        before[node.name] = ast.dump(node, include_attributes=False)
+header = '''"""Verify finite projection resources and exact canonical serialization boundaries."""
+
+from __future__ import annotations
+
+import hashlib
+from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery import extension_inputs as subject
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.models import InventoryCapture, InventoryInput
+from drm_copilot_discovery.models import JsonObject, JsonValue, ParseLimits, canonical_json
+from drm_copilot_discovery.snapshot import SnapshotFile
+from tests.discovery_runtime.analyzer.test_repository import analyzer_catalog as analyzer_catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+from tests.discovery_runtime.test_extension_inputs import capture_case
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
+
+'''
+target.write_text(header + '\n\n'.join(segments) + '\n', encoding='utf-8', newline='\n')
+path.write_text(''.join(line for index, line in enumerate(lines) if index not in removed), encoding='utf-8', newline='\n')
+after = {node.name: ast.dump(node, include_attributes=False) for node in ast.parse(target.read_text()).body if isinstance(node, ast.FunctionDef)}
+assert all(after[name] == value for name, value in before.items())
+print(json.dumps({'moved_functions': sorted(names), 'ast_preserved': True, 'before_sha256': hashlib.sha256(original.encode()).hexdigest()}))

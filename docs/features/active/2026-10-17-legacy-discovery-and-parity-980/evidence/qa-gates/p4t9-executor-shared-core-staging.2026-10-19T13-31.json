@@ -1,0 +1,41 @@
+{
+  "task": "P4-T9",
+  "status": "SHARED_CORE_REVIEW_REVISIONS_REQUIRED",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+      "sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.md",
+      "sha256": "163d312adb233d7afe525a1024ecfec63e07b9396c39560f48accc0c3bd266a4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe.2026-10-19T13-31.json",
+      "sha256": "0688d0b0943e4a4a8853049586d96770693024ce2eaecea03cceddae43bac3cc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe-harness.2026-10-19T13-31.txt",
+      "sha256": "cc288831ff2956ad7af0a011efea35ea1b6f00aa0082ac321bed6e14cb953e1a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe-before-fixture-rebind.2026-10-19T13-31.txt",
+      "sha256": "a70862edb485bef0574e61af85152e80ce7c81ddb1e166baac57597a107cfad5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review-harness.2026-10-19T13-31.txt",
+      "sha256": "3560988c6517a5d52583bf35ba7758a74f53052caf825511528810bab27ae0ca"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe.2026-10-19T13-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe-harness.2026-10-19T13-31.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-numeric-probe-before-fixture-rebind.2026-10-19T13-31.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review-harness.2026-10-19T13-31.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-staging.2026-10-19T13-31.json"
+  ],
+  "mutations": "Review evidence only",
+  "published_utc": "2026-10-19T13:31:54.126232+00:00"
+}

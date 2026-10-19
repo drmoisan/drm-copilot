@@ -1,0 +1,47 @@
+{
+  "status": "REPRODUCED_NUMERIC_ALLOCATION_BEFORE_BYTE_LIMIT",
+  "command": "poetry run python SCRATCH/issue-980-p4t9-core-numeric-probe.py",
+  "execution_utc": "2026-10-19T13:28:23.272076+00:00",
+  "exit_code": 0,
+  "output_provenance": "Structured transcription of the observed exec_command tool result; not claimed to be a redirected raw stdout file.",
+  "cases": [
+    {
+      "decimal_digits": 3,
+      "configured_bytes": 2,
+      "numeric_rendering_lengths": [
+        3
+      ],
+      "status": "EXTENSION_LIMIT"
+    },
+    {
+      "decimal_digits": 1001,
+      "configured_bytes": 10,
+      "numeric_rendering_lengths": [
+        1001
+      ],
+      "status": "EXTENSION_LIMIT"
+    },
+    {
+      "decimal_digits": 1001,
+      "configured_bytes": 1002,
+      "numeric_rendering_lengths": [
+        1001
+      ],
+      "status": "accepted"
+    }
+  ],
+  "method": "An isolated subprocess replaces only module-local str with a behavior-preserving string subclass that counts the resulting numeric text length. It is restored immediately. No timing threshold or external service is used.",
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": "42f5da1edf150ee820a1b0541a5494a1e0d979f5a4110e20f721833302403402",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": "950fd2457bbf31485850df691ad3bf51061a080692308bf7b1567722eeb285bc",
+    "tests/discovery_runtime/test_extension_results.py": "eb7cdf2dd054ada3888d1d41aa8944f3ecd19493c6da11ded6fdcc19c8fd35e4",
+    "tests/discovery_runtime/test_extension_inventory_merge.py": "7e9474868f09f5fae7b483024c065b77f54c85227c0ea383f51d9db079c63d81"
+  },
+  "initial_binding_diagnostic": {
+    "exit_code": 1,
+    "kind": "AssertionError before any probe case",
+    "cause": "The authorized merge-test fixture repair changed its hash from 776622f2... to 7e947486... while the initial checker still expected the former. Production bytes were unchanged. The rerun changed only that expected test hash.",
+    "transcription_not_raw_stream": true
+  },
+  "published_utc": "2026-10-19T13:31:54.121327+00:00"
+}

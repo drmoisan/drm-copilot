@@ -1,0 +1,29 @@
+"""Inspect prospective formatted sizes and intent comments before focused gates."""
+import ast
+import json
+from pathlib import Path
+import black
+
+paths = ['packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py', 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py', 'tests/discovery_runtime/test_extension_inputs.py', 'tests/discovery_runtime/test_extension_input_limits.py', 'tests/discovery_runtime/analyzer/test_emitter_extensions.py']
+for name in paths:
+    text = Path(name).read_text(encoding='utf-8')
+    tree = ast.parse(text)
+    parents = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            parents[child] = parent
+    missing = []
+    lines = text.splitlines()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            doc = ast.get_docstring(node) or ''
+            if 'return' not in doc.lower():
+                missing.append([node.lineno, node.name, 'return contract'])
+        if isinstance(node, (ast.For, ast.While, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            owner = node
+            while not isinstance(owner, ast.stmt):
+                owner = parents[owner]
+            nearby = lines[max(0, owner.lineno - 4):owner.lineno]
+            if not any(line.lstrip().startswith('#') for line in nearby):
+                missing.append([node.lineno, type(node).__name__, 'inspect intent comment'])
+    print(json.dumps({'path': name, 'formatted_lines': len(black.format_str(text, mode=black.Mode()).splitlines()), 'inspect': missing}))
