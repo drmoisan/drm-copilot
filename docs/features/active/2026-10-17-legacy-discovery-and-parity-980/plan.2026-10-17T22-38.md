@@ -246,7 +246,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test each v1 artifact kind, deterministic old/new ID/hash mapping, unresolved missing dimensions/pins/approval/expectations, namespaced unmapped metadata, collisions, invalid v1 input, unsupported migration versions, and dry-run.
   - Acceptance: Migration never overwrites originals, activates automatically, or invents confidence/approvals/parity; the projected v2 result is structurally valid and incomplete obligations remain visible.
 
-- [ ] [P3-T8] Provide bounded source inspection without executable access.
+- [x] [P3-T8] Provide bounded source inspection without executable access.
   - Files and behavior: Create R/source_reads.py and PT/test_{source_reads,source_read_limits}.py for list/read/literal-search operations over configured selected production/test/project/documentation/evidence/snapshot roots.
   - Tests and proof: Cover byte/line/match bounds, source hashes/revisions/spans, exact grants, disabled regex or bounded supported search, encoding/read failures, symlink/path escapes, and deterministic pagination/order.
   - Acceptance: The service returns source evidence metadata and bounded text/matches with no shell/process/network execution or mutation capability.

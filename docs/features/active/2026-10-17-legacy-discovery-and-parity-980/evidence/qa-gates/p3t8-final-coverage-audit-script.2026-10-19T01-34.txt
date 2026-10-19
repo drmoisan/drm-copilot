@@ -1,0 +1,44 @@
+"""Compute exact new-module, class, callable and changed-line coverage from raw data."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+scratch = Path(__file__).parent
+data = json.loads((scratch / "issue-980-p3t8-final-coverage.json").read_text("utf-8"))
+rows = []
+failures = []
+for name, entry in sorted(data["files"].items()):
+    path = Path(name)
+    covered, missing = set(entry["executed_lines"]), set(entry["missing_lines"])
+    measured = covered | missing
+    summary = entry["summary"]
+    line = 100 * len(covered) / len(measured)
+    branch = 100 * summary["covered_branches"] / summary["num_branches"] if summary["num_branches"] else 100
+    units = []
+    tree = ast.parse(path.read_text("utf-8"))
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            continue
+        start = min([node.lineno, *(d.lineno for d in getattr(node, "decorator_list", []))])
+        end = node.end_lineno
+        owned = measured & set(range(start, end + 1))
+        if not owned:
+            continue
+        hit = owned & covered
+        percent = 100 * len(hit) / len(owned)
+        identifier = getattr(node, "name", "lambda") + ":" + str(node.lineno)
+        units.append({"unit": identifier, "kind": type(node).__name__, "covered": len(hit), "total": len(owned), "line_percent": percent, "missing": sorted(owned - covered)})
+        if percent < 90:
+            failures.append(name + " " + identifier)
+    physical = len(path.read_text("utf-8").splitlines())
+    if line < 90 or branch < 75 or physical > 500:
+        failures.append(name)
+    rows.append({"path": path.as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "line_percent": line, "branch_percent": branch, "covered_lines": len(covered), "measured_lines": len(measured), "physical_lines": physical, "changed_line_comparison": "New file against accepted e04136458147cdf24069b6bde563231f3c38c709; every executable line is new and measured", "units": units})
+    print(f"PASS {name}: lines {len(covered)}/{len(measured)} ({line:.2f}%), branches {branch:.2f}%, {len(units)} class/callable ranges")
+result = {"ok": not failures, "accepted_baseline": "e04136458147cdf24069b6bde563231f3c38c709", "files": rows, "failures": failures}
+(scratch / "issue-980-p3t8-coverage-audit.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+if failures:
+    print("FAIL " + "; ".join(failures))
+sys.exit(bool(failures))

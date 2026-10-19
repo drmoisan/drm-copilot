@@ -1,0 +1,5861 @@
+{
+  "task": "P3-T8",
+  "started_at": "2026-10-19T01:37:34.473216+00:00",
+  "finished_at": "2026-10-19T01:37:35.910406+00:00",
+  "accepted_baseline": "e04136458147cdf24069b6bde563231f3c38c709",
+  "checked_wip": "7ae74faa52dc3f5ec9790502e9564d2489793deb",
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "deployment_agent": "atomic-executor-c4",
+    "execution_context": "standalone",
+    "logical_agent": "atomic-executor",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P3T8_final_acceptance",
+    "delegation_id": "atomic_execution_p3t8_after_wip",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+  },
+  "manifest_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-final-manifest.2026-10-19T01-34.json",
+  "manifest_sha256": "a21f3aca7f013a552ae211e74bcd77202223fc5f82a5c395d5e9f80fccd6d7e0",
+  "review_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-executor-repair-confirmation.2026-10-19T01-28.json",
+  "review_sha256": "59ac5e526b9ef476b1ee3f322d762430a936815262fa83f1c6b10c313f190c50",
+  "baseline_manifest_sha256": "27fa534c58ba3de3356b64ca1a68694886dd398e05bb962da44313c4bed31b4b",
+  "preserved_predecessors": 266,
+  "preserved_frozen": 24,
+  "source": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "physical_lines": 415
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "physical_lines": 283
+    }
+  },
+  "index_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "working_sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "index_sha256": "85f1753b245234b0c21e45416cc0b38c8dc163070ca2bf1fa0e2eff2296e73bf",
+      "committed_sha256": "85f1753b245234b0c21e45416cc0b38c8dc163070ca2bf1fa0e2eff2296e73bf",
+      "working_crlf": 423,
+      "index_crlf": 0,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "exact_byte_equality": false,
+      "exact_crlf_to_lf": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "working_sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "index_sha256": "d7d54c59c7dbd2a237f4e15f3af0fc79fddd6a64a90e8338a6a1373d91f6f9ca",
+      "committed_sha256": "d7d54c59c7dbd2a237f4e15f3af0fc79fddd6a64a90e8338a6a1373d91f6f9ca",
+      "working_crlf": 481,
+      "index_crlf": 0,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "exact_byte_equality": false,
+      "exact_crlf_to_lf": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_reads.py",
+      "working_sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "index_sha256": "3c126f5ca5027184f7ae44431965024c3fed911f56d62a817c18bde10fa3ba54",
+      "committed_sha256": "3c126f5ca5027184f7ae44431965024c3fed911f56d62a817c18bde10fa3ba54",
+      "working_crlf": 364,
+      "index_crlf": 0,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "exact_byte_equality": false,
+      "exact_crlf_to_lf": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_read_limits.py",
+      "working_sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "index_sha256": "56d2bf4303b7c1ff07c75f5e2f73da94458456e8c45aa277abe61deb93cdc369",
+      "committed_sha256": "56d2bf4303b7c1ff07c75f5e2f73da94458456e8c45aa277abe61deb93cdc369",
+      "working_crlf": 415,
+      "index_crlf": 0,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "exact_byte_equality": false,
+      "exact_crlf_to_lf": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "working_sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "index_sha256": "df9be63c671fe71a16fd6a02d9eecc006bba39b31fcd109e7f6c00d0a17d6290",
+      "committed_sha256": "df9be63c671fe71a16fd6a02d9eecc006bba39b31fcd109e7f6c00d0a17d6290",
+      "working_crlf": 283,
+      "index_crlf": 0,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "exact_byte_equality": false,
+      "exact_crlf_to_lf": true
+    }
+  ],
+  "receipts": [
+    {
+      "label": "format",
+      "stage": 1,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-format.2026-10-19T01-31.json",
+      "sha256": "3ab45082d1bd44273517826279c0cd6b2435ec5b116ee61d418d55278b7e90d9",
+      "started": "2026-10-19T01:30:59.695853+00:00",
+      "finished": "2026-10-19T01:31:01.159017+00:00",
+      "duration_seconds": 1.463,
+      "pytest_passed": null,
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "output": "All done! \u2728 \ud83c\udf70 \u2728\n5 files would be left unchanged.\n",
+      "exit_code": 0
+    },
+    {
+      "label": "lint",
+      "stage": 2,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-lint.2026-10-19T01-31.json",
+      "sha256": "d8e719a93fef1433ea50a870fd2ee08842855684b1a24123a43764b6e1915426",
+      "started": "2026-10-19T01:31:02.608287+00:00",
+      "finished": "2026-10-19T01:31:03.812567+00:00",
+      "duration_seconds": 1.204,
+      "pytest_passed": null,
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "output": "All checks passed!\n",
+      "exit_code": 0
+    },
+    {
+      "label": "types",
+      "stage": 3,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-types.2026-10-19T01-31.json",
+      "sha256": "ad384b53af0ee0ebbb2e5a98f0d1b293cdb95ecd1fc9f11ec7c651a43ada46e7",
+      "started": "2026-10-19T01:31:05.263275+00:00",
+      "finished": "2026-10-19T01:31:17.260263+00:00",
+      "duration_seconds": 11.997,
+      "pytest_passed": null,
+      "command": "poetry run pyright",
+      "output": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n",
+      "exit_code": 0
+    },
+    {
+      "label": "architecture",
+      "stage": 4,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-architecture.2026-10-19T01-31.json",
+      "sha256": "92ef0c716b9a83380182f18270fc5d4cf262a5abfa436a3d1d644f49c5a3ec85",
+      "started": "2026-10-19T01:31:25.684079+00:00",
+      "finished": "2026-10-19T01:31:27.342281+00:00",
+      "duration_seconds": 1.658,
+      "pytest_passed": 6,
+      "command": "poetry run python SCRATCH/issue-980-p3t8-architecture.py",
+      "output": "......                                                                   [100%]\n6 passed, 143 deselected in 0.05s\nPASS source package/read-only boundary: source_read_models\nPASS source package/read-only boundary: source_reads\nPASS in-memory test boundary: test_source_reads\nPASS in-memory test boundary: test_source_read_limits\nPASS in-memory test boundary: test_source_read_snapshot_scope\n",
+      "exit_code": 0
+    },
+    {
+      "label": "unit",
+      "stage": 5,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-unit.2026-10-19T01-32.json",
+      "sha256": "d4b5257c10207f7835cca155f3bc8893e45fd1916b7b40ae60790db0fc38f3d0",
+      "started": "2026-10-19T01:31:33.236243+00:00",
+      "finished": "2026-10-19T01:32:22.694935+00:00",
+      "duration_seconds": 49.459,
+      "pytest_passed": 127,
+      "command": "poetry run python SCRATCH/issue-980-p3t8-tests.py forward --cov=drm_copilot_discovery.source_reads --cov=drm_copilot_discovery.source_read_models --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p3t8-final-coverage.json",
+      "output": "........................................................................ [ 56%]\n.......................................................                  [100%]\n=============================== tests coverage ================================\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\n\nName                                                                         Stmts   Miss Branch BrPart  Cover   Missing\n------------------------------------------------------------------------------------------------------------------------\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\source_read_models.py     200      0     72      0   100%\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\source_reads.py           209      0    104      0   100%\n------------------------------------------------------------------------------------------------------------------------\nTOTAL                                                                          409      0    176      0   100%\nCoverage JSON written to file SCRATCH/issue-980-p3t8-final-coverage.json\n127 passed in 47.35s\n",
+      "exit_code": 0
+    },
+    {
+      "label": "coverage-audit",
+      "stage": 5,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-coverage-audit.2026-10-19T01-33.json",
+      "sha256": "fe50c6a70ceea250466bdc4c93d2550b04cff95f8f64873c9f6e366f96e67c8b",
+      "started": "2026-10-19T01:33:22.055250+00:00",
+      "finished": "2026-10-19T01:33:22.137393+00:00",
+      "duration_seconds": 0.082,
+      "pytest_passed": null,
+      "command": "python SCRATCH/issue-980-p3t8-coverage-audit.py",
+      "output": "PASS packages\\discovery-runtime\\src\\drm_copilot_discovery\\source_read_models.py: lines 200/200 (100.00%), branches 100.00%, 27 class/callable ranges\nPASS packages\\discovery-runtime\\src\\drm_copilot_discovery\\source_reads.py: lines 209/209 (100.00%), branches 100.00%, 16 class/callable ranges\n",
+      "exit_code": 0
+    },
+    {
+      "label": "reverse",
+      "stage": 5,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-reverse.2026-10-19T01-33.json",
+      "sha256": "33c1dd8cc53e092d4efd8348155d03dcf2a43d2b76ffcf3a6c0a62c4c42ac86b",
+      "started": "2026-10-19T01:33:23.468484+00:00",
+      "finished": "2026-10-19T01:33:44.043824+00:00",
+      "duration_seconds": 20.575,
+      "pytest_passed": 127,
+      "command": "poetry run python SCRATCH/issue-980-p3t8-tests.py reverse --no-cov",
+      "output": "........................................................................ [ 56%]\n.......................................................                  [100%]\n127 passed in 18.97s\n",
+      "exit_code": 0
+    },
+    {
+      "label": "contracts",
+      "stage": 6,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-contracts.2026-10-19T01-34.json",
+      "sha256": "3a3dcd1e4f7c9dfead7c6a287adcf6c00a320d3c2f2b07b3defc62ad63ca2c97",
+      "started": "2026-10-19T01:33:59.636661+00:00",
+      "finished": "2026-10-19T01:34:06.961200+00:00",
+      "duration_seconds": 7.325,
+      "pytest_passed": 339,
+      "command": "poetry run pytest -o addopts=-ra tests/schemas/discovery/test_v1_schema_documents.py tests/schemas/discovery/test_v1_fixtures.py tests/schemas/discovery/test_v2_common_schemas.py tests/schemas/discovery/test_v2_control_schemas.py tests/discovery_runtime/test_resources.py -q --no-cov",
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 84%]\n...................................................                      [100%]\n339 passed in 5.69s\n",
+      "exit_code": 0
+    },
+    {
+      "label": "native",
+      "stage": 7,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-final-native.2026-10-19T01-34.json",
+      "sha256": "363103a765f41b4f8f476c739da701285ef5c7a9020710b3604765ee154e9567",
+      "started": "2026-10-19T01:34:14.020836+00:00",
+      "finished": "2026-10-19T01:34:17.278455+00:00",
+      "duration_seconds": 3.258,
+      "pytest_passed": null,
+      "command": "poetry run python SCRATCH/issue-980-p3t8-native.py . SCRATCH SCRATCH/issue-980-p3t8-native-result.json",
+      "output": "PASS native pagination returns sorted selected files\nPASS native original hashes and Unicode CRLF spans are retained\nPASS configured revision is not asserted for working bytes\nPASS native literal search returns exact ordered match spans\nPASS native exact project entry read is supported\nPASS denied selection reads no target bytes\nPASS successful and denied operations preserve native tree\nPASS native adapter enforces the requested byte limit\nPASS native continuation rejects changed source bytes\nPASS native imported evidence retains immutable source identity\nPASS native imported reads preserve every artifact byte\nPASS unrequested corrupted payload blocks requested member release\nPASS all native opens receive positive bounded byte limits\nPASS no activation or mutation lock is created\n{\"count\": 14, \"elapsed_seconds\": 1.906}\n",
+      "exit_code": 0
+    }
+  ],
+  "coverage": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "covered_lines": 200,
+      "total_lines": 200,
+      "covered_branches": 72,
+      "total_branches": 72,
+      "units": [
+        {
+          "unit": "bounded_integer:20",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "require_digest:28",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadGrant:41",
+          "kind": "ClassDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SelectedManifest:67",
+          "kind": "ClassDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadSelection:85",
+          "kind": "ClassDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadLimits:128",
+          "kind": "ClassDef",
+          "covered": 14,
+          "total": 14,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadCursor:164",
+          "kind": "ClassDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadRequest:180",
+          "kind": "ClassDef",
+          "covered": 34,
+          "total": 34,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceSpan:234",
+          "kind": "ClassDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceEvidence:254",
+          "kind": "ClassDef",
+          "covered": 28,
+          "total": 28,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceItem:300",
+          "kind": "ClassDef",
+          "covered": 12,
+          "total": 12,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadResult:323",
+          "kind": "ClassDef",
+          "covered": 20,
+          "total": 20,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "operation_without_cursor:369",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "source_page:379",
+          "kind": "FunctionDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:50",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "allows:56",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:76",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:95",
+          "kind": "FunctionDef",
+          "covered": 12,
+          "total": 12,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "allows:120",
+          "kind": "FunctionDef",
+          "covered": 2,
+          "total": 2,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:146",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:173",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:197",
+          "kind": "FunctionDef",
+          "covered": 24,
+          "total": 24,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:244",
+          "kind": "FunctionDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:270",
+          "kind": "FunctionDef",
+          "covered": 19,
+          "total": 19,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:310",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:338",
+          "kind": "FunctionDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "encode:359",
+          "kind": "FunctionDef",
+          "covered": 2,
+          "total": 2,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "covered_lines": 209,
+      "total_lines": 209,
+      "covered_branches": 104,
+      "total_branches": 104,
+      "units": [
+        {
+          "unit": "SourceReader:50",
+          "kind": "ClassDef",
+          "covered": 17,
+          "total": 17,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_Inspection:107",
+          "kind": "ClassDef",
+          "covered": 176,
+          "total": 176,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__init__:57",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "inspect:87",
+          "kind": "FunctionDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__init__:114",
+          "kind": "FunctionDef",
+          "covered": 10,
+          "total": 10,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_metadata:145",
+          "kind": "FunctionDef",
+          "covered": 13,
+          "total": 13,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_profile_allows:164",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_eligible:184",
+          "kind": "FunctionDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_read:199",
+          "kind": "FunctionDef",
+          "covered": 16,
+          "total": 16,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_capture:221",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_transport:231",
+          "kind": "FunctionDef",
+          "covered": 22,
+          "total": 22,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_evidence:268",
+          "kind": "FunctionDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_paths:315",
+          "kind": "FunctionDef",
+          "covered": 28,
+          "total": 28,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_items:364",
+          "kind": "FunctionDef",
+          "covered": 34,
+          "total": 34,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_identity:431",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "run:450",
+          "kind": "FunctionDef",
+          "covered": 15,
+          "total": 15,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    }
+  ],
+  "raw_coverage_sha256": "929d4009110b0f48a7efc64d597969ec096350bd850947eaa7f34056575b3859",
+  "forward_cases": 127,
+  "reverse_cases": 127,
+  "native": {
+    "checks": [
+      "native pagination returns sorted selected files",
+      "native original hashes and Unicode CRLF spans are retained",
+      "configured revision is not asserted for working bytes",
+      "native literal search returns exact ordered match spans",
+      "native exact project entry read is supported",
+      "denied selection reads no target bytes",
+      "successful and denied operations preserve native tree",
+      "native adapter enforces the requested byte limit",
+      "native continuation rejects changed source bytes",
+      "native imported evidence retains immutable source identity",
+      "native imported reads preserve every artifact byte",
+      "unrequested corrupted payload blocks requested member release",
+      "all native opens receive positive bounded byte limits",
+      "no activation or mutation lock is created"
+    ],
+    "count": 14,
+    "elapsed_seconds": 1.906,
+    "platform": "win32",
+    "workspace": "SCRATCH/native-source-reads",
+    "native_read_calls": 30,
+    "files": {
+      "build/Example.csproj": "400b35829b2a391f4048da02e1108b98db09431b2947e806a184743bd1b33c3a",
+      "docs/migration/discovery/source-snapshots/native-source/contracts/feature.yaml": "06648cd96f84279737d83c5c7f38663f98b53086e164068dd929d47016d2cc85",
+      "docs/migration/discovery/source-snapshots/native-source/evidence/capture.txt": "8810ad581e59f2bc3928b261707a71308f7e139eb04820366dc4d5c18d980225",
+      "docs/migration/discovery/source-snapshots/native-source/manifest.json": "1bb2b419be71fdeee0982d4a680a54b235cf993417422cfc3266d23ebf51ac29",
+      "private/hidden.txt": "52fd89397eac355934ccfb0643cd30c803f83123b1db9efe4ede60534d67e6be",
+      "src/a.cs": "8b0c0ee084b6c2291af255946c406b54e96d80a44d2c654e17129c5d51178016",
+      "src/b.cs": "16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4"
+    }
+  },
+  "checks": [
+    {
+      "check": "accepted baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "checked WIP HEAD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "native authority valid",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "exact routed profile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "exact model and effort",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "current profile SHA",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/acceptance-specification.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/coverage-ledger.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/domain-profile.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/evidence-reference.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/extension-result-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/feature-contract.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/implementation-record.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/inventory-snapshot.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/parity-matrix.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/product-decision-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/product-decision.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/scope.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: examples/discovery/v2/unspecified-behavior.example.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/README.md",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/resource-manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: poetry.lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: pyproject.toml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: quality-tiers.yml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/acceptance-specification.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/activation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/capability-attestation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/common.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/discovery-invocation.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/domain-profile.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/extension-result-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/implementation-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/inventory-snapshot.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/migration-report.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/product-decision-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/product-decision.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/required-output-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/scope.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/service-request.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/service-result.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/tool-authorization.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/unspecified-behavior.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: schemas/discovery/v2/validation-receipt.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/__init__.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/domain_profile_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/discovery/rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/draft_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/evidence_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/initialization_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/mutation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/parity_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/source_snapshot_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_acceptance_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_acceptance_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_activation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_activation_store.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_agent_output.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_catalog.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_completion_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_configuration.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_coverage_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_coverage_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_decision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_decision_supersession.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_dimension_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_draft_contracts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_draft_scenarios.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_evidence_linking.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_evidence_payloads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_evidence_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_findings.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_initialization.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_initialization_conflicts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_migration_unknowns.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_migration_v1.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_mutation_commit.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_mutation_filesystem.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_mutation_plan.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_observation_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_package_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_parity_clients.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_parity_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_parsing.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_parsing_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_path_collisions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_path_policy.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_path_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_profile_dimensions.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_profile_v2.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_reference_uniqueness.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_references.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_repository_reader.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_resources.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_revision_rules.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_runtime_claims.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_schema_formats.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_schema_validation.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_export.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_import.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_imports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_loading.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/test_validation_modes.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/discovery_runtime/validation_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_authority_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_common_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_control_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_decision_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_format_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_observation_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_profile_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_target_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/test_v2_transport_schemas.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/v2_control_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/schemas/discovery/v2_schema_test_support.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_init_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/discovery/test_rendering.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor working: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor accepted blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "predecessor index blob: tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/coverage-ledger.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/coverage-ledger.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/coverage-ledger.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/evidence-reference.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/evidence-reference.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/evidence-reference.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/feature-contract.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/feature-contract.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/feature-contract.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/parity-matrix.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/parity-matrix.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/parity-matrix.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/product-decision-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/product-decision-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/product-decision-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: examples/discovery/v1/unspecified-behavior-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: examples/discovery/v1/unspecified-behavior-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: examples/discovery/v1/unspecified-behavior-record.example.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/coverage-ledger.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/evidence-reference.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/feature-contract.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/parity-matrix.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/product-decision-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/schemas/discovery/test_v1_fixtures.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/schemas/discovery/test_v1_fixtures.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/schemas/discovery/test_v1_fixtures.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/schemas/discovery/test_v1_schema_documents.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/schemas/discovery/test_v1_schema_documents.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/schemas/discovery/test_v1_schema_documents.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen working: tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen accepted/index blob: tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "frozen canonical hash: tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed working hash: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "new task path: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "source size: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual Git attributes: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "canonical index/commit bytes: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "only declared CRLF normalization: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed working hash: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "new task path: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "source size: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual Git attributes: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "canonical index/commit bytes: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "only declared CRLF normalization: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed working hash: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "new task path: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "source size: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual Git attributes: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "canonical index/commit bytes: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "only declared CRLF normalization: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed working hash: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "new task path: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "source size: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual Git attributes: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "canonical index/commit bytes: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "only declared CRLF normalization: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed working hash: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "new task path: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "source size: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual Git attributes: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "canonical index/commit bytes: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "only declared CRLF normalization: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "reviewed scope preserved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "retained review has no remaining findings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: format",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: format",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: format",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: format",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: format",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: lint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: lint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: lint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: lint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: lint",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: types",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: types",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: types",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: types",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: types",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: coverage-audit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: coverage-audit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: coverage-audit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: coverage-audit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: coverage-audit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt raw SHA: native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt success: native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt before/after bytes: native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt stage/time: native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "receipt required markers: native",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "all ordered stages",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "commands finish before next stage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "full repository type command",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual pytest count: architecture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual pytest count: unit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual pytest count: reverse",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "actual pytest count: contracts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: raw-coverage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: coverage-detail",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: forward-nodes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: reverse-nodes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: native-result",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: native-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: test-runner",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: coverage-audit-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw evidence SHA: architecture-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "executed harness copy: native-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "executed harness copy: test-runner",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "executed harness copy: coverage-audit-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "executed harness copy: architecture-script",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "same exact 127-node population reversed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "node collections bind test bytes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "two exclusion regressions executed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "measured production source only: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw executable counts: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw branch counts: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::bounded_integer:20",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::require_digest:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::ReadGrant:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SelectedManifest:67",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::ReadSelection:85",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceReadLimits:128",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::ReadCursor:164",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceReadRequest:180",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceSpan:234",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceEvidence:254",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceItem:300",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::SourceReadResult:323",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::operation_without_cursor:369",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::source_page:379",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:50",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::allows:56",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:76",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:95",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::allows:120",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:146",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:173",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:197",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:244",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:270",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:310",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::__post_init__:338",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py::encode:359",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "independent range audit matches worker: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "measured production source only: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw executable counts: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "raw branch counts: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::SourceReader:50",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_Inspection:107",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::__init__:57",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::inspect:87",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::__init__:114",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_metadata:145",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_profile_allows:164",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_eligible:184",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_read:199",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_capture:221",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_transport:231",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_evidence:268",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_paths:315",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_items:364",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::_identity:431",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "class/callable coverage: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py::run:450",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "independent range audit matches worker: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "all new executable lines and branches measured",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "43 measured ranges at 100 percent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "coverage audit success",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "14 native assertions complete",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "native result bound to command output",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "native scope and body duration",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "native raw result copy",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "unit raw coverage copy",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "final working refresh: packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "final working refresh: packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "final working refresh: tests/discovery_runtime/test_source_reads.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "final working refresh: tests/discovery_runtime/test_source_read_limits.py",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "final working refresh: tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "findings": [],
+  "publication_timestamp": "2026-10-19T01-38",
+  "task_status": "PASS",
+  "plan_counts": {
+    "checked": 32,
+    "total": 84
+  },
+  "criteria_counts": {
+    "spec.md": {
+      "checked": 11,
+      "total": 66
+    },
+    "user-story.md": {
+      "checked": 11,
+      "total": 66
+    }
+  },
+  "new_criteria_checked": 0
+}

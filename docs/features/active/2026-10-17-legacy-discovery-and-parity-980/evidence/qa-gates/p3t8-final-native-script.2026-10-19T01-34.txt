@@ -1,0 +1,152 @@
+"""Exercise real bounded read seams outside the checkout and unit test process."""
+from __future__ import annotations
+
+import json
+import sys
+import time
+from dataclasses import replace
+from hashlib import sha256
+from pathlib import Path
+from uuid import uuid4
+
+import yaml
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.models import canonical_json
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.parsing import parse_document
+from drm_copilot_discovery.profile_v2 import parse_profile_v2
+from drm_copilot_discovery.source_read_models import (
+    ReadGrant, ReadSelection, SelectedManifest, SourceReadLimits, SourceReadRequest,
+)
+from drm_copilot_discovery.source_reads import SourceReader
+from drm_copilot_discovery.transport_manifest import transport_digest
+
+repo, scratch, output = map(Path, sys.argv[1:4])
+root = scratch / ("issue-980-p3t8-native-" + uuid4().hex)
+root.mkdir()
+checks, calls = [], []
+started = time.monotonic()
+catalog = load_catalog()
+profile_data = yaml.safe_load((repo / "examples/discovery/v2/domain-profile.example.yaml").read_text("utf-8"))
+profile_data.pop("extension_schemas")
+profile_data["project_entry_points"] = ["build/Example.csproj"]
+profile = parse_profile_v2(json.dumps(profile_data), catalog=catalog)
+native = LocalMutationPrimitives(workspace_root=str(root.resolve()),
+                                 lock_path=str((scratch / "issue-980-p3t8-never-acquired.lock").resolve()))
+
+
+def check(name, condition):
+    """Record one operational assertion without exposing native scratch paths."""
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+    print("PASS " + name, flush=True)
+
+
+def put(path, content):
+    """Create synthetic setup bytes outside the checkout; never a reader action."""
+    target = root / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(content)
+
+
+def tree():
+    """Return exact file hashes for before/after non-mutation comparisons."""
+    return {path.relative_to(root).as_posix(): sha256(path.read_bytes()).hexdigest()
+            for path in sorted(root.rglob("*")) if path.is_file()}
+
+
+def read(path, *, limit):
+    """Trace only the injected native read operation and retain its finite limit."""
+    calls.append((path, limit))
+    return native.read_bytes(path, limit=limit)
+
+
+def reader(selection, limits=SourceReadLimits()):
+    """Pass only accepted metadata/byte seams into the closed source reader."""
+    return SourceReader(profile, catalog=catalog, workspace_root=str(root.resolve()),
+                        metadata=native.metadata, read_bytes=read,
+                        selection=selection, limits=limits)
+
+
+try:
+    content = "alpha\r\nβ needle needle\r\n".encode()
+    put("src/a.cs", content)
+    put("src/b.cs", b"second")
+    put("private/hidden.txt", b"must not be opened")
+    put("build/Example.csproj", b"<Project />")
+    selection = ReadSelection(grants=(ReadGrant(path="src", directory=True),
+                                      ReadGrant(path="build/Example.csproj")))
+    service = reader(selection)
+    before = tree()
+    request = SourceReadRequest(operation="list", paths=("src",), page_size=1)
+    first = service.inspect(request)
+    second = service.inspect(replace(request, cursor=first.next_cursor))
+    check("native pagination returns sorted selected files", [first.items[0].evidence.path, second.items[0].evidence.path] == ["src/a.cs", "src/b.cs"] and second.next_cursor is None)
+    lines = service.inspect(SourceReadRequest(operation="read", paths=("src/a.cs",), line_start=2))
+    check("native original hashes and Unicode CRLF spans are retained", lines.items[0].text == "β needle needle" and lines.items[0].span.line == 2 and lines.items[0].span.column_end == 16 and lines.items[0].evidence.sha256 == sha256(content).hexdigest())
+    check("configured revision is not asserted for working bytes", profile.repository.revision is not None and lines.items[0].evidence.repository.revision is None)
+    matches = service.inspect(SourceReadRequest(operation="search", paths=("src",), query="needle"))
+    check("native literal search returns exact ordered match spans", [(item.span.line, item.span.column_start, item.span.column_end) for item in matches.items] == [(2, 3, 9), (2, 10, 16)])
+    project = service.inspect(SourceReadRequest(operation="read", paths=("build/Example.csproj",)))
+    check("native exact project entry read is supported", project.items[0].text == "<Project />")
+    prior = len(calls)
+    try:
+        service.inspect(SourceReadRequest(operation="read", paths=("private/hidden.txt",)))
+    except ValueError:
+        check("denied selection reads no target bytes", len(calls) == prior)
+    else:
+        raise AssertionError("unselected source accepted")
+    check("successful and denied operations preserve native tree", tree() == before)
+    try:
+        reader(selection, SourceReadLimits(file_bytes=3)).inspect(SourceReadRequest(operation="read", paths=("src/a.cs",)))
+    except OSError:
+        check("native adapter enforces the requested byte limit", tree() == before)
+    else:
+        raise AssertionError("oversized source accepted")
+    put("src/a.cs", content + b"changed")
+    try:
+        service.inspect(replace(request, cursor=first.next_cursor))
+    except ValueError:
+        check("native continuation rejects changed source bytes", True)
+    else:
+        raise AssertionError("stale continuation accepted")
+    put("src/a.cs", content)
+
+    prefix = profile.artifacts["source_snapshots"] + "/native-source"
+    feature_bytes = (repo / "examples/discovery/v2/feature-contract.example.yaml").read_bytes()
+    payload = b"manual capture\r\n"
+    header = yaml.safe_load((repo / "examples/discovery/v2/source-snapshot-manifest.example.yaml").read_text("utf-8"))
+    header["artifacts"] = [dict(artifact_kind="feature-contract", id="feature-alpha", schema_version="2.0.0", path="contracts/feature.yaml", sha256=sha256(feature_bytes).hexdigest(), size=len(feature_bytes))]
+    header["payloads"] = [dict(path="evidence/capture.txt", sha256=sha256(payload).hexdigest(), size=len(payload))]
+    header["transport"].update(artifact_count=1, payload_count=1)
+    frozen = parse_document(json.dumps(header), format="json").value
+    header["manifest_sha256"] = transport_digest(frozen)
+    header_bytes = canonical_json(parse_document(json.dumps(header), format="json").value)
+    manifest = prefix + "/manifest.json"
+    target = prefix + "/contracts/feature.yaml"
+    put(manifest, header_bytes)
+    put(target, feature_bytes)
+    put(prefix + "/evidence/capture.txt", payload)
+    selection = ReadSelection(grants=(ReadGrant(path=target),), manifests=(SelectedManifest(path=manifest, sha256=sha256(header_bytes).hexdigest()),))
+    before = tree()
+    result = reader(selection).inspect(SourceReadRequest(operation="list", paths=(target,)))
+    evidence = result.items[0].evidence
+    check("native imported evidence retains immutable source identity", evidence.path == "contracts/feature.yaml" and evidence.workspace_path == target and evidence.repository.id == header["source_repository"]["id"] and evidence.repository.revision == "a" * 40 and evidence.sha256 == sha256(feature_bytes).hexdigest())
+    check("native imported reads preserve every artifact byte", tree() == before)
+    put(prefix + "/evidence/capture.txt", b"wrong")
+    before = tree()
+    try:
+        reader(selection).inspect(SourceReadRequest(operation="list", paths=(target,)))
+    except ValueError:
+        check("unrequested corrupted payload blocks requested member release", tree() == before)
+    else:
+        raise AssertionError("incomplete transport validation")
+    check("all native opens receive positive bounded byte limits", all(0 < limit <= 1048576 for _, limit in calls))
+    check("no activation or mutation lock is created", not (root / "config/discovery.json").exists() and not native.lock_path.exists())
+finally:
+    result = dict(checks=checks, count=len(checks), elapsed_seconds=round(time.monotonic() - started, 3),
+                  platform=sys.platform, workspace="SCRATCH/native-source-reads",
+                  native_read_calls=len(calls), files=tree())
+    output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+print(json.dumps({"count": len(checks), "elapsed_seconds": result["elapsed_seconds"]}))
