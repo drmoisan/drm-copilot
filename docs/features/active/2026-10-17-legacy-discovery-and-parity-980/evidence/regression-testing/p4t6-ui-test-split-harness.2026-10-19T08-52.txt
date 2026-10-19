@@ -1,0 +1,58 @@
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+new_path = Path("tests/discovery_runtime/analyzer/test_ui_callback_limits.py")
+baseline = feature / "evidence/baseline/p4t6-shared-baseline.2026-10-19T08-29.json"
+assert not new_path.exists()
+assert hashlib.sha256(baseline.read_bytes()).hexdigest() == "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+record = {"timestamp": stamp, "command": "poetry run python SCRATCH/issue-980-p4t6-ui-test-split.py", "exit_code": 0, "path": new_path.as_posix(), "absent_before_write": True, "shared_baseline": baseline.as_posix(), "shared_baseline_sha256": hashlib.sha256(baseline.read_bytes()).hexdigest(), "reason": "Preserve complete boundary tests and intent documentation below 500 physical lines.", "production_scope_unchanged": True}
+prefix = feature / "evidence/baseline" / ("p4t6-ui-test-split-absence." + stamp)
+Path(str(prefix)+".json").write_bytes((json.dumps(record, indent=2)+"\n").encode())
+Path(str(prefix)+".md").write_bytes((f"# UI boundary-test split absence\n\nTimestamp: {stamp}\nCommand: {record['command']}\nEXIT_CODE: 0\nOutput Summary: Approved new boundary-test path was absent before creation; original shared baseline remains immutable.\n\nPath: `{new_path.as_posix()}`. Production scope remains one module.\n").encode())
+source_path = Path("tests/discovery_runtime/analyzer/test_ui_callbacks.py")
+source = source_path.read_text("utf-8")
+lines = source.splitlines(keepends=True)
+selected = {"test_public_invalid_limits_precede_parser_calls", "test_public_limits_reject_instead_of_returning_partial_candidates", "test_pin_index_preserves_identity_and_bounds_aggregate_lookup", "test_aggregate_limits_discard_partial_results_before_release", "test_wrong_capture_type_fails_before_indexing"}
+chunks = []
+ranges = []
+for node in ast.parse(source).body:
+    if isinstance(node, ast.FunctionDef) and node.name in selected:
+        first = min([node.lineno]+[x.lineno for x in node.decorator_list])-1
+        chunks.append("".join(lines[first:node.end_lineno]))
+        ranges.append((first,node.end_lineno))
+for start, end in reversed(ranges):
+    del lines[start:end]
+source_path.write_bytes("".join(lines).encode())
+header = '''"""Verify public UI input contracts and independent aggregate budgets."""
+from __future__ import annotations
+from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+import pytest
+from drm_copilot_discovery.analyzer import ui_callbacks
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.findings import pinned_matches
+from drm_copilot_discovery.analyzer.models import InventoryInput
+from drm_copilot_discovery.analyzer.ui_callbacks import UiCallbackAnalyzer, callback_candidates
+from drm_copilot_discovery.analyzer.xml_input import XmlInputError
+from drm_copilot_discovery.repository_reader import RepositoryFile
+from tests.discovery_runtime.analyzer.test_dotnet_projects import capture
+from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+from tests.discovery_runtime.analyzer.test_ui_callbacks import markup
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
+    from drm_copilot_discovery.analyzer.models import InventoryCapture
+    from drm_copilot_discovery.catalog import SchemaCatalog
+
+
+'''
+new_path.write_bytes((header+"\n\n\n".join(chunks)+"\n").encode())
+gate = scratch / "issue-980-p4t6-ui-gate.py"
+gate.write_bytes(gate.read_bytes().replace(b"'tests/discovery_runtime/analyzer/test_ui_callbacks.py']", b"'tests/discovery_runtime/analyzer/test_ui_callbacks.py', 'tests/discovery_runtime/analyzer/test_ui_callback_limits.py']"))
+print(json.dumps(record))

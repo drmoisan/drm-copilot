@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-10-19T08-39",
+  "command": "poetry run python SCRATCH/issue-980-p4t6-ui-test-split.py",
+  "exit_code": 0,
+  "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+  "absent_before_write": true,
+  "shared_baseline": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t6-shared-baseline.2026-10-19T08-29.json",
+  "shared_baseline_sha256": "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4",
+  "reason": "Preserve complete boundary tests and intent documentation below 500 physical lines.",
+  "production_scope_unchanged": true
+}

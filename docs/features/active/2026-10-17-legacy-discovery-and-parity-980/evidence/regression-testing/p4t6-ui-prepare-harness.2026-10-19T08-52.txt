@@ -1,0 +1,16 @@
+from pathlib import Path
+import black
+import json
+scratch = Path(__file__).parent
+paths = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py", "tests/discovery_runtime/analyzer/test_ui_callbacks.py"]
+for value in paths:
+    source = Path(value).read_text("utf-8")
+    result = black.format_str(source, mode=black.Mode())
+    (scratch / ("issue-980-p4t6-ui-formatted-" + Path(value).name)).write_bytes(result.encode())
+    print(json.dumps({"path": value, "physical_lines": len(source.splitlines()), "formatted_lines": len(result.splitlines())}))
+original = (scratch / "issue-980-p4t5-com-repair-gate.py").read_text("utf-8")
+start = original.index("paths = [")
+end = original.index("\n\ndef bindings", start)
+original = original[:start] + "paths = " + repr(paths) + "\n" + original[end:]
+original = original.replace("COM", "UI").replace("P4-T5", "P4-T6").replace("p4t5-com-repair", "p4t6-ui").replace("957908053625c5a22099bafe5b6fd3dde2aedde2", "6804041b88ea80e386948a0327dca8f0d7a89471")
+(scratch / "issue-980-p4t6-ui-gate.py").write_bytes(original.encode())

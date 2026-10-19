@@ -1,0 +1,40 @@
+{
+  "stage": "lint",
+  "label": "p4t6-ui-initial-lint",
+  "started": "2026-10-19T08:42:23.650629+00:00",
+  "finished": "2026-10-19T08:42:24.810038+00:00",
+  "command": "poetry run ruff check --fix packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+  "exit_code": 1,
+  "duration_seconds": 1.159,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "aa9d17a4b2e3bec2ada859eaa4bf06cac77dc910a1bc8df9580ad78aae7f494c",
+      "physical_lines": 455
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "a1b7f11a7c0811dbcb8c4c5978f4a1f5d3959ae98d4e8c1504724d957641632e",
+      "physical_lines": 401
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "424275f55c99d94f7329a2ad8a2188b0ec67f3d26ae4df64a732da220bb296fa",
+      "physical_lines": 239
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "aa9d17a4b2e3bec2ada859eaa4bf06cac77dc910a1bc8df9580ad78aae7f494c",
+      "physical_lines": 455
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "7217fde94c5bef3e80c408c1964f7d8b535b45efa5ebf98c9053e561c21c8a5e",
+      "physical_lines": 401
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "da0223b48e6af682ead236b56fed716d23a29edf844297119522aac975d6d118",
+      "physical_lines": 242
+    }
+  },
+  "output": "E501 Line too long (91 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\ui_callbacks.py:48:89\n   |\n46 | }\n47 | _ELEMENTS = frozenset(_EVENTS) | frozenset(\n48 |     \"Grid StackPanel DockPanel WrapPanel Canvas Border ScrollViewer ContentControl\".split()\n   |                                                                                         ^^^\n49 | )\n50 | _NAME = re.compile(r\"[A-Za-z_][A-Za-z_0-9]*\\Z\")\n   |\n\nTC002 Move third-party import `drm_copilot_discovery.analyzer.models.InventoryInput` into a type-checking block\n  --> tests\\discovery_runtime\\analyzer\\test_ui_callback_limits.py:12:51\n   |\n10 | from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError\n11 | from drm_copilot_discovery.analyzer.findings import pinned_matches\n12 | from drm_copilot_discovery.analyzer.models import InventoryInput\n   |                                                   ^^^^^^^^^^^^^^\n13 | from drm_copilot_discovery.analyzer.ui_callbacks import (\n14 |     UiCallbackAnalyzer,\n   |\nhelp: Move into type-checking block\n\nE501 Line too long (89 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_ui_callback_limits.py:87:89\n   |\n86 |     def counted(local: InventoryCapture, item: InventoryInput) -> bool:\n87 |         \"\"\"Count local pin group sizes, return accepted exact-byte check; mutate list.\"\"\"\n   |                                                                                         ^\n88 |         visits.append(len(local.repository_files))\n89 |         return pinned_matches(local, item)\n   |\n\nE501 Line too long (94 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_ui_callbacks.py:45:89\n   |\n43 |     \"\"\"Return synthetic UTF-8 bytes from str body/root/class/namespace; no I/O.\"\"\"\n44 |     return (\n45 |         f'<{root} xmlns=\"{namespace}\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" '\n   |                                                                                         ^^^^^^\n46 |         f'x:Class=\"{escape(class_name, quote=True)}\">{body}</{root}>'\n47 |     ).encode()\n   |\n\nE501 Line too long (90 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_ui_callbacks.py:327:89\n    |\n325 |     catalog: SchemaCatalog,\n326 | ) -> None:\n327 |     \"\"\"Model SchemaCatalog unavailable/excluded inputs; return None, no external reads.\"\"\"\n    |                                                                                         ^^\n328 |     inputs = capture(\n329 |         catalog, ((\"src/a.xaml\", markup()), (\"src/other.txt\", b\"SECRET\")), pinned=False\n    |\n\n\nFixed 3 errors:\n- tests\\discovery_runtime\\analyzer\\test_ui_callback_limits.py:\n    2 \u00d7 I001 (unsorted-imports)\n- tests\\discovery_runtime\\analyzer\\test_ui_callbacks.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 8 errors (3 fixed, 5 remaining).\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n",
+  "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "scope": "P4-T6 UI subset only"
+}
