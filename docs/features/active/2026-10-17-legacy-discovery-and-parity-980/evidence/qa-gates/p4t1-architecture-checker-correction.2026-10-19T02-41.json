@@ -1,0 +1,25 @@
+{
+  "after": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-after.2026-10-19T02-41.txt",
+    "sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5"
+  },
+  "all_26_source_test_hashes_unchanged": true,
+  "before": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-before.2026-10-19T02-41.txt",
+    "provenance": "Reconstructed by reversing the exact single recorded patch against the preserved corrected UTF-8 LF script; no pre-edit digest was captured.",
+    "sha256": "fdc6816ca1fc0640d98c6e26e6351e353fc371643e3c8fe686e52ff518ea0a1d"
+  },
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-repair-manifest.2026-10-19T02-32.json",
+  "guards": [
+    "repository-tooling imports rejected",
+    "process and network imports rejected",
+    "os access restricted to exact lexical path operations",
+    "optional domain imports rejected",
+    "native mutation imports restricted to the composition pipeline",
+    "thin adapters and in-memory tests checked"
+  ],
+  "reason": "An unconditional os import ban falsely rejected reviewed lexical os.path.relpath and os.sep operations.",
+  "retained_failure": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-architecture-run-023540.2026-10-19T02-35.json",
+  "scope": "throwaway architecture checker only; production and tests unchanged",
+  "timestamp": "2026-10-19T02:41:08.725899+00:00"
+}

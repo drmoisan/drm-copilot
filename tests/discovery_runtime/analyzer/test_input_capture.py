@@ -323,6 +323,7 @@ class MemoryRepository:
         self.files = files
         self.calls: list[str] = []
         self.wrong_path = False
+        self.change_after_read = False
 
     def identity(self) -> RepositoryIdentity:
         """Return the configured synthetic checkout identity without inferring it.
@@ -343,26 +344,31 @@ class MemoryRepository:
 
         Returns RepositoryFile containing exact immutable fixture bytes. Raises
         FileNotFoundError for absent blobs or AssertionError for invalid requests;
-        appends only to the fixture call list.
+        records calls and may change its synthetic checkout identity.
         """
         assert revision == self.local.revision and limit > 0
         self.calls.append(path)
         if path not in self.files:
             raise FileNotFoundError(path)
-        return RepositoryFile(
+        result = RepositoryFile(
             repository=self.local,
             path="docs/wrong" if self.wrong_path else path,
             content=self.files[path],
         )
+        # Simulate a valid last blob followed by an independently changed checkout.
+        if self.change_after_read:
+            self.local = RepositoryIdentity(id=self.local.id, revision="b" * 40)
+        return result
 
 
+@pytest.mark.parametrize("change_during_read", [False, True])
 def test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_pins(
-    analyzer_catalog: SchemaCatalog,
+    analyzer_catalog: SchemaCatalog, change_during_read: bool
 ) -> None:
     """Publication precapture is idempotent and never substitutes working-copy bytes.
 
     Parameters: analyzer_catalog (SchemaCatalog): immutable installed schema
-    fixture.
+    fixture. change_during_read (bool): inject a checkout change during its last read.
 
     Returns None. Raises AssertionError when the asserted contract differs; uses
     only test-local memory and immutable schema fixtures.
@@ -379,6 +385,13 @@ def test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_p
         metadata=((".", store.metadata(".")),),
     )
     repository = MemoryRepository(profile, {source.path: source.content})
+    repository.change_after_read = change_during_read
+    # Even an otherwise valid final object cannot authorize a stale checkout capture.
+    if change_during_read:
+        with pytest.raises(ValueError, match="identity changed during source capture"):
+            pin_inventory_sources(workspace, repository)
+        assert repository.calls == [source.path]
+        return
     first = pin_inventory_sources(workspace, repository)
     assert first.snapshot.repository_files[0].content == source.content
     assert pin_inventory_sources(first, repository) == first
@@ -393,3 +406,46 @@ def test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_p
     repository.local = RepositoryIdentity(id="other", revision="b" * 40)
     with pytest.raises(ValueError, match="configured local pin"):
         pin_inventory_sources(workspace, repository)
+
+
+def test_branching_frontier_is_bounded_before_descendant_reads(
+    analyzer_catalog: SchemaCatalog,
+) -> None:
+    """Reject cumulative entries even when every directory individually fits.
+
+    analyzer_catalog (SchemaCatalog) supplies immutable schemas. Returns None;
+    assertion failure identifies unbounded traversal. Uses only local memory.
+    """
+    profile = inventory_profile(
+        analyzer_catalog, documentation_roots=[], limits={"source_files": 4}
+    )
+    store = MemoryStore()
+    # Each directory is individually small, but their combined frontier is too large.
+    for name in ("a", "b", "c"):
+        store.put(f"src/{name}/one", b"first")
+        store.put(f"src/{name}/two", b"second")
+    with pytest.raises(ValueError, match="aggregate entry limit"):
+        read_capture(profile, store)
+    assert not store.calls, "Traversal must fail before reading queued descendants"
+
+
+def test_overlapping_roots_share_one_discovered_entry_budget(
+    analyzer_catalog: SchemaCatalog,
+) -> None:
+    """Preserve deterministic deduplication when configured roots overlap.
+
+    analyzer_catalog (SchemaCatalog) supplies immutable schemas. Returns None;
+    assertion failure indicates duplicate allocation or reads. Uses only memory.
+    """
+    profile = inventory_profile(
+        analyzer_catalog,
+        production_roots=["src", "src/nested"],
+        project_entry_points=["src/nested/a.cs"],
+        documentation_roots=[],
+        limits={"source_files": 3},
+    )
+    store = MemoryStore()
+    store.put("src/nested/a.cs", b"class A {}")
+    result = read_capture(profile, store)
+    assert [item.path for item in result.inputs] == ["src/nested/a.cs"]
+    assert len(store.calls) == 2, "Only original and freshness reads are permitted"

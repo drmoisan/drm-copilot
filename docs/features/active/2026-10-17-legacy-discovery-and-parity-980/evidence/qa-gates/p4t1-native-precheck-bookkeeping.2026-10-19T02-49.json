@@ -1,0 +1,19 @@
+{
+  "precheck_initial_failure": {
+    "assertion": "before.replace(\"/existing.md\", \"/coverage-report.md\") == after",
+    "cause": "read_text universally normalized prior CRLF while the current byte decode preserved CRLF",
+    "correction": "Decode both exact byte arrays as UTF-8 before comparing the single filename change",
+    "exit_code": 1,
+    "native_executed": false,
+    "stage": "Before native invocation or evidence writes"
+  },
+  "rendering": {
+    "after_sha256": "579cf93041b72f86b414e80d817a130b99ad9b72d268db4aef99a97933edb920",
+    "before_sha256": "a75de21212304cc72217ecae3cd0286f07587f43020e0151341d238c7119dbb5",
+    "change": "Normalize Markdown line endings and strip trailing display whitespace; raw before/after harness files and JSON are unchanged.",
+    "original_location": "SCRATCH",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-fixture-correction.2026-10-19T02-47.md"
+  },
+  "scope": "Throwaway precheck harness and rendered evidence only; no production/test changes",
+  "timestamp": "2026-10-19T02:49:08.640468+00:00"
+}

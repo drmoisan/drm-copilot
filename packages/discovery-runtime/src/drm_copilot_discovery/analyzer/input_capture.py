@@ -109,12 +109,17 @@ def capture_snapshot(snapshot: DiscoverySnapshot) -> InventoryCapture:
     and ProfileError for draft configuration; performs no I/O or mutation.
     """
     rules = exclusion_rules(snapshot.profile)
-    # Retain only selected repository inputs; artifact payloads have separate roles.
-    inputs = [
-        InventoryInput(path=file.path, status="inspected", file=file)
-        for file in snapshot.manifest.files
-        if file.category in {"source", "test", "documentation"}
-    ]
+    inputs: list[InventoryInput] = []
+    # Documentation captures can contain generated views; exclude them before claims.
+    for file in snapshot.manifest.files:
+        if file.category not in {"source", "test", "documentation"}:
+            continue
+        reason = exclusion_reason(file.path, rules)
+        inputs.append(
+            InventoryInput(path=file.path, status="excluded", rationale=reason)
+            if reason is not None
+            else InventoryInput(path=file.path, status="inspected", file=file)
+        )
     # Every omitted frontier must remain explainable from the current configuration.
     for path in snapshot.excluded_paths:
         reason = exclusion_reason(path, rules)
@@ -177,9 +182,12 @@ def capture_inputs(
         + profile.project_entry_points
         + profile.documentation_roots
     )
-    pending = list(check_path_collisions(sorted(set(roots))))
+    selected = check_path_collisions(sorted(set(roots)))
+    if len(selected) > profile.limits.source_files:
+        raise ValueError("Analyzer root enumeration limit exceeded")
+    pending = list(selected)
     heapq.heapify(pending)
-    visited: set[str] = set()
+    discovered = set(selected)
     inputs: list[InventoryInput] = []
     rules = exclusion_rules(profile)
     total_bytes = 0
@@ -191,11 +199,6 @@ def capture_inputs(
     # Ordinal traversal makes both successful input order and bounded failures stable.
     while pending:
         path = heapq.heappop(pending)
-        if path in visited:
-            continue
-        visited.add(path)
-        if len(visited) > profile.limits.source_files:
-            raise ValueError("Analyzer entry enumeration limit exceeded")
         reason = exclusion_reason(path, rules)
         # Prune configured frontiers before probing descendants or opening bytes.
         if reason is not None:
@@ -210,7 +213,14 @@ def capture_inputs(
                 raise ValueError("Analyzer directory enumeration limit exceeded")
             # Keep all immediate children, including hidden and unfamiliar filenames.
             for child in entry.children:
-                heapq.heappush(pending, f"{path}/{child}")
+                child_path = f"{path}/{child}"
+                # Overlapping roots cost one entry; reject new allocation at the bound.
+                if child_path in discovered:
+                    continue
+                if len(discovered) >= profile.limits.source_files:
+                    raise ValueError("Analyzer aggregate entry limit exceeded")
+                discovered.add(child_path)
+                heapq.heappush(pending, child_path)
             continue
         try:
             content = cast(
@@ -293,6 +303,9 @@ def pin_inventory_sources(
                 "Inventory repository reader returned an unexpected object"
             )
         objects.append(source)
+    # A checkout change during the final blob read invalidates the whole capture.
+    if repository.identity() != identity:
+        raise ValueError("Inventory repository identity changed during source capture")
     return replace(
         workspace, snapshot=replace(snapshot, repository_files=tuple(objects))
     )

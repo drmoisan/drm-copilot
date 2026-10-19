@@ -1,0 +1,225 @@
+{
+  "task": "P4-T1",
+  "timestamp": "2026-10-19T02:34:39.161748+00:00",
+  "scope": "R1/R2/R3 repair confirmation only; prior consolidated review and loader acceptance retained",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "checked_wip": "34278a5db7fed0653886c46e599304691628a4b9",
+  "repair_manifest_sha256": "24ec9da90b13ad248b38aea135a7cbaf34d209f9e8a3025c345408a999b2628a",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "physical_lines": 1
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "physical_lines": 228
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "physical_lines": 142
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "physical_lines": 328
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "physical_lines": 293
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "physical_lines": 270
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "physical_lines": 57
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "physical_lines": 8
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "physical_lines": 20
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "physical_lines": 26
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "physical_lines": 14
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "physical_lines": 451
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "physical_lines": 353
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "physical_lines": 201
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "physical_lines": 342
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "physical_lines": 205
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "physical_lines": 90
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "physical_lines": 422
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "physical_lines": 213
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "physical_lines": 226
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "physical_lines": 129
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "physical_lines": 144
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "physical_lines": 145
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "physical_lines": 210
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "physical_lines": 486
+    }
+  ],
+  "changed_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+    "tests/discovery_runtime/analyzer/test_input_capture.py",
+    "tests/discovery_runtime/analyzer/test_pipeline.py"
+  ],
+  "unchanged_reviewed_paths": 23,
+  "repair_receipt_bindings": [
+    {
+      "name": "collected-nodes",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-collected-nodes-run-023258.2026-10-19T02-32.json",
+      "sha256": "d9f803cd9b33e14973f5566fcafc25b098d10f0a8c74f38647f3793ced6770df",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-format-run-022726.2026-10-19T02-27.json",
+      "sha256": "2034b5834627ee82fa547f11bdcd1ae53bebf15a0dfd247c7ae741e26d67a67c",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-lint-run-022726.2026-10-19T02-27.json",
+      "sha256": "651872f4d160411b75e02175779ec3d97bd929aa67bcfe3abe2dcc2d5c9e89bb",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "tests",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-tests-run-023133.2026-10-19T02-31.json",
+      "sha256": "af72eeaf8ee093c2bb7acd18d28b6b91428c76650f4ccecee6e9cdadb834c6a0",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "name": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-repair-types-run-022728.2026-10-19T02-27.json",
+      "sha256": "194e8bd0b01f3bf6efa1ccebf21ee31de437c1d2965ae7527ddccfd65ae748ce",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "proofs": [
+    {
+      "id": "R1",
+      "result": "PASS",
+      "path": "docs/migration/discovery/reports/coverage-report.md",
+      "status": "excluded",
+      "rationale": "Discovery artifact or evidence output.",
+      "bytes_hash_and_git_request_absent": true
+    },
+    {
+      "id": "R2",
+      "result": "PASS",
+      "actionable_failure": "Inventory repository identity changed during source capture"
+    },
+    {
+      "id": "R3",
+      "result": "PASS",
+      "configured_entries": 4,
+      "maximum_pending_entries": 3,
+      "reads_before_rejection": 0,
+      "actionable_failure": "Analyzer aggregate entry limit exceeded"
+    }
+  ],
+  "new_unit_cases_reviewed": [
+    "generated-report guarded first/repeated publication",
+    "generated-acceptance guarded first/repeated publication",
+    "final-read checkout change",
+    "aggregate branching limit",
+    "overlapping-root deduplication"
+  ],
+  "existing_scenarios_preserved": "19 nodes unchanged plus original publication as [None] and original pin-capture as [False]; five new nodes yield 26 scoped cases.",
+  "full_review_repeated": false,
+  "worker_suites_rerun": false,
+  "task_checked_off": false,
+  "documentation_binding": {
+    "proof_sha256": "1e69d08ab146c667a558089c135c05a528b6a72bb8b1983b6f9c3edee221c386",
+    "tested_sha256": "6b479acd2afb810e727106c1dbff79497f7113067c425a449bb089a33c5ea033",
+    "current_sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+    "verification": "Exact inverse replacement of the one declared docstring sentence recreates the tested SHA-256; executable ASTs are identical.",
+    "executable_ast_sha256": "be515e0cae4472c14fdf76a4fb37eec37a84dfed2fcc8e72bc54b0ac1aaa5582",
+    "gate_reuse_limit": "Focused repair proof only; final ordered gates use current exact bytes."
+  }
+}

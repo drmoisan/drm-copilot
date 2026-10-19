@@ -1,0 +1,11 @@
+{
+  "after_sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+  "before_sha256": "6b479acd2afb810e727106c1dbff79497f7113067c425a449bb089a33c5ea033",
+  "effect": "Document the already tested optional synthetic checkout mutation; no executable statement or assertion changed",
+  "executable_ast_sha256": "497238b089ddaca9199fd228f0e19bf90a8a9a3413ae6eeb93b5bce567976069",
+  "executable_ast_unchanged": true,
+  "original_bytes": "SCRATCH/issue-980-p4t1-tested-input-capture-test.py",
+  "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+  "test_rerun": false,
+  "timestamp": "2026-10-19T02:32:41.897472+00:00"
+}

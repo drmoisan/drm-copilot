@@ -5,7 +5,7 @@ validators.
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import pytest
 from drm_copilot_discovery.analyzer.emitter import inventory_result
@@ -94,10 +94,12 @@ class InventoryWriter(MemoryWriter):
 
 def publication_case(
     catalog: SchemaCatalog,
+    generated: tuple[Literal["reports", "acceptance"], str] | None = None,
 ) -> tuple[InventoryWriter, CapturedWorkspace, InventoryResult, WriteGrant]:
     """Create an incomplete workspace whose first inventory includes a real document.
 
-    Parameters: catalog (SchemaCatalog): trusted immutable schema catalog.
+    Parameters: catalog (SchemaCatalog): trusted immutable schema catalog. generated
+    (tuple[str, str] | None): optional output-root key and generated document name.
 
     Returns tuple[InventoryWriter, CapturedWorkspace, InventoryResult, WriteGrant]
     for guarded publication. Reads and mutates only a new memory store; validation
@@ -108,6 +110,10 @@ def publication_case(
     store.put(profile.artifacts["profile"], canonical_json(profile.document))
     store.put("src/main.cs", b"class Main {}\r\n")
     store.put("docs/guide.md", b"Observed guide.\n")
+    # Existing generated views are output artifacts even inside documentation roots.
+    if generated is not None:
+        kind, name = generated
+        store.put(profile.artifacts[kind] + "/" + name, b"Generated output.\n")
     repository = MemoryRepository(
         profile,
         {"src/main.cs": b"class Main {}\r\n", "docs/guide.md": b"Observed guide.\n"},
@@ -150,19 +156,37 @@ def test_default_and_dry_run_analysis_are_identical_and_do_not_write(
     assert len(first.ledger_components) == 2
 
 
+@pytest.mark.parametrize(
+    "generated",
+    [None, ("reports", "coverage-report.md"), ("acceptance", "criteria.feature")],
+)
 def test_inventory_publication_is_explicit_idempotent_and_scope_preserving(
     analyzer_catalog: SchemaCatalog,
+    generated: tuple[Literal["reports", "acceptance"], str] | None,
 ) -> None:
     """First publication passes real schema/graph/CAS gates and creates only
     inventory.
 
     Parameters: analyzer_catalog (SchemaCatalog): immutable installed schema
-    fixture.
+    fixture. generated (tuple[str, str] | None): optional existing generated output.
 
     Returns None. Raises AssertionError when the asserted contract differs; uses
     only test-local memory and immutable schema fixtures.
     """
-    writer, baseline, result, grant = publication_case(analyzer_catalog)
+    writer, baseline, result, grant = publication_case(analyzer_catalog, generated)
+    # Output bytes may be documentation to the loader but never analyzer sources.
+    if generated is not None:
+        kind, name = generated
+        output_path = baseline.snapshot.profile.artifacts[kind] + "/" + name
+        excluded = next(
+            item
+            for item in capture_snapshot(baseline.snapshot).inputs
+            if item.path == output_path
+        )
+        assert excluded.status == "excluded" and excluded.rationale
+        assert excluded.file is None and excluded.sha256 is None
+        assert output_path not in writer.repository.calls
+        assert output_path not in {item["path"] for item in result.ledger_components}
     before = dict(writer.store.files)
     plan = plan_inventory(baseline, result, grants=(grant,))
     assert dict(writer.store.files) == before
