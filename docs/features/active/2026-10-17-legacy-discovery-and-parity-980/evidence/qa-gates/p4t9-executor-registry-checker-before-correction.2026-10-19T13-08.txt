@@ -1,0 +1,143 @@
+"""Bind one frozen registry review; retain dependency proof without reviewing it."""
+from pathlib import Path
+import base64
+import datetime as dt
+import hashlib
+import json
+
+F = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+E = F / 'evidence'
+Q = E / 'qa-gates'
+sha = lambda raw: hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': sha(Path(path).read_bytes())}
+
+
+def load(path, digest=None):
+    raw = Path(path).read_bytes()
+    assert digest is None or sha(raw) == digest, str(path)
+    return json.loads(raw)
+
+
+def walk(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
+
+route_id = 'atomic_execution_p4t9_incremental_review'
+routes = [item for item in walk(load('artifacts/orchestration/orchestrator-state.json')) if item.get('delegation_id') == route_id and item.get('deployment_agent')]
+assert len(routes) == 1
+route = routes[0]
+assert (route['deployment_agent'], route['model'], route['model_reasoning_effort']) == ('atomic-executor-c4', 'gpt-6-astra', 'max')
+profile_sha = sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes())
+assert profile_sha == route['profile_sha256'] == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+authority = load(Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json')
+assert authority['profile_sha256'] == profile_sha
+assert all(authority[name] is True for name in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+freeze_path = E / 'regression-testing/p4t9-registry-freeze.2026-10-19T13-00.json'
+freeze = load(freeze_path, '32f5966bdba3d0c5819fb029eaa3c41d3c9550f902d1fc3d4b5f2ab1cc19afbf')
+staging_path = E / 'regression-testing/p4t9-registry-staging.2026-10-19T13-00.json'
+staging = load(staging_path, '5c2d79a0625bb0c094eb54b35e04f8d1cc6a711c84c4dfe85e231cebb4e5e20d')
+assert len(freeze['owned_paths']) == 5
+for path, binding in freeze['bindings'].items():
+    raw = Path(path).read_bytes()
+    assert sha(raw) == binding['sha256'] and len(raw.splitlines()) == binding['physical_lines'] <= 500, path
+for path, digest in staging['files'].items():
+    assert sha(Path(path).read_bytes()) == digest, path
+assert freeze['baseline']['sha256'] == '4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a'
+load(freeze['baseline']['path'], freeze['baseline']['sha256'])
+archive = load(freeze['archive']['path'], freeze['archive']['sha256'])
+decoded = {}
+for name, entry in archive['entries'].items():
+    raw = base64.b64decode(entry['base64'], validate=True)
+    assert sha(raw) == entry['sha256'], name
+    decoded[name] = raw
+assert len(decoded) == 48
+records = []
+last = None
+for stage, (path, digest) in zip(('format', 'lint', 'types', 'unit'), freeze['gate_records'].items(), strict=True):
+    gate = load(path, digest)
+    assert gate['stage'] == stage and gate['exit_code'] == 0
+    assert gate['source_before'] == gate['source_after'] == freeze['bindings']
+    start, finish = (dt.datetime.fromisoformat(gate[key]) for key in ('started', 'finished'))
+    assert start <= finish and (last is None or last <= start)
+    last = finish
+    for stream in gate['streams'].values():
+        raw = decoded[stream['scratch_identifier']]
+        assert len(raw) == stream['raw_bytes'] and sha(raw) == stream['raw_sha256']
+    records.append({'path': path, 'sha256': digest, 'stage': stage, 'exit_code': 0})
+    if stage == 'unit':
+        output = decoded[gate['streams']['stdout']['scratch_identifier']].decode('utf-8')
+        assert '77 passed' in output
+        offset = 0
+        for node in freeze['nodes']:
+            offset = output.index(node + ' PASSED', offset) + len(node)
+assert freeze['test_count'] == len(freeze['nodes']) == len(set(freeze['nodes'])) == 77
+coverage = load(freeze['coverage_artifact']['path'], freeze['coverage_artifact']['sha256'])
+summaries = [value['summary'] for value in freeze['coverage'].values()]
+totals = {key: sum(value[key] for value in summaries) for key in ('covered_lines', 'num_statements', 'covered_branches', 'num_branches')}
+assert tuple(totals.values()) == (63, 63, 28, 28)
+assert any(b'31 passed' in raw and b'failed' in raw for name, raw in decoded.items() if name.endswith('.stdout.bin'))
+
+command = 'poetry run python SCRATCH/issue-980-p4t9-registry-review.py'
+result = {
+    'status': 'REGISTRY_SUBSET_REVIEW_PASS', 'task': 'P4-T9', 'command': command, 'exit_code': 0,
+    'authority_receipt': route_id, 'native_authority_valid': True, 'profile_sha256': profile_sha,
+    'accepted_baseline': 'c64b35435d1c1597830d8dd03e661d7944192065',
+    'freeze': ref(freeze_path), 'owner_staging': ref(staging_path), 'shared_baseline': freeze['baseline'],
+    'reviewed_scope': [{'path': path, **freeze['bindings'][path]} for path in freeze['owned_paths']],
+    'dependency_only': [{'path': path, **freeze['bindings'][path]} for path in freeze['dependency_only']],
+    'checks': [
+        'Analyzer is the exported InventoryAdapter protocol alias, distinct from the legacy pipeline API.',
+        'The complete sorted 12-identity/version catalog returns fresh immutable data without optional implementation import or execution authority.',
+        'Validated configured profiles and the complete supported selector set are checked before the fixed optional import; generic selectors use literal imports.',
+        'Every fixed selector has class/identifier coverage; generic and optional combined dispatch preserve source hashes, file accounting, determinism, nullable relationships and uninspected coverage proposals.',
+        'Unavailable, excluded and unpinned inputs retain blockers; combined rows do not expose fixture argument values.',
+        'The neutrality exception covers only the exact reserved optional string and literal dispatch/import/constructor AST; unrelated literals and branch business logic remain rejected.',
+        'Typed contracts, intent comments, file sizes and isolated memory-only dispatch tests were inspected within the five-path scope.',
+    ],
+    'focused_proof': {'records': records, 'cases': 77, 'coverage': totals, 'exact_archived_payloads': 48},
+    'historical_failure': 'The retained earlier 31-pass import-trap failure was a test observer rejecting required core imports. The corrected observer forwards ordinary imports and still asserts that optional imports do not occur before rejection; draft-profile and metadata-only all-import traps remain scoped to their intended boundaries.',
+    'findings': [], 'open_behavioral_probes': [], 'new_behavioral_runs': 0,
+    'qualification': 'This is one immutable subset of the ongoing consolidated P4-T9 review. The emitter is hash-bound as a dependency only; its implementation and extension-result validation remain separately reviewed subsets. No predecessor suites or source review were repeated.',
+    'pending': ['Shared input/emitter subset review', 'Core extension-result subset review', 'Complete composed final gates and task acceptance'],
+    'source_test_plan_ac_checkpoint_git_mutations': False, 'task_checkoff': False,
+}
+
+
+def publish(stem, suffix, data):
+    now = dt.datetime.now(dt.timezone.utc)
+    stamp = now.strftime('%Y-%m-%dT%H-%M')
+    path = Q / f'{stem}.{stamp}{suffix}'
+    assert not path.exists()
+    if isinstance(data, dict):
+        data = (json.dumps({**data, 'timestamp': stamp, 'published_utc': now.isoformat()}, indent=2) + '\n').encode()
+    assert b'\r' not in data and data.endswith(b'\n') and not data.endswith(b'\n\n')
+    assert all(line.rstrip() == line for line in data.splitlines())
+    path.write_bytes(data)
+    return path
+
+
+proof = publish('p4t9-executor-registry-review', '.json', result)
+stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+markdown = publish('p4t9-executor-registry-review', '.md', (
+    f'# P4-T9 registry subset review\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n'
+    'Output Summary: REGISTRY_SUBSET_REVIEW_PASS; no findings or open behavioral probes.\n\n'
+    'Reviewed only the five frozen registry/public-export/dispatch-test/neutrality paths. The current protocol alias, fixed 12-identity metadata, complete pre-import profile/selection guard, literal dispatch, combined accounting and narrow neutrality allowance satisfy this subset contract. The emitter hash binds composition proof and is not included in this implementation review.\n\n'
+    'Retained proof: clean ordered format/lint/types and 77 cases, 63/63 statements and 28/28 branches. All five source/test bindings, the dependency binding, focused raw streams and 48 lossless archived payloads reconcile. The earlier import-trap failure remains preserved; its corrected observer retains the intended optional-import negative boundary. No suite or behavioral probe was replayed.\n\n'
+    'This subset can be checkpointed. Shared/core subset review and complete final gates remain pending. No P4-T9 or AC checkbox changed; current accepted counts remain 40/84 tasks and 13/66 AC.\n'
+).encode())
+harness = publish('p4t9-executor-registry-review-harness', '.txt', Path(__file__).read_bytes())
+paths = [proof, markdown, harness]
+now = dt.datetime.now(dt.timezone.utc)
+staging_path = Q / ('p4t9-executor-registry-staging.' + now.strftime('%Y-%m-%dT%H-%M') + '.json')
+staging_output = publish('p4t9-executor-registry-staging', '.json', {'task': 'P4-T9', 'status': result['status'], 'files': [ref(path) for path in paths], 'stage_paths': [path.as_posix() for path in paths + [staging_path]], 'source_test_plan_ac_checkpoint_git_mutations': False})
+assert staging_output == staging_path
+print(json.dumps({'status': result['status'], 'review': ref(proof), 'markdown': ref(markdown), 'staging': ref(staging_output), 'findings': [], 'open_probes': []}))

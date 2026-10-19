@@ -1,0 +1,479 @@
+{
+  "absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+    "tests/discovery_runtime/test_extension_inputs.py",
+    "tests/discovery_runtime/test_extension_inventory_merge.py",
+    "tests/discovery_runtime/test_extension_results.py"
+  ],
+  "affected_existing_callers": [
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad"
+      },
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad"
+      },
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    }
+  ],
+  "authority": {
+    "agent_id": "01a1515c-7fd8-7440-8b34-e14e5b3178c8",
+    "attestation_sha256": "2d2ed086137673ee0e3d2644d29f055377f7d07b5b443e8bd8187d61a1a72423",
+    "delegation_id": "workspace_operations_p4t9_baseline_core",
+    "launch_authority_valid": true,
+    "model": "gpt-6-astra",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+    "provenance_valid": true,
+    "reasoning_effort": "max",
+    "routing_valid": true
+  },
+  "coverage_baselines": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-49.json",
+        "sha256": "a960cfad811d277b12690c2bc92e8eaccff62c105f908ffd6760affc524ceb23",
+        "totals": {
+          "covered_branches": 120,
+          "covered_lines": 467,
+          "excluded_lines": 58,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 120,
+          "num_partial_branches": 0,
+          "num_statements": 467,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      "summary": {
+        "covered_branches": 0,
+        "covered_lines": 0,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "num_statements": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "units": []
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-49.json",
+        "sha256": "a960cfad811d277b12690c2bc92e8eaccff62c105f908ffd6760affc524ceb23",
+        "totals": {
+          "covered_branches": 120,
+          "covered_lines": 467,
+          "excluded_lines": 58,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 120,
+          "num_partial_branches": 0,
+          "num_statements": 467,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      "summary": {
+        "covered_branches": 14,
+        "covered_lines": 50,
+        "excluded_lines": 4,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "num_statements": 50,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "units": [
+        {
+          "kind": "functions",
+          "missing_lines": [],
+          "name": "compute_schema_ref",
+          "summary": {
+            "covered_branches": 2,
+            "covered_lines": 8,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "num_statements": 8,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "missing_lines": [],
+          "name": "serialize_record",
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 3,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 3,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "missing_lines": [],
+          "name": "_ordered",
+          "summary": {
+            "covered_branches": 4,
+            "covered_lines": 6,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "num_statements": 6,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "missing_lines": [],
+          "name": "inventory_result",
+          "summary": {
+            "covered_branches": 8,
+            "covered_lines": 18,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "num_statements": 18,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-coverage-ranges.2026-10-19T12-25.json",
+        "sha256": "9ee93fa83f87abae6b8e2a9ee80a8500ccfaf1a4d485314f2ade4070ae14a42a"
+      },
+      "summary": {
+        "covered_branches": 8,
+        "covered_lines": 23,
+        "excluded_lines": 7,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "num_statements": 23,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "units": [
+        {
+          "end": 36,
+          "kind": "ClassDef",
+          "name": "InventoryAdapter",
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+          "start": 18,
+          "status": "new-or-changed-or-covered-unit",
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 2,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "end": 27,
+          "kind": "FunctionDef",
+          "name": "InventoryAdapter.identifier",
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+          "start": 22,
+          "status": "new-or-changed-or-covered-unit",
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 1,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "end": 36,
+          "kind": "FunctionDef",
+          "name": "InventoryAdapter.analyze",
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+          "start": 29,
+          "status": "new-or-changed-or-covered-unit",
+          "summary": {
+            "covered_branches": 0,
+            "covered_lines": 0,
+            "excluded_lines": 1,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "num_statements": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        },
+        {
+          "end": 72,
+          "kind": "FunctionDef",
+          "name": "select_analyzers",
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+          "start": 39,
+          "status": "new-or-changed-or-covered-unit",
+          "summary": {
+            "covered_branches": 8,
+            "covered_lines": 14,
+            "excluded_lines": 0,
+            "missing_branches": 0,
+            "missing_lines": 0,
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "num_statements": 14,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100",
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100"
+          }
+        }
+      ]
+    }
+  ],
+  "existing_files": [
+    {
+      "commit_sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "lines": 1,
+      "original": "SCRATCH/issue-980-p4t9-baseline-originals-2026-10-19T12-41-55/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad"
+      },
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "stream_relation": "identical"
+    },
+    {
+      "commit_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "lines": 228,
+      "original": "SCRATCH/issue-980-p4t9-baseline-originals-2026-10-19T12-41-55/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad"
+      },
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "stream_relation": "identical"
+    },
+    {
+      "commit_sha256": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff",
+      "lines": 72,
+      "original": "SCRATCH/issue-980-p4t9-baseline-originals-2026-10-19T12-41-55/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+        "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+      },
+      "sha256": "b4239d408343abc7675c9dff63ecbd31d3ffcd3c5ac2206d50b7abb8dfb9ecff",
+      "stream_relation": "identical"
+    },
+    {
+      "commit_sha256": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2",
+      "lines": 310,
+      "original": "SCRATCH/issue-980-p4t9-baseline-originals-2026-10-19T12-41-55/tests/discovery_runtime/analyzer/test_registry.py",
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+        "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+      },
+      "sha256": "e77b6a9ed10854b182f5440617c6fedaededb200a546126905d7b47f64f606a2",
+      "stream_relation": "identical"
+    },
+    {
+      "commit_sha256": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80",
+      "lines": 210,
+      "original": "SCRATCH/issue-980-p4t9-baseline-originals-2026-10-19T12-41-55/tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+        "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+      },
+      "sha256": "653c804f505684a2ffee38d806f9a21a49c0b25bbebd189481fad230966cfe80",
+      "stream_relation": "identical"
+    }
+  ],
+  "head": "c64b35435d1c1597830d8dd03e661d7944192065",
+  "mutation_scope": "Read-only source/test capture; only canonical baseline evidence and external SCRATCH originals written. Coordinator releases each owner separately.",
+  "newly_necessary_existing_caller_tests": [],
+  "ownership": {
+    "inventory_analyzers": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "tests/discovery_runtime/test_extension_inputs.py",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py"
+    ],
+    "source_inspection_preparation": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "tests/discovery_runtime/analyzer/test_registry.py",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py"
+    ],
+    "workspace_operations": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "tests/discovery_runtime/test_extension_results.py",
+      "tests/discovery_runtime/test_extension_inventory_merge.py"
+    ]
+  },
+  "retained_proof": {
+    "emitter_and_initializer": {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-49.json",
+        "sha256": "a960cfad811d277b12690c2bc92e8eaccff62c105f908ffd6760affc524ceb23",
+        "totals": {
+          "covered_branches": 120,
+          "covered_lines": 467,
+          "excluded_lines": 58,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 120,
+          "num_partial_branches": 0,
+          "num_statements": 467,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      "handoff": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "sha256": "20ceec2f6b7a2b9cb3da00b2a7c6e3893df049efd5500ef8e68e5b40fa83d7ad"
+      },
+      "ordered_stages": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-ordered-stages.2026-10-19T02-55.json",
+        "sha256": "702d45312061762db8729997d41e01d434aa556e548b1a7c75db52d34cdcff54"
+      },
+      "reason": "Existing emitter, initializer and affected emitter/pipeline test bytes exactly match the accepted P4-T1 proof; no behavior or dependency prerequisite changed."
+    },
+    "registry_and_neutrality_callers": {
+      "coverage_ranges": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-coverage-ranges.2026-10-19T12-25.json",
+        "sha256": "9ee93fa83f87abae6b8e2a9ee80a8500ccfaf1a4d485314f2ade4070ae14a42a"
+      },
+      "handoff": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+        "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+      },
+      "ordered_stages": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-ordered-stages.2026-10-19T12-25.json",
+        "sha256": "b6c0d95922b4a7dacf532fc2d146ee4a05a9278ad7f9a395ebcc93e1981ab6a0"
+      },
+      "reason": "Existing registry and affected registry/domain-neutrality tests exactly match the just-accepted P4-T8 proof."
+    }
+  },
+  "state": "BASELINE_READY",
+  "task": "P4-T9",
+  "test_reuse_reason": "Exact current source/caller hashes and complete passing immutable receipts satisfy this baseline. No accepted analyzer suite was replayed.",
+  "tests_run": false,
+  "timestamp": "2026-10-19T12-41",
+  "unrelated_predecessors": {
+    "candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-candidate-binding.2026-10-19T12-25.json",
+      "sha256": "7b05db5b10ee86187a806612842b2406d1977ad80b1ff4ddb0c49a45a1f5af2c"
+    },
+    "derivation": "Union of candidate preserved_files, files and fixtures, excluding the exact 12 owned task paths; no copied predecessor metadata.",
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+      "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+    },
+    "validated_stream_count": 93
+  },
+  "written_at": "2026-10-19T12:41:55.763899+00:00"
+}

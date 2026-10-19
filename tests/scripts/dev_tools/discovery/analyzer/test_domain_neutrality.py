@@ -62,13 +62,36 @@ def _registry_without_routing_metadata(text: str) -> str:
     ]
     assert len(functions) == 1
     function = functions[0]
-    # Recognize the fixed availability set rather than arbitrary domain strings.
-    sets = [node for node in ast.walk(function) if isinstance(node, ast.Set)]
-    assert len(sets) == 1
-    assert ast.dump(sets[0]) == ast.dump(
-        ast.parse('{"repository", "office-vsto"}', mode="eval").body
+    # Permit only the optional ID within the exact complete reserved metadata tuple.
+    declarations = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id == "_BUILTIN_IDENTIFIERS"
+    ]
+    assert len(declarations) == 1
+    identifiers = declarations[0].value
+    expected_ids = (
+        "com-interop",
+        "configuration",
+        "csharp-symbols",
+        "dependencies",
+        "dotnet",
+        "event-subscriptions",
+        "filesystem-access",
+        "office-vsto",
+        "registry-access",
+        "repository",
+        "test-references",
+        "ui-callbacks",
     )
-    allowed.append(sets[0].elts[1])
+    assert ast.dump(identifiers) == ast.dump(
+        ast.parse(repr(expected_ids), mode="eval").body
+    )
+    assert isinstance(identifiers, ast.Tuple)
+    allowed.append(identifiers.elts[7])
     # Match the complete optional branch, so business logic cannot hide in dispatch.
     branches = [
         node
@@ -81,7 +104,7 @@ def _registry_without_routing_metadata(text: str) -> str:
     from drm_copilot_discovery.analyzer.optional.vsto_office import VstoOfficeAnalyzer
     selected.append(VstoOfficeAnalyzer())
 else:
-    selected.append(RepositoryAnalyzer())
+    selected.append(_generic_analyzer(identifier))
 """).body[0]
     assert ast.dump(branch) == ast.dump(
         expected
