@@ -1,0 +1,355 @@
+{
+  "status": "FROZEN_SUBSET_PENDING_INDEPENDENT_REVIEW",
+  "source_test": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "bytes": 13310
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "bytes": 15042
+    }
+  ],
+  "shared_dependency_sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-coverage.2026-10-19T10-09.json",
+    "sha256": "c60e3cbaef0b3eefccd13260631ab30b10c2891b85d081d23bb867735660a934",
+    "bytes": 11360
+  },
+  "summary": {
+    "covered_lines": 126,
+    "num_statements": 126,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 0,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 66,
+    "num_partial_branches": 0,
+    "covered_branches": 66,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "callable_ranges": [
+    {
+      "name": "_name",
+      "start": 26,
+      "end": 36,
+      "executed_lines": [
+        26,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_xml_candidate",
+      "start": 39,
+      "end": 65,
+      "executed_lines": [
+        39,
+        56
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_project",
+      "start": 68,
+      "end": 151,
+      "executed_lines": [
+        68,
+        77,
+        78,
+        79,
+        81,
+        82,
+        86,
+        87,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        96,
+        101,
+        102,
+        103,
+        104,
+        105,
+        115,
+        117,
+        118,
+        119,
+        120,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        150,
+        151
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_xml",
+      "start": 154,
+      "end": 198,
+      "executed_lines": [
+        154,
+        161,
+        162,
+        163,
+        169,
+        170,
+        173,
+        174,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_object",
+      "start": 201,
+      "end": 209,
+      "executed_lines": [
+        201,
+        207,
+        208,
+        209
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_text",
+      "start": 212,
+      "end": 220,
+      "executed_lines": [
+        212,
+        218,
+        219,
+        220
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_charge",
+      "start": 223,
+      "end": 239,
+      "executed_lines": [
+        223,
+        230,
+        231,
+        232,
+        234,
+        235,
+        236,
+        238,
+        239
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "_lock",
+      "start": 242,
+      "end": 309,
+      "executed_lines": [
+        242,
+        249,
+        251,
+        252,
+        253,
+        262,
+        264,
+        265,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        279,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        297,
+        300,
+        301
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    },
+    {
+      "name": "parse_dotnet_dependencies",
+      "start": 312,
+      "end": 332,
+      "executed_lines": [
+        312,
+        323,
+        324,
+        325,
+        326,
+        328,
+        329,
+        331,
+        332
+      ],
+      "missing_lines": [],
+      "line_percent": 100
+    }
+  ],
+  "classes": "No production classes introduced",
+  "checks": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "bytes": 2253
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.json",
+      "sha256": "82cec0e77841af3196e90a35cf7ed57fbac746f139d62d22ac8bcde23c144a8c",
+      "bytes": 2204
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "bytes": 2386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "bytes": 14760
+    }
+  ],
+  "timings_seconds": {
+    "format": 1.657,
+    "lint": 1.246,
+    "types": 1.925,
+    "unit": 1.962
+  },
+  "baseline": "Reuse shared09:44 absent-path baseline and152 shared cases; no predecessor reruns",
+  "limitations": [
+    "Subset proof only; final composed QA and independent review pending",
+    "Conservative JSON record ceiling max_nodes//64; tiny budgets fail closed",
+    "No build evaluation, central-version activation, imports, restore or installed dependency claims",
+    "Shared repairs remain integration-owned; final composition must bind repaired shared bytes"
+  ],
+  "raw_sqlite": {
+    "path": "SCRATCH/p4t7-dotnet-focused6.coverage",
+    "sha256": "95c4a529fef0f6ac0fde3a9455f917c5da66e8715c6a7e38ea1f4204af64900c"
+  },
+  "retained_history": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.json",
+      "sha256": "7ef1db533a5a144c8bc139f189481e8ccc0e513e5862a455cb50bafb127b2d28",
+      "bytes": 2259
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.json",
+      "sha256": "3c941d6a6ed7fd4b2c673e00f766109084982d376ebd86477c24ed45c16095db",
+      "bytes": 2077
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-lint.2026-10-19T10-04.json",
+      "sha256": "0ddcad398c9366b58cfa588281536d964f87d6c4031834f4987ce2a7de7b9b1b",
+      "bytes": 8762
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.json",
+      "sha256": "c3c108a59393b360b5678c47b22eb329216c6bb1bb642d6f022270e4d00291b7",
+      "bytes": 2179
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-lint.2026-10-19T10-05.json",
+      "sha256": "920a30ecb31cd39e026ab6c2b7d7e56714e8d3024c47773b8dcf7db481dab94d",
+      "bytes": 2861
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.json",
+      "sha256": "a6efaef27b9fc674b4f654ea63b4a7b19ec4ed6c3ffe54f1262645954802cf56",
+      "bytes": 2078
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lint.2026-10-19T10-05.json",
+      "sha256": "bda738b36b8a7ba37334ecfb39179e63cc6487513f761b46486e4da14da26af0",
+      "bytes": 2029
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lintfix.2026-10-19T10-05.json",
+      "sha256": "71f04be9dc860cb7ff4ba183abf1bfc4e64a50676c0d30d43a54d0b72ac72eb7",
+      "bytes": 2188
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.json",
+      "sha256": "fcb21003eb65e13fa2ac0b6a186cee477aa6bb78825fb8ea205327f5e6ad54e6",
+      "bytes": 2211
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.json",
+      "sha256": "4e3709d940fb5d0bac39b9e35a70a18aaf7930bca8b65e38790b4293f31a14d3",
+      "bytes": 14444
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.json",
+      "sha256": "7eaf991f11b0e442fe7a0f6d612a06704c184a0483dd231aa3be2a38cc7c4aed",
+      "bytes": 2178
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "bytes": 2253
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.json",
+      "sha256": "82cec0e77841af3196e90a35cf7ed57fbac746f139d62d22ac8bcde23c144a8c",
+      "bytes": 2204
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "bytes": 2386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "bytes": 14760
+    }
+  ]
+}

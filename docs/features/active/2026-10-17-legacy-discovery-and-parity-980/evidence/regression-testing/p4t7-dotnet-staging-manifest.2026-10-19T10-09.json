@@ -1,0 +1,190 @@
+{
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "bytes": 13310
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "bytes": 15042
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-coverage.2026-10-19T10-09.json",
+      "sha256": "c60e3cbaef0b3eefccd13260631ab30b10c2891b85d081d23bb867735660a934",
+      "bytes": 11360
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-executed-harnesses.2026-10-19T10-09.json",
+      "sha256": "9c13babfa742babb8fc5e69e6409f90fc31511628f6a89210a264ed9a83e37e3",
+      "bytes": 18226
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.json",
+      "sha256": "7ef1db533a5a144c8bc139f189481e8ccc0e513e5862a455cb50bafb127b2d28",
+      "bytes": 2259
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.md",
+      "sha256": "970105f1b350c493a23f09ffa8f45ff7cbcde17dcd699ef180f5215c576144de",
+      "bytes": 588
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.json",
+      "sha256": "3c941d6a6ed7fd4b2c673e00f766109084982d376ebd86477c24ed45c16095db",
+      "bytes": 2077
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.md",
+      "sha256": "421fb0d68138cba23a46d3e2e574f9f60d0d29634a146733cffca43eb814b03f",
+      "bytes": 418
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-lint.2026-10-19T10-04.json",
+      "sha256": "0ddcad398c9366b58cfa588281536d964f87d6c4031834f4987ce2a7de7b9b1b",
+      "bytes": 8762
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-lint.2026-10-19T10-04.md",
+      "sha256": "45e3ee82b92fc11bb7b92e189e5ba4ec41ec0d1173bf9028645c24d4d003378a",
+      "bytes": 6919
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.json",
+      "sha256": "c3c108a59393b360b5678c47b22eb329216c6bb1bb642d6f022270e4d00291b7",
+      "bytes": 2179
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.md",
+      "sha256": "6ec720c7bf63b7279412d64444fcb96500f275ad488d52a2ee91555e46103ffb",
+      "bytes": 513
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-lint.2026-10-19T10-05.json",
+      "sha256": "920a30ecb31cd39e026ab6c2b7d7e56714e8d3024c47773b8dcf7db481dab94d",
+      "bytes": 2861
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-lint.2026-10-19T10-05.md",
+      "sha256": "8c7c05674e078f4ed6a19603f345e19aaa32374207987eb4306436ac8a083620",
+      "bytes": 1202
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.json",
+      "sha256": "a6efaef27b9fc674b4f654ea63b4a7b19ec4ed6c3ffe54f1262645954802cf56",
+      "bytes": 2078
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.md",
+      "sha256": "fad4e79b37145baef114b705ad60e7dce3df391c76aff9fdccd5e09b8777241d",
+      "bytes": 418
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lint.2026-10-19T10-05.json",
+      "sha256": "bda738b36b8a7ba37334ecfb39179e63cc6487513f761b46486e4da14da26af0",
+      "bytes": 2029
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lint.2026-10-19T10-05.md",
+      "sha256": "a910445e787b325ded6e4d4607f5f1f2ce7f570ef9a030c89a36356eeb80ee83",
+      "bytes": 380
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lintfix.2026-10-19T10-05.json",
+      "sha256": "71f04be9dc860cb7ff4ba183abf1bfc4e64a50676c0d30d43a54d0b72ac72eb7",
+      "bytes": 2188
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lintfix.2026-10-19T10-05.md",
+      "sha256": "dcfbeea38cc7d9e63c4e1278eff02dd48c065e57bf9192c762972097d2b50506",
+      "bytes": 522
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.json",
+      "sha256": "fcb21003eb65e13fa2ac0b6a186cee477aa6bb78825fb8ea205327f5e6ad54e6",
+      "bytes": 2211
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.md",
+      "sha256": "cd5b9dde4a41fc34d8bb982cc4aa70ded264f6c190566abebd1c74d77234e9f1",
+      "bytes": 555
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.json",
+      "sha256": "4e3709d940fb5d0bac39b9e35a70a18aaf7930bca8b65e38790b4293f31a14d3",
+      "bytes": 14444
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.md",
+      "sha256": "934e34d65003d0847d9bc01f218ba5fb85bfee7632efb25ac3614f5495cc1f7e",
+      "bytes": 12468
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.json",
+      "sha256": "7eaf991f11b0e442fe7a0f6d612a06704c184a0483dd231aa3be2a38cc7c4aed",
+      "bytes": 2178
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.md",
+      "sha256": "6937295dabbe269d9ce77bf18613ca1c79b5ef78a8361700183e9a7c764ac3e2",
+      "bytes": 513
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "bytes": 2253
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.md",
+      "sha256": "7fabb6d4ebcd283715253b515d8d500f3b0ceed4a2d369021793dd01789f2f1d",
+      "bytes": 418
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.json",
+      "sha256": "82cec0e77841af3196e90a35cf7ed57fbac746f139d62d22ac8bcde23c144a8c",
+      "bytes": 2204
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.md",
+      "sha256": "b29ceb1a93967bf42aff987238dad9fbfc0b6fc210c139908f4d7d16151fe3b5",
+      "bytes": 380
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "bytes": 2386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.md",
+      "sha256": "a7a2a1ca183d2c45d1e6d71220a71ff96b13864e2c1ff2786e375acbfa5c4b89",
+      "bytes": 555
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "bytes": 14760
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.md",
+      "sha256": "b87fe3715dfc8ddd0030011818658ab97fe032c44587708e76c5911b3c8071bb",
+      "bytes": 12607
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-freeze.2026-10-19T10-09.json",
+      "sha256": "7ad5bb106f6904f99be9b6c1649a77ba2318a1091e5abc1ec05177ae1b99d1b1",
+      "bytes": 10777
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-handoff.2026-10-19T10-09.md",
+      "sha256": "3e97921a105f174973dc2c6e4818f6b68f767928f94c0c94f31399daf4ef18b1",
+      "bytes": 1043
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-nodes.2026-10-19T10-09.json",
+      "sha256": "8c4093aab60f8240e22f58ad2f0fac23442c1a0efe42bd044911c0bd38a27644",
+      "bytes": 10925
+    }
+  ],
+  "review_pending": true
+}

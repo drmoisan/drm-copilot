@@ -1,0 +1,427 @@
+{
+  "status": "FR2_REPAIRED_FROZEN_PENDING_INDEPENDENT_CONFIRMATION",
+  "authority": "snapshot_inventory_p4t7_dotnet_repair; native routing/launch/provenance confirmed by coordinator before mutation",
+  "source_test": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "bytes": 14804
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "bytes": 17468
+    }
+  ],
+  "shared": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    }
+  },
+  "preserved_originals": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-freeze.2026-10-19T10-09.json",
+      "sha256": "7ad5bb106f6904f99be9b6c1649a77ba2318a1091e5abc1ec05177ae1b99d1b1",
+      "bytes": 10777
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-staging-manifest.2026-10-19T10-09.json",
+      "sha256": "bf43f870e96c0a4bda63fabb859d7e6e3a5ce7bea3e927d38f3743a3dd064d17",
+      "bytes": 10216
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-publication-index.2026-10-19T10-15.json",
+      "sha256": "e0ef0da12892cbd8f9a948c475a048640a665ebc3c06a4db023e897a9551fa7a",
+      "bytes": 16471
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.json",
+      "sha256": "3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415",
+      "bytes": 11510
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+      "sha256": "8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52",
+      "bytes": 4018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+      "sha256": "d03a2314d7b3fba6bac99f07bd8602d184bcc15b701e293a6d8557e7cdbc18c5",
+      "bytes": 7089
+    }
+  ],
+  "checks": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-format.2026-10-19T10-29.json",
+      "sha256": "8eb37fc8b25d1b5cfde3a5e61ea502c99fb77fc6827181158c10d68daef64c2c",
+      "bytes": 2921
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-lint.2026-10-19T10-29.json",
+      "sha256": "cd184893022995600760549f899ecf25893826389dd45e2a7853a1d04c93b74a",
+      "bytes": 2872
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-types.2026-10-19T10-29.json",
+      "sha256": "a947c40b57cd993553b6c92faa913bf6df07823a420a3ba85bd67664cf5d7044",
+      "bytes": 3054
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-unit.2026-10-19T10-30.json",
+      "sha256": "31ddf6a0dbc96b0667ca9d5c9285899d557534a1eb975a4da164200c735be0e0",
+      "bytes": 17077
+    }
+  ],
+  "timings": {
+    "format": 1.467,
+    "lint": 1.158,
+    "types": 2.008,
+    "unit": 2.125
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-coverage.2026-10-19T10-30.json",
+    "sha256": "8f6ed3db68b10cd33d240e268540c53f5ca29f9372ae7f0f4d8ab418c7fb5c29",
+    "bytes": 31190
+  },
+  "coverage_original_raw": {
+    "path": "SCRATCH/p4t7-dotnet-repair3-coverage.json",
+    "sha256": "18263f1ba6d909437680022e942be406942560f69bea547414ea38828eee8c6e"
+  },
+  "coverage_summary": {
+    "covered_lines": 141,
+    "num_statements": 141,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 0,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 72,
+    "num_partial_branches": 0,
+    "covered_branches": 72,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "callable_ranges": [
+    {
+      "name": "_name",
+      "start": 31,
+      "end": 41,
+      "covered_lines": [
+        31,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_xml_candidate",
+      "start": 44,
+      "end": 70,
+      "covered_lines": [
+        44,
+        61
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_project_names",
+      "start": 73,
+      "end": 94,
+      "covered_lines": [
+        73,
+        81,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        90,
+        91,
+        93,
+        94
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_project",
+      "start": 97,
+      "end": 180,
+      "covered_lines": [
+        97,
+        106,
+        107,
+        108,
+        110,
+        111,
+        115,
+        116,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        125,
+        130,
+        131,
+        132,
+        133,
+        134,
+        144,
+        146,
+        147,
+        148,
+        149,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        179,
+        180
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_xml",
+      "start": 183,
+      "end": 231,
+      "covered_lines": [
+        183,
+        190,
+        191,
+        192,
+        198,
+        199,
+        202,
+        203,
+        205,
+        210,
+        211,
+        212,
+        213,
+        214,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_object",
+      "start": 234,
+      "end": 242,
+      "covered_lines": [
+        234,
+        240,
+        241,
+        242
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_text",
+      "start": 245,
+      "end": 253,
+      "covered_lines": [
+        245,
+        251,
+        252,
+        253
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_charge",
+      "start": 256,
+      "end": 272,
+      "covered_lines": [
+        256,
+        263,
+        264,
+        265,
+        267,
+        268,
+        269,
+        271,
+        272
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "_lock",
+      "start": 275,
+      "end": 342,
+      "covered_lines": [
+        275,
+        282,
+        284,
+        285,
+        286,
+        295,
+        297,
+        298,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310,
+        312,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        330,
+        333,
+        334
+      ],
+      "missing_lines": [],
+      "percent": 100
+    },
+    {
+      "name": "parse_dotnet_dependencies",
+      "start": 345,
+      "end": 365,
+      "covered_lines": [
+        345,
+        356,
+        357,
+        358,
+        359,
+        361,
+        362,
+        364,
+        365
+      ],
+      "missing_lines": [],
+      "percent": 100
+    }
+  ],
+  "old_cases_preserved": 63,
+  "new_cases": 10,
+  "nodes": [
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageReference-Include]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageReference-Update]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageReference-Remove]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageVersion-Include]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageVersion-Update]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[-PackageVersion-Remove]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageReference-Include]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageReference-Update]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageReference-Remove]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageVersion-Include]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageVersion-Update]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_project_operations[ xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-PackageVersion-Remove]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_metadata_conditions_remain_separate_ambiguous_declarations",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_repeated_declarations_and_missing_version_are_preserved",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_packages_config_keeps_versions_and_tag_lines",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_lock_records_and_declared_edges[Direct]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_lock_records_and_declared_edges[Transitive]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_lock_records_and_declared_edges[Project]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_json_order_is_deterministic_and_unused_metadata_is_bounded",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_values_and_locations_are_redacted[https://user:SECRET@host/file?q=SECRET]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_values_and_locations_are_redacted[$(SECRET)]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_values_and_locations_are_redacted[../SECRET]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_values_and_locations_are_redacted[token:SECRET]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Wrong/>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project xmlns=\"urn:SECRET\"/>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project><PackageReference Include=\"A\"/></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project><ItemGroup><PackageReference/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project><ItemGroup><PackageReference Include=\" \"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project><ItemGroup><PackageReference Include=\"A\" Update=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project><ItemGroup><PackageReference Include=\"A\"><Version><Value>1</Value></Version></PackageReference></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<!DOCTYPE Project [<!ENTITY x \"SECRET\">]><Project/>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_project_never_returns_partial_candidates[<Project xmlns:x=\"http://www.w3.org/2001/XInclude\"><x:include href=\"SECRET\"/></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_packages_config[<packages xmlns=\"urn:SECRET\"/>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_packages_config[<packages><other/></packages>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_packages_config[<packages><package/></packages>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_packages_config[<packages><package id=\" \"/></packages>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_packages_config[<packages><package id=\"A\"><package id=\"B\"/></package></packages>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[[]]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\":1,\"version\":1,\"dependencies\":{}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\":true,\"dependencies\":{}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\":2,\"dependencies\":{}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\":1}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\":1,\"dependencies\":{\"net\":[]}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": []}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"SECRET\"}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"resolved\": 42}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"A\": []}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_invalid_lock_shapes_and_duplicate_members[{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": null}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_bytes-1-project-<Project><ItemGroup><PackageReference Include=\"A\"/><PackageReference Include=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_bytes-1-packages-lock-{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"B\": \"1\"}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_nodes-1-project-<Project><ItemGroup><PackageReference Include=\"A\"/><PackageReference Include=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_nodes-1-packages-lock-{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"B\": \"1\"}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_depth-1-project-<Project><ItemGroup><PackageReference Include=\"A\"/><PackageReference Include=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_depth-1-packages-lock-{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"B\": \"1\"}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_candidates-1-project-<Project><ItemGroup><PackageReference Include=\"A\"/><PackageReference Include=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_candidates-1-packages-lock-{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"B\": \"1\"}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_text_bytes-1-project-<Project><ItemGroup><PackageReference Include=\"A\"/><PackageReference Include=\"B\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_limits_discard_the_entire_population[max_text_bytes-1-packages-lock-{\"version\": 1, \"dependencies\": {\"net8.0\": {\"Alpha\": {\"type\": \"Direct\", \"dependencies\": {\"B\": \"1\"}}}}}]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_line_limit_encoding_and_late_json_work_failure",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_empty_documents_bom_and_invalid_selector",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_xml_selected_values_are_redacted_and_exact_limits_succeed",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[-ProjectExtensions]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[-UsingTask]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[-PropertyGroup]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Target>-ProjectExtensions]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Target>-UsingTask]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Target>-PropertyGroup]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Choose><When Condition=\"SECRET\">-ProjectExtensions]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Choose><When Condition=\"SECRET\">-UsingTask]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_opaque_payloads_cannot_reactivate_dependency_extraction[<Choose><When Condition=\"SECRET\">-PropertyGroup]",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py::test_otherwise_and_nested_choose_keep_genuine_declarations"
+  ],
+  "raw_sqlite": {
+    "path": "SCRATCH/p4t7-dotnet-repair3.coverage",
+    "sha256": "45218d6f5e5018cd4635faf8388418ff88ebc2ed877ebf28c3d3583504329dee"
+  },
+  "limitations": [
+    "No MSBuild evaluation or package resolution",
+    "Opaque nodes remain counted by parser/index limits",
+    "Only .NET pair verified; composed final QA and task acceptance remain coordinator-owned"
+  ],
+  "delta": {
+    "ruff": 0,
+    "pyright": 0,
+    "test_failures": 0,
+    "line_percent": 0,
+    "branch_percent": 0
+  },
+  "repair": "Parent-inherited opaque masks block ProjectExtensions/UsingTask/PropertyGroup descendants before package extraction; genuine Project/Target/Choose/When/Otherwise controls preserved."
+}

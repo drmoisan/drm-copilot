@@ -1,0 +1,131 @@
+"""Probe two concrete parser risks against the original frozen shared contract."""
+
+import hashlib
+import json
+import multiprocessing
+import subprocess
+import sys
+import time
+import types
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def load_module(name, raw):
+    """Load exact captured Python bytes in this isolated probe process only."""
+    module = types.ModuleType(name)
+    module.__package__ = name.rsplit('.', 1)[0]
+    module.__file__ = 'FROZEN/' + name.rsplit('.', 1)[-1] + '.py'
+    sys.modules[name] = module
+    exec(compile(raw, module.__file__, 'exec'), module.__dict__)
+    return module
+
+
+def python_child(connection, shared, parser, count, valid):
+    """Measure one bounded setup.cfg call; a parent timeout limits regex work."""
+    original = load_module('drm_copilot_discovery.analyzer.dependency_inputs', shared)
+    module = load_module('drm_copilot_discovery.analyzer.dependency_python', parser)
+    text = '[metadata]\nx' + ' ' * count + ('!=value' if valid else '!')
+    started = time.perf_counter()
+    try:
+        result = module.parse_python_dependencies(
+            text.encode(), format='setup-cfg', limits=original.DependencyLimits())
+        output = {'status': 'returned', 'candidate_count': len(result.candidates)}
+    except original.DependencyInputError as error:
+        output = {'status': 'fixed-error', 'code': error.code}
+    output['parser_seconds'] = time.perf_counter() - started
+    connection.send(output)
+    connection.close()
+
+
+def run():
+    """Preserve evidence only; never import or review the live shared repair."""
+    root = Path.cwd()
+    feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+    qa = root / feature / 'evidence/qa-gates'
+    base = 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/'
+    expected = {
+        base + 'dependency_python.py': 'dcbf0058a783a54264f7defd8c874cdcb561667c007b4799838d1be014ce875b',
+        base + 'dependency_dotnet.py': 'cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5',
+        'tests/discovery_runtime/analyzer/test_dependency_python.py': '97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a',
+        'tests/discovery_runtime/analyzer/test_dependency_dotnet.py': '8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce',
+    }
+    captured = {path: (root / path).read_bytes() for path in expected}
+    for path, identity in expected.items():
+        assert hashlib.sha256(captured[path]).hexdigest() == identity
+    shared_commit = '1dd386135f0f52c247d7b85ccd766cbc63ebaf4d'
+    shared = subprocess.check_output(
+        ['git', 'show', shared_commit + ':' + base + 'dependency_inputs.py'], cwd=root)
+    shared_hash = hashlib.sha256(shared).hexdigest()
+    assert shared_hash == '3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253'
+    observations = []
+    context = multiprocessing.get_context('spawn')
+    # Each synthetic option line has its own hard operational budget, not a test threshold.
+    for valid in (False, True):
+        for count in (4000, 8000, 16000):
+            parent, child = context.Pipe(duplex=False)
+            process = context.Process(target=python_child, args=(
+                child, shared, captured[base + 'dependency_python.py'], count, valid))
+            started = time.perf_counter()
+            process.start()
+            child.close()
+            process.join(timeout=2.0)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=2.0)
+                assert not process.is_alive()
+                output = {'status': 'operational-timeout', 'child_budget_seconds': 2.0}
+            else:
+                assert process.exitcode == 0 and parent.poll()
+                output = parent.recv()
+            parent.close()
+            output.update(whitespace_count=count, valid_ini_option=valid,
+                          input_bytes=len('[metadata]\nx') + count + len('!=value' if valid else '!'),
+                          parent_elapsed_seconds=time.perf_counter() - started)
+            observations.append(output)
+
+    original = load_module('drm_copilot_discovery.analyzer.dependency_inputs', shared)
+    dotnet = load_module('drm_copilot_discovery.analyzer.dependency_dotnet',
+                         captured[base + 'dependency_dotnet.py'])
+    opaque = b'<Project><ProjectExtensions><ItemGroup><PackageReference Include="OpaqueData" Version="1.0"/></ItemGroup></ProjectExtensions><ItemGroup><PackageReference Include="Declared" Version="2.0"/></ItemGroup></Project>'
+    result = dotnet.parse_dotnet_dependencies(opaque, format='project',
+                                              limits=original.DependencyLimits())
+    dotnet_observation = {
+        'input': opaque.decode(),
+        'candidates': [{'name': item.name, 'kind': item.kind, 'role': item.role,
+                        'line': item.anchor.line, 'occurrence': item.anchor.occurrence}
+                       for item in result.candidates],
+        'diagnostics': list(result.diagnostics),
+        'official_semantics': 'ProjectExtensions contains non-MSBuild information ignored by MSBuild.',
+        'reference': 'https://learn.microsoft.com/en-us/visualstudio/msbuild/projectextensions-element-msbuild?view=visualstudio',
+    }
+    for path, identity in expected.items():
+        assert hashlib.sha256((root / path).read_bytes()).hexdigest() == identity
+    raw = Path(__file__).read_bytes()
+    stamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    harness = qa / f'p4t7-executor-format-probe-harness.{stamp}.txt'
+    with harness.open('xb') as stream:
+        stream.write(raw)
+    now = datetime.now(timezone.utc)
+    stamp = now.strftime('%Y-%m-%dT%H-%M')
+    receipt = qa / f'p4t7-executor-format-probe.{stamp}.json'
+    payload = {
+        'timestamp': stamp, 'published_utc': now.isoformat(), 'exit_code': 0,
+        'command': 'poetry run python SCRATCH/issue-980-p4t7-format-probe.py',
+        'source_bindings': expected, 'shared_commit': shared_commit,
+        'shared_original_sha256': shared_hash, 'live_shared_repair_loaded': False,
+        'python_input_recipe': "'[metadata]\\nx' + ' ' * whitespace_count + ('!=value' if valid_ini_option else '!')",
+        'python_ini_observations': observations, 'dotnet_opaque_data_observation': dotnet_observation,
+        'timing_qualification': 'Operational timeout and diagnostics only; deterministic regressions must check matching/work rather than wall-clock thresholds.',
+        'exact_executed_harness': {'path': harness.relative_to(root).as_posix(),
+                                   'sha256': hashlib.sha256(raw).hexdigest()},
+    }
+    with receipt.open('xb') as stream:
+        stream.write((json.dumps(payload, indent=2) + '\n').encode())
+    print(json.dumps({'receipt': receipt.relative_to(root).as_posix(),
+                      'sha256': hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                      'python': observations, 'dotnet': dotnet_observation}, indent=2))
+
+
+if __name__ == '__main__':
+    run()

@@ -1,0 +1,47 @@
+{
+  "stage": "lint",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:05:48.901965+00:00",
+  "finished": "2026-10-19T10:05:50.403657+00:00",
+  "duration_seconds": 1.503,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "29581b603ac837da31beb5fde6a8a711b87ddccc66f7feda42ca4c942bbbdcce",
+      "physical_lines": 375
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "29581b603ac837da31beb5fde6a8a711b87ddccc66f7feda42ca4c942bbbdcce",
+      "physical_lines": 375
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-lint.100550403657.stdout.bin",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_bytes": 19,
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-lint.100550403657.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "e5954b7ef4514589ed5a1f764d4fd701f73600c3007966366463ae6a1402744c"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

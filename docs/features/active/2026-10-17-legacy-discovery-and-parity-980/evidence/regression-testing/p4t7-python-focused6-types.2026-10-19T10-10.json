@@ -1,0 +1,45 @@
+{
+  "stage": "types",
+  "label": "p4t7-python-focused6-types",
+  "started": "2026-10-19T10:10:23.998731+00:00",
+  "finished": "2026-10-19T10:10:25.919525+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.921,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "eae003d49d87e7e682495de5d80629f3b263b4ac12bfe1b445681bca9c71fa00",
+      "physical_lines": 271
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+      "physical_lines": 309
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "eae003d49d87e7e682495de5d80629f3b263b4ac12bfe1b445681bca9c71fa00",
+      "physical_lines": 271
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+      "physical_lines": 309
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused6-types-101025.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused6-types-101025.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

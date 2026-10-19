@@ -1,0 +1,47 @@
+{
+  "stage": "format",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:04:49.822872+00:00",
+  "finished": "2026-10-19T10:04:51.651902+00:00",
+  "duration_seconds": 1.83,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "50a52f85cae3c0de47f32ffe42f54207049a4cbebe7b8652718df6028181b68c",
+      "physical_lines": 330
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "455b261f6cd36a5f41ee86712bc924990c6533b607d7ed8f512996e138d605d7",
+      "physical_lines": 365
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "50a52f85cae3c0de47f32ffe42f54207049a4cbebe7b8652718df6028181b68c",
+      "physical_lines": 330
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "455b261f6cd36a5f41ee86712bc924990c6533b607d7ed8f512996e138d605d7",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused2-format.100451651902.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused2-format.100451651902.stderr.bin",
+      "raw_sha256": "4874b2c3a7b699f761bfd72d5f281823ce8b127797f57e4c84ea180debe5de49",
+      "raw_bytes": 61,
+      "presentation": "All done! \\u2728 \\U0001f370 \\u2728\r\n2 files left unchanged.\r\n"
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "ec2493f4c370bd463a0b269b8a6bed0b47aea99b1a5bd846135f940dcf29ea76"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

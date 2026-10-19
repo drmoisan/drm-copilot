@@ -1,0 +1,47 @@
+{
+  "stage": "lint",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:05:29.336121+00:00",
+  "finished": "2026-10-19T10:05:30.493639+00:00",
+  "duration_seconds": 1.158,
+  "exit_code": 1,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "5febe4dbe9d682b46f91b74f049ee7332a8d3c2318ee950e8440f5464844d645",
+      "physical_lines": 374
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "5febe4dbe9d682b46f91b74f049ee7332a8d3c2318ee950e8440f5464844d645",
+      "physical_lines": 374
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused3-lint.100530493639.stdout.bin",
+      "raw_sha256": "6a865ab756e1a78c9d6af1e6e28358c0730f7c4793b500841c1ef81b02c439b3",
+      "raw_bytes": 817,
+      "presentation": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:3:1\n   |\n 1 |   \"\"\"Verify pure .NET dependency declarations, redaction and bounded failure contracts.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import json\n 6 | | from dataclasses import replace\n 7 | | from typing import cast\n 8 | |\n 9 | | import pytest\n10 | |\n11 | | from drm_copilot_discovery.analyzer.dependency_dotnet import DotnetDependencyFormat\n12 | | from drm_copilot_discovery.analyzer.dependency_dotnet import parse_dotnet_dependencies\n13 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n14 | |     DependencyInputError,\n15 | |     DependencyLimits,\n16 | | )\n   | |_^\n   |\nhelp: Organize imports\n\nFound 1 error.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused3-lint.100530493639.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "ec2493f4c370bd463a0b269b8a6bed0b47aea99b1a5bd846135f940dcf29ea76"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}
