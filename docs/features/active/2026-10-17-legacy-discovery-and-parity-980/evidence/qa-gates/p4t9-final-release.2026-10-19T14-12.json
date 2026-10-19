@@ -1,0 +1,47 @@
+{
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "workspace_operations_p4t9_final_gates_restart",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T9_final_gates_restart",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-restart-preparation.2026-10-19T14-10.json",
+    "sha256": "4c6165f0efa7b952b074ef3c0c1a4af2cbdc7b7315bc7de0d151c4d16f9dd945"
+  },
+  "command": ".venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-release.py",
+  "exit_code": 0,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-release-harness.2026-10-19T14-12.txt",
+    "sha256": "261b7d329f1fcca36943897c199898845afc18be2fec27ac149ee282127164a8"
+  },
+  "native_attestation_sha256": "2d2ed086137673ee0e3d2644d29f055377f7d07b5b443e8bd8187d61a1a72423",
+  "native_authorization": "Coordinator explicitly authorized the prepared 20-assertion stage after readiness 079084796a7f28fd7f3adc664ef217655f18575647022d1a15affb6d7f24ff4e; execution follows successful stages 1-6.",
+  "native_recorded_at": "2026-10-18T23:33:00.9003316+00:00",
+  "native_validations": {
+    "launch_authority_valid": true,
+    "provenance_valid": true,
+    "routing_valid": true
+  },
+  "qualification": "The already-running candidate retains its original final-gate route. This supplemental receipt records the fresh same-profile restart and stage-7 release without rewriting historical artifacts.",
+  "released_stages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T14-12"
+}

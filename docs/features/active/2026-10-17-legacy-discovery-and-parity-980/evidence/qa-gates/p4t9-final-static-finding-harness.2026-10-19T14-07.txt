@@ -1,0 +1,36 @@
+"""Preserve the stopped gate and completed static-only finding sweep."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+scratch = Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+failed = qa / 'p4t9-final-architecture-140511.2026-10-19T14-05.json'
+candidate = qa / 'p4t9-final-preparation.2026-10-19T14-04.json'
+bindings = json.loads(candidate.read_bytes())['files']
+assert all(hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256'] for item in bindings)
+snapshots = []
+for name in ('issue-980-p4t9-final-structure-diagnostic.py', Path(__file__).name):
+    path = scratch / name
+    copy = qa / (path.stem.removeprefix('issue-980-') + '-harness.' + stamp + '.txt')
+    assert not copy.exists()
+    copy.write_bytes(path.read_bytes())
+    snapshots.append({'path': copy.as_posix(), 'sha256': hashlib.sha256(copy.read_bytes()).hexdigest()})
+value = {'task': 'P4-T9', 'timestamp': stamp, 'status': 'ONE_COMMENT_PLACEMENT_FINDING',
+    'command': '.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-structure-diagnostic.py <bound candidate>',
+    'exit_code': 0, 'sweep_observed_at': '2026-10-19T14:06:31.029419+00:00',
+    'failed_stage': {'path': failed.as_posix(), 'sha256': hashlib.sha256(failed.read_bytes()).hexdigest()},
+    'candidate': {'path': candidate.as_posix(), 'sha256': hashlib.sha256(candidate.read_bytes()).hexdigest()},
+    'completed_stages': 'Black, Ruff and whole-repository Pyright passed; no behavioral test ran.',
+    'findings': [{'path': 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py',
+        'line': 204, 'code': 'loop-intent', 'detail': 'The ownership comment precedes two setup assignments; the explicit loop requires its immediate intent comment.'}],
+    'scope': 'All 15 frozen files: docstrings, immediate explicit-loop comments, size, operational imports/calls, production reads and test isolation.',
+    'source_test_mutations': False, 'behavioral_tests_run': 0, 'harnesses': snapshots,
+    'qualification': 'Sweep findings are a structured transcription of the completed read-only command output. The failed gate retains exact original stdout/stderr under its bound receipt; no output is represented as a new behavioral run.'}
+path = qa / ('p4t9-final-static-finding.' + stamp + '.json')
+assert not path.exists()
+path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T9 static gate finding\n\nTimestamp: {stamp}\nCommand: `{value["command"]}`\nEXIT_CODE: 0\nOutput Summary: The completed 15-file static sweep found one loop-comment placement issue at emitter.py:204. No source/test bytes changed and no behavioral tests ran. The original failed stage and all passing stages remain immutable.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}))

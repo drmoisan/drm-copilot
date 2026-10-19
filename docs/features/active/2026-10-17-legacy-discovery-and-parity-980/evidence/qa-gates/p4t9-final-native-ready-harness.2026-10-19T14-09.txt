@@ -1,0 +1,46 @@
+"""Freeze the prepared native stage without executing fixture setup or analysis."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+scratch = Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+native = scratch / 'issue-980-p4t9-final-native.py'
+tree = ast.parse(native.read_bytes())
+assertions = []
+for node in sorted(ast.walk(tree), key=lambda node: getattr(node, 'lineno', 0)):
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in {'check', 'reject'}:
+        if node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+            assertions.append(node.args[0].value)
+assert len(assertions) == 20
+snapshots = []
+for path in (native, scratch / 'issue-980-p4t9-final-native-gate.py', Path(__file__)):
+    raw = path.read_bytes()
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert all(line.rstrip() == line for line in raw.splitlines())
+    ast.parse(raw)
+    copy = qa / (path.stem.removeprefix('issue-980-') + '-harness.' + stamp + '.txt')
+    assert not copy.exists()
+    copy.write_bytes(raw)
+    snapshots.append({'path': copy.as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(), 'scratch_name': path.name})
+old = qa / 'p4t9-final-native-harness.2026-10-19T14-04.txt'
+assert old.read_bytes().replace(b'item.code, item.path', b'item.code, item.artifact_path') == native.read_bytes()
+value = {'task': 'P4-T9', 'timestamp': stamp, 'status': 'PREPARED_NOT_EXECUTED',
+    'command': '.venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-native-ready.py', 'exit_code': 0,
+    'assertions': assertions, 'assertion_count': 20, 'harnesses': snapshots,
+    'earlier_unexecuted_native': {'path': old.as_posix(), 'sha256': hashlib.sha256(old.read_bytes()).hexdigest()},
+    'preparation_delta': 'Corrected only failure rendering to the accepted Finding.artifact_path field; no native execution occurred.',
+    'preconditions': ['Synthetic committed four-file source/test/docs fixture outside the repository',
+        'Configured profile keeps the same selection and manifest path before and after output setup',
+        'Actual capture_workspace/load_snapshot and bounded LocalGitReader/pin_inventory_sources',
+        'Original source and complete fixture/Git bytes hashed at the read-only boundary'],
+    'execution_contract': 'Run native-gate only after released final stages 1-6 passed against the same repaired candidate. Native stage requires explicit coordinator release.',
+    'qualification': 'No publication planner/writer, optional import, plugin execution, installed-host or non-Windows claim. Negative variants change immutable retained bytes only.'}
+path = qa / ('p4t9-final-native-readiness.' + stamp + '.json')
+assert not path.exists()
+path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T9 native readiness\n\nTimestamp: {stamp}\nCommand: `{value["command"]}`\nEXIT_CODE: 0\nOutput Summary: Twenty fixed native assertions and exact LF harness bytes are prepared; no fixture or native analysis was executed. The actual loader/capture/pin/validate/merge path is explicit, and publication remains outside scope.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'assertions': len(assertions)}))

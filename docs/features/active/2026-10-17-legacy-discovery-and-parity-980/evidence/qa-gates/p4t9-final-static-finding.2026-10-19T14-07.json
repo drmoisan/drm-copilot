@@ -1,0 +1,39 @@
+{
+  "behavioral_tests_run": 0,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-preparation.2026-10-19T14-04.json",
+    "sha256": "8e793d4f3df4d9284a4d951f9a6594b24a203faa768ecb4128aaa16de0208dc3"
+  },
+  "command": ".venv/Scripts/python.exe SCRATCH/issue-980-p4t9-final-structure-diagnostic.py <bound candidate>",
+  "completed_stages": "Black, Ruff and whole-repository Pyright passed; no behavioral test ran.",
+  "exit_code": 0,
+  "failed_stage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-140511.2026-10-19T14-05.json",
+    "sha256": "c54b60b8e91e4c5423fae08a002e78eb21e745c9acb9f96e035557c07f151e8b"
+  },
+  "findings": [
+    {
+      "code": "loop-intent",
+      "detail": "The ownership comment precedes two setup assignments; the explicit loop requires its immediate intent comment.",
+      "line": 204,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py"
+    }
+  ],
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-structure-diagnostic-harness.2026-10-19T14-07.txt",
+      "sha256": "88351da8b12cafb7c6cb37f1e79144b63b24820a4dab17b46a1df66ac7565b9d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-static-finding-harness.2026-10-19T14-07.txt",
+      "sha256": "690874d087a52a88c5b0125a6a407bdf758236a95b1ceff7bc409851c97b4aa2"
+    }
+  ],
+  "qualification": "Sweep findings are a structured transcription of the completed read-only command output. The failed gate retains exact original stdout/stderr under its bound receipt; no output is represented as a new behavioral run.",
+  "scope": "All 15 frozen files: docstrings, immediate explicit-loop comments, size, operational imports/calls, production reads and test isolation.",
+  "source_test_mutations": false,
+  "status": "ONE_COMMENT_PLACEMENT_FINDING",
+  "sweep_observed_at": "2026-10-19T14:06:31.029419+00:00",
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T14-07"
+}

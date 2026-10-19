@@ -1,0 +1,37 @@
+"""Collect every static structure finding after the first stopped final gate."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+manifest_path = Path(sys.argv[1])
+manifest = json.loads(manifest_path.read_bytes())
+findings = []
+for entry in manifest['files']:
+    path = Path(entry['path'])
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == entry['sha256']
+    tree, lines = ast.parse(raw), raw.decode('utf-8').splitlines()
+    if len(lines) > 500:
+        findings.append({'path': entry['path'], 'code': 'size', 'line_count': len(lines)})
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and not ast.get_docstring(node):
+            findings.append({'path': entry['path'], 'code': 'docstring', 'line': node.lineno, 'name': node.name})
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)) and not lines[node.lineno - 2].lstrip().startswith('#'):
+            findings.append({'path': entry['path'], 'code': 'loop-intent', 'line': node.lineno,
+                             'context': lines[max(0, node.lineno - 5):node.lineno]})
+        imports = [node.module] if isinstance(node, ast.ImportFrom) and node.module else [item.name for item in node.names] if isinstance(node, ast.Import) else []
+        if any(item.split('.')[0] in {'subprocess', 'socket', 'requests', 'http', 'urllib', 'tempfile'} for item in imports):
+            findings.append({'path': entry['path'], 'code': 'operational-import', 'line': node.lineno})
+        if isinstance(node, ast.Call):
+            name = ast.unparse(node.func)
+            if name in {'open', 'eval', 'exec', 'compile'} or name.endswith(('.write_bytes', '.write_text', '.mkdir', '.unlink')):
+                findings.append({'path': entry['path'], 'code': 'operational-call', 'line': node.lineno, 'name': name})
+            if entry['path'].startswith('packages/') and name.endswith(('.read_bytes', '.read_text', '.glob', '.rglob')):
+                findings.append({'path': entry['path'], 'code': 'production-read', 'line': node.lineno})
+result = {'timestamp_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_manifest': manifest_path.as_posix(),
+          'source_manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(), 'files': 15,
+          'findings': findings, 'source_test_mutations': False, 'behavioral_tests_run': 0}
+print(json.dumps(result, indent=2))

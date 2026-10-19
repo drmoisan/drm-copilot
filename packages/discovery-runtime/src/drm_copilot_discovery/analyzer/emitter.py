@@ -198,9 +198,9 @@ def inventory_result(
     metadata = _analyzer_metadata(capture, analyzer_ids, extension_adapters)
     if len(analyses) > capture.profile.limits.artifact_records:
         raise ValueError("Analyzer batches exceed the configured record limit")
-    # Validate exact row ownership before aggregation allocates family-wide tuples.
     identities = {cast("str", item["id"]): item for item in metadata}
     remaining_records = capture.profile.limits.artifact_records
+    # Validate exact row ownership before aggregation allocates family-wide tuples.
     for analysis in analyses:
         families = (analysis.components, analysis.findings, analysis.relationships)
         remaining_records -= sum(map(len, families)) + len(analysis.diagnostics)

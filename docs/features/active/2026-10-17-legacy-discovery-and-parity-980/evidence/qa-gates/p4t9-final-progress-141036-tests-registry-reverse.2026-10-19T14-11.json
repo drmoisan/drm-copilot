@@ -1,0 +1,40 @@
+{
+  "binding_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.json",
+      "sha256": "589385ab3ba82ac823e31694b600d8afb6b371624056b97155f93390f3799835",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.json",
+      "sha256": "b52817c0d8d448cfc2fda1e983903f43bd79915096e8728cf0dfe5b45d43c066",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-141050.2026-10-19T14-10.json",
+      "sha256": "5aab41744c45d0dc355511ce3275758242636cef3a98d369726286b728b051ed",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-141050.2026-10-19T14-10.json",
+      "sha256": "bfb285d1333fe8b05e3ed30fb1d62a2a59f5422793b8d27b7d485d7cafe9121c",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-registry-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-registry-reverse-141125.2026-10-19T14-11.json",
+      "sha256": "86da19b964180c6708754e345dd85c16019b3540e3834a1384a8bec12a026dcf",
+      "stage": 5
+    }
+  ]
+}

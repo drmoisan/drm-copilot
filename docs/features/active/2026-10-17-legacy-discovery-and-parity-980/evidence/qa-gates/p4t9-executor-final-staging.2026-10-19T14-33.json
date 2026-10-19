@@ -1,0 +1,76 @@
+{
+  "task": "P4-T9",
+  "status": "ACCEPTED",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation.2026-10-19T14-29.json",
+      "sha256": "5f50a7732b276b5044a011f2b570c1fcabb0e719637ceb22d4fc145bb8961827",
+      "bytes": 1254
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-payload.2026-10-19T14-29.json",
+      "sha256": "8391f2edb2ff33593b6aba762bd1cba06652a3fc042588b8eb89ac7604c62e0f",
+      "bytes": 16469
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-pass2.2026-10-19T14-29.json",
+      "sha256": "e480a8d2a75aaacf02fa894addb74a8715bf8f52e1b2d3e07c95e560d0a8ed27",
+      "bytes": 8096
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-pass2-payload.2026-10-19T14-29.json",
+      "sha256": "494fc222614736453cb362b1e2f81f8cbd6b716702a170554c0742e798ff41f7",
+      "bytes": 16723
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance-payload.2026-10-19T14-33.json",
+      "sha256": "f73092ca83a2d84dd7b4d623f75cebba43c066ff5c7405ffa3a548e8bda0bc8a",
+      "bytes": 18524
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance.2026-10-19T14-33.json",
+      "sha256": "c08e7f2099908a0f2de47a4cafe8258f2ae1306713b579afd3291347d89198d7",
+      "bytes": 9734
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance.2026-10-19T14-33.md",
+      "sha256": "8bc724cc88a5c8c73b8049cd0dcdfdec50220f4d206624a70e4724daf2b671db",
+      "bytes": 2279
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "a88cda293074d0992bf4b583993d05be524e4fd4aa4ea04164bbcf1ae1b0bd43",
+      "bytes": 100092
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "6cfbda32f4569ea599e2a337f39cb19dbe76a141eff9e18dc4866132e18e3743",
+      "bytes": 111610
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "sha256": "9e4fee44ba97836140c1ad4a5edc40480bb719b288825b29db7d76e1e33d32b0",
+      "bytes": 11870
+    }
+  ],
+  "include_staging_itself": true,
+  "count_without_self": 10,
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation.2026-10-19T14-29.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-payload.2026-10-19T14-29.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-pass2.2026-10-19T14-29.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-reconciliation-pass2-payload.2026-10-19T14-29.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance-payload.2026-10-19T14-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance.2026-10-19T14-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-final-acceptance.2026-10-19T14-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md"
+  ],
+  "plan_git_qualification": "Plan working bytes preserve CRLF; Git text=auto/eol=lf normalized SHA is separately recorded in acceptance.checkoff_files. Only nine checkbox characters changed across the three documents.",
+  "owner_closure_separate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-stage-closure.2026-10-19T14-21.json",
+    "sha256": "41dc914d78d1c12986202bfad3c9f924db0d671294045a3279b8dd0fd5f6e266",
+    "bytes": 30251
+  }
+}

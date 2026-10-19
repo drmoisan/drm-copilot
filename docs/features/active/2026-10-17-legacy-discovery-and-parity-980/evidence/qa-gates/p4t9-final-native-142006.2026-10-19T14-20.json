@@ -1,0 +1,26 @@
+{
+  "binding_after_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "binding_before_sha256": "3610dc89f5153197b091eae34ea728192e70573aac42662129744ffa8d7f12a9",
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-restart-preparation.2026-10-19T14-10.json",
+  "candidate_sha256": "4c6165f0efa7b952b074ef3c0c1a4af2cbdc7b7315bc7de0d151c4d16f9dd945",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe SCRATCH\\issue-980-p4t9-final-native.py SCRATCH\\issue-980-p4t9-final-native-result-141954.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T14:20:06.649333+00:00",
+  "label": "native",
+  "raw_stderr": {
+    "bytes": 0,
+    "path": "SCRATCH/issue-980-p4t9-final-native-142006.2026-10-19T14-20.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "bytes": 1858,
+    "path": "SCRATCH/issue-980-p4t9-final-native-142006.2026-10-19T14-20.stdout.txt",
+    "sha256": "d9fc96741fbcf6b20b005f9d5fe1fcaccfc3afb63157354b5ee600de60de699c"
+  },
+  "seconds": 12.373327,
+  "stage": 7,
+  "started_at": "2026-10-19T14:19:54.276006+00:00",
+  "stderr": "",
+  "stdout": "PASS pre-output actual capture retains four original source/test/documentation inputs\r\nPASS configured manifest and result members receive actual loader categories\r\nPASS actual loading preserves original raw member and source hashes\r\nPASS actual local Git capture preserves every retained source identity and byte stream\r\nPASS extension input digest excludes transport outputs while complete capture changes\r\nPASS public fixed dispatch selects configured built-ins without importing optional code\r\nPASS inert validation binds exact manifest/member bytes and independent input digest\r\nPASS merge preserves every authoritative core row and diagnostic unchanged\r\nPASS merge preserves complete input accounting including documentation\r\nPASS external observations retain confidence and unresolved target without binding claims\r\nPASS adapter identity and version remain explicit alongside fixed built-ins\r\nPASS ledger proposals remain uninspected and unassigned\r\nPASS identical retained capture produces deterministic inventory and ledger bytes\r\nPASS wrong result member hash is rejected from retained raw data\r\nPASS wrong manifest self-digest is rejected\r\nPASS core component identity collisions fail before merged output is returned\r\nPASS executable manifest fields are rejected without importing or executing their value\r\nPASS documentation remains accounted but cannot become an extension source claim\r\nPASS all read-only captures and validations preserve source/artifact/Git bytes and state\r\nPASS no optional implementation was imported by generic extension validation\r\n{\"passed\": 20, \"elapsed_seconds\": 12.152538299997104, \"operation_seconds\": {\"actual_capture_loading_and_pin\": 2.3441192000173032, \"validate_extension_results\": 0.7280747999902815, \"merge_extension_inventory\": 1.4516319000103977, \"repeated_merge_extension_inventory\": 1.4553557999897748}}\r\n",
+  "timestamp": "2026-10-19T14-20"
+}

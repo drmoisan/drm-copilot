@@ -1,0 +1,243 @@
+{
+  "decode_verified": true,
+  "entries": [
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-140511.2026-10-19T14-05.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 429,
+      "original_sha256": "31907f274f29148ce03267ccb9c2ee80d69252e1578b3f2014635238dbfd4191",
+      "payload": "H4sIAAAAAAAC/42QQUvDQBCF74X+h6EemkA2KbUHW0QoVk8KHioejJZxM7aLm91lZ6LGg7/dpEr16Du9w7x5H28dUdMT6hdIas8CkTQ5AY3WgkWWdDEcAFwaSzA6X5S3TJHLFbprbxhduQxhhYLlle8S5ZrqUGpf0buytEXdqsqw9q8U29IwN6TmJ5Nfp8JM5urZOLQKo94ZIS1NpDy0owyscQTHkwyMg9PaV42ls54FALmjkP0B37uuLu+t86Bg+pBblmhCkuYsGIXfjOyS8dE4zSAJKLsM/iTS74c/+vy3HnsNB8s9iPHuIkYfF5DcGVf5N77BvjN0q+KWuDiMoGLjxNRUcNRFFeuN9sFYL5vDRYHdGO0HxYJqI0Kx26JHn05mHesXjPxc8K0BAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-140511.2026-10-19T14-05.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 4816,
+      "original_sha256": "827b02678def6062c4528558c80982061885c9265733a578b26e8ac9d1295559",
+      "payload": "H4sIAAAAAAAC/+2XzW7iMBDH75X6DhZnaD6h0L5E76uV5dpTsOqPyHYQWbTvvg4U0u3Fc6DaDe1pEmeSmfnJM39nf3tDyKRh3oOYPJBiPj0s8A3wVx8XfvS3hOyP5uAaNnE9Wv7K1uAzIT23W3DdzLUmSA2ZdzwTTlNuG6lsoGePjBmmul/gMkqlkYHSu6abTIdvbzovOVNUSQN99NXwTFjeajABBBXw0r8trel98sGHW/3mArtGSR4jKGubD17PtjWCua6v4ql1QF7kDgSJWcba+CYTLDCyZUrGixjjkWjQNpZnjeoIZx48YUYQqXUb2LMCcoAFYiYN4dYEx3ggDpjwd5Nj0N/Tz6EIWoYALgGxKjAY5yiMi2vE6GAtfXBdgmOxqBEcFyiOxRVxhF0A42NqsaebNvgExrouERiLGsVxdZUcHfhWJUFW5RIBcvmFOQ5ZpvbkHDMiyxLX2/+p1gTw4R1JeiJ5noO9A33TFHqmmO7ne0w/349ZpnHokDpS5RgdKYqvA4yeckxttXyOIVehyJXjIndszr+lNoKJ3ZrWifpy1PLxU0sOtDz/5nXitY11xSSoBreGpIqilGA55hMyEhzuBFeXq8spwbjn2ZANcqgVqKGWj79JPXey6RHClgZr1TuYH+RUWM2koQbaGEbJkDqIlFV1sR/af7v7evPz9ibaPw8G3ffQEgAA",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-141050.2026-10-19T14-10.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-141050.2026-10-19T14-10.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 27356,
+      "original_sha256": "9ca34972e476d60a643757a00984e12845c398f6f564fc670b6dcc38708db3fc",
+      "payload": "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",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-contracts-141922.2026-10-19T14-19.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-contracts-141922.2026-10-19T14-19.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-140458.2026-10-19T14-04.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 59,
+      "original_sha256": "4c182caf6248ee7b4faaf0e95fb24779a3f5368c16cc0ab59f942831dfb48e75",
+      "payload": "H4sIAAAAAAAC/3PMyVFIyc9LVVR4NGeFwof5vRtADF4uQ1OFtMyc1GKF8vzSnBSFpFSFnNS0EoXSvOSMxLz01BQ9Xi4AGtd3rzsAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-140458.2026-10-19T14-04.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 59,
+      "original_sha256": "4c182caf6248ee7b4faaf0e95fb24779a3f5368c16cc0ab59f942831dfb48e75",
+      "payload": "H4sIAAAAAAAC/3PMyVFIyc9LVVR4NGeFwof5vRtADF4uQ1OFtMyc1GKF8vzSnBSFpFSFnNS0EoXSvOSMxLz01BQ9Xi4AGtd3rzsAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-141037.2026-10-19T14-10.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 19,
+      "original_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "payload": "H4sIAAAAAAAC/3PMyVFIzkhNzi5WKEgsLk5NUeQCAJI/hpsTAAAA",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-140458.2026-10-19T14-04.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-140458.2026-10-19T14-04.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 19,
+      "original_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "payload": "H4sIAAAAAAAC/3PMyVFIzkhNzi5WKEgsLk5NUeQCAJI/hpsTAAAA",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-lint-141038.2026-10-19T14-10.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 1858,
+      "original_sha256": "d9fc96741fbcf6b20b005f9d5fe1fcaccfc3afb63157354b5ee600de60de699c",
+      "payload": "H4sIAAAAAAAC/4VUy47bOBC8DzD/QMx5Z0byI/bsbU97HSAfYNBkS+6AIgk+/ECQf083RUk2kiA+GJZFVldVV/fnf1+/Ch/g1eXkcxJSpSyNUNKnHEAESBJtFJ3LQbiAPVp6G+lJwXuCmN61U3kAm2RCZwVaAonPT58Mq5ztsCcYLQZpsaPjQlpNoDGbJAYYjhAiPSrAM0yljZMaAjFI0FNFmNDuXqPtmXOEcIa40AryUkFLmZGlOMl4+hVE0ff/mGahCxycIdyqcJhRUJNGTLeCfLwlEDEFkEPFhWsCG2cHhMae1cJVmawJNAVpo3chidHnKC4nNEAWDd4AoU081Enafqbr89GgEh1eiYnG6GVSJxHBgCKIO3+PGU165U5dMJ2ohsCBy7FTznNruKlOQwUmacTlLA3qsXFHtJq0X8mguVnv1UyWG4twOgQeLHvxILSiDhD6X62UmRgF5IScWTHHyl0KnkbZWxcTacx2lK7/gDU7NdaVSrlsiz60bDL/esjiXWcCq3dHRiqvYm3v6CCpoQYznWypnDNnMjRJKp9mN9kerqCMxGEOk6amkT8P2SDJJQcBBq4AV08dpKBJ42wf6Wjt5tyxCmZA94Tlg/MuShMngGzpjKd+052Ro4wRezsbNVbnPM+ZXULtdFZknibjwoAWi9Voz3TFhZFwLVyaXCEvgbg+jmkZI4FM69tIpgtuWEry7FGU5APCPPWU2O61zsQdxrwnwjgJzpZgTXYqZwzG0q9OohFH6PhkSYaugzTCkdrFELiCykkeabxmAh2CoXzLstKqgN9MSqiX+SGdAAOPSJ6G5nHVjf2JUxJLS3mfWOsoL0B6OFR3m6FukhKhKUGGuyb1q7PmNrVtHLVlNuM8BdPilUS3o0l95w22TGckZhNX65a5R56chfhFxqqZOd9ED7QMKBYL06X289P3F0+BA/3yr1g1/4gXMNLT4yGSQloZ9He7emu3q+16v/qgz65tNnTMeQgF4e7g95dx/R6q0EPd5Qcif/BoucTberNp249V0zTtbt2sV4RV6cBhZngYs8mgzdtutW92mx0Xb1b7dks3SkTujs+JZ7pvm237Zd1+cIlm/bHb0YVAa40q6MPfbm7X2y2X2tO9zf7Hj+enn67gdyFCBwAA",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-142006.2026-10-19T14-20.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-142006.2026-10-19T14-20.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 21858,
+      "original_sha256": "d2c1bf44b9693bf8ba2b64edc98794ade000b0519210dba378f6b5654cd79d1d",
+      "payload": "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",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-core-reverse-141920.2026-10-19T14-19.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-core-reverse-141920.2026-10-19T14-19.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 12416,
+      "original_sha256": "cf940c595088f79024a1e4ac12e4cd405b96921b88aebcd949e1057a011052c6",
+      "payload": "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",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-registry-reverse-141125.2026-10-19T14-11.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-registry-reverse-141125.2026-10-19T14-11.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 20275,
+      "original_sha256": "b5f1ef486009b925831deb8d6f12b8fe50430d793dc84f0833033a39a2e8935a",
+      "payload": "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",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-shared-reverse-141707.2026-10-19T14-17.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-tests-shared-reverse-141707.2026-10-19T14-17.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 194,
+      "original_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "payload": "H4sIAAAAAAAC/zXMzQqCQBSG4b3gPXzLghKFNrUIIkrdqJgUruwEJx2YZuLMYHT3/dHuXbw8MVjEipshxoPEKNN/W5mrlRt5ZY0LTpu6yIt0BT+wMJQDwfAD96eofvAYWdx7BI2kNF00YzImURIt4iXma/w6WUyjMKg0k3sTxnnS+gN+pb9gBY49qrbO06zpqrbJyqLbl/V21x139SEvC3iLsybPzp/DIAxecdGAZ8IAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-140511.2026-10-19T14-05.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-140511.2026-10-19T14-05.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 194,
+      "original_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "payload": "H4sIAAAAAAAC/zXMzQqCQBSG4b3gPXzLghKFNrUIIkrdqJgUruwEJx2YZuLMYHT3/dHuXbw8MVjEipshxoPEKNN/W5mrlRt5ZY0LTpu6yIt0BT+wMJQDwfAD96eofvAYWdx7BI2kNF00YzImURIt4iXma/w6WUyjMKg0k3sTxnnS+gN+pb9gBY49qrbO06zpqrbJyqLbl/V21x139SEvC3iLsybPzp/DIAxecdGAZ8IAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-141050.2026-10-19T14-10.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-types-141050.2026-10-19T14-10.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 9250,
+      "original_sha256": "520b334e699f6743668e60e6cdbeaea66f0629aa62384e594099e9c45fd19959",
+      "payload": "H4sIAAAAAAAC/+1Z33OiMBD+VxyfW4cAAezbPd77vZUOk2K0mQIySejV6/i/324CyChW7bSe9XiA+dzdZDfh2/xY38Y512x8N3obz5cyZxqgdzMav3CpxLKAX+NwQryJOwahFjlXmuUlil3HDW6Jc0umv4hzR8idSyfED0KXoumjZEX6lKRL6IgtODTQsuKgUE/L3yAuNH/VCsRzlim+BsVcZFyZQEqWPkMbFcczoUwPq1tZFeg9jpVMQS5z6KMU2VInrU0cs4Jlqz9cxnGSiELoJJmUK9Mlf+VppfksyURhvNzDIP2b0fQBQ6rynElraLrq2OFcFFWewLA1z3mhG2HJZQo/k7oBSInjTJxdDQZYZgy7H4MJTk4ulBLFonWCrfhrmlWzjuduVxvv7/jbNepxjWOx36Z1gqKSSS1Ytq1q+tkSN/FviZtAGvE7sW6bbEe67pml+4e+aaql9eftRGQUPZEa+bwqUg38toQbKHL9FIGhS21E6OtkzqzRXZoxpfjAmYEzR3IG/X3Cbib5QigtV/t3sxA4dzMiECNx4QEmEaAhAZlHgZGAKcwTBTkFHIBdiA/oI5BHgCNoF4EuAvsogCeCB/RT0E+R0iCfghymEV/oyUFXDvpxKL5QS1Br4jCBECML8RVhbKh1TZSodbGtiyYuaj1U+KjwzQBQ62PPPpr42IuPdhRNcByEooKiAodEAmwW+IeSL3D6si9wzpF+4TnSD2fzxPwzTS4qAQ11YLookBC/TQARBoBDZ++Of28JDXqLCCJL7hZRgwzJWzQ1yJC9RcbOkr5BwHqEDfk7mFpss2CDibWv06GDQ4ttXmywa+3rBOlg22edGh3sW2wzY4OpbVunyAYH1r7Omg0OvIfjD0uPlci0KJJmeUrEDL680KLeGHcXJ/9gRpK+hCTDdnjB2yHuK6fuh6D4WbxAZEu5+jFjpeZyYtkzF1zuYc8h7vQu5mdZy8nAnaO4Q6c77MHl6DPYUy9CA3WulDpBtEOdgHyIOsmCF1yKtN239p2kL+hMfPAW2btvetezcbqnU9i9/K0zJP/hAfbd5FQ846luU3PfQfIcl0O8N/ecRf2ryanT74bR5ddmvP0p9W+uTTiaD9Vq+uo0MLxLpi0dDjMnVTRMNaOtZHx2YXr7jPztzsbuQKcjr1VYFNu9WjkfOh8PheXvXVimQ2H5DMvwUGH+gqOS/Z9MLzXLVH9e9f5dGnjDHzZfn1frvzVU5RMiJAAA",
+      "source": "SCRATCH/issue-980-p4t9-final-registry-coverage.raw.json"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 23154,
+      "original_sha256": "05634659b18272ad2194bf6507caf5c9389a4bd1b878bc2708fbae506778ce2b",
+      "payload": "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",
+      "source": "SCRATCH/issue-980-p4t9-final-shared-coverage.raw.json"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 31003,
+      "original_sha256": "11662fee18ed0011d3bd119ea2e981215f7a5b9f33c2ff03670c733c16151560",
+      "payload": "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",
+      "source": "SCRATCH/issue-980-p4t9-final-core-coverage.raw.json"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 11825,
+      "original_sha256": "ed4a1c541daa3f5aa965db17052c1e3bbf159982ea0976205aa52e9bab5879c1",
+      "payload": "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",
+      "source": "SCRATCH/issue-980-p4t9-final-native-result-141954.raw.json"
+    }
+  ],
+  "qualification": "Exact original stdout/stderr/coverage/native streams are losslessly recoverable. Readable views sanitize workspace/scratch paths, JSON coverage keys normalize separators, and rendered Markdown trims trailing whitespace only.",
+  "task": "P4-T9"
+}

@@ -1,0 +1,1174 @@
+{
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+    "sha256": "4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a"
+  },
+  "bindings": [
+    {
+      "path": "examples/discovery/v2/domain-profile.example.yaml",
+      "sha256": "36c0d5a133a817ca2586471a797d50d662fe7dc57139ffbbf30a76a08f22c76f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py",
+      "sha256": "63ad9a5e6362ec66d4bed45b5f2269e0726d8eb07cc70f9dd850d3d8d0095570"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py",
+      "sha256": "e94f05ed63e7b1cd4facbfa5564e58228fbd0b329e5f4c33876a28ca32b379c2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py",
+      "sha256": "7a4681776a70e6f1127bafb6a1aa6f18f788da76fe07dccab6c39fc295dc21fd"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py",
+      "sha256": "e5b2c1402eb1df247cd8404d1733688673d4934278138eaa1172ef9cd6e7eb9c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py",
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284"
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888"
+    },
+    {
+      "path": "schemas/discovery/v2/activation.schema.json",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731"
+    },
+    {
+      "path": "schemas/discovery/v2/capability-attestation.schema.json",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4"
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe"
+    },
+    {
+      "path": "schemas/discovery/v2/coverage-ledger.schema.json",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e"
+    },
+    {
+      "path": "schemas/discovery/v2/discovery-invocation.schema.json",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2"
+    },
+    {
+      "path": "schemas/discovery/v2/domain-profile.schema.json",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a"
+    },
+    {
+      "path": "schemas/discovery/v2/evidence-reference.schema.json",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56"
+    },
+    {
+      "path": "schemas/discovery/v2/extension-result-manifest.schema.json",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613"
+    },
+    {
+      "path": "schemas/discovery/v2/feature-contract.schema.json",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0"
+    },
+    {
+      "path": "schemas/discovery/v2/implementation-record.schema.json",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070"
+    },
+    {
+      "path": "schemas/discovery/v2/inventory-snapshot.schema.json",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417"
+    },
+    {
+      "path": "schemas/discovery/v2/migration-report.schema.json",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b"
+    },
+    {
+      "path": "schemas/discovery/v2/parity-matrix.schema.json",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision-collection.schema.json",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision.schema.json",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c"
+    },
+    {
+      "path": "schemas/discovery/v2/required-output-manifest.schema.json",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d"
+    },
+    {
+      "path": "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7"
+    },
+    {
+      "path": "schemas/discovery/v2/scope.schema.json",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713"
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b"
+    },
+    {
+      "path": "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0"
+    },
+    {
+      "path": "schemas/discovery/v2/tool-authorization.schema.json",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior.schema.json",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d"
+    },
+    {
+      "path": "schemas/discovery/v2/validation-receipt.schema.json",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "3664e41b738e962ed9a3035f2c81af44c62b6a855e16f4437cb21db5bb95c24a"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "sha256": "48957ece4f9ebdbc66b99a7efadf3c3d916a1e7bef3dd83ec609bd502c91571b"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py",
+      "sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py",
+      "sha256": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_adapter.py",
+      "sha256": "da2e28c4be44e289d14ec951d3b85dc3412832dcfde413428041505e90834c06"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_optional_limits.py",
+      "sha256": "4d215605cccff4dc9f25bd4443f8398ab885b5dd08c3a6445e5045643f8f4bcb"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+      "sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_test_references.py",
+      "sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_ui_callbacks.py",
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_input_limits.py",
+      "sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inputs.py",
+      "sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inventory_merge.py",
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_results.py",
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_validation_limits.py",
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805"
+    },
+    {
+      "path": "tests/discovery_runtime/test_package_contract.py",
+      "sha256": "7d15e14b199a0e24d21d3d8ac8a1e61497500c5f7d6e7e9ef69409d1e5ca0e1d"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt",
+      "sha256": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt",
+      "sha256": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt",
+      "sha256": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt",
+      "sha256": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt",
+      "sha256": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2006.xml.txt",
+      "sha256": "43b8d8fa0caf93e6725f747b54be09f346de052255962b4cbcf2fc3bdd00a97f"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2009.xml.txt",
+      "sha256": "1aef9447cd9809c5629a9f672744c7507ab1cd6759c1a9763b45b7369f5c36a2"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt",
+      "sha256": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "sha256": "ba46ee04c93298247ee56f751d16d5bac7f5fb380c263cc862f7c6cb7a05071f"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py",
+      "sha256": "c0add50ff7f90b0cb4d8596abd6a5b5b26588d0d4dcb176eab701af5cdb5eaa9"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "370eb179db31ae629a817ad79dbdd92470c330430e4440d8515eecb6b3098fd8"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "sha256": "768e81d6aeb425f31ab5ed8eaa61e6f1a0fb59491fa7324192494cc0adfb5595"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "sha256": "618f4fc8252ced5cc4c474025ac55e6f29347622b0fa839fe7dd9b085d2d4063"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "sha256": "d7821ad61f444bdc8d7e536d8f213189ead8a162808818d73826fc674ce16f32"
+    }
+  ],
+  "contract_expected_count": 177,
+  "contract_selection": [
+    "tests/schemas/discovery/test_v2_inventory_schemas.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+    "tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_domain_neutrality_templates_contain_no_disallowed_tokens"
+  ],
+  "coordinator_release_receipt": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "workspace_operations_p4t9_final_gates",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T9_final_gates",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "coverage_targets": {
+    "core": [
+      "drm_copilot_discovery.extension_results",
+      "drm_copilot_discovery.extension_validation"
+    ],
+    "registry": [
+      "drm_copilot_discovery.analyzer"
+    ],
+    "shared": [
+      "drm_copilot_discovery.analyzer.emitter",
+      "drm_copilot_discovery.extension_inputs"
+    ]
+  },
+  "execution_released": true,
+  "expected_test_counts": {
+    "core": 144,
+    "registry": 77,
+    "shared": 133
+  },
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_input_limits.py",
+      "sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inputs.py",
+      "sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inventory_merge.py",
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_results.py",
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_validation_limits.py",
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5"
+    }
+  ],
+  "forward_test_module_order": {
+    "core": [
+      "tests/discovery_runtime/test_extension_results.py",
+      "tests/discovery_runtime/test_extension_inventory_merge.py",
+      "tests/discovery_runtime/test_extension_validation_limits.py"
+    ],
+    "registry": [
+      "tests/discovery_runtime/analyzer/test_registry.py",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py"
+    ],
+    "shared": [
+      "tests/discovery_runtime/test_extension_inputs.py",
+      "tests/discovery_runtime/test_extension_input_limits.py",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py"
+    ]
+  },
+  "harness_snapshots": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-prepare-harness.2026-10-19T14-04.txt",
+      "sha256": "48053881840ba30b9ffd6d5425f599b9ec39ea2f6f9f6368aafd8e62b182c381"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-gates-harness.2026-10-19T14-04.txt",
+      "sha256": "f462e7a5c0d981fb7bfc55b483b75f19e57e020a081c8aa672899c698cfe5096"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-architecture-harness.2026-10-19T14-04.txt",
+      "sha256": "80f8204cf447e098493a9e761b54cb4f151361c376723b1431d128244ac0d071"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-native-harness.2026-10-19T14-04.txt",
+      "sha256": "0f5557b3f01376fe04a79a8e8921b575fe33caed1e43b5e4b4f590a7033e8007"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-registry-coverage-harness.2026-10-19T14-04.txt",
+      "sha256": "20e1640bf36663b167d279c821bc60cf9931fa78e40488dc8ba0ad9870940cf2"
+    }
+  ],
+  "harnesses": {
+    "issue-980-p4t9-final-architecture.py": "80f8204cf447e098493a9e761b54cb4f151361c376723b1431d128244ac0d071",
+    "issue-980-p4t9-final-gates.py": "f462e7a5c0d981fb7bfc55b483b75f19e57e020a081c8aa672899c698cfe5096",
+    "issue-980-p4t9-final-native.py": "0f5557b3f01376fe04a79a8e8921b575fe33caed1e43b5e4b4f590a7033e8007",
+    "issue-980-p4t9-final-prepare.py": "48053881840ba30b9ffd6d5425f599b9ec39ea2f6f9f6368aafd8e62b182c381",
+    "issue-980-p4t9-final-registry-coverage.ini": "20e1640bf36663b167d279c821bc60cf9931fa78e40488dc8ba0ad9870940cf2"
+  },
+  "head_at_preparation": "feb2ed1a349d861122e04d2d487fac3183cf5c30",
+  "native_assertion_count": 20,
+  "native_execution_released": false,
+  "native_preconditions": [
+    "Windows native non-following reader and local Git",
+    "Synthetic source/test/docs bytes committed before profile/artifact setup",
+    "The same configured profile/manifest paths before and after transport generation",
+    "Actual capture_workspace/load_snapshot followed by retained Git pin capture",
+    "Read-only checkpoint after setup; all subsequent source/artifact/Git bytes unchanged"
+  ],
+  "preparation_only": true,
+  "prior_node_order": {
+    "core": [
+      "tests/discovery_runtime/test_extension_results.py::test_valid_bundle_preserves_versions_uncertainty_and_bytes",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path0-3.0.0-SCHEMA]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path1-untrusted.module-SCHEMA]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path2-repository-IDENTITY]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path3-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path4-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-DIGEST]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path5-value5-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path6-docs/guide.md-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path7-0-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path8-src/member.json-PATH]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path9-../member.json-SCHEMA]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[manifest-path10-wrong-id-MEMBER]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path11-other-DIGEST]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path12-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-DIGEST]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path13-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-DIGEST]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path14-8-IDENTITY]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path15-repository-IDENTITY]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path16-8-IDENTITY]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path17-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path18-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path19-docs/guide.md-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path20-verified-SCHEMA]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path21-verified-SCHEMA]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path22-value22-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path23-value23-SOURCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path24-missing-REFERENCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path25-missing-REFERENCE]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path26-value26-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path27-999-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path28-docs/other.md-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path29-value29-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path30-value30-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_results.py::test_invalid_claims_fail_closed[member-path31-value31-COLLISION]",
+      "tests/discovery_runtime/test_extension_results.py::test_selection_is_an_explicit_configured_tuple[selection0]",
+      "tests/discovery_runtime/test_extension_results.py::test_selection_is_an_explicit_configured_tuple[selection1]",
+      "tests/discovery_runtime/test_extension_results.py::test_selection_is_an_explicit_configured_tuple[selection2]",
+      "tests/discovery_runtime/test_extension_results.py::test_selection_is_an_explicit_configured_tuple[selection3]",
+      "tests/discovery_runtime/test_extension_results.py::test_line_ranges_share_cached_physical_bounds",
+      "tests/discovery_runtime/test_extension_results.py::test_generic_artifact_capture_remains_compatible",
+      "tests/discovery_runtime/test_extension_results.py::test_unexplained_capture_exclusion_has_fixed_input_error",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_merge_reconstructs_complete_core_and_external_rows",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_empty_selection_retains_exact_builtin_output",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_incomplete_external_diagnostics_remain_blocking_data[False-False]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_incomplete_external_diagnostics_remain_blocking_data[False-True]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_incomplete_external_diagnostics_remain_blocking_data[True-False]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_incomplete_external_diagnostics_remain_blocking_data[True-True]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_invalid_diagnostic_ownership_cannot_weaken_core[analyzer_id-repository-IDENTITY]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_invalid_diagnostic_ownership_cannot_weaken_core[path-other/source.cs-SOURCE]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_invalid_diagnostic_ownership_cannot_weaken_core[blocking-False-ACCOUNTING]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_core_pin_failure_is_preserved_without_falsely_validating_documentation",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_core_component_collision_fails_without_overwriting",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_merge_does_not_trust_public_validation_carriers",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_untyped_snapshot_is_rejected_before_analysis[None]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_untyped_snapshot_is_rejected_before_analysis[True]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_untyped_snapshot_is_rejected_before_analysis[snapshot]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_load_blockers_precede_valid_extension_claims",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[manifest_sha256-x]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[input_manifest_sha256-GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[adapter-None]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[result_files-value3]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[result_files-value4]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_carriers_are_immutable_descriptions_with_checked_field_types[analysis-None]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_manifest_member_paths_use_portable_containment[../escape]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_manifest_member_paths_use_portable_containment[CON]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_manifest_member_paths_use_portable_containment[C:/outside]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_manifest_member_paths_use_portable_containment[docs/migration/discovery/inventory-other/member.json]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_reused_member_paths_and_result_ids_are_rejected",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_merge_metadata_errors_remain_fixed_and_nonpublishing",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_unreadable_accounting_requires_a_blocking_diagnostic",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_metadata_budget_precedes_builtin_emission[timestamp]",
+      "tests/discovery_runtime/test_extension_inventory_merge.py::test_metadata_budget_precedes_builtin_emission[author]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[manifest-hash]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[member-hash]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[missing-member]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[category]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[missing-pin]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[changed-pin]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_transport_and_independent_pin_failures[malformed-json]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_diagnostic_link_work_has_an_independent_operation_ceiling[100-0-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_diagnostic_link_work_has_an_independent_operation_ceiling[0-100-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_diagnostic_link_work_has_an_independent_operation_ceiling[100-63-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_diagnostic_link_work_has_an_independent_operation_ceiling[100-64-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_diagnostic_link_work_has_an_independent_operation_ceiling[100-65-False]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes-0]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes--1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes-1.5]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes-1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_bytes-None]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records-0]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records--1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records-1.5]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records-1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_records-None]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes-0]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes--1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes-1.5]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes-1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_nodes-None]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth-0]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth--1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth-True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth-1.5]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth-1]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_resource_limits_require_positive_exact_integers[max_depth-None]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[None]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[True]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[False]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[3]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[-42]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[1.25]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[\\xe9\\U00010348\"\\n\\x01]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[value7]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_utf8_json_reservation_matches_canonical_boundary[value8]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[record]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[depth]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[node]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[invalid-record]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[nonfinite]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[non-json]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_independent_traversal_record_and_numeric_limits[integer]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_raw_member_aggregate_is_independent_of_each_document_limit",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_capture_index_count_is_bounded_before_projection",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[zero-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[zero-short]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[single-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-short]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-short]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-power-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-power-short]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-small-overflow]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[below-power-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-width-overflow]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-large-overflow]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-large-overflow]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-large-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-large-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[beyond-rendering-ceiling]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[remaining-exact]",
+      "tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[remaining-short]"
+    ],
+    "registry": [
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_loads_only_explicit_core_adapters",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled0]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_selects_only_consented_fixed_optional_adapter[enabled0]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_selects_only_consented_fixed_optional_adapter[enabled1]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_selects_only_consented_fixed_optional_adapter[enabled2]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_wrong_profile_type",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_registry_requires_configured_consent_before_any_import",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[bad-None-None]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-None-None]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-Not allowed-file2]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-None-None]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[unreadable- -None]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-Excluded-file5]",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_models_reject_untyped_rows_profile_inputs_and_collisions",
+      "tests/discovery_runtime/analyzer/test_registry.py::test_draft_and_input_count_limits_fail_closed",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_public_metadata_is_complete_fresh_and_import_free",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[com-interop]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[configuration]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[csharp-symbols]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[dependencies]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[dotnet]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[event-subscriptions]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[filesystem-access]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[office-vsto]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[registry-access]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[repository]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[test-references]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_each_fixed_selector_resolves_its_public_class[ui-callbacks]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_invalid_complete_selection_never_imports_optional[unknown]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_invalid_complete_selection_never_imports_optional[module.path]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_invalid_complete_selection_never_imports_optional[python -c command]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_registry_checks_complete_metadata_before_optional_loading",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_combined_dispatch_preserves_accounting_identity_and_provenance[False]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_combined_dispatch_preserves_accounting_identity_and_provenance[True]",
+      "tests/discovery_runtime/analyzer/test_registry_dispatch.py::test_combined_unavailable_inputs_preserve_blockers",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_production_modules_exist",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_access.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_syntax.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_interop.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_syntax.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration_input.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_declarations.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_tokens.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependencies.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_dotnet.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_inputs.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_node.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_python.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_values.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dotnet_projects.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[event_subscriptions.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[filesystem_access.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[findings.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[input_capture.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py0]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry_access.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[solution_input.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_reference_syntax.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_references.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[ui_callbacks.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[xml_input.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py1]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_registry_allowance_preserves_unrelated_source[\\n# vsto product behavior\\n]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_registry_allowance_preserves_unrelated_source[\\nUNRELATED = \"outlook\"\\n]",
+      "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_registry_allowance_rejects_business_logic_inside_optional_branch"
+    ],
+    "shared": [
+      "tests/discovery_runtime/test_extension_inputs.py::test_projection_retains_exact_roles_statuses_and_pins",
+      "tests/discovery_runtime/test_extension_inputs.py::test_unavailable_inputs_retain_rationale_without_fabricated_bytes[excluded]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_unavailable_inputs_retain_rationale_without_fabricated_bytes[unreadable]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[reports]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[inventory]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[acceptance]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[evidence]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_manifest_filter_requires_the_configured_inventory_root",
+      "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src/generated]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[tests]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src/main.cs]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_unconfigured_or_misclassified_inputs_fail_closed[outside/a.cs-source]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_unconfigured_or_misclassified_inputs_fail_closed[src/a.cs-test]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_exact_entrypoints_override_test_roots_without_prefix_scope",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[source]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[document]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[pin]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[absence]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[exclusion]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[profile]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[duplicate]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[revision]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[type]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_unrelated_foreign_and_generated_pins_do_not_enter_projection",
+      "tests/discovery_runtime/test_extension_inputs.py::test_manifest_hash_excludes_only_root_checksum_and_preserves_authored_arrays",
+      "tests/discovery_runtime/test_extension_inputs.py::test_repository_roles_retain_pins_and_reject_conflicting_local_identity[False]",
+      "tests/discovery_runtime/test_extension_inputs.py::test_repository_roles_retain_pins_and_reject_conflicting_local_identity[True]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[source-bytes]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[pin-bytes]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[file-bytes]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[count]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[records]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[depth]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[work]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[ASCII]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\xe9]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\u4e2d]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\U0001f600]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\x00]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\n\\t]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\"\\\\/~]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[None]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[invalid1]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[invalid2]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[None]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[True]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[False]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[123]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[-7]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[1.25]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[value6]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[value7]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[nodes]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[records]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[depth]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[integer]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[unicode]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[scalar]",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_pin_budget_is_checked_before_any_content_hash",
+      "tests/discovery_runtime/test_extension_input_limits.py::test_projected_mappings_reserve_records_before_row_construction",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_absent_and_empty_external_metadata_preserve_default_bytes",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[0.3.7]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[release-candidate]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[2026.10+local]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[\\xe9.\\U0001f600]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_metadata_is_sorted_without_changing_versions",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[repository]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[office-vsto]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[dependencies]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[ui-callbacks]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_duplicate_external_ids_fail_even_when_versions_differ[descriptors0]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_duplicate_external_ids_fail_even_when_versions_differ[descriptors1]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor0]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor1]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor2]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor3]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor4]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor5]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor6]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor7]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor8]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor9]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor10]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers0]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers1]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers2]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-components]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-findings]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-relationships]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-components]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-findings]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-relationships]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-components]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-findings]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-relationships]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-components]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-findings]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-relationships]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[ids-list]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[extensions-list]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[descriptor-type]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[id-type]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[id-size]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[extension-size]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[count]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[rows]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_versions_are_taken_from_the_single_registry_authority",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_empty_batch_limit_is_rejected_before_iteration",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[component_id]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[from_component_id]",
+      "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[to_component_id]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+      "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_document_has_exact_field_set_and_valid_patterns",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_schema_ref_is_scheme_less_relative_posix",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_wraps_relpath_value_error",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_rejects_absolute_result",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_handles_sibling_directories",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_captured_at_derives_from_injected_clock",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_emit_rejects_unguarded_writes_and_retains_serialization",
+      "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_emitted_instance_validates_against_v1_schema"
+    ]
+  },
+  "production_paths": {
+    "core": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py"
+    ],
+    "registry": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py"
+    ],
+    "shared": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py"
+    ]
+  },
+  "qualifications": [
+    "354 unique cases; shared batch already contains actual pipeline and legacy emitter callers.",
+    "Registry historical proof used an earlier emitter; final composition binds the corrected committed shared emitter.",
+    "Existing documentation-only repair and unchanged helper AST qualifications remain in immutable reviews; no current measured callable is exempted.",
+    "Registry package measurement reports only its two task-owned files; four other modules are measured in their own batches.",
+    "Baseline whole-repository coverage remains retained; final scope must not lose any accepted module/class/callable or changed-line coverage.",
+    "Stage 7 requires a separate readiness release and uses only actual local capture/data merge, never publication.",
+    "Raw harness bytes are exact LF snapshots; command streams will retain separate raw hashes and a final lossless archive."
+  ],
+  "released_stages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "retained_predecessor_count": 93,
+  "retained_predecessor_reference": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-candidate-binding.2026-10-19T12-25.json",
+    "sha256": "7b05db5b10ee86187a806612842b2406d1977ad80b1ff4ddb0c49a45a1f5af2c"
+  },
+  "review_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-registry-review.2026-10-19T13-08.json",
+      "sha256": "6844dd6514fc230ec6e7f5ad43a7a4912726aef5fa86bfd0436372ef21187f30"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+      "sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-repair-confirmation.2026-10-19T13-43.json",
+      "sha256": "7f78ece97ca748ec551cfda24e6099a090fc20a87a45879f956f04fd5c3d89cb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-repair-confirmation.2026-10-19T13-52.json",
+      "sha256": "dba30c862c35f1a6f7780c49f65ffe76ceab1873ca511cb7ff29f5faf6027d19"
+    }
+  ],
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-registry-freeze.2026-10-19T13-00.json",
+      "sha256": "32f5966bdba3d0c5819fb029eaa3c41d3c9550f902d1fc3d4b5f2ab1cc19afbf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json",
+      "sha256": "f0fb0b997ccc8ea45540bd30a09e87d4b905a69b50ecde6ec28236299a79db76"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-core-freeze.2026-10-19T13-45.json",
+      "sha256": "5c39693cb1f753fbe36b3c7dd427b78497f5f6fac5119b991dab2c3ec04b7a5b"
+    }
+  ],
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T14-04",
+  "written_at": "2026-10-19T14:04:49.860182+00:00"
+}

@@ -1,0 +1,73 @@
+{
+  "status": "STATIC_COMMENT_REPAIR_ONLY_NOT_ACCEPTANCE",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry_dispatch.py",
+      "sha256": "efd4e439c59bd6d1dd6170dfff7f22a05599bda01be4417b8f9971752c635fc7"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_input_limits.py",
+      "sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inputs.py",
+      "sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_inventory_merge.py",
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_results.py",
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63"
+    },
+    {
+      "path": "tests/discovery_runtime/test_extension_validation_limits.py",
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5"
+    }
+  ],
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-preparation.2026-10-19T14-04.json",
+    "sha256": "8e793d4f3df4d9284a4d951f9a6594b24a203faa768ecb4128aaa16de0208dc3"
+  },
+  "finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-static-finding.2026-10-19T14-07.json",
+    "sha256": "bef7aa51b9c97a9f72fdfd2c18e8ff854665eadd14951c421c8a0be05e006a5a"
+  }
+}

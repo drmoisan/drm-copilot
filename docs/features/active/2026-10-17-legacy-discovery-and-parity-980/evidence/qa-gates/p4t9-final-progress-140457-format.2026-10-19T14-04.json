@@ -1,0 +1,12 @@
+{
+  "binding_sha256": "556d73647ec7a7a78b8719c6fcb1fe4c549636ede85e69eb8f1fbdc03adc052e",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-format-140458.2026-10-19T14-04.json",
+      "sha256": "677ec7ae118e538e23cd4e2eaa7e221f1c3f5981bbd5f096a7717f476399f057",
+      "stage": 1
+    }
+  ]
+}

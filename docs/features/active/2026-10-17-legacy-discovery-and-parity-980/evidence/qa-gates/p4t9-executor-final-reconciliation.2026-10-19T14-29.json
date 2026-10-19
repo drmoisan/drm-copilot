@@ -1,0 +1,16 @@
+{
+  "task": "P4-T9",
+  "scope": "Final retained-proof reconciliation only",
+  "checks": [],
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "status": "CHECKER_FAILED",
+  "diagnostic": "Traceback (most recent call last):\n  File \"SCRATCH/p4t9-final-reconcile.py\", line 192, in <module>\n    run()\n    ~~~^^\n  File \"SCRATCH/p4t9-final-reconcile.py\", line 63, in run\n    assert len(closure[\"stage_paths\"]) == 73\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "Timestamp": "2026-10-19T14-29",
+  "published_at_utc": "2026-10-19T14:29:13.816339+00:00",
+  "Command": ".venv/Scripts/python.exe SCRATCH/p4t9-final-reconcile.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "CHECKER_FAILED; retained-proof reconciliation only; no test or production execution",
+  "executed_checker_sha256": "ce8da6fdb98e4ac560f68a22d4e6fd88f02c48daa5503c1fe8786bf944aaecb2",
+  "raw_original_sha256": "b441eda36204f89f96768b38644fc01e3337bb4490b924abd67ca51393d88dc9",
+  "rendering_qualification": "Only traceback script location is rendered as SCRATCH; exact original JSON is preserved in the final acceptance payload archive and SCRATCH. The original payload's result_sha256 refers to those archived raw bytes."
+}
