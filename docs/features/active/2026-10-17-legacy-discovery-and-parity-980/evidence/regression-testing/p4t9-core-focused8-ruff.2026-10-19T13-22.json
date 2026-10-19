@@ -1,0 +1,87 @@
+{
+  "stage": "ruff",
+  "started": "2026-10-19T13:22:31.375325+00:00",
+  "finished": "2026-10-19T13:22:31.482132+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py",
+  "exit_code": 1,
+  "duration_seconds": 0.107,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "2d28a052ec2396cc3a5177296005df1ffb189ae4b1d6c4c32e13c6f91400766e",
+      "physical_lines": 406
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "5429f525452a19f49572ddebacd4b3f8bf0480c5a6bf55873c045a62d3adf20f",
+      "physical_lines": 333
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "1d907762bbb30e3befe5be933846ace72095e567c7076db9193a577850975e81",
+      "physical_lines": 487
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "e1301148c21cdf635a507314f22b0dc6535f211dc0617d2ee06fbaf1aa46b1f2",
+      "physical_lines": 491
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "2d28a052ec2396cc3a5177296005df1ffb189ae4b1d6c4c32e13c6f91400766e",
+      "physical_lines": 406
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "5429f525452a19f49572ddebacd4b3f8bf0480c5a6bf55873c045a62d3adf20f",
+      "physical_lines": 333
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "1d907762bbb30e3befe5be933846ace72095e567c7076db9193a577850975e81",
+      "physical_lines": 487
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "e1301148c21cdf635a507314f22b0dc6535f211dc0617d2ee06fbaf1aa46b1f2",
+      "physical_lines": 491
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf",
+      "physical_lines": 432
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf",
+      "physical_lines": 432
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused8-ruff-132231.stdout.bin",
+      "raw_sha256": "0af342c18da4c74c27ff2f7c6554c3fd991147520bc9e0427ff53d53eee24e4e",
+      "raw_bytes": 1472,
+      "presentation": "E501 Line too long (92 > 88)\n   --> tests\\discovery_runtime\\test_extension_inventory_merge.py:444:89\n    |\n442 |     bundle: DiscoverySnapshot,\n443 | ) -> None:\n444 |     \"\"\"Require failed-input accounting to carry its own blocker; mutate only local state.\"\"\"\n    |                                                                                         ^^^^\n445 |     context = ExtensionValidation(bundle)\n446 |     unavailable = InventoryInput(\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_extension_inventory_merge.py:468:89\n    |\n466 |     bundle: DiscoverySnapshot, field: str, monkeypatch: pytest.MonkeyPatch\n467 | ) -> None:\n468 |     \"\"\"Reserve metadata's UTF-8 cost before any core analysis; patch only local seams.\"\"\"\n    |                                                                                         ^\n469 |     import drm_copilot_discovery.extension_results as module\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_extension_results.py:460:89\n    |\n458 |     bundle: DiscoverySnapshot,\n459 | ) -> None:\n460 |     \"\"\"Reject an unexplained omission without reflecting its untrusted path in errors.\"\"\"\n    |                                                                                         ^\n461 |     with pytest.raises(ExtensionResultError, match=\"EXTENSION_INPUT\") as failure:\n462 |         validate_extension_results(replace(bundle, excluded_paths=(\"unexplained\",)))\n    |\n\nFound 3 errors.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused8-ruff-132231.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}

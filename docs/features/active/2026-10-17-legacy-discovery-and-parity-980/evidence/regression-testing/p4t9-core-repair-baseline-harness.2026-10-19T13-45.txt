@@ -1,0 +1,55 @@
+"""Preserve the exact reviewed core before the approved R2/R3 repair."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+new_path = "tests/discovery_runtime/test_extension_validation_limits.py"
+assert not (repo / new_path).exists()
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+    "tests/discovery_runtime/test_extension_results.py",
+    "tests/discovery_runtime/test_extension_inventory_merge.py",
+]
+saved = scratch / ("p4t9-core-before-repair-" + stamp)
+saved.mkdir(exist_ok=False)
+bindings = {}
+for name in paths:
+    raw = (repo / name).read_bytes()
+    (saved / Path(name).name).write_bytes(raw)
+    tree = ast.parse(raw)
+    bindings[name] = {
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw),
+        "definitions": [node.name for node in tree.body if isinstance(node, ast.FunctionDef)],
+        "scratch_identifier": "SCRATCH/" + saved.name + "/" + Path(name).name,
+    }
+harnesses = {}
+for name in ("p4t9-core-gate.py", "p4t9-core-coverage.py", "p4t9-core-freeze.py"):
+    raw = (scratch / name).read_bytes()
+    (saved / name).write_bytes(raw)
+    harnesses[name] = {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+profile = ".codex/agents/python-typed-engineer-c4.toml"
+assert hashlib.sha256((repo / profile).read_bytes()).hexdigest() == "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+record = {
+    "timestamp": now.isoformat(), "absent_before_creation": new_path,
+    "approved_scope": paths + [new_path], "retained_before_repair": bindings,
+    "retained_harnesses": harnesses,
+    "shared_baseline": "evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+    "review": "evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+    "review_sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5",
+    "route": "workspace_operations_p4t9_core_repair", "profile": profile,
+    "source_test_mutation": False, "prior_proof_replayed": False,
+}
+prefix = feature / "evidence/baseline" / ("p4t9-core-repair-scope." + stamp)
+Path(str(prefix) + ".json").write_bytes((json.dumps(record, indent=2) + "\n").encode())
+Path(str(prefix) + ".md").write_bytes((f"# P4-T9 core repair scope\n\nTimestamp: {stamp}\n\nCommand: .venv/Scripts/python.exe SCRATCH/p4t9-core-repair-baseline.py\n\nEXIT_CODE: 0\n\nOutput Summary: Verified the approved test split was absent; preserved four reviewed source/test streams and three harnesses before repair. The paired JSON binds the original baseline, immutable review, exact hashes and scratch copies. No source or test was changed; no predecessor test was rerun.\n").encode())
+print(str(prefix.relative_to(repo)) + ".json")
+print(hashlib.sha256(Path(str(prefix) + ".json").read_bytes()).hexdigest())

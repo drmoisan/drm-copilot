@@ -1,0 +1,79 @@
+{
+  "review": "evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+  "original_test_paths": {
+    "tests/discovery_runtime/test_extension_results.py": "eb7cdf2dd054ada3888d1d41aa8944f3ecd19493c6da11ded6fdcc19c8fd35e4",
+    "tests/discovery_runtime/test_extension_inventory_merge.py": "7e9474868f09f5fae7b483024c065b77f54c85227c0ea383f51d9db079c63d81"
+  },
+  "retained_definitions": 33,
+  "moved_definitions": [
+    {
+      "name": "test_transport_and_independent_pin_failures",
+      "from": "test_extension_results.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_diagnostic_link_work_has_an_independent_operation_ceiling",
+      "from": "test_extension_results.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_resource_limits_require_positive_exact_integers",
+      "from": "test_extension_inventory_merge.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_utf8_json_reservation_matches_canonical_boundary",
+      "from": "test_extension_inventory_merge.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_independent_traversal_record_and_numeric_limits",
+      "from": "test_extension_inventory_merge.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_raw_member_aggregate_is_independent_of_each_document_limit",
+      "from": "test_extension_inventory_merge.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": true
+    },
+    {
+      "name": "test_capture_index_count_is_bounded_before_projection",
+      "from": "test_extension_inventory_merge.py",
+      "to": "test_extension_validation_limits.py",
+      "behavior_ast_unchanged": false
+    }
+  ],
+  "only_original_behavior_delta": {
+    "name": "test_capture_index_count_is_bounded_before_projection",
+    "change": "Use explicit low profile limits instead of reading an omitted optional limits member."
+  },
+  "all_125_original_case_ids_retained": true,
+  "new_case_ids": [
+    "test_integer_budget_never_renders_before_reservation[below-power-exact]",
+    "test_integer_budget_never_renders_before_reservation[beyond-rendering-ceiling]",
+    "test_integer_budget_never_renders_before_reservation[negative-exact]",
+    "test_integer_budget_never_renders_before_reservation[negative-large-exact]",
+    "test_integer_budget_never_renders_before_reservation[negative-large-overflow]",
+    "test_integer_budget_never_renders_before_reservation[negative-power-exact]",
+    "test_integer_budget_never_renders_before_reservation[negative-power-short]",
+    "test_integer_budget_never_renders_before_reservation[negative-short]",
+    "test_integer_budget_never_renders_before_reservation[power-exact]",
+    "test_integer_budget_never_renders_before_reservation[power-short]",
+    "test_integer_budget_never_renders_before_reservation[power-width-overflow]",
+    "test_integer_budget_never_renders_before_reservation[remaining-exact]",
+    "test_integer_budget_never_renders_before_reservation[remaining-short]",
+    "test_integer_budget_never_renders_before_reservation[review-large-exact]",
+    "test_integer_budget_never_renders_before_reservation[review-large-overflow]",
+    "test_integer_budget_never_renders_before_reservation[review-small-overflow]",
+    "test_integer_budget_never_renders_before_reservation[single-exact]",
+    "test_integer_budget_never_renders_before_reservation[zero-exact]",
+    "test_integer_budget_never_renders_before_reservation[zero-short]"
+  ],
+  "docstrings_ignored_for_body_comparison": true
+}

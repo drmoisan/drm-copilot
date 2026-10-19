@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-10-19T12:50:30.081916+00:00",
+  "absent": "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+    "sha256": "4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a"
+  },
+  "authority": "workspace_operations_p4t9_core_implementation",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "scope": "Pure schema/member/provenance/accounting validation; no publication authority.",
+  "exit_code": 0
+}

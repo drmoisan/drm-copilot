@@ -1,0 +1,140 @@
+"""Relocate approved boundary cases and complete only their reviewed contracts."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+test_root = repo / "tests/discovery_runtime"
+move = {
+    "test_extension_results.py": {
+        "test_transport_and_independent_pin_failures",
+        "test_diagnostic_link_work_has_an_independent_operation_ceiling",
+    },
+    "test_extension_inventory_merge.py": {
+        "test_resource_limits_require_positive_exact_integers",
+        "test_utf8_json_reservation_matches_canonical_boundary",
+        "test_independent_traversal_record_and_numeric_limits",
+        "test_raw_member_aggregate_is_independent_of_each_document_limit",
+        "test_capture_index_count_is_bounded_before_projection",
+    },
+}
+new_name = "test_extension_validation_limits.py"
+assert not (test_root / new_name).exists()
+header = '''"""Verify extension transport and prospective resource boundaries in memory."""
+
+from __future__ import annotations
+
+from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_snapshot
+from drm_copilot_discovery.extension_inputs import extension_input_digest
+from drm_copilot_discovery.extension_results import ExtensionResultError, validate_extension_results
+from drm_copilot_discovery.extension_validation import ExtensionBudget, ExtensionValidation
+from drm_copilot_discovery.models import JsonValue, canonical_json
+from drm_copilot_discovery.profile_models import ProfileLimits
+from drm_copilot_discovery.snapshot import SnapshotFile
+
+from tests.discovery_runtime.analyzer.test_repository import analyzer_catalog as analyzer_catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+from tests.discovery_runtime.test_extension_results import MANIFEST, MEMBER, documents, edit_bundle
+from tests.discovery_runtime.test_extension_results import bundle as bundle
+from tests.schemas.discovery.v2_schema_test_support import as_object
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+'''
+chunks, inventory = [], []
+for filename, names in move.items():
+    path = test_root / filename
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines(keepends=True)
+    ranges = []
+    for node in ast.parse(text).body:
+        if isinstance(node, ast.FunctionDef) and node.name in names:
+            start = min([node.lineno] + [item.lineno for item in node.decorator_list]) - 1
+            end = node.end_lineno
+            chunk = "".join(lines[start:end])
+            chunks.append(chunk.rstrip())
+            inventory.append({"name": node.name, "from": filename, "to": new_name,
+                              "before_ast": ast.dump(node, include_attributes=False),
+                              "exact_moved_chunk_sha256": hashlib.sha256(chunk.encode()).hexdigest()})
+            ranges.append((start, end))
+    assert len(ranges) == len(names)
+    for start, end in sorted(ranges, reverse=True):
+        del lines[start:end]
+    text = "".join(lines)
+    while "\n\n\n\n" in text:
+        text = text.replace("\n\n\n\n", "\n\n\n")
+    path.write_bytes((text.rstrip() + "\n").encode())
+(test_root / new_name).write_bytes((header.rstrip() + "\n\n\n" + "\n\n\n".join(chunks) + "\n").encode())
+
+docs = {
+    "extension_snapshot": "Return a pinned source/docs bundle using catalog (SchemaCatalog).\n\n    Returns DiscoverySnapshot; malformed fixture data raises ValueError.\n    Allocates isolated immutable test data without I/O or input mutation.",
+    "bundle": "Return read-only DiscoverySnapshot from analyzer_catalog (SchemaCatalog).\n\n    Module-scoped immutable data is safe to share; invalid fixture construction\n    raises ValueError. No external effects or mutable shared state are introduced.",
+    "documents": "Detach manifest/member dictionaries from snapshot (DiscoverySnapshot).\n\n    Returns tuple[dict[str, object], dict[str, object]]; missing fixture bytes\n    raise AssertionError. Allocates local fault-injection copies without I/O.",
+    "edit_bundle": "Return a resealed DiscoverySnapshot from isolated test dictionaries.\n\n    snapshot (DiscoverySnapshot) stays unchanged. manifest/member (dict[str, object])\n    are local copies; seal/bind (bool) control deliberate integrity faults.\n    Mutates those dictionaries only; invalid fixture shapes raise ValueError. No I/O.",
+    "set_field": "Change one leaf in document (dict[str, object]); return None.\n\n    path (tuple[str | int, ...]) selects the leaf; value (object) replaces it.\n    Invalid fixture paths raise KeyError/IndexError. Mutates only this local copy.",
+    "test_valid_bundle_preserves_versions_uncertainty_and_bytes": "Preserve exact bytes and inference from bundle (DiscoverySnapshot).\n\n    Returns None; assertions detect carrier/confidence changes. Pure in-memory test.",
+    "test_invalid_claims_fail_closed": "Reject a resealed claim fault in bundle (DiscoverySnapshot); return None.\n\n    target (str), path (tuple[str | int, ...]), value (object) locate the fault;\n    code (str) names the expected ExtensionResultError. Only local copies mutate;\n    assertions detect incorrect rejection or leaked partial output. No I/O.",
+    "test_selection_is_an_explicit_configured_tuple": "Reject selection (object) against bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_SELECTION; assertion failure detects accepted malformed input.\n    Uses immutable memory data without reads or input mutation.",
+    "test_transport_and_independent_pin_failures": "Reject fault (str) in bundle (DiscoverySnapshot); return None.\n\n    Creates isolated capture variants and expects the matching ExtensionResultError;\n    assertions reject incorrect integrity/provenance outcomes. No I/O occurs.",
+    "test_line_ranges_share_cached_physical_bounds": "Check repeated CRLF anchors in bundle (DiscoverySnapshot); return None.\n\n    Mutates detached fixture rows only; assertions detect mismatched source bounds.\n    No retained input bytes or external state change.",
+    "test_generic_artifact_capture_remains_compatible": "Check generic labels for bundle (DiscoverySnapshot); return None.\n\n    Creates immutable local replacements; assertions detect changed validation.\n    No input mutation or I/O occurs.",
+    "test_unexplained_capture_exclusion_has_fixed_input_error": "Reject an unexplained omission from bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_INPUT and asserts path redaction. Uses local memory only.",
+    "test_diagnostic_link_work_has_an_independent_operation_ceiling": "Check inputs/diagnostics (int) against allowed (bool); return None.\n\n    Expects EXTENSION_LIMIT only above the operation ceiling; assertions detect\n    incorrect equality/empty handling. No mutation or external effects occur.",
+    "test_merge_reconstructs_complete_core_and_external_rows": "Preserve core and external rows from bundle (DiscoverySnapshot); return None.\n\n    Assertions detect schema, identity, accounting or confidence changes. Pure\n    reconstruction returns unassigned proposals without I/O or publication.",
+    "test_empty_selection_retains_exact_builtin_output": "Compare empty selection for bundle (DiscoverySnapshot); return None.\n\n    Assertions require exact built-in output; immutable inputs and external state\n    are unchanged.",
+    "test_incomplete_external_diagnostics_remain_blocking_data": "Retain diagnostic state from bundle (DiscoverySnapshot); return None.\n\n    manifest_only/blocking (bool) choose location/severity. Only detached test\n    dictionaries change; assertions detect lost blockers or links. No I/O occurs.",
+    "test_invalid_diagnostic_ownership_cannot_weaken_core": "Reject malformed diagnostics in bundle (DiscoverySnapshot); return None.\n\n    field (str), value (object), code (str) select a local mutation and expected\n    ExtensionResultError. Assertions detect wrong rejection; no I/O occurs.",
+    "test_core_pin_failure_is_preserved_without_falsely_validating_documentation": "Retain the missing-docs-pin blocker for bundle (DiscoverySnapshot).\n\n    Returns None; local immutable replacements leave input unchanged. Assertions\n    detect lost core diagnostics; no source claim or external effect is created.",
+    "test_core_component_collision_fails_without_overwriting": "Reject external/core ID collision for bundle (DiscoverySnapshot).\n\n    Returns None; only detached rows mutate. Expects EXTENSION_COLLISION; assertion\n    failure detects replacement of authoritative rows. No I/O occurs.",
+    "test_merge_does_not_trust_public_validation_carriers": "Reject forged proof for bundle (DiscoverySnapshot); return None.\n\n    monkeypatch (pytest.MonkeyPatch) temporarily replaces one public seam. Expects\n    EXTENSION_DIGEST from raw reconstruction; assertions detect bypass. No I/O.",
+    "forged": "Return retained tuple[ValidatedExtension, ...] for ignored object args/kwargs.\n\n        Supplies deliberately untrusted proof; no input mutation, failure or I/O.",
+    "test_untyped_snapshot_is_rejected_before_analysis": "Reject invalid (object) before analysis; return None.\n\n    Expects EXTENSION_SNAPSHOT; assertion failure detects accepted malformed input.\n    No source capture, input mutation or I/O occurs.",
+    "test_load_blockers_precede_valid_extension_claims": "Keep capture failures blocking for bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_SNAPSHOT from a local immutable variant; assertion failure\n    detects false success. No input mutation or external effects occur.",
+    "test_carriers_are_immutable_descriptions_with_checked_field_types": "Reject malformed carrier fields for bundle (DiscoverySnapshot); return None.\n\n    field (str)/value (object) select a local replacement. Expects EXTENSION_CARRIER;\n    assertion failure detects unchecked fields. No input mutation or I/O occurs.",
+    "test_resource_limits_require_positive_exact_integers": "Reject invalid (object) capacity at field (str); return None.\n\n    Expects EXTENSION_LIMIT before traversal; assertions reject ambiguous types.\n    Only an isolated argument mapping is allocated; no I/O occurs.",
+    "test_utf8_json_reservation_matches_canonical_boundary": "Reserve canonical bytes of value (JsonValue); return None.\n\n    Expects EXTENSION_LIMIT one byte short; assertions require exact allowed cost.\n    Mutates local budgets only, with no input changes or I/O.",
+    "test_independent_traversal_record_and_numeric_limits": "Exhaust the independent resource selected by mode (str); return None.\n\n    Expects EXTENSION_LIMIT and no partial projection; assertion failure detects\n    an unchecked bound. Changes only isolated reservation state, without I/O.",
+    "test_raw_member_aggregate_is_independent_of_each_document_limit": "Bound combined retained bytes for bundle (DiscoverySnapshot); return None.\n\n    Alters an isolated context limit; expects EXTENSION_LIMIT on the second read.\n    Assertions detect unbounded aggregate input; no filesystem access occurs.",
+    "test_manifest_member_paths_use_portable_containment": "Reject path (str) against bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_PATH; assertions detect alias/sibling access. Uses immutable\n    capture bytes without filesystem access or input mutation.",
+    "test_reused_member_paths_and_result_ids_are_rejected": "Reject reuse in a local context for bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_COLLISION for paths and IDs; assertions detect ambiguous\n    retention. Only operation-local counters/sets change; no I/O occurs.",
+    "test_merge_metadata_errors_remain_fixed_and_nonpublishing": "Reject malformed metadata for bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_MERGE and asserts value redaction; no input mutation or I/O.",
+    "test_capture_index_count_is_bounded_before_projection": "Bound capture indexes from bundle (DiscoverySnapshot); return None.\n\n    Supplies explicit low profile limits; expects EXTENSION_LIMIT before indexing.\n    Assertions detect missed bounds; immutable local replacement causes no I/O.",
+    "test_unreadable_accounting_requires_a_blocking_diagnostic": "Require unavailable-input blockers for bundle (DiscoverySnapshot); return None.\n\n    Expects EXTENSION_ACCOUNTING after isolated context changes; assertions detect\n    unreported unreadability. No source bytes or external state change.",
+    "test_metadata_budget_precedes_builtin_emission": "Reject oversized field (str) for bundle (DiscoverySnapshot); return None.\n\n    monkeypatch (pytest.MonkeyPatch) temporarily installs bounded local seams.\n    Expects EXTENSION_LIMIT before core calls; assertions detect ordering failure.\n    Only local state changes; no I/O occurs.",
+    "bounded_context": "Return ExtensionValidation for snapshot (DiscoverySnapshot), without I/O.\n\n        Asserts the expected immutable input; returns prepared local state unchanged.",
+    "forbidden": "Reject ignored object args/kwargs with AssertionError; never return None.\n\n        Detects forbidden core emission in this isolated test; no I/O or mutation.",
+}
+for filename in (*move, new_name):
+    path = test_root / filename
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines(keepends=True)
+    replacements = []
+    for node in ast.walk(ast.parse(text)):
+        if isinstance(node, ast.FunctionDef):
+            first = node.body[0]
+            assert isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant)
+            assert node.name in docs, node.name
+            indent = " " * first.col_offset
+            content = docs[node.name].splitlines()
+            rendered = indent + '"""' + content[0]
+            if len(content) == 1:
+                rendered += '"""\n'
+            else:
+                rendered += "\n" + "\n".join(indent + line[4:] if line.startswith("    ") else line for line in content[1:])
+                rendered += "\n" + indent + '"""\n'
+            replacements.append((first.lineno - 1, first.end_lineno, rendered))
+    for start, end, rendered in sorted(replacements, reverse=True):
+        lines[start:end] = [rendered]
+    text = "".join(lines)
+    text = text.replace('    limits = as_object(to_plain_value(bundle.profile.document["limits"]))\n    limits.update(source_files=1, artifact_records=1)\n    profile = inventory_profile(bundle.catalog, limits=limits)',
+                        '    profile = inventory_profile(\n        bundle.catalog, limits={"source_files": 1, "artifact_records": 1}\n    )')
+    path.write_bytes(text.encode())
+    print(filename, len(text.splitlines()))
+(scratch / "p4t9-core-moved-case-inventory.json").write_bytes((json.dumps(inventory, indent=2) + "\n").encode())

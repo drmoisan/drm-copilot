@@ -1,0 +1,29 @@
+"""Print a narrow formatting patch for owned comments and one-line docstrings."""
+from pathlib import Path
+import textwrap
+
+paths = ['packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py',
+         'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py',
+         'tests/discovery_runtime/test_extension_results.py',
+         'tests/discovery_runtime/test_extension_inventory_merge.py']
+print('*** Begin Patch')
+for name in paths:
+    changes = []
+    for line in Path(name).read_text(encoding='utf-8').splitlines():
+        if len(line) <= 88:
+            continue
+        stripped = line.lstrip()
+        indent = line[:len(line) - len(stripped)]
+        if stripped.startswith('# '):
+            replacement = textwrap.wrap(stripped[2:], width=84-len(indent)-2)
+            changes.append((line, [indent + '# ' + item for item in replacement]))
+        elif stripped.startswith('"""') and stripped.endswith('"""'):
+            replacement = textwrap.wrap(stripped[3:-3], width=80-len(indent))
+            changes.append((line, [indent + '"""' + replacement[0]] +
+                [indent + item for item in replacement[1:]] + [indent + '"""']))
+    if changes:
+        print('*** Update File: ' + name)
+        for before, after in changes:
+            print('@@\n-' + before)
+            print('\n'.join('+' + line for line in after))
+print('*** End Patch')

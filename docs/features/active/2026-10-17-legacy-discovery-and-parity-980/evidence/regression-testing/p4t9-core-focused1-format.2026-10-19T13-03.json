@@ -1,0 +1,87 @@
+{
+  "stage": "format",
+  "started": "2026-10-19T13:03:14.894153+00:00",
+  "finished": "2026-10-19T13:03:15.605921+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m black packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py",
+  "exit_code": 0,
+  "duration_seconds": 0.712,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "3c7f69e46b78ae810707663f4898cfee5b00c95f40c7f2245cb7a41a864b6d5b",
+      "physical_lines": 322
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "9c3ba6c14e50378e4c2e58ca4f060e2113201db653b3c9f7a779b6e9b69f84bd",
+      "physical_lines": 265
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "90ef2c8eba886976c227884bfada3239463127a029e8df905a1aba38d7d2659f",
+      "physical_lines": 244
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "c48485d6b06a8827e73f507dc98ccb28b3b2bb1f296c60e55405ae0749e57f5f",
+      "physical_lines": 233
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "721832f55dc5e47217a8edcbfdb002b4c78c814a01f3a7980a2723cfa04d2778",
+      "physical_lines": 358
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "b10d4edbc33db5528ad134fe486e14a2be82042416b6d4469fe44c49473ad66a",
+      "physical_lines": 293
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "e13c039b1ff4d2a5937f0e8c2d6a7e4b1b62517f9c579a62d76c57df55d571a4",
+      "physical_lines": 421
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "92798f12b3b44b48735c9c316cd40966ed12114d91598d2cabf4ba2500723da9",
+      "physical_lines": 400
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "9545be976e7a42232f4c75d4d10bf6178e6a7705b1f34ed3a471aa3a15c1f0f5",
+      "physical_lines": 428
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "92bfd5a05bacae8976376237af9a64d0b74011f70472203f0641d4be8881f34f",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused1-format-130315.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-focused1-format-130315.stderr.bin",
+      "raw_sha256": "f12e1385a7767a922e79f00944364a54ea3669c250e5546e125ab6e7af093738",
+      "raw_bytes": 359,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_results.py\r\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_validation.py\r\nreformatted tests\\discovery_runtime\\test_extension_inventory_merge.py\r\nreformatted tests\\discovery_runtime\\test_extension_results.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n4 files reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}
