@@ -1,0 +1,50 @@
+{
+  "error": "MUTATION_INVALID",
+  "findings": [
+    {
+      "artifact_path": "docs/migration/discovery/reports/existing.md",
+      "code": "SNAPSHOT_UNCLASSIFIED",
+      "message": "Captured structured input lacks an expected artifact kind.",
+      "next_action": "Correct the inputs and validate the requested mode.",
+      "pointer": "",
+      "related_ids": [],
+      "related_paths": [],
+      "severity": "error"
+    },
+    {
+      "artifact_path": "docs/migration/discovery/reports/existing.md",
+      "code": "SNAPSHOT_UNRECOGNIZED",
+      "message": "Unrecognized file in a configured artifact location.",
+      "next_action": "Correct the input and reload the complete snapshot.",
+      "pointer": "",
+      "related_ids": [],
+      "related_paths": [],
+      "severity": "error"
+    }
+  ],
+  "fixture_file_hashes": {
+    "docs/guide.md": "d4a9aee0240eb4b3cf7e6871cee2a5b75e20cea72cc568398c645e2972741ef0",
+    "docs/migration/discovery/domain-profile.yaml": "563d65488783508620fcb37d5bf85710be39662b391aaa1e801c5d2fd69ee097",
+    "docs/migration/discovery/reports/existing.md": "4b0596a72e6459c4d862691fbc35ad94adec57e3f1464c5301e3cb99b6ef758e",
+    "src/Alpha.cs": "b953ae9082f3973a5328e982e01e269781232f247d6d5fe87b68a3392af6f762",
+    "src/Example.csproj": "8d654c44b7bebb6b31a9f2f606927f45b5072193adc4eef8cce3f3cf3b278df3",
+    "src/vendor/hidden.cs": "42db8ad74458ad10ed82ab96a6f31d097b41d0ae2cabf80ce14a646895823719",
+    "tests/AlphaTests.cs": "b50174dd029ddf6d10af34718514fe74bf609036fe444bf7180cbeb11425d497"
+  },
+  "fixture_repository_revision": "3eff9efd3f395a5b49e8047301921ec815f714df",
+  "fixture_unchanged": true,
+  "harness_copy": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-failed-harness.2026-10-19T02-46.txt",
+    "sha256": "9062dcad62b26887cddd210bb98fd030d0a78df51101433046f3d63e59a25845"
+  },
+  "inventory_copy": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-failed-inventory.2026-10-19T02-46.json",
+    "sha256": "13c1a1f5a2a23569bee69b393c785a3610bde1b4bde6deccfc15204e46818482"
+  },
+  "profile_copy": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-failed-profile.2026-10-19T02-46.json",
+    "sha256": "563d65488783508620fcb37d5bf85710be39662b391aaa1e801c5d2fd69ee097"
+  },
+  "scope": "The original failed synthetic native fixture remains in SCRATCH; this diagnostic did not recreate it or publish inventory.",
+  "timestamp": "2026-10-19T02:46:25.429064+00:00"
+}

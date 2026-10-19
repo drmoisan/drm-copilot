@@ -79,7 +79,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [ ] Required platform dimensions cannot remain unspecified.
 - [ ] Implementation planning can be gated on discovery completion.
 ### Analyzers
-- [ ] A generic repository/project inventory analyzer exists.
+- [x] A generic repository/project inventory analyzer exists.
 - [ ] At least one meaningful C#/.NET analyzer exists.
 - [ ] Output is deterministic and machine-readable.
 - [ ] Findings include source references.

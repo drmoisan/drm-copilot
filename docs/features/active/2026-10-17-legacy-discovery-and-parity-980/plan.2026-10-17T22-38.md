@@ -253,7 +253,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 4 — Deterministic generic inventory analyzers
 
-- [ ] [P4-T1] Move and harden repository inventory and the analyzer pipeline.
+- [x] [P4-T1] Move and harden repository inventory and the analyzer pipeline.
   - Files and behavior: Move DT/discovery/analyzer/{models,pipeline,inventory,emitter}.py into R/analyzer/ and leave compatibility adapters; create R/analyzer/{registry,findings}.py. Add PT/analyzer/test_{repository,pipeline,registry}.py and update Set F model/pipeline/emitter/inventory/E2E suites.
   - Tests and proof: Recognize real solution/project and generic manifest suffixes; traverse selected roots with early output/dependency/exclusion pruning; retain every included/excluded/read-failed input; hash parsed bytes once; distinguish detected/inferred findings; seed only uninspected/unassigned ledger proposals.
   - Acceptance: Default and dry-run inventory perform no writes; explicit writes are validated mutations; ordering, clock variation, separator variation, and enumeration order do not change semantic IDs/digests.

@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "native capture includes configured source, test, project and documentation bytes",
+    "native capture prunes dependency and output frontiers before metadata or bytes",
+    "excluded dependency and artifact frontiers retain explicit accounting",
+    "native source hash preserves CRLF and Unicode bytes",
+    "native precapture binds documentation to actual immutable Git bytes",
+    "native default and dry-run analysis preserve tree and semantic identity",
+    "native ledger seed proposals remain uninspected and unassigned",
+    "native mutation preview validates without publication or invalidation",
+    "native guarded first publication succeeds and invalidates prior authority",
+    "native publication creates exactly one inventory and preserves all existing bytes",
+    "native repeat publication skips the exact existing artifact",
+    "native changed source rejects stale request before publication",
+    "native bounded read failure retains unavailable input without fabricated bytes"
+  ],
+  "count": 13,
+  "elapsed_seconds": 42.4663326000009,
+  "pinned_revision": "4d5454c2b886fc3a6f096ce08f6211648dcaaa4b",
+  "scope": "Windows native operational fixture under SCRATCH; core analyzer remains pure and host Git execution is injected",
+  "working_tree_mutations": "synthetic fixture only"
+}

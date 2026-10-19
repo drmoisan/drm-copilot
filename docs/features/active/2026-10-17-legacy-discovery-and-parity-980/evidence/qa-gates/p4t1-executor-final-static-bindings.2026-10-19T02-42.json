@@ -1,0 +1,1989 @@
+{
+  "task": "P4-T1",
+  "status": "STATIC_BINDINGS_PASS",
+  "timestamp": "2026-10-19T02:42:54.748775+00:00",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "current_head": "34278a5db7fed0653886c46e599304691628a4b9",
+  "checks": 27998,
+  "findings": [],
+  "reviewed_task_paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "working_sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "index_sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "git_blob": "d25360fd0fa8d88e1568a0511da7807040437eb2",
+      "normalization": "exact",
+      "normalized_sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "crlf_count": 0,
+      "physical_lines": 1,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "working_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "index_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "git_blob": "36991492c8053eb68f629446b660bc8397feefac",
+      "normalization": "exact",
+      "normalized_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "crlf_count": 0,
+      "physical_lines": 228,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "working_sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "index_sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "git_blob": "6d9a65483a5c781f823a3fd6c34131fabc030df5",
+      "normalization": "exact",
+      "normalized_sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "crlf_count": 0,
+      "physical_lines": 142,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "working_sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "index_sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "git_blob": "a0c7fd5f7427490b935cf7fb30285913328493a2",
+      "normalization": "exact",
+      "normalized_sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "crlf_count": 0,
+      "physical_lines": 311,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "working_sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "index_sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "git_blob": "6d8d9ab143b361fd311a25220c2be806a31d0cdf",
+      "normalization": "exact",
+      "normalized_sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "crlf_count": 0,
+      "physical_lines": 328,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "working_sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "index_sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "git_blob": "dd7c0c1840106230acc1daffde642e0594428bd4",
+      "normalization": "exact",
+      "normalized_sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "crlf_count": 0,
+      "physical_lines": 293,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "working_sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "index_sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "git_blob": "24ce54f2d0044395fc90c7717daa89ca57e93637",
+      "normalization": "exact",
+      "normalized_sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "crlf_count": 0,
+      "physical_lines": 270,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "working_sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "index_sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "git_blob": "680e928d80b794793a68da5cd3cfcda8181ffdd2",
+      "normalization": "exact",
+      "normalized_sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "crlf_count": 0,
+      "physical_lines": 57,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "working_sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "index_sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "git_blob": "7b8df3a06685800559f467510e0b0a5703debd4a",
+      "normalization": "exact",
+      "normalized_sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "crlf_count": 0,
+      "physical_lines": 8,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "working_sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "index_sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "git_blob": "0c423d8055f86709882ff6fca49c79c22b9e94f9",
+      "normalization": "exact",
+      "normalized_sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "crlf_count": 0,
+      "physical_lines": 20,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "working_sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "index_sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "git_blob": "bf46c58990c4e77744d4bb9328a4360bb3695303",
+      "normalization": "exact",
+      "normalized_sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "crlf_count": 0,
+      "physical_lines": 26,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "working_sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "index_sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "git_blob": "8712a158c85108a9be7bf71d66dcedd4b28fd23e",
+      "normalization": "exact",
+      "normalized_sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "crlf_count": 0,
+      "physical_lines": 14,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "working_sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "index_sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "git_blob": "4a5b6b2703a9913da7aa1d12faa64cd99a18e935",
+      "normalization": "exact",
+      "normalized_sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "crlf_count": 0,
+      "physical_lines": 451,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "working_sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "index_sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "git_blob": "e5fef832571b0254ba531d3fa722146a825a2f45",
+      "normalization": "exact",
+      "normalized_sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "crlf_count": 0,
+      "physical_lines": 353,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "working_sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "index_sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "git_blob": "6dc2422131d4367e609ce5f4108f658d975ea506",
+      "normalization": "exact",
+      "normalized_sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "crlf_count": 0,
+      "physical_lines": 201,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "working_sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "index_sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "git_blob": "4df4031dc771f15c2942b2919931604dc7d75029",
+      "normalization": "exact",
+      "normalized_sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "crlf_count": 0,
+      "physical_lines": 342,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "working_sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "index_sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "git_blob": "c7cb15865a8944352ed81b41963dd15d41beca8f",
+      "normalization": "exact",
+      "normalized_sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "crlf_count": 0,
+      "physical_lines": 205,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "working_sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "index_sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "git_blob": "436059c4bdcfb6c8b597b8ef04d1d4a0e9a89454",
+      "normalization": "exact",
+      "normalized_sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "crlf_count": 0,
+      "physical_lines": 90,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "working_sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "index_sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "git_blob": "0aaca766460ba09db6e5f28f6f5d09e3f5d3e562",
+      "normalization": "exact",
+      "normalized_sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "crlf_count": 0,
+      "physical_lines": 422,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "working_sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "index_sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "git_blob": "5452f0c039465872eaa4492c4ca368b78341d8b5",
+      "normalization": "exact",
+      "normalized_sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "crlf_count": 0,
+      "physical_lines": 213,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "working_sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "index_sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "git_blob": "ac9982694fcf56d1def2c0a0ae7f6445a5f117f7",
+      "normalization": "exact",
+      "normalized_sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "crlf_count": 0,
+      "physical_lines": 226,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "working_sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "index_sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "git_blob": "e7f8c8d690a379005262f5b023bb76b07df256ec",
+      "normalization": "exact",
+      "normalized_sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "crlf_count": 0,
+      "physical_lines": 129,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "working_sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "index_sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "git_blob": "ac193b73194d7a8dd7dec6b1d7177c00013e0b55",
+      "normalization": "exact",
+      "normalized_sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "crlf_count": 0,
+      "physical_lines": 144,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "working_sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "index_sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "git_blob": "e44cd363cf57cd8c6f974c0191f5df621858c2f1",
+      "normalization": "exact",
+      "normalized_sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "crlf_count": 0,
+      "physical_lines": 145,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "working_sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "index_sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "git_blob": "c1aec4e93573cd645b6e1b38220924803973cd1b",
+      "normalization": "exact",
+      "normalized_sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "crlf_count": 0,
+      "physical_lines": 210,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "working_sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "index_sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "git_blob": "9826b2dbf1bc1284722abcaf2c310742c80adcb6",
+      "normalization": "exact",
+      "normalized_sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "crlf_count": 0,
+      "physical_lines": 486,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "working_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "index_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "git_blob": "f9efa54fd60e3d59eaceed9c749ae64fb3708792",
+      "normalization": "exact",
+      "normalized_sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "crlf_count": 0,
+      "physical_lines": 496,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+      "working_sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "index_sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "git_blob": "92b2c8bb900d95e78778b001012bbc1713aed3a6",
+      "normalization": "exact",
+      "normalized_sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "crlf_count": 0,
+      "physical_lines": 71,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+      "working_sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "index_sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "git_blob": "cca5a696dbe9da04cfe4809e8a015ec620825311",
+      "normalization": "exact",
+      "normalized_sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "crlf_count": 0,
+      "physical_lines": 353,
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      }
+    }
+  ],
+  "preserved_predecessors": [
+    {
+      "path": "docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "git_blob": "37c283f727f22f839a4e079b0a074ca89a1c3ef1"
+    },
+    {
+      "path": "docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c04bd95b1827f73f47aecf9dae3e33b9715ead0899e1c8cc5d8bd591298499da",
+      "git_blob": "28385f28193886b7352c795f7cf3912054af4021"
+    },
+    {
+      "path": "docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "git_blob": "18948c540f7770196fed0f143161ecff854f7632"
+    },
+    {
+      "path": "docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "git_blob": "a36724a7dec163b67a383b107da2da24701591c7"
+    },
+    {
+      "path": "docs/discovery/templates/v2/scope.yaml",
+      "sha256": "89bd691ebdd070f890bc80eac95397e1c0d3813655adace0f170123ce219d2b5",
+      "git_blob": "1a46b3dd61c76a42af6f465165f8f0315edc2381"
+    },
+    {
+      "path": "docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "git_blob": "f418f8f71dbaebbee7749f2cee328e3dc3d6179e"
+    },
+    {
+      "path": "examples/discovery/v2/acceptance-specification.example.yaml",
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+      "git_blob": "348ff16e9f70c8af13bd90cd09150c0d1438bdaa"
+    },
+    {
+      "path": "examples/discovery/v2/coverage-ledger.example.yaml",
+      "sha256": "bf52c7bf8a18e6bdee547525c46fe313f71311fb51ad46a898465643f931f30c",
+      "git_blob": "b508faba7299fe4403b26be56ba4d315d05a7a04"
+    },
+    {
+      "path": "examples/discovery/v2/domain-profile.example.yaml",
+      "sha256": "36c0d5a133a817ca2586471a797d50d662fe7dc57139ffbbf30a76a08f22c76f",
+      "git_blob": "dea10bc619ce4a9df71b878d0c81ca85ab2a4184"
+    },
+    {
+      "path": "examples/discovery/v2/evidence-reference.example.yaml",
+      "sha256": "7a9c765daafc0850bd45f7d04b0cd1e2bbb26f5644473a8d1df79b7c3cb84c1f",
+      "git_blob": "eb8237954ab615ab730aeae21868a6a1cc3e0153"
+    },
+    {
+      "path": "examples/discovery/v2/extension-result-manifest.example.yaml",
+      "sha256": "e7694ef08f376c0ae810c9698a3a5f05fd3fc4d4728f7fe60d5c3a38d50ab6a0",
+      "git_blob": "506154cc77d87743fa3c0b58c2c53288d7977a7d"
+    },
+    {
+      "path": "examples/discovery/v2/feature-contract.example.yaml",
+      "sha256": "06648cd96f84279737d83c5c7f38663f98b53086e164068dd929d47016d2cc85",
+      "git_blob": "e1c6ffde7545502cb7fa976bb3152b1f40666fd6"
+    },
+    {
+      "path": "examples/discovery/v2/implementation-record.example.yaml",
+      "sha256": "faa5bb6777cfe5907cb588c9a762f78141360da728bdbb65e41cacfb8a1da37f",
+      "git_blob": "32eaee6bba898420de7b5b5f9589a76eb554361f"
+    },
+    {
+      "path": "examples/discovery/v2/inventory-snapshot.example.yaml",
+      "sha256": "c218beee402c859360a7fd9844a23fd12603abbfd868652f4f0af4398ae17988",
+      "git_blob": "34b4d2bfb3d52e31a86adf0ae609b5f608742110"
+    },
+    {
+      "path": "examples/discovery/v2/parity-matrix.example.yaml",
+      "sha256": "68ba6c2c375cea85111e9bad31be4c2d211c8faa5f86e3fcaf7f0f78e3d7e559",
+      "git_blob": "5fe31c4e991aa5eda1687124d512495532568331"
+    },
+    {
+      "path": "examples/discovery/v2/product-decision-collection.example.yaml",
+      "sha256": "87cdcc25f1a53d2b2f8ca19b5d1c295659ff34fbf9fee9aea4de0c92351e5358",
+      "git_blob": "7092cb7c3746ed33d89ab3cf364f9ab66b84b33b"
+    },
+    {
+      "path": "examples/discovery/v2/product-decision.example.yaml",
+      "sha256": "73a2cdd11adeb70db511ed9f840147c69751ed47c7d5da30f5bbbf8b0caffd55",
+      "git_blob": "4edf18028f3fb5632d651ce1c7d223229e5ac82a"
+    },
+    {
+      "path": "examples/discovery/v2/runtime-characterization-scenario.example.yaml",
+      "sha256": "15ea28f548302d2e15ec5a5ff02ae0180b6a70bf2e1dc9c3eb6aaa02e13fc0fc",
+      "git_blob": "0523cffa32cb7be1b4bd7280fc619776cd4e1033"
+    },
+    {
+      "path": "examples/discovery/v2/scope.example.yaml",
+      "sha256": "ec3de1ce762749ca8921bd57f74c21d18612eb1b0a3a6057a5ae701b99608a3a",
+      "git_blob": "6395ea1440b279a4e8fcf3ec6ac5a1fd778e3b39"
+    },
+    {
+      "path": "examples/discovery/v2/source-snapshot-manifest.example.yaml",
+      "sha256": "1fbff8077952e1e0e6d752d714f42642bf52fea5732a92be920f5be08ac2a494",
+      "git_blob": "b7fbc3b5d56a5b7ba97b11a325d426699d24c985"
+    },
+    {
+      "path": "examples/discovery/v2/unspecified-behavior-collection.example.yaml",
+      "sha256": "adfe0c5b98cbbd6ae8c972e681c037323b433ec076dd366a6d35f000f124acc4",
+      "git_blob": "f7942c8183b7f14edd816d5df4cb9ed2eb368ad1"
+    },
+    {
+      "path": "examples/discovery/v2/unspecified-behavior.example.yaml",
+      "sha256": "f44693147791220a3dccf76348b768db4f36f7fa648296bd985138bb3a37d629",
+      "git_blob": "56fe2bb45b810f6066dacee3d837bbee3595765c"
+    },
+    {
+      "path": "packages/discovery-runtime/README.md",
+      "sha256": "bdcad70e5365e06293c4f6072c39561734be189d4f9f830e7bdb28daab0b3e3d",
+      "git_blob": "ce3ab3d8670e76dab2091e3d8eea6b37e4475f9e"
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "a52184773b6a7cbd1ad512ecb74adac0e8d7906e60a18f956f2e0200b3c86cc1",
+      "git_blob": "fca36488a72ec5c9daacdd872a0d4bf276b20bcb"
+    },
+    {
+      "path": "packages/discovery-runtime/resource-manifest.json",
+      "sha256": "04d4519350221015ec201089abacf1a47dbf99bc73c6e64579cc57668c82c02b",
+      "git_blob": "bf6cc878db0954d71d40df2f79a0db9f3a01edad"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "sha256": "344b549da438c0c73fa6fe89eefd43943bc688e2c023c8f8e1bab9caedc8c767",
+      "git_blob": "e0a034cc16796f0b956e2172ef826f93423611bc"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/coverage-ledger.json",
+      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
+      "git_blob": "37c283f727f22f839a4e079b0a074ca89a1c3ef1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/domain-profile.yaml",
+      "sha256": "c04bd95b1827f73f47aecf9dae3e33b9715ead0899e1c8cc5d8bd591298499da",
+      "git_blob": "28385f28193886b7352c795f7cf3912054af4021"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/parity-matrix.json",
+      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "git_blob": "18948c540f7770196fed0f143161ecff854f7632"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/product-decisions.yaml",
+      "sha256": "4644fffb292e210dde77959d31ce5f043a4a5467bc42e372cecc988376b30aba",
+      "git_blob": "a36724a7dec163b67a383b107da2da24701591c7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/scope.yaml",
+      "sha256": "89bd691ebdd070f890bc80eac95397e1c0d3813655adace0f170123ce219d2b5",
+      "git_blob": "1a46b3dd61c76a42af6f465165f8f0315edc2381"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/docs/discovery/templates/v2/unspecified-behaviors.yaml",
+      "sha256": "aaa963c7abe7470a3b343098df2e4821b665396973de76f37dd6ebe503d7791d",
+      "git_blob": "f418f8f71dbaebbee7749f2cee328e3dc3d6179e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "3c3edf7c867f5bc06399e4f488542d4444653eb8b61ad1051b40760e29f63c4c",
+      "git_blob": "dc50f81eee078941fb18a0203fadb73f7d72085c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/coverage-ledger.schema.json",
+      "sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
+      "git_blob": "4900a739e7647150976bc029e8ae70809b8af5d8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/evidence-reference.schema.json",
+      "sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a",
+      "git_blob": "e14f02f82a44948ef1a46ed477c92c584ac4816c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/feature-contract.schema.json",
+      "sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54",
+      "git_blob": "03bf2de401b1868e25c67e7d3daaacee7870ba70"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/parity-matrix.schema.json",
+      "sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399",
+      "git_blob": "0a72f0ce208d46862ca59354d78482e7b5dcb317"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/product-decision-record.schema.json",
+      "sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb",
+      "git_blob": "fb4f89760f9ae8d98c9e6eb27fe07455b9217f5b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df",
+      "git_blob": "745ae5f92541e772fb9e5dff09b400ca275e8316"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62",
+      "git_blob": "58452b3e8a57ef89ef462a85e1f8414d57cfda8c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "git_blob": "faa87f161d4cca70f759d57015d3cd716ca80b5a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/activation.schema.json",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731",
+      "git_blob": "85ae95a2cc5b3ae3d8f5c42d1d15a4f481090b93"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/capability-attestation.schema.json",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4",
+      "git_blob": "f8022b23b7c085d6d08618a59ae28daa3fc5e846"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "git_blob": "a466a9c7da1cd7def4fc07cc04725ff0dee8a17c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/coverage-ledger.schema.json",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e",
+      "git_blob": "5a5e0fc1d4b733f1166ff6358b9c4ba99560e7d8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/discovery-invocation.schema.json",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2",
+      "git_blob": "78dec4ad08b2827d80c19fc1de368b33e3ed682d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/domain-profile.schema.json",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a",
+      "git_blob": "56c3535b742a0aa9defced7f62690ba65f1cb0e6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/evidence-reference.schema.json",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56",
+      "git_blob": "9409f68ec378ba6a083d0759b87c025741962480"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/extension-result-manifest.schema.json",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613",
+      "git_blob": "5bbaa8e4ed5df6575ea6b873cd70596a41b26f38"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/feature-contract.schema.json",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0",
+      "git_blob": "300b9b1b5dfae992e1c13a274c3c8927133693dc"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/implementation-record.schema.json",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070",
+      "git_blob": "8dd36ece890889b2a59f5de49855069261f929b0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/inventory-snapshot.schema.json",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417",
+      "git_blob": "52ffc6019d808a173a449ba1f39ca3c1cafc3eb6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/migration-report.schema.json",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b",
+      "git_blob": "bdb77e12751677875886b05b9e7e813e9ab0fff0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/parity-matrix.schema.json",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5",
+      "git_blob": "c4bbb32afce53df2a502c9897a13bb5542e504d7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision-collection.schema.json",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33",
+      "git_blob": "2c909e3d058fc0721176fa29f195cb0268d34eed"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/product-decision.schema.json",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c",
+      "git_blob": "56948993a098ccafef4a8ed8a538342acc60be33"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/required-output-manifest.schema.json",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d",
+      "git_blob": "464bbd99d8132aae2c85a5a484aaab6213781703"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7",
+      "git_blob": "5a841e256badcc3c4ccbf41626b50ddd1d20762f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/scope.schema.json",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713",
+      "git_blob": "d44afb26ea438e3cd16282c469723b05facc9746"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
+      "git_blob": "ccc9ec3069dcdcb7ea1cb9595bcdb018e6edfd30"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0",
+      "git_blob": "4e45b5dbeca43b8b8c9472efa6f01f28e2562063"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/tool-authorization.schema.json",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8",
+      "git_blob": "7778fc6fc0675866225fed5e6b1d31aabe0fc90f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3",
+      "git_blob": "618445c67220f306f6531e02b402563f7b11c92e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/unspecified-behavior.schema.json",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d",
+      "git_blob": "d386377536356486538abd04600d460103b5c6af"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/validation-receipt.schema.json",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b",
+      "git_blob": "858644e5a291096c3ea3fa73f4b2f8cd6557ef1f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "git_blob": "416cf920f5450271441e3cb6d2a0ae22d1d0113d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "git_blob": "771dfe685c7d2af14a7730f1c705e8038edf3c77"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_models.py",
+      "sha256": "c21bdea03c45e6a4894983c8f6e395e0397a87b646acfed14af664e76a549eed",
+      "git_blob": "1d482bf8d80836ac2f55554f6f3007f12ac4574d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "git_blob": "4d3cb9d2a9e79783bf5f4adb44d2485869842c5a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "git_blob": "7fc2805aa8184c038f24e74544a6b0640e466ab3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "git_blob": "7f095e147f9e2dd2260217baae4b5614b20324af"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "sha256": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+      "git_blob": "8da49f40331e9ba045901a3faec28b50db8065be"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_rules.py",
+      "sha256": "9cff1c614cfe3e1871671c77227473a91ff8f857cbc3bc6b0be930e95f20028d",
+      "git_blob": "ae1395e5ddd484c234cdc24622bb76912b600e3b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "sha256": "0193463923026c5c06d4154b6854a9445682e3a05f372a81f2859b422494d3d2",
+      "git_blob": "a756c0b05f39d5e48944ef52c614510bf15d7112"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "sha256": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a",
+      "git_blob": "f3a8d71c6858647728d0ccee86eafb90e91f8854"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce",
+      "git_blob": "c80efcd24bc4a90c76b6f159af21bbb0023584e3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+      "git_blob": "364e087f13c4323f56bc289808dbef9a44807d87"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+      "git_blob": "d799ca09f3be9ed1f912cae3801d5353e6846785"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+      "git_blob": "914d66577862386944012a938cffccd3f3c73651"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+      "git_blob": "1483f8f63cb46d078d9fb1780faa3525f53246a8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "sha256": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "git_blob": "9914ebe3fe91eb286c3a9db3626dd866bfcb8b43"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "sha256": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "git_blob": "2655c4d999cc79933cf9e72af2e2f0ebe5e114b1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "sha256": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "git_blob": "ff34edd78af35c96c248afbe1bef2eeba87fa428"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+      "git_blob": "fe791c05ff764b04b8a7da49392dc5a04cb1f724"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "sha256": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+      "git_blob": "e22a3de877c58b68eb3b7bce3ff0ef12029abd13"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+      "git_blob": "a47d5ac41e8e16beae0bd77e9fe889ae2202d6d6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_models.py",
+      "sha256": "f360b41565700f081402264dda439a0bfb181654476d519fa6e0e543806c6224",
+      "git_blob": "22172b260a0589c61dadd03a1200772b794059b5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+      "sha256": "63177775e6c9e3c1604e71720edcb2c12b8d2d860055fbe74ebb18d4423c863d",
+      "git_blob": "531991f151e4227f5d3f0ddbabc653919225812c"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "git_blob": "a95fff36a8c0929739a88978e093e5544318d2b1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "git_blob": "64ab7ceb3a7548bbf1658a45ab940e88ee0e80f6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "git_blob": "6be2649304ca84d955f8a5cff82028f21fcdccac"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "git_blob": "22eb5c0b8a511aa5cc2c6eac84a363df726ae8a6"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "git_blob": "9a6ee85ce4a6a08ddce5e44a7a5bc37572a00b37"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "git_blob": "d7221711d92cb187ed69b02fc930744c4aaa1549"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "git_blob": "5baa5aeaa9ed58a8cb5bf1f6cfee624e3b1267a7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "git_blob": "8995172a57d32a1e49565631071692ab9b2b23f3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "sha256": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2",
+      "git_blob": "7f21a875b11cc8d27ae7166a3bc89ec2fcaa0ece"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "git_blob": "8de39ffb5f40f0f8f77e6aebbe8ce69e4d2f1502"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "git_blob": "1f916e605db08561b861c3af9f7bde59a81fe8db"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "git_blob": "3fe1584d43f14dbda600c5c3d7efbfbd9080bc0f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "git_blob": "e32df068248da1397f023e7e5b563d471f2fb862"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "git_blob": "ff3a5faf89785b828cdcea695d7739b7cd3b54fc"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/py.typed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/reference_links.py",
+      "sha256": "5f371c89809365b75bc91a8310ab4bf58a0f8191f9536635345730315bf666de",
+      "git_blob": "41b964ee36208d23081d88b5dea4123bd3542aa8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "git_blob": "efda855183af4b16b7b58d5f777de62da5edd346"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "git_blob": "c6f4c0611e63170e88fc4067528f06351c6dcfa7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "git_blob": "478b20959275de55e1dab0e21a2fd0f9a98491c3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+      "git_blob": "65e1419a4d75657591af50a5b9d286339a1a7839"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "git_blob": "7f7cf81d5e18d9fbd617eab84eba4b34da94b644"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "sha256": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8",
+      "git_blob": "280d4d877416873632c55a152b1d5e1f28c07635"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "git_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+      "git_blob": "03fe3327734efd5126140fd207c7df9a33f1a57a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+      "git_blob": "53de4aa1a3e9405693573fe8f1a3cc5b323166d7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "git_blob": "262707e26d2837517e1f345bcce3244b40a810e3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "git_blob": "8a110742aed8feef0bba3e70f0aae18145bdb200"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "git_blob": "4d6cc646470ce2644ab288e8f3d693d71c563b07"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/transport_manifest.py",
+      "sha256": "dd5d8c18c179a99e4ebf34f83fb38924b3ca083e1ca9db3509156c10cac7722c",
+      "git_blob": "5542fa8c66aba5771d293fa0a420bc4026c947a5"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+      "git_blob": "34f4b23885c4fc0ed1406a12128de37cbe75bbce"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "git_blob": "4d6960a8975d91df8dea3c11ec39a74438073ce7"
+    },
+    {
+      "path": "poetry.lock",
+      "sha256": "8fa6db4120ba602e46916f832e06b3289f4cc40822e04a50a81a07ad40b521ab",
+      "git_blob": "a48d39176eb3cc0d493f6e8dcb2d7c561d8900bd"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "git_blob": "c407c56cb06e3bcd50465af80748ab44ee3e6cd2"
+    },
+    {
+      "path": "quality-tiers.yml",
+      "sha256": "9ee8a281708c6df0bf324203461b01e4d0ae24a30f9f30e31089e80517707d40",
+      "git_blob": "5108aae98bfa94f22f820829e0740b5a69d95dde"
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "git_blob": "faa87f161d4cca70f759d57015d3cd716ca80b5a"
+    },
+    {
+      "path": "schemas/discovery/v2/activation.schema.json",
+      "sha256": "6b41640fec17f1838b90a6483b1153ba4d78efa3eabb682d1e9e54d67b663731",
+      "git_blob": "85ae95a2cc5b3ae3d8f5c42d1d15a4f481090b93"
+    },
+    {
+      "path": "schemas/discovery/v2/capability-attestation.schema.json",
+      "sha256": "74ae7a19315427ddb2b14854f4b9e80ada78daa7eefc60d6a9cf134eceeff3e4",
+      "git_blob": "f8022b23b7c085d6d08618a59ae28daa3fc5e846"
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "git_blob": "a466a9c7da1cd7def4fc07cc04725ff0dee8a17c"
+    },
+    {
+      "path": "schemas/discovery/v2/coverage-ledger.schema.json",
+      "sha256": "a4300862cb1b8815d55c35a127af39489e592ca68dda7a49a6b6439758dd4b4e",
+      "git_blob": "5a5e0fc1d4b733f1166ff6358b9c4ba99560e7d8"
+    },
+    {
+      "path": "schemas/discovery/v2/discovery-invocation.schema.json",
+      "sha256": "86142a50ad58572d6311f47ba6c41a0034d8940649f0b9794bd0fed883baa7e2",
+      "git_blob": "78dec4ad08b2827d80c19fc1de368b33e3ed682d"
+    },
+    {
+      "path": "schemas/discovery/v2/domain-profile.schema.json",
+      "sha256": "3cd06d2d722eaabf0ddb87f0c224012a196d71e29429345cfdfb336cadbb4e2a",
+      "git_blob": "56c3535b742a0aa9defced7f62690ba65f1cb0e6"
+    },
+    {
+      "path": "schemas/discovery/v2/evidence-reference.schema.json",
+      "sha256": "2dbb33d0f7270d44e4d22d5ce24fa3b92348c7b0c60d1003267ce7bd498e7c56",
+      "git_blob": "9409f68ec378ba6a083d0759b87c025741962480"
+    },
+    {
+      "path": "schemas/discovery/v2/extension-result-manifest.schema.json",
+      "sha256": "fa0413eca974e4b6d72a09bbe63bb62935a2c0a464165775ecb4764393a61613",
+      "git_blob": "5bbaa8e4ed5df6575ea6b873cd70596a41b26f38"
+    },
+    {
+      "path": "schemas/discovery/v2/feature-contract.schema.json",
+      "sha256": "cff7b6e33b2c15f8e6d08ecb586fb66f2beaebfbed4d0833a41b0f2590592cd0",
+      "git_blob": "300b9b1b5dfae992e1c13a274c3c8927133693dc"
+    },
+    {
+      "path": "schemas/discovery/v2/implementation-record.schema.json",
+      "sha256": "0e1f156b06ad957c802d0dad5a31a8ae1f327a6ff6f482250fff99c8a4532070",
+      "git_blob": "8dd36ece890889b2a59f5de49855069261f929b0"
+    },
+    {
+      "path": "schemas/discovery/v2/inventory-snapshot.schema.json",
+      "sha256": "2331b7bfb3896db62b54de08c31f37769ccfc992612d0c017f6ae42f8ee27417",
+      "git_blob": "52ffc6019d808a173a449ba1f39ca3c1cafc3eb6"
+    },
+    {
+      "path": "schemas/discovery/v2/migration-report.schema.json",
+      "sha256": "98e461e411a1a44206c9766aa39e8f0c0e5b117ea358182fae7881f636297b2b",
+      "git_blob": "bdb77e12751677875886b05b9e7e813e9ab0fff0"
+    },
+    {
+      "path": "schemas/discovery/v2/parity-matrix.schema.json",
+      "sha256": "fcb7dd0d9e8228c4f2d8fc65c1616e81f09f8ddd670e2e3947ad75889bee4fe5",
+      "git_blob": "c4bbb32afce53df2a502c9897a13bb5542e504d7"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision-collection.schema.json",
+      "sha256": "84aba2147dbdfcba691e044652d3869d49fcae52c2f4aee7efd1efa71ac8bc33",
+      "git_blob": "2c909e3d058fc0721176fa29f195cb0268d34eed"
+    },
+    {
+      "path": "schemas/discovery/v2/product-decision.schema.json",
+      "sha256": "05b52b489d7d28505cc547d2063d442b4b0f8331e97a55e33a040c3306551c7c",
+      "git_blob": "56948993a098ccafef4a8ed8a538342acc60be33"
+    },
+    {
+      "path": "schemas/discovery/v2/required-output-manifest.schema.json",
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d",
+      "git_blob": "464bbd99d8132aae2c85a5a484aaab6213781703"
+    },
+    {
+      "path": "schemas/discovery/v2/runtime-characterization-scenario.schema.json",
+      "sha256": "0f05a374069b5da887b80ef4edd2620ffd33c995b3ca9d64ade50a511ab889e7",
+      "git_blob": "5a841e256badcc3c4ccbf41626b50ddd1d20762f"
+    },
+    {
+      "path": "schemas/discovery/v2/scope.schema.json",
+      "sha256": "2da599b62c18e1ca326f61d915ec93f4480b99877bf075608c988b38a47e6713",
+      "git_blob": "d44afb26ea438e3cd16282c469723b05facc9746"
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa"
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
+      "git_blob": "ccc9ec3069dcdcb7ea1cb9595bcdb018e6edfd30"
+    },
+    {
+      "path": "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+      "sha256": "25fac0b7831302084351e1051ef3072df5068c8e26bf5a5454894bfe0f8bf2d0",
+      "git_blob": "4e45b5dbeca43b8b8c9472efa6f01f28e2562063"
+    },
+    {
+      "path": "schemas/discovery/v2/tool-authorization.schema.json",
+      "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8",
+      "git_blob": "7778fc6fc0675866225fed5e6b1d31aabe0fc90f"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
+      "sha256": "d34a3b97ea4dee7436740fd82331477c6a552e9345ca3ce3db34132bbef6cca3",
+      "git_blob": "618445c67220f306f6531e02b402563f7b11c92e"
+    },
+    {
+      "path": "schemas/discovery/v2/unspecified-behavior.schema.json",
+      "sha256": "3e0ce21871eb6b5f6e74949e67f6553efcb5f10110c58f69db1eb1dbe6b9888d",
+      "git_blob": "d386377536356486538abd04600d460103b5c6af"
+    },
+    {
+      "path": "schemas/discovery/v2/validation-receipt.schema.json",
+      "sha256": "3ed929f6ed6b0be2984b22a5ce4a4aa27ebabe704552adb6e2ec9d0f83cda29b",
+      "git_blob": "858644e5a291096c3ea3fa73f4b2f8cd6557ef1f"
+    },
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "4173504dee2aa98740b705c4113cc427f6fa713e1c1fb3761a79d902b7eb062e",
+      "git_blob": "acf461b633c3450cdd7f7eb84652b69b513038ae"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/__init__.py",
+      "sha256": "caed600ceadab5a063dd1454acd783d5cb9715e7570d0fc66c017cc0d848a389",
+      "git_blob": "4183b539ca4974da2b018c692bdafcf5efd35f41"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/domain_profile.py",
+      "sha256": "2a5478e307a1fd059d0b949d1c68116d57d30ba61997706105355e5901d446e8",
+      "git_blob": "d7f002ae7db726fdf89d85a97d27ed30f74d63e9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/domain_profile_models.py",
+      "sha256": "4b125a769dd32ea8888aba516e1548b4aca17e2707dc6eb46138f3e2d3099a54",
+      "git_blob": "6682c5283b9c8fa96a4edec02ea7f55869a14695"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_flow.py",
+      "sha256": "8b0f3edd7a15393629bb91a676691ef64c886ef432d41e16f22cc1df5f77234e",
+      "git_blob": "e65a6929d1a86e0e9134940fce3301ad010f0861"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_models.py",
+      "sha256": "a3c7d9861a9ad04dd7d9a9cec15f939be1b521d54042aeb6fae08fa97bb0a003",
+      "git_blob": "aa1802595b590792a3203bb3f953a8572e3d92f9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/io.py",
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "git_blob": "183b5670de1c2c0341b40474dcbe8562d180b18a"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/rendering.py",
+      "sha256": "ae0f5dfe5080d1b733425d7dcdc234b8ddccbdcdb7fba17af182ee35e78ace62",
+      "git_blob": "a617fbf64c2c7fb647acff3235b3045b89fe627b"
+    },
+    {
+      "path": "scripts/dev_tools/quality_tiers_contract.py",
+      "sha256": "6dc837e6bed648cc83cbe13b709baec6d42e1fc8ca5d9e0aff3e796dd5d8c0c2",
+      "git_blob": "aad36277d82d437bd98e110d7b439bc44d488bc6"
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_profile.py",
+      "sha256": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2",
+      "git_blob": "1902709d348e256c37ed0d7b8fdcc3adc8c5722a"
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "git_blob": "269cfcf5cfda44ef1bbd25c89642db64c2886cc6"
+    },
+    {
+      "path": "tests/discovery_runtime/draft_test_support.py",
+      "sha256": "90e3ab8e7a77a824dd010292147c32712bcf05ae965db23c68b409868c8eb236",
+      "git_blob": "ffba64c7b5752ee733012d7f2ce5847342d5c0b7"
+    },
+    {
+      "path": "tests/discovery_runtime/evidence_test_support.py",
+      "sha256": "bf84d9146bcac7ccbdb0fb6f712e15ae9aff176f0bb232c3f03ed6b3374695e3",
+      "git_blob": "c27690845012691a680cdadb5f4646ae8ecee1e4"
+    },
+    {
+      "path": "tests/discovery_runtime/initialization_test_support.py",
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "git_blob": "015a920d9cb37f650c6239a0d158907c7834e556"
+    },
+    {
+      "path": "tests/discovery_runtime/mutation_test_support.py",
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "git_blob": "322118bba523350bccd006ae46e66acc756bb14e"
+    },
+    {
+      "path": "tests/discovery_runtime/parity_test_support.py",
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "git_blob": "16d738cd2efee66b728c94ec1afee7dcbb7974e1"
+    },
+    {
+      "path": "tests/discovery_runtime/source_snapshot_test_support.py",
+      "sha256": "5d0d54ff616425c92a8da95929006f56caa1a8cc7335949b0685b9a0a3f3e699",
+      "git_blob": "56f7ce509f1ea4bd091bf67f76ecb04dd787edbb"
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_rules.py",
+      "sha256": "b53104eb7ebfe9aac6b88183177a8a294ade3c3d7300a8bd69e722a7beb9a4e5",
+      "git_blob": "c8dc12573fba54d1f974aeac4ba295cf20fe93cf"
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_scope.py",
+      "sha256": "4bd9f8c95d33fd39b7cef8feadb682cd391ee6dc846bb8947b75f1a6073e89c9",
+      "git_blob": "ed351473e7a763371d430a981c9b56a7bc4b7498"
+    },
+    {
+      "path": "tests/discovery_runtime/test_activation_filesystem.py",
+      "sha256": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+      "git_blob": "bf2f24945969d34a5cd7fd12eda2b0e7352338b0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_activation_store.py",
+      "sha256": "8cc5f600177fa2ae5d3e51c3250e265780d41074bd521b9250f7f9a698ab58cd",
+      "git_blob": "c71e675af670672023a3ec768893599c9b642708"
+    },
+    {
+      "path": "tests/discovery_runtime/test_agent_output.py",
+      "sha256": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+      "git_blob": "3de114f6f26355ace2678e0cb4a8b6c71705d63f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_catalog.py",
+      "sha256": "ef541fe805557dfc60d7c8bf66a229cb5a4236e0ac285d7bb5bce09ad6029168",
+      "git_blob": "9dc78cc260a1861b094823f265792325f760a93d"
+    },
+    {
+      "path": "tests/discovery_runtime/test_completion_rules.py",
+      "sha256": "ac24fc755d8d4c2312ea1e995f1efa3f39fa842e23d6695b3b14f2c3fcdcebfb",
+      "git_blob": "021e5ce86c45ebc060a9d7d29b85d247825219d6"
+    },
+    {
+      "path": "tests/discovery_runtime/test_configuration.py",
+      "sha256": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+      "git_blob": "bd16f8b51c7d46683bcfeaf25f0077a60f13dc49"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_rules.py",
+      "sha256": "ca0f54cb8d7b998e35defca37fd3dcf5599492f8e6173a2f024e9b3b56dc61fd",
+      "git_blob": "787d2bf334eb36f46238622d26683574039e4dd9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_scope.py",
+      "sha256": "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3",
+      "git_blob": "1020a07db2734761ecd0bf2d87ea24fde51083f5"
+    },
+    {
+      "path": "tests/discovery_runtime/test_decision_rules.py",
+      "sha256": "2ee1a59597f0b657629605ec2b75cc03b1cd6f8abee5835b64b14f87e719bf12",
+      "git_blob": "8d7689376b5fc8b8bd7d0820941e9df90d31a054"
+    },
+    {
+      "path": "tests/discovery_runtime/test_decision_supersession.py",
+      "sha256": "29fdeaefa361e8094b4026f7109ad8cb623ae786e61dfae99501f5a1d478a132",
+      "git_blob": "3935477e8dbeb908bb39c3046a40d4629dca1ad8"
+    },
+    {
+      "path": "tests/discovery_runtime/test_dimension_rules.py",
+      "sha256": "643677a4e3424a0be49d6e5e7f9da3b7551bdbc7ddc8e0f692369d7cc739aaec",
+      "git_blob": "12122b25c4a318e1f28eaf1e076e7fc7d332c4c5"
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_contracts.py",
+      "sha256": "76ec394037afad9a5700ad914358e6cccfc1e11c29bc1f2fb1670eff6cdbe296",
+      "git_blob": "30c14e3859692f9169dcb606ec7167939bc5dfb0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_draft_scenarios.py",
+      "sha256": "3bde4e6aa5e7d2aff71724f569f8cefe838926518eceb1c5d5bad56a6e6bc108",
+      "git_blob": "d84dc26a53d2bb3bf4add5a528ed7149c42d92a3"
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_linking.py",
+      "sha256": "8bb7317277b9c76236821e4adf6399f3acbcf9d2bdd77ba9f62b2ef42998a392",
+      "git_blob": "41ec2ff1ade98dbd310a6ab2b2192e238d34965b"
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_payloads.py",
+      "sha256": "c53705640d294f496f7d6b1ca663d761b55baf5b9bcba7fee43e7f5fe6c85e14",
+      "git_blob": "5cb36ba8ede51e5352a1a83d3124ca2173ed8576"
+    },
+    {
+      "path": "tests/discovery_runtime/test_evidence_rules.py",
+      "sha256": "aacf4e1eed97712b890a2718613382d789bbf1703207013e77f7ac080ac48c6a",
+      "git_blob": "85e69a0b8b5537bdf597669678616d31812c9022"
+    },
+    {
+      "path": "tests/discovery_runtime/test_findings.py",
+      "sha256": "4e76ff0df7b503ea769830fd5e318a213202f86339aef25a337755dda5ecfa57",
+      "git_blob": "bbe2deb5c470344a356e7f88ab34a22cce1a61bd"
+    },
+    {
+      "path": "tests/discovery_runtime/test_initialization.py",
+      "sha256": "514de83ab4a555faa98ab4977bcdb951ddd433ee5338e7c1bf208051731a6978",
+      "git_blob": "4453d57902f911674a98142e435aa650da2c9a3e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_initialization_conflicts.py",
+      "sha256": "ca8138b85dea93b2dbfafac864d17cda971de2c2264f83339171f34283d39685",
+      "git_blob": "cc932753f3b940c282db5bdd0e2ba5972af30d10"
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_unknowns.py",
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "git_blob": "e7888cb70b49d26baadabf2f3c42a4e47861a962"
+    },
+    {
+      "path": "tests/discovery_runtime/test_migration_v1.py",
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "git_blob": "ceeaaec3d66901e4fe6d8c8c2d35c581bd6bfd5f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_commit.py",
+      "sha256": "31c0dff2382bbbf563f1b63c96a24e505b6cc9cd2e33c379a5034b82a1249c42",
+      "git_blob": "39c6aa14c2e4ee08cab40ebb25d927688f2c21ad"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_filesystem.py",
+      "sha256": "582a880ea65afadaa103c147da82b4bc0e6ab9f2f79d44e71152583b31ce9e29",
+      "git_blob": "bc8c0a1793c1126c334b4ab2383890e3a62e69d1"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+      "git_blob": "b160f59fd8188db6f5df81b1468666405b1a9b4e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_observation_claims.py",
+      "sha256": "4a0ff68836c604ae4a5b54d375c7005c916ede2fc4b6d155bd8bda761c604893",
+      "git_blob": "612973240060b57ac6ec2bfe9b5ad1a080f89f0b"
+    },
+    {
+      "path": "tests/discovery_runtime/test_package_contract.py",
+      "sha256": "7d15e14b199a0e24d21d3d8ac8a1e61497500c5f7d6e7e9ef69409d1e5ca0e1d",
+      "git_blob": "38616fd2fffb81aac2280b1d0af111a0236bc7d5"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_clients.py",
+      "sha256": "f2de0b73de39032f1606e30b1aaf37e7f0af3a5b2220ccedbf61ff59fa0e323d",
+      "git_blob": "387cec7fb3f76be29bf4fef9b62501459fb6e925"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_rules.py",
+      "sha256": "8da02e8961415be42ae0383b1a81442447993a457f28d9cb549e51031f60445c",
+      "git_blob": "d1a71255640ff54654b2ec97eddbab53895246b6"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parsing.py",
+      "sha256": "2bf400da65afa3bdce30036374229baf5bc5cd1c15a0f3f37207b30ffcb6ad2c",
+      "git_blob": "2219ddacdcdcdd793e4464780dcf8c9e39c2aa0f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parsing_limits.py",
+      "sha256": "759036ca31e33f18e87ce9b13132a54cd8a01079310a7d2ff03aa080ab58c063",
+      "git_blob": "5dddec5015affc500365e437ee00c37fb989387b"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_collisions.py",
+      "sha256": "f3ff39910b4cbfdef8d5148bc283978e9bd0eacee0ae6b9a7169f3d5eb935cb4",
+      "git_blob": "8ee709db39f44d353a4f8e13063bf8228ea05a1f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_policy.py",
+      "sha256": "b3f072157d04ac6cd08f4b69869160ed5a5546afe2eb503018f4818df4649b49",
+      "git_blob": "828e380889a2259307ec5c06a169f6620ba93104"
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_resolution.py",
+      "sha256": "d05b7e713912a1f2ba8dab95c61f9c5e64cfa6517f7b906da710cbd50ce788a3",
+      "git_blob": "f62c127682a5812e7e79a505305a086f0fe760e3"
+    },
+    {
+      "path": "tests/discovery_runtime/test_profile_dimensions.py",
+      "sha256": "0d67d5bcc558c5e02161f3281664b71a5cb9bc63ff9982d0011b52534d242378",
+      "git_blob": "9a2ca966e3f84aee14742ee6e0371f57861086dc"
+    },
+    {
+      "path": "tests/discovery_runtime/test_profile_v2.py",
+      "sha256": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+      "git_blob": "094c7eb5d10867c9ba48b5148757f74cfef7d69b"
+    },
+    {
+      "path": "tests/discovery_runtime/test_reference_uniqueness.py",
+      "sha256": "d1b58842db97149eb7111d44169f7439ebdc3be3902bb9d17231057437ce8f89",
+      "git_blob": "4bafa12af06e4a7f97df6969c9730df0fb1882f1"
+    },
+    {
+      "path": "tests/discovery_runtime/test_references.py",
+      "sha256": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+      "git_blob": "b5a8b01631e924e6d755fe1b307818c6926797c0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_repository_reader.py",
+      "sha256": "d36b19679dce9dd7aa2a88e1f61635601d05b8d25e35115943e666d30448e95a",
+      "git_blob": "0402d8420d7a91391a216b5eb0eba1036570c773"
+    },
+    {
+      "path": "tests/discovery_runtime/test_resources.py",
+      "sha256": "6e36c3ba139ec722b72515259612db11efd4ce7c33d2f47d10ba0aeacb646cb5",
+      "git_blob": "2f9eac2560d53d31da9db0e6632f3fddce1b5f42"
+    },
+    {
+      "path": "tests/discovery_runtime/test_revision_rules.py",
+      "sha256": "d368d60cd7f77ec7e5f69b69a771417fd0abb00583ce122a92b6797fded49dd1",
+      "git_blob": "1150df13c22a53c2dcc5f06cd21aea807cd62141"
+    },
+    {
+      "path": "tests/discovery_runtime/test_runtime_claims.py",
+      "sha256": "8185e1cb3c4d206d9e45cc9ab30c041412ef784c9bd93f6355a400af760d18e8",
+      "git_blob": "6046f3b8ac64099061d994bdd1f097563af5e61f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_schema_formats.py",
+      "sha256": "b3bdbabb9c1247e9fdab5e359361e9485318105e0529143caf9d27c55014ea67",
+      "git_blob": "cbf3bb380361493ccc7f8e51ffea030393409a60"
+    },
+    {
+      "path": "tests/discovery_runtime/test_schema_validation.py",
+      "sha256": "c6d9547a947cef45fafd56693545b6a28acb1b3335bd79b5054b30c10c895062",
+      "git_blob": "fd4fb0406bda76075aed7f4a99389f0eba6341ea"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot.py",
+      "sha256": "160a0fbcca35848b87fbc793d86db5aca3e8d935e27bc9c2293b0b0e20204482",
+      "git_blob": "7e2e5959a6cd7207b3eeeb026c808db666da9c58"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_export.py",
+      "sha256": "ea977b4e0165a917df5f538e41d274120d8b2542501362a81d7f1c325bc58cf5",
+      "git_blob": "50c4f624bbf2dd80436373e60403c315be7be9a9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_import.py",
+      "sha256": "5b11836f53f723f98f1f21f627b4a675e9bc21e6f1c7da6cec419b4d1a0fbf0e",
+      "git_blob": "a0a320d230d480375bf7c4d8ffb300b45ac0408e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_imports.py",
+      "sha256": "6922505d950c574395ea8ef7e0b6c18defa86614c35695df10e49712f8f3346c",
+      "git_blob": "b234639d012e5308aa28a6a15541e68f8c972e68"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_io.py",
+      "sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+      "git_blob": "ca01e77ec40d46ce4ab69eef4efa01836690ba86"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading.py",
+      "sha256": "c615612ec23f74b476e390e78c64c55fa8322c01df00c4a86419026ebe7ee44a",
+      "git_blob": "591ae8635d9f73c32b3088df7321de73dbda8a80"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_replica_resolution.py",
+      "sha256": "c19c3350ae8dbb0a98a155c75a103c40e5900e3f64bc023f45bb0a014363430e",
+      "git_blob": "347dc56776482d3e4200f416f31419c31f2c9cb8"
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_read_limits.py",
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "git_blob": "4e139479d76660100c10e35f1354fcefa670ddb0"
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_read_snapshot_scope.py",
+      "sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "git_blob": "0a650fc499595b4e7f4bc5d53ccd39f698cde508"
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_reads.py",
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "git_blob": "3ff3de8c637c311517b90d416d3ed0a04af8b544"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed",
+      "git_blob": "2b9ada06226170a88f70b5c468b93a7122e9b603"
+    },
+    {
+      "path": "tests/discovery_runtime/validation_test_support.py",
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "git_blob": "1a85a81a3377bf05bc33263e668f888a654c12ab"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/acceptance-specification.invalid.yaml",
+      "sha256": "25e675c67ec5684e2e57605fe935d8ceb96c1211ce3fc64685db4b38b1f562c4",
+      "git_blob": "297167e6bee0a2d12061f54a6d26def1363d4ef3"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/coverage-ledger.invalid.yaml",
+      "sha256": "f85c16851be4552cc3d3017f28dbb9577f556f1fe89216466485a06b7ce7d846",
+      "git_blob": "99ab086ee8fb9bf59887f88c54d2730eb5a37740"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/domain-profile.invalid.yaml",
+      "sha256": "8dca86761d9b8a54864be8ef969849cf61213bba91aa16b265424317188c1cfd",
+      "git_blob": "75ffcbd9ebfd929813bd2ad6b87d8e42d2a13334"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/evidence-reference.invalid.yaml",
+      "sha256": "f851c553d251eae59ccca4db52e72ddb7819d3372f10c7f9f01daa5456715da3",
+      "git_blob": "8dcb6d1acf0de1af85d8d902e7776245a80d28bd"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/extension-result-manifest.invalid.yaml",
+      "sha256": "25cc6d74601ab02a68c1bd8c433bf9f13e930a5a20ef98a5f4198a755e41d2db",
+      "git_blob": "49a9e56f601766afe156d78907fc3188797ef1d5"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/feature-contract.invalid.yaml",
+      "sha256": "aac7afdea5d9e9720fca7ddc92dbd1e6a716a09092ced8a09c3d8ceeaaabc7f7",
+      "git_blob": "e1a4e0877afd9e57f7223c5c0a93499b192f5fb2"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/implementation-record.invalid.yaml",
+      "sha256": "a61b23dfc68a80adac7e390c890df4b65dd2202c9bc5f95eba479db11a50ceab",
+      "git_blob": "32c1f9fe97c6243a4447c38d212a7f74d74b9b43"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/inventory-snapshot.invalid.yaml",
+      "sha256": "5585c680e895298f8d710d7da4c30f05f35e19b7d224e19528ac8e66b967e7e5",
+      "git_blob": "a6bcd944790b6d8240964c509192ce2d57f87d8b"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/parity-matrix.invalid.yaml",
+      "sha256": "7ae3350b68b33662c57d0fe4ad77d7bd72a7d67a885636dede78fadb0f06e32b",
+      "git_blob": "f6fd497917023b39b75ecbc333000ae4891265b3"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/product-decision-collection.invalid.yaml",
+      "sha256": "11d0ac14ced26e3e35d4e89eb52f6153f9aceb0af1ead3c2b173dcbb81e52367",
+      "git_blob": "ff30205f8582023a5a7053cd63587524b2055a55"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/product-decision.invalid.yaml",
+      "sha256": "8ce469bbe3d8f983ccbd29b6d42adc45ba9acb0de0c05d11af898561dad447f2",
+      "git_blob": "c8feef89971d0f5bc85c77a0cb25c3bcc0723e8a"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/runtime-characterization-scenario.invalid.yaml",
+      "sha256": "535759bdfd7be3e0b03d20d3104bd9e925cc78e0b90737bb93f460c36ad20df2",
+      "git_blob": "57befe9be1e257414dae54703076fff07d5541b1"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/scope.invalid.yaml",
+      "sha256": "874977ed8e8524c4324bea52da49d1ecae3c00550481a76a3cd6cf61a802b927",
+      "git_blob": "245f85674aaf5afb27c39919c2155d0145618a63"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/source-snapshot-manifest.invalid.yaml",
+      "sha256": "d04fdc08b0ec6021c07f0ab7d88cdb6c192f391d83d8d1efa26f406bf38f5119",
+      "git_blob": "1eb71997c97b8407f922e3b11556a0c2ba7c90e7"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/unspecified-behavior-collection.invalid.yaml",
+      "sha256": "db09d5b212fa7b10fefcdaf2f526413f7f5be0546908a7722a8a1f52b21a7c7c",
+      "git_blob": "fda857f36f513840d5835448066a6b2e0a951634"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v2/unspecified-behavior.invalid.yaml",
+      "sha256": "d0125313774e7cf6d9dc0c45fb7c00522a63c57c5e0298eaf69a9ddde24d3f7a",
+      "git_blob": "acf8baefca128d9e507f76e1b597975ed4f0fbd3"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_acceptance_schemas.py",
+      "sha256": "d077f3840630143a7c8ae566aecc8a0fed346e434831b152e8bba61a48f7b133",
+      "git_blob": "ef25c31dde17e4eb5fcc0157329ba3ac615f7544"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_authority_schemas.py",
+      "sha256": "da49451672b4002ac76836744c567327de08a99a8e168a1facedc28198aada46",
+      "git_blob": "d8548657135c2924566a0988e68a64fd10d9cd5c"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_common_schemas.py",
+      "sha256": "40973502115319680b0b18348275cba897ef23b9c8eb6fa02bd8f4e27564e446",
+      "git_blob": "6d5644b652878523d2c36c085c607bd65005311d"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_control_schemas.py",
+      "sha256": "c60d562cef8b6af253de431e8c98fbe334d98ba1b95db394990762d32f837273",
+      "git_blob": "960220ef1c432ca7843ba239095c4227ba99cc52"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_decision_schemas.py",
+      "sha256": "c544c37c20c65550888f237b2a5a2e55ff814195b0ddcbced8d1fb33b1931619",
+      "git_blob": "f8752dd2ac3e637eb7b9216ce9eb1188baff8002"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_format_schemas.py",
+      "sha256": "df659dec838e0e86010a060d48f5615fcec940a2051aa396aa672f2fdf59d3bd",
+      "git_blob": "0066bb2b48280bd3ce706cdf86839a37c5a9d3ff"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_inventory_schemas.py",
+      "sha256": "ba46ee04c93298247ee56f751d16d5bac7f5fb380c263cc862f7c6cb7a05071f",
+      "git_blob": "df57e94df84a2782c046cc459375bea0df0ab807"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_observation_schemas.py",
+      "sha256": "d847506e375c218341af537cd32cf3a7247dc3eb22cabc0cca92f597557299e0",
+      "git_blob": "65c864ccc0e56cf32856ed0fa3479d884b002430"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_profile_schemas.py",
+      "sha256": "832f948c577dfce16d2749eaa702ba78bf9b93b29545afd3a9b8b6a7deeae118",
+      "git_blob": "b2cf2d76c1743c05b888b71edd892b58a9bb8b52"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_runtime_schemas.py",
+      "sha256": "c58b39e1384e6907bfb0644b932ac645ecfeeff3117156dd5050d3a4d5d0377f",
+      "git_blob": "a2b2bfe81dfa242cfe53f5a6076ae03f7b48b891"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_target_schemas.py",
+      "sha256": "3f9e1ac73efbf141a5e43866f7b48074248b07b9e73d4eee5a05e53f4a38b457",
+      "git_blob": "28e5259e3a670bb94adbef2e86ae1357895eea83"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v2_transport_schemas.py",
+      "sha256": "8edddafbcea1704b2d8d95a063fad750fb694555d12a190203e2079e8f20bc41",
+      "git_blob": "9730e5b28b4f404352647a92bcc1a3b5773acd7c"
+    },
+    {
+      "path": "tests/schemas/discovery/v2_control_test_support.py",
+      "sha256": "5075c10ea9fe0021ff94671a4f5abffb2cc242f20f3681a41a25dd4419569500",
+      "git_blob": "1ac45982a381b563523d45f95f9ee46b93cceee5"
+    },
+    {
+      "path": "tests/schemas/discovery/v2_schema_test_support.py",
+      "sha256": "531fd20dec0d27347595e88b4cbf1f10a7413df588976cd9918b8f11fbaa1f48",
+      "git_blob": "03e199552187819a4c7b6f645918008ef7114259"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "sha256": "768e81d6aeb425f31ab5ed8eaa61e6f1a0fb59491fa7324192494cc0adfb5595",
+      "git_blob": "5441560e3fb6b095965c13d89400ab8903792246"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "sha256": "846b5342c3364f41d4f92d935641a6eb6bffb7f948c9360e9d3e6b7a5dc44cf9",
+      "git_blob": "7aece9e7ad9e15f491e741d3525a38475f5d0dda"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "sha256": "5ac3972ac82b2da5dc0281167c72efd3e67c66033229ec92bad9188683ab7ea0",
+      "git_blob": "d52c8a481aed0318bc23c2196f24eb1680e40011"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "sha256": "b845883a2b27135551ee3dcf6a088ab2f845f80d0e1f3ad147cc32e57a589f2a",
+      "git_blob": "9f40f0b65bbbe1797e26fffc5768451a0c041441"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_models.py",
+      "sha256": "7b43624914170ec4bc82b7ef2fd3aa64ec689324247992331439aa93704c3445",
+      "git_blob": "b0d420860fd71cd52dd93268ae52887fea89ce9b"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_io.py",
+      "sha256": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f",
+      "git_blob": "94cc7675b247fbb23b3d15a0e46f3ba59ca41545"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_rendering.py",
+      "sha256": "803468945f9e435f66436d31d2467d8ab3a580c7da26b7325c18c03c38641956",
+      "git_blob": "fbbab31dc5e730189b2015e1731735def08788e8"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "0af7d7f5f70237f8433fed50c270ce1afe8c51c68ea16596e6c245ef1e68ba5a",
+      "git_blob": "0e9f01cd531a39adf6a7423ebb72c0ec5f232c8a"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "75d2e0dbfeddbc07e8310bc37b78449a41fd48529e4cacfb6aa635011fa23c8d",
+      "git_blob": "e46de48c893545447b8ba33b24b414bd56001f50"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_quality_tiers_contract.py",
+      "sha256": "618f4fc8252ced5cc4c474025ac55e6f29347622b0fa839fe7dd9b085d2d4063",
+      "git_blob": "0fbca7952a64084192d96494500a43f26656785f"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py",
+      "sha256": "d7821ad61f444bdc8d7e536d8f213189ead8a162808818d73826fc674ce16f32",
+      "git_blob": "6126431e2eaced76eada61e72872eb59e4fa1bde"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "a5aec57d3d51baae4ff00c37bd14d8f18763da69e4d43a65e5f6a68aa17c9a6f",
+      "git_blob": "6ac95cf73d102b4ac03901d76c85fa0c50827cb0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "sha256": "f0c7905112c236b181f328ded26215b7b14c90b60c5bcaea3962002541e0f16a",
+      "git_blob": "167df3e6b5c8cddb6f36cadade56b8926f789652"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "sha256": "6d3319e7344492a4e0f702386158c86b28ce940a11343226667b4ba67832fe7f",
+      "git_blob": "c6b730e73b996d267d12159cc4e361ce2bc925fd"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "sha256": "37c9ba4e658ec4840916fcf069a7da8faeaa186e62ce86adcf7f3ddfe37b6577",
+      "git_blob": "e5749b440b6c221ec1486e18dccbad88894ba353"
+    }
+  ],
+  "authorized_predecessor_delta": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+  "frozen_paths": [
+    {
+      "path": "examples/discovery/v1/coverage-ledger.example.json",
+      "sha256": "6cd282071a6471b2b5fa2ea833f56305a1c9bb4b048f9a2e4fd8cfb204822db2",
+      "git_blob": "dc729dd6b017dda558e6993df58b02959e5dd5a2"
+    },
+    {
+      "path": "examples/discovery/v1/evidence-reference.example.json",
+      "sha256": "09e45d8206e75750a70ab0b117d18dd1919dd644da8fb31d4a0be97df01b1c57",
+      "git_blob": "6b66e27b2af4eec2adb6832c22387ff44c1b33f7"
+    },
+    {
+      "path": "examples/discovery/v1/feature-contract.example.json",
+      "sha256": "8d2a0fac431a654f8305be32438e84fea08d1470349e8470321596d9da8936ec",
+      "git_blob": "dbcd6818c1cc142a96fa07552a2882b9ccc8934a"
+    },
+    {
+      "path": "examples/discovery/v1/parity-matrix.example.json",
+      "sha256": "e9c77f0aa623ea808e3bb0d60ebef92c6e677e22f9fe84798adc8d103e68013f",
+      "git_blob": "1bcfa761043254ac9a768c12fba2b3d1670f831e"
+    },
+    {
+      "path": "examples/discovery/v1/product-decision-record.example.json",
+      "sha256": "23e66b7a6789373fcc19ab911a1fbc47596ea41e96d87fb6ac9e101b3525f9ee",
+      "git_blob": "77b7fa9a9da9bb8f1e54b40cccf42ed757567895"
+    },
+    {
+      "path": "examples/discovery/v1/runtime-characterization-scenario.example.json",
+      "sha256": "51bdafe4723199f9476c52a9bc34085b936cfa7abea5be9e42e114db76504c85",
+      "git_blob": "cdf2fd1c269872009434a62b2cee5392da039147"
+    },
+    {
+      "path": "examples/discovery/v1/unspecified-behavior-record.example.json",
+      "sha256": "ac69833dea481c45ba55bf28964a579024167e6568d1ef991d80240a20e851e0",
+      "git_blob": "d3c0ede959c7e380665fd019735e7dc632c62cfe"
+    },
+    {
+      "path": "schemas/discovery/v1/coverage-ledger.schema.json",
+      "sha256": "5c55f4199f8a03ac4dc06c494d8ae4fd3e52117251b7db5eda919bf1ea773319",
+      "git_blob": "4900a739e7647150976bc029e8ae70809b8af5d8"
+    },
+    {
+      "path": "schemas/discovery/v1/evidence-reference.schema.json",
+      "sha256": "216728595bc3f8da90b26f3e22ae2dc33333bb6e1088d40d6305c3f461c5bb7a",
+      "git_blob": "e14f02f82a44948ef1a46ed477c92c584ac4816c"
+    },
+    {
+      "path": "schemas/discovery/v1/feature-contract.schema.json",
+      "sha256": "97776cdb4974792ce796600c9a27508bcb610e47ca4dc54813b681e71e82bb54",
+      "git_blob": "03bf2de401b1868e25c67e7d3daaacee7870ba70"
+    },
+    {
+      "path": "schemas/discovery/v1/parity-matrix.schema.json",
+      "sha256": "dcc4e21e53e7d38b7ba241aaac78285ca5212f38bf79d9eeb50c69e8a833b399",
+      "git_blob": "0a72f0ce208d46862ca59354d78482e7b5dcb317"
+    },
+    {
+      "path": "schemas/discovery/v1/product-decision-record.schema.json",
+      "sha256": "da47c8e724dfcfdd7d2deba527b45144f588fec96cbaf710d75d17712c9deadb",
+      "git_blob": "fb4f89760f9ae8d98c9e6eb27fe07455b9217f5b"
+    },
+    {
+      "path": "schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+      "sha256": "0422570bef83be0da608bd9583a4e9fc9ab3ce031919a91b9ca7066ece5639df",
+      "git_blob": "745ae5f92541e772fb9e5dff09b400ca275e8316"
+    },
+    {
+      "path": "schemas/discovery/v1/unspecified-behavior-record.schema.json",
+      "sha256": "530b962f8945c22b400227468dc750b4197dde5aee4826fdf36e05b146100c62",
+      "git_blob": "58452b3e8a57ef89ef462a85e1f8414d57cfda8c"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/coverage-ledger.invalid.json",
+      "sha256": "af56c5fa4fd2145e8742c0f9d6b99ddef733c5cf18e141c29a0a46ee8dd4f9d9",
+      "git_blob": "2ff59c0a400fcf5ceb1df2de6d0653407d1a10de"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/evidence-reference.invalid.json",
+      "sha256": "d59a7162d54e16d7bf972b563ffd4cf7b94797014fcabd25c40b55fd5e7af3dc",
+      "git_blob": "7e53feea97ba9e67ec2fa4ceeb8f8dc623e08c15"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/feature-contract.invalid.json",
+      "sha256": "7bf4a79aab51e41618bd4e8fb25e601d8ac77ae5323e0c880d0d4ecbcfa5b820",
+      "git_blob": "4e24dc581f4826c6af29cba94452e522f450e03b"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/parity-matrix.invalid.json",
+      "sha256": "fc70c080f6cfccf6367e1435774fd01fb7be023392af7655fcc664a4a1eb7f23",
+      "git_blob": "1020d3763a3db97d8cd869aae4c9c6879e1cc3c1"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/product-decision-record.invalid.json",
+      "sha256": "9c6aaa8e65a1bbc807f2b3ba78d7a2c2f68f28378b6059f14bca1b39bb2580ec",
+      "git_blob": "6b0b6eb94ce87f1eb38e3a1b1a7afe0542591d7f"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/runtime-characterization-scenario.invalid.json",
+      "sha256": "702f2da5e6c224ec0a7d68ee3c7d8190fd577679150019d9cf82d815e2d521a7",
+      "git_blob": "03de19063f4a92582b2283cb639597b130af1736"
+    },
+    {
+      "path": "tests/fixtures/discovery_schemas/v1/unspecified-behavior-record.invalid.json",
+      "sha256": "977d8ec8b034f33c95d52f9b8d455a1ef2998fd616c5733d6cddf3fd740d3567",
+      "git_blob": "19595ef89aefce9ed006ebbcda057688ef7ddaf2"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v1_fixtures.py",
+      "sha256": "4efb6295f93a10ae715708aa0d986179b3248de896a603f41336bceb22439baa",
+      "git_blob": "068266475f8cedb808b92b52549256d82254ef5c"
+    },
+    {
+      "path": "tests/schemas/discovery/test_v1_schema_documents.py",
+      "sha256": "c2ef8fea0897216dcc8b0cb4767502ed49f2e5a05bb167642007a5dc236514c8",
+      "git_blob": "c74e94df4c3a343ecdb20b5df27d3208ff7f98aa"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_package_exports.py",
+      "sha256": "41a2d85d2b5a06d7bfb74b27e0c2915c35afa5b2e565bbbec7ba9982c0e034c6",
+      "git_blob": "99046e4367ecfd09cdb7612d4189feb1c5c12169"
+    }
+  ],
+  "unchanged_legacy_paths": [
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__init__.py",
+      "sha256": "bda306382c2a7335f09f6e62add357089cdbe7acb0c0c52851cf738f4eae7c09",
+      "git_blob": "fc9c4bb1b329ffdf331f307ca4832df178080bba"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__main__.py",
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+      "git_blob": "0caabad412e4e140863a73d3693fafb9def93127"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/cli.py",
+      "sha256": "f775c05019116140cd28d0a2f353e7cd2ea26133eed587f5873546b42380b89a",
+      "git_blob": "05b8efcf7efd19cf490cc2391e82cab3de2d5d5a"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+      "git_blob": "764c8aceab3139e51539985f3cc6e5fba3048d30"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+      "git_blob": "f56e42541445f16c5666e84c651b1bfec08732ca"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+      "git_blob": "1b2a98c81066da84b3c29c1943f39161fd3b50c9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+      "git_blob": "3a1354f5ee6f4853fdfe7e28bd8582a46203f057"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+      "git_blob": "2876de753c070266e9f4d0fbcf0251fca03e8886"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+      "git_blob": "aa0137cc1163f4122fef9f78ad45375213117565"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+      "git_blob": "aaf40db04182800902a9c096e690905e96d66aa5"
+    }
+  ],
+  "authority": {
+    "routing_receipt": {
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C4",
+      "deployment_agent": "atomic-executor-c4",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-executor",
+      "model": "gpt-6-astra",
+      "model_reasoning_effort": "max",
+      "orchestration_complexity_ceiling": "C4",
+      "phase": "S5_P4T1_final_acceptance",
+      "delegation_id": "atomic_execution_p4t1_final",
+      "profile_path": ".codex/agents/atomic-executor-c4.toml",
+      "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+    },
+    "native_attestation_sha256": "b05cfda0ca11748af8da39b17bcac9e06676493547768e1dbfc97491592fa814",
+    "native_attestation_key": "bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "actual_model": "gpt-6-astra",
+    "actual_reasoning_effort": "max",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true
+  },
+  "retained_proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-executor-prior-manifest.2026-10-19T01-45.json",
+      "sha256": "298b39de4fa4e2f2be0b87b756c93e0b2851aabeeae1b8dc9a8949144a012b2d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-repair-manifest.2026-10-19T02-32.json",
+      "sha256": "24ec9da90b13ad248b38aea135a7cbaf34d209f9e8a3025c345408a999b2628a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-loader-final-bindings.2026-10-19T02-12.json",
+      "sha256": "99105f6a2795c986c084457dcc277584c88becb966e96f421bea6b875eaee492"
+    }
+  ],
+  "final_ordered_gates": "pending; this record is not task acceptance"
+}

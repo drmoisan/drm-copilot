@@ -1,0 +1,85 @@
+{
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-repair-manifest.2026-10-19T02-32.json",
+  "candidate_manifest_sha256": "24ec9da90b13ad248b38aea135a7cbaf34d209f9e8a3025c345408a999b2628a",
+  "coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-coverage.2026-10-19T02-49.json",
+  "native": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-native-result.2026-10-19T02-54.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-format-run-024935.2026-10-19T02-49.json",
+      "sha256": "f66850c279e4793620a919c2346dcc038006e02707bc6498031eeb425306a182",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-lint-run-024935.2026-10-19T02-49.json",
+      "sha256": "9a351321f9766e8715d96632db0f3f1a2a013fc7ff271f977b7c8eb8216995a3",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-types-run-024945.2026-10-19T02-49.json",
+      "sha256": "c8f10dc7c708fdc379184c136c54d74b7e9f742552309ad7b4bcf55420445c6e",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-architecture-run-024946.2026-10-19T02-49.json",
+      "sha256": "7b039afca3a060c2c95571066dcc91f0d7d448853e889e47cffc44309445ec02",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-tests-reverse-run-025416.2026-10-19T02-54.json",
+      "sha256": "ef35355476ed3416a2d83738ffd446a717c40420b59920e99a4cd32db6471b38",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-contracts-run-025421.2026-10-19T02-54.json",
+      "sha256": "33983469865f53ac512a7d80af5dee94b99c938de7d33132721890975de62c60",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-native-run-025504.2026-10-19T02-55.json",
+      "sha256": "516559d83e7ea46ecd209c155f65cb220ac174e4f7127cf71200b5f068b0311b",
+      "stage": 7
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+    "scripts/dev_tools/discovery/analyzer/emitter.py": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+    "scripts/dev_tools/discovery/analyzer/inventory.py": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+    "scripts/dev_tools/discovery/analyzer/models.py": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+    "scripts/dev_tools/discovery/analyzer/pipeline.py": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+    "tests/discovery_runtime/analyzer/test_input_capture.py": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/discovery_runtime/analyzer/test_registry.py": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+    "tests/discovery_runtime/analyzer/test_repository.py": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+    "tests/scripts/dev_tools/discovery/analyzer/test_cli.py": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+    "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+    "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+    "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+    "tests/scripts/dev_tools/discovery/analyzer/test_models.py": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+    "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+  }
+}

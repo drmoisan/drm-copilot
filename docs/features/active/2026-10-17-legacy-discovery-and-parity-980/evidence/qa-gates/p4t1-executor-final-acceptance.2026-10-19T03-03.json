@@ -1,0 +1,44 @@
+{
+  "task": "P4-T1",
+  "status": "PASS",
+  "timestamp": "2026-10-19T03:03:19.670922+00:00",
+  "accepted_baseline": "a94c44fa31e66d830d01203ee9cc068fce2deef1",
+  "checked_wip": "34278a5db7fed0653886c46e599304691628a4b9",
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-executor-final-reconciliation.2026-10-19T03-01.json",
+    "sha256": "f248b448d490c67591c14aafa5103d328b25af022d827fadd5418500a2e87330"
+  },
+  "checkbox_updates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "before_sha256": "c053b93127b24a30313e933bffc67487ca5ea421a7538674c7eb1c9a966a809b",
+      "after_sha256": "cd315e8e38ef961e8a8c4dbf6c0b93b5c1d2b3f2cbc42272cd93be439b613659",
+      "only_change": "P4-T1 checkbox",
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "before_sha256": "49f8a1d1a577a8d812ccb06456c2b6ae3487f5cf3a8f5e52faa4724b656c7dc5",
+      "after_sha256": "a0428a605cee846839b567f9edc06bbf850b89408486145d244df359b0468570",
+      "only_change": "AC-31 checkbox",
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "before_sha256": "3a612c8722aa0176ff1ef688251d8eff37502595830ce07e59b6292474b3ad18",
+      "after_sha256": "2cab091e9a3d180a9ccc8e5bbf9918f973f33eea85e4fdcf7240b097136612aa",
+      "only_change": "AC-31 checkbox",
+      "line_endings_preserved": true
+    }
+  ],
+  "tasks_complete": 33,
+  "tasks_total": 84,
+  "acceptance_criteria_complete": 12,
+  "acceptance_criteria_total": 66,
+  "accepted_criterion": "AC-31",
+  "next_task": "P4-T2",
+  "successor_released": false,
+  "production_or_test_writes": false,
+  "git_mutations": false,
+  "checkpoint_mutations": false
+}

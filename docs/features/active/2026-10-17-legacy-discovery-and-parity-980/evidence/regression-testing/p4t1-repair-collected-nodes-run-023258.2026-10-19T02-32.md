@@ -1,0 +1,47 @@
+Timestamp: 2026-10-19T02:32:58.466619+00:00
+Command: poetry run python -m pytest tests/discovery_runtime/analyzer/test_input_capture.py tests/discovery_runtime/analyzer/test_pipeline.py --collect-only -q -o addopts= --no-cov
+EXIT_CODE: 0
+Output Summary:
+
+```text
+tests/discovery_runtime/analyzer/test_input_capture.py::test_capture_prunes_outputs_and_dependencies_before_descent[/workspace]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_capture_prunes_outputs_and_dependencies_before_descent[C:/workspace]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_failed_oversized_and_missing_inputs_never_receive_fabricated_hashes
+tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits0]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits1]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_entry_and_depth_limits_fail_closed[limits2]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_aggregate_bytes_and_changed_inputs_fail_without_partial_success
+tests/discovery_runtime/analyzer/test_input_capture.py::test_path_aliases_and_links_are_rejected_without_dereference
+tests/discovery_runtime/analyzer/test_input_capture.py::test_snapshot_capture_retains_exclusions_without_inventing_payload_inputs
+tests/discovery_runtime/analyzer/test_input_capture.py::test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_pins[False]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_pin_capture_preserves_existing_objects_and_refuses_missing_or_foreign_pins[True]
+tests/discovery_runtime/analyzer/test_input_capture.py::test_branching_frontier_is_bounded_before_descendant_reads
+tests/discovery_runtime/analyzer/test_input_capture.py::test_overlapping_roots_share_one_discovered_entry_budget
+tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write
+tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs
+tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]
+tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding
+
+26 tests collected in 0.13s
+
+```
+
+Elapsed seconds: 0.516261
+Source and test bytes unchanged: True
+
+```json
+{
+  "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+  "tests/discovery_runtime/analyzer/test_input_capture.py": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+  "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+}
+```

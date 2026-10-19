@@ -1,0 +1,20 @@
+{
+  "after": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-corrected-harness.2026-10-19T02-47.txt",
+    "sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f"
+  },
+  "before": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-failed-harness.2026-10-19T02-46.txt",
+    "sha256": "9062dcad62b26887cddd210bb98fd030d0a78df51101433046f3d63e59a25845"
+  },
+  "reason": "The accepted snapshot loader rejects unknown report filenames. Use its declared coverage-report.md generated-view filename, matching the reviewed in-memory publication test.",
+  "remaining_native_assumptions_reviewed": [
+    "consistent source precapture in every writer capture",
+    "exact inventory grant and initially absent output",
+    "same metadata for byte-identical repeat publication",
+    "stale documentation rejection before writing",
+    "oversize read remains unavailable rather than receiving fabricated bytes"
+  ],
+  "scope": "Scratch fixture filename only; no production/test/configuration/rule mutation",
+  "timestamp": "2026-10-19T02:47:57.135694+00:00"
+}
