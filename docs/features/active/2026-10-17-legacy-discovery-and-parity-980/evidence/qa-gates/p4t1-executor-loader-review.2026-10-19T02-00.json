@@ -1,0 +1,48 @@
+{
+  "task": "P4-T1",
+  "portion": "approved snapshot loader prerequisite",
+  "timestamp": "2026-10-19T02:00:49.956946+00:00",
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-candidate-manifest.2026-10-19T01-58.json",
+  "candidate_manifest_sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "physical_lines": 496,
+      "executable_ast_sha256": "db01815eb3e8986d1a7a235f1356d063acf7a41281c49253243d29bd06c4a974"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+      "sha256": "52e51eff8a1882ec233fc7e06e268918924d4cb407a7836076f90a4d73f57777",
+      "physical_lines": 68,
+      "executable_ast_sha256": "f2288bb88e08a70fbd4310d68ff49711849b65253acba92cad3296b54f449437"
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+      "sha256": "531469bfde10fd8abb7c8b5278157be9485469781bca2db9af218c4021a7713d",
+      "physical_lines": 240,
+      "executable_ast_sha256": "aa1eb20bfa6739a54705af3b8ed4cf9237a054d56575b1415960f5d8a64181ba"
+    }
+  ],
+  "semantic_findings": [],
+  "policy_findings": [
+    {
+      "id": "P4T1-LOADER-R1",
+      "rule": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+      "finding": "Typed argument/return/effect documentation is incomplete in the new helper and test functions/nested adapter; file-vs-nested source and absent/wrong-pin/mismatch decision flows need intent comments.",
+      "repair": "Documentation/comments only; preserve all 18 cases and executable assertions."
+    }
+  ],
+  "reviewed_contract": [
+    "Schema-valid local nonimported inventory only",
+    "Files inspected and three nested source groups",
+    "Captured configured source/test/documentation paths only",
+    "Exact deduplicated revision/path requests",
+    "Immutable reader response verification unchanged",
+    "No coverage/revision/mutation/authority rule changes",
+    "Ordinary unreferenced docs and runtime captures remain unpinned",
+    "First-publication and writer.capture consistency delegated to analyzer composition proof"
+  ],
+  "behavioral_reruns": 0,
+  "status": "POLICY_REPAIR_REQUIRED"
+}

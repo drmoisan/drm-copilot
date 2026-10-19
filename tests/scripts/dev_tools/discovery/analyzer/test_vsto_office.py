@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from scripts.dev_tools.discovery.analyzer.emitter import serialize_record
 from scripts.dev_tools.discovery.analyzer.inventory import AnalyzerError
 from scripts.dev_tools.discovery.analyzer.models import AnalyzerContext, ParseResult
 from scripts.dev_tools.discovery.analyzer.pipeline import (
@@ -435,9 +436,13 @@ class TestEndToEndEmission:
         result = run_analyzer(analyzer, ctx, fs)
 
         # Assert
-        assert result.written_paths
-        for path in result.written_paths:
-            document = json.loads(path.read_text(encoding="utf-8"))
+        assert result.records and not result.written_paths
+        for record in result.records:
+            document = json.loads(
+                serialize_record(
+                    record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+                )
+            )
             validator.validate(document)
             top_level = set(document)
             assert _REQUIRED_TOP_LEVEL_KEYS <= top_level
@@ -463,12 +468,19 @@ class TestEndToEndEmission:
         # Act
         first = run_analyzer(analyzer, ctx, fs)
         first_content = {
-            p.name: p.read_text(encoding="utf-8") for p in first.written_paths
+            record.id: serialize_record(
+                record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+            )
+            for record in first.records
         }
         second = run_analyzer(analyzer, ctx, fs)
         second_content = {
-            p.name: p.read_text(encoding="utf-8") for p in second.written_paths
+            record.id: serialize_record(
+                record, ctx.artifact_root / f"{record.id}.json", ctx.schema_path
+            )
+            for record in second.records
         }
 
         # Assert
-        assert first_content == second_content
+        assert first_content and first_content == second_content
+        assert not ctx.artifact_root.exists()

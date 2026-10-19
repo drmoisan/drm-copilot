@@ -1,7 +1,7 @@
 """Domain-neutrality contract test over the analyzer production modules (scenario 8).
 
 The analyzer framework and inventory analyzer are epic-wide domain-neutral: no
-application- or stack-specific identifier may appear in their production source
+application- or optional-domain identifier may appear in their production source
 (code, field names, defaults, error messages, or docstrings).
 """
 
@@ -19,7 +19,7 @@ _ANALYZER_DIR = (
     / "analyzer"
 )
 
-# Case-insensitive banned identifiers plus stack literals.
+# Consumer and optional-domain identifiers remain banned in the reusable core.
 _BANNED_SUBSTRINGS = (
     "taskmaster",
     "tmw",
@@ -27,17 +27,11 @@ _BANNED_SUBSTRINGS = (
     "vsto",
     "email",
     "task-management",
-    ".csproj",
-    ".sln",
 )
 
-# Stack-specific analyzer modules delivered by feature #369. These modules are
-# stack-specific by charter, so the framework's stricter banned list (which bans
-# ``vsto``, ``.csproj``, ``.sln`` — legitimate pattern data for a .NET/VSTO
-# analyzer) must not be applied to them. Their consumer-neutrality is enforced by
-# the feature-scoped contract test ``test_stack_neutrality.py`` instead, per the
-# spec's Constraints & Risks scoping nuance. This framework test therefore scans
-# only #363's language-neutral modules.
+# Optional stack adapters retain their separate consumer-neutrality contract in
+# test_stack_neutrality.py. This scan includes both legacy adapters and canonical
+# reusable core modules; generic build filename markers are permitted structural data.
 _STACK_SPECIFIC_MODULES = frozenset(
     {
         "source_text.py",
@@ -56,9 +50,14 @@ def _production_modules() -> list[Path]:
     Stack-specific #369 modules are excluded because the framework's stricter
     banned list does not apply to them; see ``_STACK_SPECIFIC_MODULES``.
     """
+    runtime = (
+        Path(__file__).resolve().parents[5]
+        / "packages/discovery-runtime/src/drm_copilot_discovery/analyzer"
+    )
     return sorted(
         path
-        for path in _ANALYZER_DIR.glob("*.py")
+        for directory in (_ANALYZER_DIR, runtime)
+        for path in directory.glob("*.py")
         if path.name not in _STACK_SPECIFIC_MODULES
     )
 

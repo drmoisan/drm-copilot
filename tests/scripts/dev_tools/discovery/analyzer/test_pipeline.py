@@ -108,7 +108,9 @@ def _context() -> AnalyzerContext:
 
 
 def test_run_analyzer_invokes_stages_in_fixed_order_and_threads_outputs() -> None:
-    """run_analyzer calls parse -> classify -> map -> emit and returns their outputs."""
+    """run_analyzer calls parse -> classify -> map and returns records without
+    emission.
+    """
     # Arrange
     analyzer = _RecordingAnalyzer()
     fs = _ExplodingFileSystem()
@@ -117,9 +119,9 @@ def test_run_analyzer_invokes_stages_in_fixed_order_and_threads_outputs() -> Non
     result = run_analyzer(analyzer, _context(), fs)
 
     # Assert
-    assert analyzer.calls == ["parse", "classify", "map", "emit"]
+    assert analyzer.calls == ["parse", "classify", "map"]
     assert result.records == analyzer.expected_records
-    assert result.written_paths == analyzer.expected_written
+    assert result.written_paths == ()
 
 
 def test_package_reexports_public_surface() -> None:

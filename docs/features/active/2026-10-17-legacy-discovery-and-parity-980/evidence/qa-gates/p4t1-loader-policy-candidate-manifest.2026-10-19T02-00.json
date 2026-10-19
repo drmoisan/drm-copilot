@@ -1,0 +1,17 @@
+[
+  {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+    "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "physical_lines": 496
+  },
+  {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+    "sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+    "physical_lines": 71
+  },
+  {
+    "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+    "sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+    "physical_lines": 353
+  }
+]

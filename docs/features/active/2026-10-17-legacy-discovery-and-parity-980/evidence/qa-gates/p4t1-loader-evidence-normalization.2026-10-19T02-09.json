@@ -1,0 +1,190 @@
+{
+  "timestamp": "2026-10-19T02-09",
+  "operation": "evidence-only publishable normalization",
+  "scratch_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa",
+  "workspace_token": "WORKSPACE denotes the repository root; exact original rendering retained only in SCRATCH",
+  "source_test_hashes": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "physical_lines": 496
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_inventory_inputs.py",
+      "sha256": "e97619ae60491fc70534842c3393593c40b5d46708d7d76375da63a7effe3d1c",
+      "physical_lines": 71
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_loading_inventory.py",
+      "sha256": "ab27caeb5be94197f3ced6a8ff4bcda84136c035746d14cda3734b80b494e34c",
+      "physical_lines": 353
+    }
+  ],
+  "records": [
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.coverage",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.coverage",
+      "old_sha256": "ed81f6185844d19d4c2ee57442211f496c678b3a97b93a396e4182ef7ca53ccc",
+      "preserved_sha256": "ed81f6185844d19d4c2ee57442211f496c678b3a97b93a396e4182ef7ca53ccc",
+      "action": "moved-operational-sqlite",
+      "published_sha256": null
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.json",
+      "old_sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af",
+      "preserved_sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af",
+      "action": "preserved-original-receipt",
+      "published_sha256": "c178cb88b627ea96bf86c05aa16c9d833734d252704b882af9582e92299599af"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-baseline.2026-10-19T01-53.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-baseline.2026-10-19T01-53.md",
+      "old_sha256": "869f34028ef30e3a98a720610b8a1ac437532dee6bd2341ea100c6d7f91f1212",
+      "preserved_sha256": "869f34028ef30e3a98a720610b8a1ac437532dee6bd2341ea100c6d7f91f1212",
+      "action": "preserved-original-and-normalized-rendering",
+      "published_sha256": "b1eeb12b10c104cde3a0faa6c8ba5d464e83806298e7b40e8508d84c377d305d"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-pyright.2026-10-19T01-59.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-pyright.2026-10-19T01-59.md",
+      "old_sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b",
+      "preserved_sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b",
+      "action": "preserved-original-receipt",
+      "published_sha256": "c9120a4953d0a39f1ec8c8e8b671dd2f219831dd91d9bc6c857316d8943b4b1b"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-loader-ruff.2026-10-19T01-59.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/baseline/p4t1-loader-ruff.2026-10-19T01-59.md",
+      "old_sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1",
+      "preserved_sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1",
+      "action": "preserved-original-receipt",
+      "published_sha256": "d73a1ffbaa942aade0209f71936cf23c6593f6add6be676b3dbeb6f7d80eaef1"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-candidate-manifest.2026-10-19T01-58.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-candidate-manifest.2026-10-19T01-58.json",
+      "old_sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6",
+      "preserved_sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6",
+      "action": "preserved-original-receipt",
+      "published_sha256": "484049b155f537b391b8c3cb234add72429aaa564010b907ab292c49c2ccb6c6"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-candidate.2026-10-19T01-58.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-candidate.2026-10-19T01-58.md",
+      "old_sha256": "624b908b599757a3d1f9a1e8a570e349f9052d31d96d85348a1b6be32257a02a",
+      "preserved_sha256": "624b908b599757a3d1f9a1e8a570e349f9052d31d96d85348a1b6be32257a02a",
+      "action": "preserved-original-and-normalized-rendering",
+      "published_sha256": "d29507c36ece2ede9853ade848468ba4b3aeae8613df219d2953b48ebdc3ffcf"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-diffs.2026-10-19T02-02.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-diffs.2026-10-19T02-02.md",
+      "old_sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783",
+      "preserved_sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783",
+      "action": "preserved-original-receipt",
+      "published_sha256": "a524e0441cf5869cd44238b3a50037ab018bfb962994eea58f3318349ae8a783"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-black.2026-10-19T02-02.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-black.2026-10-19T02-02.md",
+      "old_sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60",
+      "preserved_sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60",
+      "action": "preserved-original-receipt",
+      "published_sha256": "c89e88699be2e9fa5c668dcc6a427e19feb1ba448ea29bc095f333afc98f4c60"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-comparison.2026-10-19T02-05.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-comparison.2026-10-19T02-05.json",
+      "old_sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2",
+      "preserved_sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2",
+      "action": "preserved-original-receipt",
+      "published_sha256": "5c254e3ea1b5f0a420b33a1b82f26a9300e87cb9874e6919253cfc7045f495b2"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-coverage.2026-10-19T02-05.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-coverage.2026-10-19T02-05.json",
+      "old_sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702",
+      "preserved_sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702",
+      "action": "preserved-original-receipt",
+      "published_sha256": "c971862343f439670d195061cab1577e04e04bd0c5833c03eda9a72faf4f7702"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-handoff.2026-10-19T02-05.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-handoff.2026-10-19T02-05.md",
+      "old_sha256": "a2ff23052d2627226c58f75451386e9660d15236ec38173f931dc94eca4a2a4b",
+      "preserved_sha256": "a2ff23052d2627226c58f75451386e9660d15236ec38173f931dc94eca4a2a4b",
+      "action": "preserved-original-and-normalized-rendering",
+      "published_sha256": "7402299011e26adf47d5383806f085ef3c86f40758e497d8833f9b741b0dd823"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-pyright.2026-10-19T02-02.md",
+      "old_sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733",
+      "preserved_sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733",
+      "action": "preserved-original-receipt",
+      "published_sha256": "34293da1e863b5d011f5d0d7782854c2121d129dcaaefff92044376016bd8733"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-pytest-reversed.2026-10-19T02-05.md",
+      "old_sha256": "1209b0f6f711a0bd3f7914829b939dfa90f8a22a9a8ece3d9604c8a74ba98032",
+      "preserved_sha256": "1209b0f6f711a0bd3f7914829b939dfa90f8a22a9a8ece3d9604c8a74ba98032",
+      "action": "preserved-original-and-normalized-rendering",
+      "published_sha256": "8cd8f67735b8d0bef692c9fbb1f34e732d8241e4ba66583033104d608cd34ba6"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final-ruff.2026-10-19T02-02.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final-ruff.2026-10-19T02-02.md",
+      "old_sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad",
+      "preserved_sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad",
+      "action": "preserved-original-receipt",
+      "published_sha256": "b7d8edfcb44b65e8868aef829f0e94856b9bce80a1a5fc089cff47ce31a6f1ad"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-final.2026-10-19T02-05.coverage",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-final.2026-10-19T02-05.coverage",
+      "old_sha256": "4cb767259374d559a57508888f9860a0ba0422a5e5e83344a52d8a478150ca67",
+      "preserved_sha256": "4cb767259374d559a57508888f9860a0ba0422a5e5e83344a52d8a478150ca67",
+      "action": "moved-operational-sqlite",
+      "published_sha256": null
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-loader-policy-candidate-manifest.2026-10-19T02-00.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/qa-gates/p4t1-loader-policy-candidate-manifest.2026-10-19T02-00.json",
+      "old_sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5",
+      "preserved_sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5",
+      "action": "preserved-original-receipt",
+      "published_sha256": "1b277e07adad8570bee8f91139ac28912ff5f1abb6eb8712ffc32fb9402cbfd5"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.coverage",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.coverage",
+      "old_sha256": "ad4e4771c587e20a2b3aec6c2e51ca763dd5ed93aaaa1d1afc62d5816da7fdc8",
+      "preserved_sha256": "ad4e4771c587e20a2b3aec6c2e51ca763dd5ed93aaaa1d1afc62d5816da7fdc8",
+      "action": "moved-operational-sqlite",
+      "published_sha256": null
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.json",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-candidate.2026-10-19T01-57.json",
+      "old_sha256": "c2db952c35fceb9850f2e2b36c88ce509464da81947f310af488095c9e09eeb0",
+      "preserved_sha256": "c2db952c35fceb9850f2e2b36c88ce509464da81947f310af488095c9e09eeb0",
+      "action": "preserved-original-receipt",
+      "published_sha256": "c2db952c35fceb9850f2e2b36c88ce509464da81947f310af488095c9e09eeb0"
+    },
+    {
+      "old_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t1-loader-rejected-baseline-command.2026-10-19T01-59.md",
+      "preserved_reference": "SCRATCH/p4t1-loader-evidence-2026-10-19T02-09-23cc9efa/regression-testing/p4t1-loader-rejected-baseline-command.2026-10-19T01-59.md",
+      "old_sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994",
+      "preserved_sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994",
+      "action": "preserved-original-receipt",
+      "published_sha256": "a85c1ae34bdcba2fa28ce3284c15749e615a7f216230bf4a00c271cde7351994"
+    }
+  ],
+  "source_tests_unchanged": true,
+  "gates_rerun": false,
+  "json_proof_unchanged": true,
+  "sqlite_count": 3,
+  "receipt_count": 4
+}
