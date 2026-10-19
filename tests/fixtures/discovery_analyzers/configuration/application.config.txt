@@ -1,0 +1,9 @@
+<configuration Condition="VALUE_SENTINEL_CONDITION">
+  <appSettings>
+    <add key="Endpoint" value="VALUE_SENTINEL_ENDPOINT" arbitrary="VALUE_SENTINEL_ATTRIBUTE"/>
+    <remove key="Obsolete"/>
+  </appSettings>
+  <connectionStrings><add name="Primary" connectionString="VALUE_SENTINEL_CONNECTION" providerName="VALUE_SENTINEL_PROVIDER"/></connectionStrings>
+  <userSettings><Client><setting name="Layout"><value>VALUE_SENTINEL_TEXT<appSettings><add key="VALUE_SENTINEL_NESTED"/></appSettings></value></setting></Client></userSettings>
+  <location path="VALUE_SENTINEL_LOCATION"><applicationSettings><Client><setting name="Theme"><value>VALUE_SENTINEL_THEME</value></setting></Client></applicationSettings></location>
+</configuration>

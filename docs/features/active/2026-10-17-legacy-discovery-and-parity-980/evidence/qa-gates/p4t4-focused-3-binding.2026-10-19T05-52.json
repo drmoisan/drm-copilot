@@ -1,0 +1,39 @@
+{
+  "batch": "focused-3",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-focused-3-coverage.2026-10-19T05-52.json",
+    "raw_path": "SCRATCH/p4t4-focused-3-coverage.raw.json",
+    "raw_sha256": "a3b7fe05c763e1f505e637386c83b016249ad7e99d98b4b2462b190b7fd96cec",
+    "sha256": "dad9a3a6992f138b1321c961ece6a8d78f2aa4590b92bf3ee5ed94669b5a8de4"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-format-055208.2026-10-19T05-52.json",
+      "sha256": "b4301b76de61b57556d39b59f4bc9ed0025a233be6a6d2a8a5431983a7a6b4bd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-lint-055209.2026-10-19T05-52.json",
+      "sha256": "4d626964075eee4f72f6edbf40b3eb9fa70540fc5d5c476dfb8e0ce3516989ba"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-3-types-055209.2026-10-19T05-52.json",
+      "sha256": "6a5ea89dd4c728e989eac9fa09bbac14b18fa7720f5b7a482a4014b9a088456d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-focused-3-tests-055247.2026-10-19T05-52.json",
+      "sha256": "b66241ba612cf3d6a87a1895ed03bef7ffc0c87568526a745757acbdaca667f7"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T05-52"
+}

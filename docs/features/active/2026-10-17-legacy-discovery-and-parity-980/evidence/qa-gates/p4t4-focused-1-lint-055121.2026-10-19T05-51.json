@@ -1,0 +1,43 @@
+{
+  "batch": "focused-1",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T05:51:21.828732+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-focused-1-lint-055121.2026-10-19T05-51.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-focused-1-lint-055121.2026-10-19T05-51.stdout.txt",
+      "sha256": "93f1a5cf9f9ec431a7aadec6604ed63f98d0730759b51dac4edd0df6759d0178"
+    }
+  },
+  "seconds": 0.104682,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "7005840928a65931f077124683aedfac7c62604634fa699e3231e033e66bfdfd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "66b567c926d37ce8ea5aa7f99337a0c2c963c4ad08ba9e8598f0c09c9cc536a0",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "d194e4d46e1ef4941b79b880d22ae066804dcab60680f4589195071b4800685c",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "7ec660e69aad854cd6c65f2adcf47fd1122815064dde6e47fe06de40934a7fa8",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "7005840928a65931f077124683aedfac7c62604634fa699e3231e033e66bfdfd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "66b567c926d37ce8ea5aa7f99337a0c2c963c4ad08ba9e8598f0c09c9cc536a0",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "d194e4d46e1ef4941b79b880d22ae066804dcab60680f4589195071b4800685c",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "7ec660e69aad854cd6c65f2adcf47fd1122815064dde6e47fe06de40934a7fa8",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T05:51:21.724050+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py:139:89\n    |\n137 |             \"configuration-presence-unresolved\",\n138 |             item.path,\n139 |             \"Values, conditions and effective configuration presence are not evaluated.\",\n    |                                                                                         ^\n140 |             analyzer=\"configuration\",\n141 |             blocking=False,\n    |\n\nE501 Line too long (96 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py:149:89\n    |\n147 |                 \"source-revision-unverified\",\n148 |                 item.path,\n149 |                 \"Capture matching immutable source bytes before publishing configuration keys.\",\n    |                                                                                         ^^^^^^^^\n150 |                 analyzer=\"configuration\",\n151 |             )\n    |\n\nE501 Line too long (129 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py:169:89\n    |\n167 |         code,\n168 |         path,\n169 |         \"Check the selected configuration against supported formats, syntax and limits; values and parser details are withheld.\",\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n170 |         analyzer=\"configuration\",\n171 |     )\n    |\n\nE501 Line too long (97 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_configuration.py:261:89\n    |\n259 |         (\n260 |             \"settings.xml\",\n261 |             b'<settings condition=\"VALUE_SENTINEL_1\"><setting name=\"K\">one</setting></settings>',\n    |                                                                                         ^^^^^^^^^\n262 |             b'<settings condition=\"VALUE_SENTINEL_2\">\\n<setting name=\"K\">two</setting></settings>',\n263 |         ),\n    |\n\nE501 Line too long (99 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_configuration.py:262:89\n    |\n260 |             \"settings.xml\",\n261 |             b'<settings condition=\"VALUE_SENTINEL_1\"><setting name=\"K\">one</setting></settings>',\n262 |             b'<settings condition=\"VALUE_SENTINEL_2\">\\n<setting name=\"K\">two</setting></settings>',\n    |                                                                                         ^^^^^^^^^^^\n263 |         ),\n264 |         (\"settings.ini\", b\"[S]\\nK=VALUE_SENTINEL_1\", b\"[S]\\n\\nK=VALUE_SENTINEL_2\"),\n    |\n\nE501 Line too long (113 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_configuration_input.py:40:89\n   |\n38 |         (\n39 |             \"xml\",\n40 |             b'<settings xmlns:x=\"http://www.w3.org/2001/XInclude\"><x:include href=\"VALUE_SENTINEL\"/></settings>',\n   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n41 |             \"configuration-xml-invalid\",\n42 |         ),\n   |\n\nFound 6 errors.\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T05-51"
+}

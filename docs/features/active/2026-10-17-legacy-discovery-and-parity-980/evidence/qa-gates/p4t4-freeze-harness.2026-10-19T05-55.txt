@@ -1,0 +1,52 @@
+"""Bind a passing P4-T4 checked-WIP candidate without accepting the task."""
+import ast
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+evidence = feature / 'evidence'
+binding_path = evidence / 'qa-gates/p4t4-focused-3-binding.2026-10-19T05-52.json'
+binding = json.loads(binding_path.read_text())
+baseline_path = evidence / 'baseline/p4t4-baseline-binding.2026-10-19T05-38.json'
+baseline = json.loads(baseline_path.read_text())
+coverage = json.loads(Path(binding['coverage']['path']).read_text())
+files = []
+units = []
+for path, expected in binding['sources'].items():
+    content = Path(path).read_bytes()
+    actual = sha256(content).hexdigest()
+    assert actual == expected, path
+    count = len(content.decode().splitlines())
+    assert count <= 500, path
+    files.append({'path': path, 'sha256': actual, 'physical_lines': count, 'disposition': 'new'})
+    if path not in coverage['files']:
+        continue
+    measured = coverage['files'][path]
+    statements = set(measured['executed_lines']) | set(measured['missing_lines'])
+    for node in ast.walk(ast.parse(content)):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            span = set(range(node.lineno, node.end_lineno + 1))
+            eligible = statements & span
+            executed = set(measured['executed_lines']) & span
+            assert not eligible or len(executed) / len(eligible) >= .90, (path, node.name)
+            units.append({'path': path, 'name': node.name, 'kind': type(node).__name__, 'start': node.lineno, 'end': node.end_lineno, 'covered_statements': len(executed), 'statements': len(eligible)})
+preserved = []
+for item in baseline['predecessor_files']:
+    actual = sha256(Path(item['path']).read_bytes()).hexdigest()
+    assert actual == item['sha256'], item['path']
+    preserved.append({'path': item['path'], 'sha256': actual})
+for receipt in binding['receipts']:
+    assert sha256(Path(receipt['path']).read_bytes()).hexdigest() == receipt['sha256']
+    value = json.loads(Path(receipt['path']).read_text())
+    assert value['exit_code'] == 0 and value['source_before'] == value['source_after'] == binding['sources']
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+document = {'task': 'P4-T4', 'state': 'CHECKED_WIP_FROZEN_TASK_UNACCEPTED', 'timestamp': stamp, 'recorded_at': now.isoformat(), 'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': files, 'baseline': {'path': baseline_path.as_posix(), 'sha256': sha256(baseline_path.read_bytes()).hexdigest()}, 'preserved_predecessors': preserved, 'focused_binding': {'path': binding_path.as_posix(), 'sha256': sha256(binding_path.read_bytes()).hexdigest()}, 'receipts': binding['receipts'], 'coverage': binding['coverage'], 'totals': coverage['totals'], 'unit_ranges': units, 'tests': {'passed': 61, 'elapsed_seconds': 37.10, 'modules': ['tests/discovery_runtime/analyzer/test_configuration.py', 'tests/discovery_runtime/analyzer/test_configuration_input.py']}, 'remaining': ['Consolidated policy and structural review before full candidate freeze', 'Independent consolidated candidate review and any bounded repair', 'Parent-authorized final ordered gates and native composition', 'Executor task acceptance'], 'limitations': ['Only finite documented JSON/XML/INI declarations are recognized; TOML is explicitly unsupported.', 'JSON lines are not fabricated; XML/INI use declaration anchors.', 'Values and conditions are neither exported nor evaluated.', 'Registry integration remains P4-T9; this direct adapter proof is not native coding-agent-host proof.'], 'provenance': 'Working file hashes are authoritative here. Parent will qualify actual Git index/commit normalization separately. Raw command bytes remain under SCRATCH/issue-980-p4t4 as named by each receipt.'}
+destination = evidence / 'qa-gates' / ('p4t4-focused-wip-freeze.' + stamp + '.json')
+destination.write_text(json.dumps(document, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+destination.with_suffix('.md').write_text(f'# P4-T4 focused checked-WIP freeze\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-freeze.py`\nEXIT_CODE: 0\nOutput Summary: Eight new source/test/fixture paths are frozen after 61 passing cases and a clean ordered Black/Ruff/Pyright/Pytest sequence. Task acceptance remains pending.\n\nProduction coverage is 251/254 statements and 104/110 branch destinations; every measured new class/callable range meets 90% statements. All 34 accepted predecessor/interface hashes match the retained baseline. Exact paths, hashes, raw receipts and limitations are in the paired JSON.\n\nThe approved split keeps pure parsing and key/error records in configuration_input.py and finite selection/provenance projection in configuration.py. Tests are split by the same responsibility. All rendered evidence is LF-only UTF-8; earlier diagnostics are preserved separately.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'freeze': destination.as_posix(), 'sha256': sha256(destination.read_bytes()).hexdigest(), 'paths': len(files), 'units': len(units), 'predecessors': len(preserved), 'sizes': {item['path']: item['physical_lines'] for item in files}}))
