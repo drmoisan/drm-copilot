@@ -1,0 +1,40 @@
+{
+  "stage": "unit",
+  "label": "p4t6-ui-focused4-unit",
+  "started": "2026-10-19T08:46:29.054984+00:00",
+  "finished": "2026-10-19T08:47:12.760544+00:00",
+  "command": "poetry run pytest tests/discovery_runtime/analyzer/test_ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callback_limits.py -q -o addopts= --cov=drm_copilot_discovery.analyzer.ui_callbacks --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p4t6-ui-coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 43.706,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "physical_lines": 458
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "physical_lines": 458
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241
+    }
+  },
+  "output": "........................................................................ [ 67%]\n...................................                                      [100%]\n=============================== tests coverage ================================\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\n\nName                                                                            Stmts   Miss Branch BrPart  Cover   Missing\n---------------------------------------------------------------------------------------------------------------------------\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\ui_callbacks.py     164      0     58      0   100%\n---------------------------------------------------------------------------------------------------------------------------\nTOTAL                                                                             164      0     58      0   100%\nCoverage JSON written to file SCRATCH/issue-980-p4t6-ui-coverage.json\n107 passed in 42.02s\n",
+  "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "scope": "P4-T6 UI subset only"
+}

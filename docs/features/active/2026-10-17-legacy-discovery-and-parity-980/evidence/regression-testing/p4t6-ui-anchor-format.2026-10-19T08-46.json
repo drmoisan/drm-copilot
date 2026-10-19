@@ -1,0 +1,40 @@
+{
+  "stage": "format",
+  "label": "p4t6-ui-anchor-format",
+  "started": "2026-10-19T08:46:04.331127+00:00",
+  "finished": "2026-10-19T08:46:06.138147+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callback_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.807,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "88eb3a45985ca0325a69cc711de063b8dd7a887b14c05001560957aabce794ab",
+      "physical_lines": 458
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": {
+      "sha256": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+      "physical_lines": 458
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": {
+      "sha256": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090",
+      "physical_lines": 417
+    },
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": {
+      "sha256": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+      "physical_lines": 241
+    }
+  },
+  "output": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\ui_callbacks.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n1 file reformatted, 2 files left unchanged.\n",
+  "accepted_baseline": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "scope": "P4-T6 UI subset only"
+}
