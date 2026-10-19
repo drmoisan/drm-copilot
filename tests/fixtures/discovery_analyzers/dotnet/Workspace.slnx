@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="src/Example App.csproj" />
+    <Project Path="../Peer/Peer.fsproj" />
+  </Folder>
+</Solution>

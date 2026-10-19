@@ -1,0 +1,16 @@
+<Project Sdk="Synthetic.Sdk/1.0">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != ''">
+    <ProjectReference Include="../Peer/Peer.csproj" Condition="Exists('ignored')" />
+    <PackageReference Include="Synthetic.Library" Version="1.2.3" />
+    <PackageReference Update="Synthetic.Library"><Version>$(Version)</Version></PackageReference>
+    <ProjectReference Remove="**/*.csproj" />
+    <Reference Include="Synthetic.Assembly"><HintPath>$(External)/Library.dll</HintPath></Reference>
+    <COMReference Include="Synthetic.Interop"><Guid>{11111111-2222-3333-4444-555555555555}</Guid><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor><Lcid>0</Lcid><WrapperTool>tlbimp</WrapperTool><EmbedInteropTypes>true</EmbedInteropTypes></COMReference>
+    <COMFileReference Include="../External/Component.tlb" />
+  </ItemGroup>
+  <Import Project="$(CustomTargets)" Condition="Exists('$(CustomTargets)')" />
+  <Sdk Name="Synthetic.SecondSdk" Version="2.0" />
+</Project>

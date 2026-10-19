@@ -45,13 +45,16 @@ class SolutionEntry:
         line must be a positive int; names/paths must be nonblank str and GUID text
         must match the solution grammar. Constructor fields remain unmodified.
         """
+        # Keep scalar invariants independent from later declaration projection.
         if type(self.line) is not int or self.line < 1:
             raise ValueError("Solution anchors must be positive integers")
+        # Empty names or paths cannot represent a usable literal declaration.
         if any(
             type(value) is not str or not value.strip()
             for value in (self.name, self.path)
         ):
             raise ValueError("Solution names and paths must be nonblank strings")
+        # GUID syntax is validated without assigning language or folder semantics.
         if any(
             type(value) is not str or re.fullmatch(_GUID, value) is None
             for value in (self.project_type, self.project_id)
@@ -90,7 +93,9 @@ def parse_solution(
         raise SolutionInputError(
             "solution-encoding", "Solution encoding is unsupported."
         ) from exc
-    lines = text.splitlines()
+    # Solution records use physical CR/LF boundaries; other Unicode stays literal.
+    lines = re.split(r"\r\n|\r|\n", text)
+    # Require a supported header before any project declaration can become a fact.
     if not any(
         line.startswith("Microsoft Visual Studio Solution File, Format Version ")
         for line in lines[:3]

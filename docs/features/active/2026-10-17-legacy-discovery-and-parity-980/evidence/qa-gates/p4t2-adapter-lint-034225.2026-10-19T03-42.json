@@ -1,0 +1,48 @@
+{
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+  "duration_seconds": 1.149,
+  "exit_code": 1,
+  "finished_at": "2026-10-19T03:42:25.864416+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-adapter-lint-034225.2026-10-19T03-42.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-adapter-lint-034225.2026-10-19T03-42.stdout.txt",
+    "sha256": "105723694523ce7fd5eefeb7ab41f28df71d599d12e03794c9a84197ec6b96e7"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "a9a928e499b63b6d1ab9c9de5cb0e7aaf7f2f1ab8b0df5b28bd2a7e695e8ae2a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "a1de30a373a11a1210dc0ecbecbbe5a690aa9547b62698d42660ad7ca8996be4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "a9a928e499b63b6d1ab9c9de5cb0e7aaf7f2f1ab8b0df5b28bd2a7e695e8ae2a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "a1de30a373a11a1210dc0ecbecbbe5a690aa9547b62698d42660ad7ca8996be4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "stage": "adapter-lint",
+  "started_at": "2026-10-19T03:42:24.716476+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (97 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_projects.py:32:89\n   |\n30 |     from drm_copilot_discovery.analyzer.models import InventoryCapture, InventoryInput\n31 |\n32 | _XML_SUFFIXES = frozenset(\".slnx .csproj .fsproj .vbproj .vcxproj .proj .props .targets\".split())\n   |                                                                                         ^^^^^^^^^\n33 | _BUILD_NAMESPACE = \"http://schemas.microsoft.com/developer/msbuild/2003\"\n34 | _KINDS = {\n   |\n\nE501 Line too long (94 > 88)\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_projects.py:48:89\n   |\n46 | }\n47 | _ATTRIBUTES = frozenset((\n48 |     \"Name Path Include Update Remove Exclude Version VersionOverride Sdk Project ToolsVersion\"\n   |                                                                                         ^^^^^^\n49 | ).split())\n50 | _METADATA = frozenset((\n   |\n\nTC002 Move third-party import `drm_copilot_discovery.models.JsonObject` into a type-checking block\n  --> tests\\discovery_runtime\\analyzer\\test_dotnet_projects.py:21:42\n   |\n19 | )\n20 | from drm_copilot_discovery.catalog import load_catalog\n21 | from drm_copilot_discovery.models import JsonObject\n   |                                          ^^^^^^^^^^\n22 | from drm_copilot_discovery.repository_reader import RepositoryFile, RepositoryIdentity\n23 | from drm_copilot_discovery.snapshot import SnapshotFile\n   |\nhelp: Move into type-checking block\n\nE501 Line too long (93 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dotnet_projects.py:443:89\n    |\n441 |     Returns None; assertions require exact round trip. No I/O or path evaluation.\n442 |     \"\"\"\n443 |     body = f'<Project><ProjectReference Update=\"{value}\" Exclude=\"skip\"/></Project>'.encode()\n    |                                                                                         ^^^^^\n444 |     analysis = DotnetProjectAnalyzer().analyze(\n445 |         capture(catalog, ((\"src/app.csproj\", body),))\n    |\n\nFound 4 errors.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-42"
+}

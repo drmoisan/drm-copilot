@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="Deferred" Condition="'$(Run)' == 'true'">
+    <ItemGroup><ProjectReference Include="../Late/Late.fsproj" /></ItemGroup>
+  </Target>
+  <Import Project="https://invalid.invalid/not-fetched.targets" />
+</Project>
