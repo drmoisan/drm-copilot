@@ -1,0 +1,113 @@
+{
+  "timestamp": "2026-10-19T11-07",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-final-release.py",
+  "exit_code": 0,
+  "state": "RELEASED_READY_TO_EXECUTE",
+  "authority": "workspace_operations_p4t7_final_gates / S5_P4T7_final_gates",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "native_authority": {
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true
+  },
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-preparation.2026-10-19T11-00.json",
+    "sha256": "9ed734c49b60f1c1bff863af66c6ddef61ada1b7d4062824bef2a3c73334a76e"
+  },
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.json",
+    "sha256": "0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf"
+    }
+  ],
+  "prepared_harnesses": [
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-gates.py",
+      "sha256": "db43345ce517e9183f5c67d9985368c298a319f9d1bad6da9247889da81e471b",
+      "lines": 145,
+      "syntax_parse": "passed",
+      "executed": false
+    },
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-architecture.py",
+      "sha256": "be199f474702a9e7043643431977f253a18d8c6e5792138c933d122d42f8d45f",
+      "lines": 55,
+      "syntax_parse": "passed",
+      "executed": false
+    },
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-native.py",
+      "sha256": "c610460f27a09be4d3de42f6ed7c4216e586c06f1b4370e624c5825efa191b9d",
+      "lines": 172,
+      "syntax_parse": "passed",
+      "executed": false
+    }
+  ],
+  "candidate": {
+    "path": "SCRATCH/issue-980-p4t7-final-candidate.released.2026-10-19T11-07.json",
+    "sha256": "5f520dc34c988a2f786f9a595eeae06e7df4d8b99c43b95efe2a7f61bf543730"
+  },
+  "release_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-release-harness.2026-10-19T11-07.txt",
+    "sha256": "25fb4dcdc2377bf6f70173b370003b6864a50068227d58c16e894524a9f5c0c7"
+  },
+  "source_test_mutation": false,
+  "git_mutation": false,
+  "gate_execution": false
+}

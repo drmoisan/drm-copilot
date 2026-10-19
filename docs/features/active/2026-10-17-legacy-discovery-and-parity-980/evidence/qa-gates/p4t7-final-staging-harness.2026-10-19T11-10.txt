@@ -1,0 +1,71 @@
+"""Close the final evidence staging set without staging or mutating reviewed work."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root, scratch = Path.cwd(), Path(__file__).parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes()), 'bytes': len(path.read_bytes())}
+
+
+handoff = qa / 'p4t7-final-handoff.2026-10-19T11-09.json'
+assert sha(handoff.read_bytes()) == '0bb22689574e3acdc8eaba593593c2bbaa23640637ba4e9cb3223219514726f8'
+report = json.loads(handoff.read_bytes())
+for entry in report['source_files']:
+    assert sha(Path(entry['path']).read_bytes()) == entry['sha256']
+coverage = json.loads(Path(report['coverage_ranges']['path']).read_bytes())
+assert all(row['covered_lines'] == row['num_statements'] and row['covered_branches'] == row['num_branches'] for row in coverage['module_summaries'].values())
+assert all(not row['summary']['num_statements'] or row['summary']['covered_lines'] == row['summary']['num_statements'] for row in coverage['unit_ranges'])
+totals = {key: sum(row[key] for row in coverage['module_summaries'].values()) for key in ('covered_lines', 'num_statements', 'covered_branches', 'num_branches')}
+original_coverage = []
+for path in sorted(qa.glob('p4t7-final-*')):
+    if path.suffix not in ('.json', '.md', '.txt'):
+        continue
+    raw = path.read_bytes()
+    assert b'\r' not in raw, path
+    assert all(line == line.rstrip() for line in raw.splitlines()), path
+    if '-original-coverage.' in path.name:
+        json.loads(raw)
+        original_coverage.append(ref(path))
+    else:
+        assert raw.endswith(b'\n') and not raw.endswith(b'\n\n'), path
+harness = qa / ('p4t7-final-staging-harness.' + stamp + '.txt')
+assert not harness.exists()
+harness.write_bytes(Path(__file__).read_bytes())
+markdown = qa / ('p4t7-final-staging.' + stamp + '.md')
+assert not markdown.exists()
+markdown.write_bytes((f'# P4-T7 final evidence closure\n\nTimestamp: {stamp}\nCommand: poetry run python SCRATCH/issue-980-p4t7-final-staging.py\nEXIT_CODE: 0\nOutput Summary: exact untracked final evidence paths are frozen for parent staging and independent acceptance; no Git or source/test mutation occurred.\n\nThe ordered run passed 557 task cases, 215 affected contracts and 16 native assertions. All six modules cover {totals["covered_lines"]}/{totals["num_statements"]} statements and {totals["covered_branches"]}/{totals["num_branches"]} branches; all 63 class/callable ranges have full statement coverage. All 14 source/test streams match their committed and reviewed bindings. The accepted 62-stream predecessor manifest and prior subset evidence remain unchanged.\n\nReadable final Markdown/JSON/harness snapshots pass CR/LF, trailing-whitespace and terminal-newline checks. Exact original coverage-generator JSON retains its original terminal-newline convention. Separate raw stdout/stderr hashes and SCRATCH identifiers remain bound in command receipts; readable presentations are sanitized. The 10:58 preparation-correction pair is explicitly included. Task/AC acceptance remains pending; no registry publication or installed-host proof is claimed.\n').encode())
+status = subprocess.check_output(['git', 'status', '--porcelain=v1', '--untracked-files=all', '--', qa.as_posix()], text=True)
+paths = []
+for line in status.splitlines():
+    relative = line[3:]
+    if Path(relative).name.startswith('p4t7-final-'):
+        assert line[:2] == '??', (line[:2], relative)
+        paths.append(relative)
+required = [str(qa / ('p4t7-final-preparation-correction.2026-10-19T10-58.' + suffix)).replace('\\', '/') for suffix in ('json', 'md')]
+assert all(path in paths for path in required)
+manifest_path = qa / ('p4t7-final-staging.' + stamp + '.json')
+assert not manifest_path.exists()
+record = {'task': 'P4-T7', 'timestamp': stamp, 'state': 'FROZEN_FINAL_EVIDENCE_AWAITING_ACCEPTANCE',
+    'command': 'poetry run python SCRATCH/issue-980-p4t7-final-staging.py', 'exit_code': 0,
+    'candidate_commit': report['checked_candidate_commit'], 'handoff': ref(handoff),
+    'coverage_totals': totals, 'measured_class_callable_ranges': len(coverage['unit_ranges']),
+    'case_counts': report['test_cases'], 'source_binding': report['source_files'],
+    'predecessor_manifest': report['shared_baseline'], 'preserved_predecessors': report['preserved_predecessors'],
+    'raw_coverage_originals': original_coverage, 'readable_evidence_precheck': 'LF, no trailing whitespace, one final newline; exact raw coverage JSON excepted for its generator convention.',
+    'preparation_correction_included': required, 'harness': ref(harness),
+    'files': [ref(Path(path)) for path in paths], 'stage_paths': paths + [manifest_path.as_posix()],
+    'no_active_processes_or_writers': True, 'source_test_edits': False, 'git_mutations': False, 'task_or_ac_checkoff': False}
+manifest_path.write_bytes((json.dumps(record, indent=2) + '\n').encode())
+print(json.dumps({'staging': ref(manifest_path), 'stage_count': len(record['stage_paths']), 'coverage': totals,
+    'cases': record['case_counts'], 'ranges': record['measured_class_callable_ranges']}, indent=2))

@@ -1,0 +1,172 @@
+"""Compose retained dependency declarations using native Windows/Git, without installs."""
+import datetime
+from dataclasses import replace
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+from uuid import uuid4
+
+import yaml
+from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_inputs, capture_snapshot, pin_inventory_sources
+from drm_copilot_discovery.analyzer.inventory import RepositoryAnalyzer
+from drm_copilot_discovery.analyzer.pipeline import plan_inventory
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.models import canonical_json
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import capture_workspace
+from drm_copilot_discovery.path_models import WriteGrant
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch = Path(__file__).resolve().parent
+root = scratch / ('issue-980-p4t7-native-' + uuid4().hex)
+root.mkdir()
+assert root.resolve().parent == scratch
+started = time.monotonic()
+checks, operation_seconds = [], {}
+
+
+def check(name, condition):
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+    print('PASS ' + name, flush=True)
+
+
+def put(path, content):
+    destination = root / path
+    assert root in destination.resolve().parents
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(content)
+
+
+def tree():
+    return {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(root.rglob('*')) if path.is_file() and '.git' not in path.relative_to(root).parts}
+
+
+def git(*arguments):
+    return subprocess.run(['git', '-C', str(root), *arguments], capture_output=True, check=True).stdout
+
+
+def run_git(argv, *, output_limit):
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        content = process.stdout.read(output_limit + 1)
+        if len(content) > output_limit:
+            process.kill()
+            raise OSError('Native Git output exceeded its bounded read')
+        if process.wait() != 0:
+            raise OSError('Native Git read failed')
+        return content
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+payloads = {
+    'src/package.json': b'{"dependencies":{"alpha":"^1","private-package":"https://example.invalid/SECRET_LOCATION"}}\r\n',
+    'src/package-lock.json': b'{"lockfileVersion":3,"packages":{"node_modules/alpha":{"version":"1","resolved":"SECRET_RESOLVED","dependencies":{"beta":"^2"}}}}',
+    'src/requirements.txt': 'gamma>=1; python_version >= "SECRET_MARKER"\r\n# Unicode Etat: \u00c9tat\r\n'.encode(),
+    'src/setup.cfg': b'[options]\r\ninstall_requires = delta==2\r\n',
+    'src/app.csproj': b'<Project><ItemGroup Condition="SECRET_CONDITION"><PackageReference Include="Epsilon" Version="3" /></ItemGroup></Project>',
+    'src/packages.config': b'<packages><package id="Zeta" version="4" targetFramework="SECRET_FRAMEWORK" /></packages>',
+    'src/packages.lock.json': b'{"version":1,"dependencies":{"SECRET_FRAMEWORK":{"Eta":{"type":"Direct","requested":"[5,6)","resolved":"5","dependencies":{"Theta":"[1,2)"}}}}}',
+}
+for path, content in payloads.items():
+    put(path, content)
+put('.gitattributes', b'src/** -text\n')
+git('init', '--quiet')
+git('config', 'core.autocrlf', 'false')
+git('add', 'src', '.gitattributes')
+git('-c', 'user.name=Discovery fixture', '-c', 'user.email=discovery@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Synthetic dependency declarations')
+revision = git('rev-parse', 'HEAD').decode('ascii').strip()
+catalog = load_catalog()
+value = yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text(encoding='utf-8'))
+value.pop('extension_schemas')
+value['system']['role'] = 'legacy-source'
+value['repository']['revision'] = revision
+value['repositories'] = []
+value['clients'] = []
+value['production_roots'] = ['src']
+value['test_roots'] = []
+value['documentation_roots'] = []
+value['project_entry_points'] = []
+value['excluded_paths'] = []
+identifiers = ('repository', 'dependencies')
+value['analyzers'] = {'enabled': list(identifiers), 'options': {'max_file_bytes': 16384}, 'ignored_paths': [], 'extension_result_manifests': []}
+profile = ProfileV2(json.dumps(value), format='json', catalog=catalog)
+put(profile.artifacts['profile'], canonical_json(profile.document))
+repository = LocalGitReader(workspace_root=str(root), repository_id=profile.repository.id, run=run_git)
+primitives = LocalMutationPrimitives(workspace_root=str(root), lock_path=str(scratch / ('issue-980-p4t7-' + uuid4().hex + '.lock')))
+before, status = tree(), git('status', '--porcelain=v1', '-z')
+timer = time.monotonic()
+selection = capture_inputs(profile, workspace_root=str(root), metadata=primitives.metadata, read_bytes=primitives.read_bytes)
+operation_seconds['capture_inputs'] = time.monotonic() - timer
+check('native capture retains all seven configured finite-format inputs', len(selection.inputs) == 7 and all(item.file is not None for item in selection.inputs))
+timer = time.monotonic()
+baseline = pin_inventory_sources(capture_workspace(workspace_root=str(root), profile_path=profile.artifacts['profile'], metadata=primitives.metadata, read_bytes=primitives.read_bytes, repository=repository, catalog=catalog), repository)
+operation_seconds['complete_capture_and_git_precapture'] = time.monotonic() - timer
+inputs = capture_snapshot(baseline.snapshot)
+check('real Git provenance retains exact CRLF and Unicode working bytes', repository.identity().revision == revision and all(item.file is not None and any(pin.path == item.path and pin.content == item.file.content for pin in inputs.repository_files) for item in inputs.inputs if item.status == 'inspected'))
+timer = time.monotonic()
+analysis = DependencyAnalyzer().analyze(inputs)
+operation_seconds['dependencies_analyze'] = time.monotonic() - timer
+check('all finite Node Python and NET formats produce detected file components', len(analysis.components) == 7 and all(item['confidence'] == 'high' and item['classification'] == 'detected' for item in analysis.components))
+check('declaration lock records and lock edges remain distinct syntax kinds', {item['kind'] for item in analysis.findings} == {'declaration', 'locked-package', 'declared-lock-edge'} and all(item['classification'] == 'detected' for item in analysis.findings))
+check('declared graph relevance remains inferred with unresolved null targets', len(analysis.relationships) == 2 and all(item['classification'] == 'inferred' and item['to_component_id'] is None and item['confidence'] == 'low' for item in analysis.relationships))
+metadata = [item['extensions']['drm.dependencies'] for item in analysis.findings]
+check('all ecosystems retain unverified installed state and unevaluated binding', {item['ecosystem'] for item in metadata} == {'node', 'python', 'dotnet'} and all(item['installed_state'] == 'unverified' and item['graph'] == 'not-evaluated' and item['binding'] == 'unresolved' and item['execution'] == 'unverified' for item in metadata))
+encoded = canonical_json(row(components=analysis.components, findings=analysis.findings, relationships=analysis.relationships, diagnostics=analysis.diagnostics))
+check('locations marker values conditions and lock target keys are redacted', b'SECRET_' not in encoded)
+check('declared lock edge requests stay separate from observed package versions', any(item['package'] == 'beta' and item['requested'] == '^2' and item['version'] is None for item in metadata) and any(item['package'] == 'Eta' and item['requested'] == '[5,6)' and item['version'] == '5' for item in metadata))
+check('valid retained syntax has no blocking diagnostics', not any(item['blocking'] for item in analysis.diagnostics))
+check('every source anchor carries exact original hashes and immutable revisions', all(item['source']['sha256'] == before[item['source']['path']] and item['source']['revision'] == revision for item in analysis.components + analysis.findings + analysis.relationships))
+timer = time.monotonic()
+unpinned = DependencyAnalyzer().analyze(replace(inputs, repository_files=()))
+operation_seconds['unpinned_analysis'] = time.monotonic() - timer
+check('missing pins remain low confidence with explicit provenance diagnostics', all(item['confidence'] == 'low' for item in unpinned.findings) and sum(item['code'] == 'source-revision-unverified' for item in unpinned.diagnostics) == 7)
+small = json.loads(json.dumps(value))
+small.setdefault('limits', {})['artifact_records'] = 2
+small_profile = ProfileV2(json.dumps(small), format='json', catalog=catalog)
+timer = time.monotonic()
+limited = DependencyAnalyzer().analyze(replace(inputs, profile=small_profile))
+operation_seconds['aggregate_limit_analysis'] = time.monotonic() - timer
+check('aggregate exhaustion discards all facts and emits one bounded fixed blocker', not limited.components and not limited.findings and not limited.relationships and len(limited.diagnostics) == 1 and limited.diagnostics[0]['code'] == 'dependency-limit' and len(canonical_json(limited.diagnostics)) < 1024)
+structural = RepositoryAnalyzer().analyze(inputs)
+timer = time.monotonic()
+result = inventory_result(inputs, (structural, analysis), analyzer_ids=identifiers, timestamp='2026-10-19T00:00:00Z', author_or_agent=row(kind='tool', id='native-proof'), catalog=catalog)
+repeated = inventory_result(inputs, (analysis, structural), analyzer_ids=tuple(reversed(identifiers)), timestamp='2026-10-20T00:00:00Z', author_or_agent=row(kind='human', id='second-observer'), catalog=catalog)
+operation_seconds['two_inventory_projections'] = time.monotonic() - timer
+check('schema-valid inventory identity is independent of adapter order and clock', result.semantic_sha256 == repeated.semantic_sha256 and result.document['id'] == repeated.document['id'])
+check('ledger proposals remain uninspected and unassigned', all(item['inspection_status'] == 'uninspected' and item['disposition'] == 'unassigned' for item in result.ledger_components))
+identifier = result.document['id']
+grant = WriteGrant(artifact_kind='inventory-snapshot', artifact_id=identifier, path=profile.artifacts['inventory'] + '/' + identifier + '.json')
+refusal = None
+timer = time.monotonic()
+try:
+    plan_inventory(baseline, result, grants=(grant,))
+except ValueError as error:
+    refusal = str(error)
+operation_seconds['expected_publication_planning_refusal'] = time.monotonic() - timer
+check('closed registry refuses dependency dispatch before publication planning', refusal == 'Unavailable analyzer selection; configure supported adapters: dependencies')
+check('analysis and refused publication preserve all source and Git state', before == tree() and status == git('status', '--porcelain=v1', '-z') and not (root / grant.path).exists())
+output = Path(sys.argv[1])
+record = {'task': 'P4-T7', 'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'platform': sys.platform, 'checks': checks,
+    'whole_composition_seconds': time.monotonic() - started, 'operation_seconds': operation_seconds,
+    'scratch_repository': 'SCRATCH/' + root.name, 'revision': revision, 'profile': value, 'inputs': before,
+    'inventory_id': identifier, 'semantic_sha256': result.semantic_sha256,
+    'component_count': len(result.document['components']), 'finding_count': len(result.document['findings']),
+    'relationship_count': len(result.document['relationships']), 'source_tree_unchanged': before == tree(),
+    'git_status_unchanged': status == git('status', '--porcelain=v1', '-z'), 'publication': 'refused-unregistered-adapter',
+    'limitations': 'Windows Python/Git operational composition only. No installation, restore, evaluated graph, package execution, coding-agent host, non-Windows run or successful registry publication; dispatch/publication remains P4-T9.'}
+output.write_bytes((json.dumps(record, indent=2, sort_keys=True) + '\n').encode())
+print(output.as_posix(), flush=True)

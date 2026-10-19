@@ -1,0 +1,145 @@
+"""Run one released P4-T7 seven-stage loop, adapted from the accepted P4-T5 runner."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+manifest_path = Path(sys.argv[1])
+manifest = json.loads(manifest_path.read_bytes())
+assert manifest.get('execution_released') is True and manifest.get('coordinator_release_receipt'), 'Coordinator execution release is required'
+assert len(manifest['subset_manifests']) == 5 and manifest.get('review'), 'All five frozen subsets and review are required'
+for reference in manifest['subset_manifests'] + [manifest['review']] + ([manifest['confirmation']] if manifest.get('confirmation') else []):
+    assert hashlib.sha256(Path(reference['path']).read_bytes()).hexdigest() == reference['sha256'], reference['path']
+expected = {entry['path']: entry['sha256'] for entry in manifest['files']}
+code = list(expected)
+assert len(code) == 14 and len(expected) == len(manifest['files']) and all(path.endswith('.py') for path in code)
+assert {Path(path).name for path in code} == {'dependency_inputs.py', 'dependency_values.py', 'dependency_node.py', 'dependency_python.py', 'dependency_dotnet.py', 'dependencies.py', 'test_dependency_inputs.py', 'test_dependency_input_limits.py', 'test_dependency_node.py', 'test_dependency_node_limits.py', 'test_dependency_python.py', 'test_dependency_dotnet.py', 'test_dependencies.py', 'test_dependency_projection_limits.py'}
+receipts = []
+harnesses = [Path(__file__).resolve(), scratch / 'issue-980-p4t7-final-architecture.py', scratch / 'issue-980-p4t7-final-native.py']
+harness_hashes = {'SCRATCH/' + path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in harnesses}
+start = datetime.datetime.now(datetime.timezone.utc)
+
+
+def hashes():
+    return {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in expected}
+
+
+def portable(text):
+    for path, label in ((root, 'WORKSPACE'), (scratch, 'SCRATCH')):
+        text = re.sub(re.escape(str(path)), lambda match: label, text, flags=re.I)
+        text = re.sub(re.escape(path.as_posix()), lambda match: label, text, flags=re.I)
+    return text
+
+
+def write(path, value):
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+def run(number, label, arguments, *, module=True):
+    before = hashes()
+    assert before == expected, ('candidate changed before', label)
+    assert all(hashlib.sha256(path.read_bytes()).hexdigest() == harness_hashes['SCRATCH/' + path.name] for path in harnesses)
+    started = datetime.datetime.now(datetime.timezone.utc)
+    env = dict(os.environ)
+    env.update(PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', COVERAGE_FILE=str(scratch / ('issue-980-p4t7-final-' + label + '.coverage')))
+    command = [sys.executable, *(['-m'] if module else []), *map(str, arguments)]
+    result = subprocess.run(command, capture_output=True, env=env)
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    stamp = finished.strftime('%Y-%m-%dT%H-%M')
+    stem = 'p4t7-final-' + label + '-' + finished.strftime('%H%M%S') + '.' + stamp
+    stdout, stderr = scratch / ('issue-980-' + stem + '.stdout.txt'), scratch / ('issue-980-' + stem + '.stderr.txt')
+    stdout.write_bytes(result.stdout)
+    stderr.write_bytes(result.stderr)
+    after = hashes()
+    document = {'stage': number, 'label': label, 'timestamp': stamp, 'started_at': started.isoformat(), 'finished_at': finished.isoformat(),
+        'seconds': (finished - started).total_seconds(), 'command': portable('poetry run python ' + ('-m ' if module else '') + subprocess.list2cmdline(list(map(str, arguments)))),
+        'exit_code': result.returncode, 'source_before': before, 'source_after': after,
+        'stdout': portable(result.stdout.decode('utf-8', errors='replace')), 'stderr': portable(result.stderr.decode('utf-8', errors='replace')),
+        'raw_stdout': {'path': 'SCRATCH/' + stdout.name, 'sha256': hashlib.sha256(result.stdout).hexdigest()},
+        'raw_stderr': {'path': 'SCRATCH/' + stderr.name, 'sha256': hashlib.sha256(result.stderr).hexdigest()}, 'harness_hashes': harness_hashes}
+    path = qa / (stem + '.json')
+    write(path, document)
+    markdown = f'# P4-T7 final {label}\n\nTimestamp: {stamp}\nCommand: `{document["command"]}`\nEXIT_CODE: {result.returncode}\nOutput Summary: Stage {number} of 7; exact source bindings, elapsed time and separate raw stream hashes are in the adjacent JSON.\n\n```text\n{document["stdout"]}{document["stderr"]}\n```\n'
+    path.with_suffix('.md').write_text('\n'.join(line.rstrip() for line in markdown.splitlines()) + '\n', encoding='utf-8', newline='\n')
+    receipts.append({'stage': number, 'label': label, 'path': path.as_posix(), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'exit_code': result.returncode})
+    progress = qa / ('p4t7-final-progress-' + start.strftime('%H%M%S') + '-' + label + '.' + stamp + '.json')
+    write(progress, {'candidate_manifest': portable(manifest_path.as_posix()), 'receipts': receipts, 'source_hashes': after})
+    print(json.dumps({'stage': number, 'label': label, 'exit_code': result.returncode, 'seconds': document['seconds'], 'receipt': path.as_posix()}), flush=True)
+    if result.returncode or before != after:
+        print((document['stdout'][-8000:] + document['stderr'][-8000:]).encode('ascii', errors='backslashreplace').decode('ascii'), flush=True)
+        raise SystemExit(result.returncode or 1)
+
+
+assert hashes() == expected
+for path in expected:
+    subprocess.run(['git', 'ls-files', '--error-unmatch', '--', path], capture_output=True, check=True)
+run(1, 'format', ['black', '--check', *code])
+run(2, 'lint', ['ruff', 'check', *code])
+run(3, 'types', ['pyright'])
+run(4, 'architecture', [scratch / 'issue-980-p4t7-final-architecture.py', manifest_path], module=False)
+test_nodes, tests, coverage_batches = [], [], []
+batches = (
+    ('shared', ('dependency_input_limits', 'dependency_inputs'), ('dependency_inputs', 'dependency_values')),
+    ('node', ('dependency_node_limits', 'dependency_node'), ('dependency_node',)),
+    ('python', ('dependency_python',), ('dependency_python',)),
+    ('dotnet', ('dependency_dotnet',), ('dependency_dotnet',)),
+    ('integration', ('dependency_projection_limits', 'dependencies'), ('dependencies',)),
+)
+for batch, module_names, production_names in batches:
+    batch_tests = ['tests/discovery_runtime/analyzer/test_' + name + '.py' for name in module_names]
+    assert batch_tests == list(reversed(manifest['forward_test_module_order'][batch])), ('unexpected reverse order', batch)
+    measured = ['drm_copilot_discovery.analyzer.' + name for name in production_names]
+    coverage_raw = scratch / ('issue-980-p4t7-final-' + batch + '-coverage.raw.json')
+    run(5, 'tests-' + batch + '-reverse', ['pytest', '-v', '-o', 'addopts=', *batch_tests,
+        *['--cov=' + name for name in measured], '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + coverage_raw.as_posix()])
+    test_receipt = json.loads(Path(receipts[-1]['path']).read_bytes())
+    batch_nodes = re.findall(r'^(tests/.+?) PASSED(?:\s|$)', test_receipt['stdout'], flags=re.M)
+    assert len(batch_nodes) == manifest['expected_test_counts'][batch] and len(batch_nodes) == len(set(batch_nodes)), (batch, len(batch_nodes))
+    assert set(batch_nodes) == set(manifest['prior_node_order'][batch]), ('case population changed', batch)
+    tests.extend(batch_tests)
+    test_nodes.extend(batch_nodes)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    coverage_path = qa / f'p4t7-final-{batch}-coverage.{stamp}.json'
+    coverage = json.loads(coverage_raw.read_bytes())
+    coverage['files'] = {portable(path).replace('\\', '/'): value for path, value in coverage['files'].items()}
+    write(coverage_path, coverage)
+    assert {Path(name).stem for name in coverage['files']} == set(production_names)
+    for filename, data in coverage['files'].items():
+        assert data['summary']['percent_statements_covered'] >= 90, filename
+        assert data['summary']['percent_branches_covered'] >= 75, filename
+        for family in ('functions', 'classes'):
+            for name, unit in data.get(family, {}).items():
+                if unit['summary']['num_statements']:
+                    assert unit['summary']['percent_statements_covered'] >= 90, (filename, name, unit['summary'])
+    coverage_batches.append({'batch': batch, 'coverage_path': coverage_path.as_posix(), 'coverage_sha256': hashlib.sha256(coverage_path.read_bytes()).hexdigest(),
+        'raw_coverage': {'path': 'SCRATCH/' + coverage_raw.name, 'sha256': hashlib.sha256(coverage_raw.read_bytes()).hexdigest()},
+        'test_module_order': batch_tests, 'test_nodes': batch_nodes})
+assert len(test_nodes) == len(set(test_nodes))
+run(6, 'contracts', ['pytest', '-q', '-o', 'addopts=', '--no-cov',
+    'tests/schemas/discovery/test_v2_inventory_schemas.py',
+    'tests/scripts/dev_tools/test_quality_tiers_contract.py',
+    'tests/scripts/dev_tools/test_quality_tiers_contract_classification.py',
+    'tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python',
+    'tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage',
+    'tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py'])
+native_raw = scratch / 'issue-980-p4t7-final-native-result.raw.json'
+run(7, 'native', [scratch / 'issue-980-p4t7-final-native.py', native_raw], module=False)
+native_path = qa / ('p4t7-final-native-result.' + datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M') + '.json')
+write(native_path, json.loads(native_raw.read_bytes()))
+finished = datetime.datetime.now(datetime.timezone.utc)
+path = qa / ('p4t7-final-ordered-stages.' + finished.strftime('%Y-%m-%dT%H-%M') + '.json')
+write(path, {'task': 'P4-T7', 'candidate_manifest': portable(manifest_path.as_posix()),
+    'candidate_manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(), 'started_at': start.isoformat(), 'finished_at': finished.isoformat(),
+    'receipts': receipts, 'source_hashes': hashes(), 'harness_hashes': harness_hashes, 'test_module_order': tests,
+    'test_nodes': test_nodes, 'test_node_count': len(test_nodes), 'coverage_batches': coverage_batches, 'native_path': native_path.as_posix(),
+    'raw_native': {'path': 'SCRATCH/' + native_raw.name, 'sha256': hashlib.sha256(native_raw.read_bytes()).hexdigest()},
+    'host_proof_limitations': 'Native Windows Python/Git only. Direct adapter composition and expected closed-registry publication refusal; dispatch/publication remains P4-T9. No coding-agent host, package install/restore/execution, or non-Windows execution.'})
+print(path.as_posix(), flush=True)

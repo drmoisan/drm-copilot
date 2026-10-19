@@ -1,0 +1,153 @@
+{
+  "checks": [
+    "native capture retains all seven configured finite-format inputs",
+    "real Git provenance retains exact CRLF and Unicode working bytes",
+    "all finite Node Python and NET formats produce detected file components",
+    "declaration lock records and lock edges remain distinct syntax kinds",
+    "declared graph relevance remains inferred with unresolved null targets",
+    "all ecosystems retain unverified installed state and unevaluated binding",
+    "locations marker values conditions and lock target keys are redacted",
+    "declared lock edge requests stay separate from observed package versions",
+    "valid retained syntax has no blocking diagnostics",
+    "every source anchor carries exact original hashes and immutable revisions",
+    "missing pins remain low confidence with explicit provenance diagnostics",
+    "aggregate exhaustion discards all facts and emits one bounded fixed blocker",
+    "schema-valid inventory identity is independent of adapter order and clock",
+    "ledger proposals remain uninspected and unassigned",
+    "closed registry refuses dependency dispatch before publication planning",
+    "analysis and refused publication preserve all source and Git state"
+  ],
+  "component_count": 14,
+  "finding_count": 10,
+  "git_status_unchanged": true,
+  "inputs": {
+    ".gitattributes": "c4aec070ffe08cb285ccd6d83c1d522c2d782ead14ac1b1f6d17c1740db423cd",
+    "docs/migration/discovery/domain-profile.yaml": "4b904f9fd904968a08a3ddadeff4749309642ececbbcc8adfc1d87d83dd37ea9",
+    "src/app.csproj": "0f46669daa40391860ed8210b783ccbb38e668541a9c6f76ecb0f788f236a22b",
+    "src/package-lock.json": "a6f0da9369cf3fc3f6823c553950bbeb6e22a6e725f851824ecbe21e95827a31",
+    "src/package.json": "3b252d02823573aa9b0b54be48b2afd47278a0454f1cfd1c469554a578ff9bce",
+    "src/packages.config": "9fd22f538c0b030bdbd79730cfb335534282283132d884c23f68a254298f3908",
+    "src/packages.lock.json": "38d6c9554284e4455b2f68637534529dc9ca9559c878ab688277b48bcff4ced4",
+    "src/requirements.txt": "630ec4301c9cbf4e3d45528dbbc6d309846cbcd4b57b430b36a1610f42494391",
+    "src/setup.cfg": "a1a22053abc578f7c0179cb672dc193b1840a87185671605174a91d7cf66bd26"
+  },
+  "inventory_id": "inventory-59a630bcb233ed0ed88389dc0f687a4aa1b034e9ed85f7bafe391c51ad58482a",
+  "limitations": "Windows Python/Git operational composition only. No installation, restore, evaluated graph, package execution, coding-agent host, non-Windows run or successful registry publication; dispatch/publication remains P4-T9.",
+  "operation_seconds": {
+    "aggregate_limit_analysis": 0.0005703000060748309,
+    "capture_inputs": 0.08806450001429766,
+    "complete_capture_and_git_precapture": 1.7711759000085294,
+    "dependencies_analyze": 0.011284999985946342,
+    "expected_publication_planning_refusal": 0.0009306000138167292,
+    "two_inventory_projections": 0.7582168999942951,
+    "unpinned_analysis": 0.0022446000075433403
+  },
+  "platform": "win32",
+  "profile": {
+    "$schema": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+    "analyzers": {
+      "enabled": [
+        "repository",
+        "dependencies"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [],
+      "options": {
+        "max_file_bytes": 16384
+      }
+    },
+    "artifact_kind": "domain-profile",
+    "artifacts": {
+      "acceptance": "docs/migration/discovery/acceptance",
+      "characterization": "docs/migration/discovery/characterization",
+      "coverage_ledger": "docs/migration/discovery/coverage-ledger.json",
+      "evidence": "docs/migration/discovery/evidence",
+      "feature_contracts": "docs/migration/discovery/feature-contracts",
+      "implementation_records": "docs/migration/discovery/implementation-records",
+      "inventory": "docs/migration/discovery/inventory",
+      "parity_matrix": "docs/migration/discovery/parity-matrix.json",
+      "product_decisions": "docs/migration/discovery/product-decisions.yaml",
+      "profile": "docs/migration/discovery/domain-profile.yaml",
+      "reports": "docs/migration/discovery/reports",
+      "root": "docs/migration/discovery",
+      "scope": "docs/migration/discovery/scope.yaml",
+      "source_snapshots": "docs/migration/discovery/source-snapshots",
+      "unspecified_behaviors": "docs/migration/discovery/unspecified-behaviors.yaml"
+    },
+    "clients": [],
+    "completion_gates": {
+      "block_on_unresolved_required_behavior": true,
+      "planning_prerequisite": "discovery-complete",
+      "require_acceptance_scenarios": true,
+      "require_all_dispositions": true,
+      "require_approved_deviations": true,
+      "require_confirmed_scope": true,
+      "require_current_inventory": true,
+      "require_feature_evidence": true,
+      "require_runtime_for_declared_features": true
+    },
+    "decision_owners": [
+      {
+        "id": "owner-example",
+        "required_evidence_types": [
+          "decision"
+        ]
+      }
+    ],
+    "documentation_roots": [],
+    "evidence_roots": [
+      "docs/migration/discovery/evidence"
+    ],
+    "excluded_paths": [],
+    "extensions": {
+      "example.discovery": {
+        "catalog_label": "Synthetic fixture",
+        "revision_notes": []
+      }
+    },
+    "id": "profile-example",
+    "production_roots": [
+      "src"
+    ],
+    "profile_state": "configured",
+    "profile_version": 2,
+    "project_entry_points": [],
+    "repositories": [],
+    "repository": {
+      "id": "workspace-example",
+      "revision": "f833025eb58dab4753c048500065e8132f2bc05f",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "required_feature_dimensions": [
+      "trigger",
+      "observable_outputs"
+    ],
+    "required_modes": [
+      "online"
+    ],
+    "required_platforms": [
+      "browser"
+    ],
+    "runtime": {
+      "capability": "manual",
+      "required_feature_ids": []
+    },
+    "schema_version": "2.0.0",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "legacy-source"
+    },
+    "test_roots": []
+  },
+  "publication": "refused-unregistered-adapter",
+  "relationship_count": 2,
+  "revision": "f833025eb58dab4753c048500065e8132f2bc05f",
+  "scratch_repository": "SCRATCH/issue-980-p4t7-native-b3b47c332c614e979bd968ed0db055b4",
+  "semantic_sha256": "59a630bcb233ed0ed88389dc0f687a4aa1b034e9ed85f7bafe391c51ad58482a",
+  "source_tree_unchanged": true,
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T11:09:09.643487+00:00",
+  "whole_composition_seconds": 4.06006950000301
+}

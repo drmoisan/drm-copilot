@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-10-19T10-58",
+  "task": "P4-T7",
+  "state": "PREPARATION_DRIVER_CORRECTION",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-final-preparation-correction.py",
+  "exit_code": 0,
+  "observed_failed_command": "poetry run python SCRATCH/issue-980-p4t7-final-prepare.py",
+  "observed_failure": "AssertionError at line82: the absolute-host-path detector incorrectly matched the s:/ suffix of a synthetic https:// fixture URL.",
+  "original_driver": {
+    "path": "SCRATCH/issue-980-p4t7-final-prepare.py",
+    "sha256": "b6fa2d68dfb86d8c11a8579f5cbad20f15fbdcaaee81872b76c9094361d943b4"
+  },
+  "preserved_partial_manifest": {
+    "path": "SCRATCH/issue-980-p4t7-final-candidate.preparation.json",
+    "sha256": "4dc2544ff6d1033fb55a6c3d2916054ac607bb20d45a8170dd1c721f664c0c50"
+  },
+  "corrected_driver": {
+    "path": "SCRATCH/issue-980-p4t7-final-prepare2.py",
+    "sha256": "56d7d670679296ade86fb074d861b6aaa837e867836cdca798c572e68067d4d8"
+  },
+  "correction": "Use the retained prior harness detector with a nonalphabetic left boundary. Preserve the original executed script and partial manifest; a new driver and manifest are used.",
+  "gate_execution": false,
+  "source_test_mutation": false,
+  "behavioral_rerun": false
+}

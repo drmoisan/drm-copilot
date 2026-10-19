@@ -1,0 +1,55 @@
+"""Verify reviewed P4-T7 purity, bounded sizes and memory-only test ownership."""
+import ast
+import hashlib
+import io
+import json
+from pathlib import Path
+import re
+import sys
+import tokenize
+
+manifest = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+checked = []
+for entry in manifest['files']:
+    path = Path(entry['path'])
+    content = path.read_bytes()
+    assert hashlib.sha256(content).hexdigest() == entry['sha256'], path
+    assert path.suffix == '.py' and len(content.splitlines()) <= 500, path
+    tree = ast.parse(content)
+    lines = content.decode('utf-8').splitlines()
+    imports, definitions, loops = [], [], []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node, ast.Import):
+            imports.extend(value.name for value in node.names)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            definitions.append(node)
+            assert ast.get_docstring(node), (path, node.name)
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            loops.append(node)
+            assert lines[node.lineno - 2].strip().startswith('#'), (path, node.lineno)
+    if path.as_posix().startswith('packages/'):
+        assert not any(value.startswith(('scripts', 'subprocess', 'socket', 'requests', 'http', 'urllib', 'os', 'io')) for value in imports), (path, imports)
+        assert not any('office' in value or 'vsto' in value for value in imports), path
+        assert re.search(r'\b(?:TaskMaster|TMW|Outlook|VSTO|MAPI)\b', content.decode(), re.I) is None, path
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                called = ast.unparse(node.func)
+                assert called not in {'open', 'eval', 'exec', 'compile', 'import_module'}, (path, called)
+                assert not called.endswith(('.read_bytes', '.read_text', '.write_bytes', '.write_text', '.unlink', '.mkdir', '.glob', '.rglob')), (path, called)
+        boundary = 'Pure retained-byte declarations and inferred relevance; no source reads, process, network or execution.'
+    else:
+        docstrings = {(node.body[0].lineno, node.body[0].col_offset) for node in ast.walk(tree)
+                      if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and ast.get_docstring(node)}
+        code_text = ' '.join(token.string for token in tokenize.generate_tokens(io.StringIO(content.decode()).readline)
+                             if token.type != tokenize.COMMENT and token.start not in docstrings)
+        assert not any(word in code_text for word in ('tmp_path', 'tmpdir', 'TemporaryDirectory', 'NamedTemporaryFile', 'tempfile', 'subprocess', 'requests', 'socket')), path
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                assert not ast.unparse(node.func).endswith(('.write_bytes', '.write_text', '.mkdir', '.unlink')), (path, ast.unparse(node.func))
+        boundary = 'Memory-only unit cases and read-only immutable schema resources.'
+    checked.append({'path': path.as_posix(), 'physical_lines': len(lines), 'documented_definitions': len(definitions),
+                    'commented_loops': len(loops), 'boundary': boundary})
+assert len(checked) == 14
+print(json.dumps({'checks': checked, 'passed': len(checked)}, indent=2))

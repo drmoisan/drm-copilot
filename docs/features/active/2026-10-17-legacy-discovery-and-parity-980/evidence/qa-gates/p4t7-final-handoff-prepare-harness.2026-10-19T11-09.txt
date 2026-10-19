@@ -1,0 +1,33 @@
+"""Prepare final evidence reconciliation from the retained P4-T6 handoff mechanics."""
+from pathlib import Path
+
+scratch = Path(__file__).parent
+text = (scratch / 'issue-980-p4t6-final-handoff.py').read_text('utf-8').replace('P4-T6', 'P4-T7').replace('p4t6', 'p4t7')
+text = text.replace("(5, 'tests-ui-reverse'), (5, 'tests-references-reverse')", "(5, 'tests-shared-reverse'), (5, 'tests-node-reverse'), (5, 'tests-python-reverse'), (5, 'tests-dotnet-reverse'), (5, 'tests-integration-reverse')")
+text = text.replace("len(native['checks']) == 13", "len(native['checks']) == 16").replace("'refused-unregistered-adapters'", "'refused-unregistered-adapter'")
+text = text.replace('len(module_coverage) == 3', 'len(module_coverage) == 6')
+text = text.replace("assert sha((scratch / batch['raw_coverage']['path'].removeprefix('SCRATCH/')).read_bytes()) == batch['raw_coverage']['sha256']", "raw_coverage_bytes = (scratch / batch['raw_coverage']['path'].removeprefix('SCRATCH/')).read_bytes()\n    assert sha(raw_coverage_bytes) == batch['raw_coverage']['sha256']\n    raw_coverage_path = qa / ('p4t7-final-' + batch['batch'] + '-original-coverage.' + stamp + '.json')\n    assert not raw_coverage_path.exists()\n    raw_coverage_path.write_bytes(raw_coverage_bytes)")
+text = text.replace("'test_count': len(batch['test_nodes']), 'test_module_order': batch['test_module_order']}", "'test_count': len(batch['test_nodes']), 'test_module_order': batch['test_module_order'], 'canonical_original': ref(raw_coverage_path)}")
+text = text.replace("snapshot_inputs['SCRATCH/' + Path(__file__).name] = sha(Path(__file__).read_bytes())", "snapshot_inputs['SCRATCH/' + Path(__file__).name] = sha(Path(__file__).read_bytes())\nfor name in ('issue-980-p4t7-final-adapt.py', 'issue-980-p4t7-final-prepare.py', 'issue-980-p4t7-final-preparation-correction.py', 'issue-980-p4t7-final-prepare2.py', 'issue-980-p4t7-final-preparation-delta.py', 'issue-980-p4t7-final-native.prepared-original.py', 'issue-980-p4t7-final-handoff-prepare.py'):\n    snapshot_inputs['SCRATCH/' + name] = sha((scratch / name).read_bytes())")
+text = text.replace("'role': 'final-gate-harness' if relative in ordered['harness_hashes'] else 'handoff-binding-only'", "'role': 'final-gate-harness' if relative in ordered['harness_hashes'] else ('unexecuted-preserved-preparation' if 'prepared-original' in relative else 'preparation-or-handoff-binding')")
+text = text.replace("'All three modules are new at the accepted P4-T5 baseline. Actual uncovered guards remain in the raw reports; no exclusion or fictional 100% claim is added.'", "'All six modules are new at the accepted P4-T6 baseline. Each module has 100% measured statements/branches and every class/callable meets its required floor. Original shared repair and format-parser proofs remain immutable; all predecessor streams are unchanged.'")
+text = text.replace("'native_assertions': 13", "'native_assertions': 16")
+start = text.index("    'limitations': [")
+end = text.index('\nwrite(handoff, document)', start)
+text = text[:start] + """    'limitations': ['Finite package.json, npm lock/shrinkwrap v2/v3, requirements/setup.cfg, MSBuild declarations, packages.config and NuGet lock v1 syntax only.',
+        'Installed state, effective resolution, graph binding, conditions and execution remain unverified or unresolved.',
+        'Unsafe locations, versions, conditions and marker values are redacted; metadata never supplies an evaluated graph.',
+        'Dispatch and successful publication remain P4-T9; the native proof verifies expected closed-registry refusal.',
+        'Native Windows Python/Git only; no installed coding-agent host, non-Windows, package installation/restore/execution proof.',
+        'Independent task/AC acceptance remains executor-owned.'],
+    'changed_line_coverage': 'All six newly added production modules have 100% measured statements/branches; changed responsibilities retain or improve their frozen focused baseline. No predecessor file changed.',
+    'overall_repository_coverage': 'Not remeasured for this atomic task; the feature-wide gate remains outstanding. This receipt claims the complete six-module task population only.'}
+""" + text[end:]
+text = text.replace('Seven ordered stages passed on seven bound source/test files.', 'Seven ordered stages passed on 14 bound source/test files.')
+text = text.replace('two isolated reversed module-order processes', 'five isolated reversed module-order processes').replace('and 13 native', 'and 16 native')
+text = text.replace('No UI/test execution, behavioral coverage, installed-host or non-Windows claim', 'No installation, restore, dependency execution, evaluated graph, behavioral coverage, installed-host or non-Windows claim')
+text = text.replace('Actual uncovered guards remain', 'Any uncovered guards remain')
+text = text.replace("print(json.dumps({'handoff': ref(handoff)", "print(json.dumps({'handoff': ref(handoff)")
+path = scratch / 'issue-980-p4t7-final-handoff.py'
+assert not path.exists()
+path.write_bytes((text.replace('\r\n', '\n').rstrip() + '\n').encode())

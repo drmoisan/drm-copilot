@@ -1,0 +1,43 @@
+{
+  "acceptance_criteria": {
+    "checked": 13,
+    "newly_checked": [],
+    "total": 66
+  },
+  "command": "poetry run python SCRATCH/issue-980-p4t7-final-reconcile.py WORKER_SCRATCH --finalize RECONCILIATION_JSON",
+  "exit_code": 0,
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-handoff.2026-10-19T11-09.json",
+    "sha256": "0bb22689574e3acdc8eaba593593c2bbaa23640637ba4e9cb3223219514726f8"
+  },
+  "limitations": [
+    "Finite package.json, npm lock/shrinkwrap v2/v3, requirements/setup.cfg, MSBuild declarations, packages.config and NuGet lock v1 syntax only.",
+    "Installed state, effective resolution, graph binding, conditions and execution remain unverified or unresolved.",
+    "Unsafe locations, versions, conditions and marker values are redacted; metadata never supplies an evaluated graph.",
+    "Dispatch and successful publication remain P4-T9; the native proof verifies expected closed-registry refusal.",
+    "Native Windows Python/Git only; no installed coding-agent host, non-Windows, package installation/restore/execution proof."
+  ],
+  "next_five": [
+    "P4-T8",
+    "P4-T9",
+    "P5-T1",
+    "P5-T2",
+    "P5-T3"
+  ],
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "sha256": "ba2110c12a1146251bcc5a0820523ae6bcb4d8e3c61def86dcf4b56857fdd3f0"
+  },
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-final-reconciliation.2026-10-19T11-14.json",
+    "sha256": "36ee0af9301195e720eedd0d96569ccf3fe8569ccae300899077649dbe283285"
+  },
+  "scope": "Only P4-T7 was checked off. Source/test/checkpoint/Git bytes were not edited.",
+  "status": "TASK_STATUS: PASS",
+  "task": "P4-T7",
+  "tasks": {
+    "checked": 39,
+    "total": 84
+  },
+  "timestamp": "2026-10-19T11-14"
+}
