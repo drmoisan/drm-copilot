@@ -1,0 +1,92 @@
+{
+  "task": "P3-T8",
+  "started_at": "2026-10-19T01:19:49.375005+00:00",
+  "finished_at": "2026-10-19T01:19:51.616730+00:00",
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-candidate-freeze.2026-10-19T01-16.json",
+  "candidate_sha256": "caa1e69a0ff85d614b43d1cfd46d8920fda1ba19c9324031a668184b3c717052",
+  "sources": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "sha256": "442f14edabaf89a21c9a95da2275dadaed0507237e4df7d1250459023dac1750",
+      "physical_lines": 423,
+      "documented_definitions": 27,
+      "missing_docs": [],
+      "unannotated_explicit_loops": []
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "sha256": "79cd291c8fce397b117f3d719a2f3303380462d7cc37e01b073944362bebc419",
+      "physical_lines": 479,
+      "documented_definitions": 16,
+      "missing_docs": [],
+      "unannotated_explicit_loops": []
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_reads.py",
+      "sha256": "c5b774599e8a3e0b97dc9d91a6dc93f5ccbab0efc585a45b2e97717515a5fabd",
+      "physical_lines": 496,
+      "documented_definitions": 21,
+      "missing_docs": [],
+      "unannotated_explicit_loops": []
+    },
+    {
+      "path": "tests/discovery_runtime/test_source_read_limits.py",
+      "sha256": "2a80ff7cf33445fcbb862b3a84639cc71a549c1101c118ec19af934b6e8aeb79",
+      "physical_lines": 496,
+      "documented_definitions": 15,
+      "missing_docs": [],
+      "unannotated_explicit_loops": []
+    }
+  ],
+  "cases": [
+    {
+      "excluded_path": "docs/migration/discovery/source-snapshots/export-alpha/manifest.json",
+      "requested_path": "docs/migration/discovery/source-snapshots/export-alpha/contracts/alpha.json",
+      "returned_rows": 1,
+      "excluded_byte_reads": 2,
+      "all_read_paths": [
+        "docs/migration/discovery/source-snapshots/export-alpha/contracts/alpha.json",
+        "docs/migration/discovery/source-snapshots/export-alpha/manifest.json",
+        "docs/migration/discovery/source-snapshots/export-alpha/questions.json"
+      ]
+    },
+    {
+      "excluded_path": "docs/migration/discovery/source-snapshots/export-alpha/questions.json",
+      "requested_path": "docs/migration/discovery/source-snapshots/export-alpha/contracts/alpha.json",
+      "returned_rows": 1,
+      "excluded_byte_reads": 2,
+      "all_read_paths": [
+        "docs/migration/discovery/source-snapshots/export-alpha/contracts/alpha.json",
+        "docs/migration/discovery/source-snapshots/export-alpha/manifest.json",
+        "docs/migration/discovery/source-snapshots/export-alpha/questions.json"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "P3T8-R1",
+      "variant": "manifest",
+      "description": "Selected transport integrity reads bypass the profile exclusion enforced for ordinary/output reads",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "lines": [
+        237,
+        239,
+        255,
+        261
+      ]
+    },
+    {
+      "id": "P3T8-R1",
+      "variant": "member",
+      "description": "Selected transport integrity reads bypass the profile exclusion enforced for ordinary/output reads",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "lines": [
+        237,
+        239,
+        255,
+        261
+      ]
+    }
+  ],
+  "behavioral_scope": "Two in-memory cases for one concrete source-review defect; no broad suite or predecessor replay"
+}

@@ -1,0 +1,51 @@
+{
+  "accepted_baseline": "e04136458147cdf24069b6bde563231f3c38c709",
+  "task": "P3-T8",
+  "status": "candidate frozen for consolidated review and checked WIP; not accepted",
+  "source": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "442f14edabaf89a21c9a95da2275dadaed0507237e4df7d1250459023dac1750",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "79cd291c8fce397b117f3d719a2f3303380462d7cc37e01b073944362bebc419",
+      "physical_lines": 479
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "c5b774599e8a3e0b97dc9d91a6dc93f5ccbab0efc585a45b2e97717515a5fabd",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "2a80ff7cf33445fcbb862b3a84639cc71a549c1101c118ec19af934b6e8aeb79",
+      "physical_lines": 496
+    }
+  },
+  "focused_cases": 125,
+  "covered_statements": 409,
+  "total_statements": 409,
+  "covered_branches": 176,
+  "total_branches": 176,
+  "class_callable_ranges": 43,
+  "minimum_unit_coverage": 100,
+  "evidence": {
+    "raw-coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-candidate-raw-coverage.2026-10-19T01-16.json",
+      "sha256": "b0f2750ecd8306ff15f17e1c570da05682bc4e911ea745f748f0c66f6defab37"
+    },
+    "coverage-detail": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-candidate-coverage-detail.2026-10-19T01-16.json",
+      "sha256": "60d6f0b4e28e5aedcde585f5691afee1d7e8f43200909dbe2416e38401cba39e"
+    }
+  },
+  "pending": [
+    "Consolidated independent candidate policy/semantic review",
+    "Checked WIP commit/push by parent",
+    "Clean ordered final seven-stage gate and exact-byte acceptance"
+  ],
+  "receipts": [
+    "evidence/regression-testing/p3t8-candidate-format.2026-10-19T01-14.json",
+    "evidence/regression-testing/p3t8-candidate-lint.2026-10-19T01-14.json",
+    "evidence/regression-testing/p3t8-candidate-types.2026-10-19T01-15.json",
+    "evidence/regression-testing/p3t8-candidate-unit.2026-10-19T01-15.json"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "task": "P3-T8",
+  "accepted_baseline": "e04136458147cdf24069b6bde563231f3c38c709",
+  "status": "Repaired candidate frozen for bounded confirmation and checked WIP; not accepted",
+  "source": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "physical_lines": 415
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "physical_lines": 283
+    }
+  },
+  "focused_cases": 127,
+  "coverage": {
+    "covered_lines": 409,
+    "num_statements": 409,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 6,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 176,
+    "num_partial_branches": 0,
+    "covered_branches": 176,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "class_callable_ranges": 43,
+  "minimum_unit_coverage": 100.0,
+  "receipts": [
+    "evidence/regression-testing/p3t8-review-fixed-format.2026-10-19T01-25.json",
+    "evidence/regression-testing/p3t8-review-fixed-lint.2026-10-19T01-25.json",
+    "evidence/regression-testing/p3t8-review-fixed-types.2026-10-19T01-25.json",
+    "evidence/regression-testing/p3t8-review-fixed-unit.2026-10-19T01-26.json"
+  ],
+  "evidence": {
+    "raw-coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-review-fixed-raw-coverage.2026-10-19T01-26.json",
+      "sha256": "3e97a0fe56b4fc7a3546c8addf45edb3f1cabb2754a8d9444762b2ef2aeb14fb"
+    },
+    "coverage-detail": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-review-fixed-coverage-detail.2026-10-19T01-26.json",
+      "sha256": "d34bad7daba312bbb7d8add17cc5496251af7cee617f10385159f0aa22f14c54"
+    },
+    "forward-nodes": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t8-review-fixed-forward-nodes.2026-10-19T01-26.json",
+      "sha256": "a65d91ec28b4342af5063be07e0ddd1832c5028bc5f672651640e7fd1cc43901"
+    }
+  },
+  "prior_review": "evidence/qa-gates/p3t8-executor-candidate-review.2026-10-19T01-21.json",
+  "repairs": [
+    "Shared profile root/exclusion predicate applies before header/member byte capture",
+    "Separate output read grants remain narrower than integrity inputs",
+    "Two nested fake-reader contract docstrings and ReadSelection label corrected",
+    "Seven existing snapshot definitions relocated without removing cases/assertions",
+    "Two regressions prove excluded headers/integrity siblings are never opened"
+  ],
+  "pending": [
+    "Bounded executor confirmation against consolidated review",
+    "Parent checked WIP commit/push",
+    "Final clean ordered seven-stage gate"
+  ]
+}

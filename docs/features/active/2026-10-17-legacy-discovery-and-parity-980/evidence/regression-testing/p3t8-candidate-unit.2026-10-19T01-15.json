@@ -1,0 +1,46 @@
+{
+  "stage": 5,
+  "label": "p3t8-candidate-unit",
+  "started": "2026-10-19T01:15:01.659442+00:00",
+  "finished": "2026-10-19T01:15:44.037868+00:00",
+  "command": "poetry run pytest tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py -o addopts=-ra --cov=drm_copilot_discovery.source_reads --cov=drm_copilot_discovery.source_read_models --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p3t8-candidate-coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 42.378,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "442f14edabaf89a21c9a95da2275dadaed0507237e4df7d1250459023dac1750",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "79cd291c8fce397b117f3d719a2f3303380462d7cc37e01b073944362bebc419",
+      "physical_lines": 479
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "c5b774599e8a3e0b97dc9d91a6dc93f5ccbab0efc585a45b2e97717515a5fabd",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "2a80ff7cf33445fcbb862b3a84639cc71a549c1101c118ec19af934b6e8aeb79",
+      "physical_lines": 496
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "442f14edabaf89a21c9a95da2275dadaed0507237e4df7d1250459023dac1750",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "79cd291c8fce397b117f3d719a2f3303380462d7cc37e01b073944362bebc419",
+      "physical_lines": 479
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "c5b774599e8a3e0b97dc9d91a6dc93f5ccbab0efc585a45b2e97717515a5fabd",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "2a80ff7cf33445fcbb862b3a84639cc71a549c1101c118ec19af934b6e8aeb79",
+      "physical_lines": 496
+    }
+  },
+  "output": "============================= test session starts =============================\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\nrootdir: .\nconfigfile: pyproject.toml\nplugins: anyio-4.12.1, cov-7.0.0\ncollected 125 items\n\ntests\\discovery_runtime\\test_source_reads.py ........................... [ 21%]\n...                                                                      [ 24%]\ntests\\discovery_runtime\\test_source_read_limits.py ..................... [ 40%]\n........................................................................ [ 98%]\n..                                                                       [100%]\n\n=============================== tests coverage ================================\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\n\nName                                                                         Stmts   Miss Branch BrPart  Cover   Missing\n------------------------------------------------------------------------------------------------------------------------\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\source_read_models.py     200      0     72      0   100%\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\source_reads.py           209      0    104      0   100%\n------------------------------------------------------------------------------------------------------------------------\nTOTAL                                                                          409      0    176      0   100%\nCoverage JSON written to file SCRATCH/issue-980-p3t8-candidate-coverage.json\n============================ 125 passed in 40.60s =============================\n"
+}

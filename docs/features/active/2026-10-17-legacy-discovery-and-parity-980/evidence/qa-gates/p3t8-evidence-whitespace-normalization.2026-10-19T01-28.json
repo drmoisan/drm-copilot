@@ -1,0 +1,12 @@
+{
+  "changes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t8-focused2-unit.2026-10-19T01-06.md",
+      "old_sha256": "08dc38eb4fe62dde664dfea1d1cff7f08f3ceaa63fbee85f7cb9c36e1b046294",
+      "new_sha256": "811b9bc79c2af2c847b0544354c11ed0039045ddda7d73bbcf60df6914d99f4d",
+      "paired_json_sha256": "81fcd286440a9ee80a936e75efe2a07e41ed2ed8434d81ef4e744fbf9a2890aa"
+    }
+  ],
+  "raw_json_unchanged": true,
+  "source_working_bytes_unchanged": true
+}

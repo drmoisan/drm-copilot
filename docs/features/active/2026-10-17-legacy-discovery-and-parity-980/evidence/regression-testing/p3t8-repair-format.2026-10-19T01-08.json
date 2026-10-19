@@ -1,0 +1,46 @@
+{
+  "stage": 1,
+  "label": "p3t8-repair-format",
+  "started": "2026-10-19T01:08:33.883625+00:00",
+  "finished": "2026-10-19T01:08:35.778643+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py tests/discovery_runtime/test_source_reads.py tests/discovery_runtime/test_source_read_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.895,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "55bc6c09f21aff17dba7072987202f69ef73d8948dfdfc8d7a03d52640b4f2c1",
+      "physical_lines": 350
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "44186adb1ff8bc6de8f8082c4d8705f6af7b7c7448429aa5aa38f9cf8c0b6a30",
+      "physical_lines": 466
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "6a656f54c58b3f3c65ecfb405837d6b804a53520ef3694de8cf776ee9081a756",
+      "physical_lines": 464
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "42752914b393df95a7971db3510b36f84ebdd726e29f70224d368bcb9c8cc856",
+      "physical_lines": 472
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "55bc6c09f21aff17dba7072987202f69ef73d8948dfdfc8d7a03d52640b4f2c1",
+      "physical_lines": 350
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "c7fe7d524cefed1c760a0cc2df30ddf2cb31c7e4092872b86ed7e2575e79080f",
+      "physical_lines": 472
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "12b511b0d5d645570ef47c5908326b24921a5dc6db8a0c6bbef043075ff02b26",
+      "physical_lines": 474
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "c79500e2eeb216277010ed4fcdae3a5a7c4db62d74914cba443d8550dd93040e",
+      "physical_lines": 484
+    }
+  },
+  "output": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\source_reads.py\nreformatted tests\\discovery_runtime\\test_source_reads.py\nreformatted tests\\discovery_runtime\\test_source_read_limits.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n3 files reformatted, 1 file left unchanged.\n"
+}
