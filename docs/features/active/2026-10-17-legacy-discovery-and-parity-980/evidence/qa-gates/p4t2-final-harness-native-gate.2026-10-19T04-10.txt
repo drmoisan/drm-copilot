@@ -1,0 +1,103 @@
+"""Run P4-T2 operational filesystem/Git composition in an isolated scratch repository."""
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+from uuid import uuid4
+
+import yaml
+from dataclasses import replace
+from drm_copilot_discovery.analyzer.dotnet_projects import DotnetProjectAnalyzer
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_inputs
+from drm_copilot_discovery.analyzer.inventory import RepositoryAnalyzer
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch=Path(__file__).resolve().parent
+root=scratch/('native-dotnet-'+uuid4().hex)
+root.mkdir()
+assert root.resolve().parent == scratch
+checks=[]
+def check(name,value):
+    if not value:
+        raise AssertionError(name)
+    checks.append(name)
+    print('PASS '+name,flush=True)
+def put(path,content):
+    destination=root/path
+    assert root in destination.resolve().parents
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    destination.write_bytes(content)
+def tree():
+    return {path.relative_to(root).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(root.rglob('*')) if path.is_file() and '.git' not in path.relative_to(root).parts}
+def git(*arguments):
+    return subprocess.run(['git','-C',str(root),*arguments],capture_output=True,check=True).stdout
+def run_git(argv,*,output_limit):
+    process=subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    try:
+        content=process.stdout.read(output_limit+1)
+        if len(content)>output_limit:
+            process.kill()
+            raise OSError('Native Git output exceeded its bounded read')
+        if process.wait()!=0:
+            raise OSError('Native Git read failed')
+        return content
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+fixture_root=Path('tests/fixtures/discovery_analyzers/dotnet')
+fixture_paths=sorted(path for path in fixture_root.iterdir() if path.is_file())
+for path in fixture_paths:
+    put('src/'+path.name,path.read_bytes())
+put('src/Unicode.sln',(fixture_root/'Workspace.sln').read_text(encoding='utf-8').encode('utf-16'))
+git('init','--quiet')
+git('config','core.autocrlf','false')
+git('add','src')
+git('-c','user.name=Discovery fixture','-c','user.email=discovery@example.invalid','-c','commit.gpgsign=false','commit','--quiet','-m','Synthetic declared build inventory')
+revision=git('rev-parse','HEAD').decode('ascii').strip()
+catalog=load_catalog()
+value=yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text(encoding='utf-8'))
+value.pop('extension_schemas')
+value['system']['role']='legacy-source'
+value['repository']['revision']=revision
+value['repositories']=[]
+value['clients']=[]
+value['production_roots']=['src']
+value['test_roots']=[]
+value['documentation_roots']=[]
+value['project_entry_points']=[]
+value['excluded_paths']=[]
+value['analyzers']={'enabled':['repository','dotnet'],'options':{'max_file_bytes':16384},'ignored_paths':[],'extension_result_manifests':[]}
+profile=ProfileV2(json.dumps(value),format='json',catalog=catalog)
+reader=LocalGitReader(workspace_root=str(root),repository_id=profile.repository.id,run=run_git)
+primitives=LocalMutationPrimitives(workspace_root=str(root),lock_path=str(scratch/('native-dotnet-'+uuid4().hex+'.lock')))
+before=tree()
+before_status=git('status','--porcelain=v1','-z')
+inputs=capture_inputs(profile,workspace_root=str(root),metadata=primitives.metadata,read_bytes=primitives.read_bytes)
+check('native capture includes all seven selected declared build inputs',len(inputs.inputs)==7 and all(item.file is not None for item in inputs.inputs))
+pins=tuple(reader.read_file(revision=revision,path=item.path,limit=16384) for item in inputs.inputs)
+inputs=replace(inputs,repository_files=pins)
+check('real Git identity and retained immutable bytes agree',reader.identity().revision==revision and all(pin.content==item.file.content for pin,item in zip(pins,inputs.inputs)))
+declared=DotnetProjectAnalyzer().analyze(inputs)
+check('native XML and BOM-marked solution files emit declarations without blockers',len(declared.components)==7 and not any(item['blocking'] for item in declared.diagnostics))
+structural=RepositoryAnalyzer().analyze(inputs)
+result=inventory_result(inputs,(structural,declared),analyzer_ids=('repository','dotnet'),timestamp='2026-10-19T03:00:00Z',author_or_agent=row(kind='tool',id='native-proof'),catalog=catalog)
+repeated=inventory_result(inputs,(declared,structural),analyzer_ids=('dotnet','repository'),timestamp='2026-10-20T03:00:00Z',author_or_agent=row(kind='human',id='second-observer'),catalog=catalog)
+check('composed inventory semantic identity ignores analyzer order and capture clock',result.semantic_sha256==repeated.semantic_sha256 and result.document['id']==repeated.document['id'])
+check('every declared dependency target remains unresolved',declared.relationships and all(item['to_component_id'] is None and item['classification']=='detected' for item in declared.relationships))
+check('ledger proposals remain uninspected and unassigned',all(item['inspection_status']=='uninspected' and item['disposition']=='unassigned' for item in result.ledger_components))
+check('analysis leaves source bytes and native Git status unchanged',before==tree() and before_status==git('status','--porcelain=v1','-z'))
+output=Path(sys.argv[1])
+record={'task':'P4-T2','timestamp':datetime.datetime.now(datetime.timezone.utc).isoformat(),'platform':sys.platform,'checks':checks,'scratch_repository':'SCRATCH/'+root.name,'revision':revision,'inputs':before,'inventory_id':result.document['id'],'semantic_sha256':result.semantic_sha256,'component_count':len(declared.components),'finding_count':len(declared.findings),'relationship_count':len(declared.relationships),'source_tree_unchanged':before==tree(),'git_status_unchanged':before_status==git('status','--porcelain=v1','-z')}
+output.write_text(json.dumps(record,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(output.as_posix(),flush=True)

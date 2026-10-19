@@ -1,0 +1,2613 @@
+{
+  "accepted_predecessor_commit": "5db172f2bc104cfa0e7372f4f7b014a4d4d0ec99",
+  "approved_split": "solution_input.py and test_solution_input.py were explicitly approved because the initial combined project module reached 477 physical lines before final guards.",
+  "baseline": "Existing P4-T1/source snapshot and mutation proofs retained; initial P4-T2 modules were absent. The checked parser WIP and full candidate proofs bind the first implementation without rerunning unaffected predecessors.",
+  "checked_complete_candidate_wip_commit": "e46b2c870bb0cdec0aff605fb72dc07c17bb9007",
+  "checked_parser_wip_commit": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+  "collected_test_nodes": [
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Application.csproj-implicit-sdk]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Legacy.vbproj-target-framework-version]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Directory.Build.props-package-reference]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Directory.Build.targets-import]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Workspace.slnx-solution-project]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_synthetic_fixtures_emit_valid_composed_inventory[Workspace.sln-solution-entry]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_reference_operations_conditions_and_metadata_are_literal",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_branches_and_deferred_targets_remain_in_context",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.csproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.fsproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.vbproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.vcxproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.proj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.props]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.targets]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_project_family_suffixes_share_literal_xml_contract[.CSPROJ]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Other/>-xml-root]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Project>-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Project xmlns=\"urn:foreign\"/>-xml-namespace]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Project><x:Reference xmlns:x=\"urn:foreign\"/></Project>-xml-namespace]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<!DOCTYPE Project SYSTEM \"https://invalid.invalid/a\"><Project/>-xml-dtd]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Project><Reference Include=\" \"/></Project>-build-declaration]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_invalid_build_input_becomes_blocking_diagnostic[<Project Sdk=\" \"/>-build-declaration]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_unavailable_excluded_and_nonmatching_inputs_are_not_fabricated",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_absent_or_mismatched_pin_cannot_receive_high_confidence[False]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_absent_or_mismatched_pin_cannot_receive_high_confidence[True]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_parser_and_result_budgets_are_independent[<Project/>-2-analysis-limit]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_parser_and_result_budgets_are_independent[<Project Sdk=\"Synthetic\"/>-1-declaration-limit]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_parser_and_result_budgets_are_independent[<Project><Child/></Project>-1-xml-limit]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_aggregate_budget_and_byte_limit_apply_before_projection",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_duplicate_same_line_declarations_have_distinct_stable_ids",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_relationships_round_trip_unresolved_literal_targets[../Peer/P.csproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_relationships_round_trip_unresolved_literal_targets[C:\\\\External\\\\P.csproj]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_relationships_round_trip_unresolved_literal_targets[$(Project)]",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py::test_relationships_round_trip_unresolved_literal_targets[**/*.csproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\n-utf-8]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\n-utf-8-sig]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\n-utf-16]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\n-utf-32]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\r\\n-utf-8]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\r\\n-utf-8-sig]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\r\\n-utf-16]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_bytes_preserve_literal_fields_and_duplicate_anchors[\\r\\n-utf-32]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_foreign_parent_expression_and_wildcard_paths_stay_inert[../Peer/Peer.csproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_foreign_parent_expression_and_wildcard_paths_stay_inert[C:\\\\Elsewhere\\\\App.fsproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_foreign_parent_expression_and_wildcard_paths_stay_inert[$(Root)/App.vbproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_foreign_parent_expression_and_wildcard_paths_stay_inert[**/*.csproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_foreign_parent_expression_and_wildcard_paths_stay_inert[https://invalid.invalid/App.csproj]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[-solution-header]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Other Format\\n-solution-header]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject(\"bad\") = \"bad\"\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nEndProject\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject(\"{11111111-2222-3333-4444-555555555555}\") = \"\\xc9tat\", \"src\\\\Example App.csproj\", \"{11111111-2222-3333-4444-555555555555}\"\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject(\"{11111111-2222-3333-4444-555555555555}\") = \"\\xc9tat\", \"src\\\\Example App.csproj\", \"{11111111-2222-3333-4444-555555555555}\"\\nProject(\"{11111111-2222-3333-4444-555555555555}\") = \"\\xc9tat\", \"src\\\\Example App.csproj\", \"{11111111-2222-3333-4444-555555555555}\"\\nEndProject\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject(\"{11111111-2222-3333-4444-555555555555}\") = \" \", \"src\\\\Example App.csproj\", \"{11111111-2222-3333-4444-555555555555}\"\\nEndProject\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject(\"{11111111-2222-3333-4444-555555555555}\") = \"\\xc9tat\", \" \", \"{11111111-2222-3333-4444-555555555555}\"\\nEndProject\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_malformed_solution_does_not_return_partial_entries[Microsoft Visual Studio Solution File, Format Version 12.00\\nProject (\"{11111111-2222-3333-4444-555555555555}\") = \"\\xc9tat\", \"src\\\\Example App.csproj\", \"{11111111-2222-3333-4444-555555555555}\"\\nEndProject\\n-solution-project]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unknown_bytes_are_not_decoded_by_machine_locale",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_sections_are_retained_as_uninterpreted_surrounding_text",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_byte_and_declaration_budgets_fail_closed[limits0-input-limit]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_byte_and_declaration_budgets_fail_closed[limits1-declaration-limit]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_invalid_limits_cannot_disable_bounding[limits0]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_invalid_limits_cannot_disable_bounding[limits1]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_invalid_limits_cannot_disable_bounding[limits2]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_invalid_limits_cannot_disable_bounding[limits3]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_invalid_limits_cannot_disable_bounding[limits4]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_retained_byte_contract_and_frozen_result_are_enforced[path]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_retained_byte_contract_and_frozen_result_are_enforced[name]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes0]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes1]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes2]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes3]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes4]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_solution_entry_invariants[changes5]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[abc]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[ \\u03a9\\xe9 ]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[A012A012A012A012A012A012A012A012A012A012A012A012A012A012A012]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[../x]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[\\\\x]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_literal_path_round_trip[a/b c]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0b-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0b-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0b-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0c-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0c-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x0c-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1c-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1c-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1c-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1d-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1d-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1d-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1e-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1e-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x1e-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x85-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x85-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\x85-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2028-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2028-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2028-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2029-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2029-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_comment_separators_preserve_physical_anchor[\\u2029-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0b-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0b-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0b-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0c-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0c-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x0c-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1c-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1c-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1c-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1d-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1d-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1d-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1e-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1e-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x1e-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x85-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x85-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\x85-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2028-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2028-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2028-\\r]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2029-\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2029-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_solution_input.py::test_unicode_separators_in_quoted_path_remain_literal[\\u2029-\\r]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_literal_nodes_preserve_unicode_namespace_parents_and_anchors[utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_literal_nodes_preserve_unicode_namespace_parents_and_anchors[utf-8-sig]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_literal_nodes_preserve_unicode_namespace_parents_and_anchors[utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_literal_nodes_preserve_unicode_namespace_parents_and_anchors[utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_comments_processing_instructions_and_multiline_tags_remain_literal",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project>-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project>-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project>-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x \"expanded\">]>-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x \"expanded\">]>-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x \"expanded\">]>-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"file:///never-read.dtd\">-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"file:///never-read.dtd\">-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"file:///never-read.dtd\">-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"https://invalid.invalid/never-fetch.dtd\">-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"https://invalid.invalid/never-fetch.dtd\">-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project SYSTEM \"https://invalid.invalid/never-fetch.dtd\">-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY % remote SYSTEM \"https://invalid.invalid/never-fetch.dtd\">%remote;]>-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY % remote SYSTEM \"https://invalid.invalid/never-fetch.dtd\">%remote;]>-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY % remote SYSTEM \"https://invalid.invalid/never-fetch.dtd\">%remote;]>-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x SYSTEM \"file:///never-read.txt\">]>-utf-8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x SYSTEM \"file:///never-read.txt\">]>-utf-16]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_all_dtd_forms_are_rejected_before_processing[<!DOCTYPE Project [<!ENTITY x SYSTEM \"file:///never-read.txt\">]>-utf-32]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[<Project xmlns:xi=\"http://www.w3.org/2001/XInclude\"><xi:include href=\"file:///never-read\"/></Project>-xml-external]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[<Project>&undefined;</Project>-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[<Project><Unclosed></Project>-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[<Project/><Project/>-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[\\x1f\\x8bcompressed-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_unsupported_or_malformed_input_fails_closed[<?xml version=\"1.0\" encoding=\"unknown-encoding\"?><Project/>-xml-malformed]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_resource_limits_reject_before_allocating_excess_nodes[limits0-<Project/>]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_resource_limits_reject_before_allocating_excess_nodes[limits1-<Project><Child/></Project>]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_resource_limits_reject_before_allocating_excess_nodes[limits2-<Project><Child/></Project>]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_invalid_parser_limits_are_not_silently_coerced[max_bytes-0]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_invalid_parser_limits_are_not_silently_coerced[max_bytes-67108865]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_invalid_parser_limits_are_not_silently_coerced[max_elements-100001]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_invalid_parser_limits_are_not_silently_coerced[max_depth-129]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_invalid_parser_limits_are_not_silently_coerced[max_depth-True]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_input_cannot_cross_the_retained_bytes_boundary",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_missing_parser_line_is_not_invented",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes0]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes1]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes2]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes3]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes4]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes5]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes6]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes7]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes8]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes9]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_node_construction_rejects_mutable_or_invalid_values[changes10]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_nodes_are_frozen_and_parent_zero_is_valid[line]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_nodes_are_frozen_and_parent_zero_is_valid[parent]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[1-]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[1-abc]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[1- \\u03a9\\xe9 ]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[1-A012A012A012A012A012A012A012A012A012A012]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[2-]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[2-abc]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[2- \\u03a9\\xe9 ]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[2-A012A012A012A012A012A012A012A012A012A012]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[8-]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[8-abc]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[8- \\u03a9\\xe9 ]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[8-A012A012A012A012A012A012A012A012A012A012]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[12-]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[12-abc]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[12- \\u03a9\\xe9 ]",
+    "tests/discovery_runtime/analyzer/test_xml_input.py::test_text_and_exact_element_budget_are_preserved[12-A012A012A012A012A012A012A012A012A012A012]"
+  ],
+  "contract_cases": 176,
+  "coverage": {
+    "delta": "Three new modules have no predecessor executable coverage; all new units exceed 90%. All 26 P4-T1 reviewed paths remain byte-identical and retain their accepted coverage proof.",
+    "per_module": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": {
+        "covered_branches": 50,
+        "covered_lines": 126,
+        "excluded_lines": 2,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 50,
+        "num_partial_branches": 0,
+        "num_statements": 126,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": {
+        "covered_branches": 34,
+        "covered_lines": 63,
+        "excluded_lines": 0,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 34,
+        "num_partial_branches": 0,
+        "num_statements": 63,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": {
+        "covered_branches": 32,
+        "covered_lines": 101,
+        "excluded_lines": 21,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 32,
+        "num_partial_branches": 0,
+        "num_statements": 101,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    "per_new_unit": [
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_local",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 4,
+          "covered_lines": 6,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "num_statements": 6,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_context",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 2,
+          "covered_lines": 7,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 7,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_declaration",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_xml_declarations",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 26,
+          "covered_lines": 39,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 26,
+          "num_partial_branches": 0,
+          "num_statements": 39,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_solution_declarations",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_project_rows",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 6,
+          "covered_lines": 17,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "num_statements": 17,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_overflow",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "DotnetProjectAnalyzer.analyze",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 12,
+          "covered_lines": 31,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "num_statements": 31,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "DotnetProjectAnalyzer",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+        "summary": {
+          "covered_branches": 12,
+          "covered_lines": 31,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "num_statements": 31,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "SolutionInputError.__init__",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "SolutionEntry.__post_init__",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "summary": {
+          "covered_branches": 6,
+          "covered_lines": 6,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "num_statements": 6,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "parse_solution",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "summary": {
+          "covered_branches": 28,
+          "covered_lines": 38,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 28,
+          "num_partial_branches": 0,
+          "num_statements": 38,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "SolutionInputError",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "SolutionEntry",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "summary": {
+          "covered_branches": 6,
+          "covered_lines": 6,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "num_statements": 6,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "XmlInputError.__init__",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "XmlNode.__post_init__",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 14,
+          "covered_lines": 13,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 14,
+          "num_partial_branches": 0,
+          "num_statements": 13,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "XmlNode.attribute",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.__init__",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 4,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 4,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.reject",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.start",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 4,
+          "covered_lines": 7,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "num_statements": 7,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.end",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.data",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.doctype",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "_GuardedTarget.close",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 2,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "functions",
+        "name": "parse_xml",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 12,
+          "covered_lines": 24,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "num_statements": 24,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "XmlInputError",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "XmlNode",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 14,
+          "covered_lines": 14,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 14,
+          "num_partial_branches": 0,
+          "num_statements": 14,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "disposition": "new",
+        "kind": "classes",
+        "name": "_GuardedTarget",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+        "summary": {
+          "covered_branches": 6,
+          "covered_lines": 21,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "num_statements": 21,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      }
+    ],
+    "totals": {
+      "covered_branches": 116,
+      "covered_lines": 290,
+      "excluded_lines": 23,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 116,
+      "num_partial_branches": 0,
+      "num_statements": 290,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    }
+  },
+  "evidence_git_bindings": [
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-coverage.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-coverage.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "594436d476b7d2514771341e9c3b6eb864370c21",
+      "index_sha256": "6ab12ca96fc04964433f30c6736c5a358af3ae628d5fe8d3a8bbeceb8c664651",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-coverage.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "6ab12ca96fc04964433f30c6736c5a358af3ae628d5fe8d3a8bbeceb8c664651"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.json: eol: lf"
+      ],
+      "index_blob_oid": "d15355a09eff7127f9c7de1079f1b3dd159c68ca",
+      "index_sha256": "52fcb0c1aa1ba4de1a0c92906b4a518bd93931ea4c27b7955194152d3b40ec17",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "f3d169e23023820750a65aae0a4b162545b6652bc30cfd24ccbe85a280fa9326"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.md: eol: lf"
+      ],
+      "index_blob_oid": "609110f919fb298dd27f8559840c1b276f4bdcc5",
+      "index_sha256": "1beefb7e5bbe47bc25073ee7937712a9e3ce842f9980c88d8820e840be9432c8",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034254.2026-10-19T03-42.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "23da79d310571aa23e6e035f8b70b58c64ba2cc0531cd9a544a96c45b58d20a1"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "aa95ac7ef9bfe6fe1e22c6b05c59d25983f7f6f9",
+      "index_sha256": "b5ad809716a90280290a4d12576ebd0a1ae882a975651b621bc625ad4321933b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a808ae0a7a844c236468501e78b6801cffc992b56e8a3dc73f0061165a203a72"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.md: eol: lf"
+      ],
+      "index_blob_oid": "5cf9cc439b7ce0fbc12fa79f7020a9cbb0025571",
+      "index_sha256": "82cce7d95e6ed7659bbcdc9e6397c9e4fc93613aa2f3d72a8eb005efe3779dec",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-034343.2026-10-19T03-43.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "82cd822591f0e1a0c5b99fef65f81950aa962737be0fa7e2b0412b26f9c0f83e"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.json: eol: lf"
+      ],
+      "index_blob_oid": "07e9428d1afc3c2ced00a947e9cf26c94dd7b583",
+      "index_sha256": "f3f4b389d5c205bd928b960840b0739992a723c5d2bfb51d10256ab8da980dce",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "47e65b420ebe7093b1d0b0fad46a4e9a177966b37bcf96a10993d8c4e073720f"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.md: eol: lf"
+      ],
+      "index_blob_oid": "14609d498b81e821920125f84710eb6998d585b2",
+      "index_sha256": "3c710f52174020015d8ca678d293e6adff7cacf7d3ddb62ed90397d3752de11c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034152.2026-10-19T03-41.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "0f58bb90c869e94399d0a48f1fdb1db1f7a369a9912e7c5b8fc931630e25d94b"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.json: eol: lf"
+      ],
+      "index_blob_oid": "f80a63f95f15c31d67c09e7d055069e99f70921e",
+      "index_sha256": "eb299159baa829fbb77e6c3ec1720827da97dadd695a3c627afa1d0a6eaa8747",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a562a9e8b06f64ce572123c01f13e5001b4e75b6e3897afc43f98aff1863b9bd"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.md: eol: lf"
+      ],
+      "index_blob_oid": "d0af7017f322e32f116491df9b91f5d4e49359b2",
+      "index_sha256": "f0729c7280d7fa755d9f631e276fe5c52e36206bd920c99b6d0fd9f45a2bec57",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034250.2026-10-19T03-42.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "00ad61216525f4f8e64fd9dd0e9c07f0bdeb4fe5fd0ee378ea199f584ce2a04c"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "0687a4172f4dae9e7cb76a5c0089d344d8c12c97",
+      "index_sha256": "8b212f1abdf0a14600c237501e309e1feaadde51265f2680b1fbef935d7d330b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a2064b9871c006ec2d735e72b232d0aae3302adfc526b17b30ee920e4166c791"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.md: eol: lf"
+      ],
+      "index_blob_oid": "b9636a7634bf470c3d100ed785397b1174de1fb2",
+      "index_sha256": "7b46c4454939a9949e95125fb70f86bee5992aa9c87aad93975e851791dbb110",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-format-repair-034339.2026-10-19T03-43.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "659473b51288adaeb4db6d1b86c177a8d78ba88f9a0b6f418048ec1e4afb95f1"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.json: eol: lf"
+      ],
+      "index_blob_oid": "de6d8fdbd16606913b26750d2c223efe8de6127e",
+      "index_sha256": "5e0010206ff95f8af8ecbc443c03153410bc0bfcf6e07020a93bababaf1136d9",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "4e17755155134466966ac33fed2ea754eb77a4b7ab58de02cf55f38e5ef4a5b2"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.md: eol: lf"
+      ],
+      "index_blob_oid": "dc7bfd2fa4d9761d43ba840dfa2c189a7aa9aa68",
+      "index_sha256": "e3e57aacef37afc0ceecfcc1480559e7d2adc1a5a0aabbe6608a818fbeef9bce",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034225.2026-10-19T03-42.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "2bd9f4e1ea7624ded85cac99f128b8451ffb80bba061a0ccef6174c361f2f121"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.json: eol: lf"
+      ],
+      "index_blob_oid": "9074fb40fdec9616d9c619a73d75e5b40ad24fac",
+      "index_sha256": "5661ec22a76e258e6804034abfdedfb2a0e8e653bd224087a5e3aa6b5dc86c0b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "932a7b992dbd3f54530d0ffccda3837067db3a31ed3c083826a29a28596c6b54"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.md: eol: lf"
+      ],
+      "index_blob_oid": "779e19dfadb7d5fb8b2cd8b218d2fe3321bb7364",
+      "index_sha256": "ce0189acc1dc1404bce4155e6d4bd0fe407669af63ed1f5b907747b01fb6ba8c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034258.2026-10-19T03-42.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "9093e155abd390fbc8fe36b8d782aac29407c2d2cefd03e4dadd821c775821d0"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "6156360bb409e05ba644debfd5ef31e3ba79c0f7",
+      "index_sha256": "96a47ab6ca555b703d22235d676763181626761e1e8de6a9a822c70d7e7fb8d1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "400cff75e86dc4bd059e38f645797ee7ab7be65e848191990e41ac932e5b07cc"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.md: eol: lf"
+      ],
+      "index_blob_oid": "166a325f044370974739a59b36703ee16e1afcf3",
+      "index_sha256": "1fd01d494b1af3becfbd9880ec7c739d67377819fbb507df8fe193786051d27e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-lint-034347.2026-10-19T03-43.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a28bbdb8a18bd05b2e66c2ef3d1ae36eadbff92fd71eb739e1a792747fed6e53"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.json: eol: lf"
+      ],
+      "index_blob_oid": "e8c2eddf2e23a2e82c4ec75188167f0e6db6fb93",
+      "index_sha256": "185591ccb3b76df20dd8cfbd7319ba5a8f577e5c434299a4620a168d13dc8cae",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "b9cd31c39bd078e794556b46f393b5b2f7ee51ff1e90c3646bcb4d8b127983de"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.md: eol: lf"
+      ],
+      "index_blob_oid": "ad3b97a70a74f4391cdff830186954734f76fd4a",
+      "index_sha256": "b4737b49581d2dabf736b76a41b224aadd0016bb6daca91b55748ef4d9320ec1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-tests-034442.2026-10-19T03-44.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "d95bdc17b73b940ce38176b9181c8cada9f5c4ecb41110fe16dcf89e8670c22b"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "8db27be3e696b0fa0f4c34e24c5866166716f15e",
+      "index_sha256": "81bd3aa6cda8c891f0f60d55f54ca6cc88a9ff79997a4dbb4056e3f10ba7a83e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a1579284800bf83ee7d77babdbce4bbc165693d435fe469e13aedb1c3a7bed82"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.md: eol: lf"
+      ],
+      "index_blob_oid": "a2c6d796e880cd73e0d06315c2f39299158a46bf",
+      "index_sha256": "9efa36674b93b1b0c82949a2a9abd59b4ff5e66948c622b9168d24dd087a7ab5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034303.2026-10-19T03-43.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "37e8f7e784d49cc6d9f56553023ff2834f2fe03f2c8cda3f9d667ff2648eee61"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.json: eol: lf"
+      ],
+      "index_blob_oid": "541ca482810cfa935f5e4ff7816f581eaa6f2e94",
+      "index_sha256": "ef4bf73b7e0a411941360097d31785742ca570b5dac140d3efed6b29e25cb597",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "fdf96bc40db556520b986ae1afb29a5e0e49339f4a88897a847bd3199d38c4bb"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.md: eol: lf"
+      ],
+      "index_blob_oid": "60db5f2b96f94c9b060a7d68a9785587912228ba",
+      "index_sha256": "7dfebea5628c312fd560db2e33d224703e111bc0a8a70da4a565dc7a5e946998",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-types-034352.2026-10-19T03-43.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "fb7e8c89dff36b34197d7c2a4b0cbf8c565d93ce91da1cb3004207b6ee95b9fc"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-coverage.2026-10-19T03-47.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-coverage.2026-10-19T03-47.json: eol: lf"
+      ],
+      "index_blob_oid": "714fc5678dc31f5f9cc7fb86672782601bb653f7",
+      "index_sha256": "99257d193fb23cbe1d213db2294e42f42af3de7f97484281b5c8c4f25e728f84",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-coverage.2026-10-19T03-47.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "99257d193fb23cbe1d213db2294e42f42af3de7f97484281b5c8c4f25e728f84"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.json: eol: lf"
+      ],
+      "index_blob_oid": "cc046c2d1ac3400b315ae58af848cd4663c9fa1a",
+      "index_sha256": "e253549bc5ce22e7aece084bfd52094dcb5642240fa17e199d6e6766073ba1dc",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "d7336d404b8e7c4504709309fabbc1f9ce82d73c7956b00f24d7998bcf7011df"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.md: eol: lf"
+      ],
+      "index_blob_oid": "e88caa6300a58d1422fc700893b6bb6b4265faf3",
+      "index_sha256": "9e315d490d7c7a5ad73e30ac2e37fe6b1879dd17f4a090ff2cfdf4e43c3b5610",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "cc2496f6a501b8f9c2ab0d57076256253166a32f149de26947b2fb2b635d3e27"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.json: eol: lf"
+      ],
+      "index_blob_oid": "6c94f92561e7eff6f9c2e901bc3c7d22619631e9",
+      "index_sha256": "c67f621a3521f5a84d2500eb6a10097c0b86731e35817173e7b2874ff0a5f26f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "75dac02e1e6a84f1ceabeafd913c66a50d8095648f4d1e25c3db88cb05085681"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.md: eol: lf"
+      ],
+      "index_blob_oid": "8857a3a001863f3263ce4e4810513d4dfd829649",
+      "index_sha256": "90c66e1c0bccef121327d623f2f023b685f6e50583b8add092f457f06d569973",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "8b0d9be48f71bc105763e0221f1b4327d339081288fb57a41b29d016a9a57e70"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json: eol: lf"
+      ],
+      "index_blob_oid": "52bb22ecd995e63f86c11a966d673a09ccaa3ca5",
+      "index_sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.md: eol: lf"
+      ],
+      "index_blob_oid": "e4d70d268433fe4be08cd4000631426421490bc6",
+      "index_sha256": "2f88966ac8e7d27cda15bafc749f98f2d8741b21556ff35b6ac62eb88c456080",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "2f88966ac8e7d27cda15bafc749f98f2d8741b21556ff35b6ac62eb88c456080"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.json: eol: lf"
+      ],
+      "index_blob_oid": "45312e007662c55f49a0fb0bc7fb87dc954d27b4",
+      "index_sha256": "6e7b65e40c56cc283c87fda4adcc6f34a198fd14f19d903b5fdec931f1db212d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "e6ea83d38a27ddeb7210cada929d2ec6cb0bfb927f9e21d7d42bbf392e291608"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.md: eol: lf"
+      ],
+      "index_blob_oid": "b6d5f93b606cd57598349f8aa9257c4b2561f6a4",
+      "index_sha256": "70d88cbc50addab5fab072b1b5fd1ed6c11ecc76fa361d8dc3bb4b9734ecff57",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "9979dcc7c5db46eccd5e01e57e59d553b861395192e8508657bccdd62a2959c4"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.json: eol: lf"
+      ],
+      "index_blob_oid": "710c469cccf710c8df4c012f655679a5212175b6",
+      "index_sha256": "bb0dcb7c4a98ee5efe2d5c3ced9f6f50c8602d43791cb30e9740ece7edfb5bea",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "ac8a2221380224a514de5698a08449aa2a6ae720e5552242b73e2c77e1251cd3"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.md: eol: lf"
+      ],
+      "index_blob_oid": "1a32a4fb9ec85d8e65d5f5b212587017e4ea10f1",
+      "index_sha256": "c54042d2f761bbbca2f763cc13db647581b7fd64e580c04314d113dda4be312c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "a3d9cae9d9fd55b1acc8fa0905d6ed39cb3e383345a90c16dc49409035f62dd8"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json: eol: lf"
+      ],
+      "index_blob_oid": "af7ff3d47ee1e14b306671aea2c25c42014cd75d",
+      "index_sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json: eol: lf"
+      ],
+      "index_blob_oid": "3e630b6e66f5cedc7af21355e6f09bc8fa603bdc",
+      "index_sha256": "e14da8e45a5dfcfaacab0d6b251c245d9c59319cc8a3fbacdfc12765efeefb70",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "e14da8e45a5dfcfaacab0d6b251c245d9c59319cc8a3fbacdfc12765efeefb70"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.md: eol: lf"
+      ],
+      "index_blob_oid": "8975015a38bb1a499df5ba2f183060b538821f32",
+      "index_sha256": "0d44d404876506e3a9144e512374aa4ca1589ed182340f449d9494ec16c9c3bc",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "0d44d404876506e3a9144e512374aa4ca1589ed182340f449d9494ec16c9c3bc"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.json: eol: lf"
+      ],
+      "index_blob_oid": "df5cc5d4ad123566fb4892c12ee88af8581b0bef",
+      "index_sha256": "b976a7aa80cfec5994887a42b85267a273e3116865858fcbd2373ee98d192c4f",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "b976a7aa80cfec5994887a42b85267a273e3116865858fcbd2373ee98d192c4f"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.md: eol: lf"
+      ],
+      "index_blob_oid": "9f96f34e184e420237b8659fb00643693a0d670e",
+      "index_sha256": "c6c6a61116a63b248f2b3025a3bc4d3c7e0104aef445ef6659a6ebc53b54dece",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-parser-wip.2026-10-19T03-42.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "c6c6a61116a63b248f2b3025a3bc4d3c7e0104aef445ef6659a6ebc53b54dece"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json: eol: lf"
+      ],
+      "index_blob_oid": "29efa8b2f2520588cb51821dfe9d9ad0d116a5ec",
+      "index_sha256": "06fa338ce2072ac4daf74ad3a756effc19c5fdfbe5302aca09e4c3fef0ea871d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "06fa338ce2072ac4daf74ad3a756effc19c5fdfbe5302aca09e4c3fef0ea871d"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.md: eol: lf"
+      ],
+      "index_blob_oid": "a51e6aca7a2ce44b7d4a6d73c1c6f2f4cf5c6836",
+      "index_sha256": "5d71319df527c6ef150ca702f63deafba5c0c30306ffd7c8385ccb88a5ec4c07",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "5d71319df527c6ef150ca702f63deafba5c0c30306ffd7c8385ccb88a5ec4c07"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-architecture-040552.2026-10-19T04-05.json",
+      "working_sha256": "c57cf1c9f3a707eb6b81fa6db8d00e06fedbd2d2e165d009a29178b4f237e358"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-architecture-040552.2026-10-19T04-05.md",
+      "working_sha256": "44be21d2268495652c2591cf398549d41267cb501a62a89d4f1b25ebffde7a8b"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-contracts-040637.2026-10-19T04-06.json",
+      "working_sha256": "ea9f1a8e86351c9e2c5a4ef67d356b8763d83dac7e3790d648d25a6f758323b5"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-contracts-040637.2026-10-19T04-06.md",
+      "working_sha256": "370893b9d14a596e0fa92b9bccef61af6a7498938d4940b8b29cca431250c341"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-coverage.2026-10-19T04-06.json",
+      "working_sha256": "29c7980db6b73ae91eb31c656c4874b22b21ab50e6a6b5110edb2af39331ff4c"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-format-040541.2026-10-19T04-05.json",
+      "working_sha256": "20c82d37c493ab8c15f9473816afb3178e679de2d1f594dbbabd3e09a42a9403"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-format-040541.2026-10-19T04-05.md",
+      "working_sha256": "99c9cadd85c62ce409f2cb73162f974883a284d8f11c70aece51bc560c750ce2"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-lint-040541.2026-10-19T04-05.json",
+      "working_sha256": "ad4fce1049011c89bf1edc254d99ddf8cfbb019f7705cd8f32ce6276d233c8b8"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-lint-040541.2026-10-19T04-05.md",
+      "working_sha256": "65f434c2f7120845c638bea6c9c0875e00b77c45df8aefd8454d25348ec1e119"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-040639.2026-10-19T04-06.json",
+      "working_sha256": "92f4a8fb0e0ff35ea75008d9836aaad5d1b6ddd20f84de270ed2156023b9b778"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-040639.2026-10-19T04-06.md",
+      "working_sha256": "ecaeac37e1b4a8d4425855839cfb20d9babdabd56d2bc6626abb53040080f495"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-result.2026-10-19T04-06.json",
+      "working_sha256": "b82a54473b78866c4d901edc8b96860738c8fe827d1fff7933b7695e02fe58c1"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-node-collection-040657.2026-10-19T04-06.json",
+      "working_sha256": "088e1a682452a9be076a1ba148b98b19f43d3043da34724cbf39729ab8173534"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-node-collection-040657.2026-10-19T04-06.md",
+      "working_sha256": "e776215bd1ddb3682b013fbe4412f61e406fa12fe5c18df32ef067bac65e4d7c"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-ordered-stages.2026-10-19T04-06.json",
+      "working_sha256": "c734d479907b8e8570707405ff9b5dfe3fb635c33d0b7084324a2796e1eab211"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-progress-040540.2026-10-19T04-05.json",
+      "working_sha256": "ee02e75b77625309a3d7ddb0cf099848426c26e5ab1707a0d9caea1f6f1fe0ca"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-progress-040540.2026-10-19T04-06.json",
+      "working_sha256": "376cc89c92ffc4217f91af744590c0a2aae014a000428dc213ee7bf743a3b673"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-tests-reverse-040635.2026-10-19T04-06.json",
+      "working_sha256": "2920bbd19041aa56c5fb284b52d4dd193eb46731b68f11da9646c9ce524355d9"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-tests-reverse-040635.2026-10-19T04-06.md",
+      "working_sha256": "5d18b712e188f39ef67206415b210587946f48e7b1eb44c9a43fcc708d2108dc"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-types-040552.2026-10-19T04-05.json",
+      "working_sha256": "2d321cbb42ffc8385994e90ee81c10ca34072c455ba84c6a7b5c496c4efef4eb"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-types-040552.2026-10-19T04-05.md",
+      "working_sha256": "181e1a4ea36161879001b661c51a484facff5a6e8e12a417fdaa4a0bb5a4de5c"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-diff.2026-10-19T04-01.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-diff.2026-10-19T04-01.md: eol: lf"
+      ],
+      "index_blob_oid": "b9ea0394d4047cd2971379f43bd7217a7340b41a",
+      "index_sha256": "5062a45bbb3b96cbd31d8ac55fdbe4f83a03f621492d7f000ecdc545d5f69f73",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-diff.2026-10-19T04-01.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "5062a45bbb3b96cbd31d8ac55fdbe4f83a03f621492d7f000ecdc545d5f69f73"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json: eol: lf"
+      ],
+      "index_blob_oid": "5b88153958877b8824ea8619dc509a3a72e304f7",
+      "index_sha256": "cc39a8362ab243ecdb9c3511dcf515b10be77f95e1b50319f791fde87d333e99",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "cc39a8362ab243ecdb9c3511dcf515b10be77f95e1b50319f791fde87d333e99"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.md: eol: lf"
+      ],
+      "index_blob_oid": "a85a7dbe8820067d426b13b5760dacd0cb15d432",
+      "index_sha256": "6ee0086903dd11024702f66fc36950b68811f3bd8c95a6601d07d90720d2c028",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "6ee0086903dd11024702f66fc36950b68811f3bd8c95a6601d07d90720d2c028"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-coverage.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-coverage.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "1e7db0d7707258bc27c98e4bb96c9cafbb0a6b52",
+      "index_sha256": "157ccd9f32b9aa3a775cd2ad6346cd13532ce06b16e367f4ce7e4945fa20e8d6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-coverage.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "157ccd9f32b9aa3a775cd2ad6346cd13532ce06b16e367f4ce7e4945fa20e8d6"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.json: eol: lf"
+      ],
+      "index_blob_oid": "ca1fc1796789061c1207e18405765b0d797414b1",
+      "index_sha256": "396d3dbebbbaaa1452b032269f62fcc406d46d66cb95b2e11b9d7d78c6f14b59",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "396d3dbebbbaaa1452b032269f62fcc406d46d66cb95b2e11b9d7d78c6f14b59"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.md: eol: lf"
+      ],
+      "index_blob_oid": "b0435a65f61e579b63278e1aa0daf11eabf1e07f",
+      "index_sha256": "53192daf584b59dfef966972f001f553a18520a9784b09de74cfcb5b443082aa",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033539.2026-10-19T03-35.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "53192daf584b59dfef966972f001f553a18520a9784b09de74cfcb5b443082aa"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.json: eol: lf"
+      ],
+      "index_blob_oid": "c6662d7240378912355b1b1ecaea5d9307e05e6d",
+      "index_sha256": "29f30c78e1addd1325ada66a02f5c7da055ad6d827ae3dad87ba9fff1dfbbe83",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "29f30c78e1addd1325ada66a02f5c7da055ad6d827ae3dad87ba9fff1dfbbe83"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.md: eol: lf"
+      ],
+      "index_blob_oid": "599a191437cedf15a0a0bf9190817ead6e84f450",
+      "index_sha256": "bc00b31eba76d8da29754b67cdbe19faefa671c0dede3068faf0208491fa90c4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033634.2026-10-19T03-36.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "bc00b31eba76d8da29754b67cdbe19faefa671c0dede3068faf0208491fa90c4"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "b6fd837d5dc8c653545d65881864686b21b9ebfb",
+      "index_sha256": "00e3681ee14bc97820cafaee01c1ba61a04614c3b8524fdd9e5c68f172ebb8e7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "00e3681ee14bc97820cafaee01c1ba61a04614c3b8524fdd9e5c68f172ebb8e7"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "d561d26367c4d159cbbc74f467036dcfb8db230a",
+      "index_sha256": "f6cbffbc00e3ea9a9920426ecb19d2fdee529563a433128ec073b772c1c92c68",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033719.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "f6cbffbc00e3ea9a9920426ecb19d2fdee529563a433128ec073b772c1c92c68"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "b125bff1b75e74168485c3123519f668228ed36c",
+      "index_sha256": "499487a7d4cdd9655bba23c8b9945980e2d5fca40992b025a3181778749d216d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "499487a7d4cdd9655bba23c8b9945980e2d5fca40992b025a3181778749d216d"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "f55e5f9588f3d37cd8b6b6f91b80aaceae9b45c6",
+      "index_sha256": "245b7460e550d6e9cf55f261990386db5a61e79944cc88e03912f1ee5266f580",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-033734.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "245b7460e550d6e9cf55f261990386db5a61e79944cc88e03912f1ee5266f580"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "e5182772ac3e5ca00e784b6d441de4efb352ef62",
+      "index_sha256": "7872c8be87fda5378e4e8ec452995c88aabcdd463bcfd8e7eadf6d4930066c4c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "7872c8be87fda5378e4e8ec452995c88aabcdd463bcfd8e7eadf6d4930066c4c"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "5802aa1745be59f78ce7c2c14418a01b1f983778",
+      "index_sha256": "7014ead039acf4dd2d34d8a5f53ccc0c8ac2a3c1f2baadf6b65ba9f83ccced99",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-format-repair-033730.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "7014ead039acf4dd2d34d8a5f53ccc0c8ac2a3c1f2baadf6b65ba9f83ccced99"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.json: eol: lf"
+      ],
+      "index_blob_oid": "bbcef823ce627eebe4e15896992e8800bbde0ff6",
+      "index_sha256": "b004180fbaff236e1619feb45c4d64d1ea9c0a4be8fc953013b50194c987a67b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "b004180fbaff236e1619feb45c4d64d1ea9c0a4be8fc953013b50194c987a67b"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.md: eol: lf"
+      ],
+      "index_blob_oid": "23990b63792c9ca512ce43027707e875d213e086",
+      "index_sha256": "375d517d71d6816c935e93a0325682298e9368fc8ee467d2d3ff66537b5e9524",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-imports-033622.2026-10-19T03-36.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "375d517d71d6816c935e93a0325682298e9368fc8ee467d2d3ff66537b5e9524"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.json: eol: lf"
+      ],
+      "index_blob_oid": "6b83f96e423be608d7e78428924cf624e1caeda8",
+      "index_sha256": "77a5d1f1a51b3b0e2485f576ecc5b0ea8c888638d44e69575ab0174f0ed662c4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "77a5d1f1a51b3b0e2485f576ecc5b0ea8c888638d44e69575ab0174f0ed662c4"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.md: eol: lf"
+      ],
+      "index_blob_oid": "71341285af3d339fffcb6d055d4ac48ee5985fe2",
+      "index_sha256": "62b1ca70fdea1f778b3acb8997938c2afb7381b24e934034c49b8784d6c8cab5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033552.2026-10-19T03-35.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "62b1ca70fdea1f778b3acb8997938c2afb7381b24e934034c49b8784d6c8cab5"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.json: eol: lf"
+      ],
+      "index_blob_oid": "52d92a213f953ce49db0ebbbb67278fb66c294e0",
+      "index_sha256": "36a7901fa86181c52973c6c39831f5601a462632a3eb211c9fba64114798d3d4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "36a7901fa86181c52973c6c39831f5601a462632a3eb211c9fba64114798d3d4"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.md: eol: lf"
+      ],
+      "index_blob_oid": "a1d79b8dc4c6aa983d5bd77bb408c9ef1ba901ac",
+      "index_sha256": "3237c007b6cb5a8f2858c99d8312b197892afb382f9d549d54a03bc843935024",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033637.2026-10-19T03-36.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "3237c007b6cb5a8f2858c99d8312b197892afb382f9d549d54a03bc843935024"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "5a5efbc9151525e1c79d4a4770b236da183ff5ae",
+      "index_sha256": "647ae7b3bbdaf56bc5401f2e429a07675aed527284b19d9fc1e5d498a8eded2a",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "647ae7b3bbdaf56bc5401f2e429a07675aed527284b19d9fc1e5d498a8eded2a"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "7e12adc107cca3d483df2138f18e0ce88c5a2917",
+      "index_sha256": "87b581282b6b46d35d0d47923feb7774ebff869bbfe7481dd3c1a5cc7843a93e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-lint-033738.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "87b581282b6b46d35d0d47923feb7774ebff869bbfe7481dd3c1a5cc7843a93e"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "dcd18cdca151db780bc17eced58fd241192e9dba",
+      "index_sha256": "fb735a833e83afc458797ce468f42b9fc365aca59667569f23460ea6120a64b5",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "fb735a833e83afc458797ce468f42b9fc365aca59667569f23460ea6120a64b5"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "aa62cd474296d5d64765e5717e2bcf89fa6593c1",
+      "index_sha256": "9725d7701f84423154d4bbf8fdba7f918353216685093b57c311fad926d95b79",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-tests-033752.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "9725d7701f84423154d4bbf8fdba7f918353216685093b57c311fad926d95b79"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.json: eol: lf"
+      ],
+      "index_blob_oid": "33fe71d8fcd4a77325be28527766a9f06ed6ccb2",
+      "index_sha256": "8654d55f4b87430a9a94bd1c3104ccc911e4af0b215f1c13b279a00726f27d4c",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "8654d55f4b87430a9a94bd1c3104ccc911e4af0b215f1c13b279a00726f27d4c"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.md: eol: lf"
+      ],
+      "index_blob_oid": "bd049ae616e4512d0c62e5cacec66069568940e4",
+      "index_sha256": "4fbbbe679ed7206e3da210a0e782a31a18a56de0d50fb797a02cfdb775f35d17",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033642.2026-10-19T03-36.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "4fbbbe679ed7206e3da210a0e782a31a18a56de0d50fb797a02cfdb775f35d17"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.json: eol: lf"
+      ],
+      "index_blob_oid": "4185a76f574457d5769b3081023ed6f4eaa88ff0",
+      "index_sha256": "1254781b09e6d7d68eace9d68868d8c72481594b43d5816124ae04341020a904",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "1254781b09e6d7d68eace9d68868d8c72481594b43d5816124ae04341020a904"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.md: eol: lf"
+      ],
+      "index_blob_oid": "14357a8322dcec607c28ca2deace2d421fca0a97",
+      "index_sha256": "d8520ac7b8c3652e91e31c30698cfc3bad7d1f59e6e8afb7ec8aad52ef51fd24",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-types-033742.2026-10-19T03-37.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "d8520ac7b8c3652e91e31c30698cfc3bad7d1f59e6e8afb7ec8aad52ef51fd24"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.json: eol: lf"
+      ],
+      "index_blob_oid": "2415b1b091c96dd96b872cee656d3ffaaf91cd1a",
+      "index_sha256": "6a239f9987eba5c05037760fd77307ec6bc392208dd5b2063c025859b69e3029",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "322fc8278a24a2342d73785f2f6a13bec92a9ca29faade67a2c6483f2e860f71"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.md: eol: lf"
+      ],
+      "index_blob_oid": "91a17dbf2cc2be42789f84691de6419b81d3491e",
+      "index_sha256": "caf815f115337c760f9bed16956a103eee9fdb710a531e6a9f55dbe2bd2fb804",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "1d1240859fa1d20e1599a7e0d9edba65641fd1d05275f5af2027d607e0f9e1ff"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json: eol: lf"
+      ],
+      "index_blob_oid": "a8e1190ab76fc75db61d83b28a06edba1bbfcbdf",
+      "index_sha256": "bfa02beb43c44a2405bab5e57d960105bd16a0e2a6f1f621ae9cb9894287791e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "bfa02beb43c44a2405bab5e57d960105bd16a0e2a6f1f621ae9cb9894287791e"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.json: eol: lf"
+      ],
+      "index_blob_oid": "96c2889683293ae6a57fd397d9ab386eafce99a5",
+      "index_sha256": "cec354f80fa235dbe05940d8b9e7c64b6688d43aae9ffe17cd02758d139a050e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "9cdabb52e5692f580b48cce0967cc506859f00ad899daf969dd11a60de8b81e1"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.md: eol: lf"
+      ],
+      "index_blob_oid": "079f457da5a1bb53109d3ff877b77a37103281ce",
+      "index_sha256": "9bfce0f6032dbaf7c5ca1247ff563fbc7e0b0527a6111f07969f50df580c23b3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "c3153e501b2104ee324c2b4245af3e6fb8c9461846d01727dbb6db5b521a0206"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.json: eol: lf"
+      ],
+      "index_blob_oid": "7dbb870ef0b859f172c971fb382952cb117f2213",
+      "index_sha256": "c618a421ff153c270cb97d281d35f27e7530fd16b91d6450988a13539b7e555e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "49b65ac3e667d56db2d0c73da0f14e2374ac7bbcfb191c073c0f56d3049ae3a8"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.md: eol: lf"
+      ],
+      "index_blob_oid": "06465e00d45425a60bb6bcce976c1f0285486645",
+      "index_sha256": "6f2b41859892bc069d8b5016bc9db458acb6445e798db8651748b59393df1d68",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "9e987e666741317f08284b36817d20895926a64a3c409293060ea0d119bb7003"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.json: eol: lf"
+      ],
+      "index_blob_oid": "9ddcc912099162144b7b41db1ff5d09e51731152",
+      "index_sha256": "f33e67414f7a1e1764d2e6b44ca9efc3dc61d6bf9bb4b39afbaaedfe9f24c0c9",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "ba89f683fac644ac43da5fd4a6bd3edc29fb01f207b5ab2560504bdb21d324fe"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.md: eol: lf"
+      ],
+      "index_blob_oid": "e3cee9e883ce7661027c7ad60ea6b50f0d4854c4",
+      "index_sha256": "58b6e44ac14200591c9529c5aac0b5d2b65bec7f9e65cad7d852838d04c3d5c2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "0086918655d57d9bae40d4097f8baa9110f6761b819e46697783cfe8aa8a67ab"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.json: eol: lf"
+      ],
+      "index_blob_oid": "94499e284cc4a444e0aad33b345cf4c530f00ac3",
+      "index_sha256": "b1b4b77ead7cf1549df0ca26943df4e6274cd14c2ee64e1c03939c88452985d1",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "b8f826ae09b39ceb132e301ab2f4dfb1a1927fafcf80f7ea5604984f26a42817"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.md: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.md: eol: lf"
+      ],
+      "index_blob_oid": "755ed5dce572e85e0691e957f9eb4f67d30a5b7d",
+      "index_sha256": "a3dd2bad1c23bdcfe4542edc463e11fb2830bdd4bfa6d390c79572b02084151b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.md",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": false,
+      "working_sha256": "bd4b24c92d45e76d0876862a9090c6964aee2776f967a3c9d7167f2444a84b34"
+    }
+  ],
+  "evidence_normalization": [
+    {
+      "commit": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.json",
+      "qualified_text_equivalent": true,
+      "wip_git_blob_sha256": "6a239f9987eba5c05037760fd77307ec6bc392208dd5b2063c025859b69e3029",
+      "working_equals_git": false,
+      "working_sha256": "322fc8278a24a2342d73785f2f6a13bec92a9ca29faade67a2c6483f2e860f71"
+    },
+    {
+      "commit": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-parser-wip-manifest.2026-10-19T03-39.md",
+      "qualified_text_equivalent": true,
+      "wip_git_blob_sha256": "caf815f115337c760f9bed16956a103eee9fdb710a531e6a9f55dbe2bd2fb804",
+      "working_equals_git": false,
+      "working_sha256": "1d1240859fa1d20e1599a7e0d9edba65641fd1d05275f5af2027d607e0f9e1ff"
+    }
+  ],
+  "files": [
+    {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "a59e9435b9980ac3ad90a0fe13a8a3462d6230a4",
+      "disposition": "new",
+      "index_blob_oid": "a59e9435b9980ac3ad90a0fe13a8a3462d6230a4",
+      "index_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "lines": 252,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "working_blob_oid": "a59e9435b9980ac3ad90a0fe13a8a3462d6230a4",
+      "working_index_identical": true,
+      "working_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0"
+    },
+    {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "3d4bfbcbbdf888b4725fb6935d93ec51ab84502b",
+      "disposition": "new",
+      "index_blob_oid": "3d4bfbcbbdf888b4725fb6935d93ec51ab84502b",
+      "index_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "lines": 144,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "working_blob_oid": "3d4bfbcbbdf888b4725fb6935d93ec51ab84502b",
+      "working_index_identical": true,
+      "working_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde"
+    },
+    {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "a298531a944a54c1517e10ef41b44b53a91db1e1",
+      "disposition": "new",
+      "index_blob_oid": "a298531a944a54c1517e10ef41b44b53a91db1e1",
+      "index_sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+      "lines": 462,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "working_blob_oid": "a298531a944a54c1517e10ef41b44b53a91db1e1",
+      "working_index_identical": true,
+      "working_sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af"
+    },
+    {
+      "attributes": [
+        "tests/discovery_runtime/analyzer/test_xml_input.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_xml_input.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "73c7189a1fb504e102b7d688522724133d54b29d",
+      "disposition": "new",
+      "index_blob_oid": "73c7189a1fb504e102b7d688522724133d54b29d",
+      "index_sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+      "lines": 259,
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "working_blob_oid": "73c7189a1fb504e102b7d688522724133d54b29d",
+      "working_index_identical": true,
+      "working_sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+    },
+    {
+      "attributes": [
+        "tests/discovery_runtime/analyzer/test_solution_input.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_solution_input.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "b7b791e7de16f74f8009353b645181cc453d782d",
+      "disposition": "new",
+      "index_blob_oid": "b7b791e7de16f74f8009353b645181cc453d782d",
+      "index_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "lines": 248,
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "working_blob_oid": "b7b791e7de16f74f8009353b645181cc453d782d",
+      "working_index_identical": true,
+      "working_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632"
+    },
+    {
+      "attributes": [
+        "tests/discovery_runtime/analyzer/test_dotnet_projects.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_dotnet_projects.py: eol: lf"
+      ],
+      "checked_wip_blob_oid": "09fd281a66bab5d3a6dcd8eab1125b14ad3ba004",
+      "disposition": "new",
+      "index_blob_oid": "09fd281a66bab5d3a6dcd8eab1125b14ad3ba004",
+      "index_sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+      "lines": 472,
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "working_blob_oid": "09fd281a66bab5d3a6dcd8eab1125b14ad3ba004",
+      "working_index_identical": true,
+      "working_sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Application.csproj: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Application.csproj: eol: lf"
+      ],
+      "checked_wip_blob_oid": "dd80c65ba98458721daa862216ae16feb83aac84",
+      "disposition": "new",
+      "index_blob_oid": "dd80c65ba98458721daa862216ae16feb83aac84",
+      "index_sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+      "lines": 16,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "working_blob_oid": "dd80c65ba98458721daa862216ae16feb83aac84",
+      "working_index_identical": true,
+      "working_sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props: eol: lf"
+      ],
+      "checked_wip_blob_oid": "e2f55b32321b431db878c993e2f04d90a71613ff",
+      "disposition": "new",
+      "index_blob_oid": "e2f55b32321b431db878c993e2f04d90a71613ff",
+      "index_sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+      "lines": 10,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "working_blob_oid": "e2f55b32321b431db878c993e2f04d90a71613ff",
+      "working_index_identical": true,
+      "working_sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets: eol: lf"
+      ],
+      "checked_wip_blob_oid": "fa6bee1afdae14b1d85475249e342e717ac34b00",
+      "disposition": "new",
+      "index_blob_oid": "fa6bee1afdae14b1d85475249e342e717ac34b00",
+      "index_sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "working_blob_oid": "fa6bee1afdae14b1d85475249e342e717ac34b00",
+      "working_index_identical": true,
+      "working_sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj: eol: lf"
+      ],
+      "checked_wip_blob_oid": "a3fe01a239f88e0a6fa03a786317ba73eb511b8f",
+      "disposition": "new",
+      "index_blob_oid": "a3fe01a239f88e0a6fa03a786317ba73eb511b8f",
+      "index_sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "working_blob_oid": "a3fe01a239f88e0a6fa03a786317ba73eb511b8f",
+      "working_index_identical": true,
+      "working_sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln: eol: lf"
+      ],
+      "checked_wip_blob_oid": "a065878fb65e3e11249b8877c1102fdde97f615a",
+      "disposition": "new",
+      "index_blob_oid": "a065878fb65e3e11249b8877c1102fdde97f615a",
+      "index_sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "working_blob_oid": "a065878fb65e3e11249b8877c1102fdde97f615a",
+      "working_index_identical": true,
+      "working_sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6"
+    },
+    {
+      "attributes": [
+        "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx: text: auto",
+        "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx: eol: lf"
+      ],
+      "checked_wip_blob_oid": "981c4f1fd64001d5db4c96720714a8effe4cc1cf",
+      "disposition": "new",
+      "index_blob_oid": "981c4f1fd64001d5db4c96720714a8effe4cc1cf",
+      "index_sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "working_blob_oid": "981c4f1fd64001d5db4c96720714a8effe4cc1cf",
+      "working_index_identical": true,
+      "working_sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+    }
+  ],
+  "final_routing_receipt": "inventory_analyzers_p4t2_final",
+  "harness_hashes": {
+    "SCRATCH/architecture_gate.py": "b933a9831cfa8cdad73d29a0eb4924b65450a440a12aa9d621f9d15c7b71ab6e",
+    "SCRATCH/final_gates.py": "a7fd1de29ec63d272b91992f360f9e16d8caa94d2240eba6c3d9b0d95f4a7c2f",
+    "SCRATCH/native_gate.py": "13fc23ce16deb7324d6ddb07e5c83576b14f5d9ac16031e52e4b9aaa2c770de2"
+  },
+  "limitations": [
+    "Declaration extraction only; no MSBuild, SDK, imports, globs, target activation or dependency evaluation.",
+    "Relationships retain null target component IDs; paths are inert descriptive strings.",
+    "XML anchors use actual parser-reported element lines, not complete lexical spans.",
+    "XML outside empty or legacy MSBuild namespace fails closed; .slnx uses literal Solution/Folder/Project declarations.",
+    "Public dotnet registry selection remains P4-T9; direct adapter tests and composed inventory emission are implemented here.",
+    "UTF-8 and BOM-marked UTF-16/32 solution text are supported; other encodings fail closed.",
+    "Native Windows Python/Git only; coding-agent host execution and non-Windows CI are not exercised by this task.",
+    "No CLI/registry wiring is claimed before P4-T9. No full-feature completion or repository-wide final quality acceptance is claimed by this task."
+  ],
+  "native_checks": [
+    "native capture includes all seven selected declared build inputs",
+    "real Git identity and retained immutable bytes agree",
+    "native XML and BOM-marked solution files emit declarations without blockers",
+    "composed inventory semantic identity ignores analyzer order and capture clock",
+    "every declared dependency target remains unresolved",
+    "ledger proposals remain uninspected and unassigned",
+    "analysis leaves source bytes and native Git status unchanged"
+  ],
+  "new_r1_cases": 48,
+  "next_step": "Executor reconciles exact bindings and checks off only P4-T2; parent commits/pushes and explicitly releases the next task.",
+  "node_order_provenance": "A separate collection-only receipt uses the same frozen bytes, module order and pytest options after the ordered loop; it does not rerun test bodies. Quiet execution output proves 198 passes and exact module order but does not itself list node identities.",
+  "ordered_receipts": [
+    {
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:05:41.009071+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-format-040541.2026-10-19T04-05.json",
+        "working_sha256": "20c82d37c493ab8c15f9473816afb3178e679de2d1f594dbbabd3e09a42a9403"
+      },
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-format-040541.2026-10-19T04-05.json",
+      "seconds": 0.323681,
+      "sha256": "20c82d37c493ab8c15f9473816afb3178e679de2d1f594dbbabd3e09a42a9403",
+      "stage": 1,
+      "started_at": "2026-10-19T04:05:40.685390+00:00"
+    },
+    {
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:05:41.116491+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-lint-040541.2026-10-19T04-05.json",
+        "working_sha256": "ad4fce1049011c89bf1edc254d99ddf8cfbb019f7705cd8f32ce6276d233c8b8"
+      },
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-lint-040541.2026-10-19T04-05.json",
+      "seconds": 0.103613,
+      "sha256": "ad4fce1049011c89bf1edc254d99ddf8cfbb019f7705cd8f32ce6276d233c8b8",
+      "stage": 2,
+      "started_at": "2026-10-19T04:05:41.012878+00:00"
+    },
+    {
+      "command": "poetry run python -m pyright",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:05:52.824659+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-types-040552.2026-10-19T04-05.json",
+        "working_sha256": "2d321cbb42ffc8385994e90ee81c10ca34072c455ba84c6a7b5c496c4efef4eb"
+      },
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-types-040552.2026-10-19T04-05.json",
+      "seconds": 11.705241,
+      "sha256": "2d321cbb42ffc8385994e90ee81c10ca34072c455ba84c6a7b5c496c4efef4eb",
+      "stage": 3,
+      "started_at": "2026-10-19T04:05:41.119418+00:00"
+    },
+    {
+      "command": "poetry run python SCRATCH\\architecture_gate.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p4t2-newline-repair-manifest.2026-10-19T04-01.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:05:52.931121+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-architecture-040552.2026-10-19T04-05.json",
+        "working_sha256": "c57cf1c9f3a707eb6b81fa6db8d00e06fedbd2d2e165d009a29178b4f237e358"
+      },
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-architecture-040552.2026-10-19T04-05.json",
+      "seconds": 0.1012,
+      "sha256": "c57cf1c9f3a707eb6b81fa6db8d00e06fedbd2d2e165d009a29178b4f237e358",
+      "stage": 4,
+      "started_at": "2026-10-19T04:05:52.829921+00:00"
+    },
+    {
+      "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_dotnet_projects.py tests/discovery_runtime/analyzer/test_solution_input.py tests/discovery_runtime/analyzer/test_xml_input.py --cov=drm_copilot_discovery.analyzer.xml_input --cov=drm_copilot_discovery.analyzer.solution_input --cov=drm_copilot_discovery.analyzer.dotnet_projects --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/p4t2-final-coverage.raw.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:06:35.470634+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-tests-reverse-040635.2026-10-19T04-06.json",
+        "working_sha256": "2920bbd19041aa56c5fb284b52d4dd193eb46731b68f11da9646c9ce524355d9"
+      },
+      "label": "tests-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-tests-reverse-040635.2026-10-19T04-06.json",
+      "seconds": 42.533489,
+      "sha256": "2920bbd19041aa56c5fb284b52d4dd193eb46731b68f11da9646c9ce524355d9",
+      "stage": 5,
+      "started_at": "2026-10-19T04:05:52.937145+00:00"
+    },
+    {
+      "command": "poetry run python -m pytest -q -o addopts= --no-cov tests/schemas/discovery/test_v2_inventory_schemas.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:06:37.046833+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-contracts-040637.2026-10-19T04-06.json",
+        "working_sha256": "ea9f1a8e86351c9e2c5a4ef67d356b8763d83dac7e3790d648d25a6f758323b5"
+      },
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-contracts-040637.2026-10-19T04-06.json",
+      "seconds": 1.563422,
+      "sha256": "ea9f1a8e86351c9e2c5a4ef67d356b8763d83dac7e3790d648d25a6f758323b5",
+      "stage": 6,
+      "started_at": "2026-10-19T04:06:35.483411+00:00"
+    },
+    {
+      "command": "poetry run python SCRATCH\\native_gate.py SCRATCH\\p4t2-final-native-result.raw.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T04:06:39.889190+00:00",
+      "git_binding": {
+        "index_blob_oid": null,
+        "index_sha256": null,
+        "index_status": "Generated after the checked WIP; parent staging remains pending.",
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-040639.2026-10-19T04-06.json",
+        "working_sha256": "92f4a8fb0e0ff35ea75008d9836aaad5d1b6ddd20f84de270ed2156023b9b778"
+      },
+      "label": "native",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-040639.2026-10-19T04-06.json",
+      "seconds": 2.83693,
+      "sha256": "92f4a8fb0e0ff35ea75008d9836aaad5d1b6ddd20f84de270ed2156023b9b778",
+      "stage": 7,
+      "started_at": "2026-10-19T04:06:37.052260+00:00"
+    }
+  ],
+  "preserved_predecessors": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "verified_unchanged": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "verified_unchanged": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "verified_unchanged": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "verified_unchanged": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "verified_unchanged": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "verified_unchanged": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "verified_unchanged": true
+    }
+  ],
+  "proof": [
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json: eol: lf"
+      ],
+      "index_blob_oid": "52bb22ecd995e63f86c11a966d673a09ccaa3ca5",
+      "index_sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json: eol: lf"
+      ],
+      "index_blob_oid": "3e630b6e66f5cedc7af21355e6f09bc8fa603bdc",
+      "index_sha256": "e14da8e45a5dfcfaacab0d6b251c245d9c59319cc8a3fbacdfc12765efeefb70",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "e14da8e45a5dfcfaacab0d6b251c245d9c59319cc8a3fbacdfc12765efeefb70"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json: eol: lf"
+      ],
+      "index_blob_oid": "af7ff3d47ee1e14b306671aea2c25c42014cd75d",
+      "index_sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json: eol: lf"
+      ],
+      "index_blob_oid": "29efa8b2f2520588cb51821dfe9d9ad0d116a5ec",
+      "index_sha256": "06fa338ce2072ac4daf74ad3a756effc19c5fdfbe5302aca09e4c3fef0ea871d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-repair-confirmation.2026-10-19T04-02.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "06fa338ce2072ac4daf74ad3a756effc19c5fdfbe5302aca09e4c3fef0ea871d"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json: eol: lf"
+      ],
+      "index_blob_oid": "5b88153958877b8824ea8619dc509a3a72e304f7",
+      "index_sha256": "cc39a8362ab243ecdb9c3511dcf515b10be77f95e1b50319f791fde87d333e99",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "cc39a8362ab243ecdb9c3511dcf515b10be77f95e1b50319f791fde87d333e99"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-ordered-stages.2026-10-19T04-06.json",
+      "working_sha256": "c734d479907b8e8570707405ff9b5dfe3fb635c33d0b7084324a2796e1eab211"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-coverage.2026-10-19T04-06.json",
+      "working_sha256": "29c7980db6b73ae91eb31c656c4874b22b21ab50e6a6b5110edb2af39331ff4c"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-native-result.2026-10-19T04-06.json",
+      "working_sha256": "b82a54473b78866c4d901edc8b96860738c8fe827d1fff7933b7695e02fe58c1"
+    },
+    {
+      "index_blob_oid": null,
+      "index_sha256": null,
+      "index_status": "Generated after the checked WIP; parent staging remains pending.",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-node-collection-040657.2026-10-19T04-06.json",
+      "working_sha256": "088e1a682452a9be076a1ba148b98b19f43d3043da34724cbf39729ab8173534"
+    },
+    {
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t2-baseline-binding.2026-10-19T03-19.json: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t2-baseline-binding.2026-10-19T03-19.json: eol: lf"
+      ],
+      "index_blob_oid": "956cf930e077faa40d2f0e72faa4d568c7f2a9e1",
+      "index_sha256": "207ea1b9a5a30f6de25964de8d8690662907effd3e81b2eade45dc02a7898a90",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t2-baseline-binding.2026-10-19T03-19.json",
+      "qualified_lf_text_equivalent": true,
+      "working_index_identical": true,
+      "working_sha256": "207ea1b9a5a30f6de25964de8d8690662907effd3e81b2eade45dc02a7898a90"
+    }
+  ],
+  "raw_coverage": {
+    "path": "SCRATCH/p4t2-final-coverage.raw.json",
+    "sha256": "29c7980db6b73ae91eb31c656c4874b22b21ab50e6a6b5110edb2af39331ff4c"
+  },
+  "raw_native": {
+    "path": "SCRATCH/p4t2-final-native-result.raw.json",
+    "sha256": "b82a54473b78866c4d901edc8b96860738c8fe827d1fff7933b7695e02fe58c1"
+  },
+  "retained_candidate_cases": 150,
+  "review": "Single consolidated review retained; its one physical-newline finding was corrected in two files and independently confirmed. No source edits occurred during final gates.",
+  "state": "EXECUTOR_ACCEPTANCE_PENDING",
+  "task": "P4-T2",
+  "test_cases": 198,
+  "test_module_order": [
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+    "tests/discovery_runtime/analyzer/test_solution_input.py",
+    "tests/discovery_runtime/analyzer/test_xml_input.py"
+  ],
+  "timestamp": "2026-10-19T04-07"
+}

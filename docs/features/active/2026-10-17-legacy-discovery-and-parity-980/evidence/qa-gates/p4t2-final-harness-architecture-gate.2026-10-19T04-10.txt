@@ -1,0 +1,47 @@
+"""Inspect the frozen P4-T2 package and unit-test boundaries without executing them."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+manifest = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+checked = []
+for entry in manifest['files']:
+    path = Path(entry['path'])
+    content = path.read_bytes()
+    assert hashlib.sha256(content).hexdigest() == entry['working_sha256'], path
+    if path.suffix != '.py':
+        continue
+    assert len(content.splitlines()) <= 500, path
+    tree = ast.parse(content)
+    imports=[]
+    for node in ast.walk(tree):
+        if isinstance(node,ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node,ast.Import):
+            imports.extend(value.name for value in node.names)
+    if path.as_posix().startswith('packages/'):
+        assert not any(value.startswith(('scripts','subprocess','socket','requests','http','urllib','os','io')) for value in imports), (path,imports)
+        assert not any('office' in value or 'vsto' in value for value in imports),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call):
+                called=ast.unparse(node.func)
+                assert called not in {'open','eval','exec','compile'},(path,called)
+                assert not called.endswith(('.read_bytes','.read_text','.write_bytes','.write_text','.unlink','.mkdir','.glob','.rglob')),(path,called)
+                if called == 'import_module':
+                    assert path.name == 'xml_input.py' and len(node.args)==1 and isinstance(node.args[0],ast.Constant) and node.args[0].value=='lxml.etree',path
+        if path.name=='xml_input.py':
+            parsers=[node for node in ast.walk(tree) if isinstance(node,ast.Call) and ast.unparse(node.func)=='library.XMLParser']
+            assert len(parsers)==1
+            settings={value.arg:ast.literal_eval(value.value) for value in parsers[0].keywords if value.arg!='target'}
+            assert settings == {'resolve_entities':False,'load_dtd':False,'no_network':True,'dtd_validation':False,'attribute_defaults':False,'recover':False,'huge_tree':False,'remove_comments':True,'remove_pis':True}
+        checked.append({'path':path.as_posix(),'boundary':'pure package; fixed secure parser; no optional domain imports'})
+    else:
+        text=content.decode('utf-8')
+        assert not any(word in text for word in ('tmp_path','tmpdir','TemporaryDirectory','NamedTemporaryFile','tempfile','subprocess','requests','socket')),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call):
+                assert not ast.unparse(node.func).endswith(('.write_bytes','.write_text','.mkdir','.unlink')),path
+        checked.append({'path':path.as_posix(),'boundary':'in-memory units and read-only immutable resources'})
+print(json.dumps({'checks':checked,'passed':len(checked)},indent=2))

@@ -1,0 +1,152 @@
+{
+  "task": "P4-T2",
+  "status": "PASS",
+  "timestamp": "2026-10-19T04:13:23.361982+00:00",
+  "accepted_baseline": "5db172f2bc104cfa0e7372f4f7b014a4d4d0ec99",
+  "checked_parser_wip": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+  "checked_complete_candidate_wip": "e46b2c870bb0cdec0aff605fb72dc07c17bb9007",
+  "routing_receipt": "atomic_execution_p4t2_final",
+  "native_profile": {
+    "name": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_and_receipt_match": true
+  },
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-final-reconciliation.2026-10-19T04-11.json",
+    "sha256": "72196598c2b0352dc55371ef35ac0a73e3cacd19d27177857cbc8ed01d2886c8"
+  },
+  "worker_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-handoff.2026-10-19T04-07.json",
+    "sha256": "4a2c3d7ccc0b81be030d6f1611051c2ccc88296e8b838dbe2d7a6a7aa1a44be5"
+  },
+  "harness_preservation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-preservation.2026-10-19T04-10.json",
+    "sha256": "03d72912fb440e514e266ba6cbfe539bc9cddbb54e9c613c8e07b8ff606e3c49"
+  },
+  "canonical_harnesses": [
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/architecture_gate.py",
+      "raw_sha256": "b933a9831cfa8cdad73d29a0eb4924b65450a440a12aa9d621f9d15c7b71ab6e",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-architecture-gate.2026-10-19T04-10.txt",
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-architecture-gate.2026-10-19T04-10.txt: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-architecture-gate.2026-10-19T04-10.txt: eol: lf"
+      ],
+      "expected_git_sha256": "b933a9831cfa8cdad73d29a0eb4924b65450a440a12aa9d621f9d15c7b71ab6e",
+      "expected_git_blob_oid": "a33fb9471c44d75e88eb69e446c4aef152da3ffc",
+      "line_count": 47,
+      "normalization_required": false
+    },
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/final_gates.py",
+      "raw_sha256": "a7fd1de29ec63d272b91992f360f9e16d8caa94d2240eba6c3d9b0d95f4a7c2f",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-final-gates.2026-10-19T04-10.txt",
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-final-gates.2026-10-19T04-10.txt: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-final-gates.2026-10-19T04-10.txt: eol: lf"
+      ],
+      "expected_git_sha256": "a7fd1de29ec63d272b91992f360f9e16d8caa94d2240eba6c3d9b0d95f4a7c2f",
+      "expected_git_blob_oid": "237ed83b07cfdd6108097388e4e5aedbddfc292f",
+      "line_count": 88,
+      "normalization_required": false
+    },
+    {
+      "exact_byte_copy": true,
+      "original_reference": "SCRATCH/native_gate.py",
+      "raw_sha256": "13fc23ce16deb7324d6ddb07e5c83576b14f5d9ac16031e52e4b9aaa2c770de2",
+      "snapshot_format": "UTF-8 Python source stored as inert .txt evidence; no conversion or normalization applied.",
+      "snapshot_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-native-gate.2026-10-19T04-10.txt",
+      "attributes": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-native-gate.2026-10-19T04-10.txt: text: auto",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-final-harness-native-gate.2026-10-19T04-10.txt: eol: lf"
+      ],
+      "expected_git_sha256": "13fc23ce16deb7324d6ddb07e5c83576b14f5d9ac16031e52e4b9aaa2c770de2",
+      "expected_git_blob_oid": "c984d81f02cb5a243049f33bbee13d6ef6540d00",
+      "line_count": 103,
+      "normalization_required": false
+    }
+  ],
+  "checkbox_updates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "before_sha256": "cd315e8e38ef961e8a8c4dbf6c0b93b5c1d2b3f2cbc42272cd93be439b613659",
+      "after_sha256": "4cb6128ba58b1a960047d2380c5a29a974e3182a55ec2b026434a045d12b4022",
+      "only_change": "P4-T2 checkbox",
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "before_sha256": "a0428a605cee846839b567f9edc06bbf850b89408486145d244df359b0468570",
+      "after_sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+      "only_change": "AC-32 checkbox",
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "before_sha256": "2cab091e9a3d180a9ccc8e5bbf9918f973f33eea85e4fdcf7240b097136612aa",
+      "after_sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+      "only_change": "AC-32 checkbox",
+      "line_endings_preserved": true
+    }
+  ],
+  "tasks_complete": 34,
+  "tasks_total": 84,
+  "acceptance_criteria_complete": 13,
+  "acceptance_criteria_total": 66,
+  "accepted_criterion": "AC-32",
+  "criterion_text": "At least one meaningful C#/.NET analyzer exists.",
+  "criterion_evidence": "Direct .NET solution/project analyzer covers .sln/.slnx, XML project families, props/targets, project/package/COM references and conditions with immutable provenance; 198 unit cases, 176 contracts and seven native checks pass.",
+  "deferred_criteria": {
+    "AC-33-AC-36": "Phase-wide analyzer normalization/provenance/classification/fixture coverage remains pending later analyzer tasks.",
+    "quality_and_host_criteria": "Full-feature quality, publishing, CLI/registry/host exposure and cross-platform CI remain pending their assigned tasks."
+  },
+  "test_results": {
+    "unit_passed": 198,
+    "contract_passed": 176,
+    "native_passed": 7,
+    "architecture_checks": 6,
+    "covered_lines": 290,
+    "total_lines": 290,
+    "covered_branches": 116,
+    "total_branches": 116,
+    "executables_at_100_percent": 22,
+    "concrete_classes_at_100_percent": 6,
+    "protocol_method_stubs_not_applicable": 8,
+    "protocol_classes_not_applicable": 3
+  },
+  "source_identity": {
+    "working_index_checked_commit_identical": 12,
+    "preserved_predecessors": 26,
+    "retained_candidate_files": 10,
+    "repaired_files": 2
+  },
+  "evidence_identity": {
+    "bound_evidence_files": 101,
+    "historical_git_normalization_qualifications": 40,
+    "new_harness_snapshots": 3,
+    "harness_raw_and_expected_git_bytes_identical": true
+  },
+  "limitations": [
+    "Declaration extraction only; no MSBuild, SDK, imports, globs, target activation or dependency evaluation.",
+    "Relationships retain null target component IDs; paths are inert descriptive strings.",
+    "XML anchors use actual parser-reported element lines, not complete lexical spans.",
+    "XML outside empty or legacy MSBuild namespace fails closed; .slnx uses literal Solution/Folder/Project declarations.",
+    "Public dotnet registry selection remains P4-T9; direct adapter tests and composed inventory emission are implemented here.",
+    "UTF-8 and BOM-marked UTF-16/32 solution text are supported; other encodings fail closed.",
+    "Native Windows Python/Git only; coding-agent host execution and non-Windows CI are not exercised by this task.",
+    "No CLI/registry wiring is claimed before P4-T9. No full-feature completion or repository-wide final quality acceptance is claimed by this task."
+  ],
+  "next_task": "P4-T3",
+  "successor_released": false,
+  "production_or_test_writes": false,
+  "git_mutations": false,
+  "checkpoint_mutations": false,
+  "command": "poetry run python SCRATCH/issue-980-p4t2-final-acceptance.py",
+  "exit_code": 0
+}

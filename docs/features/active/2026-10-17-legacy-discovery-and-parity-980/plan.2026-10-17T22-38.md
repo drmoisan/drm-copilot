@@ -258,7 +258,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Recognize real solution/project and generic manifest suffixes; traverse selected roots with early output/dependency/exclusion pruning; retain every included/excluded/read-failed input; hash parsed bytes once; distinguish detected/inferred findings; seed only uninspected/unassigned ledger proposals.
   - Acceptance: Default and dry-run inventory perform no writes; explicit writes are validated mutations; ordering, clock variation, separator variation, and enumeration order do not change semantic IDs/digests.
 
-- [ ] [P4-T2] Inventory declared .NET solutions and projects safely.
+- [x] [P4-T2] Inventory declared .NET solutions and projects safely.
   - Files and behavior: Create R/analyzer/{xml_input,dotnet_projects}.py, PT/analyzer/test_{xml_input,dotnet_projects}.py, and synthetic text fixtures under tests/fixtures/discovery_analyzers/dotnet/.
   - Tests and proof: Cover .sln/.slnx, project/props/targets XML, project/package/COM references, target frameworks, conditions, implicit SDK/unresolved expressions, malformed XML, DTD/entity/network rejection, and source spans/hashes.
   - Acceptance: Explicit declarations are machine-readable detected facts with provenance; unresolved/evaluated build semantics are not presented as a resolved dependency or runtime graph.
