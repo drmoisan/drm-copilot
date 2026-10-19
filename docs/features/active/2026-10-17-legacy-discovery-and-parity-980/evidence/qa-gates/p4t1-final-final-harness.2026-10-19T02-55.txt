@@ -1,0 +1,68 @@
+"""Run final ordered scoped gates after review and parent staging."""
+import datetime
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent.resolve()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+EVIDENCE = FEATURE / 'evidence/qa-gates'
+manifest_path = Path(sys.argv[1])
+manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+paths = [record['path'] for record in manifest['files']]
+expected = {record['path']: record['sha256'] for record in manifest['files']}
+receipts = []
+
+def hashes():
+    return {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in paths}
+
+def sanitize(text):
+    for path, replacement in ((str(ROOT), 'WORKSPACE'), (ROOT.as_posix(), 'WORKSPACE'), (str(SCRATCH), 'SCRATCH'), (SCRATCH.as_posix(), 'SCRATCH')):
+        text = re.sub(re.escape(path), lambda match: replacement, text, flags=re.IGNORECASE)
+    return text
+
+def run(stage, label, arguments, *, module=True):
+    before = hashes()
+    assert before == expected, 'Frozen candidate changed before ' + label
+    started = datetime.datetime.now(datetime.timezone.utc)
+    environment = os.environ.copy()
+    environment['COVERAGE_FILE'] = str(SCRATCH / 'issue-980-p4t1-final.coverage')
+    result = subprocess.run([sys.executable, *(['-m'] if module else []), *map(str, arguments)], capture_output=True, env=environment)
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    purpose = 'p4t1-final-' + label + '-run-' + finished.strftime('%H%M%S')
+    name = purpose + '.' + finished.strftime('%Y-%m-%dT%H-%M')
+    (SCRATCH / ('issue-980-' + name + '.stdout')).write_bytes(result.stdout)
+    (SCRATCH / ('issue-980-' + name + '.stderr')).write_bytes(result.stderr)
+    after = hashes()
+    record = {'stage': stage, 'label': label, 'started_at': started.isoformat(), 'finished_at': finished.isoformat(), 'command': sanitize('poetry run python ' + ('-m ' if module else '') + ' '.join(map(str, arguments))), 'exit_code': result.returncode, 'seconds': (finished - started).total_seconds(), 'source_before': before, 'source_after': after, 'stdout': sanitize(result.stdout.decode('utf-8', errors='replace')), 'stderr': sanitize(result.stderr.decode('utf-8', errors='replace')), 'original_stdout_sha256': hashlib.sha256(result.stdout).hexdigest(), 'original_stderr_sha256': hashlib.sha256(result.stderr).hexdigest(), 'original_output_location': 'SCRATCH', 'raw_path_replacements': ['WORKSPACE', 'SCRATCH']}
+    raw_path = EVIDENCE / (name + '.json')
+    raw_path.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    fence = chr(96) * 3
+    rendering = 'Timestamp: ' + finished.isoformat() + '\nCommand: ' + record['command'] + '\nEXIT_CODE: ' + str(result.returncode) + '\nOutput Summary:\n\n' + fence + 'text\n' + record['stdout'] + record['stderr'] + '\n' + fence + '\n\nExact source/test bytes unchanged: ' + str(before == after == expected) + '\nRaw command output and hashes: ' + raw_path.as_posix() + '\n'
+    rendering = '\n'.join(line.rstrip(' \t') for line in rendering.splitlines()) + '\n'
+    raw_path.with_suffix('.md').write_text(rendering, encoding='utf-8')
+    receipts.append({'stage': stage, 'label': label, 'path': raw_path.as_posix(), 'sha256': hashlib.sha256(raw_path.read_bytes()).hexdigest(), 'exit_code': result.returncode})
+    print(json.dumps({'stage': stage, 'label': label, 'exit_code': result.returncode, 'seconds': record['seconds'], 'evidence': raw_path.as_posix()}), flush=True)
+    if result.returncode or before != after:
+        print(record['stdout'][-8000:] + record['stderr'][-8000:], flush=True)
+        raise SystemExit(result.returncode or 1)
+
+run(1, 'format', ['black', '--check', *paths])
+run(2, 'lint', ['ruff', 'check', *paths])
+run(3, 'types', ['pyright'])
+run(4, 'architecture', [SCRATCH / 'issue-980-p4t1-architecture.py', manifest_path], module=False)
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+coverage = EVIDENCE / ('p4t1-final-coverage.' + stamp + '.json')
+test_paths = sorted([*Path('tests/discovery_runtime/analyzer').glob('test_*.py'), *Path('tests/scripts/dev_tools/discovery/analyzer').glob('test_*.py')], reverse=True)
+run(5, 'tests-reverse', ['pytest', *test_paths, '-q', '-o', 'addopts=', '--cov=drm_copilot_discovery.analyzer', *('--cov=scripts.dev_tools.discovery.analyzer.' + name for name in ('models', 'pipeline', 'inventory', 'emitter')), '--cov-branch', '--cov-report=term-missing', '--cov-report=json:' + coverage.as_posix()])
+run(6, 'contracts', ['pytest', '-q', '-o', 'addopts=', '--no-cov', 'tests/schemas/discovery/test_v1_schema_documents.py', 'tests/schemas/discovery/test_v1_fixtures.py', 'tests/schemas/discovery/test_v2_inventory_schemas.py', 'tests/discovery_runtime/test_resources.py', 'tests/scripts/dev_tools/test_quality_tiers_contract.py', 'tests/scripts/dev_tools/test_quality_tiers_contract_classification.py'])
+native = EVIDENCE / ('p4t1-final-native-result.' + datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M') + '.json')
+run(7, 'native', [SCRATCH / 'issue-980-p4t1-native.py', native], module=False)
+final_path = EVIDENCE / ('p4t1-final-ordered-stages.' + datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M') + '.json')
+final_path.write_text(json.dumps({'candidate_manifest': manifest_path.as_posix(), 'candidate_manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(), 'receipts': receipts, 'coverage': coverage.as_posix(), 'native': native.as_posix(), 'source_hashes': hashes()}, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+print(final_path.as_posix(), flush=True)

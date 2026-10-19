@@ -1,0 +1,221 @@
+{
+  "task": "P4-T1 supplemental harness evidence",
+  "status": "PASS",
+  "timestamp": "2026-10-19T03:14:21.159971+00:00",
+  "accepted_commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+  "routing_receipt": "atomic_execution_p4t1_harnesses",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority": "Fresh receipt/current profile/native attestation reconciled before this command; actual gpt-6-astra/max, routing/provenance/launch valid.",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-before.2026-10-19T02-41.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-correction.2026-10-19T02-41.json",
+        "field": "before",
+        "sha256": "fdc6816ca1fc0640d98c6e26e6351e353fc371643e3c8fe686e52ff518ea0a1d"
+      },
+      "working_sha256": "fdc6816ca1fc0640d98c6e26e6351e353fc371643e3c8fe686e52ff518ea0a1d",
+      "working_bytes": 2258,
+      "working_git_blob_oid": "eb7591228e16201e7bcc6289fedebad043dad2ad",
+      "expected_staged_sha256": "fdc6816ca1fc0640d98c6e26e6351e353fc371643e3c8fe686e52ff518ea0a1d",
+      "expected_staged_bytes": 2258,
+      "expected_staged_git_blob_oid": "eb7591228e16201e7bcc6289fedebad043dad2ad",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "none; exact byte identity",
+      "working_crlf_count": 0,
+      "physical_lines": 37,
+      "original_preservation": null,
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-after.2026-10-19T02-41.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-architecture-checker-correction.2026-10-19T02-41.json",
+        "field": "after",
+        "sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5"
+      },
+      "working_sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5",
+      "working_bytes": 2768,
+      "working_git_blob_oid": "aa9a4796aea6c73f795c195831cc72c792bbf588",
+      "expected_staged_sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5",
+      "expected_staged_bytes": 2768,
+      "expected_staged_git_blob_oid": "aa9a4796aea6c73f795c195831cc72c792bbf588",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "none; exact byte identity",
+      "working_crlf_count": 0,
+      "physical_lines": 45,
+      "original_preservation": null,
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-failed-harness.2026-10-19T02-46.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-fixture-correction.2026-10-19T02-47.json",
+        "field": "before",
+        "sha256": "9062dcad62b26887cddd210bb98fd030d0a78df51101433046f3d63e59a25845"
+      },
+      "working_sha256": "9062dcad62b26887cddd210bb98fd030d0a78df51101433046f3d63e59a25845",
+      "working_bytes": 9269,
+      "working_git_blob_oid": "768498ada51a799edd6c4ecaca3350d8c9fb1d15",
+      "expected_staged_sha256": "43b52b7dedf2fb405309ffb594867f6044bf42ab3b6e0691d766635e03c2a9bd",
+      "expected_staged_bytes": 9268,
+      "expected_staged_git_blob_oid": "4a396ee85053c7454ba35836bc8a2c0654055f10",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "final CRLF to LF only",
+      "working_crlf_count": 1,
+      "physical_lines": 141,
+      "original_preservation": {
+        "path": "SCRATCH/p4t1-harness-originals-2026-10-19T03-14-21/p4t1-native-failed-harness.2026-10-19T02-46.txt",
+        "sha256": "9062dcad62b26887cddd210bb98fd030d0a78df51101433046f3d63e59a25845",
+        "bytes": 9269
+      },
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-corrected-harness.2026-10-19T02-47.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-native-fixture-correction.2026-10-19T02-47.json",
+        "field": "after",
+        "sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f"
+      },
+      "working_sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f",
+      "working_bytes": 9276,
+      "working_git_blob_oid": "a6453bc79814c84a2600b1cc1a5a663100aacafe",
+      "expected_staged_sha256": "11f58f27f372fb897fc875205a5357589f1429195e59819700ff9af5d4f7ba7a",
+      "expected_staged_bytes": 9275,
+      "expected_staged_git_blob_oid": "918cc966de580a0bb10078d75b905c8dc3d3169f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "final CRLF to LF only",
+      "working_crlf_count": 1,
+      "physical_lines": 141,
+      "original_preservation": {
+        "path": "SCRATCH/p4t1-harness-originals-2026-10-19T03-14-21/p4t1-native-corrected-harness.2026-10-19T02-47.txt",
+        "sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f",
+        "bytes": 9276
+      },
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-final-harness.2026-10-19T02-55.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "field": "harnesses",
+        "sha256": "1629a3ef68be3f95bd343d164c07f9447656f771b13cd596ae42738568917031"
+      },
+      "working_sha256": "1629a3ef68be3f95bd343d164c07f9447656f771b13cd596ae42738568917031",
+      "working_bytes": 5735,
+      "working_git_blob_oid": "9524ccd1fecd07079f9c0bd8dfba9d3b20a35930",
+      "expected_staged_sha256": "1629a3ef68be3f95bd343d164c07f9447656f771b13cd596ae42738568917031",
+      "expected_staged_bytes": 5735,
+      "expected_staged_git_blob_oid": "9524ccd1fecd07079f9c0bd8dfba9d3b20a35930",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "none; exact byte identity",
+      "working_crlf_count": 0,
+      "physical_lines": 68,
+      "original_preservation": null,
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-architecture-harness.2026-10-19T02-55.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "field": "harnesses",
+        "sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5"
+      },
+      "working_sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5",
+      "working_bytes": 2768,
+      "working_git_blob_oid": "aa9a4796aea6c73f795c195831cc72c792bbf588",
+      "expected_staged_sha256": "64ce552c7d33e46d98b4d368c8781ed9f9f1b26b89b45462020c2d876b2814c5",
+      "expected_staged_bytes": 2768,
+      "expected_staged_git_blob_oid": "aa9a4796aea6c73f795c195831cc72c792bbf588",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "none; exact byte identity",
+      "working_crlf_count": 0,
+      "physical_lines": 45,
+      "original_preservation": null,
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-native-harness.2026-10-19T02-55.txt",
+      "accepted_binding": {
+        "commit": "bba0e8b1f2ee743655587dbf0fc703b33b6885bc",
+        "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json",
+        "field": "harnesses",
+        "sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f"
+      },
+      "working_sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f",
+      "working_bytes": 9276,
+      "working_git_blob_oid": "a6453bc79814c84a2600b1cc1a5a663100aacafe",
+      "expected_staged_sha256": "11f58f27f372fb897fc875205a5357589f1429195e59819700ff9af5d4f7ba7a",
+      "expected_staged_bytes": 9275,
+      "expected_staged_git_blob_oid": "918cc966de580a0bb10078d75b905c8dc3d3169f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "normalization": "final CRLF to LF only",
+      "working_crlf_count": 1,
+      "physical_lines": 141,
+      "original_preservation": {
+        "path": "SCRATCH/p4t1-harness-originals-2026-10-19T03-14-21/p4t1-final-native-harness.2026-10-19T02-55.txt",
+        "sha256": "a65918571633d2ee8bceb0af15c585619f5b1277f7004d22b22a4cdbfd531e8f",
+        "bytes": 9276
+      },
+      "working_bytes_unchanged": true,
+      "host_specific_paths": [],
+      "syntax_and_normalized_ast_equivalent": true
+    }
+  ],
+  "findings": [],
+  "rejected_checker_false_positive": {
+    "expression": "An unanchored Windows-drive regex matched the y suffix in the source literal Summary followed by an escaped newline.",
+    "matched_text": "y:\\",
+    "disposition": "Rejected. No host path exists. AST string constants were inspected with an anchored path predicate."
+  },
+  "provenance_limitation": "Reconstructed by reversing the exact single recorded patch against the preserved corrected UTF-8 LF script; no pre-edit digest was captured.",
+  "interpretation": "Existing accepted hashes describe preserved raw working bytes. Three expected Git blobs are explicitly qualified newline-normalized representations and do not claim raw identity. Original accepted receipts remain unchanged.",
+  "source_test_harness_writes": false,
+  "plan_ac_checkpoint_git_writes": false,
+  "tests_or_behavior_rerun": false,
+  "writes": [
+    "Three exact raw native snapshots preserved under session SCRATCH",
+    "This paired canonical Markdown/JSON supplemental receipt"
+  ],
+  "staging_status": "Expected filtered Git blob identities verified read-only; parent owns staging and commit."
+}
