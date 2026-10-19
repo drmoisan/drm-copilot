@@ -1,0 +1,132 @@
+"""Publish the retained P4-T6 acceptance without replaying behavioral proof."""
+
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+QA = FEATURE / 'evidence/qa-gates'
+PLAN = FEATURE / 'plan.2026-10-17T22-38.md'
+RECON = QA / 'p4t6-executor-final-reconciliation.2026-10-19T09-31.json'
+
+
+def digest(data):
+    """Return the byte identity used by the accepted evidence contract."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def binding(path):
+    """Record working and qualified LF publication identities separately."""
+    raw = (ROOT / path).read_bytes()
+    return {
+        'path': path.as_posix(), 'working_sha256': digest(raw),
+        'expected_lf_blob_sha256': digest(raw.replace(b'\r\n', b'\n')),
+        'crlf_count': raw.count(b'\r\n'),
+    }
+
+
+def publish(stem, suffix, payload):
+    """Use actual UTC publication time and avoid overwriting retained proof."""
+    now = datetime.now(timezone.utc)
+    minute = now.strftime('%Y-%m-%dT%H-%M')
+    path = QA / f'{stem}.{minute}.{suffix}'
+    if isinstance(payload, dict):
+        payload = dict(payload, timestamp=minute, published_utc=now.isoformat())
+        text = json.dumps(payload, indent=2, ensure_ascii=True) + '\n'
+    else:
+        text = payload.replace('{TIMESTAMP}', minute).replace('{WRITE_TIME}', now.isoformat())
+    raw = text.encode('utf-8')
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert all(line == line.rstrip() for line in raw.splitlines())
+    with (ROOT / path).open('xb') as stream:
+        stream.write(raw)
+    return path
+
+
+proof = json.loads((ROOT / RECON).read_text(encoding='utf-8'))
+assert digest((ROOT / RECON).read_bytes()) == '008c7d099c6ee963ac6e800639dc34961b76f73f172e832a763f3b658d2661ff'
+assert proof['status'] == 'PASS_READY_FOR_P4T6_CHECKOFF'
+original = Path(__file__).parent / 'p4t6-plan-before-checkoff.2026-10-19T09-34.md'
+before = original.read_bytes()
+after = (ROOT / PLAN).read_bytes()
+old = b'- [ ] [P4-T6] Map declared UI callbacks and inferred test references.'
+new = old.replace(b'[ ]', b'[x]', 1)
+assert before.count(old) == 1 and after == before.replace(old, new, 1)
+assert digest(before) == proof['plan_before']['sha256']
+tasks = re.findall(rb'^- \[([ x])\] \[P\d+-T\d+\]', after, re.MULTILINE)
+assert len(tasks) == 84 and tasks.count(b'x') == 38
+
+# The original requirement files remain authoritative and unchanged.
+for name, expected in proof['source_ac'].items():
+    assert digest((ROOT / FEATURE / name).read_bytes()) == expected['sha256']
+    assert expected['checked'] == 13 and expected['total'] == 66
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip() == proof['checked_candidate_commit']
+
+harness = publish('p4t6-executor-acceptance-harness', 'txt', Path(__file__).read_text(encoding='utf-8'))
+result = {
+    'task': 'P4-T6', 'task_status': 'PASS', 'findings': [], 'open_checks': [],
+    'command': 'poetry run python SCRATCH/issue-980-p4t6-accept.py', 'exit_code': 0,
+    'reconciliation': binding(RECON), 'retained_review': proof['retained_review'],
+    'worker_handoff': proof['handoff'], 'candidate_commit': proof['checked_candidate_commit'],
+    'routing_delegation_id': proof['routing_receipt']['delegation_id'],
+    'native_authority': 'Reverified in the bound reconciliation; exact C4 profile unchanged.',
+    'plan': dict(binding(PLAN), before_sha256=digest(before), checked=38, total=84,
+                 change='P4-T6 checkbox only; exact original bytes otherwise preserved.',
+                 preserved_original='SCRATCH/' + original.name),
+    'acceptance_criteria': {'checked': 13, 'total': 66, 'newly_satisfied': [],
+                            'sources': proof['source_ac'], 'reason': proof['ac_mapping']},
+    'verification': {'ordered_stages': 7, 'unit_cases': 245, 'contract_cases': 209,
+                     'native_assertions': 13, 'statement_coverage': [382, 386],
+                     'branch_coverage': [150, 154], 'ranges_at_least_90_percent': 26,
+                     'exact_working_index_commit_streams': 7, 'preserved_predecessor_streams': 55,
+                     'behavioral_reruns_by_verifier': 0},
+    'native_publication': 'Expected refusal of unregistered adapters; successful publication remains P4-T9.',
+    'task_acceptance': 'Declared UI/project facts remain distinct from inferred nullable code-behind and test relevance; no runtime execution or behavioral coverage claim.',
+    'limitations': proof['limitations'][:-1],
+    'historical_qualifications': 'Retain original subset diagnostics, candidate-review checker/path qualifications, parser-anchor limits and full space-bearing node reconstruction. Reconciliation documents corrected read-only metadata field assumptions; no source or behavioral proof changed.',
+    'language_gates': {'Python': 'PASS: scoped Black/Ruff, whole-repository Pyright, architecture, isolated reversed tests, affected contracts, Windows/Git composition.',
+                       'TypeScript_PowerShell_CSharp': 'No code changes in this task; no additional language gate claimed.'},
+    'next_tasks': ['P4-T7', 'P4-T8', 'P4-T9', 'P5-T1', 'P5-T2'],
+    'executed_publication_harness': binding(harness),
+}
+accepted = publish('p4t6-executor-final-acceptance', 'json', result)
+markdown = f'''# P4-T6 final acceptance
+
+Timestamp: {{TIMESTAMP}}
+Published UTC: {{WRITE_TIME}}
+Command: `poetry run python SCRATCH/issue-980-p4t6-accept.py`
+EXIT_CODE: 0
+
+## Output Summary:
+
+TASK_STATUS: PASS. TASK: P4-T6. No blocking finding or open verification remains.
+
+The retained candidate review and [final receipt reconciliation]({RECON.name}) establish the task contract. All seven ordered stages passed: 245 isolated reversed unit cases, 209 affected contracts and 13 Windows/Git assertions. Coverage is 382/386 statements and 150/154 branches; all 26 measured class/callable ranges meet 90%. Seven working/index/committed source streams and 55 predecessor streams remain bound. No behavior was rerun for acceptance.
+
+Only the P4-T6 plan checkbox changed. The raw comparison preserves every other byte, including 559 CRLF line endings. Plan status is **38/84**; source acceptance criteria remain **13/66**, with no new AC checkoff. The [acceptance record]({accepted.name}) binds exact hashes and the preserved original plan.
+
+Declared facts remain separate from inferred nullable relevance. Native composition verified expected refusal of unregistered adapters; successful publication remains P4-T9. Parser anchor limitations, finite syntax, uncovered defensive guards and historical diagnostics remain explicit. This proof does not establish UI/test execution, behavioral coverage, installed agent hosts or non-Windows operation.
+
+Current phase: Phase 4. Next tasks: P4-T7, P4-T8, P4-T9, P5-T1 and P5-T2. The coordinator owns staging, commit/push and successor release.
+'''
+accepted_md = publish('p4t6-executor-final-acceptance', 'md', markdown)
+
+# Enumerate only this verifier's unstaged evidence, plus the authorized plan change.
+paths = subprocess.check_output(
+    ['git', 'ls-files', '--others', '--exclude-standard', '--',
+     (QA / 'p4t6-executor-*').as_posix()], cwd=ROOT, text=True).splitlines()
+owned = sorted({Path(path) for path in paths} | {PLAN}, key=lambda path: path.as_posix())
+manifest = publish('p4t6-executor-staging-manifest', 'json', {
+    'task': 'P4-T6', 'scope': 'Verifier-owned untracked evidence and the single plan checkoff; worker evidence remains indexed by its handoff.',
+    'staging_performed': False, 'files': [binding(path) for path in owned],
+    'manifest_self_excluded': True,
+    'normalization': 'Evidence is UTF-8 LF. The plan working bytes retain CRLF; expected_lf_blob_sha256 qualifies Git text=auto/eol=lf publication and is not raw identity.',
+})
+print(json.dumps({'status': 'PASS', 'plan': binding(PLAN), 'acceptance_json': binding(accepted),
+                  'acceptance_md': binding(accepted_md), 'staging_manifest': binding(manifest),
+                  'owned_staging_file_count_excluding_manifest': len(owned),
+                  'tasks': '38/84', 'acceptance_criteria': '13/66'}, indent=2))

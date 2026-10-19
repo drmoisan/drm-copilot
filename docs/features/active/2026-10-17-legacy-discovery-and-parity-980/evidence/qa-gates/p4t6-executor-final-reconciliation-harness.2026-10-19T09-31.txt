@@ -1,0 +1,163 @@
+"""Reconcile only final P4-T6 receipts against the retained candidate review."""
+from __future__ import annotations
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+SCRATCH = Path(os.environ["LOCALAPPDATA"]) / "Temp/codex-legacy-discovery/issue-980"
+AUTH = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json"
+PROFILE = "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+HANDOFF = {"path": (QA / "p4t6-final-handoff.2026-10-19T09-23.json").as_posix(), "sha256": "04d81716b7a914ce69d411a4695c9e83e13b83d191bc69dff09aa89558a2c76c"}
+checked = {}
+
+
+def sha(data: bytes) -> str:
+    """Return exact byte SHA-256 without normalization or I/O."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def bound(reference: dict) -> bytes:
+    """Read a frozen proof and retain its exact published hash binding."""
+    data = Path(reference["path"]).read_bytes()
+    assert sha(data) == reference["sha256"], reference["path"]
+    checked[reference["path"]] = reference["sha256"]
+    return data
+
+
+def raw(reference: dict) -> bytes:
+    """Verify one retained raw stream under the worker's established scratch root."""
+    name = reference["path"].replace("\\", "/")
+    assert name.startswith("SCRATCH/")
+    data = (SCRATCH / name.removeprefix("SCRATCH/")).read_bytes()
+    assert sha(data) == reference["sha256"], name
+    return data
+
+
+started = datetime.now(timezone.utc)
+state = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+receipt = next(r for r in state["codex_model_routing_receipts"] if r.get("delegation_id") == "atomic_execution_p4t6_final_acceptance")
+authority = json.loads(AUTH.read_bytes())
+assert receipt["model"] == authority["actual_model"] == "gpt-6-astra"
+assert receipt["model_reasoning_effort"] == authority["actual_reasoning_effort"] == "max"
+assert receipt["profile_sha256"] == authority["profile_sha256"] == PROFILE
+assert sha(Path(receipt["profile_path"]).read_bytes()) == PROFILE
+assert all(authority[k] is True for k in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+handoff = json.loads(bound(HANDOFF))
+bound({"path": str(Path(HANDOFF["path"]).with_suffix(".md")), "sha256": "35ce30c641818164d9b41fd7b1c6a6b090750af5b07848faed4925d14a124f67"})
+review = json.loads(bound(handoff["retained_review"]))
+assert not review["findings"] and not review["open_behavioral_probes"]
+review_binding = json.loads(bound(review["binding"]))
+expected = {r["path"]: r["working_sha256"] for r in review_binding["source_bindings"]}
+head = handoff["checked_candidate_commit"]
+assert head == "75e732b91a45ebace5cf1fce37b7988eec1907d5"
+assert subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip() == head
+# Source/test identity is rechecked without repeating their accepted implementation review.
+for item in handoff["source_files"]:
+    data = bound(item)
+    assert sha(data) == expected[item["path"]] == item["index_sha256"] == item["commit_sha256"]
+    assert data == subprocess.check_output(["git", "show", ":" + item["path"]])
+    assert data == subprocess.check_output(["git", "show", head + ":" + item["path"]])
+    assert b"\r" not in data
+assert len(expected) == len(handoff["source_files"]) == 7
+candidate = json.loads(bound(handoff["candidate"]))
+assert {r["path"]: r["sha256"] for r in candidate["files"]} == expected
+ordered = json.loads(bound(handoff["ordered_stages"]))
+assert ordered["source_hashes"] == expected
+snapshots = json.loads(bound(handoff["executed_harnesses"]))
+harness_bindings = {}
+# Base64 is the raw executed identity; readable companions carry explicit normalization.
+for item in snapshots["snapshots"]:
+    decoded = base64.b64decode(item["executed_content_base64"], validate=True)
+    assert sha(decoded) == item["executed_sha256"]
+    assert raw({"path": item["executed_path"], "sha256": item["executed_sha256"]}) == decoded
+    companion = bound(item["readable_lf_companion"])
+    assert companion == decoded.replace(b"\r\n", b"\n")
+    harness_bindings[item["executed_path"]] = {"sha256": sha(decoded), "crlf_count": decoded.count(b"\r\n"), "companion_sha256": sha(companion)}
+assert len(harness_bindings) == 4
+for path, digest in ordered["harness_hashes"].items():
+    assert harness_bindings[path]["sha256"] == digest
+labels = ["format", "lint", "types", "architecture", "tests-ui-reverse", "tests-references-reverse", "contracts", "native"]
+assert [r["label"] for r in handoff["ordered_receipts"]] == labels
+assert [r["stage"] for r in handoff["ordered_receipts"]] == [1, 2, 3, 4, 5, 5, 6, 7]
+nodes = []
+stage_data = []
+previous = None
+# Reconcile eight commands in seven ordered stages, including two isolated unit processes.
+for ref in handoff["ordered_receipts"]:
+    data = json.loads(bound(ref))
+    bound(ref["markdown"])
+    assert data["exit_code"] == ref["exit_code"] == 0
+    assert data["source_before"] == data["source_after"] == expected
+    assert data["harness_hashes"] == ordered["harness_hashes"]
+    begin, end = datetime.fromisoformat(data["started_at"]), datetime.fromisoformat(data["finished_at"])
+    assert end >= begin and (previous is None or begin >= previous)
+    previous = end
+    stdout, stderr = raw(data["raw_stdout"]), raw(data["raw_stderr"])
+    # Full verbose node IDs include whitespace-bearing parametrizations.
+    found = re.findall(r"^(tests/.*) PASSED \[\s*\d+%\]\r?$", stdout.decode("utf-8"), re.M)
+    if data["label"].startswith("tests-"):
+        assert len(found) == (107 if data["label"] == "tests-ui-reverse" else 138)
+        nodes.extend(found)
+    if data["label"] == "contracts":
+        assert re.search(r"209 passed", stdout.decode("utf-8"))
+    stage_data.append({"stage": data["stage"], "label": data["label"], "exit_code": 0, "seconds": data["seconds"], "raw_stdout": data["raw_stdout"], "raw_stderr": data["raw_stderr"]})
+assert nodes == ordered["test_nodes"] and len(nodes) == len(set(nodes)) == ordered["test_node_count"] == 245
+assert ordered["test_module_order"] == ["tests/discovery_runtime/analyzer/test_ui_callback_limits.py", "tests/discovery_runtime/analyzer/test_ui_callbacks.py", "tests/discovery_runtime/analyzer/test_test_reference_syntax.py", "tests/discovery_runtime/analyzer/test_test_references.py"]
+coverage = json.loads(bound(handoff["coverage_ranges"]))
+files = {}
+for batch in coverage["coverage_batches"]:
+    report = json.loads(bound(batch))
+    original = json.loads(raw(batch["raw"]))
+    assert report["totals"] == original["totals"] == batch["totals"]
+    for path, value in report["files"].items():
+        files[path.replace("\\", "/")] = value
+assert {p: v["summary"] for p, v in files.items()} == coverage["module_summaries"]
+totals = [sum(v["summary"][k] for v in files.values()) for k in ("covered_lines", "num_statements", "covered_branches", "num_branches")]
+assert totals == [382, 386, 150, 154]
+assert len(coverage["unit_ranges"]) == 26
+for unit in coverage["unit_ranges"]:
+    family = "classes" if unit["kind"] == "ClassDef" else "functions"
+    summary = files[unit["path"]][family][unit["name"]]["summary"]
+    assert summary == unit["summary"] and summary["percent_statements_covered"] >= 90
+missing = {Path(p).name: value["missing_lines"] for p, value in files.items()}
+assert missing == {"ui_callbacks.py": [], "test_reference_syntax.py": [55], "test_references.py": [257, 358, 392]}
+native = json.loads(bound(handoff["native_result"]))
+assert json.loads(raw(ordered["raw_native"])) == native
+assert len(native["checks"]) == 13 and native["platform"] == "win32"
+assert native["source_tree_unchanged"] and native["git_status_unchanged"]
+assert native["publication"] == "refused-unregistered-adapters"
+native_receipt = json.loads(Path(handoff["ordered_receipts"][-1]["path"]).read_bytes())
+assert re.findall(r"^PASS (.+?)\r?$", native_receipt["stdout"], re.M) == native["checks"]
+baseline = json.loads(bound(handoff["shared_baseline"]))
+assert len(baseline["preserved_files"]) == handoff["preserved_predecessors"] == 55
+for item in baseline["preserved_files"]:
+    assert sha(Path(item["path"]).read_bytes()) == item["sha256"], item["path"]
+plan = FEATURE / "plan.2026-10-17T22-38.md"
+plan_bytes = plan.read_bytes()
+assert b"- [ ] [P4-T6] Map declared UI callbacks and inferred test references." in plan_bytes
+assert len(re.findall(rb"^- \[x\] \[P\d+-T\d+\]", plan_bytes, re.M)) == 37
+source_ac = {}
+for name in ("spec.md", "user-story.md"):
+    path = FEATURE / name
+    content = path.read_bytes()
+    section = content.decode().split("## Acceptance Criteria", 1)[1].split("\n## ", 1)[0]
+    boxes = re.findall(r"^- \[([ x])\] ", section, re.M)
+    assert len(boxes) == 66 and boxes.count("x") == 13
+    source_ac[name] = {"sha256": sha(content), "checked": 13, "total": 66, "newly_satisfied": []}
+finished = datetime.now(timezone.utc)
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+harness = QA / f"p4t6-executor-final-reconciliation-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+output = QA / f"p4t6-executor-final-reconciliation.{stamp}.json"
+result = {"timestamp": stamp, "started_utc": started.isoformat(), "finished_utc": finished.isoformat(), "command": "poetry run python SCRATCH/issue-980-p4t6-final-reconcile.py", "exit_code": 0, "status": "PASS_READY_FOR_P4T6_CHECKOFF", "routing_receipt": receipt, "native_attestation_sha256": sha(AUTH.read_bytes()), "handoff": HANDOFF, "retained_review": handoff["retained_review"], "source_files": handoff["source_files"], "checked_candidate_commit": head, "stages": stage_data, "node_count": 245, "coverage_totals": totals, "covered_unit_ranges": 26, "uncovered_guards": missing, "native_assertions": 13, "native_publication": native["publication"], "preserved_predecessor_count": 55, "executed_harness_bindings": harness_bindings, "checked_artifacts": [{"path": p, "sha256": d} for p, d in sorted(checked.items())], "plan_before": {"path": plan.as_posix(), "sha256": sha(plan_bytes), "checked": 37, "total": 84}, "source_ac": source_ac, "ac_mapping": "Analyzer-wide AC-33 through AC-36 and final quality criteria remain incomplete pending later analyzer/registry and feature-wide gates. This task adds no fully delivered source AC.", "limitations": handoff["limitations"], "metadata_inspection_qualification": "Initial read-only metadata queries used earlier field names source_files/modules/units/harnesses and received null-index diagnostics. The current final record uses files/module_summaries/unit_ranges/snapshots. No evidence or behavior changed and no test rerun occurred.", "behavioral_reruns": 0, "harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())}}
+output.write_bytes((json.dumps(result, indent=2, ensure_ascii=True) + "\n").encode())
+print(json.dumps({"path": output.as_posix(), "sha256": sha(output.read_bytes()), "status": result["status"], "totals": totals}))

@@ -1,0 +1,103 @@
+{
+  "task": "P4-T6",
+  "task_status": "PASS",
+  "findings": [],
+  "open_checks": [],
+  "command": "poetry run python SCRATCH/issue-980-p4t6-accept.py",
+  "exit_code": 0,
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-final-reconciliation.2026-10-19T09-31.json",
+    "working_sha256": "008c7d099c6ee963ac6e800639dc34961b76f73f172e832a763f3b658d2661ff",
+    "expected_lf_blob_sha256": "008c7d099c6ee963ac6e800639dc34961b76f73f172e832a763f3b658d2661ff",
+    "crlf_count": 0
+  },
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-candidate-review.2026-10-19T09-18.json",
+    "sha256": "38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e"
+  },
+  "worker_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-handoff.2026-10-19T09-23.json",
+    "sha256": "04d81716b7a914ce69d411a4695c9e83e13b83d191bc69dff09aa89558a2c76c"
+  },
+  "candidate_commit": "75e732b91a45ebace5cf1fce37b7988eec1907d5",
+  "routing_delegation_id": "atomic_execution_p4t6_final_acceptance",
+  "native_authority": "Reverified in the bound reconciliation; exact C4 profile unchanged.",
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "working_sha256": "2578a9e5b7ceb61df8fd6b43ad624d744d1536b4760f3f5448d50f951dae1750",
+    "expected_lf_blob_sha256": "7a5ce5270c9a9b8be70f4178cee22089c10dead84382420729c2913f45522a62",
+    "crlf_count": 559,
+    "before_sha256": "5db7cb1316cb4bb544295917a70bb2e5adb6cff18b8fd74405c542f2265e0e44",
+    "checked": 38,
+    "total": 84,
+    "change": "P4-T6 checkbox only; exact original bytes otherwise preserved.",
+    "preserved_original": "SCRATCH/p4t6-plan-before-checkoff.2026-10-19T09-34.md"
+  },
+  "acceptance_criteria": {
+    "checked": 13,
+    "total": 66,
+    "newly_satisfied": [],
+    "sources": {
+      "spec.md": {
+        "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+        "checked": 13,
+        "total": 66,
+        "newly_satisfied": []
+      },
+      "user-story.md": {
+        "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+        "checked": 13,
+        "total": 66,
+        "newly_satisfied": []
+      }
+    },
+    "reason": "Analyzer-wide AC-33 through AC-36 and final quality criteria remain incomplete pending later analyzer/registry and feature-wide gates. This task adds no fully delivered source AC."
+  },
+  "verification": {
+    "ordered_stages": 7,
+    "unit_cases": 245,
+    "contract_cases": 209,
+    "native_assertions": 13,
+    "statement_coverage": [
+      382,
+      386
+    ],
+    "branch_coverage": [
+      150,
+      154
+    ],
+    "ranges_at_least_90_percent": 26,
+    "exact_working_index_commit_streams": 7,
+    "preserved_predecessor_streams": 55,
+    "behavioral_reruns_by_verifier": 0
+  },
+  "native_publication": "Expected refusal of unregistered adapters; successful publication remains P4-T9.",
+  "task_acceptance": "Declared UI/project facts remain distinct from inferred nullable code-behind and test relevance; no runtime execution or behavioral coverage claim.",
+  "limitations": [
+    "Only a finite WPF declaration dialect and bounded lexical test contexts are supported.",
+    "Code-behind, handler and test relevance remain inferred with null targets; binding, execution and behavioral coverage are unresolved.",
+    "XML anchors preserve accepted parser precision, including multiline/bare-CR limitations.",
+    "Dispatch and successful publication of these adapters remain P4-T9. The native proof verifies expected current closed-registry refusal.",
+    "Native Windows Python/Git only; no installed coding-agent host, non-Windows, UI or test execution proof."
+  ],
+  "historical_qualifications": "Retain original subset diagnostics, candidate-review checker/path qualifications, parser-anchor limits and full space-bearing node reconstruction. Reconciliation documents corrected read-only metadata field assumptions; no source or behavioral proof changed.",
+  "language_gates": {
+    "Python": "PASS: scoped Black/Ruff, whole-repository Pyright, architecture, isolated reversed tests, affected contracts, Windows/Git composition.",
+    "TypeScript_PowerShell_CSharp": "No code changes in this task; no additional language gate claimed."
+  },
+  "next_tasks": [
+    "P4-T7",
+    "P4-T8",
+    "P4-T9",
+    "P5-T1",
+    "P5-T2"
+  ],
+  "executed_publication_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-executor-acceptance-harness.2026-10-19T09-35.txt",
+    "working_sha256": "ae131d8bff9276ed59ea136ad4151971acfc52fa5d8f4f6bc2ded8cc5a2fd8a9",
+    "expected_lf_blob_sha256": "ae131d8bff9276ed59ea136ad4151971acfc52fa5d8f4f6bc2ded8cc5a2fd8a9",
+    "crlf_count": 0
+  },
+  "timestamp": "2026-10-19T09-35",
+  "published_utc": "2026-10-19T09:35:49.634991+00:00"
+}

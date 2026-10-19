@@ -1,0 +1,43 @@
+{
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callbacks.py tests/discovery_runtime/analyzer/test_ui_callback_limits.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T09:20:21.587264+00:00",
+  "harness_hashes": {
+    "SCRATCH/issue-980-p4t6-final-architecture.py": "de680fc2311fe73eca09b5d728d16290acd585ca1824c4d9cc2cf31bfe45c681",
+    "SCRATCH/issue-980-p4t6-final-gates.py": "b1c21d12cea503271205acc82e50273cb46cb69e728bc3771ca8ac2488e3dc6e",
+    "SCRATCH/issue-980-p4t6-final-native.py": "523889f46a863abb75127da79d23d1c6437cf3cbe2a8bc2f8c48b6cfd4f11ed7"
+  },
+  "label": "lint",
+  "raw_stderr": {
+    "path": "SCRATCH/issue-980-p4t6-final-lint-092021.2026-10-19T09-20.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/issue-980-p4t6-final-lint-092021.2026-10-19T09-20.stdout.txt",
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "seconds": 0.100954,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/ui_callbacks.py": "631814beddcb0169f48f0534b9619e2d5fc904b7626bfc37671a6d21d9a75955",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+    "tests/discovery_runtime/analyzer/test_ui_callback_limits.py": "165ce4fcdfb3beb78890f8ae53d87ab05a0e71686eea543b8f654f3aacdf36ea",
+    "tests/discovery_runtime/analyzer/test_ui_callbacks.py": "1fdddea22b2f20c0e6ccfac0bff8f84f22c30dbd27fce3e46456697edb436090"
+  },
+  "stage": 2,
+  "started_at": "2026-10-19T09:20:21.486310+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "timestamp": "2026-10-19T09-20"
+}

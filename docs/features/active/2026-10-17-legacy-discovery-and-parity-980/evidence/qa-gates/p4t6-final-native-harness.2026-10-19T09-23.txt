@@ -1,0 +1,176 @@
+"""Compose reviewed UI/test adapters from native Windows capture without execution."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+from uuid import uuid4
+
+import yaml
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_inputs, capture_snapshot, pin_inventory_sources
+from drm_copilot_discovery.analyzer.inventory import RepositoryAnalyzer
+from drm_copilot_discovery.analyzer.pipeline import plan_inventory
+from drm_copilot_discovery.analyzer.test_references import TestReferenceAnalyzer
+from drm_copilot_discovery.analyzer.ui_callbacks import UiCallbackAnalyzer
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.models import canonical_json
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import capture_workspace
+from drm_copilot_discovery.path_models import WriteGrant
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch = Path(__file__).resolve().parent
+root = scratch / ('issue-980-p4t6-native-' + uuid4().hex)
+root.mkdir()
+assert root.resolve().parent == scratch
+started = time.monotonic()
+checks, operation_seconds = [], {}
+
+
+def check(name, condition):
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+    print('PASS ' + name, flush=True)
+
+
+def put(path, content):
+    destination = root / path
+    assert root in destination.resolve().parents
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(content)
+
+
+def tree():
+    return {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(root.rglob('*'))
+            if path.is_file() and '.git' not in path.relative_to(root).parts}
+
+
+def git(*arguments):
+    return subprocess.run(['git', '-C', str(root), *arguments], capture_output=True, check=True).stdout
+
+
+def run_git(argv, *, output_limit):
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        content = process.stdout.read(output_limit + 1)
+        if len(content) > output_limit:
+            process.kill()
+            raise OSError('Native Git output exceeded its bounded read')
+        if process.wait() != 0:
+            raise OSError('Native Git read failed')
+        return content
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+put('src/Widget.cs', 'class Widget {}\r\n// Unicode État\r\n'.encode('utf-8'))
+put('src/View.xaml', b'<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="Fixture.View">\r\n<Button Click="OnClick"/><TextBox Text="VALUE_SENTINEL_UI"/></Window>')
+put('src/View.xaml.cs', b'namespace Fixture; partial class View { void OnClick(object sender) {} }\r\n')
+put('src/app.csproj', b'<Project/>')
+put('tests/WidgetTests.cs', b'new Widget();\r\n// VALUE_SENTINEL_COMMENT\r\n')
+put('tests/Tests.csproj', b'<Project><ItemGroup><ProjectReference Include="../src/app.csproj"/></ItemGroup></Project>')
+put('.gitattributes', b'src/** -text\ntests/** -text\n')
+git('init', '--quiet')
+git('config', 'core.autocrlf', 'false')
+git('add', 'src', 'tests', '.gitattributes')
+git('-c', 'user.name=Discovery fixture', '-c', 'user.email=discovery@example.invalid',
+    '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Synthetic UI and test reference inventory')
+revision = git('rev-parse', 'HEAD').decode('ascii').strip()
+catalog = load_catalog()
+value = yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text(encoding='utf-8'))
+value.pop('extension_schemas')
+value['system']['role'] = 'legacy-source'
+value['repository']['revision'] = revision
+value['repositories'] = []
+value['clients'] = []
+value['production_roots'] = ['src']
+value['test_roots'] = ['tests']
+value['documentation_roots'] = []
+value['project_entry_points'] = []
+value['excluded_paths'] = []
+identifiers = ('repository', 'ui-callbacks', 'test-references')
+value['analyzers'] = {'enabled': list(identifiers), 'options': {'max_file_bytes': 16384},
+                      'ignored_paths': [], 'extension_result_manifests': []}
+profile = ProfileV2(json.dumps(value), format='json', catalog=catalog)
+put(profile.artifacts['profile'], canonical_json(profile.document))
+repository = LocalGitReader(workspace_root=str(root), repository_id=profile.repository.id, run=run_git)
+primitives = LocalMutationPrimitives(workspace_root=str(root), lock_path=str(scratch / ('issue-980-p4t6-' + uuid4().hex + '.lock')))
+before, status = tree(), git('status', '--porcelain=v1', '-z')
+timer = time.monotonic()
+selection = capture_inputs(profile, workspace_root=str(root), metadata=primitives.metadata, read_bytes=primitives.read_bytes)
+operation_seconds['capture_inputs'] = time.monotonic() - timer
+check('native capture retains the six configured source and test inputs', len(selection.inputs) == 6 and all(item.file is not None for item in selection.inputs))
+timer = time.monotonic()
+baseline = pin_inventory_sources(capture_workspace(workspace_root=str(root), profile_path=profile.artifacts['profile'],
+    metadata=primitives.metadata, read_bytes=primitives.read_bytes, repository=repository, catalog=catalog), repository)
+operation_seconds['complete_capture_and_git_precapture'] = time.monotonic() - timer
+inputs = capture_snapshot(baseline.snapshot)
+check('real Git pins match exact retained CRLF and Unicode bytes', repository.identity().revision == revision and
+      all(item.file is not None and any(pin.path == item.path and pin.content == item.file.content for pin in inputs.repository_files)
+          for item in inputs.inputs if item.status == 'inspected'))
+timer = time.monotonic()
+ui = UiCallbackAnalyzer().analyze(inputs)
+operation_seconds['ui_analyze'] = time.monotonic() - timer
+timer = time.monotonic()
+references = TestReferenceAnalyzer().analyze(inputs)
+operation_seconds['test_reference_analyze'] = time.monotonic() - timer
+check('literal WPF class and callback declarations remain detected facts', len(ui.findings) == 2 and
+      {item['kind'] for item in ui.findings} == {'ui_class', 'ui_callback'} and
+      all(item['classification'] == 'detected' and item['confidence'] == 'high' for item in ui.findings))
+check('UI code relevance remains inferred with null targets', len(ui.relationships) == 2 and
+      all(item['classification'] == 'inferred' and item['to_component_id'] is None for item in ui.relationships))
+mentions = [item for item in references.findings if item['kind'] == 'test-type-mention']
+check('one test type mention is inferred without claiming binding', len(mentions) == 1 and mentions[0]['classification'] == 'inferred')
+projects = [item for item in references.findings if item['kind'] == 'test-project-reference-declaration']
+check('literal project reference syntax stays distinct from inferred relevance', len(projects) == 1 and projects[0]['classification'] == 'detected' and
+      references.relationships and all(item['classification'] == 'inferred' and item['to_component_id'] is None for item in references.relationships))
+analyses = (ui, references)
+check('pinned direct analysis has no blocking diagnostics', not any(item['blocking'] for analysis in analyses for item in analysis.diagnostics))
+encoded = canonical_json(row(results=tuple(row(components=item.components, findings=item.findings,
+    relationships=item.relationships, diagnostics=item.diagnostics) for item in analyses)))
+check('noncallback values and masked comments are omitted', b'VALUE_SENTINEL' not in encoded)
+check('source anchors retain exact captured hashes and immutable revisions', all(
+    item['source']['sha256'] == before[item['source']['path']] and item['source']['revision'] == revision
+    for analysis in analyses for item in analysis.components + analysis.findings + analysis.relationships))
+structural = RepositoryAnalyzer().analyze(inputs)
+timer = time.monotonic()
+result = inventory_result(inputs, (structural, *analyses), analyzer_ids=identifiers, timestamp='2026-10-19T00:00:00Z',
+    author_or_agent=row(kind='tool', id='native-proof'), catalog=catalog)
+repeated = inventory_result(inputs, (*reversed(analyses), structural), analyzer_ids=tuple(reversed(identifiers)),
+    timestamp='2026-10-20T00:00:00Z', author_or_agent=row(kind='human', id='second-observer'), catalog=catalog)
+operation_seconds['two_inventory_projections'] = time.monotonic() - timer
+check('composed schema-valid identity is independent of adapter order and clock', result.semantic_sha256 == repeated.semantic_sha256 and result.document['id'] == repeated.document['id'])
+check('ledger proposals remain uninspected and unassigned', all(item['inspection_status'] == 'uninspected' and item['disposition'] == 'unassigned' for item in result.ledger_components))
+identifier = result.document['id']
+grant = WriteGrant(artifact_kind='inventory-snapshot', artifact_id=identifier, path=profile.artifacts['inventory'] + '/' + identifier + '.json')
+refusal = None
+timer = time.monotonic()
+try:
+    plan_inventory(baseline, result, grants=(grant,))
+except ValueError as error:
+    refusal = str(error)
+operation_seconds['expected_publication_planning_refusal'] = time.monotonic() - timer
+check('closed registry refuses unavailable adapters before publication planning', refusal ==
+      'Unavailable analyzer selection; configure supported adapters: test-references, ui-callbacks')
+check('analysis and refused publication preserve all source and Git state', before == tree() and status == git('status', '--porcelain=v1', '-z') and not (root / grant.path).exists())
+output = Path(sys.argv[1])
+record = {'task': 'P4-T6', 'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'platform': sys.platform,
+          'checks': checks, 'whole_composition_seconds': time.monotonic() - started, 'operation_seconds': operation_seconds,
+          'scratch_repository': 'SCRATCH/' + root.name, 'revision': revision, 'profile': value, 'inputs': before,
+          'inventory_id': result.document['id'], 'semantic_sha256': result.semantic_sha256,
+          'component_count': len(result.document['components']), 'finding_count': len(result.document['findings']),
+          'relationship_count': len(result.document['relationships']), 'source_tree_unchanged': before == tree(),
+          'git_status_unchanged': status == git('status', '--porcelain=v1', '-z'), 'publication': 'refused-unregistered-adapters',
+          'limitations': 'Windows Python/Git operational composition only; no UI or test execution, installed host proof, non-Windows run, or registry publication success. Adapter dispatch/publication remains P4-T9.'}
+output.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+print(output.as_posix(), flush=True)

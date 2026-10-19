@@ -1,0 +1,151 @@
+{
+  "checks": [
+    "native capture retains the six configured source and test inputs",
+    "real Git pins match exact retained CRLF and Unicode bytes",
+    "literal WPF class and callback declarations remain detected facts",
+    "UI code relevance remains inferred with null targets",
+    "one test type mention is inferred without claiming binding",
+    "literal project reference syntax stays distinct from inferred relevance",
+    "pinned direct analysis has no blocking diagnostics",
+    "noncallback values and masked comments are omitted",
+    "source anchors retain exact captured hashes and immutable revisions",
+    "composed schema-valid identity is independent of adapter order and clock",
+    "ledger proposals remain uninspected and unassigned",
+    "closed registry refuses unavailable adapters before publication planning",
+    "analysis and refused publication preserve all source and Git state"
+  ],
+  "component_count": 11,
+  "finding_count": 6,
+  "git_status_unchanged": true,
+  "inputs": {
+    ".gitattributes": "b5e9a2a90fec4bf66b1d32db55d85861560c0de7389aeae9032279a2ceb55fc3",
+    "docs/migration/discovery/domain-profile.yaml": "1c784bfabb67702a6f26fb925f96802907f057f6738af44e5a81641d01f1fd6f",
+    "src/View.xaml": "a0a58aa9f1960270b208d730bebfea9c19ae6c8963d921f2f2425fbc5a2486dc",
+    "src/View.xaml.cs": "d3377d81f070bdf809adc1e3a605cc06e1b89e8ee5cba043a8f169e686265e90",
+    "src/Widget.cs": "a7d6e8cf32db45b0704fd65b4b9f325f298bc9465f65e17810901ea7c3360094",
+    "src/app.csproj": "4fd24be83f7dd636f6e2e8f456dfa559f1ca9c7346e1d10a5358db346b1300b9",
+    "tests/Tests.csproj": "d78f498e1429651ed93335a999e0a34044b5f72c6ae9e0c54686f3c6671a8a19",
+    "tests/WidgetTests.cs": "3fce0c00d55437f9f175c8bd89560c39f9fbe997872f4bb7e11f0dc3e1474105"
+  },
+  "inventory_id": "inventory-c714788e11cc8ba89ef81f1045ba0e0ef62bc40dd23c5da7082ad2c0e81c5e5d",
+  "limitations": "Windows Python/Git operational composition only; no UI or test execution, installed host proof, non-Windows run, or registry publication success. Adapter dispatch/publication remains P4-T9.",
+  "operation_seconds": {
+    "capture_inputs": 0.08405520001542754,
+    "complete_capture_and_git_precapture": 1.5576137999887578,
+    "expected_publication_planning_refusal": 0.0015418000111822039,
+    "test_reference_analyze": 0.0006178000185173005,
+    "two_inventory_projections": 0.6665721999888774,
+    "ui_analyze": 0.007494999998016283
+  },
+  "platform": "win32",
+  "profile": {
+    "$schema": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+    "analyzers": {
+      "enabled": [
+        "repository",
+        "ui-callbacks",
+        "test-references"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [],
+      "options": {
+        "max_file_bytes": 16384
+      }
+    },
+    "artifact_kind": "domain-profile",
+    "artifacts": {
+      "acceptance": "docs/migration/discovery/acceptance",
+      "characterization": "docs/migration/discovery/characterization",
+      "coverage_ledger": "docs/migration/discovery/coverage-ledger.json",
+      "evidence": "docs/migration/discovery/evidence",
+      "feature_contracts": "docs/migration/discovery/feature-contracts",
+      "implementation_records": "docs/migration/discovery/implementation-records",
+      "inventory": "docs/migration/discovery/inventory",
+      "parity_matrix": "docs/migration/discovery/parity-matrix.json",
+      "product_decisions": "docs/migration/discovery/product-decisions.yaml",
+      "profile": "docs/migration/discovery/domain-profile.yaml",
+      "reports": "docs/migration/discovery/reports",
+      "root": "docs/migration/discovery",
+      "scope": "docs/migration/discovery/scope.yaml",
+      "source_snapshots": "docs/migration/discovery/source-snapshots",
+      "unspecified_behaviors": "docs/migration/discovery/unspecified-behaviors.yaml"
+    },
+    "clients": [],
+    "completion_gates": {
+      "block_on_unresolved_required_behavior": true,
+      "planning_prerequisite": "discovery-complete",
+      "require_acceptance_scenarios": true,
+      "require_all_dispositions": true,
+      "require_approved_deviations": true,
+      "require_confirmed_scope": true,
+      "require_current_inventory": true,
+      "require_feature_evidence": true,
+      "require_runtime_for_declared_features": true
+    },
+    "decision_owners": [
+      {
+        "id": "owner-example",
+        "required_evidence_types": [
+          "decision"
+        ]
+      }
+    ],
+    "documentation_roots": [],
+    "evidence_roots": [
+      "docs/migration/discovery/evidence"
+    ],
+    "excluded_paths": [],
+    "extensions": {
+      "example.discovery": {
+        "catalog_label": "Synthetic fixture",
+        "revision_notes": []
+      }
+    },
+    "id": "profile-example",
+    "production_roots": [
+      "src"
+    ],
+    "profile_state": "configured",
+    "profile_version": 2,
+    "project_entry_points": [],
+    "repositories": [],
+    "repository": {
+      "id": "workspace-example",
+      "revision": "c8f48f6a55392efe18be35c0350f1d7db55dde31",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "required_feature_dimensions": [
+      "trigger",
+      "observable_outputs"
+    ],
+    "required_modes": [
+      "online"
+    ],
+    "required_platforms": [
+      "browser"
+    ],
+    "runtime": {
+      "capability": "manual",
+      "required_feature_ids": []
+    },
+    "schema_version": "2.0.0",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "legacy-source"
+    },
+    "test_roots": [
+      "tests"
+    ]
+  },
+  "publication": "refused-unregistered-adapters",
+  "relationship_count": 4,
+  "revision": "c8f48f6a55392efe18be35c0350f1d7db55dde31",
+  "scratch_repository": "SCRATCH/issue-980-p4t6-native-f19afb317eba4b18aff833a152d79daa",
+  "semantic_sha256": "c714788e11cc8ba89ef81f1045ba0e0ef62bc40dd23c5da7082ad2c0e81c5e5d",
+  "source_tree_unchanged": true,
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T09:23:36.527743+00:00",
+  "whole_composition_seconds": 3.3862634999968577
+}

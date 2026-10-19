@@ -1,0 +1,55 @@
+"""Bind explicit coordinator release without altering prepared or reviewed bytes."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+qa = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates'
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+preparation_path = qa / 'p4t6-final-preparation.2026-10-19T09-13.json'
+assert sha(preparation_path.read_bytes()) == 'b3ce1ac6cbafd8c775ac7d48b1c675b5d1a4be20dae8bee08336cb32e2eb74d8'
+preparation = json.loads(preparation_path.read_bytes())
+source_path = scratch / preparation['candidate_manifest']['path'].removeprefix('SCRATCH/')
+assert sha(source_path.read_bytes()) == preparation['candidate_manifest']['sha256']
+candidate = json.loads(source_path.read_bytes())
+assert candidate['execution_released'] is False
+for harness in preparation['prepared_harnesses']:
+    assert sha((scratch / harness['path'].removeprefix('SCRATCH/')).read_bytes()) == harness['sha256']
+for item in candidate['files']:
+    assert sha((root / item['path']).read_bytes()) == item['sha256']
+review_path = qa / 'p4t6-executor-candidate-review.2026-10-19T09-18.json'
+assert sha(review_path.read_bytes()) == '38d033308542311e956507ff3af5e5a8489938f24aa2b4a25a434eb0c5ffbe1e'
+review = json.loads(review_path.read_bytes())
+assert review['status'] == 'CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES'
+assert not review['findings'] and not review['open_behavioral_probes'] and not review['open_evidence_discrepancies']
+candidate.update(preparation_only=False, execution_released=True,
+    coordinator_release_receipt='workspace_operations_p4t6_final_gates / S5_P4T6_final_ordered_gates',
+    review=ref(review_path), confirmation=None, preparation=ref(preparation_path), released_at=stamp)
+candidate_path = scratch / ('issue-980-p4t6-final-candidate.released.' + stamp + '.json')
+assert not candidate_path.exists()
+candidate_path.write_text(json.dumps(candidate, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+harness_path = qa / ('p4t6-final-release-harness.' + stamp + '.txt')
+assert not harness_path.exists()
+harness_path.write_bytes(Path(__file__).read_bytes())
+record = {'timestamp': stamp, 'command': 'poetry run python SCRATCH/issue-980-p4t6-final-release.py', 'exit_code': 0,
+    'state': 'RELEASED_READY_TO_EXECUTE', 'authority': candidate['coordinator_release_receipt'], 'preparation': ref(preparation_path),
+    'review': ref(review_path), 'source_files': candidate['files'], 'prepared_harnesses': preparation['prepared_harnesses'],
+    'candidate': {'path': 'SCRATCH/' + candidate_path.name, 'sha256': sha(candidate_path.read_bytes())},
+    'release_harness': ref(harness_path), 'source_test_mutation': False, 'git_mutation': False, 'gate_execution': False}
+record_path = qa / ('p4t6-final-execution-release.' + stamp + '.json')
+assert not record_path.exists()
+record_path.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+record_path.with_suffix('.md').write_text(f'# P4-T6 final execution release\n\nTimestamp: {stamp}\nCommand: `{record["command"]}`\nEXIT_CODE: 0\nOutput Summary: Coordinator release and immutable zero-finding review bind seven unchanged source/test streams and four unchanged prepared harnesses. No gate was executed by this binding command.\n\nThe new scratch execution manifest enables the prepared runner. Original preparation and review evidence remain unchanged. Native routing, launch and provenance authority and the exact Python C4 profile were reverified before this step.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'release': ref(record_path), 'candidate': record['candidate']}, indent=2))
