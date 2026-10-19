@@ -1,0 +1,375 @@
+{
+  "ok": true,
+  "accepted_baseline": "e04136458147cdf24069b6bde563231f3c38c709",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py",
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "covered_lines": 200,
+      "measured_lines": 200,
+      "physical_lines": 423,
+      "changed_line_comparison": "New file against accepted e04136458147cdf24069b6bde563231f3c38c709; every executable line is new and measured",
+      "units": [
+        {
+          "unit": "bounded_integer:20",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "require_digest:28",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadGrant:41",
+          "kind": "ClassDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SelectedManifest:67",
+          "kind": "ClassDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadSelection:85",
+          "kind": "ClassDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadLimits:128",
+          "kind": "ClassDef",
+          "covered": 14,
+          "total": 14,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ReadCursor:164",
+          "kind": "ClassDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadRequest:180",
+          "kind": "ClassDef",
+          "covered": 34,
+          "total": 34,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceSpan:234",
+          "kind": "ClassDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceEvidence:254",
+          "kind": "ClassDef",
+          "covered": 28,
+          "total": 28,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceItem:300",
+          "kind": "ClassDef",
+          "covered": 12,
+          "total": 12,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "SourceReadResult:323",
+          "kind": "ClassDef",
+          "covered": 20,
+          "total": 20,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "operation_without_cursor:369",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "source_page:379",
+          "kind": "FunctionDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:50",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "allows:56",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:76",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:95",
+          "kind": "FunctionDef",
+          "covered": 12,
+          "total": 12,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "allows:120",
+          "kind": "FunctionDef",
+          "covered": 2,
+          "total": 2,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:146",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:173",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:197",
+          "kind": "FunctionDef",
+          "covered": 24,
+          "total": 24,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:244",
+          "kind": "FunctionDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:270",
+          "kind": "FunctionDef",
+          "covered": 19,
+          "total": 19,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:310",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:338",
+          "kind": "FunctionDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "encode:359",
+          "kind": "FunctionDef",
+          "covered": 2,
+          "total": 2,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "covered_lines": 209,
+      "measured_lines": 209,
+      "physical_lines": 481,
+      "changed_line_comparison": "New file against accepted e04136458147cdf24069b6bde563231f3c38c709; every executable line is new and measured",
+      "units": [
+        {
+          "unit": "SourceReader:50",
+          "kind": "ClassDef",
+          "covered": 17,
+          "total": 17,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_Inspection:107",
+          "kind": "ClassDef",
+          "covered": 176,
+          "total": 176,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__init__:57",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "inspect:87",
+          "kind": "FunctionDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__init__:114",
+          "kind": "FunctionDef",
+          "covered": 10,
+          "total": 10,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_metadata:145",
+          "kind": "FunctionDef",
+          "covered": 13,
+          "total": 13,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_profile_allows:164",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_eligible:184",
+          "kind": "FunctionDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_read:199",
+          "kind": "FunctionDef",
+          "covered": 16,
+          "total": 16,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_capture:221",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_transport:231",
+          "kind": "FunctionDef",
+          "covered": 22,
+          "total": 22,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_evidence:268",
+          "kind": "FunctionDef",
+          "covered": 18,
+          "total": 18,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_paths:315",
+          "kind": "FunctionDef",
+          "covered": 28,
+          "total": 28,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_items:364",
+          "kind": "FunctionDef",
+          "covered": 34,
+          "total": 34,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_identity:431",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "run:450",
+          "kind": "FunctionDef",
+          "covered": 15,
+          "total": 15,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    }
+  ],
+  "failures": []
+}
