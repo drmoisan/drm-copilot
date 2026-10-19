@@ -1,0 +1,48 @@
+"""Reproduce concrete declaration-context and work-budget risks in memory."""
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+import drm_copilot_discovery.analyzer.csharp_declarations as declarations
+from drm_copilot_discovery.analyzer.csharp_tokens import tokenize_csharp
+
+QA=Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+manifest_path=QA/'p4t3-candidate-freeze.2026-10-19T04-46.json'
+manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+expected={row['path']:row['sha256'] for row in manifest['files']}
+assert expected=={path:sha256(Path(path).read_bytes()).hexdigest() for path in expected}
+cases=[]
+examples=[
+ ('contextual record variable in foreach','class C { void Run(object[] items) { foreach (var record in items) { } } }','type','in'),
+ ('parameterless anonymous delegate body','class C { void Run() { System.Action a = delegate { Work(); }; } void Work() {} }','delegate','Work'),
+]
+for label,source,kind,symbol in examples:
+ values=declarations.declaration_candidates('src/example.cs',source)
+ rows=[{'kind':v.detection_kind,'symbol':v.symbol,'symbol_kind':v.symbol_kind,'line':v.line,'extra':dict(v.extra)} for v in values]
+ reproduced=any(value['kind']==kind and value['symbol']==symbol for value in rows)
+ cases.append({'case':label,'input':source,'input_sha256':sha256(source.encode()).hexdigest(),'observed':rows,'unexpected_declaration':{'kind':kind,'symbol':symbol},'finding_reproduced':reproduced})
+
+class CountedTokens(tuple):
+ def __new__(cls,values):
+  value=super().__new__(cls,values)
+  value.accesses=0
+  return value
+ def __getitem__(self,key):
+  if isinstance(key,int):self.accesses+=1
+  return super().__getitem__(key)
+
+work=[]
+for shape in ('generic','event-prefix'):
+ for size in (64,128,256):
+  source=('class T<'*size+'int'+'>'*size) if shape=='generic' else ('event Action '*size+';')
+  tokens=CountedTokens(tokenize_csharp(source))
+  with patch.object(declarations,'tokenize_csharp',return_value=tokens):
+   values=declarations.declaration_candidates('src/work.cs',source,include_members=False)
+  work.append({'shape':shape,'repetitions':size,'input_sha256':sha256(source.encode()).hexdigest(),'input_chars':len(source),'tokens':len(tokens),'token_index_accesses':tokens.accesses,'output_count':len(values),'error':None})
+assert expected=={path:sha256(Path(path).read_bytes()).hexdigest() for path in expected}
+now=datetime.now(timezone.utc);stamp=now.strftime('%Y-%m-%dT%H-%M')
+record={'task':'P4-T3','timestamp':now.isoformat(),'scope':'Two valid declaration-context examples and two small adversarial prefix families; no suite or final gate run.','source_bindings':expected,'manifest':{'path':manifest_path.as_posix(),'sha256':sha256(manifest_path.read_bytes()).hexdigest()},'context_cases':cases,'bounded_work_cases':work,'instrumentation':'A tuple subclass counts integer token reads; only tokenizer return is replaced with the identical token tuple in-process. Production bytes are unchanged.','source_test_changes':False,'exit_code_meaning':'Probe execution completes; context findings and measured work growth are recorded, not a task pass.'}
+out=QA/f'p4t3-executor-candidate-probes.{stamp}.json';out.write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8',newline='\n')
+print(json.dumps({'artifact':out.as_posix(),'context_cases':cases,'work':work},indent=2))

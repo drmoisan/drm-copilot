@@ -28,6 +28,10 @@ _ANALYZER_DIR = (
 _FIXTURE_DIR = (
     Path(__file__).resolve().parents[5] / "tests" / "fixtures" / "discovery_dotnet_vsto"
 )
+_RUNTIME_ANALYZER_DIR = (
+    Path(__file__).resolve().parents[5]
+    / "packages/discovery-runtime/src/drm_copilot_discovery/analyzer"
+)
 
 # Stack-specific production modules delivered by #369 (contingent pattern modules
 # included when present).
@@ -38,6 +42,9 @@ _STACK_MODULE_NAMES = (
     "vsto_office.py",
     "vsto_patterns.py",
     "stack_cli.py",
+    "csharp_tokens.py",
+    "csharp_declarations.py",
+    "event_subscriptions.py",
 )
 
 # Consumer identifiers are banned everywhere (production and fixtures).
@@ -59,11 +66,17 @@ _PERMITTED_STACK_LITERALS = ("csharp", "vsto", "microsoft.office.interop.", ".cs
 
 
 def _existing_stack_modules() -> list[Path]:
-    """Return the delivered stack-specific modules that exist on disk."""
+    """Return sorted list[Path] for legacy and moved runtime stack modules.
+
+    Takes no arguments; performs only existence checks on repository files.
+    Including both surfaces prevents a thin adapter from hiding implementation.
+    """
+    # Scan actual implementations as well as compatibility adapters after relocation.
     return sorted(
-        _ANALYZER_DIR / name
+        directory / name
+        for directory in (_ANALYZER_DIR, _RUNTIME_ANALYZER_DIR)
         for name in _STACK_MODULE_NAMES
-        if (_ANALYZER_DIR / name).exists()
+        if (directory / name).exists()
     )
 
 

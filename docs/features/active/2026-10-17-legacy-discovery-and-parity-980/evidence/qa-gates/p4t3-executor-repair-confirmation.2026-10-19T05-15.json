@@ -1,0 +1,1102 @@
+{
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05:15:46.703721+00:00",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "command": "poetry run python SCRATCH/issue-980-p4t3-repair-confirm.py SCRATCH/worker",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t3_repair_confirmation",
+    "phase": "S5_P4T3_repair_confirmation",
+    "profile": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_authority": "Unchanged native attestation and exact current profile/receipt verified; no fallback."
+  },
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-freeze.2026-10-19T05-08.json",
+    "sha256": "f805ef676ce36fab5c65f26a66144f4cbb0c0b4643819da1e8b14c395e773c71"
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-review.2026-10-19T05-00.json",
+    "sha256": "53b9c90086d370d4de177fc9edc8d69326134efd0ca6ea9074b220d8d18b2150"
+  },
+  "original_probes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-probes.2026-10-19T04-51.json",
+    "sha256": "5cbf1766c668e57aa55a8ed0528c672f3f872686cae54cd63e6b10986305a41a"
+  },
+  "binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-binding.2026-10-19T05-06.json",
+    "sha256": "2f7ed74a5cb68a6944a479c366bff8f9aba6d8e998880ddce7cd9e4d26839fbf"
+  },
+  "delta": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-delta.2026-10-19T05-08.md",
+    "sha256": "ec051f5b4f428c265acc9a0ded02cb9ace557172a044d91c983ae544a20737a6"
+  },
+  "original_preservation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-original-bindings.2026-10-19T05-03.json",
+    "sha256": "5f5fdbd8b66ec80f2302de124e7b0b71762e55baeff661b258d0852a1585363d"
+  },
+  "files": [
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "git_working_blob": "d000d812ed935384aff82225349e42a21254a5f5",
+      "index_blob": "d000d812ed935384aff82225349e42a21254a5f5",
+      "index_bytes_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "lines": 330,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1"
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "git_working_blob": "b3c1af02b3af302c4be44197c3e75cb291a4dc43",
+      "index_blob": "b3c1af02b3af302c4be44197c3e75cb291a4dc43",
+      "index_bytes_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "lines": 189,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2"
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "git_working_blob": "4c22a1c4f9f8a8425bf38c688d268623fb0dc4cd",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 401,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "sha256": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32"
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "git_working_blob": "2a1e106ba3156dcd77b59058e3b64579fa28ad8f",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 132,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9"
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "git_working_blob": "bac6006cacdffa5eff2b6ce2dfcbb764cfb6dc2e",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 460,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9"
+    },
+    {
+      "attributes": "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto\nscripts/dev_tools/discovery/analyzer/source_text.py: eol: lf\nscripts/dev_tools/discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/scripts/dev_tools/discovery/analyzer/source_text.py",
+      "git_working_blob": "51437b3a0618f6f5bce408bf8741d86e9fae51d8",
+      "index_blob": "51437b3a0618f6f5bce408bf8741d86e9fae51d8",
+      "index_bytes_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "lines": 26,
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71"
+    },
+    {
+      "attributes": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: text: auto\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: eol: lf\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "git_working_blob": "47e46729ff028619d6ea0f7c1a6cb16cdabecb31",
+      "index_blob": "764c8aceab3139e51539985f3cc6e5fba3048d30",
+      "index_bytes_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+      "lines": 12,
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_source_masking.py: text: auto\ntests/discovery_runtime/analyzer/test_source_masking.py: eol: lf\ntests/discovery_runtime/analyzer/test_source_masking.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/discovery_runtime/analyzer/test_source_masking.py",
+      "git_working_blob": "a275ec009ff2986904d6cc3c236fddd0dcae92b0",
+      "index_blob": "a275ec009ff2986904d6cc3c236fddd0dcae92b0",
+      "index_bytes_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "lines": 205,
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_tokens.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "git_working_blob": "d9568aa07ea9e1edf4871cbd39949f5e6dc6b7a4",
+      "index_blob": "d9f2d0d116efefdb494f4ab6252716c1347c0f81",
+      "index_bytes_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "lines": 221,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_declarations.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "git_working_blob": "77573d2afba07df36cec5cd5d85767fccc5ce891",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 470,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_event_subscriptions.py: text: auto\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: eol: lf\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "git_working_blob": "1f6118f7b1fb679bc42799cdc7c209263101542e",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 179,
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6"
+    },
+    {
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "git_working_blob": "eb6f6b77e5e1d1537fcf75063ff6e464d932f868",
+      "index_blob": "eb6f6b77e5e1d1537fcf75063ff6e464d932f868",
+      "index_bytes_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "lines": 413,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c"
+    },
+    {
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "git_working_blob": "c9a10b8ff22209effbae5d91a2a7771331f24f62",
+      "index_blob": "aaf40db04182800902a9c096e690905e96d66aa5",
+      "index_bytes_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+      "lines": 142,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/repair-frozen/tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py",
+      "git_working_blob": "e74b7bb9fd8391b6b327200f25676763386b2eba",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 117,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py",
+      "sha256": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83"
+    }
+  ],
+  "changed_existing_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py"
+  ],
+  "added_paths": [
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py"
+  ],
+  "unchanged_original_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+    "scripts/dev_tools/discovery/analyzer/source_text.py",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+    "tests/discovery_runtime/analyzer/test_source_masking.py",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py"
+  ],
+  "preserved_original_copies": 13,
+  "preserved_prior_proof_copies": 5,
+  "preserved_callers_fixtures": 12,
+  "closed_findings": [
+    {
+      "id": "P4-T3-R1",
+      "confirmation": "The original foreach reproduction emits no type in; actual class/member declarations remain. Context/name-continuation guards are confined to contextual record interpretation."
+    },
+    {
+      "id": "P4-T3-R2",
+      "confirmation": "The original anonymous delegate body emits no delegate Work. Early exclusions for *, { and ( stop body/signature entry; named/generic delegate regressions pass."
+    },
+    {
+      "id": "P4-T3-R3",
+      "confirmation": "One _ScanWork instance per declaration scan charges generic, namespace, event/delegate, reverse-name and member-prefix traversals. Original six adversarial inputs now fail with source-work-limit before returning partial results; retained v2 tests assert empty component/finding/relationship arrays even after an earlier valid declaration."
+    }
+  ],
+  "remaining_findings": [],
+  "independent_reproduction_count": 8,
+  "context_reproductions": [
+    {
+      "case": "contextual record variable in foreach",
+      "input_sha256": "ae4a2819204e15154c842b746a9e3b1d0d5cafa2235ee6a202b1e047be4483d0",
+      "observed": [
+        {
+          "kind": "type",
+          "symbol": "C",
+          "symbol_kind": "class",
+          "line": 1,
+          "extra": {
+            "offset": 0,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Run",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 10,
+            "end_line": 1
+          }
+        }
+      ],
+      "original_false_declaration_absent": true,
+      "actual_class_preserved": true
+    },
+    {
+      "case": "parameterless anonymous delegate body",
+      "input_sha256": "d93964430a0f06f1cfa260fe24a35bc4e5f5a2e1f87698105fbc29d9be529850",
+      "observed": [
+        {
+          "kind": "type",
+          "symbol": "C",
+          "symbol_kind": "class",
+          "line": 1,
+          "extra": {
+            "offset": 0,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Run",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 10,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Work",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 65,
+            "end_line": 1
+          }
+        }
+      ],
+      "original_false_declaration_absent": true,
+      "actual_class_preserved": true
+    }
+  ],
+  "work_reproductions": [
+    {
+      "shape": "generic",
+      "repetitions": 64,
+      "input_sha256": "b3358b9900d56443d210d4ddc62553ffdb25227e17ae78e6de9992ac1fd1c10e",
+      "tokens": 257,
+      "before_token_index_accesses": 8832,
+      "after_token_index_accesses": 1063,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    },
+    {
+      "shape": "generic",
+      "repetitions": 128,
+      "input_sha256": "6234fec06412e5f08e0f1dea77e36687eaf6f6674c83d78f6a06dcc9184b0db3",
+      "tokens": 513,
+      "before_token_index_accesses": 34048,
+      "after_token_index_accesses": 2087,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    },
+    {
+      "shape": "generic",
+      "repetitions": 256,
+      "input_sha256": "ed4494b0e5d5baaa949f84df746b73c8293c790d7e1fb66d23d2f455a72879cf",
+      "tokens": 1025,
+      "before_token_index_accesses": 133632,
+      "after_token_index_accesses": 4135,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 64,
+      "input_sha256": "8dee148821c00359383d5f18f333fd525181ba33b0d849b9d56e99ba7e7cd14d",
+      "tokens": 129,
+      "before_token_index_accesses": 4671,
+      "after_token_index_accesses": 545,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 128,
+      "input_sha256": "38298a31410c43f0fe7659359d3ba30181585391cb826f176ada71125edd9328",
+      "tokens": 257,
+      "before_token_index_accesses": 17535,
+      "after_token_index_accesses": 1057,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 256,
+      "input_sha256": "0a04be6486770bad318b423705c512f4665bd9b6cb4b4ca4b23da0834bca45dc",
+      "tokens": 513,
+      "before_token_index_accesses": 67839,
+      "after_token_index_accesses": 2081,
+      "error_code": "source-work-limit",
+      "partial_result_returned": false
+    }
+  ],
+  "focused_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-format-050555.2026-10-19T05-05.json",
+      "sha256": "4ab9c6a23ed72dcb0104a6d1034c746635fa8c628befd172dd45e3c4cc5710be",
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "started_at": "2026-10-19T05:05:54.575805+00:00",
+      "finished_at": "2026-10-19T05:05:55.171864+00:00",
+      "seconds": 0.596059,
+      "stdout": "",
+      "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n8 files would be left unchanged.\r\n",
+      "raw_binding_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-lint-050555.2026-10-19T05-05.json",
+      "sha256": "4a9a8e9e023ccc706bde71fce8cc044bb17fe14adea32f48a3644518b0370668",
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "started_at": "2026-10-19T05:05:55.174863+00:00",
+      "finished_at": "2026-10-19T05:05:55.278727+00:00",
+      "seconds": 0.103864,
+      "stdout": "All checks passed!\n",
+      "stderr": "",
+      "raw_binding_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-types-050556.2026-10-19T05-05.json",
+      "sha256": "1862a3f714a46c29459126d5db7d0c9437ccca9e367d73ca255faed66a795e20",
+      "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "started_at": "2026-10-19T05:05:55.281837+00:00",
+      "finished_at": "2026-10-19T05:05:56.506542+00:00",
+      "seconds": 1.224705,
+      "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+      "stderr": "",
+      "raw_binding_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-repair-tests-050628.2026-10-19T05-06.json",
+      "sha256": "e54bb38eb3f1625db6733c49056968c70effc02044ff7d4c22546552ebee91c2",
+      "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py --cov=drm_copilot_discovery.analyzer.csharp_declarations --cov=drm_copilot_discovery.analyzer.event_subscriptions --cov=drm_copilot_discovery.analyzer.dotnet_inventory --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-repair-coverage.raw.json",
+      "exit_code": 0,
+      "started_at": "2026-10-19T05:05:56.509455+00:00",
+      "finished_at": "2026-10-19T05:06:28.719566+00:00",
+      "seconds": 32.210111,
+      "stdout": "........................................................................ [ 52%]\r\n.................................................................        [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_declarations.py     174      0     98      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_inventory.py        137      0     36      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\event_subscriptions.py      47      0     28      0   100%\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    358      0    162      0   100%\r\nCoverage JSON written to file SCRATCH\\p4t3-repair-coverage.raw.json\r\n137 passed in 31.60s\r\n",
+      "stderr": "",
+      "raw_binding_verified": true
+    }
+  ],
+  "test_counts": {
+    "retained": 111,
+    "new": 26,
+    "total": 137
+  },
+  "collection_qualification": "Collection-only metadata is separately verified; original three test modules/parameterizations remain byte-identical. No test body was rerun by this verifier.",
+  "new_test_nodes": [
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run(object[] items) { foreach (var record in items) { } } }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run() { System.Action a = delegate { Work(); }; } void Work() {} }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run() { System.Action a = delegate() { Work(); }; } void Work() {} }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run() { System.Action<int> a = delegate(int item) { Work(); }; } void Work() {} }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run() { record value = default; } }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { void Run(record value) {} }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { record value = default; }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_executable_contexts_cannot_project_named_declarations[class C { delegate*<int, void> callback; }]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[record R;-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[record R(int Value);-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[[Tag] public partial record R<T> where T : class {}-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[record class R : Base {}-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[public readonly record struct R<T>(T Value);-R-record_struct]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[class Outer { public record R; }-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[namespace Scope; record R {}-R-record]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[delegate void Handler();-Handler-delegate]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_context_guards_preserve_actual_record_and_named_delegate_forms[public delegate T Handler<T>(T value);-Handler-delegate]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[generic-64]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[generic-128]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[generic-256]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[event-prefix-64]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[event-prefix-128]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[event-prefix-256]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[delegate-prefix-64]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[delegate-prefix-128]",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py::test_repeated_prefixes_fail_at_the_shared_work_bound_without_partial_claims[delegate-prefix-256]"
+  ],
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-repair-coverage.2026-10-19T05-06.json",
+    "sha256": "42099e90adcb6065cadb20098e462eb20ce62852ab1b2b35124e229ca7e632e3"
+  },
+  "coverage_totals": {
+    "covered_lines": 358,
+    "num_statements": 358,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 4,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 162,
+    "num_partial_branches": 0,
+    "covered_branches": 162,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "coverage_units": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_ScanWork.__init__",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_ScanWork.consume",
+      "summary": {
+        "covered_lines": 3,
+        "num_statements": 3,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_detection",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_generic",
+      "summary": {
+        "covered_lines": 18,
+        "num_statements": 18,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_namespace",
+      "summary": {
+        "covered_lines": 14,
+        "num_statements": 14,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_type",
+      "summary": {
+        "covered_lines": 14,
+        "num_statements": 14,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "covered_branches": 8,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_callable_name",
+      "summary": {
+        "covered_lines": 13,
+        "num_statements": 13,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "covered_branches": 8,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_event_or_delegate",
+      "summary": {
+        "covered_lines": 21,
+        "num_statements": 21,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_member",
+      "summary": {
+        "covered_lines": 20,
+        "num_statements": 20,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "covered_branches": 14,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "_members",
+      "summary": {
+        "covered_lines": 30,
+        "num_statements": 30,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 20,
+        "num_partial_branches": 0,
+        "covered_branches": 20,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "functions",
+      "name": "declaration_candidates",
+      "summary": {
+        "covered_lines": 22,
+        "num_statements": 22,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 16,
+        "num_partial_branches": 0,
+        "covered_branches": 16,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "kind": "classes",
+      "name": "_ScanWork",
+      "summary": {
+        "covered_lines": 4,
+        "num_statements": 4,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "classify_text",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer.__init__",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer._require_ctx",
+      "summary": {
+        "covered_lines": 3,
+        "num_statements": 3,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer.parse",
+      "summary": {
+        "covered_lines": 18,
+        "num_statements": 18,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer.classify",
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer.map",
+      "summary": {
+        "covered_lines": 12,
+        "num_statements": 12,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "covered_branches": 8,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "DotnetInventoryAnalyzer.emit",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "_project",
+      "summary": {
+        "covered_lines": 23,
+        "num_statements": 23,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 8,
+        "num_partial_branches": 0,
+        "covered_branches": 8,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "_analyze",
+      "summary": {
+        "covered_lines": 31,
+        "num_statements": 31,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "covered_branches": 10,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "CSharpDeclarationAnalyzer.analyze",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "functions",
+      "name": "EventSubscriptionAnalyzer.analyze",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "classes",
+      "name": "DotnetInventoryAnalyzer",
+      "summary": {
+        "covered_lines": 42,
+        "num_statements": 42,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 18,
+        "num_partial_branches": 0,
+        "covered_branches": 18,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "classes",
+      "name": "CSharpDeclarationAnalyzer",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "kind": "classes",
+      "name": "EventSubscriptionAnalyzer",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "kind": "functions",
+      "name": "_left",
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "kind": "functions",
+      "name": "_right",
+      "summary": {
+        "covered_lines": 14,
+        "num_statements": 14,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "kind": "functions",
+      "name": "_handler",
+      "summary": {
+        "covered_lines": 7,
+        "num_statements": 7,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "kind": "functions",
+      "name": "subscription_candidates",
+      "summary": {
+        "covered_lines": 13,
+        "num_statements": 13,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    }
+  ],
+  "policy_confirmation": "Only the reviewed 51-line declaration delta and new 117-line isolated regression module were reviewed. Production module401 lines, all files<=500. New helper/test contracts and intent comments present. Shared private counter changes no I/O or public payload authority. Existing unit tests unchanged, no temporary filesystem/process use introduced.",
+  "reuse_rationale": "The complete 05-00 candidate review, nine AST qualifications, tokenizer58/masking108/caller83 proof and all accepted predecessor proof remain applicable to their exact unchanged bytes. This confirmation does not repeat the full candidate review or any broad behavioral suite.",
+  "index_qualification": "Freeze lists actual working and index hashes separately. Untracked/substantively changed files are not claimed index-equal. The existing source_text compatibility adapter retains its exact CRLF-to-LF qualification. Final index/commit bindings belong to parent staging and final acceptance.",
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-repair-confirmation-harness.2026-10-19T05-15.txt",
+    "sha256": "8dd56e2f5f357084fda508afaf15adc4ed5217b36df25a0d00086fb424ec9b09"
+  },
+  "next_step": "Parent may commit the checked corrected candidate and release the single final ordered gate sequence. P4-T3 and AC checkoffs remain pending.",
+  "mutations": "Verification artifacts only; no production/tests/checkpoint/plan/AC/Git edits."
+}

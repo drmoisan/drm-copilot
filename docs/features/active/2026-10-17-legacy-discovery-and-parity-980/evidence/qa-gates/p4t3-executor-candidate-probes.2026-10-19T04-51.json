@@ -1,0 +1,191 @@
+{
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04:51:55.993985+00:00",
+  "scope": "Two valid declaration-context examples and two small adversarial prefix families; no suite or final gate run.",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "tests/discovery_runtime/analyzer/test_source_masking.py": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+  },
+  "manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-candidate-freeze.2026-10-19T04-46.json",
+    "sha256": "a078045ecbba053eb113419bd50d9e14767a616c4f8f90626c31993bb1daff32"
+  },
+  "context_cases": [
+    {
+      "case": "contextual record variable in foreach",
+      "input": "class C { void Run(object[] items) { foreach (var record in items) { } } }",
+      "input_sha256": "ae4a2819204e15154c842b746a9e3b1d0d5cafa2235ee6a202b1e047be4483d0",
+      "observed": [
+        {
+          "kind": "type",
+          "symbol": "C",
+          "symbol_kind": "class",
+          "line": 1,
+          "extra": {
+            "offset": 0,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Run",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 10,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "type",
+          "symbol": "in",
+          "symbol_kind": "record",
+          "line": 1,
+          "extra": {
+            "offset": 50,
+            "end_line": 1
+          }
+        }
+      ],
+      "unexpected_declaration": {
+        "kind": "type",
+        "symbol": "in"
+      },
+      "finding_reproduced": true
+    },
+    {
+      "case": "parameterless anonymous delegate body",
+      "input": "class C { void Run() { System.Action a = delegate { Work(); }; } void Work() {} }",
+      "input_sha256": "d93964430a0f06f1cfa260fe24a35bc4e5f5a2e1f87698105fbc29d9be529850",
+      "observed": [
+        {
+          "kind": "type",
+          "symbol": "C",
+          "symbol_kind": "class",
+          "line": 1,
+          "extra": {
+            "offset": 0,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Run",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 10,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "delegate",
+          "symbol": "Work",
+          "symbol_kind": "delegate",
+          "line": 1,
+          "extra": {
+            "offset": 41,
+            "end_line": 1
+          }
+        },
+        {
+          "kind": "member",
+          "symbol": "Work",
+          "symbol_kind": "method",
+          "line": 1,
+          "extra": {
+            "declaring_type": "C",
+            "binding": "unresolved",
+            "offset": 65,
+            "end_line": 1
+          }
+        }
+      ],
+      "unexpected_declaration": {
+        "kind": "delegate",
+        "symbol": "Work"
+      },
+      "finding_reproduced": true
+    }
+  ],
+  "bounded_work_cases": [
+    {
+      "shape": "generic",
+      "repetitions": 64,
+      "input_sha256": "b3358b9900d56443d210d4ddc62553ffdb25227e17ae78e6de9992ac1fd1c10e",
+      "input_chars": 579,
+      "tokens": 257,
+      "token_index_accesses": 8832,
+      "output_count": 64,
+      "error": null
+    },
+    {
+      "shape": "generic",
+      "repetitions": 128,
+      "input_sha256": "6234fec06412e5f08e0f1dea77e36687eaf6f6674c83d78f6a06dcc9184b0db3",
+      "input_chars": 1155,
+      "tokens": 513,
+      "token_index_accesses": 34048,
+      "output_count": 128,
+      "error": null
+    },
+    {
+      "shape": "generic",
+      "repetitions": 256,
+      "input_sha256": "ed4494b0e5d5baaa949f84df746b73c8293c790d7e1fb66d23d2f455a72879cf",
+      "input_chars": 2307,
+      "tokens": 1025,
+      "token_index_accesses": 133632,
+      "output_count": 256,
+      "error": null
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 64,
+      "input_sha256": "8dee148821c00359383d5f18f333fd525181ba33b0d849b9d56e99ba7e7cd14d",
+      "input_chars": 833,
+      "tokens": 129,
+      "token_index_accesses": 4671,
+      "output_count": 63,
+      "error": null
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 128,
+      "input_sha256": "38298a31410c43f0fe7659359d3ba30181585391cb826f176ada71125edd9328",
+      "input_chars": 1665,
+      "tokens": 257,
+      "token_index_accesses": 17535,
+      "output_count": 127,
+      "error": null
+    },
+    {
+      "shape": "event-prefix",
+      "repetitions": 256,
+      "input_sha256": "0a04be6486770bad318b423705c512f4665bd9b6cb4b4ca4b23da0834bca45dc",
+      "input_chars": 3329,
+      "tokens": 513,
+      "token_index_accesses": 67839,
+      "output_count": 255,
+      "error": null
+    }
+  ],
+  "instrumentation": "A tuple subclass counts integer token reads; only tokenizer return is replaced with the identical token tuple in-process. Production bytes are unchanged.",
+  "source_test_changes": false,
+  "exit_code_meaning": "Probe execution completes; context findings and measured work growth are recorded, not a task pass."
+}

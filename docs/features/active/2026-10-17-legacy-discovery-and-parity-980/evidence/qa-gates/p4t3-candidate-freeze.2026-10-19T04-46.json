@@ -1,0 +1,1134 @@
+{
+  "accepted_base_commit": "6a94e5789e8622d4f1aaa2f3aa2c45e1a9c92f89",
+  "coverage_disposition": {
+    "csharp_declarations": "Changed/split lexical declarations161/161 lines94/94branches; namespace/type/record/delegate/event assertions retained, new multiline/Unicode/member/bounded-work tests.",
+    "csharp_tokens": "New bounded tokenizer97/98 lines47/48branches; unchanged production. Test-doc/comment cleanup AST-equivalent to58-case proof.",
+    "dotnet_inventory": "Changed/relocated compatibility + v2 projection137/137lines36/36branches. Prior inventory114/126lines38/44branches; rereads/unguarded emission replaced by exact retained bytes and explicit rejection.",
+    "event_subscriptions": "Changed/split assignment inference47/47 lines28/28branches; legacy heuristic metadata retained; v2 confidence stays schema-shaped.",
+    "source_text": "Relocated/refactored masking 145/145 lines and50/50 branches; six evidence/carrier AST contracts preserved; old adapter8/8. Prior source144/144 lines and50/52branches."
+  },
+  "current_head": "ec2745639ee52f1f3cd683d82d61e9535d3e79ec",
+  "files": [
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "git_working_blob": "d000d812ed935384aff82225349e42a21254a5f5",
+      "index_blob": "d000d812ed935384aff82225349e42a21254a5f5",
+      "index_bytes_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "lines": 330,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "units": [
+        {
+          "end": 42,
+          "kind": "ClassDef",
+          "name": "_Frame",
+          "start": 31
+        },
+        {
+          "end": 193,
+          "kind": "ClassDef",
+          "name": "_Masker",
+          "start": 45
+        },
+        {
+          "end": 205,
+          "kind": "FunctionDef",
+          "name": "strip_comments_and_strings",
+          "start": 196
+        },
+        {
+          "end": 214,
+          "kind": "FunctionDef",
+          "name": "numbered_lines",
+          "start": 208
+        },
+        {
+          "end": 226,
+          "kind": "FunctionDef",
+          "name": "slugify",
+          "start": 217
+        },
+        {
+          "end": 245,
+          "kind": "FunctionDef",
+          "name": "build_evidence_id",
+          "start": 229
+        },
+        {
+          "end": 257,
+          "kind": "ClassDef",
+          "name": "TextParseResult",
+          "start": 249
+        },
+        {
+          "end": 300,
+          "kind": "FunctionDef",
+          "name": "build_evidence_record",
+          "start": 260
+        },
+        {
+          "end": 318,
+          "kind": "ClassDef",
+          "name": "Detection",
+          "start": 304
+        },
+        {
+          "end": 330,
+          "kind": "ClassDef",
+          "name": "DetectionResult",
+          "start": 322
+        },
+        {
+          "end": 59,
+          "kind": "FunctionDef",
+          "name": "__init__",
+          "start": 54
+        },
+        {
+          "end": 70,
+          "kind": "FunctionDef",
+          "name": "_blank",
+          "start": 61
+        },
+        {
+          "end": 78,
+          "kind": "FunctionDef",
+          "name": "_run_end",
+          "start": 72
+        },
+        {
+          "end": 94,
+          "kind": "FunctionDef",
+          "name": "_comment",
+          "start": 80
+        },
+        {
+          "end": 111,
+          "kind": "FunctionDef",
+          "name": "_open_string",
+          "start": 96
+        },
+        {
+          "end": 140,
+          "kind": "FunctionDef",
+          "name": "_code",
+          "start": 113
+        },
+        {
+          "end": 180,
+          "kind": "FunctionDef",
+          "name": "_literal",
+          "start": 142
+        },
+        {
+          "end": 193,
+          "kind": "FunctionDef",
+          "name": "run",
+          "start": 182
+        }
+      ]
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "git_working_blob": "b3c1af02b3af302c4be44197c3e75cb291a4dc43",
+      "index_blob": "b3c1af02b3af302c4be44197c3e75cb291a4dc43",
+      "index_bytes_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "lines": 189,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "units": [
+        {
+          "end": 28,
+          "kind": "ClassDef",
+          "name": "SourceScanError",
+          "start": 18
+        },
+        {
+          "end": 51,
+          "kind": "ClassDef",
+          "name": "Token",
+          "start": 32
+        },
+        {
+          "end": 81,
+          "kind": "FunctionDef",
+          "name": "decode_source",
+          "start": 54
+        },
+        {
+          "end": 106,
+          "kind": "FunctionDef",
+          "name": "_character",
+          "start": 84
+        },
+        {
+          "end": 135,
+          "kind": "FunctionDef",
+          "name": "_identifier_end",
+          "start": 109
+        },
+        {
+          "end": 189,
+          "kind": "FunctionDef",
+          "name": "tokenize_csharp",
+          "start": 138
+        },
+        {
+          "end": 28,
+          "kind": "FunctionDef",
+          "name": "__init__",
+          "start": 25
+        },
+        {
+          "end": 51,
+          "kind": "FunctionDef",
+          "name": "__post_init__",
+          "start": 46
+        }
+      ]
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "git_working_blob": "36a33b000ad8f00b94dd24f2fb760e338bc0a50a",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 350,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "units": [
+        {
+          "end": 50,
+          "kind": "FunctionDef",
+          "name": "_detection",
+          "start": 29
+        },
+        {
+          "end": 77,
+          "kind": "FunctionDef",
+          "name": "_generic",
+          "start": 53
+        },
+        {
+          "end": 118,
+          "kind": "FunctionDef",
+          "name": "_namespace",
+          "start": 80
+        },
+        {
+          "end": 140,
+          "kind": "FunctionDef",
+          "name": "_type",
+          "start": 121
+        },
+        {
+          "end": 161,
+          "kind": "FunctionDef",
+          "name": "_callable_name",
+          "start": 143
+        },
+        {
+          "end": 195,
+          "kind": "FunctionDef",
+          "name": "_event_or_delegate",
+          "start": 164
+        },
+        {
+          "end": 252,
+          "kind": "FunctionDef",
+          "name": "_member",
+          "start": 198
+        },
+        {
+          "end": 306,
+          "kind": "FunctionDef",
+          "name": "_members",
+          "start": 255
+        },
+        {
+          "end": 350,
+          "kind": "FunctionDef",
+          "name": "declaration_candidates",
+          "start": 309
+        }
+      ]
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "git_working_blob": "2a1e106ba3156dcd77b59058e3b64579fa28ad8f",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 132,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "units": [
+        {
+          "end": 36,
+          "kind": "FunctionDef",
+          "name": "_left",
+          "start": 20
+        },
+        {
+          "end": 65,
+          "kind": "FunctionDef",
+          "name": "_right",
+          "start": 39
+        },
+        {
+          "end": 89,
+          "kind": "FunctionDef",
+          "name": "_handler",
+          "start": 68
+        },
+        {
+          "end": 132,
+          "kind": "FunctionDef",
+          "name": "subscription_candidates",
+          "start": 92
+        }
+      ]
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "git_working_blob": "bac6006cacdffa5eff2b6ce2dfcbb764cfb6dc2e",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 460,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "units": [
+        {
+          "end": 59,
+          "kind": "ClassDef",
+          "name": "_CapturedText",
+          "start": 52
+        },
+        {
+          "end": 70,
+          "kind": "ClassDef",
+          "name": "_CapturedDetections",
+          "start": 63
+        },
+        {
+          "end": 84,
+          "kind": "FunctionDef",
+          "name": "classify_text",
+          "start": 73
+        },
+        {
+          "end": 208,
+          "kind": "ClassDef",
+          "name": "DotnetInventoryAnalyzer",
+          "start": 87
+        },
+        {
+          "end": 343,
+          "kind": "FunctionDef",
+          "name": "_project",
+          "start": 211
+        },
+        {
+          "end": 426,
+          "kind": "FunctionDef",
+          "name": "_analyze",
+          "start": 346
+        },
+        {
+          "end": 443,
+          "kind": "ClassDef",
+          "name": "CSharpDeclarationAnalyzer",
+          "start": 429
+        },
+        {
+          "end": 460,
+          "kind": "ClassDef",
+          "name": "EventSubscriptionAnalyzer",
+          "start": 446
+        },
+        {
+          "end": 100,
+          "kind": "FunctionDef",
+          "name": "__init__",
+          "start": 97
+        },
+        {
+          "end": 106,
+          "kind": "FunctionDef",
+          "name": "_require_ctx",
+          "start": 102
+        },
+        {
+          "end": 143,
+          "kind": "FunctionDef",
+          "name": "parse",
+          "start": 108
+        },
+        {
+          "end": 162,
+          "kind": "FunctionDef",
+          "name": "classify",
+          "start": 145
+        },
+        {
+          "end": 196,
+          "kind": "FunctionDef",
+          "name": "map",
+          "start": 164
+        },
+        {
+          "end": 208,
+          "kind": "FunctionDef",
+          "name": "emit",
+          "start": 198
+        },
+        {
+          "end": 443,
+          "kind": "FunctionDef",
+          "name": "analyze",
+          "start": 438
+        },
+        {
+          "end": 460,
+          "kind": "FunctionDef",
+          "name": "analyze",
+          "start": 455
+        }
+      ]
+    },
+    {
+      "attributes": "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto\nscripts/dev_tools/discovery/analyzer/source_text.py: eol: lf\nscripts/dev_tools/discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/scripts/dev_tools/discovery/analyzer/source_text.py",
+      "git_working_blob": "51437b3a0618f6f5bce408bf8741d86e9fae51d8",
+      "index_blob": "51437b3a0618f6f5bce408bf8741d86e9fae51d8",
+      "index_bytes_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "lines": 26,
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "units": []
+    },
+    {
+      "attributes": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: text: auto\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: eol: lf\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "git_working_blob": "47e46729ff028619d6ea0f7c1a6cb16cdabecb31",
+      "index_blob": "764c8aceab3139e51539985f3cc6e5fba3048d30",
+      "index_bytes_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+      "lines": 12,
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "units": []
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_source_masking.py: text: auto\ntests/discovery_runtime/analyzer/test_source_masking.py: eol: lf\ntests/discovery_runtime/analyzer/test_source_masking.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/discovery_runtime/analyzer/test_source_masking.py",
+      "git_working_blob": "a275ec009ff2986904d6cc3c236fddd0dcae92b0",
+      "index_blob": "a275ec009ff2986904d6cc3c236fddd0dcae92b0",
+      "index_bytes_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "lines": 205,
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "units": [
+        {
+          "end": 52,
+          "kind": "FunctionDef",
+          "name": "test_complete_literal_masks_every_character_and_keeps_following_code",
+          "start": 43
+        },
+        {
+          "end": 69,
+          "kind": "FunctionDef",
+          "name": "test_raw_delimiter_lengths_do_not_release_shorter_quote_runs",
+          "start": 57
+        },
+        {
+          "end": 96,
+          "kind": "FunctionDef",
+          "name": "test_incomplete_multiline_or_interpolation_constructs_remain_masked",
+          "start": 86
+        },
+        {
+          "end": 111,
+          "kind": "FunctionDef",
+          "name": "test_ordinary_unterminated_forms_recover_at_physical_newlines",
+          "start": 101
+        },
+        {
+          "end": 119,
+          "kind": "FunctionDef",
+          "name": "test_deep_nested_interpolation_uses_no_python_recursion",
+          "start": 114
+        },
+        {
+          "end": 133,
+          "kind": "FunctionDef",
+          "name": "test_numbered_lines_uses_only_physical_crlf_cr_lf_boundaries",
+          "start": 125
+        },
+        {
+          "end": 164,
+          "kind": "FunctionDef",
+          "name": "test_masking_metamorphic_properties_hold_for_generated_unicode_fragments",
+          "start": 136
+        },
+        {
+          "end": 205,
+          "kind": "FunctionDef",
+          "name": "test_identifiers_and_evidence_projection_are_deterministic_under_repetition",
+          "start": 167
+        }
+      ]
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_tokens.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "git_working_blob": "d9568aa07ea9e1edf4871cbd39949f5e6dc6b7a4",
+      "index_blob": "d9f2d0d116efefdb494f4ab6252716c1347c0f81",
+      "index_bytes_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "lines": 221,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "units": [
+        {
+          "end": 22,
+          "kind": "FunctionDef",
+          "name": "test_decoding_retains_physical_text",
+          "start": 18
+        },
+        {
+          "end": 32,
+          "kind": "FunctionDef",
+          "name": "test_big_endian_bom_is_authoritative",
+          "start": 29
+        },
+        {
+          "end": 43,
+          "kind": "FunctionDef",
+          "name": "test_invalid_encoding_never_uses_replacement",
+          "start": 38
+        },
+        {
+          "end": 51,
+          "kind": "FunctionDef",
+          "name": "test_invalid_byte_bound_is_explicit",
+          "start": 47
+        },
+        {
+          "end": 60,
+          "kind": "FunctionDef",
+          "name": "test_byte_limit_is_inclusive",
+          "start": 54
+        },
+        {
+          "end": 86,
+          "kind": "FunctionDef",
+          "name": "test_identifier_literal_spelling_and_offsets",
+          "start": 79
+        },
+        {
+          "end": 99,
+          "kind": "FunctionDef",
+          "name": "test_physical_lines_and_literal_offsets",
+          "start": 90
+        },
+        {
+          "end": 107,
+          "kind": "FunctionDef",
+          "name": "test_unicode_whitespace_does_not_fabricate_physical_lines",
+          "start": 103
+        },
+        {
+          "end": 129,
+          "kind": "FunctionDef",
+          "name": "test_malformed_identifier_is_not_partially_accepted",
+          "start": 124
+        },
+        {
+          "end": 138,
+          "kind": "FunctionDef",
+          "name": "test_direct_text_rejects_invalid_scalars",
+          "start": 133
+        },
+        {
+          "end": 146,
+          "kind": "FunctionDef",
+          "name": "test_invalid_token_bound_is_explicit",
+          "start": 142
+        },
+        {
+          "end": 156,
+          "kind": "FunctionDef",
+          "name": "test_token_limit_bounds_allocation",
+          "start": 149
+        },
+        {
+          "end": 174,
+          "kind": "FunctionDef",
+          "name": "test_directives_are_omitted_without_evaluating_branches",
+          "start": 159
+        },
+        {
+          "end": 199,
+          "kind": "FunctionDef",
+          "name": "test_compound_operators_and_numeric_tokens",
+          "start": 177
+        },
+        {
+          "end": 212,
+          "kind": "FunctionDef",
+          "name": "test_token_construction_enforces_literal_span",
+          "start": 206
+        },
+        {
+          "end": 221,
+          "kind": "FunctionDef",
+          "name": "test_tokens_are_immutable",
+          "start": 215
+        }
+      ]
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_declarations.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "git_working_blob": "77573d2afba07df36cec5cd5d85767fccc5ce891",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 470,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "units": [
+        {
+          "end": 74,
+          "kind": "FunctionDef",
+          "name": "test_multiline_unicode_declarations_have_physical_anchors",
+          "start": 45
+        },
+        {
+          "end": 82,
+          "kind": "FunctionDef",
+          "name": "test_literal_identifier_spelling_survives_declaration",
+          "start": 78
+        },
+        {
+          "end": 102,
+          "kind": "FunctionDef",
+          "name": "test_same_line_nested_partial_and_record_forms_remain_distinct",
+          "start": 85
+        },
+        {
+          "end": 139,
+          "kind": "FunctionDef",
+          "name": "test_direct_members_exclude_method_locals_and_accessor_bodies",
+          "start": 105
+        },
+        {
+          "end": 161,
+          "kind": "FunctionDef",
+          "name": "test_non_declaration_fragments_do_not_invent_names",
+          "start": 158
+        },
+        {
+          "end": 169,
+          "kind": "FunctionDef",
+          "name": "test_unterminated_generic_is_an_explicit_diagnostic_input",
+          "start": 164
+        },
+        {
+          "end": 185,
+          "kind": "FunctionDef",
+          "name": "test_attribute_strings_raw_strings_and_directives_do_not_create_declarations",
+          "start": 172
+        },
+        {
+          "end": 232,
+          "kind": "FunctionDef",
+          "name": "test_v2_schema_provenance_and_separate_inference",
+          "start": 188
+        },
+        {
+          "end": 258,
+          "kind": "FunctionDef",
+          "name": "test_missing_or_mismatched_revision_cannot_verify_lexical_rows",
+          "start": 236
+        },
+        {
+          "end": 284,
+          "kind": "FunctionDef",
+          "name": "test_excluded_unreadable_and_non_source_inputs_stay_distinct",
+          "start": 261
+        },
+        {
+          "end": 305,
+          "kind": "FunctionDef",
+          "name": "test_malformed_or_over_budget_inputs_fail_without_partial_claims",
+          "start": 295
+        },
+        {
+          "end": 330,
+          "kind": "FunctionDef",
+          "name": "test_byte_and_aggregate_limits_are_independent",
+          "start": 308
+        },
+        {
+          "end": 343,
+          "kind": "FunctionDef",
+          "name": "test_repeated_v2_sites_and_calls_have_stable_unique_ids",
+          "start": 333
+        },
+        {
+          "end": 350,
+          "kind": "FunctionDef",
+          "name": "_legacy_context",
+          "start": 346
+        },
+        {
+          "end": 363,
+          "kind": "FunctionDef",
+          "name": "test_legacy_reexports_and_text_only_carriers_keep_identity",
+          "start": 353
+        },
+        {
+          "end": 387,
+          "kind": "FunctionDef",
+          "name": "test_legacy_mapping_uses_parsed_payload_after_source_changes",
+          "start": 366
+        },
+        {
+          "end": 402,
+          "kind": "FunctionDef",
+          "name": "test_legacy_wrong_context_and_unbound_carriers_fail_closed",
+          "start": 390
+        },
+        {
+          "end": 416,
+          "kind": "FunctionDef",
+          "name": "test_legacy_decode_failure_clears_prior_context",
+          "start": 405
+        },
+        {
+          "end": 436,
+          "kind": "FunctionDef",
+          "name": "test_attributed_generic_members_and_nonmembers_are_distinguished",
+          "start": 419
+        },
+        {
+          "end": 446,
+          "kind": "FunctionDef",
+          "name": "test_lexical_generic_arity_ignores_nested_commas",
+          "start": 442
+        },
+        {
+          "end": 454,
+          "kind": "FunctionDef",
+          "name": "test_member_work_is_bounded_for_adversarial_prefixes",
+          "start": 449
+        },
+        {
+          "end": 470,
+          "kind": "FunctionDef",
+          "name": "test_legacy_captured_detection_cannot_reference_an_uncaptured_path",
+          "start": 457
+        },
+        {
+          "end": 380,
+          "kind": "FunctionDef",
+          "name": "reject_read",
+          "start": 378
+        }
+      ]
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_event_subscriptions.py: text: auto\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: eol: lf\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "git_working_blob": "1f6118f7b1fb679bc42799cdc7c209263101542e",
+      "index_blob": null,
+      "index_bytes_sha256": null,
+      "lines": 179,
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "units": [
+        {
+          "end": 45,
+          "kind": "FunctionDef",
+          "name": "test_possible_handlers_are_explicitly_heuristic",
+          "start": 39
+        },
+        {
+          "end": 74,
+          "kind": "FunctionDef",
+          "name": "test_non_handler_or_incomplete_syntax_is_not_promoted",
+          "start": 71
+        },
+        {
+          "end": 86,
+          "kind": "FunctionDef",
+          "name": "test_multiline_unicode_target_and_lambda_preserve_lines",
+          "start": 78
+        },
+        {
+          "end": 103,
+          "kind": "FunctionDef",
+          "name": "test_same_line_assignments_keep_order_and_operator",
+          "start": 89
+        },
+        {
+          "end": 141,
+          "kind": "FunctionDef",
+          "name": "test_v2_event_rows_are_inferred_and_never_resolve_targets",
+          "start": 106
+        },
+        {
+          "end": 154,
+          "kind": "FunctionDef",
+          "name": "test_event_projection_accounts_for_relationship_budget",
+          "start": 144
+        },
+        {
+          "end": 171,
+          "kind": "FunctionDef",
+          "name": "test_missing_source_pin_downgrades_relationships",
+          "start": 157
+        },
+        {
+          "end": 179,
+          "kind": "FunctionDef",
+          "name": "test_repeated_incomplete_assignments_have_a_total_work_bound",
+          "start": 174
+        }
+      ]
+    },
+    {
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "git_working_blob": "eb6f6b77e5e1d1537fcf75063ff6e464d932f868",
+      "index_blob": "eb6f6b77e5e1d1537fcf75063ff6e464d932f868",
+      "index_bytes_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "lines": 413,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "units": [
+        {
+          "end": 164,
+          "kind": "ClassDef",
+          "name": "TestStripper",
+          "start": 31
+        },
+        {
+          "end": 192,
+          "kind": "ClassDef",
+          "name": "TestNumberedLines",
+          "start": 167
+        },
+        {
+          "end": 226,
+          "kind": "ClassDef",
+          "name": "TestSlugify",
+          "start": 195
+        },
+        {
+          "end": 289,
+          "kind": "ClassDef",
+          "name": "TestBuildEvidenceId",
+          "start": 229
+        },
+        {
+          "end": 327,
+          "kind": "ClassDef",
+          "name": "TestTextParseResult",
+          "start": 292
+        },
+        {
+          "end": 341,
+          "kind": "FunctionDef",
+          "name": "test_runtime_and_old_imports_share_every_public_helper_and_carrier",
+          "start": 330
+        },
+        {
+          "end": 379,
+          "kind": "FunctionDef",
+          "name": "test_shared_carriers_preserve_positional_defaults_slots_and_base_identity",
+          "start": 344
+        },
+        {
+          "end": 413,
+          "kind": "FunctionDef",
+          "name": "test_evidence_projection_keeps_keyword_contract_and_ordered_metadata",
+          "start": 382
+        },
+        {
+          "end": 60,
+          "kind": "FunctionDef",
+          "name": "test_blanks_non_code_spans",
+          "start": 51
+        },
+        {
+          "end": 71,
+          "kind": "FunctionDef",
+          "name": "test_preserves_length_exactly",
+          "start": 62
+        },
+        {
+          "end": 84,
+          "kind": "FunctionDef",
+          "name": "test_preserves_line_count_multiline_block_comment",
+          "start": 73
+        },
+        {
+          "end": 95,
+          "kind": "FunctionDef",
+          "name": "test_preserves_column_offset",
+          "start": 86
+        },
+        {
+          "end": 107,
+          "kind": "FunctionDef",
+          "name": "test_verbatim_doubled_quote_stays_in_string",
+          "start": 97
+        },
+        {
+          "end": 120,
+          "kind": "FunctionDef",
+          "name": "test_unterminated_block_comment_blanks_to_end",
+          "start": 109
+        },
+        {
+          "end": 128,
+          "kind": "FunctionDef",
+          "name": "test_code_outside_comments_is_untouched",
+          "start": 122
+        },
+        {
+          "end": 164,
+          "kind": "FunctionDef",
+          "name": "test_stripper_edge_cases",
+          "start": 153
+        },
+        {
+          "end": 179,
+          "kind": "FunctionDef",
+          "name": "test_numbers_lines_from_one",
+          "start": 170
+        },
+        {
+          "end": 192,
+          "kind": "FunctionDef",
+          "name": "test_line_numbers_align_with_stripped_text",
+          "start": 181
+        },
+        {
+          "end": 214,
+          "kind": "FunctionDef",
+          "name": "test_slugify_cases",
+          "start": 211
+        },
+        {
+          "end": 226,
+          "kind": "FunctionDef",
+          "name": "test_non_empty_slug_conforms_to_grammar",
+          "start": 220
+        },
+        {
+          "end": 242,
+          "kind": "FunctionDef",
+          "name": "test_id_is_deterministic_across_calls",
+          "start": 232
+        },
+        {
+          "end": 262,
+          "kind": "FunctionDef",
+          "name": "test_id_conforms_to_grammar",
+          "start": 254
+        },
+        {
+          "end": 271,
+          "kind": "FunctionDef",
+          "name": "test_same_symbol_different_location_is_unique",
+          "start": 264
+        },
+        {
+          "end": 280,
+          "kind": "FunctionDef",
+          "name": "test_same_symbol_different_line_is_unique",
+          "start": 273
+        },
+        {
+          "end": 289,
+          "kind": "FunctionDef",
+          "name": "test_empty_symbol_falls_back_to_location_slug",
+          "start": 282
+        },
+        {
+          "end": 301,
+          "kind": "FunctionDef",
+          "name": "test_is_parse_result_subtype",
+          "start": 295
+        },
+        {
+          "end": 310,
+          "kind": "FunctionDef",
+          "name": "test_field_ordering_paths_then_file_texts",
+          "start": 303
+        },
+        {
+          "end": 319,
+          "kind": "FunctionDef",
+          "name": "test_is_frozen",
+          "start": 312
+        },
+        {
+          "end": 327,
+          "kind": "FunctionDef",
+          "name": "test_default_file_texts_is_empty",
+          "start": 321
+        }
+      ]
+    },
+    {
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: working-tree-encoding: unspecified",
+      "frozen_copy": "SCRATCH/candidate-frozen/tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "git_working_blob": "c9a10b8ff22209effbae5d91a2a7771331f24f62",
+      "index_blob": "aaf40db04182800902a9c096e690905e96d66aa5",
+      "index_bytes_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+      "lines": 142,
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "units": [
+        {
+          "end": 80,
+          "kind": "FunctionDef",
+          "name": "_existing_stack_modules",
+          "start": 68
+        },
+        {
+          "end": 85,
+          "kind": "FunctionDef",
+          "name": "_fixture_files",
+          "start": 83
+        },
+        {
+          "end": 97,
+          "kind": "FunctionDef",
+          "name": "test_stack_modules_present",
+          "start": 88
+        },
+        {
+          "end": 114,
+          "kind": "FunctionDef",
+          "name": "test_module_has_no_consumer_identifier_or_app_hardcoding",
+          "start": 101
+        },
+        {
+          "end": 127,
+          "kind": "FunctionDef",
+          "name": "test_fixture_has_no_consumer_identifier",
+          "start": 118
+        },
+        {
+          "end": 142,
+          "kind": "FunctionDef",
+          "name": "test_permitted_stack_literals_do_not_trip_the_ban",
+          "start": 130
+        }
+      ]
+    }
+  ],
+  "known_limitations": [
+    "Lexical inventory is not compiler binding or complete C# grammar; namespace aliases, active preprocessing and #line maps remain unresolved.",
+    "Member candidates and event assignment relationships remain inferred; identifier operands may be arithmetic.",
+    "Generic indexer/operator and complex declaration semantics require later inspection; no runtime event activation is claimed.",
+    "Public registry exposure remains P4-T9.",
+    "Only docstrings/comments changed after successful111-case scanner and58-case tokenizer behavioral proof; exact AST qualifications are retained.",
+    "The only unexecuted tokenizer statement is the defensive64MiB direct-text allocation guard; new module/class/callable coverage exceeds90%."
+  ],
+  "preserved_files": [
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt",
+      "sha256": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt",
+      "sha256": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt",
+      "sha256": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt",
+      "sha256": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt",
+      "sha256": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt",
+      "sha256": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2"
+    }
+  ],
+  "proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-baseline-binding.2026-10-19T04-20.json",
+      "sha256": "7588f43e0cee2cfdf43ee69143cf145395d9a8e538bd384c4da8194dfb5cad91"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-binding.2026-10-19T04-30.json",
+      "sha256": "08cfcc9e9123ab6b224e01baaba91599c43fdc706ffea5c816490f5c4ac0eda2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+      "sha256": "92b7f1253e014c4efffa84b415a8a667bf42e410c2060cdc594ab4405e0647e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-evidence-index.2026-10-19T04-36.json",
+      "sha256": "6d02d530004add7ef350c92a831947e81aa77eee3b866ab61bc528db8dcedbe1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-scanners-binding.2026-10-19T04-42.json",
+      "sha256": "d4eb67a7a257fb8541cd216ff3f3b6cd35efbefe4e9f3c89f4c12127af5047ad"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-policy-docstrings.2026-10-19T04-44.json",
+      "sha256": "fd154c848cc8ab08667beee9ca30aa0ac3cedf6a1a5fe7448e5ee8a8045a6df3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-policy-comments.2026-10-19T04-45.json",
+      "sha256": "e80379012a629d1fe2916f68877d8c2050946562f1ca600a5ef7c7c25bd3b520"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-dependent-callers-044646.2026-10-19T04-46.json",
+      "sha256": "7630b8fcf51132a24acbc42a0ea21310ad11f34964fbea95b7cac1704c7d839c"
+    }
+  ],
+  "review_request": "One consolidated semantic/policy/coverage review across all13 paths, reusing focused subset proofs and unchanged predecessor evidence. Final gates have not begun.",
+  "routing_receipt": "inventory_analyzers_p4t3_policy_cleanup",
+  "state": "FROZEN_READY",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-46"
+}

@@ -1,0 +1,147 @@
+"""Reconcile retained candidate proof without executing behavioral tests."""
+import ast
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+EVIDENCE = FEATURE / 'evidence'
+SCRATCH = Path(__file__).parent
+WORKER = Path('SCRATCH/worker')  # Bound worker scratch root; host path omitted.
+STAMP = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+
+
+def git_bytes(ref):
+    return subprocess.run(['git', 'show', ref], capture_output=True, check=True).stdout
+
+
+def tree(data, strip_docs=False):
+    parsed = ast.parse(data.decode('utf-8-sig'))
+    if strip_docs:
+        for node in ast.walk(parsed):
+            if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+                    node.body.pop(0)
+    return ast.dump(parsed, include_attributes=False)
+
+
+manifest_path = EVIDENCE / 'qa-gates/p4t3-candidate-freeze.2026-10-19T04-46.json'
+assert digest(manifest_path.read_bytes()) == 'a078045ecbba053eb113419bd50d9e14767a616c4f8f90626c31993bb1daff32'
+manifest = read(manifest_path)
+assert digest(Path('.codex/agents/atomic-executor-c4.toml').read_bytes()) == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+files = []
+for item in manifest['files']:
+    path = item['path']
+    data = Path(path).read_bytes()
+    assert digest(data) == item['sha256'], path
+    assert digest((SCRATCH / 'p4t3-reviewed-candidate' / path).read_bytes()) == item['sha256'], path
+    assert len(data.splitlines()) <= 500, path
+    attributes = subprocess.run(['git', 'check-attr', 'text', 'eol', 'working-tree-encoding', '--', path], capture_output=True, check=True, text=True).stdout.strip()
+    index = subprocess.run(['git', 'show', ':' + path], capture_output=True)
+    indexed = index.stdout if index.returncode == 0 else None
+    files.append({'path': path, 'working_sha256': digest(data), 'physical_lines': len(data.splitlines()), 'attributes': attributes, 'index_sha256': digest(indexed) if indexed is not None else None, 'working_equals_index': data == indexed, 'crlf_to_lf_equals_index': data.replace(b'\r\n', b'\n') == indexed})
+
+proof_refs = []
+for item in manifest['proofs']:
+    assert digest(Path(item['path']).read_bytes()) == item['sha256'], item['path']
+    proof_refs.append(item)
+
+ast_checks = []
+for name, original_key, strip_docs in [('p4t3-policy-docstrings.2026-10-19T04-44.json', 'before', True), ('p4t3-policy-comments.2026-10-19T04-45.json', 'original', False)]:
+    proof = read(EVIDENCE / 'qa-gates' / name)
+    for item in proof['changes']:
+        before = (WORKER / item[original_key].removeprefix('SCRATCH/')).read_bytes()
+        assert digest(before) == item['before_sha256'], item['path']
+        if strip_docs:
+            after = (WORKER / ('comments-before-' + Path(item['path']).name)).read_bytes()
+        else:
+            after = Path(item['path']).read_bytes()
+        assert digest(after) == item['after_sha256'], item['path']
+        assert tree(before, strip_docs) == tree(after, strip_docs), item['path']
+        ast_checks.append({'path': item['path'], 'before_sha256': digest(before), 'after_sha256': digest(after), 'comparison': 'AST excluding docstrings' if strip_docs else 'complete AST including docstrings', 'equal': True})
+
+retained = []
+for name in ['p4t1-analyzer-final-handoff.2026-10-19T02-55.json', 'p4t2-final-handoff.2026-10-19T04-07.json']:
+    prior = read(EVIDENCE / 'qa-gates' / name)
+    for item in prior['files']:
+        actual = digest(Path(item['path']).read_bytes())
+        assert actual == item['working_sha256'], item['path']
+        retained.append({'path': item['path'], 'sha256': actual, 'accepted_proof': name})
+for item in manifest['preserved_files']:
+    assert digest(Path(item['path']).read_bytes()) == item['sha256'], item['path']
+
+receipts = []
+coverage = []
+for name in ['p4t3-tokenizer-binding.2026-10-19T04-30.json', 'p4t3-scanners-binding.2026-10-19T04-42.json']:
+    binding = read(EVIDENCE / 'qa-gates' / name)
+    for ref in binding['receipts']:
+        assert digest(Path(ref['path']).read_bytes()) == ref['sha256'], ref['path']
+        receipt = read(ref['path'])
+        assert receipt['exit_code'] == 0 and receipt['source_before'] == receipt['source_after'] == binding['sources'], ref['path']
+        for value in receipt['raw'].values():
+            assert digest((WORKER / value['path'].removeprefix('SCRATCH/')).read_bytes()) == value['sha256'], value['path']
+        receipts.append({'path': ref['path'], 'sha256': ref['sha256'], 'command': receipt['command'], 'exit_code': 0, 'raw_bindings_verified': True, 'stdout': receipt['stdout'], 'seconds': receipt['seconds']})
+    covref = binding['coverage']
+    assert digest(Path(covref['path']).read_bytes()) == covref['sha256']
+    cov = read(covref['path'])
+    for path, details in cov['files'].items():
+        units = []
+        for category in ['functions', 'classes']:
+            for unit, value in details[category].items():
+                if unit and value['summary']['num_statements']:
+                    assert value['summary']['percent_covered'] >= 90, (path, unit)
+                    units.append({'kind': category, 'name': unit, 'summary': value['summary']})
+        coverage.append({'path': path.replace('\\', '/'), 'summary': details['summary'], 'units': units, 'raw_proof': covref, 'qualification': 'Measured pre-comment source; exact AST equivalence maps retained proof to candidate.'})
+
+mask = read(EVIDENCE / 'regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json')
+for ref in mask['ordered_focused_receipts']:
+    assert digest(Path(ref['path']).read_bytes()) == ref['sha256']
+    receipt = read(ref['path'])
+    assert receipt['exit_code'] == 0 and receipt['source_before'] == receipt['source_after']
+    for path, value in receipt['source_after'].items():
+        assert digest(Path(path).read_bytes()) == value['sha256'], path
+    receipts.append({'path': ref['path'], 'sha256': ref['sha256'], 'command': receipt['command'], 'exit_code': 0, 'output': receipt['output'], 'seconds': receipt['duration_seconds']})
+assert digest(Path(mask['raw_coverage']['path']).read_bytes()) == mask['raw_coverage']['sha256']
+maskcov = read(mask['raw_coverage']['path'])
+for item in mask['coverage']:
+    assert maskcov['files'].get(item['path'], {}).get('summary') == item['summary'] or maskcov['files'].get(item['path'].replace('/', '\\'), {}).get('summary') == item['summary']
+    assert all(unit['percent'] == 100 for unit in item['units'])
+    coverage.append({'path': item['path'], 'summary': item['summary'], 'units': item['units'], 'raw_proof': mask['raw_coverage'], 'qualification': 'Exact unchanged working bytes.'})
+
+baseline = manifest['accepted_base_commit']
+old_source = git_bytes(baseline + ':scripts/dev_tools/discovery/analyzer/source_text.py')
+old_tests = git_bytes(baseline + ':tests/scripts/dev_tools/discovery/analyzer/test_source_text.py')
+assert digest(old_source) == mask['old_source_sha256'] or digest(old_source.replace(b'\n', b'\r\n')) == mask['old_source_sha256']
+preservation = []
+for before, after, names, label in [(old_source, Path('packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py').read_bytes(), mask['preserved_public_ast_except_docstrings'], 'public-carrier/helper'), (old_tests, Path('tests/scripts/dev_tools/discovery/analyzer/test_source_text.py').read_bytes(), mask['preserved_original_test_definitions'], 'original-test-definition')]:
+    oldtree = ast.parse(before.decode('utf-8-sig'))
+    newtree = ast.parse(after.decode('utf-8-sig'))
+    for name in names:
+        oldnode = next(node for node in oldtree.body if getattr(node, 'name', None) == name)
+        newnode = next(node for node in newtree.body if getattr(node, 'name', None) == name)
+        assert tree(ast.unparse(oldnode).encode(), True) == tree(ast.unparse(newnode).encode(), True), name
+        preservation.append({'name': name, 'kind': label, 'ast_except_docstrings_equal': True})
+
+dependent_path = EVIDENCE / 'regression-testing/p4t3-dependent-callers-044646.2026-10-19T04-46.json'
+dependent = read(dependent_path)
+assert dependent['exit_code'] == 0 and dependent['source_before'] == dependent['source_after']
+for path, expected in dependent['source_after'].items():
+    assert digest(Path(path).read_bytes()) == expected
+for value in dependent['raw'].values():
+    assert digest((WORKER / value['path'].removeprefix('SCRATCH/')).read_bytes()) == value['sha256']
+
+out = {'timestamp': datetime.now(timezone.utc).isoformat(), 'task': 'P4-T3', 'status': 'RETAINED_PROOF_BOUND_CANDIDATE_REVIEW_ONLY', 'command': 'poetry run python SCRATCH/issue-980-p4t3-review-bindings.py', 'exit_code': 0, 'candidate': {'path': manifest_path.as_posix(), 'sha256': digest(manifest_path.read_bytes())}, 'files': files, 'proof_refs': proof_refs, 'ast_checks': ast_checks, 'retained_predecessor_count': len(retained), 'retained_predecessors': retained, 'preserved_caller_fixture_count': len(manifest['preserved_files']), 'receipts': receipts, 'coverage': coverage, 'preservation': preservation, 'dependent_callers': {'path': dependent_path.as_posix(), 'sha256': digest(dependent_path.read_bytes()), 'exit_code': 0, 'stdout': dependent['stdout'], 'exact_source_and_raw_bindings': True}, 'behavioral_tests_rerun': False}
+destination = EVIDENCE / 'qa-gates' / f'p4t3-executor-review-bindings.{STAMP}.json'
+destination.write_text(json.dumps(out, indent=2, ensure_ascii=True) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'path': destination.as_posix(), 'sha256': digest(destination.read_bytes()), 'source_paths': len(files), 'ast_checks': len(ast_checks), 'predecessor_paths': len(retained), 'receipts': len(receipts), 'coverage_modules': len(coverage), 'preservation_contracts': len(preservation)}, ensure_ascii=True))

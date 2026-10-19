@@ -1,0 +1,1631 @@
+{
+  "timestamp": "2026-10-19T04:57:59.604948+00:00",
+  "task": "P4-T3",
+  "status": "RETAINED_PROOF_BOUND_CANDIDATE_REVIEW_ONLY",
+  "command": "poetry run python SCRATCH/issue-980-p4t3-review-bindings.py",
+  "exit_code": 0,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-candidate-freeze.2026-10-19T04-46.json",
+    "sha256": "a078045ecbba053eb113419bd50d9e14767a616c4f8f90626c31993bb1daff32"
+  },
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "working_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "physical_lines": 330,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "working_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "physical_lines": 189,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py: working-tree-encoding: unspecified",
+      "index_sha256": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "working_sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "physical_lines": 350,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "working_sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "physical_lines": 132,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "working_sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "physical_lines": 460,
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: eol: lf\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "working_sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26,
+      "attributes": "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto\nscripts/dev_tools/discovery/analyzer/source_text.py: eol: lf\nscripts/dev_tools/discovery/analyzer/source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "working_sha256": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+      "physical_lines": 12,
+      "attributes": "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py: text: auto\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: eol: lf\nscripts/dev_tools/discovery/analyzer/dotnet_inventory.py: working-tree-encoding: unspecified",
+      "index_sha256": "36311764e88b19d07482cdc00c934b378441c9f755df8a4ce7d9ea0612f2a476",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "working_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "physical_lines": 205,
+      "attributes": "tests/discovery_runtime/analyzer/test_source_masking.py: text: auto\ntests/discovery_runtime/analyzer/test_source_masking.py: eol: lf\ntests/discovery_runtime/analyzer/test_source_masking.py: working-tree-encoding: unspecified",
+      "index_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "working_sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "physical_lines": 221,
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_tokens.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_tokens.py: working-tree-encoding: unspecified",
+      "index_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "working_sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "physical_lines": 470,
+      "attributes": "tests/discovery_runtime/analyzer/test_csharp_declarations.py: text: auto\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: eol: lf\ntests/discovery_runtime/analyzer/test_csharp_declarations.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "working_sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "physical_lines": 179,
+      "attributes": "tests/discovery_runtime/analyzer/test_event_subscriptions.py: text: auto\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: eol: lf\ntests/discovery_runtime/analyzer/test_event_subscriptions.py: working-tree-encoding: unspecified",
+      "index_sha256": null,
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "working_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413,
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_source_text.py: working-tree-encoding: unspecified",
+      "index_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "working_equals_index": true,
+      "crlf_to_lf_equals_index": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "working_sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "physical_lines": 142,
+      "attributes": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: text: auto\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: eol: lf\ntests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py: working-tree-encoding: unspecified",
+      "index_sha256": "b4e63e6a9662f0b6322201364c7c25964ff2fd124fac008c7235ee9e4596d427",
+      "working_equals_index": false,
+      "crlf_to_lf_equals_index": false
+    }
+  ],
+  "proof_refs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-baseline-binding.2026-10-19T04-20.json",
+      "sha256": "7588f43e0cee2cfdf43ee69143cf145395d9a8e538bd384c4da8194dfb5cad91"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-binding.2026-10-19T04-30.json",
+      "sha256": "08cfcc9e9123ab6b224e01baaba91599c43fdc706ffea5c816490f5c4ac0eda2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+      "sha256": "92b7f1253e014c4efffa84b415a8a667bf42e410c2060cdc594ab4405e0647e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-evidence-index.2026-10-19T04-36.json",
+      "sha256": "6d02d530004add7ef350c92a831947e81aa77eee3b866ab61bc528db8dcedbe1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-scanners-binding.2026-10-19T04-42.json",
+      "sha256": "d4eb67a7a257fb8541cd216ff3f3b6cd35efbefe4e9f3c89f4c12127af5047ad"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-policy-docstrings.2026-10-19T04-44.json",
+      "sha256": "fd154c848cc8ab08667beee9ca30aa0ac3cedf6a1a5fe7448e5ee8a8045a6df3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-policy-comments.2026-10-19T04-45.json",
+      "sha256": "e80379012a629d1fe2916f68877d8c2050946562f1ca600a5ef7c7c25bd3b520"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-dependent-callers-044646.2026-10-19T04-46.json",
+      "sha256": "7630b8fcf51132a24acbc42a0ea21310ad11f34964fbea95b7cac1704c7d839c"
+    }
+  ],
+  "ast_checks": [
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "before_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "after_sha256": "22c0d93a5d905db9cead5614c3db7a35e50927957db91808a93d8b7078d1b573",
+      "comparison": "AST excluding docstrings",
+      "equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "before_sha256": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+      "after_sha256": "17c7777bf2afdcf1893ba30437815c1fdb74296d83910baa19c9b6f0d6c52877",
+      "comparison": "AST excluding docstrings",
+      "equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "before_sha256": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+      "after_sha256": "6659dce5add476f13d5baaab425d500bdfab4ebb994e5faaa45398e1d60d1ed0",
+      "comparison": "AST excluding docstrings",
+      "equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "before_sha256": "f9385043cf75790d2fc64215d7e398204689061d368b2311a96837718d2c95e9",
+      "after_sha256": "fab11585ff2b24a083dc3fc13d29cb7a847c1efea73235ccd2806b099dfe7209",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "before_sha256": "6a36b65aaafb94f97f25f5f766acbda3db167e28695250503617f2ff3063c62d",
+      "after_sha256": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "before_sha256": "01df2b590f28208108a13941b5524dc7385201741a72b674e541ddf6f4e777b2",
+      "after_sha256": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "before_sha256": "22c0d93a5d905db9cead5614c3db7a35e50927957db91808a93d8b7078d1b573",
+      "after_sha256": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py",
+      "before_sha256": "17c7777bf2afdcf1893ba30437815c1fdb74296d83910baa19c9b6f0d6c52877",
+      "after_sha256": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py",
+      "before_sha256": "6659dce5add476f13d5baaab425d500bdfab4ebb994e5faaa45398e1d60d1ed0",
+      "after_sha256": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+      "comparison": "complete AST including docstrings",
+      "equal": true
+    }
+  ],
+  "retained_predecessor_count": 38,
+  "retained_predecessors": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "accepted_proof": "p4t1-analyzer-final-handoff.2026-10-19T02-55.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    },
+    {
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8",
+      "accepted_proof": "p4t2-final-handoff.2026-10-19T04-07.json"
+    }
+  ],
+  "preserved_caller_fixture_count": 12,
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-format-043037.2026-10-19T04-30.json",
+      "sha256": "c1b10d5f65dece85221b974feee64300608469f5f4cf75988a3f8259c583fa47",
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "",
+      "seconds": 0.89389
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-lint-043038.2026-10-19T04-30.json",
+      "sha256": "025ba57f38ef7261db6d107477746c54ffd0f2836789259d73b4fafb3bf861c2",
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "All checks passed!\n",
+      "seconds": 0.166999
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-tokenizer-types-043039.2026-10-19T04-30.json",
+      "sha256": "b02b12d1003854ce187b636ac841eb99c6f65eb16d1141e2c9a4b0441b62848b",
+      "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+      "seconds": 0.983526
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-tokenizer-tests-043039.2026-10-19T04-30.json",
+      "sha256": "f46272c29399c5514e88f183e37954058df478140bcfece19c7bcd21f9f01296",
+      "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_tokens.py --cov=drm_copilot_discovery.analyzer.csharp_tokens --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-tokenizer-coverage.raw.json",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "..........................................................               [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                             Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_tokens.py      98      1     48      1    99%   149\r\n----------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                               98      1     48      1    99%\r\nCoverage JSON written to file SCRATCH\\p4t3-tokenizer-coverage.raw.json\r\n58 passed in 0.17s\r\n",
+      "seconds": 0.74592
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-scanners-format-044224.2026-10-19T04-42.json",
+      "sha256": "8d23a8a1a5d22a997e2e81a72f2242654f8a7a76aef5c7a1b601a4caab14136f",
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "",
+      "seconds": 0.576244
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-scanners-lint-044224.2026-10-19T04-42.json",
+      "sha256": "7f8b9c71de1f7eb1b14df05128e5e58cecaf2df9c70c1fe22c2bf2fa1d9b54ca",
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "All checks passed!\n",
+      "seconds": 0.112135
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-scanners-types-044225.2026-10-19T04-42.json",
+      "sha256": "38f4388ea7b926866fdcfd514852bc0c9ed1ceb98f9d45ffffa97e862600a4b7",
+      "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py scripts/dev_tools/discovery/analyzer/dotnet_inventory.py",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+      "seconds": 1.084832
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-scanners-tests-044241.2026-10-19T04-42.json",
+      "sha256": "1e40d719a2a0f41804adbfe4a3880594934e43d6e7e0bf6cb322918908c3269f",
+      "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_csharp_declarations.py tests/discovery_runtime/analyzer/test_event_subscriptions.py tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py --cov=drm_copilot_discovery.analyzer.csharp_declarations --cov=drm_copilot_discovery.analyzer.event_subscriptions --cov=drm_copilot_discovery.analyzer.dotnet_inventory --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t3-scanners-coverage.raw.json",
+      "exit_code": 0,
+      "raw_bindings_verified": true,
+      "stdout": "........................................................................ [ 64%]\r\n.......................................                                  [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                   Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\csharp_declarations.py     161      0     94      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_inventory.py        137      0     36      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\event_subscriptions.py      47      0     28      0   100%\r\n----------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                    345      0    158      0   100%\r\nCoverage JSON written to file SCRATCH\\p4t3-scanners-coverage.raw.json\r\n111 passed in 15.03s\r\n",
+      "seconds": 15.667239
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json",
+      "sha256": "8b5ec94a911435083b2b71f08692196fba6556c108a9049aecdb67b43b584189",
+      "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+      "exit_code": 0,
+      "output": "All done! \u2728 \ud83c\udf70 \u2728\n4 files would be left unchanged.\n",
+      "seconds": 1.478
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json",
+      "sha256": "f4426e59f3872aa8966f5250dbc94a1e456c7300b379c73b4261eca27a4126f9",
+      "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+      "exit_code": 0,
+      "output": "All checks passed!\n",
+      "seconds": 1.179
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json",
+      "sha256": "4e2bacc91ab7817092fdf236b62fccc16f9c726493871fe0ee86d2c45658abfd",
+      "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+      "exit_code": 0,
+      "output": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n",
+      "seconds": 2.018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json",
+      "sha256": "ff684b1ab5f120c84f0c5307c4f9daff0df9a3fcc98462bfff2d367376d6a418",
+      "command": "poetry run pytest -o addopts=-ra tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py -q --cov=drm_copilot_discovery.analyzer.source_text --cov=scripts.dev_tools.discovery.analyzer.source_text --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p4t3-masking-coverage.json",
+      "exit_code": 0,
+      "output": "........................................................................ [ 66%]\n....................................                                     [100%]\n=============================== tests coverage ================================\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\n\nName                                                                           Stmts   Miss Branch BrPart  Cover   Missing\n--------------------------------------------------------------------------------------------------------------------------\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\source_text.py     145      0     50      0   100%\nscripts\\dev_tools\\discovery\\analyzer\\source_text.py                                8      0      0      0   100%\n--------------------------------------------------------------------------------------------------------------------------\nTOTAL                                                                            153      0     50      0   100%\nCoverage JSON written to file SCRATCH/issue-980-p4t3-masking-coverage.json\n108 passed in 0.33s\n",
+      "seconds": 2.023
+    }
+  ],
+  "coverage": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py",
+      "summary": {
+        "covered_lines": 97,
+        "num_statements": 98,
+        "percent_covered": 98.63013698630137,
+        "percent_covered_display": "99",
+        "missing_lines": 1,
+        "excluded_lines": 0,
+        "percent_statements_covered": 98.9795918367347,
+        "percent_statements_covered_display": "99",
+        "num_branches": 48,
+        "num_partial_branches": 1,
+        "covered_branches": 47,
+        "missing_branches": 1,
+        "percent_branches_covered": 97.91666666666667,
+        "percent_branches_covered_display": "98"
+      },
+      "units": [
+        {
+          "kind": "functions",
+          "name": "SourceScanError.__init__",
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "Token.__post_init__",
+          "summary": {
+            "covered_lines": 4,
+            "num_statements": 4,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "decode_source",
+          "summary": {
+            "covered_lines": 16,
+            "num_statements": 16,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 10,
+            "num_partial_branches": 0,
+            "covered_branches": 10,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_character",
+          "summary": {
+            "covered_lines": 10,
+            "num_statements": 10,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_identifier_end",
+          "summary": {
+            "covered_lines": 14,
+            "num_statements": 14,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "tokenize_csharp",
+          "summary": {
+            "covered_lines": 30,
+            "num_statements": 31,
+            "percent_covered": 96.07843137254902,
+            "percent_covered_display": "96",
+            "missing_lines": 1,
+            "excluded_lines": 0,
+            "percent_statements_covered": 96.7741935483871,
+            "percent_statements_covered_display": "97",
+            "num_branches": 20,
+            "num_partial_branches": 1,
+            "covered_branches": 19,
+            "missing_branches": 1,
+            "percent_branches_covered": 95.0,
+            "percent_branches_covered_display": "95"
+          }
+        },
+        {
+          "kind": "classes",
+          "name": "SourceScanError",
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "classes",
+          "name": "Token",
+          "summary": {
+            "covered_lines": 4,
+            "num_statements": 4,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        }
+      ],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-tokenizer-coverage.2026-10-19T04-30.json",
+        "sha256": "cf20089fac0824bf41e7298a65bd3a9d10069e62ce80196437dfc8ee7925da92"
+      },
+      "qualification": "Measured pre-comment source; exact AST equivalence maps retained proof to candidate."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py",
+      "summary": {
+        "covered_lines": 161,
+        "num_statements": 161,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 94,
+        "num_partial_branches": 0,
+        "covered_branches": 94,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [
+        {
+          "kind": "functions",
+          "name": "_detection",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_generic",
+          "summary": {
+            "covered_lines": 17,
+            "num_statements": 17,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 12,
+            "num_partial_branches": 0,
+            "covered_branches": 12,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_namespace",
+          "summary": {
+            "covered_lines": 13,
+            "num_statements": 13,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_type",
+          "summary": {
+            "covered_lines": 10,
+            "num_statements": 10,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_callable_name",
+          "summary": {
+            "covered_lines": 12,
+            "num_statements": 12,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_event_or_delegate",
+          "summary": {
+            "covered_lines": 20,
+            "num_statements": 20,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 12,
+            "num_partial_branches": 0,
+            "covered_branches": 12,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_member",
+          "summary": {
+            "covered_lines": 20,
+            "num_statements": 20,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 14,
+            "num_partial_branches": 0,
+            "covered_branches": 14,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_members",
+          "summary": {
+            "covered_lines": 33,
+            "num_statements": 33,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 22,
+            "num_partial_branches": 0,
+            "covered_branches": 22,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "declaration_candidates",
+          "summary": {
+            "covered_lines": 21,
+            "num_statements": 21,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 16,
+            "num_partial_branches": 0,
+            "covered_branches": 16,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        }
+      ],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-scanners-coverage.2026-10-19T04-42.json",
+        "sha256": "84737b7e058211526370b05b5e0ebcb4bdf5a0305d1100ddd065a79b7a12de1c"
+      },
+      "qualification": "Measured pre-comment source; exact AST equivalence maps retained proof to candidate."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py",
+      "summary": {
+        "covered_lines": 137,
+        "num_statements": 137,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 36,
+        "num_partial_branches": 0,
+        "covered_branches": 36,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [
+        {
+          "kind": "functions",
+          "name": "classify_text",
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer.__init__",
+          "summary": {
+            "covered_lines": 2,
+            "num_statements": 2,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer._require_ctx",
+          "summary": {
+            "covered_lines": 3,
+            "num_statements": 3,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer.parse",
+          "summary": {
+            "covered_lines": 18,
+            "num_statements": 18,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer.classify",
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer.map",
+          "summary": {
+            "covered_lines": 12,
+            "num_statements": 12,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "DotnetInventoryAnalyzer.emit",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_project",
+          "summary": {
+            "covered_lines": 23,
+            "num_statements": 23,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 8,
+            "num_partial_branches": 0,
+            "covered_branches": 8,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_analyze",
+          "summary": {
+            "covered_lines": 31,
+            "num_statements": 31,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 10,
+            "num_partial_branches": 0,
+            "covered_branches": 10,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "CSharpDeclarationAnalyzer.analyze",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "EventSubscriptionAnalyzer.analyze",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "classes",
+          "name": "DotnetInventoryAnalyzer",
+          "summary": {
+            "covered_lines": 42,
+            "num_statements": 42,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 18,
+            "num_partial_branches": 0,
+            "covered_branches": 18,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "classes",
+          "name": "CSharpDeclarationAnalyzer",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "classes",
+          "name": "EventSubscriptionAnalyzer",
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        }
+      ],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-scanners-coverage.2026-10-19T04-42.json",
+        "sha256": "84737b7e058211526370b05b5e0ebcb4bdf5a0305d1100ddd065a79b7a12de1c"
+      },
+      "qualification": "Measured pre-comment source; exact AST equivalence maps retained proof to candidate."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py",
+      "summary": {
+        "covered_lines": 47,
+        "num_statements": 47,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 28,
+        "num_partial_branches": 0,
+        "covered_branches": 28,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [
+        {
+          "kind": "functions",
+          "name": "_left",
+          "summary": {
+            "covered_lines": 6,
+            "num_statements": 6,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 4,
+            "num_partial_branches": 0,
+            "covered_branches": 4,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_right",
+          "summary": {
+            "covered_lines": 14,
+            "num_statements": 14,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 12,
+            "num_partial_branches": 0,
+            "covered_branches": 12,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "_handler",
+          "summary": {
+            "covered_lines": 7,
+            "num_statements": 7,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        },
+        {
+          "kind": "functions",
+          "name": "subscription_candidates",
+          "summary": {
+            "covered_lines": 13,
+            "num_statements": 13,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 6,
+            "num_partial_branches": 0,
+            "covered_branches": 6,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          }
+        }
+      ],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-scanners-coverage.2026-10-19T04-42.json",
+        "sha256": "84737b7e058211526370b05b5e0ebcb4bdf5a0305d1100ddd065a79b7a12de1c"
+      },
+      "qualification": "Measured pre-comment source; exact AST equivalence maps retained proof to candidate."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "summary": {
+        "covered_lines": 145,
+        "num_statements": 145,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 50,
+        "num_partial_branches": 0,
+        "covered_branches": 50,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [
+        {
+          "name": "_Frame",
+          "kind": "ClassDef",
+          "start": 30,
+          "end": 42,
+          "covered_lines": 6,
+          "measured_lines": 6,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_Masker",
+          "kind": "ClassDef",
+          "start": 45,
+          "end": 193,
+          "covered_lines": 99,
+          "measured_lines": 99,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "strip_comments_and_strings",
+          "kind": "FunctionDef",
+          "start": 196,
+          "end": 205,
+          "covered_lines": 2,
+          "measured_lines": 2,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "numbered_lines",
+          "kind": "FunctionDef",
+          "start": 208,
+          "end": 214,
+          "covered_lines": 2,
+          "measured_lines": 2,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "slugify",
+          "kind": "FunctionDef",
+          "start": 217,
+          "end": 226,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "build_evidence_id",
+          "kind": "FunctionDef",
+          "start": 229,
+          "end": 245,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "TextParseResult",
+          "kind": "ClassDef",
+          "start": 248,
+          "end": 257,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "build_evidence_record",
+          "kind": "FunctionDef",
+          "start": 260,
+          "end": 300,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "Detection",
+          "kind": "ClassDef",
+          "start": 303,
+          "end": 318,
+          "covered_lines": 8,
+          "measured_lines": 8,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "DetectionResult",
+          "kind": "ClassDef",
+          "start": 321,
+          "end": 330,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "start": 54,
+          "end": 59,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_blank",
+          "kind": "FunctionDef",
+          "start": 61,
+          "end": 70,
+          "covered_lines": 6,
+          "measured_lines": 6,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_run_end",
+          "kind": "FunctionDef",
+          "start": 72,
+          "end": 78,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_comment",
+          "kind": "FunctionDef",
+          "start": 80,
+          "end": 94,
+          "covered_lines": 10,
+          "measured_lines": 10,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_open_string",
+          "kind": "FunctionDef",
+          "start": 96,
+          "end": 111,
+          "covered_lines": 10,
+          "measured_lines": 10,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_code",
+          "kind": "FunctionDef",
+          "start": 113,
+          "end": 140,
+          "covered_lines": 23,
+          "measured_lines": 23,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_literal",
+          "kind": "FunctionDef",
+          "start": 142,
+          "end": 180,
+          "covered_lines": 32,
+          "measured_lines": 32,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "run",
+          "kind": "FunctionDef",
+          "start": 182,
+          "end": 193,
+          "covered_lines": 7,
+          "measured_lines": 7,
+          "percent": 100.0,
+          "missing_lines": []
+        }
+      ],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+        "sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d"
+      },
+      "qualification": "Exact unchanged working bytes."
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "summary": {
+        "covered_lines": 8,
+        "num_statements": 8,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [],
+      "raw_proof": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+        "sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d"
+      },
+      "qualification": "Exact unchanged working bytes."
+    }
+  ],
+  "preservation": [
+    {
+      "name": "slugify",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "build_evidence_id",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "build_evidence_record",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TextParseResult",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "Detection",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "DetectionResult",
+      "kind": "public-carrier/helper",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TestStripper",
+      "kind": "original-test-definition",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TestNumberedLines",
+      "kind": "original-test-definition",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TestSlugify",
+      "kind": "original-test-definition",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TestBuildEvidenceId",
+      "kind": "original-test-definition",
+      "ast_except_docstrings_equal": true
+    },
+    {
+      "name": "TestTextParseResult",
+      "kind": "original-test-definition",
+      "ast_except_docstrings_equal": true
+    }
+  ],
+  "dependent_callers": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-dependent-callers-044646.2026-10-19T04-46.json",
+    "sha256": "7630b8fcf51132a24acbc42a0ea21310ad11f34964fbea95b7cac1704c7d839c",
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 86%]\r\n...........                                                              [100%]\r\n83 passed in 0.24s\r\n",
+    "exact_source_and_raw_bindings": true
+  },
+  "behavioral_tests_rerun": false
+}

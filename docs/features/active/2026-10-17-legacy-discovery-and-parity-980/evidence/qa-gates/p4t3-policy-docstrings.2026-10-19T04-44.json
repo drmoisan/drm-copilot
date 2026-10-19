@@ -1,0 +1,35 @@
+{
+  "changes": [
+    {
+      "after_sha256": "22c0d93a5d905db9cead5614c3db7a35e50927957db91808a93d8b7078d1b573",
+      "ast_equivalent": true,
+      "ast_without_docstrings_sha256": "2955d2b01ef8d205efeeaa9e53341e62cb99bb36033d25af399c88beada74243",
+      "before": "SCRATCH/policy-before-test_csharp_tokens.py",
+      "before_sha256": "9dad87afbdeff76f8c1fab9f1e4f6b207efb24406b2b73f6fb7ebc2ef9e9669f",
+      "lines": 217,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_tokens.py"
+    },
+    {
+      "after_sha256": "17c7777bf2afdcf1893ba30437815c1fdb74296d83910baa19c9b6f0d6c52877",
+      "ast_equivalent": true,
+      "ast_without_docstrings_sha256": "fcda9bf5ee0a7f6c95034ba407054a0b8058ca338e73272b5ca9a3444253c307",
+      "before": "SCRATCH/policy-before-test_csharp_declarations.py",
+      "before_sha256": "ac6a6d638de7283f47f9614abc5db9a43b42ce5adff8d731fc681581d892599e",
+      "lines": 448,
+      "path": "tests/discovery_runtime/analyzer/test_csharp_declarations.py"
+    },
+    {
+      "after_sha256": "6659dce5add476f13d5baaab425d500bdfab4ebb994e5faaa45398e1d60d1ed0",
+      "ast_equivalent": true,
+      "ast_without_docstrings_sha256": "6abbc53f53fbe55f31ba4fef337c62f42d433c1d1b2b76f801fc91c65e1a9d87",
+      "before": "SCRATCH/policy-before-test_event_subscriptions.py",
+      "before_sha256": "d687be93bf79b53ebe95d36e20ad4ead6421f632f61e5e47df4708ed029c2217",
+      "lines": 170,
+      "path": "tests/discovery_runtime/analyzer/test_event_subscriptions.py"
+    }
+  ],
+  "qualification": "Only test docstrings changed. Original imports, executable statements, assertions and parametrization are identical. Prior tokenizer58 and scanner111 test behavior remains valid; final combined gates follow consolidated review.",
+  "routing_receipt": "inventory_analyzers_p4t3_policy_cleanup",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-44"
+}
