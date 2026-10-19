@@ -1,0 +1,35 @@
+{
+  "batch": "initial-format",
+  "command": "poetry run python -m black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:49:13.575040+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-initial-format-format-084913.2026-10-19T08-49.stderr.txt",
+      "sha256": "5f39faf236f07f639a76b94d8d989f6450f944c8454aa19f0fd4bd99624ec384"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-initial-format-format-084913.2026-10-19T08-49.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.697648,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "7aef0052209fbd4c06b50d30cba47c24a711b9e6e1c776683af27c3df262cb4a",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "90cbf0a670d4430faa2e1485ae151d54f6e537ae7bbc96070c121880eb83ef76",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "791a915dcd92df92cb55c6829109075c1bc7054760dcdb9f74996c79a8d8df86"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "7d0e59063bb98ae3b731b322422dca2010a12cc455642879167dbf9f83d8ee29",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "0bbfdbf69d3bdddeb6f9697a95f321d4e03c7ccf56e79f3eceef231e326855bc",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "d8c3506485848e3e19a0647760f090a1c3e1e06849d8ba7b553e9d7e49bb15b7",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "892f6906fedd1e13e4048b4eb890efac3e974a3fa4f9a1a6f3103cbaa01ab6b2"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T08:49:12.877392+00:00",
+  "stderr": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_reference_syntax.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_test_reference_syntax.py\r\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_test_references.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n4 files reformatted.\r\n",
+  "stdout": "",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-49"
+}

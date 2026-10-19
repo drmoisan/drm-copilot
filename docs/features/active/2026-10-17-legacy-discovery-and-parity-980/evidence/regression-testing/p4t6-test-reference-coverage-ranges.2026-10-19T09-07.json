@@ -1,0 +1,519 @@
+{
+  "baseline": "Two new modules have no prior executable population; all 55 accepted predecessor working-byte proofs remain exact.",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-test-reference-bounded-scope-typed-coverage.2026-10-19T09-05.json",
+    "raw_path": "SCRATCH/p4t6-test-reference-bounded-scope-typed-coverage.raw.json",
+    "raw_sha256": "a3c654c0181381e62ef02f5437fb314b13282c8a5b255f2638e2bfedca74966a",
+    "sha256": "0641de3ecf985ff077351bfe404c9d59b354204d13cae12a50198e31769f2e9b"
+  },
+  "files": [
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py: eol: lf",
+      "filtered_git_blob": "79b1440d9991bd4237ee034e95ce501e693101e9",
+      "lines": 481,
+      "normalized_sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "sha256": "cc4d1cdc8b2caf0292da1e94dd0aa375ca39117514fa690eb5d55d7d3b3faa6b",
+      "stream_relation": "identical",
+      "working_git_blob": "79b1440d9991bd4237ee034e95ce501e693101e9"
+    },
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py: eol: lf",
+      "filtered_git_blob": "52cc97d4f4439edbe8db06b41d42b0cbd273e110",
+      "lines": 121,
+      "normalized_sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "sha256": "19d3b849d3d351587a0647c1820755cffeef3393c1aaa8e07455fea210811596",
+      "stream_relation": "identical",
+      "working_git_blob": "52cc97d4f4439edbe8db06b41d42b0cbd273e110"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_test_references.py: text: auto\ntests/discovery_runtime/analyzer/test_test_references.py: eol: lf",
+      "filtered_git_blob": "64c83a63eeaf200ba9d8f953b45d2f74ea1bf45e",
+      "lines": 486,
+      "normalized_sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+      "path": "tests/discovery_runtime/analyzer/test_test_references.py",
+      "sha256": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6",
+      "stream_relation": "identical",
+      "working_git_blob": "64c83a63eeaf200ba9d8f953b45d2f74ea1bf45e"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py: text: auto\ntests/discovery_runtime/analyzer/test_test_reference_syntax.py: eol: lf",
+      "filtered_git_blob": "9f66c7f31f4d7e283ce033c38b6c600d5e3a9520",
+      "lines": 311,
+      "normalized_sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+      "path": "tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+      "sha256": "35ebc0cf8e4d7e7c58704770e49474a289f8b1d6631f19cbab97cbf5b91205de",
+      "stream_relation": "identical",
+      "working_git_blob": "9f66c7f31f4d7e283ce033c38b6c600d5e3a9520"
+    }
+  ],
+  "modules": [
+    {
+      "missing_branches": [
+        [
+          256,
+          257
+        ],
+        [
+          357,
+          358
+        ],
+        [
+          391,
+          392
+        ]
+      ],
+      "missing_lines": [
+        257,
+        358,
+        392
+      ],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "summary": {
+        "covered_branches": 55,
+        "covered_lines": 157,
+        "excluded_lines": 3,
+        "missing_branches": 3,
+        "missing_lines": 3,
+        "num_branches": 58,
+        "num_partial_branches": 3,
+        "num_statements": 160,
+        "percent_branches_covered": 94.82758620689656,
+        "percent_branches_covered_display": "95",
+        "percent_covered": 97.24770642201835,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.125,
+        "percent_statements_covered_display": "98"
+      }
+    },
+    {
+      "missing_branches": [
+        [
+          54,
+          55
+        ]
+      ],
+      "missing_lines": [
+        55
+      ],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "summary": {
+        "covered_branches": 37,
+        "covered_lines": 61,
+        "excluded_lines": 3,
+        "missing_branches": 1,
+        "missing_lines": 1,
+        "num_branches": 38,
+        "num_partial_branches": 1,
+        "num_statements": 62,
+        "percent_branches_covered": 97.36842105263158,
+        "percent_branches_covered_display": "97",
+        "percent_covered": 98.0,
+        "percent_covered_display": "98",
+        "percent_statements_covered": 98.38709677419355,
+        "percent_statements_covered_display": "98"
+      }
+    }
+  ],
+  "node_order_qualification": "Reconstructed from the exact retained verbose stdout with space-bearing parameter identifiers preserved. The preliminary focused receipt test_node_order field used a non-whitespace pattern and is not the authoritative full node list.",
+  "task": "P4-T6",
+  "test_module_order": [
+    "tests/discovery_runtime/analyzer/test_test_references.py",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py"
+  ],
+  "test_node_order": [
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}()-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}()-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}()-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}<int>()-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}<int>()-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}<int>()-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}[2]-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}[2]-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[new {name}[2]-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[typeof({name})-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[typeof({name})-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[typeof({name})-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[default({name})-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[default({name})-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[default({name})-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[sizeof({name})-]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[sizeof({name})-Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_explicit_type_contexts_remain_inferred[sizeof({name})-global::Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_ambiguous_partial_nested_generic_names_never_bind[partial class Widget {} partial class Widget {}]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_ambiguous_partial_nested_generic_names_never_bind[namespace A { class Widget {} } namespace B { class Widget {} }]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_ambiguous_partial_nested_generic_names_never_bind[class Outer { class Widget<T> {} } class Widget {}]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_alias_shadowing_and_preprocessing_are_explicitly_unbound",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_unicode_literal_spelling_and_repeated_physical_offsets[Widget]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_unicode_literal_spelling_and_repeated_physical_offsets[\\xc5Value]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_unicode_literal_spelling_and_repeated_physical_offsets[\\U00010400Type]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_unicode_literal_spelling_and_repeated_physical_offsets[@Widget]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_unicode_literal_spelling_and_repeated_physical_offsets[\\\\u0057idget]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_scope_uses_component_boundaries_and_production_precedence[tests_extra/a.cs-changes0]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_scope_uses_component_boundaries_and_production_precedence[docs/a.cs-changes1]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_scope_uses_component_boundaries_and_production_precedence[tests/a.cs-changes2]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_scope_uses_component_boundaries_and_production_precedence[tests/a.cs-changes3]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_scope_uses_component_boundaries_and_production_precedence[tests/a.cs-changes4]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_project_expression_values_are_withheld[$(VALUE_SENTINEL)/a.csproj-expression]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_project_expression_values_are_withheld[@(VALUE_SENTINEL)-expression]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_project_expression_values_are_withheld[%(VALUE_SENTINEL)-expression]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_project_expression_values_are_withheld[VALUE_SENTINEL/*.csproj-wildcard]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_project_expression_values_are_withheld[VALUE_SENTINEL?.csproj-wildcard]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_encoding_and_lexical_failures_are_redacted[\\xffVALUE_SENTINEL]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_encoding_and_lexical_failures_are_redacted[\\x00]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_encoding_and_lexical_failures_are_redacted[class \\uXXYYVALUE_SENTINEL {}]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_bom_decoding_uses_captured_bytes[utf-8-sig]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_bom_decoding_uses_captured_bytes[utf-16]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_source_bom_decoding_uses_captured_bytes[utf-32]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_exact_pin_is_required_without_reusing_working_claims[missing]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_exact_pin_is_required_without_reusing_working_claims[bytes]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_exact_pin_is_required_without_reusing_working_claims[revision]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_exact_pin_is_required_without_reusing_working_claims[repository]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_omission_rationale_cannot_leak_into_diagnostics[excluded]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_omission_rationale_cannot_leak_into_diagnostics[unreadable]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_direct_adapter_is_schema_valid_and_does_not_assign_coverage",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_global_budget_overflow_discards_all_claims[artifact_records-4]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_global_budget_overflow_discards_all_claims[document_bytes-4000]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_global_budget_overflow_discards_all_claims[source_files-1]",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_foreign_unused_pin_bytes_consume_independent_budget",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_later_valid_duplicate_pin_retains_exact_matching_semantics",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_type_index_budget_is_reserved_before_name_insertion",
+    "tests/discovery_runtime/analyzer/test_test_references.py::test_file_byte_limit_precedes_masking",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[Widget + value]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[Widget variable;]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[Widget.Run();]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[WidgetTests();]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new WidgetTests()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[class Widget {}]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[using A = Widget; new A();]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new Widget {}]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new Alias::Widget()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new Namespace.]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[typeof Widget]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[default]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[sizeof(]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[new .Widget()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[holder.new Widget()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[holder?.new Widget()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[holder::new Widget()]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[\"new Widget()\"]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[// new Widget()\\n]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[/* typeof(Widget) */]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[$\"{new Widget()}\"]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[\"\"\"new Widget()\"\"\"]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_unselected_contexts_and_masked_text_do_not_imply_relevance[#if new Widget()\\n#endif]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_opaque_or_unselected_project_contexts_have_no_edges[<Project><Target><ItemGroup><ProjectReference Include=\"x\"/></ItemGroup></Target></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_opaque_or_unselected_project_contexts_have_no_edges[<Project><ProjectReference Include=\"x\"/></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_opaque_or_unselected_project_contexts_have_no_edges[<Project><ItemGroup><Other Include=\"x\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_opaque_or_unselected_project_contexts_have_no_edges[<Project><ItemGroup><ProjectReference xmlns=\"urn:other\" Include=\"x\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[True-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[True-limit]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[1.5-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[1.5-limit]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[0-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[0-limit]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[-1-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[-1-limit]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[67108865-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_limits_are_exact_integers_before_parsing[67108865-limit]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_qualified_and_overlapping_lookahead_has_linear_counted_work[1]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_qualified_and_overlapping_lookahead_has_linear_counted_work[8]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_qualified_and_overlapping_lookahead_has_linear_counted_work[32]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_oversized_token_population_fails_before_access",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_line_and_ordinal_preserve_duplicate_declarations",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root--Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root--Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root--Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[root- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group--Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group--Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group--Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[group- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference--Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference--Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference--Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[reference- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none--Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none--Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none--Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Include]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Update]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_project_operations_keep_conditions_and_targets_unevaluated[none- xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"-Remove]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Other/>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project xmlns=\"urn:other\"/>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project><ItemGroup><ProjectReference/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project><ItemGroup><ProjectReference Include=\" \"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project><ItemGroup><ProjectReference Include=\"x\" Update=\"y\"/></ItemGroup></Project>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<!DOCTYPE Project [<!ENTITY x \"VALUE_SENTINEL\">]><Project/>]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project VALUE_SENTINEL]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_malformed_selected_project_is_redacted_and_has_no_partial_claims[<Project>VALUE_SENTINEL]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_scope_classification_is_once_per_input_and_reserved_before_matching[1-5000-2-False]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_scope_classification_is_once_per_input_and_reserved_before_matching[2-5000-2-True]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_scope_classification_is_once_per_input_and_reserved_before_matching[1-1000-0-True]",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py::test_selected_input_count_is_reserved_before_projection"
+  ],
+  "timestamp": "2026-10-19T09-07",
+  "totals": {
+    "covered_branches": 92,
+    "covered_lines": 218,
+    "excluded_lines": 6,
+    "missing_branches": 4,
+    "missing_lines": 4,
+    "num_branches": 96,
+    "num_partial_branches": 4,
+    "num_statements": 222,
+    "percent_branches_covered": 95.83333333333333,
+    "percent_branches_covered_display": "96",
+    "percent_covered": 97.48427672955975,
+    "percent_covered_display": "97",
+    "percent_statements_covered": 98.1981981981982,
+    "percent_statements_covered_display": "98"
+  },
+  "units": [
+    {
+      "branches": 2,
+      "covered_branches": 2,
+      "covered_statements": 11,
+      "end": 72,
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_TypeIndex",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 48,
+      "statements": 11
+    },
+    {
+      "branches": 2,
+      "covered_branches": 2,
+      "covered_statements": 7,
+      "end": 72,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_TypeIndex.add",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 61,
+      "statements": 7
+    },
+    {
+      "branches": 0,
+      "covered_branches": 0,
+      "covered_statements": 2,
+      "end": 88,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_failure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 75,
+      "statements": 2
+    },
+    {
+      "branches": 4,
+      "covered_branches": 4,
+      "covered_statements": 29,
+      "end": 214,
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_Output",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 92,
+      "statements": 29
+    },
+    {
+      "branches": 2,
+      "covered_branches": 2,
+      "covered_statements": 7,
+      "end": 130,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_Output.reserve",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 109,
+      "statements": 7
+    },
+    {
+      "branches": 0,
+      "covered_branches": 0,
+      "covered_statements": 6,
+      "end": 156,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_Output.component",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 132,
+      "statements": 6
+    },
+    {
+      "branches": 2,
+      "covered_branches": 2,
+      "covered_statements": 9,
+      "end": 214,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_Output.site",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 158,
+      "statements": 9
+    },
+    {
+      "branches": 4,
+      "covered_branches": 4,
+      "covered_statements": 7,
+      "end": 234,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_role",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 217,
+      "statements": 7
+    },
+    {
+      "branches": 14,
+      "covered_branches": 13,
+      "covered_statements": 23,
+      "end": 277,
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          256,
+          257
+        ]
+      ],
+      "missing_lines": [
+        257
+      ],
+      "name": "_selected",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 237,
+      "statements": 24
+    },
+    {
+      "branches": 10,
+      "covered_branches": 10,
+      "covered_statements": 16,
+      "end": 307,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_pinned",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 280,
+      "statements": 16
+    },
+    {
+      "branches": 24,
+      "covered_branches": 22,
+      "covered_statements": 53,
+      "end": 481,
+      "kind": "ClassDef",
+      "missing_branches": [
+        [
+          357,
+          358
+        ],
+        [
+          391,
+          392
+        ]
+      ],
+      "missing_lines": [
+        358,
+        392
+      ],
+      "name": "TestReferenceAnalyzer",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 310,
+      "statements": 55
+    },
+    {
+      "branches": 12,
+      "covered_branches": 11,
+      "covered_statements": 29,
+      "end": 373,
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          357,
+          358
+        ]
+      ],
+      "missing_lines": [
+        358
+      ],
+      "name": "TestReferenceAnalyzer.analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 321,
+      "statements": 30
+    },
+    {
+      "branches": 12,
+      "covered_branches": 11,
+      "covered_statements": 22,
+      "end": 481,
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          391,
+          392
+        ]
+      ],
+      "missing_lines": [
+        392
+      ],
+      "name": "TestReferenceAnalyzer._file",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py",
+      "start": 375,
+      "statements": 23
+    },
+    {
+      "branches": 20,
+      "covered_branches": 19,
+      "covered_statements": 27,
+      "end": 69,
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          54,
+          55
+        ]
+      ],
+      "missing_lines": [
+        55
+      ],
+      "name": "type_mentions",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "start": 22,
+      "statements": 28
+    },
+    {
+      "branches": 18,
+      "covered_branches": 18,
+      "covered_statements": 29,
+      "end": 121,
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "project_reference_sites",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+      "start": 72,
+      "statements": 29
+    }
+  ]
+}

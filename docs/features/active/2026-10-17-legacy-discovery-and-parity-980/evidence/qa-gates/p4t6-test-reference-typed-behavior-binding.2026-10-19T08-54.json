@@ -1,0 +1,35 @@
+{
+  "batch": "typed-behavior",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-test-reference-typed-behavior-coverage.2026-10-19T08-54.json",
+    "raw_path": "SCRATCH/p4t6-test-reference-typed-behavior-coverage.raw.json",
+    "raw_sha256": "56fa2e19cb8d725f950956b30b83c166d13823cb2a4583d8a369cb4bb0f241d5",
+    "sha256": "5ae2bd40201c9dbccbd0d60de0383c3032f446539fc1b3c2dd61e7441efa1589"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-test-reference-typed-behavior-format-085207.2026-10-19T08-52.json",
+      "sha256": "96858300919c872a24d84b8b808ce7b3756e0019ed2b8d3434a2501da5835782"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-test-reference-typed-behavior-lint-085207.2026-10-19T08-52.json",
+      "sha256": "14a08f9ac16bef06a9ba44fc12b06080a351171d492d9190204c2254f63cdd0f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-test-reference-typed-behavior-types-085208.2026-10-19T08-52.json",
+      "sha256": "8689c4e4fda6a11ed25639d3b5a2b04c6ce7ba145490bc38bb0c99b7d50b30bc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t6-test-reference-typed-behavior-tests-085420.2026-10-19T08-54.json",
+      "sha256": "a4819de8716507fe03fe045003a2a81e3caacc9f159fdd461c83884312fa2d6b"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cea9d7da013b76efcb67eccbcc946db7ae5ac25570fdda37695271f29f414053",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6"
+  },
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-54"
+}
