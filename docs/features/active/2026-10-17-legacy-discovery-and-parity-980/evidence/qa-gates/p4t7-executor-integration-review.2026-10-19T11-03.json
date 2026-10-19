@@ -1,0 +1,204 @@
+{
+  "status": "INTEGRATION_REVIEW_PASS_READY_FOR_FINAL_GATES",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T11-03",
+  "published_utc": "2026-10-19T11:03:03.126844+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-integration-review.py",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t7_central_integration_review",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": true
+  },
+  "scope": "First review of central dependencies.py and its two frozen tests only. Five borrowed parser/shared sources are hash bindings, not repeated reviews.",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-freeze.2026-10-19T10-53.json",
+    "sha256": "28975f0cd0dd00c11c1595135e9832ae502a8039c1c0d990c1b5ae034e5e4266",
+    "bytes": 46020
+  },
+  "source_test_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "bytes": 19107,
+      "physical_lines": 467
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "bytes": 17615,
+      "physical_lines": 467
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "bytes": 13698,
+      "physical_lines": 339
+    }
+  ],
+  "borrowed_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "bytes": 20798
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "bytes": 7771
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "bytes": 12347
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "bytes": 13384
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "bytes": 14804
+    }
+  ],
+  "focused_receipts_reused": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.json",
+      "sha256": "54b8a34b142aafc4beebb2647016a9c7835c4cd1d54a87b97fa525c5448d43b4",
+      "bytes": 4563
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.json",
+      "sha256": "1839386d368c310880e30929229f19fcfa7ad5468bf669a6a6446996d563b26b",
+      "bytes": 4497
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.json",
+      "sha256": "68a3796d91c2766a0aa000860e7bfd236bca236302df82a0a95befef668d6eb4",
+      "bytes": 4680
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.json",
+      "sha256": "a4dab482401d5483de28d36d022f242c7f12cb075f3dcd35fc63f3cd563ef73a",
+      "bytes": 15506
+    }
+  ],
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-coverage.2026-10-19T10-53.json",
+    "sha256": "67e51730e03cc8a61186c0cf06481d803fa2ce0a67acab90595deb2929452faf",
+    "bytes": 13860
+  },
+  "test_and_coverage_summary": {
+    "cases": 66,
+    "statements": "149/149",
+    "branches": "62/62",
+    "named_class_callable_ranges": 13,
+    "all_ranges_fully_covered": true
+  },
+  "review_checks": [
+    {
+      "boundary": "Aggregate pin and selected input work",
+      "result": "One bounded retained-pin index, prospective pin count/byte/path work and selected input byte limits precede allocations. Exact same-path pin groups retain any valid immutable identity/byte match."
+    },
+    {
+      "boundary": "Remaining parser budgets",
+      "result": "Independent work, input, text and record domains are propagated through the finite public parser calls. Successful usage is checked before refund; failure retains conservative reserved work."
+    },
+    {
+      "boundary": "Complete output and error reservation",
+      "result": "Full components, findings, inferred relationships and deduplicated diagnostics reserve counts and conservative serialized bytes before construction. Aggregate failure replaces partial output with the reserved fixed fallback; impossible fallback envelopes raise."
+    },
+    {
+      "boundary": "Source ownership and confidence",
+      "result": "Captured digest/path/repository/revision remain explicit. Confidence is high only with exact retained pin identity and bytes. No installed, executed, evaluated, target architecture or coverage-completion claim is introduced."
+    },
+    {
+      "boundary": "Facts and inferred relationships",
+      "result": "Observed declarations/lock records are detected facts. Edges retain requested versions and nullable targets with inferred low-confidence relevance; conditions and all target execution/binding states remain unresolved."
+    },
+    {
+      "boundary": "Determinism and schema composition",
+      "result": "Validated captures canonicalize paths; fixed dispatch, within-file ordinals and semantic identifiers produce stable output. The retained real three-parser/emitter composition validates schemas and uninspected/unassigned ledger proposals."
+    },
+    {
+      "boundary": "Policy and test isolation",
+      "result": "The three files remain 467/467/339 lines with typed contracts and intent comments. Tests use captured memory values, bounded injection and existing immutable catalog resources; no temporary files or external processes."
+    }
+  ],
+  "resolved_read_only_question": "InventoryCapture already enforces configured input count during construction. This interface check required no new probe or predecessor code change.",
+  "new_behavioral_probes": [],
+  "findings": [],
+  "open_probes": [],
+  "retained_subset_confirmations": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json",
+      "sha256": "89fa8d3c97da9343e8b83d855ce6d8dc8ca28f758b6e7ef2489ddbd0de7beac0",
+      "bytes": 10960
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation.2026-10-19T10-36.json",
+      "sha256": "226d6b3885d34e6bfe53dcda7f98c3f48318704a3dbfb6230d7257f4027b7208",
+      "bytes": 11456
+    }
+  ],
+  "worker_executed_harness_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-executed-harnesses.2026-10-19T10-53.json",
+    "sha256": "7c10002149c76da7919029f0dc63f79c0e9a41d20768e3409dac5015b624dac2",
+    "bytes": 32271
+  },
+  "decoded_harness_hashes": [
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-test-split.py",
+      "raw_sha256": "c2e4ee13c006083bb6f5b0743d0dc0ad9e3b823253cc790daf7180b8e37249ff"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-preformat.py",
+      "raw_sha256": "23b890eb3f2d61190fcd68bbc7dc52be07058b707ce17f39bcb790838b172f8b"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-resume.py",
+      "raw_sha256": "57e59e22e97789bdde7bb263207976616c2ce576e7b39b49a96a48c59516589d"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-gate.py",
+      "raw_sha256": "4749baefa1de70d4f5c8e6f4f9e438ed3275274433cfc76dcd1be4ece9d1eac5"
+    },
+    {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-freeze.py",
+      "raw_sha256": "de6b264a19eb4fe2cce937b9afe628c8baf9e18cd22168053a7145647372c9d3"
+    }
+  ],
+  "prior_failure_preservation": {
+    "initial_coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-initial-coverage.2026-10-19T10-53.json",
+      "sha256": "aa332555ef2e59fe3fafcdce103dda0de3e6ff0e3820ae13073ab8ad373d72e7",
+      "bytes": 13860
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-handoff.2026-10-19T10-53.md",
+      "sha256": "ba1b6ce0f8701e02d22fcf1f6789d5ab9978f283f6eee0cd1c1902f4d3a290f4",
+      "bytes": 2942
+    },
+    "qualification": "Original 64-pass/2-fail fixture diagnostics and earlier lint/type history remain in the immutable worker freeze; fixture-only pin order and computed-profile setup were corrected before the clean 66-case loop."
+  },
+  "raw_coverage_qualification": "Coverage-generator JSON is retained byte-for-byte, including its original terminal-newline convention.",
+  "no_replay": "No behavioral suite or independent behavioral probe was run; existing 66-case proof and prior subset confirmations were reused. The 62-stream predecessor manifest was referenced, not recaptured.",
+  "pending": [
+    "Parent checked checkpoint",
+    "Combined final ordered toolchain and native composition",
+    "P4-T7 final receipt acceptance and task/AC mapping"
+  ],
+  "limitations": [
+    "Registry/CLI publication remains P4-T9.",
+    "No native coding-agent host or non-Windows acceptance is asserted.",
+    "This candidate review does not mark P4-T7 accepted."
+  ],
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review-harness.2026-10-19T11-03.txt",
+    "sha256": "f4fad3d870c892b1266210d02e7d3e5454fdec2085b51aa3515c8b976a16b90b",
+    "bytes": 11179
+  },
+  "task_or_ac_checkoff": false
+}

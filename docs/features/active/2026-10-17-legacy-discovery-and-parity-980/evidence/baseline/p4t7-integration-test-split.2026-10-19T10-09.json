@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-10-19T10-09",
+  "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+  "exists_before_creation": false,
+  "approval": "Parent approval at2026-10-19T10:07:46Z; exclusive integration test split",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "command": "poetry run python SCRATCH/issue-980-p4t7-integration-test-split.py",
+  "exit_code": 0
+}

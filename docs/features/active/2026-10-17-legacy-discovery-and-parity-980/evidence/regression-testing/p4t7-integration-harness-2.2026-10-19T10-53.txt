@@ -1,0 +1,9 @@
+"""Measure formatted integration scope before applying any size-violating output."""
+import black
+from pathlib import Path
+
+for name in ("packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py", "tests/discovery_runtime/analyzer/test_dependencies.py"):
+    path = Path(name)
+    content = black.format_file_contents(path.read_text("utf-8"), fast=False, mode=black.Mode())
+    print(name, len(path.read_text("utf-8").splitlines()), len(content.splitlines()))
+    Path(__file__).with_name("issue-980-p4t7-integration-" + path.name + ".candidate.txt").write_bytes(content.encode())

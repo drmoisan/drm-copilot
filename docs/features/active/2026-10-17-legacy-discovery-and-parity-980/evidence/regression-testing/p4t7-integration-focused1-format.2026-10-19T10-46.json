@@ -1,0 +1,97 @@
+{
+  "stage": "format-auto",
+  "label": "p4t7-integration-focused1-format",
+  "started": "2026-10-19T10:46:40.696311+00:00",
+  "finished": "2026-10-19T10:46:42.490675+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py tests/discovery_runtime/analyzer/test_dependencies.py tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.794,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "cfe8fba2faab880277511d6b2fb6750a622fe33f1e2b118d5666016051affac2",
+      "physical_lines": 314
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "d7b1e8ad1ffcaeb90b2f8173396707af06815301fb006d996a36c164e09ec114",
+      "physical_lines": 309
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "40fccf677171dc847cb76f8bfb0de937f5d9ca19283896ce50b8be73185b520b",
+      "physical_lines": 244
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "c8d3b838e8ae4a530690fab283809d404cd780d60eace1e1070a840d05ce6888",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "39b6541f1499a93c77fd825796639efccf78b01874b451355c52be35840fad12",
+      "physical_lines": 466
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "4ca33aef4e88b84a35fe9b369ac6afca3e763dd394da828f5121e5c76f39cd37",
+      "physical_lines": 342
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused1-format-104642.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused1-format-104642.stderr.bin",
+      "raw_sha256": "d831f5c3b8b27020e60b816c547e7d5e55f00e99f72c2fd9e5708427f2dab01d",
+      "raw_bytes": 289,
+      "presentation": "reformatted tests\\discovery_runtime\\analyzer\\test_dependency_projection_limits.py\r\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependencies.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependencies.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n3 files reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 central integration only"
+}

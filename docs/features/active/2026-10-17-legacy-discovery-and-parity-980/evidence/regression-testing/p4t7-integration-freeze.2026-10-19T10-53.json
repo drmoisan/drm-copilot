@@ -1,0 +1,716 @@
+{
+  "status": "FROZEN_READY",
+  "timestamp": "2026-10-19T10-53",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-integration-freeze.py",
+  "exit_code": 0,
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "physical_lines": 467,
+      "lf_normalized_sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 13,
+      "loops_with_immediate_intent_comments": 4
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "physical_lines": 467,
+      "lf_normalized_sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_dependencies.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_dependencies.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 17,
+      "loops_with_immediate_intent_comments": 0
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "physical_lines": 339,
+      "lf_normalized_sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 16,
+      "loops_with_immediate_intent_comments": 0
+    }
+  ],
+  "ordered_focused_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.json",
+      "sha256": "54b8a34b142aafc4beebb2647016a9c7835c4cd1d54a87b97fa525c5448d43b4",
+      "stage": "format",
+      "started": "2026-10-19T10:51:17.539147+00:00",
+      "finished": "2026-10-19T10:51:19.288906+00:00",
+      "duration_seconds": 1.75
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.json",
+      "sha256": "1839386d368c310880e30929229f19fcfa7ad5468bf669a6a6446996d563b26b",
+      "stage": "lint",
+      "started": "2026-10-19T10:51:21.989659+00:00",
+      "finished": "2026-10-19T10:51:23.160373+00:00",
+      "duration_seconds": 1.171
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.json",
+      "sha256": "68a3796d91c2766a0aa000860e7bfd236bca236302df82a0a95befef668d6eb4",
+      "stage": "types",
+      "started": "2026-10-19T10:51:25.843952+00:00",
+      "finished": "2026-10-19T10:51:27.959849+00:00",
+      "duration_seconds": 2.116
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.json",
+      "sha256": "a4dab482401d5483de28d36d022f242c7f12cb075f3dcd35fc63f3cd563ef73a",
+      "stage": "unit",
+      "started": "2026-10-19T10:51:30.738172+00:00",
+      "finished": "2026-10-19T10:52:37.371620+00:00",
+      "duration_seconds": 66.633
+    }
+  ],
+  "borrowed_sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "frozen_subset_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+      "sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.json",
+      "sha256": "d8bc7e62f27dadfa1093122e36482de9da1e0016f41c405516743c2e66ed1642"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json",
+      "sha256": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-freeze.2026-10-19T10-30.json",
+      "sha256": "02e7fa6de5f8a895a1738777e1effcba1e973ade848b17347f3ce2e916956f96"
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-coverage.2026-10-19T10-53.json",
+    "sha256": "67e51730e03cc8a61186c0cf06481d803fa2ce0a67acab90595deb2929452faf"
+  },
+  "initial_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-initial-coverage.2026-10-19T10-53.json",
+    "sha256": "aa332555ef2e59fe3fafcdce103dda0de3e6ff0e3820ae13073ab8ad373d72e7"
+  },
+  "coverage_ranges": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependencies.py": {
+      "summary": {
+        "covered_lines": 149,
+        "num_statements": 149,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 62,
+        "num_partial_branches": 0,
+        "covered_branches": 62,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "_format": {
+          "covered_lines": 9,
+          "num_statements": 9,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_parse": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_failure": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_metadata": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_candidate_cost": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.__init__": {
+          "covered_lines": 20,
+          "num_statements": 20,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.reserve": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.note": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.parse": {
+          "covered_lines": 20,
+          "num_statements": 20,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_Run.inspect": {
+          "covered_lines": 38,
+          "num_statements": 38,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 18,
+          "num_partial_branches": 0,
+          "covered_branches": 18,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyAnalyzer.analyze": {
+          "covered_lines": 16,
+          "num_statements": 16,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "_Run": {
+          "covered_lines": 88,
+          "num_statements": 88,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 40,
+          "num_partial_branches": 0,
+          "covered_branches": 40,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyAnalyzer": {
+          "covered_lines": 16,
+          "num_statements": 16,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  },
+  "test_count": 66,
+  "test_nodes_in_execution_order": [
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/package.json-package-json]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/PACKAGE-LOCK.JSON-package-lock]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/npm-shrinkwrap.json-package-lock]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/setup.cfg-setup-cfg]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/requirements.txt-requirements]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/requirements-dev.txt-requirements]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.csproj-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.vbproj-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.fsproj-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.proj-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/Directory.Packages.props-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.targets-project]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/packages.config-packages-config]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/packages.lock.json-packages-lock]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/setup.py-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/pyproject.toml-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/poetry.lock-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/yarn.lock-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/pnpm-lock.yaml-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/readme.txt-None]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[package-json-parse_node_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[package-lock-parse_node_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[requirements-parse_python_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[setup-cfg-parse_python_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[project-parse_dotnet_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[packages-config-parse_dotnet_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[packages-lock-parse_dotnet_dependencies]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_projected_facts_and_edges_preserve_source_semantics",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_redacted_edge_and_repeated_container_identity",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[absent]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-bytes]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-revision]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-path]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-repository]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[duplicate]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_unavailable_excluded_and_unsupported_inputs_do_not_parse",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-malformed]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-encoding]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-limit]",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_analysis_is_deterministic_and_schema_valid",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_empty_capture_and_irrelevant_inputs_have_no_fabricated_fact",
+    "tests/discovery_runtime/analyzer/test_dependencies.py::test_real_parser_families_compose_with_inventory_schema",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_all_diagnostics_and_error_fallbacks_share_output_limits",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_impossible_error_envelope_raises_instead_of_emitting_over_budget[1]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_impossible_error_envelope_raises_instead_of_emitting_over_budget[1023]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[artifact_records-1]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[document_bytes-1024]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[document_bytes-4096]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[pin-count]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[pin-bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[input-bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[scan-work]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[path-work]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[diagnostics]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[text]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[ordinal]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[line]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_invalid_public_capture_and_internal_reservations",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_pin_lookup_visits_only_each_inputs_retained_group",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_remaining_parser_resources_are_independent",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[maximum-file]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[retained-text]"
+  ],
+  "public_signatures": {
+    "DependencyAnalyzer.analyze": "(self, capture: 'InventoryCapture') -> 'Analysis'"
+  },
+  "predecessor_streams_preserved": 62,
+  "executed_harnesses": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-executed-harnesses.2026-10-19T10-53.json",
+    "sha256": "7c10002149c76da7919029f0dc63f79c0e9a41d20768e3409dac5015b624dac2"
+  },
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-handoff.2026-10-19T10-53.md",
+    "sha256": "ba1b6ce0f8701e02d22fcf1f6789d5ab9978f283f6eee0cd1c1902f4d3a290f4"
+  },
+  "evidence_files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-coverage.2026-10-19T10-53.json",
+      "sha256": "67e51730e03cc8a61186c0cf06481d803fa2ce0a67acab90595deb2929452faf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-executed-harnesses.2026-10-19T10-53.json",
+      "sha256": "7c10002149c76da7919029f0dc63f79c0e9a41d20768e3409dac5015b624dac2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused1-format.2026-10-19T10-46.json",
+      "sha256": "ff0caa9cb31cf0d3566f2acae646b25f10356d3513b1831a9501f09eee9aaac4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused1-format.2026-10-19T10-46.md",
+      "sha256": "bd0459888f7ef263dbc5e0ea08077ea6493d4d04ae68b77f94d5f677a7178311"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-format.2026-10-19T10-46.json",
+      "sha256": "6b414809362a0e62094f846b569e84f1245cdecd00d60123947af153aecda658"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-format.2026-10-19T10-46.md",
+      "sha256": "395763b2f14aecf83ef99d38e8d8783988ab77063301c034373f1cd3a515a97d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lint.2026-10-19T10-46.json",
+      "sha256": "bc4f4448e121f08d801e74a9913f054cfeb617a8c47fc7f1a91f538d04be3754"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lint.2026-10-19T10-46.md",
+      "sha256": "6714b14ab8a1ce85b8d1d4be48dd520ef4064dd0871e087f7ec59522bd5ba610"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lintfix.2026-10-19T10-47.json",
+      "sha256": "4660fb2e25d52834c70ff130a1a8f106569d1e150bdb1ca1565525e2f6dd3244"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lintfix.2026-10-19T10-47.md",
+      "sha256": "594424c4bc25bf2732e21a3eee5e514aebe5c3b2e6b0536008857816ec546c93"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-format.2026-10-19T10-47.json",
+      "sha256": "6f2899cc3ff5b1fbc5ac5026337ffb8eac09c640de66d1c0e3240a7953db1bcd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-format.2026-10-19T10-47.md",
+      "sha256": "6369ca53fec7c5f710e29f7a314aa29ad9d0acc549695691b1293ea0d26cb337"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-formatfix.2026-10-19T10-47.json",
+      "sha256": "507d7f2da31a9a393d373e97ec0b0a07fd19c1cea9b7f608569865688e56ec0a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-formatfix.2026-10-19T10-47.md",
+      "sha256": "29c3a8a9811829a078dee5fed56c2445f9466d68678b7b95e8eb63bf180b15eb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-format.2026-10-19T10-47.json",
+      "sha256": "9b808f09281506c02a04940d6c8bd9cf06afb30c928d860216e558adae34778a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-format.2026-10-19T10-47.md",
+      "sha256": "340ac5182e3b1a3f8e12b63bdf1997a0b6ab0c31f6e826a757f25c99be316b29"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-lint.2026-10-19T10-47.json",
+      "sha256": "919863b8d91238ff7fdbb69b348450925bc00a23089a8b4b2d01d186b4292c63"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-lint.2026-10-19T10-47.md",
+      "sha256": "9907391c47ace05243fb8a6b23004e0a81a74e269600a39d00c99ed84ea3d592"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-format.2026-10-19T10-48.json",
+      "sha256": "82da756c829e503eec891453bdecfb49a6d298669e6b2a5cfd3b78bc6dc1eb01"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-format.2026-10-19T10-48.md",
+      "sha256": "65336b41dc8e16d173cbe6a71e202104d311c5320a5632ed69c7a0ca7541758d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-lint.2026-10-19T10-48.json",
+      "sha256": "3f5928bb86b44a4405bbff63236b682852ecfa8bf57d9e888e4c088dfc51be9d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-lint.2026-10-19T10-48.md",
+      "sha256": "439eab7a32706435bd6b3e7a55632604588de3b6df1cdb0a0c3207cc07f7e7c3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-types.2026-10-19T10-48.json",
+      "sha256": "b5b9e97295a376b03e5188e5814ea0b52591704d401c6f00a2ee3eb1cc1a482a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-types.2026-10-19T10-48.md",
+      "sha256": "07b5e49f8ee74fb257a514f8c8b991edbc7dcf2608a2a2131e51e7d39a3c153c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-format.2026-10-19T10-48.json",
+      "sha256": "004f96d87194db47783a50db8fe187748c83b433bd582041c171bfe8934d442c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-format.2026-10-19T10-48.md",
+      "sha256": "0bd96ae5d7985346529a5ee4a35002e7682095b568e1abf0beb3949096f605d0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-lint.2026-10-19T10-48.json",
+      "sha256": "1021f84dea1dda35a67e2d506e2e2993f618ed48837e7719fd98cd0cbaede1a7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-lint.2026-10-19T10-48.md",
+      "sha256": "cbd8e521b92cc611ed40709bc91e9b4ebcda1145fa29f6c2f5d6ebe3cdaa9744"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-types.2026-10-19T10-48.json",
+      "sha256": "34c75530708d68e4b7de1e039546883415129acaca0d3174d4f1fc2da85a9cda"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-types.2026-10-19T10-48.md",
+      "sha256": "2edf7415030a0a8c877d8d760fd343fa15cea9e8143f4e4d84d5dd23fe6bcd75"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-unit.2026-10-19T10-49.json",
+      "sha256": "bec2a93cda8468ead870e49966481dbbd29978f146972119697632526105544c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-unit.2026-10-19T10-49.md",
+      "sha256": "2f400603b274d6bd1f6eef40f7a9af80c7403cab1949f4cbdb0bd3a4cc8ed393"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.json",
+      "sha256": "54b8a34b142aafc4beebb2647016a9c7835c4cd1d54a87b97fa525c5448d43b4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.md",
+      "sha256": "c814fb677599c5ae3fa7996f1896b586afd106443b69ae7f18f829f26c0f99e8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.json",
+      "sha256": "1839386d368c310880e30929229f19fcfa7ad5468bf669a6a6446996d563b26b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.md",
+      "sha256": "e455cfbb84ee3ecd5f0af52b63bf8355def68fea3ae634d1b0428b59f01817aa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.json",
+      "sha256": "68a3796d91c2766a0aa000860e7bfd236bca236302df82a0a95befef668d6eb4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.md",
+      "sha256": "1a1c2f20b0bb558869758422cf7696969db52f9d630f4f2efe87098c734a8cda"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.json",
+      "sha256": "a4dab482401d5483de28d36d022f242c7f12cb075f3dcd35fc63f3cd563ef73a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.md",
+      "sha256": "24c336b49ea725db55aa354ba55968a6b5236656129620db49351a8f002b5c6c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-handoff.2026-10-19T10-53.md",
+      "sha256": "ba1b6ce0f8701e02d22fcf1f6789d5ab9978f283f6eee0cd1c1902f4d3a290f4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-1.2026-10-19T10-53.txt",
+      "sha256": "c2e4ee13c006083bb6f5b0743d0dc0ad9e3b823253cc790daf7180b8e37249ff"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-2.2026-10-19T10-53.txt",
+      "sha256": "23b890eb3f2d61190fcd68bbc7dc52be07058b707ce17f39bcb790838b172f8b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-3.2026-10-19T10-53.txt",
+      "sha256": "57e59e22e97789bdde7bb263207976616c2ce576e7b39b49a96a48c59516589d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-4.2026-10-19T10-53.txt",
+      "sha256": "4749baefa1de70d4f5c8e6f4f9e438ed3275274433cfc76dcd1be4ece9d1eac5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-5.2026-10-19T10-53.txt",
+      "sha256": "de6b264a19eb4fe2cce937b9afe628c8baf9e18cd22168053a7145647372c9d3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-initial-coverage.2026-10-19T10-53.json",
+      "sha256": "aa332555ef2e59fe3fafcdce103dda0de3e6ff0e3820ae13073ab8ad373d72e7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-resume.2026-10-19T10-38.json",
+      "sha256": "8f96c85c25c3d8946d81f42a1e23d7f6e9ee9ead4aaf38078d74fc5d81846e23"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-resume.2026-10-19T10-38.md",
+      "sha256": "fbcbdecfc543795798a2ba2bc60b7d9ee68d18beae8ed38ff425806edd40ee50"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-test-split.2026-10-19T10-09.json",
+      "sha256": "cf0ea9dc271a8ca8ffdd7fd96bcce75169feec9f9a9edc9fe30d0fbf7054eb81"
+    }
+  ],
+  "stage_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+    "tests/discovery_runtime/analyzer/test_dependencies.py",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-coverage.2026-10-19T10-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-executed-harnesses.2026-10-19T10-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused1-format.2026-10-19T10-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused1-format.2026-10-19T10-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-format.2026-10-19T10-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-format.2026-10-19T10-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lint.2026-10-19T10-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lint.2026-10-19T10-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lintfix.2026-10-19T10-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused2-lintfix.2026-10-19T10-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-format.2026-10-19T10-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-format.2026-10-19T10-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-formatfix.2026-10-19T10-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused3-formatfix.2026-10-19T10-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-format.2026-10-19T10-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-format.2026-10-19T10-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-lint.2026-10-19T10-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused4-lint.2026-10-19T10-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-format.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-format.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-lint.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-lint.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-types.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused5-types.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-format.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-format.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-lint.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-lint.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-types.2026-10-19T10-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-types.2026-10-19T10-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-unit.2026-10-19T10-49.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused6-unit.2026-10-19T10-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-format.2026-10-19T10-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-lint.2026-10-19T10-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-types.2026-10-19T10-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-focused7-unit.2026-10-19T10-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-handoff.2026-10-19T10-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-1.2026-10-19T10-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-2.2026-10-19T10-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-3.2026-10-19T10-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-4.2026-10-19T10-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-harness-5.2026-10-19T10-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-initial-coverage.2026-10-19T10-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-resume.2026-10-19T10-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-resume.2026-10-19T10-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-integration-test-split.2026-10-19T10-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-freeze.2026-10-19T10-53.json"
+  ],
+  "changed_line_coverage": "New module: 100% measured statements and branches; all measured classes/callables 100%. No predecessor production changes.",
+  "raw_coverage_qualification": "Coverage-generator JSON is retained byte-for-byte, including its original terminal-newline convention.",
+  "pending": [
+    "existing independent integration review",
+    "parent checked WIP commit",
+    "combined final ordered gates/native composition",
+    "P4-T7 acceptance"
+  ],
+  "source_test_edits_during_freeze": false,
+  "behavioral_reruns_during_freeze": false,
+  "git_mutations": false
+}
