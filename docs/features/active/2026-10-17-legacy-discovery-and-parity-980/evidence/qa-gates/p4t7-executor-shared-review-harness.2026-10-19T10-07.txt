@@ -1,0 +1,168 @@
+"""Bind the one scoped shared-contract review without repeating worker tests."""
+
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+QA = FEATURE / 'evidence/qa-gates'
+REG = FEATURE / 'evidence/regression-testing'
+
+
+def sha(data):
+    """Identify exact bytes; no normalization is implicit."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def bound(path, expected=None):
+    """Read a retained artifact and fail if its frozen identity changed."""
+    path = Path(path)
+    data = (ROOT / path).read_bytes()
+    identity = sha(data)
+    if expected is not None:
+        assert identity == expected, path.as_posix()
+    return {'path': path.as_posix(), 'sha256': identity}
+
+
+freeze_ref = bound(REG / 'p4t7-lead-shared-freeze.2026-10-19T09-56.json',
+                   'c28f9f32dd36d246a357216e00729e33e1607e93df23c476e2af9ccff8990edf')
+freeze = json.loads((ROOT / freeze_ref['path']).read_text(encoding='utf-8'))
+contract = bound(REG / 'p4t7-lead-contract.2026-10-19T09-56.md',
+                 'e3defed6aaea9ce8b0eaa4dfb119613a41d9c550d103a4ffe890092d04afbd68')
+probe_ref = bound(QA / 'p4t7-executor-shared-probe.2026-10-19T10-05.json',
+                  '9b9f3fd13f7e2e6a13a8deda91d2e7278a080d360c01f696df6ed2ce831bb106')
+probe = json.loads((ROOT / probe_ref['path']).read_text(encoding='utf-8'))
+probe_harness = bound(
+    probe['exact_executed_harness']['path'], probe['exact_executed_harness']['sha256'])
+checkpoint = json.loads((ROOT / 'artifacts/orchestration/orchestrator-state.json').read_text(encoding='utf-8-sig'))
+receipt = next(row for row in checkpoint['codex_model_routing_receipts']
+               if row['delegation_id'] == 'atomic_execution_p4t7_candidate_review')
+assert receipt['deployment_agent'] == 'atomic-executor-c4'
+assert receipt['model'] == 'gpt-6-astra' and receipt['model_reasoning_effort'] == 'max'
+bound(receipt['profile_path'], receipt['profile_sha256'])
+assert receipt['profile_sha256'] == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+
+# Reuse the coordinator's exact checked-WIP binding; inspect only the two frozen streams.
+candidate_commit = '1dd386135f0f52c247d7b85ccd766cbc63ebaf4d'
+sources = []
+for row in freeze['source_files']:
+    current = bound(row['path'], row['sha256'])
+    blob = subprocess.check_output(['git', 'show', candidate_commit + ':' + row['path']], cwd=ROOT)
+    assert sha(blob) == row['sha256']
+    current['checked_commit_sha256'] = sha(blob)
+    current['physical_lines'] = row['physical_lines']
+    assert current['physical_lines'] <= 500
+    sources.append(current)
+stages = []
+for row in freeze['ordered_focused_gates']:
+    reference = bound(row['path'], row['sha256'])
+    gate = json.loads((ROOT / row['path']).read_text(encoding='utf-8'))
+    assert gate['exit_code'] == 0
+    for source in sources:
+        assert gate['source_before'][source['path']]['sha256'] == source['sha256']
+        assert gate['source_after'][source['path']]['sha256'] == source['sha256']
+    stages.append(dict(reference, stage=row['stage'], exit_code=0))
+assert [stage['stage'] for stage in stages] == ['format', 'lint', 'types', 'unit']
+coverage_ref = bound(freeze['coverage']['path'], freeze['coverage']['sha256'])
+coverage = json.loads((ROOT / coverage_ref['path']).read_text(encoding='utf-8'))
+module = next(iter(coverage['files'].values()))
+summary = module['summary']
+assert (summary['covered_lines'], summary['num_statements'],
+        summary['covered_branches'], summary['num_branches']) == (221, 221, 108, 108)
+range_count = 0
+for category in ('functions', 'classes'):
+    for name, item in freeze['coverage_ranges'][category].items():
+        assert module[category][name]['summary'] == item
+        assert item['missing_lines'] == 0 and item['missing_branches'] == 0
+        range_count += 1
+assert range_count == 22 and freeze['test_count'] == len(freeze['test_nodes_in_execution_order']) == 152
+baseline_ref = bound(freeze['shared_baseline']['path'], freeze['shared_baseline']['sha256'])
+
+findings = [
+    {
+        'id': 'P4T7-SR1', 'priority': 'high', 'location': 'dependency_inputs.py:33-36,160-173',
+        'issue': 'Nested version regex repetitions overlap on hyphen characters, so the 256-character length guard does not bound matching work.',
+        'proof': "Public dependency_value on '1-' + 'a-' * 28 + '!' (59 characters) exceeded the isolated two-second operational budget. Shorter observations and exact harness are retained; this is not a timing-based unit-test assertion.",
+        'required_correction': 'Replace ambiguous backtracking in both literal and constraint classification with bounded deterministic scanning or a demonstrably linear finite grammar. Preserve supported exact versions, prereleases, constraints and redaction. Add deterministic work/regression assertions for adversarial short values and maximum accepted lengths.',
+    },
+    {
+        'id': 'P4T7-SR2', 'priority': 'medium', 'location': 'dependency_inputs.py:421-429',
+        'issue': 'The prospective check uses character count, then allocates the complete UTF-8 bytes before checking their byte cost.',
+        'proof': 'With max_text_bytes=5, three astral characters caused a 12-byte encode allocation before dependency-limit. The later failure correctly poisons result access, but the configured allocation budget was already exceeded.',
+        'required_correction': 'Determine bounded UTF-8 byte cost without first allocating the oversized encoding, including remaining aggregate capacity and surrogate rejection. Preserve valid exact-capacity ASCII/BMP/astral inputs; add a counted allocation-boundary assertion rather than timing checks.',
+    },
+    {
+        'id': 'P4T7-SR3', 'priority': 'medium', 'location': 'dependency_inputs.py:33,164-173',
+        'issue': 'Wildcard version components are reported as literal exact declarations.',
+        'proof': '1.*, 1.x, 1.2.* and 1.X return literal, while standalone * returns constraint. The shared-contract owner confirmed literal is intended to distinguish an exact syntactic version from wildcard/range constraints.',
+        'required_correction': 'Classify wildcard components as constraints and retain actual exact-version/prerelease controls. Neither category may assert installed or evaluated resolution.',
+    },
+    {
+        'id': 'P4T7-SR4', 'priority': 'medium', 'location': 'dependency_inputs.py public carriers/helpers; test_dependency_inputs.py parameterized helpers',
+        'issue': 'Presence-only docstring checks do not satisfy the mandatory contract documentation requirements.',
+        'proof': 'For example, safe_identifier:114 and dependency_value:178 omit typed parameter meanings; DependencyBudget.reserve:339 omits the independent units/return contract; DependencyBudget and DependencyResult class summaries omit lifecycle/counter semantics. Parameterized test/helper docstrings similarly omit the injected parameter contracts.',
+        'required_correction': 'Complete concise purpose, typed parameters, return/raises/side-effect contracts and non-obvious class lifecycle/invariants in the owned shared subset. Preserve intent comments and the 500-line limit; obtain coordinator authorization before any cohesive helper split.',
+        'policy': '.agents/skills/self-explanatory-code-commenting/SKILL.md',
+    },
+]
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+raw_script = Path(__file__).read_bytes()
+harness = QA / f'p4t7-executor-shared-review-harness.{stamp}.txt'
+with (ROOT / harness).open('xb') as stream:
+    stream.write(raw_script)
+assert (ROOT / harness).read_bytes() == raw_script
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+result_path = QA / f'p4t7-executor-shared-review.{stamp}.json'
+result = {
+    'timestamp': stamp, 'published_utc': now.isoformat(),
+    'task': 'P4-T7', 'status': 'SCOPED_SHARED_REPAIR_REQUIRED', 'exit_code': 0,
+    'command': 'poetry run python SCRATCH/issue-980-p4t7-shared-review.py',
+    'scope': 'First immutable shared-contract portion of one consolidated task review, not full task acceptance.',
+    'routing_receipt': receipt, 'native_authority': 'Current native routing/launch/provenance reread true; actual model gpt-6-astra/max.',
+    'freeze': freeze_ref, 'contract': contract, 'baseline': baseline_ref,
+    'candidate_commit': candidate_commit, 'sources': sources, 'probe': probe_ref,
+    'probe_harness': probe_harness, 'ordered_focused_gates': stages,
+    'coverage': dict(coverage_ref, statements=[221, 221], branches=[108, 108], ranges=22),
+    'reused_test_cases': 152, 'worker_or_predecessor_suite_reruns': 0,
+    'predecessor_binding_reuse': '62 accepted streams remain covered by the shared baseline and coordinator checked-WIP binding; no predecessor review or suite replay.',
+    'findings': findings, 'open_shared_behavioral_probes': [], 'binding_discrepancies': [],
+    'retained_positive_review': ['Immutable typed carriers and independent capacities',
+        'Closed source anchors and null redacted reference values', 'Separate declaration/locked/edge facts',
+        'Fixed diagnostics and whole-result refusal after limits/encoding failures',
+        'Read-only pure imports, memory-only tests, deterministic diagnostic and metadata ordering'],
+    'review_not_yet_performed': ['Mutable Node/Python/.NET parser implementations',
+        'Mutable integration projection, cross-file aggregate output and provenance',
+        'Final combined gates and registry/publication exposure'],
+    'source_test_plan_ac_checkpoint_git_mutations': False,
+    'exact_executed_harness': bound(harness),
+    'read_qualification': 'AGENTS legacy python-code-change skill path is absent; the listed shared python/SKILL.md and mandatory commenting policy were used. No policy was edited.',
+}
+with (ROOT / result_path).open('xb') as stream:
+    stream.write((json.dumps(result, indent=2) + '\n').encode('utf-8'))
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+markdown_path = QA / f'p4t7-executor-shared-review.{stamp}.md'
+lines = [
+    '# P4-T7 shared-contract candidate review', '', f'Timestamp: {stamp}',
+    f'Published UTC: {now.isoformat()}',
+    'Command: `poetry run python SCRATCH/issue-980-p4t7-shared-review.py`',
+    'EXIT_CODE: 0', '', '## Output Summary:', '',
+    'SCOPED_SHARED_REPAIR_REQUIRED. This is the frozen shared subset of the single P4-T7 review; task acceptance remains pending.', '',
+    f'The [structured review]({result_path.name}) binds both source/test files to checked WIP `{candidate_commit}`, the 09:56 freeze/contract and the bounded 10:05 reproductions. The retained ordered focused loop has 152 passes, 221/221 statements, 108/108 branches and 22 fully covered ranges. No worker or predecessor suite was rerun.', '',
+]
+for finding in findings:
+    lines.extend([f"- **{finding['id']} ({finding['priority']})**: {finding['issue']} {finding['required_correction']}"])
+lines.extend(['', 'No shared behavioral probe or evidence discrepancy remains open. Preserve the immutable original finding/probe artifacts; repairs require coordinator release. Mutable parser and integration scopes have not been reviewed and will join this same task review after their freezes.', '',
+              'Current phase: Phase 4. P4-T7 remains unchecked. Next tasks after it: P4-T8, P4-T9, P5-T1, P5-T2 and P5-T3.', ''])
+raw_markdown = '\n'.join(lines).encode('utf-8')
+assert b'\r' not in raw_markdown and all(line == line.rstrip() for line in raw_markdown.splitlines())
+with (ROOT / markdown_path).open('xb') as stream:
+    stream.write(raw_markdown)
+print(json.dumps({'status': result['status'], 'findings': [item['id'] for item in findings],
+                  'review_json': bound(result_path), 'review_md': bound(markdown_path),
+                  'harness': bound(harness), 'open_shared_probes': []}, indent=2))

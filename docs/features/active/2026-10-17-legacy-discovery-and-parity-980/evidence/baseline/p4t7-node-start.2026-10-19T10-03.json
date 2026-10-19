@@ -1,0 +1,18 @@
+{
+  "absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py"
+  ],
+  "baseline_quality": "New pair absent; accepted predecessor and152-case shared-contract proof reused without replay.",
+  "entrypoint": "parse_node_dependencies(content: bytes, *, format: Literal['package-json','package-lock'], limits: DependencyLimits) -> DependencyResult",
+  "head": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+  "preserved_count": 62,
+  "scope": "Only the Node parser and its in-memory tests; no shared, integration, predecessor, Git or checkpoint edits.",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "shared_contract_sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-03"
+}

@@ -1,0 +1,157 @@
+{
+  "timestamp": "2026-10-19T10-07",
+  "published_utc": "2026-10-19T10:07:56.550093+00:00",
+  "task": "P4-T7",
+  "status": "SCOPED_SHARED_REPAIR_REQUIRED",
+  "exit_code": 0,
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-review.py",
+  "scope": "First immutable shared-contract portion of one consolidated task review, not full task acceptance.",
+  "routing_receipt": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "deployment_agent": "atomic-executor-c4",
+    "execution_context": "standalone",
+    "logical_agent": "atomic-executor",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T7_consolidated_candidate_review",
+    "delegation_id": "atomic_execution_p4t7_candidate_review",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+  },
+  "native_authority": "Current native routing/launch/provenance reread true; actual model gpt-6-astra/max.",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-shared-freeze.2026-10-19T09-56.json",
+    "sha256": "c28f9f32dd36d246a357216e00729e33e1607e93df23c476e2af9ccff8990edf"
+  },
+  "contract": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-contract.2026-10-19T09-56.md",
+    "sha256": "e3defed6aaea9ce8b0eaa4dfb119613a41d9c550d103a4ffe890092d04afbd68"
+  },
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "candidate_commit": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+  "sources": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "checked_commit_sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+      "physical_lines": 496
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a",
+      "checked_commit_sha256": "474422ef600bf8e68c8804cd0193aea6fe3b2ecaef8e64818d7e3548fb4ba39a",
+      "physical_lines": 453
+    }
+  ],
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe.2026-10-19T10-05.json",
+    "sha256": "9b9f3fd13f7e2e6a13a8deda91d2e7278a080d360c01f696df6ed2ce831bb106"
+  },
+  "probe_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe-harness.2026-10-19T10-05.txt",
+    "sha256": "21a03f97c8eff10082e1f72f705bf2b4c3ffbb82d08ea9152c1988636fc69fe6"
+  },
+  "ordered_focused_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-focused4-format.2026-10-19T09-54.json",
+      "sha256": "ab4e3b95448c31c03adc9a2c3cbb9aef67ff4597df015faf44d835578899c17c",
+      "stage": "format",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-focused4-lint.2026-10-19T09-54.json",
+      "sha256": "7d6af0098d932eb26fba9b7fa258b1f410dec8f20d25086d3e729062eed58c04",
+      "stage": "lint",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-focused4-types.2026-10-19T09-54.json",
+      "sha256": "7b45e72c58d5f05540db69d23a8af4069cca6c176050e75aa36bfeaa064fe40e",
+      "stage": "types",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-focused4-unit.2026-10-19T09-55.json",
+      "sha256": "e99b726391c7d065eef152005a24fbec94a752e55e9855238ad030379c5fe674",
+      "stage": "unit",
+      "exit_code": 0
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-coverage.2026-10-19T09-56.json",
+    "sha256": "b8558eaa7054a3ff3790d25df030319631a57498ad5c463ff3890821841267b7",
+    "statements": [
+      221,
+      221
+    ],
+    "branches": [
+      108,
+      108
+    ],
+    "ranges": 22
+  },
+  "reused_test_cases": 152,
+  "worker_or_predecessor_suite_reruns": 0,
+  "predecessor_binding_reuse": "62 accepted streams remain covered by the shared baseline and coordinator checked-WIP binding; no predecessor review or suite replay.",
+  "findings": [
+    {
+      "id": "P4T7-SR1",
+      "priority": "high",
+      "location": "dependency_inputs.py:33-36,160-173",
+      "issue": "Nested version regex repetitions overlap on hyphen characters, so the 256-character length guard does not bound matching work.",
+      "proof": "Public dependency_value on '1-' + 'a-' * 28 + '!' (59 characters) exceeded the isolated two-second operational budget. Shorter observations and exact harness are retained; this is not a timing-based unit-test assertion.",
+      "required_correction": "Replace ambiguous backtracking in both literal and constraint classification with bounded deterministic scanning or a demonstrably linear finite grammar. Preserve supported exact versions, prereleases, constraints and redaction. Add deterministic work/regression assertions for adversarial short values and maximum accepted lengths."
+    },
+    {
+      "id": "P4T7-SR2",
+      "priority": "medium",
+      "location": "dependency_inputs.py:421-429",
+      "issue": "The prospective check uses character count, then allocates the complete UTF-8 bytes before checking their byte cost.",
+      "proof": "With max_text_bytes=5, three astral characters caused a 12-byte encode allocation before dependency-limit. The later failure correctly poisons result access, but the configured allocation budget was already exceeded.",
+      "required_correction": "Determine bounded UTF-8 byte cost without first allocating the oversized encoding, including remaining aggregate capacity and surrogate rejection. Preserve valid exact-capacity ASCII/BMP/astral inputs; add a counted allocation-boundary assertion rather than timing checks."
+    },
+    {
+      "id": "P4T7-SR3",
+      "priority": "medium",
+      "location": "dependency_inputs.py:33,164-173",
+      "issue": "Wildcard version components are reported as literal exact declarations.",
+      "proof": "1.*, 1.x, 1.2.* and 1.X return literal, while standalone * returns constraint. The shared-contract owner confirmed literal is intended to distinguish an exact syntactic version from wildcard/range constraints.",
+      "required_correction": "Classify wildcard components as constraints and retain actual exact-version/prerelease controls. Neither category may assert installed or evaluated resolution."
+    },
+    {
+      "id": "P4T7-SR4",
+      "priority": "medium",
+      "location": "dependency_inputs.py public carriers/helpers; test_dependency_inputs.py parameterized helpers",
+      "issue": "Presence-only docstring checks do not satisfy the mandatory contract documentation requirements.",
+      "proof": "For example, safe_identifier:114 and dependency_value:178 omit typed parameter meanings; DependencyBudget.reserve:339 omits the independent units/return contract; DependencyBudget and DependencyResult class summaries omit lifecycle/counter semantics. Parameterized test/helper docstrings similarly omit the injected parameter contracts.",
+      "required_correction": "Complete concise purpose, typed parameters, return/raises/side-effect contracts and non-obvious class lifecycle/invariants in the owned shared subset. Preserve intent comments and the 500-line limit; obtain coordinator authorization before any cohesive helper split.",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md"
+    }
+  ],
+  "open_shared_behavioral_probes": [],
+  "binding_discrepancies": [],
+  "retained_positive_review": [
+    "Immutable typed carriers and independent capacities",
+    "Closed source anchors and null redacted reference values",
+    "Separate declaration/locked/edge facts",
+    "Fixed diagnostics and whole-result refusal after limits/encoding failures",
+    "Read-only pure imports, memory-only tests, deterministic diagnostic and metadata ordering"
+  ],
+  "review_not_yet_performed": [
+    "Mutable Node/Python/.NET parser implementations",
+    "Mutable integration projection, cross-file aggregate output and provenance",
+    "Final combined gates and registry/publication exposure"
+  ],
+  "source_test_plan_ac_checkpoint_git_mutations": false,
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review-harness.2026-10-19T10-07.txt",
+    "sha256": "8f6c0661fcf5d059b6df4ef1dfd7f6704c0f385729c517f3041155e510a8393f"
+  },
+  "read_qualification": "AGENTS legacy python-code-change skill path is absent; the listed shared python/SKILL.md and mandatory commenting policy were used. No policy was edited."
+}

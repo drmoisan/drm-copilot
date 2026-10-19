@@ -1,0 +1,172 @@
+"""Bind the four-file shared repair, retained cases, API and exact executed proof."""
+import ast
+import base64
+import datetime
+import hashlib
+import inspect
+import json
+from pathlib import Path
+import re
+import subprocess
+
+from drm_copilot_discovery.analyzer import dependency_inputs as api
+from drm_copilot_discovery.analyzer import dependency_values as values
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence")
+paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+]
+command = "poetry run python SCRATCH/issue-980-p4t7-shared-repair-freeze.py"
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def write(path, raw):
+    assert not path.exists(), path.name
+    path.write_bytes(raw)
+
+
+def json_write(path, value):
+    write(path, (json.dumps(value, indent=2) + "\n").encode())
+
+
+class WithoutDocs(ast.NodeTransformer):
+    def visit_Constant(self, node):
+        return node
+
+    def generic_visit(self, node):
+        node = super().generic_visit(node)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and ast.get_docstring(node):
+            node.body = node.body[1:]
+        return node
+
+
+baseline_path = evidence / "baseline/p4t7-shared-baseline.2026-10-19T09-44.json"
+baseline = json.loads(baseline_path.read_bytes())
+assert sha(baseline_path.read_bytes()) == "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in baseline["preserved_files"])
+scope_path = max((evidence / "baseline").glob("p4t7-shared-repair-scope.*.json"))
+scope = json.loads(scope_path.read_bytes())
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in scope["paused_integration"])
+old_freeze_path = evidence / "regression-testing/p4t7-lead-shared-freeze.2026-10-19T09-56.json"
+old = json.loads(old_freeze_path.read_bytes())
+assert sha(old_freeze_path.read_bytes()) == "c28f9f32dd36d246a357216e00729e33e1607e93df23c476e2af9ccff8990edf"
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in old["evidence_files"])
+sources = []
+for name in paths:
+    raw = Path(name).read_bytes()
+    text = raw.decode()
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))]
+    assert len(lines) <= 500 and all(ast.get_docstring(node) for node in definitions)
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops)
+    assert re.search(r"\b(?:tmp_path|tmpdir|tempfile|subprocess|requests|socket)\b", text) is None
+    sources.append({"path": name, "sha256": sha(raw), "physical_lines": len(lines),
+                    "lf_normalized_sha256": sha(raw.replace(b"\r\n", b"\n")), "crlf_count": raw.count(b"\r\n"),
+                    "git_attributes": subprocess.check_output(["git", "check-attr", "--all", "--", name], text=True).splitlines(),
+                    "definitions_with_docstrings": len(definitions), "loops_with_immediate_intent_comments": len(loops)})
+ordered = []
+for stage in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t7-shared-repair3-" + stage + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    assert all(receipt["source_before"][item["path"]]["sha256"] == receipt["source_after"][item["path"]]["sha256"] == item["sha256"] for item in sources)
+    for stream in receipt["streams"].values():
+        raw = (scratch / Path(stream["scratch_identifier"]).name).read_bytes()
+        assert sha(raw) == stream["raw_sha256"]
+    ordered.append({**reference(path), "stage": stage, "started": receipt["started"], "finished": receipt["finished"], "duration_seconds": receipt["duration_seconds"]})
+assert all(left["finished"] <= right["started"] for left, right in zip(ordered, ordered[1:]))
+stdout = receipt["streams"]["stdout"]["presentation"]
+nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", stdout, flags=re.M)
+assert len(nodes) == len(set(nodes)) == 191 and "191 passed" in stdout
+original_nodes = {node.split("::", 1)[1] for node in old["test_nodes_in_execution_order"]}
+assert len(original_nodes) == 152
+assert original_nodes <= {node.split("::", 1)[1] for node in nodes}
+prior_raw = subprocess.check_output(["git", "show", "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d:" + paths[2]])
+prior_tree = ast.parse(prior_raw.decode())
+prior_defs = {node.name: ast.dump(WithoutDocs().visit(node), include_attributes=False) for node in prior_tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+current_defs = {}
+for path in paths[2:]:
+    tree = ast.parse(Path(path).read_text("utf-8"))
+    current_defs.update({node.name: ast.dump(WithoutDocs().visit(node), include_attributes=False) for node in tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))})
+assert all(current_defs[name] == content for name, content in prior_defs.items())
+coverage_raw = (scratch / "issue-980-p4t7-shared-repair3-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+assert len(coverage["files"]) == 2
+ranges = {}
+for path, data in coverage["files"].items():
+    assert not data["missing_lines"] and not data["missing_branches"]
+    ranges[path] = {"summary": data["summary"], "functions": {key: row["summary"] for key, row in data["functions"].items() if key},
+                    "classes": {key: row["summary"] for key, row in data["classes"].items() if key}}
+    assert all(row["covered_lines"] == row["num_statements"] for kind in ("functions", "classes") for row in ranges[path][kind].values())
+signatures = {name: str(inspect.signature(getattr(api, name))) for name in
+              ("DependencyLimits", "DependencyAnchor", "DependencyValue", "DependencyCandidate", "DependencyResult", "DependencyBudget", "DependencyInputError", "safe_identifier", "dependency_value")}
+signatures.update({"DependencyBudget." + name: str(inspect.signature(getattr(api.DependencyBudget, name))) for name in ("decode", "reserve", "note", "add", "result")})
+assert signatures == old["public_signatures"]
+assert all(getattr(api, name) is getattr(values, name) for name in ("Ecosystem", "DependencyValue", "safe_identifier", "dependency_value"))
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+coverage_path = evidence / f"regression-testing/p4t7-shared-repair-coverage.{stamp}.json"
+write(coverage_path, coverage_raw)
+contract = evidence / f"regression-testing/p4t7-shared-repair-contract.{stamp}.md"
+body = "\n".join(f"- `{name}{signature}`" for name, signature in signatures.items())
+write(contract, (f"# Repaired shared dependency contract\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+    "Output Summary: 191 focused cases; both modules and all measured ranges have 100% line/branch coverage. This is a checked subset awaiting bounded confirmation and full task integration.\n\n"
+    "The original public constructor/function/method signatures are identical. `dependency_inputs` explicitly re-exports `DependencyValue`, `Ecosystem`, `safe_identifier` and `dependency_value` from `dependency_values`; both import routes share object identity. Carrier fields, defaults, fixed errors and immutable output responsibilities remain unchanged.\n\n"
+    + body + "\n\n"
+    "SR1 replaces the overlapping version regexes with forward-only cursor scans. The 256-character cap precedes scanning; range separators partition bounded input, and operator prefixes do not overlap version components. Counted public-call regressions cover the original 59-character reproducer and maximum accepted/rejected inputs without timing assertions. SR3 classifies `*`, `x` and `X` wildcard components as constraints, retaining actual exact/prerelease syntax as literal. Neither category proves installed or evaluated resolution.\n\n"
+    "SR2 counts UTF-8 scalar widths before allocating an encoding. Independent remaining aggregate text capacity is checked during the scan; surrogates fail with the fixed encoding code. Counted public-collector regressions prohibit encode calls for ASCII, BMP and astral exact-capacity controls, early oversize rejection and surrogate failures. Raw selected UTF-8 work plus quoted retained ASCII values remain the conservative parser text budget; complete Analysis serialization is separately charged by integration. SR4 documents typed parameters, returns, exceptions, lifecycle and side effects in every shared carrier/helper and scoped test definition.\n\n"
+    "Accepted JSON parser mapping: `ParseLimits.artifact_records = min(max_nodes // 64, 1000000)`, with `max_nodes < 64` rejected before parsing. This bounds the existing parser's expanded-node allocation; its finite preflight token envelope remains the accepted lower-layer contract. Parsers independently charge extraction/index work, cap the accepted byte/depth hard ceilings and never edit parser infrastructure. XML has explicit element/depth limits. This clarifies the original 09:56 contract without rewriting it.\n\n"
+    "The original 152 cases and all original assertions, decorators and helper bodies are preserved after removing docstrings for comparison; eight tests moved to the approved boundary module. Thirty-nine new cases cover the four findings. Original failed review probes, operational timeout, and all original focused evidence remain immutable. The integration trio is byte-identical to its paused copies. No format-parser file, predecessor, policy, registry, checkpoint, plan, AC or Git state was mutated by this repair. One full task review/final sequence and integration remain pending.\n").encode())
+harnesses = []
+filenames = (
+    "issue-980-p4t7-shared-repair-baseline.py", "issue-980-p4t7-shared-repair-edit.py",
+    "issue-980-p4t7-shared-test-repair.py", "issue-980-p4t7-shared-repair-structure.py",
+    "issue-980-p4t7-shared-repair-gate.py", Path(__file__).name,
+)
+for index, filename in enumerate(filenames):
+    raw = (scratch / filename).read_bytes()
+    assert not re.search(rb"[A-Za-z]:[\\/]", raw)
+    snapshot = evidence / f"regression-testing/p4t7-shared-repair-harness-{index + 1}.{stamp}.txt"
+    write(snapshot, raw.replace(b"\r\n", b"\n"))
+    harnesses.append({"scratch_identifier": "SCRATCH/" + filename, "raw_sha256": sha(raw),
+                      "raw_base64": base64.b64encode(raw).decode(), "readable_snapshot": reference(snapshot), "crlf_count": raw.count(b"\r\n")})
+harness_path = evidence / f"regression-testing/p4t7-shared-repair-executed-harnesses.{stamp}.json"
+json_write(harness_path, {"timestamp": stamp, "harnesses": harnesses, "qualification": "Exact executed raw bytes are base64-bound; readable snapshots normalize CRLF to LF only."})
+handoff = evidence / f"regression-testing/p4t7-shared-repair-handoff.{stamp}.md"
+write(handoff, (f"# Shared repair handoff\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+    "Output Summary: FROZEN_READY for bounded SR1-SR4 confirmation and checked WIP commit.\n\n"
+    "Scope: dependency_inputs.py, dependency_values.py, test_dependency_inputs.py and test_dependency_input_limits.py. No integration edits.\n\n"
+    "Baseline: original 152 cases, 221/221 statements, 108/108 branches; all original cases and behavioral ASTs retained. Plan: approved cohesive value split, forward-only grammar, allocation-free UTF-8 reservations, explicit typed contracts and boundary tests. Diffs are confined to these four paths; pure helpers are re-exported without signature/identity divergence.\n\n"
+    "QA: clean focused3 Black, Ruff, scoped Pyright and 191 tests; zero new lint/type/test failures. Coverage 275/275 statements and 142/142 branches across two production modules; every measured class/function is 100%. Earlier formatting/import/private-test-access diagnostics are retained. No failed unit assertion or source behavior correction occurred in this repair loop.\n\n"
+    "The frozen manifest contains exact sources, signatures, raw coverage and stream hashes, 191 ordered nodes, all executed script bytes, preserved predecessor/integration bindings and an explicit staging list. Full-repository/final task gates, parser composition, independent confirmation and task acceptance are pending. The parent owns commits, subsequent integration release and plan/AC changes.\n").encode())
+evidence_files = sorted((evidence / "regression-testing").glob("p4t7-shared-repair*"))
+evidence_files += sorted((evidence / "baseline").glob("p4t7-shared-repair-scope.*"))
+freeze = evidence / f"regression-testing/p4t7-shared-repair-freeze.{stamp}.json"
+manifest = {"status": "FROZEN_READY", "timestamp": stamp, "command": command, "exit_code": 0,
+    "accepted_baseline": baseline["head"], "shared_baseline": reference(baseline_path), "original_shared_freeze": reference(old_freeze_path),
+    "scope_supplement": reference(scope_path), "source_files": sources, "ordered_focused_gates": ordered,
+    "coverage": reference(coverage_path), "coverage_ranges": ranges, "test_nodes_in_execution_order": nodes,
+    "test_count": 191, "original_cases_preserved": 152, "new_cases": 39, "original_definition_bodies_preserved": sorted(prior_defs),
+    "public_signatures": signatures, "public_signatures_unchanged": True, "reexport_identity_verified": True,
+    "parser_contract": reference(contract), "executed_harnesses": reference(harness_path), "handoff": reference(handoff),
+    "paused_integration": scope["paused_integration"], "predecessor_streams_preserved": len(baseline["preserved_files"]),
+    "evidence_files": [reference(path) for path in evidence_files],
+    "stage_paths": paths + [path.as_posix() for path in evidence_files] + [freeze.as_posix()],
+    "changed_line_coverage": "100% for both repaired/moved responsibilities; no loss against the original 100% line/branch proof.",
+    "pending": ["bounded independent shared repair confirmation", "parent checked WIP commit", "integration release and parser composition", "full task review/final ordered gates"],
+    "source_test_edits_during_freeze": False, "behavioral_reruns_during_freeze": False, "git_mutations": False}
+json_write(freeze, manifest)
+print(json.dumps({"freeze": reference(freeze), "source_files": sources, "stage_count": len(manifest["stage_paths"]),
+                  "coverage": coverage["totals"], "measured_ranges": sum(len(row[kind]) for row in ranges.values() for kind in ("functions", "classes"))}, indent=2))

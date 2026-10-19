@@ -1,0 +1,61 @@
+{
+  "stage": "format",
+  "label": "p4t7-shared-repair0-format",
+  "started": "2026-10-19T10:20:55.956216+00:00",
+  "finished": "2026-10-19T10:20:57.844864+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py tests/discovery_runtime/analyzer/test_dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 1.889,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "6df4b7908b1c018d4dedac6041e7bbf999390fdaefd90ea982067ee7cb678898",
+      "physical_lines": 499
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "ea3985d69d3666b83079f5fef5c5abe318efcb5d3b376432ea86ce1cb162257a",
+      "physical_lines": 187
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "edbc286b7087a0ca9c21995146f608ccfa3c0fa03d72bc44a43b385b4d08b988",
+      "physical_lines": 392
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "a340c03b40a740c93a7bff2b98eb1b3582b33d558560fd4a17f5d5dab4ea557e",
+      "physical_lines": 337
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "264bb245cae70838d0cac38b4dd35a63d89a64fb64726030b29c443b46d45588",
+      "physical_lines": 495
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "fab39386ca40b332bf45847fc2d04c993079300ea5b05dcc9771004cc80f9948",
+      "physical_lines": 376
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "038b8ca40a54e7ca270eadd95186827e58d783d675257e7aab9b91b4d38fa85b",
+      "physical_lines": 361
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair0-format-102057.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair0-format-102057.stderr.bin",
+      "raw_sha256": "8fdeb505181d930f21c087a307b9ff359e56a1292476d18b98d457292633d533",
+      "raw_bytes": 390,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_values.py\r\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependency_inputs.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n4 files reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared SR1-SR4 repair only"
+}

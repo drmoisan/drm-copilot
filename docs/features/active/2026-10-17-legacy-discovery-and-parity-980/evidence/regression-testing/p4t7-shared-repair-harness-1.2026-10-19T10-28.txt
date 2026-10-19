@@ -1,0 +1,48 @@
+"""Record authorized new-path absence and preserve paused integration bytes."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+new_paths = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+]
+paused = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+    "tests/discovery_runtime/analyzer/test_dependencies.py",
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+]
+assert all(not (repo / path).exists() for path in new_paths)
+copies = scratch / ("p4t7-paused-integration-" + stamp)
+copies.mkdir()
+bindings = []
+for path in paused:
+    raw = (repo / path).read_bytes()
+    target = copies / Path(path).name
+    target.write_bytes(raw)
+    bindings.append({"path": path, "sha256": hashlib.sha256(raw).hexdigest(),
+                     "preserved_copy": "SCRATCH/" + target.relative_to(scratch).as_posix()})
+record = {
+    "timestamp": stamp, "captured_utc": now.isoformat(), "task": "P4-T7",
+    "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-baseline.py", "exit_code": 0,
+    "new_paths_absent_before_creation": new_paths, "paused_integration": bindings,
+    "shared_baseline": {"path": "evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+                        "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"},
+    "review_sha256": "0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8",
+    "routing_receipt": "workspace_operations_p4t7_shared_repair",
+    "profile_sha256": hashlib.sha256((repo / ".codex/agents/python-typed-engineer-c4.toml").read_bytes()).hexdigest(),
+    "native_authority": "routing_valid, launch_authority_valid and provenance_valid reread true before edits",
+    "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+    "checked_shared_wip": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+    "original_152_case_evidence": "Preserved unchanged; no baseline replay.",
+}
+prefix = feature / "evidence/baseline" / ("p4t7-shared-repair-scope." + stamp)
+Path(str(prefix) + ".json").write_bytes((json.dumps(record, indent=2) + "\n").encode())
+Path(str(prefix) + ".md").write_bytes((f"# Shared dependency repair scope\n\nTimestamp: {stamp}\nCommand: {record['command']}\nEXIT_CODE: 0\nOutput Summary: both approved paths were absent; all three paused integration files were copied byte-for-byte to external SCRATCH. Original shared evidence and predecessor code remain unchanged.\n").encode())
+print(str(prefix.relative_to(repo)) + ".json")

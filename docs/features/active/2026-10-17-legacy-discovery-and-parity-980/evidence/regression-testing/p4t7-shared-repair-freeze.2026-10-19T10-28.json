@@ -1,0 +1,1064 @@
+{
+  "status": "FROZEN_READY",
+  "timestamp": "2026-10-19T10-28",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-repair-freeze.py",
+  "exit_code": 0,
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "original_shared_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-lead-shared-freeze.2026-10-19T09-56.json",
+    "sha256": "c28f9f32dd36d246a357216e00729e33e1607e93df23c476e2af9ccff8990edf"
+  },
+  "scope_supplement": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-repair-scope.2026-10-19T10-15.json",
+    "sha256": "e86c279522eac233c79eb828dbe0e08d489c1fb1876e0eb9d12673e3c9f387b1"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500,
+      "lf_normalized_sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 18,
+      "loops_with_immediate_intent_comments": 2
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208,
+      "lf_normalized_sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 6,
+      "loops_with_immediate_intent_comments": 7
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "physical_lines": 375,
+      "lf_normalized_sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_dependency_inputs.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_dependency_inputs.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 17,
+      "loops_with_immediate_intent_comments": 2
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "physical_lines": 366,
+      "lf_normalized_sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_dependency_input_limits.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_dependency_input_limits.py: eol: lf"
+      ],
+      "definitions_with_docstrings": 19,
+      "loops_with_immediate_intent_comments": 1
+    }
+  ],
+  "ordered_focused_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.json",
+      "sha256": "53b7e40874baa9c37471701d53f1fb17bedc9fdb808c15ffed8deb447a46de4f",
+      "stage": "format",
+      "started": "2026-10-19T10:28:05.890002+00:00",
+      "finished": "2026-10-19T10:28:07.678158+00:00",
+      "duration_seconds": 1.788
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.json",
+      "sha256": "a7c0eb8f3c727241a0d90c7cb6fcea62fdc851b6b61b8fcce89d78a8f2d0896e",
+      "stage": "lint",
+      "started": "2026-10-19T10:28:10.490816+00:00",
+      "finished": "2026-10-19T10:28:11.660091+00:00",
+      "duration_seconds": 1.169
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.json",
+      "sha256": "47beaa5bab94b85caf9bff1a262dd857a63a85d13824a3b7c3e62962cc34fce6",
+      "stage": "types",
+      "started": "2026-10-19T10:28:14.379065+00:00",
+      "finished": "2026-10-19T10:28:16.380130+00:00",
+      "duration_seconds": 2.001
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.json",
+      "sha256": "033187a78226ee34dc6b42b09d2bc82da1bb7b672136c9b7c5f29d737e4036a4",
+      "stage": "unit",
+      "started": "2026-10-19T10:28:19.139055+00:00",
+      "finished": "2026-10-19T10:28:22.117153+00:00",
+      "duration_seconds": 2.978
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-coverage.2026-10-19T10-28.json",
+    "sha256": "95472fc1d0f55779425585c5ec7cdaed2ca31c1b6e8bc17ed975338c052dec78"
+  },
+  "coverage_ranges": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py": {
+      "summary": {
+        "covered_lines": 174,
+        "num_statements": 174,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 74,
+        "num_partial_branches": 0,
+        "covered_branches": 74,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "DependencyInputError.__init__": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyLimits.__post_init__": {
+          "covered_lines": 3,
+          "num_statements": 3,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyAnchor.__post_init__": {
+          "covered_lines": 10,
+          "num_statements": 10,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyCandidate.__post_init__": {
+          "covered_lines": 18,
+          "num_statements": 18,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 18,
+          "num_partial_branches": 0,
+          "covered_branches": 18,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyResult.__post_init__": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.__init__": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.reserve": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.decode": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.note": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget._reserve_text": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.add": {
+          "covered_lines": 20,
+          "num_statements": 20,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget.result": {
+          "covered_lines": 3,
+          "num_statements": 3,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "DependencyInputError": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyLimits": {
+          "covered_lines": 3,
+          "num_statements": 3,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyAnchor": {
+          "covered_lines": 10,
+          "num_statements": 10,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyCandidate": {
+          "covered_lines": 18,
+          "num_statements": 18,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 18,
+          "num_partial_branches": 0,
+          "covered_branches": 18,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyResult": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyBudget": {
+          "covered_lines": 73,
+          "num_statements": 73,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 36,
+          "num_partial_branches": 0,
+          "covered_branches": 36,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_values.py": {
+      "summary": {
+        "covered_lines": 101,
+        "num_statements": 101,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 68,
+        "num_partial_branches": 0,
+        "covered_branches": 68,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "safe_identifier": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_version_term": {
+          "covered_lines": 33,
+          "num_statements": 33,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 26,
+          "num_partial_branches": 0,
+          "covered_branches": 26,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_version_kind": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "covered_branches": 12,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "DependencyValue.__post_init__": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "dependency_value": {
+          "covered_lines": 19,
+          "num_statements": 19,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 16,
+          "num_partial_branches": 0,
+          "covered_branches": 16,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "DependencyValue": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  },
+  "test_nodes_in_execution_order": [
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/pkg-@scope/pkg]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-pkg-name-pkg-name]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-Upper-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-Example_Package-Example_Package]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[dotnet-Example.Package-Example.Package]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-None-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python--None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-node_modules/pkg-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-../secret-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-https://user:secret@example.test-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/../../secret-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-caf\\xe9-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[None-missing-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[-missing-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.2.3-literal-1.2.3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[v1.0-beta+build-literal-v1.0-beta+build]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[>=1.2,<2-constraint->=1.2,<2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[[1.0,2.0)-constraint-[1.0,2.0)]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[^1.0 || ~2.0-constraint-^1.0 || ~2.0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[*-constraint-*]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[next-tag-next]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[workspace:*-workspace-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[npm:other@1-alias-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[git+https://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[hg+ssh://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[svn+https://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[https://name:secret@example.test/a-url-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[file:../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[link:../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[./secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[/secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[\\\\secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[Z:\\\\secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[$(Secret)-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[%Secret%-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[{secret}-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[private-token-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.0; secret-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[|||-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[wrong-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[literal-secret]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[constraint-1.0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[tag-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[local-secret]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values6]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values7]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values8]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values10]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_closed_anchors_preserve_json_occurrences_and_xml_lines",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes6]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes7]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes8]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes10]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes11]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes12]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes13]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes14]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes15]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_carriers_are_immutable_and_preserve_distinct_dependency_kinds",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[-1-]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one-1-one]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one\\r\\ntwo\\rthree\\n-3-one\\r\\ntwo\\rthree\\n]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\r\\n-1-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\xef\\xbb\\xbfhello-1-hello]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[caf\\xc3\\xa9-1-caf\\xe9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_shared_collector_redacts_values_and_keeps_requested_separate",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_diagnostic_deduplication_and_snapshot_isolation",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_empty_and_repeated_results_are_deterministic",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_split_preserves_public_import_identity_and_signatures",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[True-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[False-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[0-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[-1-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[1.5-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[2-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_depth]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_limits_reject_nonpositive_and_noninteger_capacities[None-max_lines]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_decode_failures_poison_partial_result[limits0-ab-dependency-limit]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_decode_failures_poison_partial_result[limits1-a\\nb-dependency-limit]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_decode_failures_poison_partial_result[limits2-\\xffsecret-dependency-encoding]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_reservations_are_prospective_independent_and_fail_closed[nodes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_reservations_are_prospective_independent_and_fail_closed[candidates]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_reservations_are_prospective_independent_and_fail_closed[text_bytes]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_invalid_reservation_does_not_consume_capacity[True]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_invalid_reservation_does_not_consume_capacity[-1]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_invalid_reservation_does_not_consume_capacity[0.5]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_invalid_reservation_does_not_consume_capacity[1]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_encoded_candidate_and_raw_text_reservations_are_aggregate",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_selected_scalar_bounds_precede_unsafe_storage[secretsecretsecretsecretsecretsecretsecretsecretsecret-10-dependency-limit]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_selected_scalar_bounds_precede_unsafe_storage[\\xe9\\xe9\\xe9\\xe9-5-dependency-limit]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_selected_scalar_bounds_precede_unsafe_storage[\\ud800secret-500-dependency-encoding]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_collector_rejects_invalid_argument_types[changes0]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_collector_rejects_invalid_argument_types[changes1]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_collector_rejects_invalid_argument_types[changes2]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_contract_invalid_types_and_fixed_error_messages",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-!-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1.a.b.c-alpha+build-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-a+a+a+!-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-a+-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1-+a-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1.-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[v-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_version_scanning_has_linear_counted_character_work[1.2.*-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.*-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.x-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.X-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.2.*-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[x-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[X-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[>=1.x,<2-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[>=1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-constraint]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.2.3-alpha.1+build-2-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.xx-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.0-beta-x-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1.2.3-literal]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[>===1-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[>=1-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-a-!-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1..2-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1-\\xe9-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1-a++b-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_wildcards_and_adversarial_constraints_remain_syntactic[1\\n-unsupported]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_overlength_values_never_enter_version_scanning",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_exact_utf8_capacity_requires_no_encoding_allocation[A-1]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_exact_utf8_capacity_requires_no_encoding_allocation[\\xe9-2]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_exact_utf8_capacity_requires_no_encoding_allocation[\\u6f22-3]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_exact_utf8_capacity_requires_no_encoding_allocation[\\U0001f600-4]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_collection_rejects_before_encoding_or_candidate_allocation[\\U0001f600\\U0001f600\\U0001f600-0-5-dependency-limit-2]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_collection_rejects_before_encoding_or_candidate_allocation[\\xe9\\xe9\\xe9-3-8-dependency-limit-3]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_collection_rejects_before_encoding_or_candidate_allocation[AAAAAA-0-5-dependency-limit-0]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_collection_rejects_before_encoding_or_candidate_allocation[A\\ud800-0-5-dependency-encoding-2]",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py::test_public_collection_rejects_before_encoding_or_candidate_allocation[\\udfff-0-5-dependency-encoding-1]"
+  ],
+  "test_count": 191,
+  "original_cases_preserved": 152,
+  "new_cases": 39,
+  "original_definition_bodies_preserved": [
+    "_InjectedAdd",
+    "add",
+    "candidate",
+    "test_anchor_rejects_dynamic_keys_or_fabricated_spans",
+    "test_candidate_rejects_unsanitized_or_mutable_metadata",
+    "test_carriers_are_immutable_and_preserve_distinct_dependency_kinds",
+    "test_closed_anchors_preserve_json_occurrences_and_xml_lines",
+    "test_collector_rejects_invalid_argument_types",
+    "test_decode_failures_poison_partial_result",
+    "test_decode_preserves_valid_text_with_physical_line_boundaries",
+    "test_diagnostic_deduplication_and_snapshot_isolation",
+    "test_empty_and_repeated_results_are_deterministic",
+    "test_encoded_candidate_and_raw_text_reservations_are_aggregate",
+    "test_identifier_allowlists_keep_only_literal_names",
+    "test_invalid_reservation_does_not_consume_capacity",
+    "test_limits_reject_nonpositive_and_noninteger_capacities",
+    "test_public_contract_invalid_types_and_fixed_error_messages",
+    "test_reservations_are_prospective_independent_and_fail_closed",
+    "test_result_rejects_mutable_unsanitized_and_invalid_usage",
+    "test_selected_scalar_bounds_precede_unsafe_storage",
+    "test_shared_collector_redacts_values_and_keeps_requested_separate",
+    "test_value_constructor_cannot_bypass_sanitization",
+    "test_version_classification_never_retains_reference_targets"
+  ],
+  "public_signatures": {
+    "DependencyLimits": "(max_bytes: 'int' = 1048576, max_nodes: 'int' = 100000, max_depth: 'int' = 64, max_candidates: 'int' = 10000, max_text_bytes: 'int' = 1048576, max_lines: 'int' = 100000) -> None",
+    "DependencyAnchor": "(format: \"Literal['json', 'xml', 'text']\", location: 'str', occurrence: 'int' = 1, line: 'int | None' = None) -> None",
+    "DependencyValue": "(kind: 'str', value: 'str | None' = None) -> None",
+    "DependencyCandidate": "(kind: 'DependencyKind', ecosystem: 'Ecosystem', name: 'str | None', version: 'DependencyValue', role: 'str', anchor: 'DependencyAnchor', requested: 'DependencyValue' = DependencyValue(kind='missing', value=None), owner: 'str | None' = None, operation: 'str' = 'reference', condition_present: 'bool' = False, extras: 'tuple[str, ...]' = (), markers: 'tuple[str, ...]' = ()) -> None",
+    "DependencyResult": "(candidates: 'tuple[DependencyCandidate, ...]' = (), diagnostics: 'tuple[str, ...]' = (), consumed_nodes: 'int' = 0, consumed_text_bytes: 'int' = 0) -> None",
+    "DependencyBudget": "(limits: 'DependencyLimits') -> 'None'",
+    "DependencyInputError": "(code: 'str') -> 'None'",
+    "safe_identifier": "(value: 'str | None', *, ecosystem: 'Ecosystem' = 'python') -> 'str | None'",
+    "dependency_value": "(value: 'str | None') -> 'DependencyValue'",
+    "DependencyBudget.decode": "(self, content: 'bytes') -> 'str'",
+    "DependencyBudget.reserve": "(self, *, nodes: 'int' = 0, candidates: 'int' = 0, text_bytes: 'int' = 0) -> 'None'",
+    "DependencyBudget.note": "(self, code: 'str') -> 'None'",
+    "DependencyBudget.add": "(self, *, kind: 'DependencyKind', ecosystem: 'Ecosystem', name: 'str | None', version: 'str | None', role: 'str', anchor: 'DependencyAnchor', requested: 'str | None' = None, owner: 'str | None' = None, operation: 'str' = 'reference', condition_present: 'bool' = False, extras: 'tuple[str, ...]' = (), markers: 'tuple[str, ...]' = ()) -> 'None'",
+    "DependencyBudget.result": "(self) -> 'DependencyResult'"
+  },
+  "public_signatures_unchanged": true,
+  "reexport_identity_verified": true,
+  "parser_contract": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-contract.2026-10-19T10-28.md",
+    "sha256": "f1a56bdca52a5f87a9400ddc6cada685f308624a2cc5ee8785c6a22b10902876"
+  },
+  "executed_harnesses": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-executed-harnesses.2026-10-19T10-28.json",
+    "sha256": "439e1c3360a34b903eb28813fe311eb6b2620d6f17f1d43ff64a83bf559691d4"
+  },
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-handoff.2026-10-19T10-28.md",
+    "sha256": "ce1bf50c9330f617c9212a46948ebff30d172ac8fbaaf2f1d1dc1be09d8710a4"
+  },
+  "paused_integration": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "073f4d390cb41aaf2b55c2451bdbceab706d5353137df1e735d90502a83c7115",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "fef3fbfb7d32a25f6b7067cc4802574ce85f87b30244f5613e83059eb9ed6123",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependencies.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "3e9486a2f0ab8857ec5ebcc7593359af20d95ac89727f94363048f848268bb9d",
+      "preserved_copy": "SCRATCH/p4t7-paused-integration-2026-10-19T10-15/test_dependency_projection_limits.py"
+    }
+  ],
+  "predecessor_streams_preserved": 62,
+  "evidence_files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-contract.2026-10-19T10-28.md",
+      "sha256": "f1a56bdca52a5f87a9400ddc6cada685f308624a2cc5ee8785c6a22b10902876"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-coverage.2026-10-19T10-28.json",
+      "sha256": "95472fc1d0f55779425585c5ec7cdaed2ca31c1b6e8bc17ed975338c052dec78"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-executed-harnesses.2026-10-19T10-28.json",
+      "sha256": "439e1c3360a34b903eb28813fe311eb6b2620d6f17f1d43ff64a83bf559691d4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-handoff.2026-10-19T10-28.md",
+      "sha256": "ce1bf50c9330f617c9212a46948ebff30d172ac8fbaaf2f1d1dc1be09d8710a4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-1.2026-10-19T10-28.txt",
+      "sha256": "6a4c6fb44870ad3e56f61eff760d20a76ce6e1413607fc4d7e699401186e3162"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-2.2026-10-19T10-28.txt",
+      "sha256": "d3630199021c56d7dc6fdb517591e27ae4838fce8aa0b80320ed2373f2aa66be"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-3.2026-10-19T10-28.txt",
+      "sha256": "82cd6c5d00b4788dccf2b53b3a5ffea5fcb8e5b83fc1fee68569c0fe2b3dca11"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-4.2026-10-19T10-28.txt",
+      "sha256": "e31608fe137fe022c7c50361ed897ae61776330b9d99a87f54dcdc602cb1e01c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-5.2026-10-19T10-28.txt",
+      "sha256": "681b771f877225ac12af18472892fca17e65a5e61cafc887f7bf0a19cdf592e2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-6.2026-10-19T10-28.txt",
+      "sha256": "c3b05cb27b3f558eb619f582539430598146c646bff10cc24a95a5fafaad04ae"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-7.2026-10-19T10-28.txt",
+      "sha256": "0ca3525c956dd79272c1020e8fdfe7885311b4195c23f65546ef83003439b39f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-8.2026-10-19T10-28.txt",
+      "sha256": "e3a4c987cbb036f3466788a099d693d494bfaf3a04ccf0cd7c8c9dc6ffe0be0f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-size.2026-10-19T10-28.json",
+      "sha256": "db21a703b51ef6d50144551d359459dde65a73486250098ccb1fb6dd066ba557"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-size.2026-10-19T10-28.md",
+      "sha256": "b7722b852f5b65822b751473ac854b60ab6de8ddb8832aab5d2baed9942a12b4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-structure.2026-10-19T10-20.json",
+      "sha256": "1d031902049ea69e4cf3ab1118782e5fa207c8e70bf41ce47c9e536d39f81107"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair0-format.2026-10-19T10-20.json",
+      "sha256": "0ff952d04545d3bf0a8a62881e56ce0302f9c2930b7e519324e3bcd6781b0185"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair0-format.2026-10-19T10-20.md",
+      "sha256": "8363418c24da232cc0cf60fcb0a4c6a92b70c01609feae3f077c12e0ccde6c0f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-format.2026-10-19T10-21.json",
+      "sha256": "22f6247536a5846cb389c086811cb368976999401cdb48e0ca7f1cdf1a2dd417"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-format.2026-10-19T10-21.md",
+      "sha256": "09c0f7600eac02479fb16eb2d9625d99a1791616a9246be2dbce39bbb679115f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-import-fix.2026-10-19T10-21.json",
+      "sha256": "2e053fcb37d60689667cdc68d3e96280dd6df8ecc901b57d982452bb6fff1e5e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-import-fix.2026-10-19T10-21.md",
+      "sha256": "2d948006b8622475170fc184367454c97b0110c828117d47223621973117a2b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-lint.2026-10-19T10-21.json",
+      "sha256": "bde5dcff797367c0d0de36d71c924eaede3369e0756bc1a442fdeb9d751507b9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-lint.2026-10-19T10-21.md",
+      "sha256": "0ca71c7f76d64ffd836952af18822da9c02673fcd0e9fbc03d9a9261ebb0ba0a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-format.2026-10-19T10-21.json",
+      "sha256": "f36bb82983c85500644ee274a2d796ff15fbd9704c6b0449c78a8998b74953e0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-format.2026-10-19T10-21.md",
+      "sha256": "5ced763ea1a8acdb26b954477f1958b75b18fe43f10e3dbb6ae82f2333c5066e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-lint.2026-10-19T10-21.json",
+      "sha256": "51642915dc85c0b80d377402fb1ef842aa2ff5b7416cafa3291c797f07546ffb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-lint.2026-10-19T10-21.md",
+      "sha256": "48d6a154c16858b95d4b79681f55f18f737bf01b854af9e9e41ad766a148c5dd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-types.2026-10-19T10-21.json",
+      "sha256": "c55d2879b117a2bf5ab83f17ed90c351d2aab46715c8bab9e1ba0a006db821d8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-types.2026-10-19T10-21.md",
+      "sha256": "dbaeee94265ab598d752db83d7509251b1f3faccdc191a30d563ec521f73aa78"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-format.2026-10-19T10-23.json",
+      "sha256": "a22404c210447b05844b430d69066c54c5ce9d09ff26c12c33306f2a66abbc7f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-format.2026-10-19T10-23.md",
+      "sha256": "a1c9f40eef9ccae39f78098460f3168432e426aa7cfa572be4ae8ee41786cb82"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-lint.2026-10-19T10-23.json",
+      "sha256": "f745fc7cc1e829212587f890df0e43eacc1bac67666163336188e1dfdefa7672"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-lint.2026-10-19T10-23.md",
+      "sha256": "674065acb97a754a8e62c72e8d3e74e7708cd8f04e7e80199f173e33f7a51a48"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-types.2026-10-19T10-23.json",
+      "sha256": "eb3a71e19c3f076a59ca028fb3a982ebb071932d1368e38422c51a959fc07b7b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-types.2026-10-19T10-23.md",
+      "sha256": "668773a05e0d38e2f588fe1d51ec3995601fcf9e446f6345b23090bde349f6fa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-unit.2026-10-19T10-23.json",
+      "sha256": "b1f442a0d9a122d242d87d1a6938cfae45b4efa76defde2f7b19525fa4c909ae"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-unit.2026-10-19T10-23.md",
+      "sha256": "a384e07e75821d96b9227d17bf35040495a9b6128d19f3ec98bab4386d8db8ed"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.json",
+      "sha256": "53b7e40874baa9c37471701d53f1fb17bedc9fdb808c15ffed8deb447a46de4f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.md",
+      "sha256": "b08f458205802e0e6d1df05e013e2cd2f1d3f2c14e47a9ed5847c16bd7e958ac"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.json",
+      "sha256": "a7c0eb8f3c727241a0d90c7cb6fcea62fdc851b6b61b8fcce89d78a8f2d0896e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.md",
+      "sha256": "5f772b094441e6f680f082fe251d7a51d573e44ca211e1c59d7d776eefea0feb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.json",
+      "sha256": "47beaa5bab94b85caf9bff1a262dd857a63a85d13824a3b7c3e62962cc34fce6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.md",
+      "sha256": "543337b9e5257c4a97de43208fd8ffd8daac90ed11f7b1c9c8263a3305a15c43"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.json",
+      "sha256": "033187a78226ee34dc6b42b09d2bc82da1bb7b672136c9b7c5f29d737e4036a4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.md",
+      "sha256": "0105ce1521cb882d8d434a9d2839a5bc004b481b1911900961614ab6155ee002"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-repair-scope.2026-10-19T10-15.json",
+      "sha256": "e86c279522eac233c79eb828dbe0e08d489c1fb1876e0eb9d12673e3c9f387b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-repair-scope.2026-10-19T10-15.md",
+      "sha256": "cb25abcf3a719155ae0c00a30a2b420131fa1727f768f4e7e352854f92e53c48"
+    }
+  ],
+  "stage_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-contract.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-coverage.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-executed-harnesses.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-handoff.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-1.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-2.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-3.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-4.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-5.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-6.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-7.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-harness-8.2026-10-19T10-28.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-size.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-size.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-structure.2026-10-19T10-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair0-format.2026-10-19T10-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair0-format.2026-10-19T10-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-format.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-format.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-import-fix.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-import-fix.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-lint.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair1-lint.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-format.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-format.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-lint.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-lint.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-types.2026-10-19T10-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair2-types.2026-10-19T10-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-format.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-format.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-lint.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-lint.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-types.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-types.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-unit.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair3-unit.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-repair-scope.2026-10-19T10-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-repair-scope.2026-10-19T10-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json"
+  ],
+  "changed_line_coverage": "100% for both repaired/moved responsibilities; no loss against the original 100% line/branch proof.",
+  "pending": [
+    "bounded independent shared repair confirmation",
+    "parent checked WIP commit",
+    "integration release and parser composition",
+    "full task review/final ordered gates"
+  ],
+  "source_test_edits_during_freeze": false,
+  "behavioral_reruns_during_freeze": false,
+  "git_mutations": false
+}

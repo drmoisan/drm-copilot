@@ -1,0 +1,231 @@
+{
+  "files": [
+    {
+      "crlf_count": 0,
+      "definitions": [
+        {
+          "docstring_present": true,
+          "end_line": 55,
+          "line": 44,
+          "name": "_fields"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 66,
+          "line": 58,
+          "name": "_text"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 95,
+          "line": 69,
+          "name": "_location_name"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 212,
+          "line": 98,
+          "name": "_NodeParser"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 299,
+          "line": 215,
+          "name": "parse_node_dependencies"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 114,
+          "line": 107,
+          "name": "__init__"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 155,
+          "line": 116,
+          "name": "maps"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 212,
+          "line": 157,
+          "name": "lock"
+        }
+      ],
+      "imports": [
+        "from __future__ import annotations",
+        "from typing import TYPE_CHECKING, Literal, cast",
+        "from drm_copilot_discovery.analyzer.dependency_inputs import DependencyAnchor, DependencyBudget, DependencyInputError, DependencyLimits, DependencyResult, safe_identifier",
+        "from drm_copilot_discovery.models import JsonObject, ParseLimits",
+        "from drm_copilot_discovery.parsing import parse_document",
+        "from drm_copilot_discovery.models import JsonValue"
+      ],
+      "lines": 299,
+      "missing_iteration_comments": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505"
+    },
+    {
+      "crlf_count": 0,
+      "definitions": [
+        {
+          "docstring_present": true,
+          "end_line": 32,
+          "line": 20,
+          "name": "parse"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 41,
+          "line": 35,
+          "name": "rendered"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 74,
+          "line": 59,
+          "name": "test_manifest_groups_preserve_declared_values_without_resolution"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 117,
+          "line": 78,
+          "name": "test_lock_records_root_maps_and_edges_have_distinct_meanings"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 137,
+          "line": 120,
+          "name": "test_order_and_repeated_groups_are_deterministic_without_precedence"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 174,
+          "line": 152,
+          "name": "test_unsafe_specifiers_are_classifications_without_target_text"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 201,
+          "line": 189,
+          "name": "test_unsafe_locations_never_enter_anchors_or_identities"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 233,
+          "line": 212,
+          "name": "test_explicit_names_do_not_resolve_conflicting_location_identity"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 262,
+          "line": 236,
+          "name": "test_metadata_only_links_and_explicit_names_remain_unevaluated"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 292,
+          "line": 275,
+          "name": "test_unsupported_controls_are_diagnosed_without_evaluation"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 316,
+          "line": 307,
+          "name": "test_malformed_manifest_shape_never_returns_partial_candidates"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 353,
+          "line": 344,
+          "name": "test_lock_versions_and_selected_shapes_fail_closed"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 380,
+          "line": 367,
+          "name": "test_parser_errors_withhold_messages_keys_and_selected_secret_text"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 398,
+          "line": 383,
+          "name": "test_bom_empty_inputs_and_unicode_separator_are_honest_json"
+        }
+      ],
+      "imports": [
+        "from __future__ import annotations",
+        "import json",
+        "from dataclasses import asdict, replace",
+        "from typing import Literal",
+        "import pytest",
+        "from drm_copilot_discovery.analyzer.dependency_inputs import DependencyInputError, DependencyLimits, DependencyResult",
+        "from drm_copilot_discovery.analyzer.dependency_node import parse_node_dependencies"
+      ],
+      "lines": 398,
+      "missing_iteration_comments": [],
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "db0bd88c98a33400ae7ab2ad4e17856dc4b0a46a057baa62d88c3c9a629020eb"
+    },
+    {
+      "crlf_count": 0,
+      "definitions": [
+        {
+          "docstring_present": true,
+          "end_line": 46,
+          "line": 29,
+          "name": "test_public_contract_misuse_has_fixed_errors"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 76,
+          "line": 57,
+          "name": "test_input_limits_precede_json_parser_allocation"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 109,
+          "line": 95,
+          "name": "test_aggregate_allocation_and_normalization_bounds_discard_complete_result"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 122,
+          "line": 113,
+          "name": "test_lock_extraction_reserves_linear_work_across_records"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 140,
+          "line": 129,
+          "name": "test_unicode_and_escaped_identifiers_remain_redacted_and_budgeted"
+        },
+        {
+          "docstring_present": true,
+          "end_line": 67,
+          "line": 65,
+          "name": "forbidden"
+        }
+      ],
+      "imports": [
+        "from __future__ import annotations",
+        "from dataclasses import replace",
+        "from typing import cast",
+        "import pytest",
+        "from drm_copilot_discovery.analyzer import dependency_node as implementation",
+        "from drm_copilot_discovery.analyzer.dependency_inputs import DependencyInputError, DependencyLimits",
+        "from drm_copilot_discovery.analyzer.dependency_node import parse_node_dependencies",
+        "from tests.discovery_runtime.analyzer.test_dependency_node import FORMATS, parse, rendered"
+      ],
+      "lines": 140,
+      "missing_iteration_comments": [],
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "611105b3e954060b955587395d4c850bd2aef22e154ec2882e35a44ee79e199c"
+    }
+  ],
+  "harness_sha256": "5bb6450d9ec1f16287fcd39802298df8065da390bf7b79b9c9b9ad1ebb81046c",
+  "passed": true,
+  "scope": "Size, annotations, docstring presence, immediate iteration comments, and forbidden native-I/O/evaluation calls. Typed parameter meanings, return shape, errors and side effects were additionally inspected manually; this checker does not prove prose semantics.",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-15"
+}

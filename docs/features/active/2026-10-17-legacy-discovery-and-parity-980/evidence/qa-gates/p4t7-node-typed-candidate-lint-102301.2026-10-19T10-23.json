@@ -1,0 +1,45 @@
+{
+  "batch": "typed-candidate",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T10:23:01.919731+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-node-focused.py",
+    "sha256": "a1c6dcefdd24fbcd16940f91e1bc7e39302224fbafc462486618d058488eedd3"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.stdout.txt",
+      "sha256": "46585b929ab139361b5cca1254571fa35574150999e0e6be8f23b565c4220737"
+    }
+  },
+  "seconds": 0.108021,
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "db0bd88c98a33400ae7ab2ad4e17856dc4b0a46a057baa62d88c3c9a629020eb",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "f657e859e969f27605769e937237656d8dd272302114135680275dd8dd15b39b"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "db0bd88c98a33400ae7ab2ad4e17856dc4b0a46a057baa62d88c3c9a629020eb",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "f657e859e969f27605769e937237656d8dd272302114135680275dd8dd15b39b"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T10:23:01.811710+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_node.py:132:89\n    |\n130 |     )\n131 |     assert first == second\n132 |     # Keep overlapping groups as separate facts instead of choosing effective precedence.\n    |                                                                                         ^\n133 |     assert [(item.name, item.version.value) for item in first.candidates] == [\n134 |         (\"a\", \"1\"),\n    |\n\nE501 Line too long (90 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_node.py:239:89\n    |\n237 |     \"\"\"Observe inert link and location-independent name declarations; returns None.\n238 |\n239 |     Missing versions stay missing; link targets, scripts and arbitrary fields stay opaque.\n    |                                                                                         ^^\n240 |     \"\"\"\n241 |     result = parse(\n    |\n\nFound 2 errors.\n",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-23"
+}

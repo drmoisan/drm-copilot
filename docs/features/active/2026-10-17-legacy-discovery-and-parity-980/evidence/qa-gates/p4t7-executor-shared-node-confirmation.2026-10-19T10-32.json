@@ -1,0 +1,261 @@
+{
+  "status": "SHARED_REPAIR_CONFIRMED_NODE_REVIEW_CLEAR",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-32",
+  "published_utc": "2026-10-19T10:32:15.666197+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-shared-node-confirmation.py",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t7_shared_node_review",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": true
+  },
+  "scope": "Four shared repair source/test paths plus three frozen Node source/test paths only.",
+  "source_test_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "bytes": 20798,
+      "lines": 500
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "bytes": 7771,
+      "lines": 208
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "bytes": 13978,
+      "lines": 375
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "bytes": 13200,
+      "lines": 366
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "bytes": 12347,
+      "lines": 299
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "bytes": 14132,
+      "lines": 398
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "bytes": 5156,
+      "lines": 145
+    }
+  ],
+  "freezes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+      "sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749",
+      "bytes": 75082
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.json",
+      "sha256": "d8bc7e62f27dadfa1093122e36482de9da1e0016f41c405516743c2e66ed1642",
+      "bytes": 25143
+    }
+  ],
+  "focused_receipts_reused": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-format.2026-10-19T10-28.json",
+      "sha256": "53b7e40874baa9c37471701d53f1fb17bedc9fdb808c15ffed8deb447a46de4f",
+      "bytes": 2909
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-lint.2026-10-19T10-28.json",
+      "sha256": "a7c0eb8f3c727241a0d90c7cb6fcea62fdc851b6b61b8fcce89d78a8f2d0896e",
+      "bytes": 2842
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-types.2026-10-19T10-28.json",
+      "sha256": "47beaa5bab94b85caf9bff1a262dd857a63a85d13824a3b7c3e62962cc34fce6",
+      "bytes": 3025
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair4-unit.2026-10-19T10-28.json",
+      "sha256": "033187a78226ee34dc6b42b09d2bc82da1bb7b672136c9b7c5f29d737e4036a4",
+      "bytes": 35363
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.json",
+      "sha256": "b3a3beb94270ab21967c8c781fbb1b291636c97dbcc1fd4b27147233041aed11",
+      "bytes": 2770
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.json",
+      "sha256": "2fb7374594a8ed96c2a3e59f8e840c3c6653166c9d4e5fa52819c34e91a21535",
+      "bytes": 2706
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.json",
+      "sha256": "4660e4c739e5c52addce86e3f707d373fed95cc7d772d2028403c07adbc31a18",
+      "bytes": 2887
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.json",
+      "sha256": "a39ce08d09d267f0a00c2ec8b7e5cc7693b52696031d9a3381a33d60fc30d694",
+      "bytes": 40284
+    }
+  ],
+  "coverage_reconciled": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-coverage.2026-10-19T10-28.json",
+      "sha256": "95472fc1d0f55779425585c5ec7cdaed2ca31c1b6e8bc17ed975338c052dec78",
+      "bytes": 26391
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-coverage-ranges.2026-10-19T10-24.json",
+      "sha256": "f111d1b5bb6bdfec7ebb655c51e186097d68ef4a29cd263e2bc3409087ca5a39",
+      "bytes": 21784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-coverage.2026-10-19T10-23.json",
+      "sha256": "f56e97e43e3e871815150120ba6e22ba42b872382e4cfbba1800db352bacb582",
+      "bytes": 24179
+    }
+  ],
+  "proof_reused": {
+    "shared_cases": 191,
+    "original_shared_cases": 152,
+    "added_shared_cases": 39,
+    "shared_statements": "275/275",
+    "shared_branches": "142/142",
+    "shared_ranges": 24,
+    "node_cases": 111,
+    "node_statements": "103/103",
+    "node_branches": "52/52",
+    "node_ranges": 8
+  },
+  "shared_closure": {
+    "SR1": "Forward-only version scans and bounded partitioning replace nested ambiguous regex; deterministic counted regressions cover work.",
+    "SR2": "UTF-8 scalar widths are counted without encoding allocation; original 12-byte input/5-byte capacity reproduction rejects with zero encode calls and poisons result.",
+    "SR3": "All four originally misclassified wildcard spellings now return constraint; literal control remains literal.",
+    "SR4": "Reviewed changed shared/helper/test contracts now document typed inputs, results, errors and side effects; all four files are at most 500 lines."
+  },
+  "retained_version_reproductions": [
+    {
+      "seconds": 0.00011289998656138778,
+      "kind": "unsupported",
+      "repetitions": 8,
+      "input_characters": 19
+    },
+    {
+      "seconds": 0.00010659999679774046,
+      "kind": "unsupported",
+      "repetitions": 12,
+      "input_characters": 27
+    },
+    {
+      "seconds": 0.0001391999830957502,
+      "kind": "unsupported",
+      "repetitions": 16,
+      "input_characters": 35
+    },
+    {
+      "seconds": 0.00012260000221431255,
+      "kind": "unsupported",
+      "repetitions": 20,
+      "input_characters": 43
+    },
+    {
+      "seconds": 0.00010899998596869409,
+      "kind": "unsupported",
+      "repetitions": 28,
+      "input_characters": 59
+    }
+  ],
+  "allocation_reproduction": {
+    "encode_calls": 0,
+    "partial_result_refused": true
+  },
+  "version_classifications": [
+    {
+      "input": "1.2.3",
+      "kind": "literal"
+    },
+    {
+      "input": "*",
+      "kind": "constraint"
+    },
+    {
+      "input": "1.*",
+      "kind": "constraint"
+    },
+    {
+      "input": "1.x",
+      "kind": "constraint"
+    },
+    {
+      "input": "1.2.*",
+      "kind": "constraint"
+    },
+    {
+      "input": "1.X",
+      "kind": "constraint"
+    }
+  ],
+  "timing_qualification": "Only operational two-second caps; elapsed measurements are diagnostics, never unit-test thresholds. Worker deterministic work-count tests are retained.",
+  "public_signatures_and_reexport_identity": "Independently confirmed against frozen manifest.",
+  "node_review": {
+    "findings": [],
+    "boundaries": [
+      "finite package-json and lock v2/v3 maps",
+      "declared/locked/edge distinction without target resolution",
+      "redacted dynamic location keys and explicit alias ambiguity",
+      "closed container and normalized ordinal anchors",
+      "separate normalization/extraction/text/candidate bounds and whole-result failures",
+      "typed public contracts, comments, size and isolated tests"
+    ]
+  },
+  "node_shared_byte_qualification": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-size.2026-10-19T10-28.json",
+      "sha256": "db21a703b51ef6d50144551d359459dde65a73486250098ccb1fb6dd066ba557",
+      "bytes": 1372
+    },
+    "before_sha256": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "after_sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+    "removed_blank_line": 275,
+    "exact_single_blank_line_mapping_verified": true,
+    "normalized_executable_ast_equal": true,
+    "historical_501_line_diagnostic_preserved": true,
+    "node_suite_not_replayed": true,
+    "later_composed_final_gates_required": true
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.json",
+    "sha256": "0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8",
+    "bytes": 9398
+  },
+  "original_failed_probe_preserved": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe.2026-10-19T10-05.json",
+    "sha256": "9b9f3fd13f7e2e6a13a8deda91d2e7278a080d360c01f696df6ed2ce831bb106",
+    "bytes": 2932
+  },
+  "open_probes": [],
+  "remaining_findings": [],
+  "limitations": [
+    "This closes only shared SR1-SR4 and the first Node subset review; full P4-T7 acceptance is pending.",
+    "The Python/.NET format repairs and central integration were excluded from this step.",
+    "No predecessor suite was replayed or manifest recaptured; retained 62-stream baseline proof remains referenced by the subset freezes.",
+    "Registry/CLI exposure remains P4-T9; no host or non-Windows proof is asserted."
+  ],
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-harness.2026-10-19T10-32.txt",
+    "sha256": "315c68f8f5bb7b4959e6c0b378bc866a2a476fff6a49088d669dee2bfa9d0da5",
+    "bytes": 14455
+  },
+  "task_or_ac_checkoff": false
+}

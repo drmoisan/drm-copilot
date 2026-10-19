@@ -1,0 +1,43 @@
+{
+  "batch": "complete-candidate",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-coverage.2026-10-19T10-23.json",
+    "raw_path": "SCRATCH/p4t7-node-complete-candidate-coverage.raw.json",
+    "raw_sha256": "024bd47280ae5c6cb85a958ecf30ca40cf29dfc9afb3e4ab04d0df6869805c53",
+    "sha256": "f56e97e43e3e871815150120ba6e22ba42b872382e4cfbba1800db352bacb582"
+  },
+  "initial_sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.json",
+      "sha256": "b3a3beb94270ab21967c8c781fbb1b291636c97dbcc1fd4b27147233041aed11"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.json",
+      "sha256": "2fb7374594a8ed96c2a3e59f8e840c3c6653166c9d4e5fa52819c34e91a21535"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.json",
+      "sha256": "4660e4c739e5c52addce86e3f707d373fed95cc7d772d2028403c07adbc31a18"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.json",
+      "sha256": "a39ce08d09d267f0a00c2ec8b7e5cc7693b52696031d9a3381a33d60fc30d694"
+    }
+  ],
+  "shared_sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+  },
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-23"
+}
