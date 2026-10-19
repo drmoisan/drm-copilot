@@ -1,0 +1,54 @@
+{
+  "stage": 5,
+  "label": "p3t8-final-reverse",
+  "started": "2026-10-19T01:33:23.468484+00:00",
+  "finished": "2026-10-19T01:33:44.043824+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p3t8-tests.py reverse --no-cov",
+  "exit_code": 0,
+  "duration_seconds": 20.575,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "physical_lines": 415
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "physical_lines": 283
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "tests/discovery_runtime/test_source_reads.py": {
+      "sha256": "4a7eaf7a5a6b560a1d95e9cedd6d1456518f775f3121e0b624e4f129b0ef3955",
+      "physical_lines": 364
+    },
+    "tests/discovery_runtime/test_source_read_limits.py": {
+      "sha256": "e94654999a4191a66a731aa9cb879877a5533b7d4db200a611ffa19082067cf8",
+      "physical_lines": 415
+    },
+    "tests/discovery_runtime/test_source_read_snapshot_scope.py": {
+      "sha256": "8affa17e87c41d6d4cf931815933253cd70f23124506946797da4eb59b5ea01b",
+      "physical_lines": 283
+    }
+  },
+  "output": "........................................................................ [ 56%]\n.......................................................                  [100%]\n127 passed in 18.97s\n"
+}
