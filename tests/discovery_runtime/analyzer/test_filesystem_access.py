@@ -7,6 +7,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery.analyzer import api_syntax
 from drm_copilot_discovery.analyzer.api_syntax import access_sites
 from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
 from drm_copilot_discovery.analyzer.emitter import inventory_result
@@ -417,3 +418,54 @@ def test_aggregate_byte_work_is_bounded_separately_from_output(
     assert not result.components and not result.findings
     assert len(result.diagnostics) == 1
     assert result.diagnostics[0]["code"] == "analysis-work-limit"
+
+
+class OversizedText(str):
+    """Report an over-limit length without allocating a large test payload."""
+
+    def __len__(self) -> int:
+        """Return an int above the decoded-character bound; no mutation or I/O."""
+        return 67108865
+
+
+@pytest.mark.parametrize(
+    "capacity,maximum,code",
+    [
+        ("sites", True, "source-record-limit"),
+        ("sites", False, "source-record-limit"),
+        ("sites", 0.5, "source-record-limit"),
+        ("sites", None, "source-record-limit"),
+        ("sites", "1", "source-record-limit"),
+        ("tokens", True, "source-token-limit"),
+        ("tokens", False, "source-token-limit"),
+        ("tokens", 0.5, "source-token-limit"),
+        ("tokens", None, "source-token-limit"),
+        ("tokens", "1", "source-token-limit"),
+        ("tokens", 0, "source-token-limit"),
+        ("tokens", 100001, "source-token-limit"),
+        ("text", None, "source-limit"),
+    ],
+)
+def test_public_bounds_reject_before_masking_or_token_allocation(
+    monkeypatch: pytest.MonkeyPatch, capacity: str, maximum: object, code: str
+) -> None:
+    """Patch masking; str capacity/code and object maximum select invalid inputs.
+
+    Returns None; every failure must precede mask/token work and redact source text.
+    The length-reporting string avoids a large allocation in this unit test.
+    """
+
+    def prohibited_mask(text: str) -> str:
+        """Reject any mask request for str text with AssertionError; no allocation."""
+        raise AssertionError("Masking must not run for invalid public bounds")
+
+    monkeypatch.setattr(api_syntax, "strip_comments_and_strings", prohibited_mask)
+    source = OversizedText("VALUE_SENTINEL") if capacity == "text" else "VALUE_SENTINEL"
+    with pytest.raises(SourceScanError) as error:
+        access_sites(
+            source,
+            FILESYSTEM_SURFACE,
+            max_sites=cast("int", maximum) if capacity == "sites" else 100000,
+            max_tokens=cast("int", maximum) if capacity == "tokens" else 100000,
+        )
+    assert error.value.code == code and "VALUE_SENTINEL" not in str(error.value)

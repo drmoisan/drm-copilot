@@ -1,0 +1,121 @@
+{
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-42",
+  "status": "REPAIR_REQUIRED",
+  "review_kind": "Single consolidated candidate review; not final task acceptance",
+  "routing_receipt": "atomic_execution_p4t5_consolidated_review",
+  "profile": {
+    "deployment": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "authority": "Fresh persisted receipt and native routing, launch and provenance checked at review entry."
+  },
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "checked_wip_commits": [
+    "2aafdd818957f4067edd11ab1e08bea45759bda2",
+    "a4a084f247b624a382d9c1356018b687d8aec59a"
+  ],
+  "scope": {
+    "production_modules": ["api_syntax.py", "api_access.py", "filesystem_access.py", "registry_access.py", "com_interop.py"],
+    "test_modules": ["test_filesystem_access.py", "test_registry_access.py", "test_com_interop.py", "test_com_candidates.py"],
+    "exact_path_and_byte_authority": "p4t5-executor-review-binding.2026-10-19T07-42.json",
+    "source_test_paths": 9,
+    "source_test_mutations": false,
+    "plan_ac_checkpoint_git_mutations": false
+  },
+  "evidence": {
+    "binding": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-review-binding.2026-10-19T07-42.json",
+      "sha256": "99bf4dce51b12ed7daa75ff4f2c708e1b00b36fe07f363ebb34b6da35f7cc944"
+    },
+    "binding_harness": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-review-binding-harness.2026-10-19T07-42.txt",
+      "sha256": "8082cb2bb135ab5f1abb2b2d173055dce0a0d1101d3207a795970b7ac8700039"
+    },
+    "probes": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-probes.2026-10-19T07-34.json",
+      "sha256": "6504b78d3b627259799ccefbbbcd798a8f8eae8ce41c1be7ced36289f2a7cb71"
+    },
+    "probe_harness": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-probe-harness.2026-10-19T07-34.txt",
+      "sha256": "99d10fa29a632e2fe2cd4233fc926b1cce800d4b4a8f261b9ea0df7c3cf6f38d"
+    }
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "priority": "P2",
+      "category": "semantic correctness",
+      "title": "Exclude unambiguous collection expressions and explicit interface declarations from API syntax candidates",
+      "locations": [
+        {"path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py", "line": 128},
+        {"path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py", "line": 131}
+      ],
+      "observed": "Take([ComImport]) and Take(0, [ComVisible]) produce COM attributes. Explicit interface member declarations named Marshal.IsComObject, File.Open and Registry.GetValue produce calls/invocations. Each negative probe returned one candidate instead of zero; genuine COM attribute and call controls returned one as expected.",
+      "impact": "The inventory claims an attribute or invocation where the concrete syntax is a collection expression or method declaration. Marking runtime binding unresolved does not correct this syntactic misclassification.",
+      "required_change": "Discriminate these declaration/expression contexts using bounded lexical traversal. Preserve valid attribute, invocation and constructor recognition, exact source anchors, fixed output names and the existing aggregate work/record bounds. Add the five retained negative cases and positive controls to the relevant isolated unit modules.",
+      "owner_split": "COM owner repairs COM contexts; access owner repairs shared filesystem/registry invocation context. Any shared helper expansion requires coordinator approval.",
+      "probe_cases": ["collection-argument", "second-collection-argument", "explicit-com-member-declaration", "explicit-file-member-declaration", "explicit-registry-member-declaration"],
+      "primary_references": [
+        "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/collection-expressions",
+        "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces"
+      ]
+    },
+    {
+      "id": "R2",
+      "priority": "P2",
+      "category": "bounded public input contract",
+      "title": "Reject oversized text and invalid capacity values before allocating the access scanner mask",
+      "locations": [{"path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py", "line": 170}],
+      "observed": "The public access_sites seam invokes strip_comments_and_strings on a 64 MiB-plus-one string before the tokenizer can reject it. An immediate masking sentinel proved this without allocating the actual mask. max_sites=True, False and 0.5 are accepted on empty text despite the documented integer contract.",
+      "impact": "Direct callers can cause avoidable proportional masking allocation before the documented size rejection, and invalid capacity types bypass construction-time validation. Normal analyzer entry already uses bounded decode; this finding concerns the independently callable scanner seam.",
+      "required_change": "Validate exact integer capacity types and supported ranges, and reject oversized text before masking/tokenization. Preserve fixed redacted SourceScanError codes and no partial results. Test the retained invalid values and over-limit input with counted or intercepted work, not wall-clock thresholds.",
+      "owner_split": "Access owner only; no accepted masking/tokenizer implementation change is required.",
+      "probe_cases": ["capacity-type-bool-True", "capacity-type-bool-False", "capacity-type-float-0.5", "public-source-limit-precedes-masking"]
+    },
+    {
+      "id": "R3",
+      "priority": "P2",
+      "category": "required intent documentation",
+      "title": "Document the three metadata-extraction comprehensions in the COM project test",
+      "locations": [{"path": "tests/discovery_runtime/analyzer/test_com_candidates.py", "line": 262}],
+      "observed": "The ordinal set comprehension and operation/embed_interop_types list comprehensions at lines 264, 266 and 272 convert metadata and select keys without an immediate intent comment.",
+      "required_change": "Add a concise intent comment immediately above each comprehension or its containing assertion, or expand it with an equivalent commented loop. Preserve every assertion and all existing test cases.",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md:42",
+      "owner_split": "COM test owner only."
+    }
+  ],
+  "reviewed_boundaries": [
+    "Finite API and COM allowlists; generic domain-neutral syntax; source candidates inferred and project declarations detected; runtime binding unresolved.",
+    "Captured-byte source references, immutable pins, any-matching duplicate pin semantics, deterministic identifiers and output ordering.",
+    "Independent per-file and aggregate source, pin-count, pin-byte, record and projected-text bounds; fixed diagnostics and whole-overflow failure; no value or condition text projected.",
+    "No production I/O, source evaluation, optional-platform import or public registry wiring; the accepted core boundaries remain unchanged.",
+    "All nine reviewed files are at most 500 lines. Memory-only unit isolation and source/test contracts were reviewed; the remaining intent-comment defect is R3."
+  ],
+  "retained_quality": {
+    "access_cases": 156,
+    "com_cases": 111,
+    "access_coverage": {"statements": [212, 212], "branches": [82, 82], "named_ranges": 15},
+    "com_coverage": {"statements": [170, 170], "branches": [74, 74], "named_ranges": 9},
+    "all_measured_ranges": "100% measured statement and branch coverage; not proof that the reproduced semantic/input cases were tested",
+    "ordered_focused_stages": "Both independent Black, Ruff, scoped Pyright and unit sequences passed on the reviewed hashes.",
+    "reruns": 0,
+    "predecessor_reuse": "Shared baseline and 45 preserved predecessor streams referenced through the frozen manifests; no repeated predecessor implementation review or suites."
+  },
+  "probes": {"executed": 11, "positive_controls_passed": 2, "negative_expectations_reproduced": 9, "harness_exit_code": 0, "behavioral_gate_pass": false, "open": 0},
+  "final_gate_proposal": [
+    "After the bounded repairs and confirmation, run scoped Black, scoped Ruff, full repository Pyright and changed-scope architecture/size/import checks in order.",
+    "Run two isolated unit batches: access modules in reversed order, then COM modules in reversed order. Retain all 267 existing cases plus justified regressions; bind actual executed node order and per-module/class/callable coverage. Preserve changed-line coverage and the >=90% per-unit requirement.",
+    "Run affected inventory/resource/quality-tier contracts and actual domain-neutrality caller checks. Do not replay unrelated accepted analyzer suites or expose public registry entries before P4-T9.",
+    "Run bounded Windows/Git synthetic composition through capture, immutable pins, all three adapters and inventory validation. Verify provenance, redaction, confidence, deterministic output and unchanged source/Git state without activating COM or touching a real registry."
+  ],
+  "limitations": [
+    "Lexical candidates do not resolve aliases, arbitrary receiver types, runtime paths, platform execution or compiler binding.",
+    "COM focused receipts retain path-sanitized combined command output, not separately preserved unsanitized stdout/stderr. Access raw stream digests were independently checked.",
+    "Original diagnostic attempts and evidence-only normalization history remain preserved. No original failing probe or earlier focused attempt is superseded.",
+    "P4-T5 is not accepted. The final ordered gates and bounded repair confirmation remain outstanding; public registration belongs to P4-T9."
+  ],
+  "plan_status": {"completed": 36, "total": 84, "ac_completed": 13, "ac_total": 66, "checkoffs_changed": false},
+  "next_action": "Coordinator releases only the isolated R1-R3 repairs. Reuse this complete review for bounded correction confirmation and final receipt reconciliation."
+}

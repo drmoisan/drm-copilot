@@ -1,0 +1,37 @@
+{
+  "batch": "review-repair",
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-coverage.2026-10-19T07-53.json",
+    "raw_path": "SCRATCH/p4t5-access-review-repair-coverage.raw.json",
+    "raw_sha256": "eff10702c3bc1f462b51029872fb9dce97440ebe1d321363e34f5a5340e25dfa",
+    "sha256": "1ddaefa66885c61714a0b8ad5790625decd03f9feb3860cde5a5bbc0a6ef0b0d"
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-format-075202.2026-10-19T07-52.json",
+      "sha256": "47703350d304bcd626765b7d3c3695736aa7ce2abc8ba9fa33cc66b0b7e81fea"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-lint-075202.2026-10-19T07-52.json",
+      "sha256": "ffe31a9e1361de296255e5da43dc0dc1bc96c18b24ed5a0874f9820918837df2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-types-075203.2026-10-19T07-52.json",
+      "sha256": "cafd4625502021070a384eb85fda51638f17461cbb44763ad84e2849934f2098"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-tests-075350.2026-10-19T07-53.json",
+      "sha256": "be9345bd75c56295839de7090498d10b2c049fd1dca6e4abb8884e0913b32608"
+    }
+  ],
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+  },
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-53"
+}

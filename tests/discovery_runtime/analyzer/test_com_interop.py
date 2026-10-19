@@ -92,6 +92,32 @@ def test_direct_com_selection_is_schema_valid_and_never_claims_execution(
 
 
 @pytest.mark.parametrize(
+    "payload",
+    (
+        b"Take([ComImport]);",
+        b"Take(0, [ComVisible]);",
+        b"bool Marshal.IsComObject(object VALUE_SENTINEL) { return false; }",
+    ),
+)
+def test_rejected_expression_and_declaration_contexts_keep_only_source_inventory(
+    catalog: SchemaCatalog,
+    payload: bytes,
+) -> None:
+    """Project bytes payload as an inspected file without false COM findings.
+
+    Returns None; SchemaCatalog constructs an isolated pinned capture. Source
+    inventory/provenance remains available while argument values stay withheld.
+    """
+    result = ComInteropAnalyzer().analyze(
+        capture(catalog, (("src/context.cs", payload),))
+    )
+    assert len(result.components) == 1 and result.findings == ()
+    assert result.components[0]["confidence"] == "high"
+    assert all(not item["blocking"] for item in result.diagnostics)
+    assert "VALUE_SENTINEL" not in serialized(result)
+
+
+@pytest.mark.parametrize(
     "encoding,bom",
     (
         ("utf-8", b""),

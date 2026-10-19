@@ -388,6 +388,9 @@ class CountedTokens:
         "File.Open();" * 40,
         "using Alias = " + "Name." * 40 + "Type;",
         "Registry.CurrentUser." + "Member." * 40 + "Call();",
+        "class C : File { void File.Open() {} }" * 40,
+        "class C : File { void File.Open() { File.Open(); } }" * 20,
+        "File.Open(" * 20 + "value" + ")" * 20 + ";",
     ],
 )
 def test_aggregate_token_work_is_linear_for_long_and_repeated_chains(
@@ -420,3 +423,48 @@ def test_token_limit_never_emits_partial_candidates() -> None:
     with pytest.raises(SourceScanError) as error:
         access_sites("File.Open(); File.Open();", FILESYSTEM_SURFACE, max_tokens=8)
     assert error.value.code == "source-token-limit"
+
+
+@pytest.mark.parametrize("family", ["filesystem", "registry"])
+@pytest.mark.parametrize("body", ["empty", "arrow", "nested", "nested-arrow"])
+def test_explicit_interface_declarations_preserve_only_real_call_sites(
+    catalog: SchemaCatalog, family: str, body: str
+) -> None:
+    """Catalog and str family/body separate declarations from body invocations.
+
+    Returns None; both original review inputs and expression bodies produce no
+    false type/call claim. Nested genuine calls retain exact offsets and inference.
+    """
+    # Keep the exact reviewed interface declarations while varying only the body.
+    if family == "filesystem":
+        prefix = "interface File { void Open(); } class C : File { void "
+        method = "File.Open"
+        empty = "{}"
+        invocation = "File.Open();"
+        surface = FILESYSTEM_SURFACE
+        analyzer = FilesystemAccessAnalyzer()
+    else:
+        prefix = (
+            "interface Registry { object GetValue(); } class C : Registry { object "
+        )
+        method = "Registry.GetValue"
+        empty = "{ return null; }"
+        invocation = "return Registry.GetValue();"
+        surface = REGISTRY_SURFACE
+        analyzer = RegistryAccessAnalyzer()
+    # Body and arrow terminators identify declarations independently of binding.
+    bodies = {
+        "empty": empty,
+        "arrow": "=> throw new Exception();",
+        "nested": "{ " + invocation + " }",
+        "nested-arrow": "=> " + method + "();",
+    }
+    source = prefix + method + "() " + bodies[body] + " }"
+    sites = access_sites(source, surface)
+    result = analyzer.analyze(capture(catalog, (("src/a.cs", source.encode()),)))
+    assert len(sites) == len(result.findings) == int(body.startswith("nested"))
+    if sites:
+        assert sites[0].start == source.rindex(method)
+        assert sites[0].end == sites[0].start + len(method)
+        assert result.findings[0]["classification"] == "inferred"
+        assert result.findings[0]["confidence"] == "medium"

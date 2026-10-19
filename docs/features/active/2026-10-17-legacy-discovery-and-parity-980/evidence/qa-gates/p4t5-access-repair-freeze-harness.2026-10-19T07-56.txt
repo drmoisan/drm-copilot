@@ -1,0 +1,130 @@
+"""Bind the isolated access repair to retained review and focused execution proof."""
+import ast
+import copy
+import datetime
+import difflib
+import hashlib
+import io
+import json
+from pathlib import Path
+import subprocess
+import tokenize
+
+root = Path.cwd()
+scratch = Path(__file__).parent
+feature = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+evidence = feature / 'evidence'
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+def write(path, document):
+    path.write_text(json.dumps(document, indent=2, sort_keys=True)+'\n', encoding='utf-8', newline='\n')
+
+original_path = evidence / 'qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json'
+review_path = evidence / 'qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json'
+binding_path = evidence / 'qa-gates/p4t5-access-review-repair-binding.2026-10-19T07-53.json'
+original = json.loads(original_path.read_bytes())
+binding = json.loads(binding_path.read_bytes())
+paths = [entry['path'] for entry in original['files']]
+files = []
+changed = []
+patch = []
+retained_definitions = []
+units = []
+coverage_path = root / binding['coverage']['path']
+coverage = json.loads(coverage_path.read_bytes())
+assert sha(coverage_path.read_bytes()) == binding['coverage']['sha256']
+assert coverage['totals']['missing_lines'] == coverage['totals']['missing_branches'] == 0
+assert sha((scratch / binding['coverage']['raw_path'].removeprefix('SCRATCH/')).read_bytes()) == binding['coverage']['raw_sha256']
+for entry in original['files']:
+    path = root / entry['path']
+    content = path.read_bytes()
+    assert sha(content) == binding['sources'][entry['path']]
+    previous = (scratch / 'access-reviewed-original' / (path.name+'.txt')).read_bytes()
+    assert sha(previous) == entry['sha256']
+    text = content.decode()
+    tree = ast.parse(text)
+    assert len(text.splitlines()) <= 500 and b'\r' not in content
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            assert ast.get_docstring(node), (path.name, node.name)
+    attributes = subprocess.run(['git','check-attr','text','eol','--',entry['path']],check=True,capture_output=True).stdout.decode().strip()
+    blob = subprocess.run(['git','hash-object','--no-filters','--stdin'],input=content,check=True,capture_output=True).stdout.decode().strip()
+    filtered = subprocess.run(['git','hash-object','--path='+entry['path'],'--stdin'],input=content,check=True,capture_output=True).stdout.decode().strip()
+    assert blob == filtered
+    files.append({'path': entry['path'], 'sha256':sha(content), 'original_sha256':entry['sha256'], 'lines':len(text.splitlines()), 'git_attributes':attributes, 'working_git_blob':blob, 'filtered_git_blob':filtered, 'index_qualification':'Current index remains the reviewed WIP until parent stages the repair.'})
+    if previous != content:
+        changed.append(entry['path'])
+        patch.extend(difflib.unified_diff(previous.decode().splitlines(keepends=True),text.splitlines(keepends=True),fromfile='reviewed/'+entry['path'],tofile='repaired/'+entry['path']))
+    if entry['path'].startswith('tests/'):
+        original_tree = ast.parse(previous.decode())
+        current = {node.name:node for node in tree.body if isinstance(node,(ast.ClassDef,ast.FunctionDef))}
+        for old in original_tree.body:
+            if not isinstance(old,(ast.ClassDef,ast.FunctionDef)):
+                continue
+            new = current[old.name]
+            old_copy, new_copy = copy.deepcopy(old), copy.deepcopy(new)
+            if old.name == 'test_aggregate_token_work_is_linear_for_long_and_repeated_chains':
+                old_matrix = old_copy.decorator_list[0].args[1].elts
+                new_matrix = new_copy.decorator_list[0].args[1].elts
+                assert [ast.dump(value) for value in old_matrix] == [ast.dump(value) for value in new_matrix[:len(old_matrix)]]
+                assert len(new_matrix) == len(old_matrix)+3
+                old_copy.decorator_list = new_copy.decorator_list = []
+            assert ast.dump(old_copy) == ast.dump(new_copy), (entry['path'],old.name)
+            retained_definitions.append({'path':entry['path'],'name':old.name,'proof':'Exact original AST; the work-test matrix retains its four original entries and adds three.'})
+        docs={(node.body[0].lineno,node.body[0].col_offset) for node in ast.walk(tree) if isinstance(node,(ast.Module,ast.ClassDef,ast.FunctionDef)) and ast.get_docstring(node)}
+        executable=' '.join(token.string for token in tokenize.generate_tokens(io.StringIO(text).readline) if token.type!=tokenize.COMMENT and token.start not in docs)
+        assert not any(word in executable for word in ('tmp_path','tmpdir','TemporaryDirectory','NamedTemporaryFile','tempfile','subprocess','requests','socket'))
+    else:
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                called = ast.unparse(node.func)
+                assert called not in {'open','eval','exec','compile','import_module'}
+                assert not called.endswith(('.read_bytes','.read_text','.write_bytes','.write_text','.mkdir','.unlink'))
+        measured=coverage['files'][entry['path']]
+        executed=set(measured['executed_lines'])
+        def collect(nodes,prefix=''):
+            for node in nodes:
+                if isinstance(node,(ast.ClassDef,ast.FunctionDef)):
+                    statements=[line for line in executed if node.lineno<=line<=node.end_lineno]
+                    arcs=[arc for arc in measured['executed_branches'] if node.lineno<=arc[0]<=node.end_lineno]
+                    units.append({'path':entry['path'],'name':prefix+node.name,'start':node.lineno,'end':node.end_lineno,'covered_statements':len(statements),'missing_statements':0,'covered_branches':len(arcs),'missing_branches':0})
+                    collect(node.body,prefix+node.name+'.')
+        collect(tree.body)
+assert set(changed) == {paths[1],paths[4],paths[5]}
+receipts=[]
+for item in binding['receipts']:
+    path=root/item['path']
+    assert sha(path.read_bytes()) == item['sha256']
+    receipt=json.loads(path.read_bytes())
+    assert receipt['exit_code'] == 0 and receipt['source_before'] == receipt['source_after'] == binding['sources']
+    for stream in receipt['raw'].values():
+        assert sha((scratch/stream['path'].removeprefix('SCRATCH/')).read_bytes()) == stream['sha256']
+    receipts.append({**item,'stage':receipt['stage'],'seconds':receipt['seconds'],'markdown':ref(path.with_suffix('.md'))})
+assert [receipt['stage'] for receipt in receipts] == ['format','lint','types','tests']
+assert '180 passed' in json.loads((root/receipts[-1]['path']).read_bytes())['stdout']
+baseline=evidence/'baseline/p4t5-shared-baseline.2026-10-19T06-59.json'
+preserved=json.loads(baseline.read_bytes())['preserved_files']
+for entry in preserved:
+    assert sha((root/entry['path']).read_bytes())==entry['sha256']
+delta=evidence/'qa-gates'/('p4t5-access-repair-delta.'+stamp+'.txt')
+delta.write_text(''.join(patch),encoding='utf-8',newline='\n')
+range_path=evidence/'regression-testing'/('p4t5-access-repair-coverage-ranges.'+stamp+'.json')
+write(range_path,{'task':'P4-T5','timestamp':stamp,'source_files':files,'coverage':binding['coverage'],'module_summaries':{path:value['summary'] for path,value in coverage['files'].items()},'units':units,'retained_test_definitions':retained_definitions})
+harnesses=[]
+for name in ('issue-980-access-focused.py','issue-980-access-repair-freeze.py','issue-980-access-preserve-review.py'):
+    source=scratch/name
+    target=evidence/'qa-gates'/('p4t5-access-'+name.removeprefix('issue-980-access-').removesuffix('.py')+'-harness.'+stamp+'.txt')
+    target.write_bytes(source.read_bytes())
+    harnesses.append(ref(target))
+manifest=evidence/'qa-gates'/('p4t5-access-repair-freeze.'+stamp+'.json')
+document={'task':'P4-T5','timestamp':stamp,'state':'ACCESS_REPAIR_FROZEN_CONFIRMATION_PENDING','files':files,'changed_scope':changed,'original_manifest':ref(original_path),'complete_review':ref(review_path),'original_preservation':ref(evidence/'qa-gates/p4t5-access-original-review-binding.2026-10-19T07-47.json'),'focused_binding':ref(binding_path),'ordered_receipts':receipts,'coverage_ranges':ref(range_path),'delta':ref(delta),'harnesses':harnesses,'shared_baseline':ref(baseline),'preserved_predecessor_count':len(preserved),'case_counts':{'retained':156,'added':24,'passed':180},'repairs':{'R1':'The existing single delimiter pass stores parenthesis pairs; a constant-time body/arrow check excludes explicit member declarations while retaining nested calls and exact inferred source anchors.','R2':'Exact int/range guards for both public capacities and the 67108864 decoded-character limit precede masking/tokenization; failures expose fixed SourceScanError codes.'},'regressions':{'declaration_and_projection_cases':8,'intercepted_preallocation_cases':13,'counted_work_cases':3},'coverage_delta':{'statements_before':212,'statements_after':226,'branches_before':82,'branches_after':94,'uncovered_before':0,'uncovered_after':0},'limitations':['Bounded lexical candidate recognition does not resolve compiler bindings or runtime behavior.','No COM files, accepted predecessor modules, public registry, plan, AC, checkpoint or Git state were changed.','The combined final seven-stage sequence remains withheld pending confirmation and parent release.']}
+write(manifest,document)
+markdown=f'# P4-T5 access repair freeze\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-access-repair-freeze.py`\nEXIT_CODE: 0\nOutput Summary: ACCESS_REPAIR_FROZEN_CONFIRMATION_PENDING. R1/R2 are implemented in three existing files; focused Black, Ruff, Pyright and 180 tests pass.\n\nAll 156 original cases remain; 24 added cases cover declaration/projection negatives and positive controls, pre-mask limits, and counted aggregate work. All 226 statements and 94 branch destinations are covered. Fifteen production unit ranges and {len(retained_definitions)} unchanged original test/helper AST definitions are bound in the adjacent coverage receipt. All {len(preserved)} predecessor hashes match the original shared baseline.\n\nThe JSON binds the exact six files, three-path patch, ordered raw receipts, coverage, original candidate/review, and inert harness snapshots. The initial formatter-change receipt is retained. Source/tests are frozen for bounded confirmation. Final gates, task acceptance and AC checkoff have not occurred.\n'
+manifest.with_suffix('.md').write_text(markdown,encoding='utf-8',newline='\n')
+print(json.dumps({'manifest':ref(manifest),'markdown':ref(manifest.with_suffix('.md')),'files':files,'changed':changed,'units':len(units),'retained_definitions':len(retained_definitions),'tests':180,'coverage':coverage['totals']}),flush=True)

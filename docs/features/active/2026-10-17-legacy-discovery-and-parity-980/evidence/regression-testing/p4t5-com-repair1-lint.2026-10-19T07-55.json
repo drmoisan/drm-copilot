@@ -1,0 +1,48 @@
+{
+  "stage": "2",
+  "label": "p4t5-com-repair1-lint",
+  "started": "2026-10-19T07:55:04.962180+00:00",
+  "finished": "2026-10-19T07:55:06.165475+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 1,
+  "duration_seconds": 1.203,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "63f3619499363757d0dcbccd4a697fecc4a7cad47ea446b0206efc7303dc6e39",
+      "physical_lines": 429
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "physical_lines": 356
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": {
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "physical_lines": 229
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "physical_lines": 367
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "63f3619499363757d0dcbccd4a697fecc4a7cad47ea446b0206efc7303dc6e39",
+      "physical_lines": 429
+    }
+  },
+  "output": "E501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_com_candidates.py:352:89\n    |\n350 |         \"unresolved\",\n351 |     ]\n352 |     # Keep false and ambiguous metadata separate instead of enabling interop by presence.\n    |                                                                                         ^\n353 |     assert [dict(value.extra)[\"embed_interop_types\"] for value in values] == [\n354 |         \"false\",\n    |\n\nFound 1 error.\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}

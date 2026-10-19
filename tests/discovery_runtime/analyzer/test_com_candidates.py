@@ -9,6 +9,9 @@ from drm_copilot_discovery.analyzer.com_interop import (
     com_project_candidates,
     com_source_candidates,
 )
+from drm_copilot_discovery.analyzer.com_syntax import (
+    com_source_candidates as source_candidates,
+)
 from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
 from drm_copilot_discovery.analyzer.source_text import Detection
 from drm_copilot_discovery.analyzer.xml_input import XmlInputError
@@ -122,6 +125,81 @@ def test_non_com_or_masked_lookalikes_do_not_become_candidates(source: str) -> N
     provide insufficient COM evidence on their own.
     """
     assert com_source_candidates("src/sample.cs", source) == ()
+
+
+@pytest.mark.parametrize(
+    "source",
+    (
+        "class C { void M() { int ComImport = 1; Take([ComImport]); } "
+        "void Take(int[] values) {} }",
+        "class C { void M() { int ComVisible = 1; Take(0, [ComVisible]); } "
+        "void Take(int n, int[] values) {} }",
+        "interface Marshal { bool IsComObject(object x); } class C : Marshal { "
+        "bool Marshal.IsComObject(object x) { return false; } }",
+        "bool Marshal.IsComObject(object x) => false;",
+        "Take([ComImport], rest);",
+        "Take([ComImport] is object);",
+        "Take([ComImport] as object);",
+        "Take([ComImport] switch { _ => 1 });",
+        "Take([[ComImport]]);",
+        "Take([ComImport][ComVisible]);",
+        "Take([ComImport]());",
+        "[ComImport]",
+    ),
+)
+def test_collection_arguments_and_explicit_methods_are_not_com_candidates(
+    source: str,
+) -> None:
+    """Reject str source expression/declaration contexts without false syntax claims.
+
+    Returns None; these include all retained COM R1 probes and neighboring contexts.
+    No compiler binding, runtime behavior or file I/O is involved.
+    """
+    assert com_source_candidates("src/context.cs", source) == ()
+
+
+@pytest.mark.parametrize(
+    "source,count",
+    (
+        ("[ComImport] interface C {}", 1),
+        ("[ComImport][ComVisible(false)] class C {}", 2),
+        ("[assembly:ComVisible(false)]", 1),
+        ("[module:ComVisible(false)]", 1),
+        ("void M([ComDefaultInterface(typeof(I))] object value) {}", 1),
+        ("void M(int x, [ComVisible(false)] object value) {}", 1),
+        ("[ComVisible(false)] () => value", 1),
+        ("Marshal.IsComObject(value)", 1),
+        ("void M() { if (Marshal.IsComObject(value)) {} }", 1),
+        ("bool Marshal.IsComObject(object x) => Marshal.IsComObject(x);", 1),
+    ),
+)
+def test_context_filter_preserves_attributes_and_nested_invocations(
+    source: str,
+    count: int,
+) -> None:
+    """Preserve genuine syntax in str source with int count; return None, pure.
+
+    The old public entry point explicitly re-exports the same callable/carrier.
+    Declaration-body calls remain independent candidates, without execution claims.
+    """
+    assert com_source_candidates is source_candidates
+    result = com_source_candidates("src/context.cs", source)
+    assert len(result) == count and all(isinstance(item, Detection) for item in result)
+
+
+def test_long_attribute_chain_respects_the_original_candidate_capacity() -> None:
+    """Resolve chained declaration context once with unchanged result bounds; pure.
+
+    Returns None; deterministic repeated sections preserve separate source anchors.
+    No wall-clock threshold or external allocation instrumentation is used.
+    """
+    source = "[ComImport]" * 256 + "interface C {}"
+    result = com_source_candidates("src/chain.cs", source, max_candidates=256)
+    assert len(result) == 256
+    # Distinct sections must retain every source location despite sharing a name.
+    assert len({dict(item.extra)["offset"] for item in result}) == 256
+    with pytest.raises(SourceScanError, match="candidates exceed"):
+        com_source_candidates("src/chain.cs", source, max_candidates=255)
 
 
 def test_masked_earlier_guid_cannot_replace_the_actual_candidate_anchor() -> None:
@@ -259,16 +337,19 @@ def test_project_duplicates_and_unresolved_metadata_remain_separate() -> None:
         b"<ItemDefinitionGroup><COMReference/></ItemDefinitionGroup></Project>"
     )
     values = com_project_candidates("src/a.props", payload)
+    # Extract literal ordinals to prove duplicate declarations remain distinct.
     assert (
         len(values) == 4
         and len({dict(value.extra)["ordinal"] for value in values}) == 4
     )
+    # Project each operation classification without interpreting reference targets.
     assert [dict(value.extra)["operation"] for value in values] == [
         "include",
         "unresolved",
         "remove",
         "unresolved",
     ]
+    # Preserve false/ambiguous metadata; element presence does not enable interop.
     assert [dict(value.extra)["embed_interop_types"] for value in values] == [
         "false",
         "unresolved",

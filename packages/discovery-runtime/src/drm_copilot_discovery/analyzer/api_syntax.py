@@ -80,24 +80,30 @@ class AccessSite:
     end_line: int
 
 
-def _balanced(tokens: tuple[Token, ...]) -> None:
-    """Check bounded token delimiters in one pass; return None or SourceScanError.
+def _balanced(tokens: tuple[Token, ...]) -> dict[int, int]:
+    """Check delimiters once and return opening-to-closing parenthesis positions.
 
     tokens is the already bounded immutable lexical stream. No source text is
     retained or evaluated; incomplete syntax fails before any candidate is built.
+    SourceScanError rejects mismatches; returned int indexes avoid suffix rescans.
     """
-    stack: list[str] = []
+    stack: list[tuple[str, int]] = []
+    parentheses: dict[int, int] = {}
     closing = {")": "(", "]": "[", "}": "{"}
     # Each delimiter is pushed/popped at most once, with no suffix rescans.
-    for token in tokens:
+    for index, token in enumerate(tokens):
+        # Validate nesting before retaining a pair for declaration discrimination.
         if token.value in {"(", "[", "{"}:
-            stack.append(token.value)
-        elif token.value in closing and (
-            not stack or stack.pop() != closing[token.value]
-        ):
-            raise SourceScanError("source-delimiter", "Source delimiters mismatch")
+            stack.append((token.value, index))
+        elif token.value in closing:
+            if not stack or stack[-1][0] != closing[token.value]:
+                raise SourceScanError("source-delimiter", "Source delimiters mismatch")
+            opening, start = stack.pop()
+            if opening == "(":
+                parentheses[start] = index
     if stack:
         raise SourceScanError("source-delimiter", "Source delimiters are incomplete")
+    return parentheses
 
 
 def _recognize(
@@ -162,15 +168,22 @@ def access_sites(
     """Return bounded fixed-name candidates from C# text and immutable surface.
 
     max_tokens (int, 1..100000) and max_sites (int, 0..100000) bound tokens/records.
+    Both capacities require exact int values; bool and fractional values fail.
+    Text has at most 67108864 decoded characters, checked before allocating masks.
     Comments, string/interpolation contents and directives cannot create evidence.
     SourceScanError reports size/token/delimiter/record limits without partial
-    success. Traversal is linear in token count; at most eight names are retained
-    per chain. No I/O, source evaluation or argument collection occurs.
+    success. Explicit member bodies are declarations, not invocation candidates.
+    Traversal is linear in token count; at most eight names are retained per chain.
+    No I/O, source evaluation or argument collection occurs.
     """
-    if not 0 <= max_sites <= 100000:
+    if type(cast("object", max_sites)) is not int or not 0 <= max_sites <= 100000:
         raise SourceScanError("source-record-limit", "Invalid candidate record limit")
+    if type(cast("object", max_tokens)) is not int or not 1 <= max_tokens <= 100000:
+        raise SourceScanError("source-token-limit", "Invalid token limit")
+    if len(text) > 67108864:
+        raise SourceScanError("source-limit", "C# text exceeds its character limit")
     tokens = tokenize_csharp(strip_comments_and_strings(text), max_tokens=max_tokens)
-    _balanced(tokens)
+    parentheses = _balanced(tokens)
     sites: list[AccessSite] = []
     index = 0
     # Consume every maximal dotted chain once, including overlong rejected chains.
@@ -220,11 +233,16 @@ def access_sites(
         )
         if matched is None:
             continue
+        operation, leaf = matched
+        # Paired delimiters distinguish method bodies without rescanning arguments.
+        if operation == "invocation":
+            after = parentheses[index] + 1
+            if after < len(tokens) and tokens[after].value in {"{", "=>"}:
+                continue
         if len(sites) >= max_sites:
             raise SourceScanError(
                 "source-record-limit", "Candidate record limit exceeded"
             )
-        operation, leaf = matched
         first = tokens[start - 1] if constructor else token
         # All emitted name parts originate in the finite adapter allowlist.
         api = ".".join(

@@ -1,0 +1,106 @@
+"""Probe only concrete P4-T5 context and public allocation-bound concerns."""
+from __future__ import annotations
+
+from dataclasses import asdict
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+from drm_copilot_discovery.analyzer import api_syntax
+from drm_copilot_discovery.analyzer.com_interop import com_source_candidates
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.filesystem_access import FILESYSTEM_SURFACE
+from drm_copilot_discovery.analyzer.registry_access import REGISTRY_SURFACE
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+references = [
+    {"path": (FEATURE / "evidence/regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json").as_posix(), "sha256": "7cb5dc86803a76495cec0e9501a9b5553e992c99a1bf71bbb1ce9422c805d2b7"},
+    {"path": (QA / "p4t5-access-candidate-freeze.2026-10-19T07-30.json").as_posix(), "sha256": "e5a06ce35585e0549cd182c355decbbd451a7c23ed7f9f4cd8ce5ec4596a5dfd"},
+]
+
+
+def sha(raw: bytes) -> str:
+    """Bind exact supplied candidate and probe bytes without normalization."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+expected = {}
+for reference in references:
+    raw = Path(reference["path"]).read_bytes()
+    assert sha(raw) == reference["sha256"]
+    manifest = json.loads(raw)
+    for item in manifest.get("source_files", manifest.get("files", [])):
+        expected[item["path"]] = item["sha256"]
+assert len(expected) == 9
+assert all(sha(Path(path).read_bytes()) == digest for path, digest in expected.items())
+started = dt.datetime.now(dt.timezone.utc)
+cases = []
+syntax_cases = [
+    ("com-attribute-positive", "com", "[ComImport] interface C {}", 1),
+    ("com-call-positive", "com", "Marshal.IsComObject(value);", 1),
+    ("collection-argument", "com", "class C { void M() { int ComImport = 1; Take([ComImport]); } void Take(int[] values) {} }", 0),
+    ("second-collection-argument", "com", "class C { void M() { int ComVisible = 1; Take(0, [ComVisible]); } void Take(int n, int[] values) {} }", 0),
+    ("explicit-com-member-declaration", "com", "interface Marshal { bool IsComObject(object x); } class C : Marshal { bool Marshal.IsComObject(object x) { return false; } }", 0),
+    ("explicit-file-member-declaration", "filesystem", "interface File { void Open(); } class C : File { void File.Open() {} }", 0),
+    ("explicit-registry-member-declaration", "registry", "interface Registry { object GetValue(); } class C : Registry { object Registry.GetValue() { return null; } }", 0),
+]
+# These contexts distinguish syntax declarations/collections from actual calls/attributes.
+for name, analyzer, source, expected_count in syntax_cases:
+    if analyzer == "com":
+        result = com_source_candidates("src/probe.cs", source)
+    else:
+        surface = FILESYSTEM_SURFACE if analyzer == "filesystem" else REGISTRY_SURFACE
+        result = api_syntax.access_sites(source, surface)
+    cases.append({"case": name, "input": source, "input_sha256": sha(source.encode()), "expected_count": expected_count, "actual_count": len(result), "observed": [asdict(value) for value in result], "expectation_met": len(result) == expected_count})
+
+# Invalid candidate-capacity types must fail before ordinary successful scanning.
+for value in (True, False, .5):
+    try:
+        result = api_syntax.access_sites("", FILESYSTEM_SURFACE, max_sites=value)
+    except (SourceScanError, ValueError) as error:
+        outcome = {"rejected": True, "error_type": type(error).__name__}
+    else:
+        outcome = {"rejected": False, "result_count": len(result)}
+    cases.append({"case": "capacity-type-" + type(value).__name__ + "-" + str(value), "max_sites": value, "expectation_met": outcome["rejected"], **outcome})
+
+mask_calls = []
+
+
+class MaskReached(Exception):
+    """Signal entry to allocation work that an oversized public input should reject."""
+
+
+def forbidden_mask(text: str) -> str:
+    """Record input length and reject before the real masking allocation occurs."""
+    mask_calls.append(len(text))
+    raise MaskReached("Masking entered before source-size rejection")
+
+
+# Allocate only one input at the documented 64 MiB boundary; prohibit all mask copies.
+oversized = "x" * 67108865
+with patch.object(api_syntax, "strip_comments_and_strings", forbidden_mask):
+    try:
+        api_syntax.access_sites(oversized, FILESYSTEM_SURFACE)
+    except SourceScanError as error:
+        code = error.code
+        error_type = type(error).__name__
+    except MaskReached as error:
+        code = None
+        error_type = type(error).__name__
+    else:
+        code = None
+        error_type = None
+cases.append({"case": "public-source-limit-precedes-masking", "input_characters": len(oversized), "mask_calls": mask_calls, "error_type": error_type, "code": code, "expectation_met": not mask_calls and code == "source-limit", "allocation_scope": "One 64 MiB-plus-one input string; real masking was replaced by an immediate sentinel, with no timing assertion."})
+del oversized
+assert all(sha(Path(path).read_bytes()) == digest for path, digest in expected.items())
+finished = dt.datetime.now(dt.timezone.utc)
+stamp = finished.strftime("%Y-%m-%dT%H-%M")
+harness = QA / ("p4t5-executor-candidate-probe-harness." + stamp + ".txt")
+harness.write_bytes(Path(__file__).read_bytes())
+output = QA / ("p4t5-executor-candidate-probes." + stamp + ".json")
+document = {"task": "P4-T5", "timestamp": stamp, "started_at": started.isoformat(), "finished_at": finished.isoformat(), "command": "poetry run python SCRATCH/issue-980-p4t5-candidate-probes.py", "exit_code": 0, "scope": "Independent bounded memory-only probes; failed expectations are review findings, not a clean test-gate claim.", "manifests": references, "source_before_and_after": expected, "cases": cases, "case_count": len(cases), "failed_expectations": sum(not case["expectation_met"] for case in cases), "harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())}, "primary_syntax_references": ["https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/collection-expressions", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces"]}
+output.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"path": output.as_posix(), "sha256": sha(output.read_bytes()), "cases": [{"case": case["case"], "expectation_met": case["expectation_met"]} for case in cases], "frozen_source_count": len(expected)}))
