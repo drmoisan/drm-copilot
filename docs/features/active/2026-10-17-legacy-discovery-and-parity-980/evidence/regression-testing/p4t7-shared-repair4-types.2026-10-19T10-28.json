@@ -1,0 +1,61 @@
+{
+  "stage": "types",
+  "label": "p4t7-shared-repair4-types",
+  "started": "2026-10-19T10:28:14.379065+00:00",
+  "finished": "2026-10-19T10:28:16.380130+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py tests/discovery_runtime/analyzer/test_dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 2.001,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "physical_lines": 375
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "physical_lines": 366
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "physical_lines": 375
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f",
+      "physical_lines": 366
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair4-types-102816.stdout.bin",
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair4-types-102816.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared SR1-SR4 repair only"
+}

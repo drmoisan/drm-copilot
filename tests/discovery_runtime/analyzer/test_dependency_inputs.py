@@ -8,7 +8,6 @@ from drm_copilot_discovery.analyzer.dependency_inputs import (
     DependencyAnchor,
     DependencyBudget,
     DependencyCandidate,
-    DependencyInputError,
     DependencyLimits,
     DependencyResult,
     DependencyValue,
@@ -19,15 +18,23 @@ from drm_copilot_discovery.analyzer.dependency_inputs import (
 
 
 class _InjectedAdd(Protocol):
-    """Allow intentional malformed keyword values at the isolated runtime boundary."""
+    """Typed injection seam for malformed parser kwargs in isolated tests.
+
+    Cast a bound collector method, call once, and require its runtime validation.
+    This protocol stores no state and introduces no filesystem or process effects."""
 
     def __call__(self, **values: object) -> None:
-        """Forward injected values; the real collector must validate or reject them."""
+        """Forward values (object kwargs) to validation; return None.
+
+        The collector may raise ValueError; any mutation remains in its local budget."""
         ...
 
 
 def candidate(**changes: object) -> DependencyCandidate:
-    """Return an isolated valid candidate with intentional constructor overrides."""
+    """Build a valid carrier with changes (object kwargs) for constructor tests.
+
+    Return DependencyCandidate; propagate ValueError for rejected overrides.
+    Only isolated immutable values are constructed; no I/O occurs."""
     item = DependencyCandidate(
         "declaration",
         "python",
@@ -40,7 +47,10 @@ def candidate(**changes: object) -> DependencyCandidate:
 
 
 def add(budget: DependencyBudget, **changes: object) -> None:
-    """Append valid or intentionally malformed values; mutate only its budget."""
+    """Call budget (DependencyBudget) with changes (object kwargs); return None.
+
+    Mutate only this isolated collector. Propagate its ValueError or
+    DependencyInputError so each test can assert the intended rejection."""
     values: dict[str, object] = {
         "kind": "declaration",
         "ecosystem": "python",
@@ -51,26 +61,6 @@ def add(budget: DependencyBudget, **changes: object) -> None:
     }
     values.update(changes)
     cast("_InjectedAdd", budget.add)(**values)
-
-
-@pytest.mark.parametrize(
-    "field",
-    [
-        "max_bytes",
-        "max_nodes",
-        "max_depth",
-        "max_candidates",
-        "max_text_bytes",
-        "max_lines",
-    ],
-)
-@pytest.mark.parametrize("value", [True, False, 0, -1, 1.5, "2", None])
-def test_limits_reject_nonpositive_and_noninteger_capacities(
-    field: str, value: object
-) -> None:
-    """Reject invalid capacities before processing input; return no result."""
-    with pytest.raises(ValueError, match="positive integers"):
-        replace(DependencyLimits(), **{field: value})
 
 
 @pytest.mark.parametrize(
@@ -95,7 +85,9 @@ def test_limits_reject_nonpositive_and_noninteger_capacities(
 def test_identifier_allowlists_keep_only_literal_names(
     ecosystem: Ecosystem, raw: str | None, expected: str | None
 ) -> None:
-    """Classify a package name without exposing an unsafe spelling in output."""
+    """Classify raw (str | None) using ecosystem (Ecosystem).
+
+    Return None after comparing expected (str | None); no I/O or expected error."""
     assert safe_identifier(raw, ecosystem=ecosystem) == expected
 
 
@@ -136,7 +128,9 @@ def test_identifier_allowlists_keep_only_literal_names(
 def test_version_classification_never_retains_reference_targets(
     raw: str | None, kind: str, value: str | None
 ) -> None:
-    """Retain finite version grammar or a fixed redacted reference classification."""
+    """Classify raw (str | None) into kind (str) and value (str | None).
+
+    Return None after safe/redacted comparison; no mutation or expected error."""
     assert dependency_value(raw) == DependencyValue(kind, value)
 
 
@@ -153,7 +147,9 @@ def test_version_classification_never_retains_reference_targets(
 def test_value_constructor_cannot_bypass_sanitization(
     kind: str, value: str | None
 ) -> None:
-    """Directly construct an invalid carrier; expect a fixed contract error."""
+    """Reject a noncanonical kind (str) and value (str | None) carrier pair.
+
+    Return None; catch expected ValueError without I/O or state mutation."""
     with pytest.raises(ValueError, match="dependency|Dependency|Redacted"):
         DependencyValue(kind, value)
 
@@ -177,13 +173,17 @@ def test_value_constructor_cannot_bypass_sanitization(
 def test_anchor_rejects_dynamic_keys_or_fabricated_spans(
     values: dict[str, object],
 ) -> None:
-    """Reject unsafe key interpolation and invalid locations without source access."""
+    """Reject values (dict[str, object]) overriding a closed source anchor.
+
+    Return None; catch ValueError without accessing source bytes or global state."""
     with pytest.raises(ValueError, match="Dependency|JSON|Text"):
         replace(DependencyAnchor("json", ""), **values)
 
 
 def test_closed_anchors_preserve_json_occurrences_and_xml_lines() -> None:
-    """Keep container membership and parser-reported line identity without raw keys."""
+    """Verify closed JSON occurrences and parser-reported XML lines; return None.
+
+    No arguments, expected errors, external mutation or source reads."""
     first = DependencyAnchor("json", "/packages", occurrence=1)
     second = replace(first, occurrence=2)
     xml = DependencyAnchor("xml", "VersionOverride", occurrence=4, line=9)
@@ -216,7 +216,9 @@ def test_closed_anchors_preserve_json_occurrences_and_xml_lines() -> None:
 def test_candidate_rejects_unsanitized_or_mutable_metadata(
     changes: dict[str, object],
 ) -> None:
-    """Attempt a direct carrier bypass and expect a deterministic ValueError."""
+    """Reject changes (dict[str, object]) that bypass candidate sanitization.
+
+    Return None; catch ValueError using only local immutable fixtures."""
     with pytest.raises(ValueError):
         candidate(**changes)
 
@@ -235,13 +237,17 @@ def test_candidate_rejects_unsanitized_or_mutable_metadata(
 def test_result_rejects_mutable_unsanitized_and_invalid_usage(
     changes: dict[str, object],
 ) -> None:
-    """Construct malformed result payloads; expect validation without side effects."""
+    """Reject changes (dict[str, object]) to result tuples or usage counters.
+
+    Return None; catch ValueError without external side effects."""
     with pytest.raises(ValueError):
         replace(DependencyResult(), **changes)
 
 
 def test_carriers_are_immutable_and_preserve_distinct_dependency_kinds() -> None:
-    """Keep independent declaration/locked/edge facts with unresolved identity."""
+    """Verify separate declaration/locked/edge facts and immutability; return None.
+
+    No arguments or I/O; catch FrozenInstanceError on local assignment attempts."""
     item = candidate()
     locked = replace(
         item, kind="locked-package", requested=DependencyValue("constraint", ">=1")
@@ -273,7 +279,9 @@ def test_carriers_are_immutable_and_preserve_distinct_dependency_kinds() -> None
 def test_decode_preserves_valid_text_with_physical_line_boundaries(
     content: bytes, lines: int, expected: str
 ) -> None:
-    """Decode exact-capacity retained bytes, including BOM and CRLF/CR/LF boundaries."""
+    """Decode content (bytes) within lines (int) into expected (str).
+
+    Return None; exercise exact capacity/BOM/newlines without I/O or expected errors."""
     budget = DependencyBudget(
         DependencyLimits(max_bytes=max(len(content), 1), max_lines=lines)
     )
@@ -281,56 +289,10 @@ def test_decode_preserves_valid_text_with_physical_line_boundaries(
     assert budget.result() == DependencyResult()
 
 
-@pytest.mark.parametrize(
-    ("limits", "content", "code"),
-    [
-        (DependencyLimits(max_bytes=1), b"ab", "dependency-limit"),
-        (DependencyLimits(max_lines=1), b"a\nb", "dependency-limit"),
-        (DependencyLimits(), b"\xffsecret", "dependency-encoding"),
-    ],
-)
-def test_decode_failures_poison_partial_result(
-    limits: DependencyLimits, content: bytes, code: str
-) -> None:
-    """Reject byte/line/encoding violations and forbid returning earlier candidates."""
-    budget = DependencyBudget(limits)
-    add(budget)
-    with pytest.raises(DependencyInputError) as caught:
-        budget.decode(content)
-    assert caught.value.code == code and "secret" not in str(caught.value)
-    with pytest.raises(DependencyInputError, match="limit"):
-        budget.result()
-
-
-@pytest.mark.parametrize("capacity", ["nodes", "candidates", "text_bytes"])
-def test_reservations_are_prospective_independent_and_fail_closed(
-    capacity: str,
-) -> None:
-    """Reserve the exact independent capacity; the next unit invalidates all output."""
-    budget = DependencyBudget(
-        DependencyLimits(max_nodes=2, max_candidates=2, max_text_bytes=2)
-    )
-    budget.reserve(**{capacity: 2})
-    with pytest.raises(DependencyInputError) as caught:
-        budget.reserve(**{capacity: 1})
-    assert caught.value.code == "dependency-limit"
-    with pytest.raises(DependencyInputError):
-        budget.result()
-    with pytest.raises(DependencyInputError):
-        budget.decode(b"")
-
-
-@pytest.mark.parametrize("value", [True, -1, 0.5, "1"])
-def test_invalid_reservation_does_not_consume_capacity(value: object) -> None:
-    """Reject noninteger/negative reservations without mutating the valid budget."""
-    budget = DependencyBudget(DependencyLimits())
-    with pytest.raises(ValueError):
-        budget.reserve(nodes=cast("int", value))
-    assert budget.result() == DependencyResult()
-
-
 def test_shared_collector_redacts_values_and_keeps_requested_separate() -> None:
-    """Sanitize output while retaining factual version roles and conditions."""
+    """Verify sanitized fields and separate requested/version roles; return None.
+
+    No arguments or expected errors; only the local collector is mutated."""
     budget = DependencyBudget(DependencyLimits())
     add(
         budget,
@@ -355,7 +317,9 @@ def test_shared_collector_redacts_values_and_keeps_requested_separate() -> None:
 
 
 def test_diagnostic_deduplication_and_snapshot_isolation() -> None:
-    """Charge fixed diagnostics once and isolate immutable snapshots."""
+    """Charge each fixed code once while preserving earlier snapshots; return None.
+
+    No arguments, expected errors or I/O; mutate only the local collector."""
     budget = DependencyBudget(DependencyLimits())
     add(budget)
     before = budget.result()
@@ -374,72 +338,10 @@ def test_diagnostic_deduplication_and_snapshot_isolation() -> None:
     )
 
 
-def test_encoded_candidate_and_raw_text_reservations_are_aggregate() -> None:
-    """Charge UTF-8 work plus quoted retained strings before candidate storage."""
-    probe = DependencyBudget(DependencyLimits())
-    add(probe, name="café")
-    used = probe.result().consumed_text_bytes
-    budget = DependencyBudget(DependencyLimits(max_text_bytes=used))
-    add(budget, name="café")
-    assert budget.result() == probe.result()
-    with pytest.raises(DependencyInputError):
-        add(budget)
-    with pytest.raises(DependencyInputError):
-        budget.result()
-    short = DependencyBudget(DependencyLimits(max_text_bytes=used - 1))
-    with pytest.raises(DependencyInputError):
-        add(short, name="café")
-
-
-@pytest.mark.parametrize(
-    ("text", "capacity", "code"),
-    [
-        ("secret" * 9, 10, "dependency-limit"),
-        ("é" * 4, 5, "dependency-limit"),
-        ("\ud800secret", 500, "dependency-encoding"),
-    ],
-)
-def test_selected_scalar_bounds_precede_unsafe_storage(
-    text: str, capacity: int, code: str
-) -> None:
-    """Reject oversized text, encoded bytes and surrogates with fixed errors."""
-    budget = DependencyBudget(DependencyLimits(max_text_bytes=capacity))
-    with pytest.raises(DependencyInputError) as caught:
-        add(budget, name=text)
-    assert caught.value.code == code and "secret" not in str(caught.value)
-    with pytest.raises(DependencyInputError):
-        budget.result()
-
-
-@pytest.mark.parametrize(
-    "changes", [{"extras": ["extra"]}, {"markers": ["extra"]}, {"name": 1}]
-)
-def test_collector_rejects_invalid_argument_types(changes: dict[str, object]) -> None:
-    """Inject invalid parser arguments; require an explicit ValueError before append."""
-    budget = DependencyBudget(DependencyLimits())
-    with pytest.raises(ValueError):
-        add(budget, **changes)
-    assert budget.result().candidates == ()
-
-
-def test_public_contract_invalid_types_and_fixed_error_messages() -> None:
-    """Reject public misuse without exposing raw parser messages or values."""
-    with pytest.raises(ValueError, match="validated limits"):
-        DependencyBudget(cast("DependencyLimits", None))
-    with pytest.raises(ValueError, match="text or null"):
-        safe_identifier(cast("str", 1))
-    with pytest.raises(ValueError, match="text or null"):
-        dependency_value(cast("str", 1))
-    with pytest.raises(ValueError, match="retained bytes"):
-        DependencyBudget(DependencyLimits()).decode(cast("bytes", "raw"))
-    with pytest.raises(ValueError, match="Unknown"):
-        DependencyInputError("raw secret")
-    with pytest.raises(ValueError, match="Unknown"):
-        DependencyBudget(DependencyLimits()).note("raw secret")
-
-
 def test_empty_and_repeated_results_are_deterministic() -> None:
-    """Preserve stable order without mutating earlier results or global state."""
+    """Compare two independent empty/repeated collection sequences; return None.
+
+    No arguments or expected errors; mutate only each isolated collector."""
     first, second = DependencyBudget(DependencyLimits()), DependencyBudget(
         DependencyLimits()
     )
@@ -451,3 +353,23 @@ def test_empty_and_repeated_results_are_deterministic() -> None:
     assert first.result() == second.result()
     assert first.result().consumed_nodes == 4
     assert first.result().diagnostics == ()
+
+
+def test_value_split_preserves_public_import_identity_and_signatures() -> None:
+    """Verify moved public values remain identical re-exports; return None.
+
+    No arguments, expected errors or mutation; inspect only imported callables.
+    """
+    from inspect import signature
+
+    from drm_copilot_discovery.analyzer import dependency_values
+
+    assert DependencyValue is dependency_values.DependencyValue
+    assert Ecosystem is dependency_values.Ecosystem
+    assert safe_identifier is dependency_values.safe_identifier
+    assert dependency_value is dependency_values.dependency_value
+    assert tuple(signature(safe_identifier).parameters) == ("value", "ecosystem")
+    assert signature(safe_identifier).parameters["ecosystem"].default == "python"
+    assert tuple(signature(dependency_value).parameters) == ("value",)
+    assert tuple(signature(DependencyValue).parameters) == ("kind", "value")
+    assert signature(DependencyValue).parameters["value"].default is None

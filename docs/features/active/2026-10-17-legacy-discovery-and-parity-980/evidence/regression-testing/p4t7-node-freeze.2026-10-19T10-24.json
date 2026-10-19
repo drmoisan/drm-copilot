@@ -1,0 +1,343 @@
+{
+  "budget_domains": {
+    "candidates": "Shared add reserves candidate capacity before retaining each immutable candidate. Any error discards the complete call result.",
+    "extraction": "Independent max_nodes for root/group/package indexes and location segments before allocation. No repeated raw-document scans or repeated sorting.",
+    "input": "Independent max_bytes/max_lines; strict UTF-8 and fixed errors; accepted JSON caps are 64 MiB, 128 levels and 1000000 records.",
+    "normalization": "artifact_records=min(max_nodes//64,1000000); max_nodes below 64 fails before parsing. Normalization is bounded by 64 times records; accepted source-token preflight has a separate 2x envelope.",
+    "text": "Independent shared max_text_bytes for selected raw UTF-8 plus retained quoted strings; location splitting prospectively reserves 4 UTF-8 bytes per Unicode character. This is a conservative text-allocation bound, not a claim about Python object memory."
+  },
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-coverage-ranges.2026-10-19T10-24.json",
+    "sha256": "f111d1b5bb6bdfec7ebb655c51e186097d68ef4a29cd263e2bc3409087ca5a39"
+  },
+  "evidence_index": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-start.2026-10-19T10-03.json",
+      "sha256": "240fe9542c33a17f0b708ede8da4c01b3d2214060470e2b64eb7794fb5c91c96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-test-split.2026-10-19T10-11.json",
+      "sha256": "fd540e89a12c24814d398acca01e9e535e6dec217384d28f73b024b7e35915b3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-test-split.2026-10-19T10-11.md",
+      "sha256": "344c12cd8322ec5236dc606d1a8fbed28d9457cd2e077c0827a0d11acc926572"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-format-102314.2026-10-19T10-23.json",
+      "sha256": "504c18e6b616ea727ab599e65b9bd919a420ddbc16f6b0c7123e9b7d3a12e92c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-format-102314.2026-10-19T10-23.md",
+      "sha256": "20119d213ebcc58105851252af852bd528eb326a55a666a47776111b1af90ad1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-lint-102314.2026-10-19T10-23.json",
+      "sha256": "81ea8d567f02d274a3ec139a858434b110962b3496d054b196baae17aad24455"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-lint-102314.2026-10-19T10-23.md",
+      "sha256": "9c45ffc82079e146233fbe669f4ac72f12fe3a7cd991cc77d255184d9f1b24c1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.json",
+      "sha256": "8d39bd6eb1e518cdf644769ee7d97828a76afc127f7f0e576f41c499e2628756"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.md",
+      "sha256": "788f4b3126c73f11239102c4205114e93bf8d76281556109eae6f6ba05e2aed9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-binding.2026-10-19T10-23.json",
+      "sha256": "0e7b53f7c6d9cbf61205fe43166bb0e2d2b81733ddee827b58b2d32f293d13cb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.json",
+      "sha256": "b3a3beb94270ab21967c8c781fbb1b291636c97dbcc1fd4b27147233041aed11"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.md",
+      "sha256": "f251364c5ca8b7dd3d5d39fd478b809f3f7d0f321f63f5c84168e31080358ab3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.json",
+      "sha256": "2fb7374594a8ed96c2a3e59f8e840c3c6653166c9d4e5fa52819c34e91a21535"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.md",
+      "sha256": "0dc78a7edb510db3b1cd36266d8e1786ff358d2504cdc54bcde45eff1f49bb9b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.json",
+      "sha256": "4660e4c739e5c52addce86e3f707d373fed95cc7d772d2028403c07adbc31a18"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.md",
+      "sha256": "8ddbf528c5adbbb8c7004f4616531892fc5847586182a93641246c9a43136b4a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-focused-harness.2026-10-19T10-24.json",
+      "sha256": "03ae081fb7f6b8eb1d22c520a07334979039c4823905cb3d9dfd49da25fab8b2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-import-format-102258.2026-10-19T10-22.json",
+      "sha256": "6caa4521e7410d86b698339053a36acd248422c66316c7715b701fde32e1a107"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-import-format-102258.2026-10-19T10-22.md",
+      "sha256": "b15a0c318ade7b0e80c35d940808a6d53f54919a6fd730e6d4882e36741c2656"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-setup-format-101337.2026-10-19T10-13.json",
+      "sha256": "5bd9c5ae9ee6980d801973f7045d203fcaaca5378ce2032c90efd9399d3e7e16"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-setup-format-101337.2026-10-19T10-13.md",
+      "sha256": "eeea70aa3cafd3eff10be79607eb3f9b80287ee48dad2008b5aa11075a534cbe"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-freeze-harness.2026-10-19T10-24.json",
+      "sha256": "c6f8b30ad4d229163549f28728a72c048a92fade63be5ef4feee6fe8805f0b95"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-initial-format-102243.2026-10-19T10-22.json",
+      "sha256": "eeff927e3e299ea20d8d321b829811a561161cdbfd1fddf5e6395aed65a2dbac"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-initial-format-102243.2026-10-19T10-22.md",
+      "sha256": "f659080d388b856413b87e677f9768560fddea97c25d79d460589a649281771e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-preview-harness.2026-10-19T10-24.json",
+      "sha256": "4943e7d41e0c119fc5b3f7b3e5cd93a05d166ed11b274fda7f6ebdf1b3a535de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-start-harness.2026-10-19T10-24.json",
+      "sha256": "cfa486b6ac4a52c524ec457d4b100d28755fd4e160606e955f4e0bcdad4a862e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure-harness.2026-10-19T10-24.json",
+      "sha256": "cc7a56db0fff4c07dda377c9074d8fd1e95ad285ccc484e69059f8d87fc8b17d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure.2026-10-19T10-15.json",
+      "sha256": "02f14e0522f6b11fc724d07dd3351d1a9890496061eab797ceca02fb16d78456"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure.2026-10-19T10-23.json",
+      "sha256": "4e2cf6ce3630fae7a2b7ad7b6950e090f7950fa940592cb7b5254581f92c8938"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-test-split-harness.2026-10-19T10-24.json",
+      "sha256": "dd8333c97dc6184ebaf1cd92c31d30646098537e24a7ff76190c207d065f58d4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-format-102301.2026-10-19T10-23.json",
+      "sha256": "ab6be38cecb8cf9c93c4942d57209e02f317c84238af00652b1c002264eda31c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-format-102301.2026-10-19T10-23.md",
+      "sha256": "4bafca02e60ef2aae2c57143d9f57bd0a8a3cda45fa6a1973b732e77de7018a5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.json",
+      "sha256": "440e90328153b3a42b8411537d7aaec455ace822ec1c154eb2963ded09e185e7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.md",
+      "sha256": "04d2f06aac0dfb5d4639ba1bf82d233d3d057d93206be80e1f0d934edde104ed"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-coverage.2026-10-19T10-23.json",
+      "sha256": "f56e97e43e3e871815150120ba6e22ba42b872382e4cfbba1800db352bacb582"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.json",
+      "sha256": "a39ce08d09d267f0a00c2ec8b7e5cc7693b52696031d9a3381a33d60fc30d694"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.md",
+      "sha256": "9a3c0500a7d94080d23ed3ee095e943846f03be1c1a2943cfc4addadc9ed1bd9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-coverage-ranges.2026-10-19T10-24.json",
+      "sha256": "f111d1b5bb6bdfec7ebb655c51e186097d68ef4a29cd263e2bc3409087ca5a39"
+    }
+  ],
+  "files": [
+    {
+      "attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py: eol: lf",
+      "filtered_git_blob": "6921e3c63619034c9906718ba6911255277190fc",
+      "lines": 299,
+      "normalized_sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "stream_relation": "identical",
+      "working_git_blob": "6921e3c63619034c9906718ba6911255277190fc"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_dependency_node.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_node.py: eol: lf",
+      "filtered_git_blob": "95f4b642fb5db2030aa59eac9c714dfd7ee0105e",
+      "lines": 398,
+      "normalized_sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+      "stream_relation": "identical",
+      "working_git_blob": "95f4b642fb5db2030aa59eac9c714dfd7ee0105e"
+    },
+    {
+      "attributes": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py: text: auto\ntests/discovery_runtime/analyzer/test_dependency_node_limits.py: eol: lf",
+      "filtered_git_blob": "88a619bc48dfd118888438592588b87482fdfd5f",
+      "lines": 145,
+      "normalized_sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7",
+      "stream_relation": "identical",
+      "working_git_blob": "88a619bc48dfd118888438592588b87482fdfd5f"
+    }
+  ],
+  "focused_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-binding.2026-10-19T10-23.json",
+    "sha256": "0e7b53f7c6d9cbf61205fe43166bb0e2d2b81733ddee827b58b2d32f293d13cb"
+  },
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-start-harness.2026-10-19T10-24.json",
+      "sha256": "cfa486b6ac4a52c524ec457d4b100d28755fd4e160606e955f4e0bcdad4a862e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-preview-harness.2026-10-19T10-24.json",
+      "sha256": "4943e7d41e0c119fc5b3f7b3e5cd93a05d166ed11b274fda7f6ebdf1b3a535de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-test-split-harness.2026-10-19T10-24.json",
+      "sha256": "dd8333c97dc6184ebaf1cd92c31d30646098537e24a7ff76190c207d065f58d4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-focused-harness.2026-10-19T10-24.json",
+      "sha256": "03ae081fb7f6b8eb1d22c520a07334979039c4823905cb3d9dfd49da25fab8b2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure-harness.2026-10-19T10-24.json",
+      "sha256": "cc7a56db0fff4c07dda377c9074d8fd1e95ad285ccc484e69059f8d87fc8b17d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-freeze-harness.2026-10-19T10-24.json",
+      "sha256": "c6f8b30ad4d229163549f28728a72c048a92fade63be5ef4feee6fe8805f0b95"
+    }
+  ],
+  "head": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+  "limitations": [
+    "Only package.json four dependency maps and npm lock/shrinkwrap versions 2/3 packages records are selected; the v2 compatibility tree is deliberately ignored.",
+    "Closed JSON container anchors and normalized occurrence order disclose no dynamic package-location keys; physical JSON line numbers are absent.",
+    "Declarations, locked-package records and declared-lock-edge requested versions are distinct syntax categories; no installed state, resolved target, restore or execution claim.",
+    "Links, aliases, workspace expressions, unsupported controls and unsafe names/versions remain fixed diagnostics or redacted classifications; no workspace or semver evaluation.",
+    "The shared contract bytes are external integration prerequisites, explicitly bound rather than independently edited or accepted here.",
+    "Public registry exposure remains P4-T9. Native coding-agent host and non-Windows proof are not supplied. Combined final gates and independent task acceptance remain pending."
+  ],
+  "ordered_receipts": [
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.md",
+        "sha256": "f251364c5ca8b7dd3d5d39fd478b809f3f7d0f321f63f5c84168e31080358ab3"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.json",
+      "seconds": 0.58197,
+      "sha256": "b3a3beb94270ab21967c8c781fbb1b291636c97dbcc1fd4b27147233041aed11",
+      "stage": "format"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.md",
+        "sha256": "0dc78a7edb510db3b1cd36266d8e1786ff358d2504cdc54bcde45eff1f49bb9b"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.json",
+      "seconds": 0.102411,
+      "sha256": "2fb7374594a8ed96c2a3e59f8e840c3c6653166c9d4e5fa52819c34e91a21535",
+      "stage": "lint"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.md",
+        "sha256": "8ddbf528c5adbbb8c7004f4616531892fc5847586182a93641246c9a43136b4a"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.json",
+      "seconds": 0.851278,
+      "sha256": "4660e4c739e5c52addce86e3f707d373fed95cc7d772d2028403c07adbc31a18",
+      "stage": "types"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.md",
+        "sha256": "9a3c0500a7d94080d23ed3ee095e943846f03be1c1a2943cfc4addadc9ed1bd9"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.json",
+      "seconds": 0.972745,
+      "sha256": "a39ce08d09d267f0a00c2ec8b7e5cc7693b52696031d9a3381a33d60fc30d694",
+      "stage": "tests"
+    }
+  ],
+  "preserved_predecessors": 62,
+  "recorded_at": "2026-10-19T10:24:59.001786+00:00",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "shared_sources_used": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-start.2026-10-19T10-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-test-split.2026-10-19T10-11.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-node-test-split.2026-10-19T10-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-format-102314.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-format-102314.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-lint-102314.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-lint-102314.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-binding.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-lint-102334.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-complete-candidate-types-102335.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-focused-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-import-format-102258.2026-10-19T10-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-import-format-102258.2026-10-19T10-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-setup-format-101337.2026-10-19T10-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-format-setup-format-101337.2026-10-19T10-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-freeze-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-initial-format-102243.2026-10-19T10-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-initial-format-102243.2026-10-19T10-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-preview-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-start-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure.2026-10-19T10-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-test-split-harness.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-format-102301.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-format-102301.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-typed-candidate-lint-102301.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-coverage.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-complete-candidate-tests-102336.2026-10-19T10-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-coverage-ranges.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.md",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py"
+  ],
+  "state": "NODE_SUBSET_FROZEN_REVIEW_PENDING",
+  "structural_check": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-node-structure.2026-10-19T10-23.json",
+    "sha256": "4e2cf6ce3630fae7a2b7ad7b6950e090f7950fa940592cb7b5254581f92c8938"
+  },
+  "task": "P4-T7",
+  "test_count": 111,
+  "timestamp": "2026-10-19T10-24"
+}

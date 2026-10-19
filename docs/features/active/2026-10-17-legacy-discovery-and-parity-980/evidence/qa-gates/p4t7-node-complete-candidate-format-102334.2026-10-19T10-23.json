@@ -1,0 +1,45 @@
+{
+  "batch": "complete-candidate",
+  "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T10:23:34.778920+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-node-focused.py",
+    "sha256": "a1c6dcefdd24fbcd16940f91e1bc7e39302224fbafc462486618d058488eedd3"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.stderr.txt",
+      "sha256": "ab81d49758ee3d83e73f7d022b92772c8d7969bfd4d6680c5baf6a23890a301f"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t7-node-complete-candidate-format-102334.2026-10-19T10-23.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.58197,
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T10:23:34.196950+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n3 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-23"
+}

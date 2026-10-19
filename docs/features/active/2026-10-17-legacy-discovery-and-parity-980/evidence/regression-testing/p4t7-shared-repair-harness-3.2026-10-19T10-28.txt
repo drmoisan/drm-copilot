@@ -1,0 +1,135 @@
+"""Retain all original assertions while splitting and documenting shared tests."""
+import ast
+from pathlib import Path
+
+path = Path("tests/discovery_runtime/analyzer/test_dependency_inputs.py")
+source = path.read_text("utf-8")
+docs = {
+    "_InjectedAdd": """Typed injection seam for malformed parser kwargs in isolated tests.
+
+    Cast a bound collector method, call once, and require its runtime validation.
+    This protocol stores no state and introduces no filesystem or process effects.""",
+    "__call__": """Forward values (object kwargs) to validation; return None.
+
+        The collector may raise ValueError; any mutation remains in its local budget.""",
+    "candidate": """Build a valid carrier with changes (object kwargs) for constructor tests.
+
+    Return DependencyCandidate; propagate ValueError for rejected overrides.
+    Only isolated immutable values are constructed; no I/O occurs.""",
+    "add": """Call budget (DependencyBudget) with changes (object kwargs); return None.
+
+    Mutate only this isolated collector. Propagate its ValueError or
+    DependencyInputError so each test can assert the intended rejection.""",
+    "test_limits_reject_nonpositive_and_noninteger_capacities": """Reject field (str) with invalid value (object) before input processing.
+
+    Return None; the expected ValueError is caught. No external mutation occurs.""",
+    "test_identifier_allowlists_keep_only_literal_names": """Classify raw (str | None) using ecosystem (Ecosystem).
+
+    Return None after comparing expected (str | None); no I/O or expected error.""",
+    "test_version_classification_never_retains_reference_targets": """Classify raw (str | None) into kind (str) and value (str | None).
+
+    Return None after safe/redacted comparison; no mutation or expected error.""",
+    "test_value_constructor_cannot_bypass_sanitization": """Reject a noncanonical kind (str) and value (str | None) carrier pair.
+
+    Return None; catch expected ValueError without I/O or state mutation.""",
+    "test_anchor_rejects_dynamic_keys_or_fabricated_spans": """Reject values (dict[str, object]) overriding a closed source anchor.
+
+    Return None; catch ValueError without accessing source bytes or global state.""",
+    "test_closed_anchors_preserve_json_occurrences_and_xml_lines": """Verify closed JSON occurrences and parser-reported XML lines; return None.
+
+    No arguments, expected errors, external mutation or source reads.""",
+    "test_candidate_rejects_unsanitized_or_mutable_metadata": """Reject changes (dict[str, object]) that bypass candidate sanitization.
+
+    Return None; catch ValueError using only local immutable fixtures.""",
+    "test_result_rejects_mutable_unsanitized_and_invalid_usage": """Reject changes (dict[str, object]) to result tuples or usage counters.
+
+    Return None; catch ValueError without external side effects.""",
+    "test_carriers_are_immutable_and_preserve_distinct_dependency_kinds": """Verify separate declaration/locked/edge facts and immutability; return None.
+
+    No arguments or I/O; catch FrozenInstanceError on local assignment attempts.""",
+    "test_decode_preserves_valid_text_with_physical_line_boundaries": """Decode content (bytes) within lines (int) into expected (str).
+
+    Return None; exercise exact capacity/BOM/newlines without I/O or expected errors.""",
+    "test_decode_failures_poison_partial_result": """Reject content (bytes) under limits (DependencyLimits) with code (str).
+
+    Return None; catch fixed errors and verify local result poisoning, with no I/O.""",
+    "test_reservations_are_prospective_independent_and_fail_closed": """Exhaust capacity (str counter name), then reject all output; return None.
+
+    Catch DependencyInputError; mutate only an isolated collector.""",
+    "test_invalid_reservation_does_not_consume_capacity": """Reject value (object) as an invalid work reservation; return None.
+
+    Catch ValueError and verify unchanged local counters; no I/O occurs.""",
+    "test_shared_collector_redacts_values_and_keeps_requested_separate": """Verify sanitized fields and separate requested/version roles; return None.
+
+    No arguments or expected errors; only the local collector is mutated.""",
+    "test_diagnostic_deduplication_and_snapshot_isolation": """Charge each fixed code once while preserving earlier snapshots; return None.
+
+    No arguments, expected errors or I/O; mutate only the local collector.""",
+    "test_encoded_candidate_and_raw_text_reservations_are_aggregate": """Verify exact UTF-8/retained cost and aggregate overflow; return None.
+
+    No arguments or I/O; catch DependencyInputError from local collectors.""",
+    "test_selected_scalar_bounds_precede_unsafe_storage": """Reject text (str) against capacity (int bytes) with code (str).
+
+    Return None; catch fixed errors and assert poisoning without external effects.""",
+    "test_collector_rejects_invalid_argument_types": """Reject changes (dict[str, object]) injected as invalid parser arguments.
+
+    Return None; catch ValueError and inspect the isolated collector without I/O.""",
+    "test_public_contract_invalid_types_and_fixed_error_messages": """Verify malformed public calls retain only fixed errors; return None.
+
+    No arguments or I/O; catch expected ValueErrors from local values/collectors.""",
+    "test_empty_and_repeated_results_are_deterministic": """Compare two independent empty/repeated collection sequences; return None.
+
+    No arguments or expected errors; mutate only each isolated collector.""",
+}
+lines = source.splitlines(keepends=True)
+edits = []
+for node in ast.walk(ast.parse(source)):
+    if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+        doc = node.body[0]
+        assert isinstance(doc, ast.Expr) and isinstance(doc.value, ast.Constant)
+        replacement = ' ' * doc.col_offset + '"""' + docs[node.name] + '"""\n'
+        edits.append((doc.lineno - 1, doc.end_lineno, replacement))
+for start, end, replacement in sorted(edits, reverse=True):
+    lines[start:end] = [replacement]
+source = "".join(lines)
+move = {
+    "test_limits_reject_nonpositive_and_noninteger_capacities",
+    "test_decode_failures_poison_partial_result",
+    "test_reservations_are_prospective_independent_and_fail_closed",
+    "test_invalid_reservation_does_not_consume_capacity",
+    "test_encoded_candidate_and_raw_text_reservations_are_aggregate",
+    "test_selected_scalar_bounds_precede_unsafe_storage",
+    "test_collector_rejects_invalid_argument_types",
+    "test_public_contract_invalid_types_and_fixed_error_messages",
+}
+lines = source.splitlines(keepends=True)
+pieces, ranges = [], []
+for node in ast.parse(source).body:
+    if isinstance(node, ast.FunctionDef) and node.name in move:
+        start = min([node.lineno] + [item.lineno for item in node.decorator_list]) - 1
+        pieces.append("".join(lines[start:node.end_lineno]))
+        ranges.append((start, node.end_lineno))
+for start, end in reversed(ranges):
+    del lines[start:end]
+path.write_bytes(("".join(lines).strip() + "\n").encode())
+target = path.with_name("test_dependency_input_limits.py")
+assert not target.exists()
+header = '''"""Verify dependency work and allocation boundaries using only memory values."""
+
+from __future__ import annotations
+
+from collections.abc import Iterator
+from dataclasses import replace
+from typing import Self, SupportsIndex, cast
+
+import pytest
+from drm_copilot_discovery.analyzer import dependency_values
+from drm_copilot_discovery.analyzer.dependency_inputs import (
+    DependencyBudget, DependencyInputError, DependencyLimits, DependencyResult,
+    dependency_value, safe_identifier,
+)
+from tests.discovery_runtime.analyzer.test_dependency_inputs import add
+
+'''
+target.write_bytes((header + "\n\n".join(pieces).strip() + "\n").encode())
+print("Preserved", len(move), "original tests in approved boundary module")

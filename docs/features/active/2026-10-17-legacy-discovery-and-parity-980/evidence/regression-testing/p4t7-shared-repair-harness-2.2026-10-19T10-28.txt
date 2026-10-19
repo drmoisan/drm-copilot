@@ -1,0 +1,182 @@
+"""Apply only the approved shared split, documentation and UTF-8 reservation repair."""
+import ast
+from pathlib import Path
+
+path = Path("packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py")
+source = path.read_text("utf-8")
+lines = source.splitlines(keepends=True)
+removed = {"safe_identifier", "DependencyValue", "_version_kind", "dependency_value"}
+assignments = {"Ecosystem", "_NAME", "_NPM_NAME", "_VERSION", "_TERM"}
+ranges = []
+for node in ast.parse(source).body:
+    remove = isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in removed
+    remove = remove or isinstance(node, ast.Assign) and any(isinstance(item, ast.Name) and item.id in assignments for item in node.targets)
+    if remove:
+        start = min([node.lineno] + [item.lineno for item in getattr(node, "decorator_list", [])])
+        ranges.append((start - 1, node.end_lineno))
+for start, end in reversed(ranges):
+    del lines[start:end]
+source = "".join(lines).replace("import re\n", "")
+source = source.replace('from typing import Literal, cast\n', '''from typing import Literal, cast
+
+from .dependency_values import (
+    DependencyValue as DependencyValue,
+    Ecosystem as Ecosystem,
+    dependency_value as dependency_value,
+    safe_identifier as safe_identifier,
+)
+''')
+replacements = {
+    '"""Expose a fixed code/message without embedding untrusted parser details."""': '''"""Fixed parser failure with a public str code and no retained input.
+
+    Construct when validation fails and propagate to the adapter; the code selects
+    a constant message. Instances never perform I/O or retain parser exceptions.
+    """''',
+    '"""Accept a fixed code; reject unknown codes; retain no input."""': '''"""Bind code (str) to its fixed message; return None with local mutation.
+
+        Raises ValueError for an unknown code; raw parser text is never accepted.
+        """''',
+    '"""Independent positive capacities; defaults bound a single retained document."""': '''"""Immutable independent capacities for one bounded parser invocation.
+
+    Pass this carrier to DependencyBudget before decoding. All fields are positive
+    exact ints, excluding bool: max_bytes counts input bytes; max_nodes counts
+    traversal/index work; max_depth bounds nesting; max_candidates counts records;
+    max_text_bytes counts selected UTF-8 work plus quoted retained ASCII strings;
+    max_lines counts physical CRLF/CR/LF lines. Construction validates without I/O.
+    Full Analysis output accounting belongs to the integration layer.
+    """''',
+    '"""Reject bool/noninteger/nonpositive capacities without allocating input."""': '''"""Validate this carrier's six int capacities; return None without mutation.
+
+        Raises ValueError for bool, noninteger or nonpositive capacity values.
+        """''',
+    '"""An honest closed container anchor; occurrence distinguishes its declarations."""': '''"""Immutable source container identity without untrusted keys or locations.
+
+    Construct from an accepted parser's str format/location before collecting a
+    candidate. occurrence is a positive int in normalized traversal order; line
+    is a positive parser-reported XML/physical-text int or None for JSON. Validate
+    once, then share immutable values; no source reads or other I/O occur.
+    """''',
+    '"""Reject dynamic locations, invalid ordinals, or fabricated JSON line spans."""': '''"""Validate this anchor's format/location/occurrence/line; return None.
+
+        Raises ValueError for invalid types, locations or spans; has no side effects.
+        """''',
+    '"""Syntax facts with unresolved binding, execution and effective precedence."""': '''"""Immutable sanitized syntax fact without binding or execution claims.
+
+    DependencyBudget normally constructs this carrier after reserving costs.
+    kind/ecosystem/name/role identify declaration syntax; version and requested
+    remain distinct DependencyValues; owner is an optional safe package name.
+    anchor supplies source location, operation and condition_present describe
+    syntax, and extras/markers are immutable safe-name tuples. Direct construction
+    enforces the same invariants without I/O, evaluation or global mutation.
+    """''',
+    '"""Validate sanitized construction; reject mutable or unsafe metadata."""': '''"""Validate this carrier's typed fields; return None without side effects.
+
+        Raises ValueError when metadata is mutable, unsafe or structurally invalid.
+        """''',
+    '"""Immutable parser output without Analysis rows, identities or provenance."""': '''"""Immutable snapshot of sanitized candidates, diagnostics and parser usage.
+
+    Obtain from DependencyBudget.result after parsing. candidates preserves parser
+    order; diagnostics contains fixed codes; consumed_nodes counts reserved
+    traversal/index operations and consumed_text_bytes counts selected UTF-8 work
+    plus quoted retained ASCII strings. Counters are nonnegative exact ints.
+    Validation has no I/O; snapshots remain unchanged by later collector mutation
+    and never supply Analysis rows, IDs, source provenance or resolved binding.
+    """''',
+    '"""Reject mutable payloads, unknown diagnostics and invalid usage counters."""': '''"""Validate this snapshot's tuples and int counters; return None.
+
+        Raises ValueError for malformed fields; performs no external mutation.
+        """''',
+    '"""Reserve work and output before append; exhaustion invalidates results."""': '''"""One-invocation mutable collector with independent prospective reservations.
+
+    Construct with DependencyLimits, decode retained bytes, reserve traversal work,
+    then add candidates/note diagnostics and obtain immutable result snapshots.
+    Internal counters track nodes, records and selected/retained text bytes.
+    Exhaustion or invalid encoding poisons result access; no partial success can
+    escape. Mutation is local, without I/O, concurrency or global state. Consumers
+    separately account for complete Analysis rows and aggregate input documents.
+    """''',
+    '"""Bind limits and empty counters; reject invalid limits; allocate no I/O."""': '''"""Initialize local state from limits (DependencyLimits); return None.
+
+        Raises ValueError for an invalid carrier; performs no external I/O.
+        """''',
+    '"""Reserve nonnegative work; reject invalid or exhausted capacities."""': '''"""Reserve nodes, candidates and text_bytes (nonnegative exact ints).
+
+        Units are traversal/index operations, retained records and UTF-8/quoted
+        ASCII bytes respectively. Return None; mutate counters only after all
+        bounds pass. Raise ValueError for invalid types or DependencyInputError
+        on exhaustion, which permanently poisons result access.
+        """''',
+    '"""Return UTF-8 after byte/physical-line checks; raise fixed input errors."""': '''"""Decode content (bytes) after input-byte and physical-line checks.
+
+        Return str with an optional UTF-8 BOM removed. Raise ValueError for an
+        invalid type or fixed DependencyInputError for limits/encoding failures;
+        such failures poison this collector. No source reads occur.
+        """''',
+    '"""Reserve and deduplicate fixed codes; reject unknown or exhausted input."""': '''"""Record code (str) once and reserve its quoted ASCII cost; return None.
+
+        Mutates local diagnostics/counters. Raise ValueError for an unknown code
+        or DependencyInputError when the prospective text reservation fails.
+        """''',
+    '"""Return a snapshot; raise after any exhaustion or decoding failure."""': '''"""Return a DependencyResult snapshot of this collector without mutation.
+
+        No arguments or I/O. Raise DependencyInputError after limits/encoding
+        failures, preserving the rule that incomplete parsing cannot succeed.
+        """''',
+}
+for old, new in replacements.items():
+    assert source.count(old) == 1, old
+    source = source.replace(old, new)
+old = '''                if len(value) > self.limits.max_text_bytes - self._text:
+                    self._failed = True
+                    raise DependencyInputError("dependency-limit")
+                try:
+                    encoded_size = len(value.encode("utf-8"))
+                except UnicodeEncodeError:
+                    self._failed = True
+                    raise DependencyInputError("dependency-encoding") from None
+                self.reserve(text_bytes=encoded_size)'''
+assert old in source
+source = source.replace(old, '                self._reserve_text(value)')
+new_method = '''    def _reserve_text(self, value: str) -> None:
+        """Reserve value (str) UTF-8 cost without allocating encoded bytes.
+
+        Return None; update local counters only after prospective checks. Raise
+        fixed DependencyInputError on capacity/surrogate failure and poison
+        result access. Character work stops at the remaining byte capacity.
+        """
+        remaining = self.limits.max_text_bytes - self._text
+        if len(value) > remaining:
+            self._failed = True
+            raise DependencyInputError("dependency-limit")
+        size = 0
+        # Count scalar widths before allocation; reject invalid Unicode directly.
+        for character in value:
+            point = ord(character)
+            if 0xD800 <= point <= 0xDFFF:
+                self._failed = True
+                raise DependencyInputError("dependency-encoding")
+            # Unicode scalar ranges have fixed UTF-8 widths, independent of codecs.
+            size += 1 if point < 0x80 else 2 if point < 0x800 else 3 if point < 0x10000 else 4
+            if size > remaining:
+                self._failed = True
+                raise DependencyInputError("dependency-limit")
+        self.reserve(text_bytes=size)
+
+'''
+source = source.replace('    def add(\n', new_method + '    def add(\n')
+start = source.index('        """Reserve raw selected text, sanitize and append one candidate; return None.')
+end = source.index('        """', start + 12) + 11
+source = source[:start] + '''        """Reserve, sanitize and append one candidate; return None.
+
+        Args: kind (DependencyKind) and ecosystem (Ecosystem) select syntax;
+        name/version/requested/owner (str | None) are untrusted names/references;
+        role (str) is a group; anchor (DependencyAnchor) is a closed location;
+        operation (str) and condition_present (bool) describe syntax; extras and
+        markers (tuple[str, ...]) are names only, never condition expressions.
+        Callers first reserve traversal work. Raise ValueError for invalid fields
+        or DependencyInputError for bounds/encoding failures. Mutate only local
+        counters/output after checks; raw plus retained text costs are distinct
+        from complete Analysis serialization, which integration accounts for.
+        """''' + source[end:]
+path.write_bytes((source.strip() + "\n").encode())
+print(path, len(source.splitlines()))

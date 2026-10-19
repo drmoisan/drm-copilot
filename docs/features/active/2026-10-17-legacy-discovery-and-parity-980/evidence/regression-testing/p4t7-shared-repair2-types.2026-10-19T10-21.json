@@ -1,0 +1,61 @@
+{
+  "stage": "types",
+  "label": "p4t7-shared-repair2-types",
+  "started": "2026-10-19T10:21:56.223190+00:00",
+  "finished": "2026-10-19T10:21:58.714688+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py tests/discovery_runtime/analyzer/test_dependency_inputs.py tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+  "exit_code": 1,
+  "duration_seconds": 2.491,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+      "physical_lines": 501
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "physical_lines": 375
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "db2152e27fdb24df7a015db5f40f00fc73077fc67a07494519590536f79f0c37",
+      "physical_lines": 364
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+      "physical_lines": 501
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py": {
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+      "physical_lines": 375
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_input_limits.py": {
+      "sha256": "db2152e27fdb24df7a015db5f40f00fc73077fc67a07494519590536f79f0c37",
+      "physical_lines": 364
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair2-types-102158.stdout.bin",
+      "raw_sha256": "3cc21cc5350d8a8ed647c98faa755df9d925c8bd32245e9e5193e23c84c8d680",
+      "raw_bytes": 1047,
+      "presentation": ".\\tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py\n  .\\tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py:246:30 - error: \"_version_term\" is private and used outside of the module in which it is declared (reportPrivateUsage)\n  .\\tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py:325:12 - error: \"_reserve_text\" is protected and used outside of the class in which it is declared (reportPrivateUsage)\n  .\\tests\\discovery_runtime\\analyzer\\test_dependency_input_limits.py:329:16 - error: \"_reserve_text\" is protected and used outside of the class in which it is declared (reportPrivateUsage)\n3 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-shared-repair2-types-102158.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 shared SR1-SR4 repair only"
+}

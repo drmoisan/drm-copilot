@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-10-19T10-32",
+  "published_utc": "2026-10-19T10:32:40.5445662Z",
+  "status": "EVIDENCE_CLOSURE_READY",
+  "streams": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.json",
+      "sha256": "0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.md",
+      "sha256": "f3c8e75a40678ae413fda5967a8b8746b82ea9dc81ad3e68d6dad4eb29080d8c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review-harness.2026-10-19T10-07.txt",
+      "sha256": "8f6c0661fcf5d059b6df4ef1dfd7f6704c0f385729c517f3041155e510a8393f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe.2026-10-19T10-05.json",
+      "sha256": "9b9f3fd13f7e2e6a13a8deda91d2e7278a080d360c01f696df6ed2ce831bb106"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe-harness.2026-10-19T10-05.txt",
+      "sha256": "21a03f97c8eff10082e1f72f705bf2b4c3ffbb82d08ea9152c1988636fc69fe6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json",
+      "sha256": "89fa8d3c97da9343e8b83d855ce6d8dc8ca28f758b6e7ef2489ddbd0de7beac0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.md",
+      "sha256": "9dc5e78f62f693cfdd2c310782dcee63c5041fd4922811f33737cc7c80956fa6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-harness.2026-10-19T10-32.txt",
+      "sha256": "315c68f8f5bb7b4959e6c0b378bc866a2a476fff6a49088d669dee2bfa9d0da5"
+    }
+  ],
+  "staging_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review-harness.2026-10-19T10-07.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe.2026-10-19T10-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-probe-harness.2026-10-19T10-05.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-confirmation.2026-10-19T10-32.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-harness.2026-10-19T10-32.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-node-staging.2026-10-19T10-32.json"
+  ],
+  "note": "Only original shared findings/probes and the bounded shared/Node confirmation. Canonical raw harness bytes remain separate from summaries; no format-repair or integration paths included."
+}

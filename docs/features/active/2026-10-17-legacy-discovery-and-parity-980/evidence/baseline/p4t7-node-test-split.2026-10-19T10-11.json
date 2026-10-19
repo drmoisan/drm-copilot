@@ -1,0 +1,11 @@
+{
+  "absent_before_creation": true,
+  "approved_path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+  "harness_sha256": "0560977f680e9428a415aedf3e4a08fdba441de1fbce1f2f700426903c78e91d",
+  "reason": "Read-only Black preview projects 523 lines; isolate public-boundary and capacity tests without changing assertions.",
+  "recorded_at": "2026-10-19T10:11:56.792494+00:00",
+  "shared_baseline": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+  "source_before_sha256": "dd89d0053e601f1d9587a24e5de700ad3ef5505cb5c60a9bf245b2c65feee743",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-11"
+}

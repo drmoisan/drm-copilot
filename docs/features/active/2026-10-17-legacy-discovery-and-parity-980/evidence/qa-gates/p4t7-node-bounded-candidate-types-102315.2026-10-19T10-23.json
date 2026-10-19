@@ -1,0 +1,45 @@
+{
+  "batch": "bounded-candidate",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node.py tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T10:23:15.780670+00:00",
+  "harness": {
+    "path": "SCRATCH/issue-980-node-focused.py",
+    "sha256": "a1c6dcefdd24fbcd16940f91e1bc7e39302224fbafc462486618d058488eedd3"
+  },
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t7-node-bounded-candidate-types-102315.2026-10-19T10-23.stdout.txt",
+      "sha256": "8dbbebfd843422f03f4d9397ef07d1c5426abe9d236a1e2a2ff0394ff9f42a0f"
+    }
+  },
+  "seconds": 1.516269,
+  "shared_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "shared_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "4c2024cd558f0f42300181a5e63a4f869978dcd299587b2dffe9fc9e3fc5a462",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "f657e859e969f27605769e937237656d8dd272302114135680275dd8dd15b39b"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+    "tests/discovery_runtime/analyzer/test_dependency_node.py": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf",
+    "tests/discovery_runtime/analyzer/test_dependency_node_limits.py": "f657e859e969f27605769e937237656d8dd272302114135680275dd8dd15b39b"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T10:23:14.264401+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_dependency_node_limits.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_dependency_node_limits.py:113:15 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"parse\"\n  \u00a0\u00a0Argument type is \"dict[Unknown, Unknown] | object\" (reportUnknownArgumentType)\n1 error, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-23"
+}
