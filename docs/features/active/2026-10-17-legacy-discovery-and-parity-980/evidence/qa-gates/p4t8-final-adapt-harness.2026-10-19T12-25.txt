@@ -1,0 +1,28 @@
+"""Prepare existing ordered runner mechanics for the frozen optional task."""
+import ast
+from pathlib import Path
+
+scratch = Path(__file__).parent
+text = (scratch / 'issue-980-p4t7-final-gates.py').read_text('utf-8').replace('P4-T7', 'P4-T8').replace('p4t7', 'p4t8')
+text = text.replace("len(manifest['subset_manifests']) == 5", "len(manifest['subset_manifests']) == 2").replace('All five frozen subsets', 'Both frozen subsets')
+start = text.index('assert len(code) == 14')
+stop = text.index('receipts = []', start)
+text = text[:start] + "assert len(code) == 16 and len(expected) == len(manifest['files']) and all(path.endswith('.py') for path in code)\n" + text[stop:]
+text = text.replace("return {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in expected}",
+    "assert all(hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256'] for item in manifest['preserved_files'])\n    assert all(hashlib.sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256'] for item in manifest['fixtures'])\n    return {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in expected}")
+start = text.index('batches = (')
+stop = text.index("    coverage_raw =", start)
+text = text[:start] + "for batch in ('optional', 'compatibility'):\n    batch_tests = list(reversed(manifest['forward_test_module_order'][batch]))\n    measured = manifest['coverage_targets'][batch]\n" + text[stop:]
+text = text.replace("assert {Path(name).stem for name in coverage['files']} == set(production_names)",
+    "assert set(coverage['files']) == set(manifest['production_paths'][batch])")
+text = text.replace("    'tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py'])",
+    "    'tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_domain_neutrality_templates_contain_no_disallowed_tokens'])")
+text = text.replace('Direct adapter composition and expected closed-registry publication refusal; dispatch/publication remains P4-T9. No coding-agent host, package install/restore/execution, or non-Windows execution.',
+    'Supported optional registry dispatch and read-only inventory composition only; no publication attempt. No installed Office runtime, callback execution, coding-agent host or non-Windows execution.')
+target = scratch / 'issue-980-p4t8-final-gates.py'
+assert not target.exists()
+raw = (text.rstrip() + '\n').encode()
+assert b'\r' not in raw
+ast.parse(raw)
+target.write_bytes(raw)
+print(target.name)

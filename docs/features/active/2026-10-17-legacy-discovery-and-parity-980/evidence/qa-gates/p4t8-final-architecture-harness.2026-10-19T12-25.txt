@@ -1,0 +1,62 @@
+"""Check reviewed optional/compatibility boundaries without running analysis."""
+import ast
+import hashlib
+import io
+import json
+from pathlib import Path
+import sys
+import tokenize
+
+manifest = json.loads(Path(sys.argv[1]).read_bytes())
+checked = []
+for entry in manifest['files']:
+    path = Path(entry['path'])
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == entry['sha256']
+    text = raw.decode('utf-8')
+    lines = text.splitlines()
+    assert len(lines) <= 500
+    tree = ast.parse(text)
+    definitions, loops, imports = [], [], []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node, ast.Import):
+            imports.extend(item.name for item in node.names)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            definitions.append(node)
+            assert ast.get_docstring(node), (path, node.name)
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            loops.append(node)
+            assert lines[node.lineno - 2].lstrip().startswith('#'), (path, node.lineno)
+    is_test = path.as_posix().startswith('tests/')
+    legacy_cli = path.as_posix() == 'scripts/dev_tools/discovery/analyzer/stack_cli.py'
+    if is_test:
+        docstrings = {(node.body[0].lineno, node.body[0].col_offset) for node in ast.walk(tree)
+                      if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and ast.get_docstring(node)}
+        code = ' '.join(token.string for token in tokenize.generate_tokens(io.StringIO(text).readline)
+                        if token.type != tokenize.COMMENT and token.start not in docstrings)
+        assert not any(word in code for word in ('tmp_path', 'tmpdir', 'TemporaryDirectory', 'NamedTemporaryFile', 'tempfile', 'subprocess', 'requests', 'socket')), path
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                if ast.unparse(node.func).endswith(('.write_bytes', '.write_text', '.mkdir', '.unlink')):
+                    assert path.as_posix() == 'tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py'
+                    helper = next(item for item in tree.body if isinstance(item, ast.FunctionDef) and item.name == '_build_source')
+                    assert helper.lineno <= node.lineno <= helper.end_lineno and 'mem_fs_path' in text
+        boundary = 'In-memory unit cases plus immutable checked-in fixture/schema reads.'
+    else:
+        assert not any(item.startswith(('subprocess', 'socket', 'requests', 'http', 'urllib')) for item in imports), path
+        if path.as_posix().startswith('packages/'):
+            assert not any(item.startswith('scripts') for item in imports), path
+        calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)]
+        assert not any(ast.unparse(node.func) in {'open', 'eval', 'exec', 'compile'} for node in calls), path
+        if not legacy_cli:
+            assert not any(ast.unparse(node.func).endswith(('.read_bytes', '.read_text', '.write_bytes', '.write_text', '.mkdir', '.unlink', '.glob', '.rglob')) for node in calls), path
+        else:
+            optional_entry = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'main_vsto')
+            assert {ast.unparse(node.func) for node in ast.walk(optional_entry) if isinstance(node, ast.Call)} == {'_build_parser', "_build_parser('dev.discovery.vsto').parse_args", 'print'}
+        boundary = 'Pure optional syntax/compatibility or fixed lazy registry; legacy .NET CLI I/O remains unchanged.'
+    checked.append({'path': path.as_posix(), 'physical_lines': len(lines), 'documented_definitions': len(definitions),
+                    'commented_explicit_loops': len(loops), 'boundary': boundary})
+assert len(checked) == 16
+print(json.dumps({'checks': checked, 'passed': len(checked)}, indent=2))

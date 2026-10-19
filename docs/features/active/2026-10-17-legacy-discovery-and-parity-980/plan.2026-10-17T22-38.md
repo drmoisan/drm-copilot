@@ -288,7 +288,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover pinned/unpinned versions, conditions/markers, direct versus declared lock relationships, malformed/unsupported manifests, duplicate ordering, and secret/token redaction; no package install/restore/network lookup.
   - Acceptance: Each supported ecosystem yields deterministic source-linked declarations and clear limitations; unsupported formats are diagnostics rather than fabricated evaluated dependencies.
 
-- [ ] [P4-T8] Retain the optional platform analyzer behind explicit consent.
+- [x] [P4-T8] Retain the optional platform analyzer behind explicit consent.
   - Files and behavior: Move DT/discovery/analyzer/{vsto_office,vsto_patterns}.py into R/analyzer/optional/ with thin compatibility imports; update registry lazy loading, add PT/analyzer/test_optional_adapter.py, and update Set F vsto_office/stack_neutrality/domain_neutrality suites.
   - Tests and proof: Retain generic Ribbon XML/callback, interop/lifecycle/COM/API marker fixtures with secure XML and shared generic COM detector; verify disabled imports, explicit profile consent, and absence of product IDs/semantics.
   - Acceptance: Core package imports, templates, schemas, roles, and ordinary inventories contain no optional-domain behavior; the existing optional adapter works only when explicitly selected and permitted.

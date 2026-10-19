@@ -1,0 +1,134 @@
+{
+  "decode_verified": true,
+  "entries": [
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-format-122347.2026-10-19T12-23.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 59,
+      "original_sha256": "24315bea89f680c399aecdf314732fa86f8f9b1e43b91a23310112252efd5bf6",
+      "payload": "H4sIAAAAAAAC/3PMyVFIyc9LVVR4NGeFwof5vRtADF4uQzOFtMyc1GKF8vzSnBSFpFSFnNS0EoXSvOSMxLz01BQ9Xi4AQCTxwjsAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-format-122347.2026-10-19T12-23.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 19,
+      "original_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "payload": "H4sIAAAAAAAC/3PMyVFIzkhNzi5WKEgsLk5NUeQCAJI/hpsTAAAA",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-lint-122347.2026-10-19T12-23.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-lint-122347.2026-10-19T12-23.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 194,
+      "original_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "payload": "H4sIAAAAAAAC/zXMzQqCQBSG4b3gPXzLghKFNrUIIkrdqJgUruwEJx2YZuLMYHT3/dHuXbw8MVjEipshxoPEKNN/W5mrlRt5ZY0LTpu6yIt0BT+wMJQDwfAD96eofvAYWdx7BI2kNF00YzImURIt4iXma/w6WUyjMKg0k3sTxnnS+gN+pb9gBY49qrbO06zpqrbJyqLbl/V21x139SEvC3iLsybPzp/DIAxecdGAZ8IAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-types-122400.2026-10-19T12-24.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-types-122400.2026-10-19T12-24.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 4978,
+      "original_sha256": "62e49374855879ac195ddfb440967b80069d63da15ea32180f2cf48de45ba792",
+      "payload": "H4sIAAAAAAAC/+2Wz2/aMBTH75X6P1icC0kgQNmO0w5I07bDbtNkGfsBT3XsyHYQbrX/fTaM0k6a4qkwhXUny/aLn/3J9/14uL4ipMfXwO9s7w35GqeEPOyHsFMztw7rYeR3bAU2E2i53oDxfdMohxVk1vBMmIpyXaPUjj5aZEwx6e/BZLp2qMMkoxQVOkoHte/dHJ2svUXOJJWoIF6jOO4JzZsKlANBBSzj1+GkaJMfbbiufprAtpbIgwepdf2L1UI3SjDj43M+NwbI4VbEeuXYNgvHhOfiAiU6T7QhS9yCIJLde2JghdYZ/5ZIWDHuyeDj+y/k3Yc5mWefwm7FUFnSKL5magVi0Nu7/X5zZqAb6zTVyyVyaGFajicJVIthEtbyNWANZzowyraAnf5X6x9h3d+/Ta3lKIHqJInqbVepOrDuCVJ6QPoILhrQwxUpE6wOgmwhN5rkp4vz3whyrvoVVNr48Fp0hDMLltSysQSrqnFsIYHsagqIPqrI0AXYmQ1rFQukmLAnpyOxQtcWq8NZEpy883BeFpAHJbdltmECrDKJVdHVGLTcYB11BhvqtJZPiB55WRdwUy6xTV757GRZK79oYul9ybBMqZ9F8VqgJXYd49sUapcNLa0CJCazUZGfXWd/sS4mCWrHR+gIniponGHxt7UFZBKotCQ2vCBOqUl+lI9ThDT954S0B5Sso2JanrsYdhLTLos/y5NtghonVcDxSxqt7pJKahJG06RyN+sKojh827kJcKwFEd1Orq/Cxg9db6rWchMAAA==",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-architecture-122400.2026-10-19T12-24.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-architecture-122400.2026-10-19T12-24.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 18041,
+      "original_sha256": "907ad114902e93b0369fcaaf1f2101864ef715e39f29defcd90067b4e7d5b461",
+      "payload": "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",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-tests-optional-reverse-122430.2026-10-19T12-24.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-tests-optional-reverse-122430.2026-10-19T12-24.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 27216,
+      "original_sha256": "a51c2cf87d081d69c313b56e8b0db7181f44274b4f17df38991fa6392d01f048",
+      "payload": "H4sIAAAAAAAC/9WdbW/bOBKAvwfIfxB6OKALrGxLfs82C3TT7CKHvqFN7w6wC4KWaJtbidSRlBPfYv/7DSnJoWXHPXTtiA2KJpYp8iFnOJyhRtLl5YEfTxGpPEmkpJx5UmGhpHfohMvzsyzBas5F6t1R1g093/fer9USTu+2AvgX/uhla12tP251WvpTki8Waz9oDVodXfrqYvpJEiGnrzB7w6nEbCpIxuU0Fqkf8YwmXPl3ahp2woEfdPxgeBuGfrczba0IW00/RoJmSk4z02iL3JPzswhHSxJTceG1iraROXJ+JjhX5vi3Ngp1czanizlNyAV0LBP8dxKpluJpoociX1AmLzzM1pT7Peh9K/jRi/jKH0LnzdlJAuUpW3itVssrP5LYCwYDjyqSyvOz8zONLNuy6Fk7JiukOE/gLyqhLiLWbcxwsv4vEW3Tu5inmDLESK4ETqhaQ7cvLsxXABjn0CBnKIW/EiIRuacg5PcvP368fuVNPK/z989HbbJoB8FAKSgiEeNohhkjMaIxYYrOKREThCijCiE4rfPZggmagMEZRTiKQO3hRCdo5BpK3NdowiZoIp6CqBQRPKvhdJvC2Ts4DdFoY5ALrCdYDajXOBDILcuVE1hyiUWGYhIluGCrz7R+g1iKfyE7QIMmgGKSEQYfI0rc4llDVYqRujING4YyCi4dg2I8JjWkUcNIpXO0DTVuGGqFk3xHzZuBMrqNSmeuhhQ04h+RlCpYdGvuUUMs4GgrJPNZ0eSu9Q4a8ZO0Dy7XEpzmvc5bEDYDxWLw7p1gMdYRQp9M5aJmkYJuM0Bak7hY19W6ERooRBJZR2nEP8poRhLKSB2mEa9IkAUEiEZIzrDsn+GN+ESSJ/lj3nUzRKakIHMiYF0le8OjYNg8WF16jThFOQWDmCQzHH1xguc+TfYq0rjhTZnAARhzPtoemLARDyhKaA0jaNYpDBpnsdfyLZqw0bW8eRRrLd+CObaP87A0Jgm/w9ryZ4JIIlZEopwJkmAFZJLnIiKTKfubt5KKe+WGsDcjS7yiXEyZDdlrGPLT2w/Xr1/eAsyl94znKuH8y7MnRxTExIFolksQpJQo4QsagXGUIGfETQiEEzQTUHppoX2TiyQVrEV7yYpvqm17M25Mna65UruX2Cg2KLnMUyIs1UZcIJxlUELEEddhztc39sKBM5D7tvnCYfN45e7DY8GRC4hf3QEIR81DavOG+HxOo3oc5QxdhvX6zepBZzh2hG9f6NDtNA9XrA9IkXtVGzoX6PZMYHvl7wauDaBzdKa2HSe7G7pmVLYGruueUTkl35ze633EA4Bb14oj2VL3yubpPT3PHu/EIS6zqu4j6j85UXnpA2kJbjZsWvdpor+o4w2eHE/Q2YwzFOWg72lONZhzUCjsdAb7yIYukI3dIDMGq8Dbo/dHdtMyIsyGSVyWgW8JlJEQDQKfQgqaQGpJdBBvUfwFZ6xYwi4ubuHQx9xsWb/HaimrgK44hL4QkgEFmeM8gQA0ZzDncIw4S9YTE6cWHsXnJ4H6XYKqgKBSLB5rvdc5WesQ4+uLVDGF5Q3qEKArJ4a4FoILGyHFic5fBDUBY6cvKuoMOYj+OXsUJTgRit4RwdESzwBC5yp+nSQ8FYnECxgIfbiEUHf8hBCFMlQ7K3D0YROGgHTIRjZRwuE0oHq4/DvBYrGyg4Je1wGgwDWg0AbqOQDUtYH6pwB62GtckiRDmMWFYhca43eaBQj8LZF8kwdjFlTw2iAIoDO6vf5xAUECWHWUkAWO1lWEQe5JVFzBLBfqDTFNMy6UHfO4y1dFPTbh0BXCjVrYdKNj00FUI6Xxq2Q59WAB0V4XuFsPq9lmOpZsKYWT2MIvz16jIhr5HkjBhbUxx45ilsGUhdrvuIF6JziAqnVGDojfZdhtDegH7pLuUQJHaKEl7WDGh1QgdBW1pgBdVzn3iN8VVoHn6pDse05y1gTvJuQeqfePDboKUJViUHe4KZNZcXdZmRlfc7ozLKTt0vUHDsFVg+gqX4q3ZsnQITSdF3RSNrmkel/4PzmFeEZvViVVWnFtPrzlbEvBRo2RzHBcfWNH4v3xSYhioiMEZe6uxNEm6RrdUbW0IkIwJ0rkkQLxlQZl8itOtueka4C3Irf5Bp2T8EVLEn0BheeAI/MsSygYXR0uV6CVAS4GzHeNSvP4dVkOju7xlVEvCFEruUSg8XdYVPlnkY5AGREKxVhhi+Po7lzOvjB+x2o8KOZEmq31chLmDLRJ6vWzjJwZTrcGqCkwpAssEbJZTuqfVYIqZl+1M1Zeli81CkdUUdClx30zBxm3/bJBzznAXZ9scHSf7E7gLNOE1X4fkDDOzIQsmdbFZnppKQ6I2CG4mmwH7pDtEWqjdEGrf0imQ2fYaiIdOQO2R6KNwnUOyXPsCFlNmq5g7cpy2GkSzQ8OCHMYuIK2LU13uPaI89v9tk0uXXHh+YPJBXlFFDEPqakW/SpzJRfULOz6YvhkqVR20YYGlyTFspXSSHDJ56oF/W0X9bZ1Ek67E7SrGr4X6HG7M9wL3T0tdJkqRO4VYbLUGCTpAqqTkyyfJTTyjCJ4H7wL76ao5Nou7f3xp7/vuN2JnkudeLMRwbui8isuSOt77FrVpz+8spMQvOtHS/1G1JVRpU83z8tDNP4BigkCUSvzWJ4kP3l/en/6Vkm7U/3GO/Vqn6Budfutos7y1y9YEi2mg2WfsGuR1NY31bdLlL1UYHUR9A2ULEazXGkzD2GqlgtY49hCGzzJqJdZetJqeHjahrmgC6q3l9QdL9KaqkxBWu21b43D0XCueHpTpCPviImnCCsQAQiE6LgylZOJLm62Bz57Jot5jiPiXWntsr55wBw1h/lPCtMmIc8VBEU/fC5tW0VafukC6k01jLfrjDyvTq4OtDafbuTNp2Lj5oedsd86xe7UuJlObQbbm7yiMruJnwcAXRrgFaex94akMyKeg8HVJrYoZIGPOqcHlwocEJxwRtAip7GeaHr3S/eHrPRmIYzukwKlWIDjnaDUjE21fxrr2wX0bUfpjCeTDyQhYM6hknezmsM5CtxA/FXbsYY5sZhRWFTEuk68R8iTYnUvNNLmDB3jfBnHH8jcJuyenhACmwVMDgzHVub2kKdtvrxVBum7jBeVvkmksFgQGD5pdvEn5ttdX6iss3V9H5HkJ9/8soev5xY/GCQF9vFwN1r/Tl5RUbThfpd+I4wIGr3MMu/y8Y79i4v4J1//b3el/xRLgHb8q5serGXMOKS7btdo8CQTbvc2Izl5cfXuzYfqo3fDoiSPyeWzcoBf09mz9s++Xebzd4L984trsHhxWa12YOTP2md70d49/qJtV/d4f4fN9XdPZw/qvRbbwQJP3C/dn93wZ2R5x5t29F05iqak1p71bKz64yMSjmNp7uHRFx3BGaS6QQhycAxmhAi7xfFRWqyyRHKGV5gm5q4RSZKiy9Jc2ucQb87L5x1NCDNJanbWe7MkdmLGuNMkSegMiX1TxDhokqRnk4RHISlaLWfJQ3IdzEn4f5OFUk6YffraJMeWtnab4wiPz1FpiElk3lxY1wnNVlO9IzVV5m5Vj6qGnpY9rzK4MFuXeRpW6/2/0nrxJEzzkKhNX6GWJcTHZn8K4XQGLDyX+kGDXNfKFjqFzNcJbX4tq60JljIFkDxCNGiWSHnm4Unwt1acsGEycm+ck0eGavj0QOa2zlhPXt/b4Rk1OEDX1R9abP2jURVPY3tIo9aGRF8Ou5Mb21LmsZqkHZ4kVL9wxPKQxn/JLzFZ2abu8hG4uuMQCaX6PtY5LIH6lkRpBT9Bx6z552eXh3/M+1GkZ3DwgnhfKX55foa2fjZnXnjbr00xL0mxXpoCAoE++h1v+3ykGd/ilHhH+vmoUuiPB+GrlN4vxfPMfhHvMZhe70qzlt+B1pyf+c38nJ9l4JXAoMnpRhX8UhWmUkT6nS2ofGcL2pSYVkoytfSj6HTYLX53il+jh09aD87PyvBjugk/pntqte/8PDzG/V7xu2w1tBqHlQT+7w1/9PoDvz/8P5veDnoONh0eoaf1h8wcaG+01VxYb64xBbp9d/vy9bHmjBd0h7ZEw44t0RH086qyD//4+O6tdyf0QyiYp7inTZ93ddE27x5qb9491H6ZZa+wwu3XPMJJ+5akWTsCG3rvF/ed+g/hL8zFnPjjUefhLz/rqVFpMLYyP/zK2rQEvmvp5zwcNnDmJUQZltoyUuaFo1an+9XXP/0PKF/FO1BqAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-tests-compatibility-reverse-122459.2026-10-19T12-24.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-tests-compatibility-reverse-122459.2026-10-19T12-24.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 264,
+      "original_sha256": "961a1681212ac9163c2b6552391ec62b70659864e08725d546dc937903237d09",
+      "payload": "H4sIAAAAAAAC/9PTow5QiFYwMVCN5eXSo56BFoZEGahAJIg2NAC70NDcXKEgsbg4NUUhM0/BUM/IopiXCwDpDazCCAEAAA==",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-contracts-122501.2026-10-19T12-25.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-contracts-122501.2026-10-19T12-25.json",
+      "stream": "raw_stderr"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 1763,
+      "original_sha256": "4e69388e921852e122232497ac8ce50e7fe9cda1f8216b74037d4669c4209049",
+      "payload": "H4sIAAAAAAAC/11Uy47cNhC8B8g/8AfkSQDDcHIzduHAwBowvDaQa0tqSW1TJEFSM6N8faopDmfXF0GvLlZVV/eXD8/PxsdRHMXdRJ4lZdyQG43lmYbdDH4NlKUXK3k3sgYfczLW02icNz5k8Y6sCTT8pJl//+2LIg7eTTJvkUdgBp8k+7h33tndJLY8aJFJmfZkpshs/HRHqkc0pDVYzmxWuQLtXj2R2GR6nnzkWiNuNgJyZ7Iy3gFXXnuOFa+qah8fnj6B4rQlbmCqTaFC9JNYkIuvyFle2WXSFxXT4eHMZqCQIRlwmcQlQ9aayW/xpRsJzwObfz8/FY9xxA/oMeLC1iRHxkH/SNavZ3bkUBAiJ45nkHz4+vSx1Poosyin798+/vmuQPZ75hsKX4OVASiN+907gPYWWAmmgdRUrG3NHyWh48NSge71B3ftiHewIFWlZkR/BgXiKw25C3h1p15RHp4XigEVls9FUeS1uCRu4qjWXBY1W2WMPFiKxWG4CEdvB1Ss4ztKBljcI3iNSQPbHAzz9oxbt1mrck2mOHNzGQ+bNvL2uniKTo1SLEKGNjjk+MwRfmVcxUGSBtlEf7nBTGQTG03YWELzGqW0TdVq1u8teSEQ6cw0UqaKV02GRYuPTVfr9UJpAS1Y7ErLzpIOl3DsgvbhR5hiPj3e+P0yC2lHdK8Ko9PbWz/8VNaj0Ox8yjKk13NCKNr/A/9FVoQ5XiiOyZRBzgte06qBcEkdGjEd65aL13UWKtgqKZWJ0oZXSdZfjsEYi0EqoPnzIviFIsfWtXlGTgn7gK8LbalYiMAOhVcgLAGo1P4UxNsoIq815RXvliSJOn5oQNAO42FhjVNjUrUZmkoCcnGOLEZ03LEv2NXV07J5nMgvxjNffBe9z+ar9L0uLrnWNXEMAJmVLKxdNauqDbukgelIclkcYLZSd7TznkR1L5fFjP4hbE0KdjquJY2quG1TxBlrWh3GWkZ2Kw0MDLiEY4y1anOEns2uCStJSHL42rambv66msq+u8UXfZhIncXPusqQ/wxVD3+fvuPndHok99lLInf6EMIj4n968gju6Ruv4TT4ka/dkcBOm6us9xNCtHH31/s/7nddeJvfd5P63B1buAObzeY3kS5vfiRd0f8DoIw2H+MGAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-native-122505.2026-10-19T12-25.json",
+      "stream": "raw_stdout"
+    },
+    {
+      "encoding": "gzip+base64",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload": "H4sIAAAAAAAC/wMAAAAAAAAAAAA=",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-native-122505.2026-10-19T12-25.json",
+      "stream": "raw_stderr"
+    }
+  ],
+  "qualification": "Exact raw process streams are losslessly retained; stage JSON/Markdown remains the path-sanitized readable view."
+}

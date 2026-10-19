@@ -1,0 +1,91 @@
+{
+  "task_status": "PASS",
+  "task": "P4-T8",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-final-acceptance.py",
+  "exit_code": 0,
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-reconciliation.2026-10-19T12-31.json",
+    "sha256": "2e4b875be81b4dc7576ca6e618b74fc243633b79fe6a168a0557e95729f4c61f"
+  },
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+    "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+  },
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.json",
+    "sha256": "ad62b8f8e9b77504aa956f00e7fdaeea94b016479ee042ac1654099dd110bc45"
+  },
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "sha256": "f3ddf24cf8904e74c98c8ae2126e4bf4849ca4a890a3e56e9078317a389af5cc"
+  },
+  "plan_checkoff": "P4-T8 only; exact one-checkbox byte delta",
+  "plan_count": "40/84",
+  "plan_working_git_binding": {
+    "working_before_sha256": "ba2110c12a1146251bcc5a0820523ae6bcb4d8e3c61def86dcf4b56857fdd3f0",
+    "git_before_sha256": "51942ba243736f1a734a6a365f07f02c6a6f2361e0b40d8a05e9a41234228954",
+    "working_after_sha256": "f3ddf24cf8904e74c98c8ae2126e4bf4849ca4a890a3e56e9078317a389af5cc",
+    "expected_staged_sha256": "b79ff2f22d7f8c386bd7275bb75ff719c91e3c53352ffa1beb158360aac53375",
+    "working_crlf_count": 559,
+    "git_attributes": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md: text: auto\ndocs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md: eol: lf",
+    "qualification": "Inverse one-checkbox delta reconstructs the exact previously captured working hash; CRLF-to-LF alone matches the committed prior blob. Existing plan line endings were preserved."
+  },
+  "source_ac_count": "13/66 in each authoritative source; unchanged",
+  "new_source_ac_checkoffs": [],
+  "gates": {
+    "clean_ordered_stages": 7,
+    "unit_cases": 266,
+    "contract_cases": 177,
+    "native_windows_git_assertions": 22,
+    "coverage": {
+      "covered_lines": 439,
+      "num_statements": 442,
+      "covered_branches": 146,
+      "num_branches": 146
+    },
+    "class_callable_ranges": 40,
+    "changed_statements_covered": 374,
+    "changed_statements_total": 374
+  },
+  "raw_diff_whitespace_qualification": {
+    "artifact": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-harness-correction-diff.2026-10-19T12-23.txt",
+      "sha256": "92efac20b106a6adee075e3b8fc4a9edada82ada5358d2da0a6037bb4375abab"
+    },
+    "single_space_context_marker_lines": [
+      22,
+      23,
+      59,
+      60
+    ],
+    "interpretation": "Exact unified-diff empty context-line prefixes; raw bytes retained. Qualification applies only to this artifact and these four markers, not other whitespace or source/test content."
+  },
+  "limitations": [
+    "Finite static declarations do not prove runtime binding or execution.",
+    "Native proof is local Windows Python/Git only; no publication or installed coding-agent-host/non-Windows proof.",
+    "Whole-repository coverage and feature-wide final gates remain outstanding.",
+    "Earlier preliminary structure-rendering loss and exact synthetic-output archive qualifications remain as documented in the retained candidate review."
+  ],
+  "findings": [],
+  "new_behavioral_runs": 0,
+  "next_five_tasks": [
+    "P4-T9",
+    "P5-T1",
+    "P5-T2",
+    "P5-T3",
+    "P5-T4"
+  ],
+  "source_test_checkpoint_git_mutations": false,
+  "acceptance_checker_qualification": {
+    "initial_exit_code": 1,
+    "observed_diagnostic": "AssertionError comparing the Git LF plan blob to the previously captured working-byte SHA; no acceptance artifacts had been written.",
+    "original_executed_checker": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-acceptance-initial-checker.2026-10-19T12-34.txt",
+      "sha256": "d742bee78d0ff97806f26cf4918cc83c8b4991603d28e180e0319fbfc571d0b3"
+    },
+    "correction": "Bind working bytes and Git-normalized bytes separately under actual text=auto/eol=lf attributes; retain the one-checkbox mutation and original plan CRLF.",
+    "diagnostic_qualification": "Observed tool diagnostic transcribed; no separate original output-byte capture is claimed."
+  },
+  "timestamp": "2026-10-19T12-34",
+  "published_utc": "2026-10-19T12:34:00.013137+00:00"
+}

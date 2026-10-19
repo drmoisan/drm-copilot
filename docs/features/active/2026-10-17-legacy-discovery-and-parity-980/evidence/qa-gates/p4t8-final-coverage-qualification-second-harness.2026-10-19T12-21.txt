@@ -1,0 +1,124 @@
+"""Preserve the stopped final harness and prove its two unchanged CLI gaps."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+qa = feature / 'evidence/qa-gates'
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def write(path, value):
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+baseline_path = feature / 'evidence/baseline/p4t8-shared-baseline.2026-10-19T11-23.json'
+baseline = json.loads(baseline_path.read_bytes())
+baseline_coverage_path = root / baseline['coverage']['path']
+assert sha(baseline_coverage_path.read_bytes()) == baseline['coverage']['sha256']
+baseline_coverage = json.loads(baseline_coverage_path.read_bytes())
+baseline_coverage['files'] = {path.replace('\\', '/'): value for path, value in baseline_coverage['files'].items()}
+relative = 'scripts/dev_tools/discovery/analyzer/stack_cli.py'
+old = next(item for item in baseline['existing_files'] if item['path'] == relative)
+old_path = scratch / old['original'].removeprefix('SCRATCH/')
+assert sha(old_path.read_bytes()) == old['sha256']
+current = root / relative
+original_tree, current_tree = ast.parse(old_path.read_bytes()), ast.parse(current.read_bytes())
+qualified = []
+for name in ('_utc_now', '_default_schema_path'):
+    before = next(node for node in original_tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
+    after = next(node for node in current_tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
+    for node in (before, after):
+        if ast.get_docstring(node) is not None:
+            node.body = node.body[1:]
+    assert ast.dump(before, include_attributes=False) == ast.dump(after, include_attributes=False)
+    baseline_unit = baseline_coverage['files'][relative]['functions'][name]
+    qualified.append({'path': relative, 'name': name, 'kind': 'functions', 'old_range': [before.lineno, before.end_lineno],
+        'current_range': [after.lineno, after.end_lineno], 'executable_ast_sha256': sha(ast.dump(after, include_attributes=False).encode()),
+        'baseline_summary': baseline_unit['summary'], 'baseline_executed_lines': baseline_unit['executed_lines'],
+        'baseline_missing_lines': baseline_unit['missing_lines']})
+runner = scratch / 'issue-980-p4t8-final-gates.py'
+runner_copy = qa / ('p4t8-final-stopped-runner-harness.' + stamp + '.txt')
+assert not runner_copy.exists()
+runner_copy.write_bytes(runner.read_bytes())
+coverage_refs, failed_ranges, changed = [], [], []
+for batch in ('optional', 'compatibility'):
+    raw = scratch / ('issue-980-p4t8-final-' + batch + '-coverage.raw.json')
+    copy = qa / ('p4t8-final-stopped-' + batch + '-coverage.' + stamp + '.json')
+    assert not copy.exists()
+    copy.write_bytes(raw.read_bytes())
+    coverage = json.loads(copy.read_bytes())
+    coverage_refs.append({'batch': batch, **ref(copy), 'raw_path': 'SCRATCH/' + raw.name})
+    for path, data in coverage['files'].items():
+        path = path.replace('\\', '/')
+        for family in ('functions', 'classes'):
+            for name, unit in data[family].items():
+                if name and unit['summary']['num_statements'] and unit['summary']['percent_statements_covered'] < 90:
+                    failed_ranges.append({'path': path, 'name': name, 'kind': family, 'summary': unit['summary'],
+                        'executed_lines': unit['executed_lines'], 'missing_lines': unit['missing_lines']})
+        diff = subprocess.run(['git', 'diff', '--no-ext-diff', '--unified=0', 'e5223d18ca0cfb92653efa75b56e6c5ec079b817', 'HEAD', '--', path], capture_output=True, check=True).stdout.decode()
+        changed_lines = set()
+        for start, count in re.findall(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@', diff, flags=re.M):
+            changed_lines.update(range(int(start), int(start) + (int(count) if count else 1)))
+        executable = set(data['executed_lines']) | set(data['missing_lines'])
+        missing = sorted(set(data['missing_lines']) & changed_lines)
+        assert not missing, (path, missing)
+        changed.append({'path': path, 'changed_executable_lines': sorted(executable & changed_lines), 'missing_changed_lines': missing})
+assert {(item['path'], item['name']) for item in failed_ranges} == {(relative, '_utc_now'), (relative, '_default_schema_path')}
+for item in qualified:
+    observed = next(unit for unit in failed_ranges if unit['name'] == item['name'])
+    assert observed['missing_lines'] == item['baseline_missing_lines']
+    assert observed['executed_lines'] == item['baseline_executed_lines']
+    item['current_summary'] = observed['summary']
+    item['current_missing_lines'] = observed['missing_lines']
+progress = qa / 'p4t8-final-progress-121232-tests-compatibility-reverse.2026-10-19T12-13.json'
+receipts = json.loads(progress.read_bytes())['receipts']
+assert len(receipts) == 6
+for item in receipts:
+    path = root / item['path']
+    assert sha(path.read_bytes()) == item['sha256']
+    record = json.loads(path.read_bytes())
+    assert record['exit_code'] == 0 and record['source_before'] == record['source_after']
+    for stream in ('raw_stdout', 'raw_stderr'):
+        raw = record[stream]
+        assert sha((scratch / raw['path'].removeprefix('SCRATCH/')).read_bytes()) == raw['sha256']
+candidate = json.loads((scratch / 'issue-980-p4t8-final-candidate.released.2026-10-19T12-12.json').read_bytes())
+for item in candidate['files'] + candidate['fixtures'] + candidate['preserved_files']:
+    assert sha((root / item['path']).read_bytes()) == item['sha256']
+document = {'task': 'P4-T8', 'timestamp': stamp, 'state': 'HARNESS_COVERAGE_ASSERTION_FAILED_NO_TEST_FAILURE',
+    'harness_exit_code': 1, 'failed_assertion': "unit['summary']['percent_statements_covered'] >= 90",
+    'diagnostic_capture': 'The outer AssertionError was returned by the exec tool; no separate raw outer stderr stream was captured. This receipt reconstructs the exact assertion condition and measured values from preserved raw coverage, not an invented original process stream.',
+    'completed_receipts': receipts, 'test_counts': {'optional': 100, 'compatibility': 166, 'total': 266},
+    'not_run': ['stage 6 affected contracts', 'stage 7 native composition'], 'failed_harness': ref(runner_copy),
+    'raw_coverage': coverage_refs, 'failed_ranges': failed_ranges, 'qualified_unchanged_units': qualified,
+    'source': {'path': relative, 'original_sha256': old['sha256'], 'current_sha256': sha(current.read_bytes())},
+    'baseline': ref(baseline_path), 'baseline_coverage': ref(baseline_coverage_path),
+    'existing_qualification': ref(feature / 'evidence/regression-testing/p4t8-compatibility-coverage-ranges.2026-10-19T11-54.json'),
+    'changed_executable_line_coverage': changed, 'all_frozen_streams_unchanged': True,
+    'policy': {'path': '.agents/skills/python-qa-gate/SKILL.md', 'rule': 'New modules, classes, or methods: coverage >= 90% for each new unit introduced in the batch; per-file coverage must not regress.'},
+    'authorized_correction': 'Harness-only exact baseline-bound unchanged-unit qualification with no-loss and changed-line gates retained. No production/test edits or extra tests; restart full ordered sequence after frozen correction.'}
+first_script = scratch / 'issue-980-p4t8-final-coverage-failure.first.py'
+first_copy = qa / ('p4t8-final-coverage-qualification-first-harness.' + stamp + '.txt')
+first_copy.write_bytes(first_script.read_bytes())
+document['qualification_script_initial_failure'] = {'exit_code': 1, 'error': "KeyError: 'scripts/dev_tools/discovery/analyzer/stack_cli.py'", 'cause': 'Baseline coverage keys used native backslashes; the corrected read-only binder normalizes keys only in memory.', 'original_harness': ref(first_copy), 'source_or_test_mutations': False, 'production_gates_replayed': False}
+path = qa / ('p4t8-final-coverage-failure-qualification.' + stamp + '.json')
+write(path, document)
+path.with_suffix('.md').write_text(f'# P4-T8 stopped coverage assertion qualification\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-p4t8-final-coverage-failure.py`\nEXIT_CODE: 0\nOutput Summary: The final runner exited 1 after all 266 tests passed; this read-only reconciliation passed. Contracts and native checks did not run.\n\nThe original blanket callable assertion failed on two pre-existing CLI helpers. Their executable AST, three uncovered statements and baseline execution sets are unchanged. Every changed executable statement is covered. The original runner, raw coverage and six completed receipts are preserved. No frozen source/test/fixture/predecessor bytes changed.\n\nThe authorized correction is limited to exact unchanged helper ranges, preserving their no-loss baseline comparison and every new/changed-unit threshold. The full ordered sequence will restart after the harness correction is frozen. The outer tool-returned AssertionError was not separately captured as a raw process stream; the JSON labels its assertion reconstruction explicitly.\n', encoding='utf-8', newline='\n')
+snapshot = qa / ('p4t8-final-coverage-failure-binding-harness.' + stamp + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'qualification': ref(path), 'harness': ref(snapshot), 'unchanged_units': [item['name'] for item in qualified], 'changed_statements': sum(len(item['changed_executable_lines']) for item in changed)}), flush=True)

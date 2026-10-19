@@ -1,0 +1,60 @@
+"""List exact final-owned evidence for staging without staging or changing code."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path.cwd()
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+qa = feature / 'evidence/qa-gates'
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+handoff_path = Path(sys.argv[1])
+handoff = json.loads(handoff_path.read_bytes())
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes()), 'bytes': len(path.read_bytes())}
+
+
+assert handoff['state'] == 'EXECUTOR_ACCEPTANCE_PENDING'
+for item in handoff['source_files'] + handoff['fixture_bindings']:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256']
+head = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip()
+assert head == handoff['checked_candidate_commit']
+source_script = Path(__file__)
+snapshot = qa / ('p4t8-final-closure-harness.' + stamp + '.txt')
+assert not snapshot.exists()
+snapshot.write_bytes(source_script.read_bytes())
+untracked = subprocess.run(['git', 'ls-files', '--others', '--exclude-standard', '-z', '--', qa.as_posix()], capture_output=True, check=True).stdout.decode().split('\0')
+selected = sorted(path for path in untracked if path and Path(path).name.startswith('p4t8-final-'))
+assert handoff_path.as_posix() in selected
+markdown_findings = []
+for relative in selected:
+    path = Path(relative)
+    if path.suffix == '.md':
+        content = path.read_bytes()
+        assert b'\r' not in content and content.endswith(b'\n') and not content.endswith(b'\n\n'), relative
+        for index, line in enumerate(content.decode('utf-8').splitlines(), 1):
+            if line.rstrip() != line:
+                markdown_findings.append({'path': relative, 'line': index})
+assert not markdown_findings
+manifest_path = qa / ('p4t8-final-stage-closure.' + stamp + '.json')
+markdown_path = manifest_path.with_suffix('.md')
+stage_paths = sorted([*selected, manifest_path.as_posix(), markdown_path.as_posix()])
+assert len(stage_paths) == len(set(stage_paths))
+document = {'task': 'P4-T8', 'timestamp': stamp, 'state': 'FINAL_OWNED_EVIDENCE_FROZEN', 'head': head,
+    'handoff': ref(handoff_path), 'stage_paths': stage_paths, 'files': [ref(Path(path)) for path in selected],
+    'self_binding': 'The JSON and Markdown list themselves without recursive self hashes; the coordinator binds their final bytes.',
+    'scope': 'Only untracked p4t8-final-* evidence owned by workspace_operations. Existing committed subset/baseline evidence and independent review files remain separately owned and are referenced, not restaged here.',
+    'format_check': {'readable_markdown_lf_one_final_newline': True, 'trailing_whitespace_findings': markdown_findings},
+    'publication': 'No staging, commit, push, plan, acceptance-criteria or checkpoint mutation was performed by this script.'}
+assert not manifest_path.exists()
+manifest_path.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+markdown_path.write_text(f'# P4-T8 final evidence staging closure\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-p4t8-final-closure.py <final-handoff>`\nEXIT_CODE: 0\nOutput Summary: {len(stage_paths)} exact final-owned evidence paths are frozen for coordinator staging; source and tests remain unchanged.\n\nThe adjacent JSON lists path, byte count and SHA-256 for every existing selected artifact. It includes both the stopped attempt and corrected final sequence, raw coverage, exact harnesses, qualifications, handoff and this closure. Independent reviewer evidence is outside this ownership list. No Git or acceptance state was mutated.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'closure': ref(manifest_path), 'markdown': ref(markdown_path), 'stage_count': len(stage_paths)}), flush=True)

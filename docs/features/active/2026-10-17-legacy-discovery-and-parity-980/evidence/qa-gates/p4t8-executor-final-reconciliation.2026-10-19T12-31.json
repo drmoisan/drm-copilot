@@ -1,0 +1,112 @@
+{
+  "status": "FINAL_RECONCILIATION_PASS",
+  "task": "P4-T8",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-final-reconcile.py",
+  "exit_code": 0,
+  "authority_receipt": "atomic_execution_p4t8_final_acceptance",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority_valid": true,
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json",
+    "sha256": "ada77be180de024926492fe6a38596732f53067fd96d4c3d44f976886286c785"
+  },
+  "final_evidence_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-stage-closure.2026-10-19T12-26.json",
+    "sha256": "d0de86c66c89a97d589fcd751131accedd6968be20e4e8f9ff7d4cbd3068f216"
+  },
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-candidate-review.2026-10-19T12-08.json",
+    "sha256": "ad62b8f8e9b77504aa956f00e7fdaeea94b016479ee042ac1654099dd110bc45"
+  },
+  "checked_candidate": "c388b3a5e4200c9781ff850bc242f39ee80d1758",
+  "verified_bindings": {
+    "source_test_working_index_commit": 16,
+    "fixtures": 2,
+    "preserved_predecessor_hashes": 79,
+    "final_owned_paths": 91,
+    "raw_command_streams": 16,
+    "executed_harness_snapshots": 7
+  },
+  "gates": {
+    "clean_ordered_stages": 7,
+    "unit_cases": 266,
+    "contract_cases": 177,
+    "native_windows_git_assertions": 22,
+    "coverage": {
+      "covered_lines": 439,
+      "num_statements": 442,
+      "covered_branches": 146,
+      "num_branches": 146
+    },
+    "class_callable_ranges": 40,
+    "changed_statements_covered": 374,
+    "changed_statements_total": 374
+  },
+  "unchanged_legacy_gaps": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-coverage-failure-qualification.2026-10-19T12-21.json",
+    "sha256": "8b4a2467cddba5d0bd91bb35cf59994aeb6be344b3bb157833259da3fbed4edc"
+  },
+  "harness_correction": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-harness-correction.2026-10-19T12-23.json",
+    "sha256": "e92db824532d3dea5674cbf873535f81be2e00684d375633da1b6f88aa740cce"
+  },
+  "raw_diff_whitespace_qualification": {
+    "artifact": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-harness-correction-diff.2026-10-19T12-23.txt",
+      "sha256": "92efac20b106a6adee075e3b8fc4a9edada82ada5358d2da0a6037bb4375abab"
+    },
+    "single_space_context_marker_lines": [
+      22,
+      23,
+      59,
+      60
+    ],
+    "interpretation": "Exact unified-diff empty context-line prefixes; raw bytes retained. Qualification applies only to this artifact and these four markers, not other whitespace or source/test content."
+  },
+  "task_acceptance": "Optional adapter requires explicit configured consent; ordinary paths avoid optional imports, legacy v1 paths fail closed, and bounded captured-byte inventory preserves evidence and fact/inference distinctions.",
+  "ac_mapping": {
+    "sources": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+        "accepted": 13,
+        "total": 66
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+        "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+        "accepted": 13,
+        "total": 66
+      }
+    ],
+    "new_checkoffs": [],
+    "reason": "Optional analyzer task is complete. Global analyzer/neutrality/publishing/quality criteria remain broader than this subset; P4-T9 and later phases remain outstanding."
+  },
+  "plan_before": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "sha256": "ba2110c12a1146251bcc5a0820523ae6bcb4d8e3c61def86dcf4b56857fdd3f0"
+  },
+  "plan_count_before": "39/84",
+  "authorized_next_edit": "Only the P4-T8 checkbox",
+  "findings": [],
+  "new_behavioral_runs": 0,
+  "retained_limitations": [
+    "Finite static declarations do not prove runtime binding or execution.",
+    "Native proof is local Windows Python/Git only; no publication or installed coding-agent-host/non-Windows proof.",
+    "Whole-repository coverage and feature-wide final gates remain outstanding.",
+    "Earlier preliminary structure-rendering loss and exact synthetic-output archive qualifications remain as documented in the retained candidate review."
+  ],
+  "timestamp": "2026-10-19T12-31",
+  "published_utc": "2026-10-19T12:31:53.714042+00:00",
+  "checker_only_correction": {
+    "initial_exit_code": 1,
+    "observed_diagnostic": "KeyError: 'FunctionDef' at the raw coverage lookup; no acceptance artifacts had been written.",
+    "diagnostic_qualification": "Observed tool diagnostic transcribed; no separate original command-output byte capture is claimed.",
+    "correction": "Map AST FunctionDef/ClassDef range kinds to the existing raw coverage functions/classes namespaces.",
+    "original_executed_checker": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-initial-checker.2026-10-19T12-31.txt",
+      "sha256": "6ef4c33c3c81da329f29b47e4f19756c25e24d606d50c7d4b59d332910a6bb74"
+    },
+    "behavioral_reruns": 0
+  }
+}
