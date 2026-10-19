@@ -1,0 +1,54 @@
+{
+  "stage": 3,
+  "label": "p3t7-pass3-types",
+  "started": "2026-10-19T00:24:56.212025+00:00",
+  "finished": "2026-10-19T00:25:07.716360+00:00",
+  "command": "poetry run pyright",
+  "exit_code": 0,
+  "duration_seconds": 11.504,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478
+    }
+  },
+  "output": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n"
+}

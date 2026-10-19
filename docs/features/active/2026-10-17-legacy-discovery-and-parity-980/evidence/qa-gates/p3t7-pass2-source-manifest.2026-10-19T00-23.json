@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-10-19T00:23:05.017198+00:00",
+  "label": "p3t7-pass2",
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "physical_lines": 300
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "physical_lines": 273
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "physical_lines": 356
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "2b3b6dc8ba6b5335a0af56a8f38b5d64befba0ecc3e8539f6dbbca3ab5e209be",
+      "physical_lines": 489
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "3126d64e7699fa703c60ef36a16b399555cd5021bc63fd8c7e9964c54685d7fc",
+      "physical_lines": 440
+    }
+  },
+  "raw_evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-raw-coverage.2026-10-19T00-23.json",
+      "sha256": "45443cdf0329d5888ea385dbf89dbe07485c6c3a6f17ccd3c0ac152849250b18"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-coverage-detail.2026-10-19T00-23.json",
+      "sha256": "343fb88c63efdfdb3ac6db5d2ad5f6486d5622d81375b55b1d294ef076007970"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-forward-nodes.2026-10-19T00-23.json",
+      "sha256": "89d6fb7a4628904dee0ad254f4ab85dc27a4a6e2565527527b3cbfbd31cd63fe"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-reverse-nodes.2026-10-19T00-23.json",
+      "sha256": "5b7362f805d8d25c48b2e47a757faded9274771cd03ff5dfd0e859fffe725b36"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-native-result.2026-10-19T00-23.json",
+      "sha256": "b634445f963664e1568780cd0282791cf30f930825fc1b4fa897717b4bd45c48"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-ordered-stages.2026-10-19T00-23.json",
+      "sha256": "5bae88d7e4e3aecc126d44d67a47137e4f5fd0386263f4e5b010e1d743f813fc"
+    }
+  ],
+  "script_bindings": [
+    {
+      "path": "SCRATCH/issue-980-p3t7-gate.py",
+      "sha256": "a850b2ac9cde243f154cd271b8511ce8e6904e6c60edcd139aad95aba8b3a9b5"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-tests.py",
+      "sha256": "f5afabb3d100ce225e5a515a6df0ff82e322ea58a9f3e128c55e4ef03f8d2840"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-coverage-audit.py",
+      "sha256": "e7f792f9dee19b2b35beac0b68de4b15df700209e67df0fdb4e1276aa064afd7"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-architecture.py",
+      "sha256": "00ade34e466af292f935a19bd48237d6235ce2ea184e187b39a368f9c15e59fc"
+    },
+    {
+      "path": "SCRATCH/issue-980-p3t7-native.py",
+      "sha256": "e1b467ca331db88bb3145f692514ad387de82c2701d2d3cfc4a2d771736cc8a9"
+    }
+  ],
+  "harness_artifact": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-harnesses.2026-10-19T00-23.md"
+}

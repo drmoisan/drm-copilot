@@ -1,0 +1,259 @@
+{
+  "ok": true,
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "87b7b53364bc74b4575e5bf921f92ab67d226a4c1e62aad312bb5a920720bd45",
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "covered_lines": 76,
+      "measured_lines": 76,
+      "physical_lines": 273,
+      "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+      "units": [
+        {
+          "unit": "migrated_id:34",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "legacy_features:41",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_parsed:54",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_draft_changes:62",
+          "kind": "FunctionDef",
+          "covered": 3,
+          "total": 3,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_scenario:70",
+          "kind": "FunctionDef",
+          "covered": 7,
+          "total": 7,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_decision:118",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_evidence:151",
+          "kind": "FunctionDef",
+          "covered": 4,
+          "total": 4,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "convert_artifact:176",
+          "kind": "FunctionDef",
+          "covered": 32,
+          "total": 32,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "sha256": "b50b7e78ba6d24ccdfb3ce6f81c0133ae851824f8d94a41f74dc33cde60756d0",
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "covered_lines": 96,
+      "measured_lines": 96,
+      "physical_lines": 300,
+      "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+      "units": [
+        {
+          "unit": "MigrationSource:28",
+          "kind": "ClassDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "MigrationBinding:53",
+          "kind": "ClassDef",
+          "covered": 10,
+          "total": 10,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "MigrationRequest:84",
+          "kind": "ClassDef",
+          "covered": 22,
+          "total": 22,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "ConvertedArtifact:131",
+          "kind": "ClassDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "MigrationPlan:141",
+          "kind": "ClassDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "MigrationResult:155",
+          "kind": "ClassDef",
+          "covered": 9,
+          "total": 9,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "mapping_report:171",
+          "kind": "FunctionDef",
+          "covered": 11,
+          "total": 11,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "publication_report:253",
+          "kind": "FunctionDef",
+          "covered": 12,
+          "total": 12,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:39",
+          "kind": "FunctionDef",
+          "covered": 6,
+          "total": 6,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:64",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "__post_init__:97",
+          "kind": "FunctionDef",
+          "covered": 15,
+          "total": 15,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "lambda:107",
+          "kind": "Lambda",
+          "covered": 1,
+          "total": 1,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "lambda:123",
+          "kind": "Lambda",
+          "covered": 1,
+          "total": 1,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "sha256": "79c200fd8fb2fb7279152d6b59a61810abafbb8bfaf37467300be89712fbebe1",
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "covered_lines": 131,
+      "measured_lines": 131,
+      "physical_lines": 356,
+      "changed_line_comparison": "New file against accepted e58a61428bdf98a97f66f57f08793a743eff28f2; every executable line is new and measured",
+      "units": [
+        {
+          "unit": "_sources:51",
+          "kind": "FunctionDef",
+          "covered": 24,
+          "total": 24,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_document:101",
+          "kind": "FunctionDef",
+          "covered": 5,
+          "total": 5,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_append:111",
+          "kind": "FunctionDef",
+          "covered": 10,
+          "total": 10,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "_project:129",
+          "kind": "FunctionDef",
+          "covered": 26,
+          "total": 26,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "plan_migration:183",
+          "kind": "FunctionDef",
+          "covered": 20,
+          "total": 20,
+          "line_percent": 100.0,
+          "missing": []
+        },
+        {
+          "unit": "commit_migration:252",
+          "kind": "FunctionDef",
+          "covered": 34,
+          "total": 34,
+          "line_percent": 100.0,
+          "missing": []
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

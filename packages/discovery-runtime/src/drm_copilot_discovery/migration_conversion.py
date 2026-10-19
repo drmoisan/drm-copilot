@@ -32,14 +32,21 @@ if TYPE_CHECKING:
 
 
 def migrated_id(identifier: str) -> str:
-    """Preserve v2-compatible legacy IDs, otherwise derive a stable explicit mapping."""
+    """Map identifier (str) to a v2-compatible str without I/O or mutation.
+
+    Compatible IDs remain unchanged; other spellings use their UTF-8 SHA-256.
+    """
+    # Preserve identity when valid; hashing makes incompatible spellings explicit.
     if re.fullmatch(r"[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*", identifier):
         return identifier
     return "migrated-" + sha256(identifier.encode("utf-8")).hexdigest()
 
 
 def legacy_features(document: JsonObject) -> tuple[str, ...]:
-    """Collect declared v1 feature selectors without interpreting behavior prose."""
+    """Return sorted tuple[str, ...] selectors from document (JsonObject).
+
+    Only validated direct/nested declarations contribute; no I/O or mutation occurs.
+    """
     selected = list(cast("tuple[str, ...]", document.get("feature_ids", ())))
     if isinstance(document.get("feature_id"), str):
         selected.append(cast("str", document["feature_id"]))
@@ -52,7 +59,10 @@ def legacy_features(document: JsonObject) -> tuple[str, ...]:
 
 
 def _parsed(change: MutationChange) -> JsonObject:
-    """Read accepted draft-builder bytes without loading schemas or external state."""
+    """Parse change (MutationChange) bytes into JsonObject without I/O.
+
+    Raise MutationError when an accepted builder returns malformed JSON.
+    """
     value = parse_document(change.content, format="json").value
     if value is None:
         raise MutationError("MIGRATION_DRAFT", "Draft builder returned invalid JSON")
@@ -62,7 +72,11 @@ def _parsed(change: MutationChange) -> JsonObject:
 def _draft_changes(
     changes: tuple[MutationChange, ...],
 ) -> tuple[JsonObject, tuple[JsonObject, ...]]:
-    """Separate a new artifact from its builder-created unresolved collection."""
+    """Split changes (tuple[MutationChange, ...]) from the accepted draft builder.
+
+    Return (JsonObject artifact, tuple[JsonObject, ...] new questions) without I/O.
+    Only the appended question is selected; malformed bytes raise MutationError.
+    """
     records = cast("tuple[JsonObject, ...]", _parsed(changes[1])["records"])
     return _parsed(changes[0]), records[-1:]
 
@@ -74,7 +88,18 @@ def _scenario(
     features: tuple[str, ...],
     binding: MigrationBinding,
 ) -> tuple[JsonObject, tuple[JsonObject, ...]]:
-    """Retain stimulus and require an explicitly selected environment."""
+    """Retain legacy stimulus using an explicit environment, without I/O.
+
+    Args:
+        baseline (CapturedWorkspace): Immutable draft-builder context.
+        document (JsonObject): Validated v1 scenario.
+        identifier (str): Mapped v2 scenario identity.
+        features (tuple[str, ...]): Mapped feature IDs.
+        binding (MigrationBinding): Caller-selected environment.
+
+    Return (JsonObject scenario, tuple[JsonObject, ...] questions). Missing
+    environment or malformed draft bytes raise MutationError; inputs are unchanged.
+    """
     if binding.environment is None:
         raise MutationError(
             "MIGRATION_REQUIRED_CONTEXT", f"Supply environment for {document['id']}"
@@ -93,6 +118,7 @@ def _scenario(
         or ("Determine legacy preconditions before execution.",),
         action=draft_object(
             description=stimulus["description"],
+            # Preserve named input values in deterministic order without inference.
             inputs=tuple(
                 draft_object(name=name, value=value)
                 for name, value in sorted(inputs.items())
@@ -121,10 +147,16 @@ def _decision(
     features: tuple[str, ...],
     question: JsonObject,
 ) -> JsonObject:
-    """Preserve proposed text but require a new explicit target approval and scope."""
+    """Return a proposed JsonObject decision without approving legacy claims.
+
+    document (JsonObject) supplies validated text, identifier (str) its mapped ID,
+    features (tuple[str, ...]) its scope and question (JsonObject) its open finding.
+    No I/O or input mutation occurs; caller validates the complete draft graph.
+    """
     fields = draft_header("product-decision", identifier)
     fields.update(
         decision_id=identifier,
+        # Translate caller-selected scope without manufacturing target approval.
         feature_refs=tuple(
             draft_reference("feature-contract", value) for value in features
         ),
@@ -151,7 +183,12 @@ def _decision(
 def _evidence(
     source: MigrationSource, document: JsonObject, identifier: str, repository: str
 ) -> JsonObject:
-    """Prove legacy record bytes without verifying its claimed payload."""
+    """Return JsonObject evidence of record bytes, not its claimed payload.
+
+    source (MigrationSource) supplies captured bytes/path, document (JsonObject)
+    the original timestamp, and identifier/repository (str) explicit local IDs.
+    No I/O or input mutation occurs; provenance remains unverified metadata.
+    """
     fields = draft_header("evidence-reference", identifier)
     fields.update(
         evidence_id=identifier,
@@ -184,23 +221,35 @@ def convert_artifact(
 ) -> ConvertedArtifact:
     """Convert a validated v1 record using explicit context and accepted draft builders.
 
-    Missing feature/environment context raises MutationError. The caller validates
-    the complete projected graph. Original values remain namespaced and cannot
-    supply verified observations, approval, coverage or parity. No I/O occurs.
+    Args:
+        baseline (CapturedWorkspace): Immutable configured builder context.
+        source (MigrationSource): Exact validated original bytes, path and kind.
+        document (JsonObject): Parsed and schema-validated v1 record.
+        binding (MigrationBinding): Caller feature/environment context, if needed.
+        feature_ids (Mapping[str, str]): Original-to-mapped feature input IDs.
+        template (JsonObject | None): Required empty ledger/parity draft template.
+
+    Return ConvertedArtifact containing a draft, originals and open obligations.
+    Missing context/templates or malformed builder output raise MutationError;
+    invalid required draft fields raise ValueError. No I/O or input mutation occurs.
+    Caller validates the complete graph; originals cannot supply verified state.
     """
     old_id = cast("str", document["id"])
     identifier = migrated_id(old_id)
+    # Contracts bind themselves; other records prefer explicit caller selectors.
     selected = (
         (old_id,)
         if source.kind == "feature-contract"
         else binding.feature_ids or legacy_features(document)
     )
+    # Every selection must resolve to a real feature input in this migration.
     if not selected or any(value not in feature_ids for value in selected):
         raise MutationError(
             "MIGRATION_REQUIRED_CONTEXT",
             f"Supply feature_ids for {old_id} referencing feature-contract "
             "inputs in this migration",
         )
+    # Resolve only declared selectors and sort references for deterministic output.
     features = tuple(sorted(feature_ids[value] for value in selected))
     question = open_question(
         "unknown-migration-" + identifier,
@@ -210,6 +259,8 @@ def convert_artifact(
         f"environment, approvals and expectations retained from v1 record {old_id}.",
     )
     questions = (question,)
+    # Route contracts/scenarios through builders, decisions to proposals, unknowns
+    # to open records, evidence to byte proofs, and ledger/parity to empty drafts.
     if source.kind == "feature-contract":
         converted, questions = _draft_changes(
             contract_changes(
@@ -246,6 +297,7 @@ def convert_artifact(
             )
         fields = dict(template)
         fields["id"] = identifier
+        # Legacy rows cannot prove v2 pins/evidence; retain them only in metadata.
         if source.kind == "coverage-ledger":
             fields.update(revision=None, components=(), inventory_snapshot_refs=())
         else:
@@ -257,6 +309,7 @@ def convert_artifact(
         "source_path": source.path,
         "source_sha256": sha256(source.content).hexdigest(),
         "disposition": "draft-reconciliation-required",
+        # Keep missing semantics explicitly linked instead of supplying defaults.
         "unresolved_behavior_refs": tuple(
             draft_reference("unspecified-behavior", cast("str", value["id"]))
             for value in questions
