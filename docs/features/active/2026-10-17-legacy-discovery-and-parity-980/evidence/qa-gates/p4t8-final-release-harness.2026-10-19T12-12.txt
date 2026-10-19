@@ -1,0 +1,59 @@
+"""Bind explicit final execution release to unchanged reviewed P4-T8 streams."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+scratch = Path(__file__).parent
+qa = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates')
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+def save(path, value):
+    assert not path.exists(), path
+    path.write_bytes((json.dumps(value, indent=2) + '\n').encode())
+preparation_path = qa / 'p4t8-final-preparation.2026-10-19T12-06.json'
+assert sha(preparation_path.read_bytes()) == '415a9fc87678bb3020bdbf99746031abd7873fdd0f5fa7942a0b651464ea87b0'
+preparation = json.loads(preparation_path.read_bytes())
+source = scratch / preparation['candidate_manifest']['path'].removeprefix('SCRATCH/')
+assert sha(source.read_bytes()) == preparation['candidate_manifest']['sha256']
+candidate = json.loads(source.read_bytes())
+assert candidate['execution_released'] is False
+head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+assert head == 'c388b3a5e4200c9781ff850bc242f39ee80d1758'
+assert sha(Path('.codex/agents/python-typed-engineer-c4.toml').read_bytes()) == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+route = 'workspace_operations_p4t8_final_gates'
+assert route in Path('artifacts/orchestration/orchestrator-state.json').read_text('utf-8')
+for entry in candidate['files'] + candidate['fixtures'] + candidate['preserved_files']:
+    assert sha(Path(entry['path']).read_bytes()) == entry['sha256']
+for entry in preparation['prepared_harnesses']:
+    assert sha((scratch / entry['path'].removeprefix('SCRATCH/')).read_bytes()) == entry['sha256']
+review_path = qa / 'p4t8-executor-candidate-review.2026-10-19T12-08.json'
+assert sha(review_path.read_bytes()) == 'ad62b8f8e9b77504aa956f00e7fdaeea94b016479ee042ac1654099dd110bc45'
+review = json.loads(review_path.read_bytes())
+assert review['status'] == 'CANDIDATE_REVIEW_PASS_READY_FOR_FINAL_GATES'
+assert not review['findings'] and not review['open_behavioral_probes']
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+candidate.update(preparation_only=False, execution_released=True,
+    coordinator_release_receipt=route + ' / S5_P4T8_final_gates', review=ref(review_path),
+    preparation=ref(preparation_path), released_at=stamp, committed_candidate=head)
+candidate_path = scratch / ('issue-980-p4t8-final-candidate.released.' + stamp + '.json')
+save(candidate_path, candidate)
+harness_path = qa / ('p4t8-final-release-harness.' + stamp + '.txt')
+assert not harness_path.exists()
+harness_path.write_bytes(Path(__file__).read_bytes())
+record = {'timestamp': stamp, 'command': 'poetry run python SCRATCH/issue-980-p4t8-final-release.py', 'exit_code': 0,
+    'state': 'RELEASED_READY_TO_EXECUTE', 'authority': candidate['coordinator_release_receipt'],
+    'profile_sha256': '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6',
+    'native_authority': {'routing_valid': True, 'launch_authority_valid': True, 'provenance_valid': True},
+    'preparation': ref(preparation_path), 'review': ref(review_path), 'source_files': candidate['files'], 'fixtures': candidate['fixtures'],
+    'prepared_harnesses': preparation['prepared_harnesses'], 'committed_candidate': head,
+    'original_preparation_head': candidate['head_at_preparation'], 'accepted_baseline': candidate['accepted_baseline'],
+    'candidate': {'path': 'SCRATCH/' + candidate_path.name, 'sha256': sha(candidate_path.read_bytes())},
+    'release_harness': ref(harness_path), 'source_test_mutation': False, 'git_mutation': False, 'gate_execution': False}
+path = qa / ('p4t8-final-execution-release.' + stamp + '.json')
+save(path, record)
+path.with_suffix('.md').write_bytes((f'# P4-T8 final execution release\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: current C4/native authority and immutable consolidated review bind all 16 committed source/test streams, two fixtures and three prepared harnesses.\n\nThe original preparation HEAD and accepted baseline remain preserved. Current committed HEAD differs only by coordinated checked-subset commits; exact reviewed working streams are identical. The separate released manifest authorizes the prepared final sequence. No gate ran during this binding; no source/test, Git, checkpoint, plan or acceptance-criteria edit occurred.\n').encode())
+print(json.dumps({'release': ref(path), 'candidate': record['candidate']}, indent=2))

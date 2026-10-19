@@ -1,0 +1,67 @@
+{
+  "task": "P4-T8",
+  "task_status": "PASS",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-reconciliation.2026-10-19T12-31.json",
+      "sha256": "2e4b875be81b4dc7576ca6e618b74fc243633b79fe6a168a0557e95729f4c61f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-reconciliation-harness.2026-10-19T12-31.txt",
+      "sha256": "edc7013773ba94e7e28ac794a73af4256cc03af134b9a5f19bab45eadaa9b867"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-initial-checker.2026-10-19T12-31.txt",
+      "sha256": "6ef4c33c3c81da329f29b47e4f19756c25e24d606d50c7d4b59d332910a6bb74"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-acceptance-initial-checker.2026-10-19T12-34.txt",
+      "sha256": "d742bee78d0ff97806f26cf4918cc83c8b4991603d28e180e0319fbfc571d0b3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance.2026-10-19T12-34.json",
+      "sha256": "5cc45174601a3ef12c426aec43be1f69990cecfab873f7e86314b99e0914968f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance.2026-10-19T12-34.md",
+      "sha256": "536526332032c051e283e2464e05d1b33926b99739e78027f17d24fb9734f01d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance-harness.2026-10-19T12-34.txt",
+      "sha256": "bc89f70ab9a5203f30cb658a3653ba88b1f4a2b9a74b70b3c6e78313652026d4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "f3ddf24cf8904e74c98c8ae2126e4bf4849ca4a890a3e56e9078317a389af5cc"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-reconciliation.2026-10-19T12-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-reconciliation-harness.2026-10-19T12-31.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-initial-checker.2026-10-19T12-31.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-acceptance-initial-checker.2026-10-19T12-34.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance.2026-10-19T12-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance.2026-10-19T12-34.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-acceptance-harness.2026-10-19T12-34.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-final-staging.2026-10-19T12-34.json"
+  ],
+  "prior_final_owned_evidence_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-final-stage-closure.2026-10-19T12-26.json",
+    "sha256": "d0de86c66c89a97d589fcd751131accedd6968be20e4e8f9ff7d4cbd3068f216"
+  },
+  "plan_count": "40/84",
+  "source_ac_count": "13/66",
+  "plan_working_git_binding": {
+    "working_before_sha256": "ba2110c12a1146251bcc5a0820523ae6bcb4d8e3c61def86dcf4b56857fdd3f0",
+    "git_before_sha256": "51942ba243736f1a734a6a365f07f02c6a6f2361e0b40d8a05e9a41234228954",
+    "working_after_sha256": "f3ddf24cf8904e74c98c8ae2126e4bf4849ca4a890a3e56e9078317a389af5cc",
+    "expected_staged_sha256": "b79ff2f22d7f8c386bd7275bb75ff719c91e3c53352ffa1beb158360aac53375",
+    "working_crlf_count": 559,
+    "git_attributes": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md: text: auto\ndocs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md: eol: lf",
+    "qualification": "Inverse one-checkbox delta reconstructs the exact previously captured working hash; CRLF-to-LF alone matches the committed prior blob. Existing plan line endings were preserved."
+  },
+  "source_test_checkpoint_git_mutations": false,
+  "timestamp": "2026-10-19T12-34",
+  "published_utc": "2026-10-19T12:34:00.015403+00:00"
+}

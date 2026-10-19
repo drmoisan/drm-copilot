@@ -1,0 +1,101 @@
+"""Freeze a narrowly qualified coverage harness before the full ordered restart."""
+import ast
+import copy
+import datetime
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+qa = root / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates'
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def ref(path):
+    return {'path': path.relative_to(root).as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def write(path, value):
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+
+
+qualification_path = qa / 'p4t8-final-coverage-failure-qualification.2026-10-19T12-21.json'
+qualification = json.loads(qualification_path.read_bytes())
+candidate_path = scratch / 'issue-980-p4t8-final-candidate.released.2026-10-19T12-12.json'
+candidate = json.loads(candidate_path.read_bytes())
+baseline = json.loads((root / qualification['baseline_coverage']['path']).read_bytes())
+baseline['files'] = {path.replace('\\', '/'): value for path, value in baseline['files'].items()}
+runner = scratch / 'issue-980-p4t8-final-gates.py'
+parsed = ast.parse(runner.read_bytes())
+gate = next(node for node in parsed.body if isinstance(node, ast.FunctionDef) and node.name == 'coverage_gate')
+namespace = {'ast': ast, 'hashlib': hashlib, 'Path': Path, 'subprocess': subprocess, 're': __import__('re'),
+    'manifest': candidate, 'qualification': qualification, 'baseline_coverage': baseline,
+    'unchanged_units': {(item['path'], item['kind'], item['name']): item for item in qualification['qualified_unchanged_units']}}
+exec(compile(ast.Module(body=[gate], type_ignores=[]), '<frozen coverage_gate>', 'exec'), namespace)
+coverage_gate = namespace['coverage_gate']
+records = {}
+for entry in qualification['raw_coverage']:
+    path = root / entry['path']
+    assert sha(path.read_bytes()) == entry['sha256']
+    for name, data in json.loads(path.read_bytes())['files'].items():
+        name = name.replace('\\', '/')
+        coverage_gate(name, data)
+        records[name] = data
+rejections = []
+for label in ('extra-unchanged-gap', 'module-regression', 'changed-callable-gap'):
+    name = 'scripts/dev_tools/discovery/analyzer/stack_cli.py'
+    data = copy.deepcopy(records[name])
+    if label == 'extra-unchanged-gap':
+        data['functions']['_utc_now']['missing_lines'].append(999)
+    elif label == 'module-regression':
+        data['summary']['percent_statements_covered'] = 94.0
+    else:
+        data['functions']['main_vsto']['summary']['percent_statements_covered'] = 0.0
+    try:
+        coverage_gate(name, data)
+    except AssertionError:
+        rejections.append(label)
+    else:
+        raise AssertionError(label)
+assert len(rejections) == 3
+for item in candidate['files'] + candidate['fixtures'] + candidate['preserved_files']:
+    assert sha((root / item['path']).read_bytes()) == item['sha256']
+snapshots = []
+for name in ('gates', 'handoff', 'architecture', 'native'):
+    path = scratch / ('issue-980-p4t8-final-' + name + '.py')
+    content = path.read_bytes()
+    assert b'\r' not in content and content.endswith(b'\n') and not content.endswith(b'\n\n')
+    compile(content, str(path.name), 'exec')
+    copy_path = qa / ('p4t8-final-corrected-' + name + '-harness.' + stamp + '.txt')
+    assert not copy_path.exists()
+    copy_path.write_bytes(content)
+    snapshots.append({'scratch_path': 'SCRATCH/' + path.name, **ref(copy_path)})
+old_runner = root / qualification['failed_harness']['path']
+delta = ''.join(difflib.unified_diff(old_runner.read_text('utf-8').splitlines(keepends=True), runner.read_text('utf-8').splitlines(keepends=True), fromfile='original-final-runner', tofile='qualified-final-runner'))
+delta_path = qa / ('p4t8-final-harness-correction-diff.' + stamp + '.txt')
+delta_path.write_text(delta, encoding='utf-8', newline='\n')
+old_handoff = scratch / 'issue-980-p4t8-final-handoff.prepared-original.py'
+old_handoff_copy = qa / ('p4t8-final-unexecuted-handoff-original.' + stamp + '.txt')
+old_handoff_copy.write_bytes(old_handoff.read_bytes())
+document = {'task': 'P4-T8', 'timestamp': stamp, 'state': 'CORRECTED_HARNESS_FROZEN_FOR_FULL_ORDERED_RESTART',
+    'qualification': ref(qualification_path), 'stopped_runner': ref(old_runner), 'delta': ref(delta_path),
+    'corrected_harnesses': snapshots, 'unexecuted_handoff_original': ref(old_handoff_copy),
+    'checks': {'all_eight_modules_validate_from_preserved_coverage': True, 'negative_guard_probes': rejections,
+               'frozen_source_test_fixture_predecessor_streams_unchanged': True, 'syntax_and_lf_one_eof': True},
+    'remaining_setup_audit': 'Native fixture/profile/capture/provenance/output assumptions were read against the accepted public APIs and two valid fixtures; 22 bounded assertions remain unchanged. No native invocation occurred during this audit.',
+    'scope': 'Only the exact two baseline-bound unchanged CLI helper bodies qualify for no-loss comparison. All new/changed units retain 90%; every changed executable line remains required covered; module/branch and baseline regression gates remain enforced.',
+    'next': 'Restart all seven ordered stages from Black. Preserve the stopped attempt and all passing receipts; do not mutate any source/test or acceptance artifact.'}
+path = qa / ('p4t8-final-harness-correction.' + stamp + '.json')
+write(path, document)
+path.with_suffix('.md').write_text(f'# P4-T8 final harness correction\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-p4t8-final-harness-correction.py`\nEXIT_CODE: 0\nOutput Summary: Corrected harness is frozen for a full ordered restart; no source/test changes.\n\nThe two exact unchanged helper bodies retain their original no-loss coverage requirement. New and changed units still require 90% coverage; changed executable lines, module thresholds, and baseline deltas remain enforced. The corrected predicate accepted all eight preserved module reports and rejected three deliberately invalid coverage records. This was harness validation against existing results, not a test-suite replay.\n\nOriginal runner and unexecuted handoff, corrected exact scripts, unified runner delta, failed-attempt qualification, and source stability are bound in JSON. Native setup was inspected without execution and remains limited to 22 consented Windows/Git assertions, with no publication or installed-host claim.\n', encoding='utf-8', newline='\n')
+snapshot = qa / ('p4t8-final-harness-correction-binder.' + stamp + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'correction': ref(path), 'binder': ref(snapshot), 'runner_sha256': sha(runner.read_bytes()), 'qualified_modules': len(records)}), flush=True)
