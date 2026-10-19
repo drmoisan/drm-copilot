@@ -268,7 +268,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Preserve namespace/type/record/delegate/event/member candidates and comment/string/raw-string masking; cover arithmetic +=/-= false positives, handler candidates, multiline declarations, Unicode, line endings, and unsupported preprocessing/binding diagnostics.
   - Acceptance: Detected syntax and inferred event relationships remain separate, source references identify inspected bytes, and no module exceeds 500 physical lines.
 
-- [ ] [P4-T4] Extract configuration keys without exposing values.
+- [x] [P4-T4] Extract configuration keys without exposing values.
   - Files and behavior: Create R/analyzer/configuration.py, PT/analyzer/test_configuration.py, and tests/fixtures/discovery_analyzers/configuration/ synthetic inputs.
   - Tests and proof: Parse JSON, secure XML, INI/settings declarations and key paths; cover conditions, duplicates/malformed input, secret-looking key values, deterministic ordering, and unsupported-format diagnostics. TOML value evaluation is not claimed without an approved compatible parser.
   - Acceptance: Findings expose key/declaration locations and provenance but no credential/secret values, executable configuration evaluation, or product-specific settings catalog.

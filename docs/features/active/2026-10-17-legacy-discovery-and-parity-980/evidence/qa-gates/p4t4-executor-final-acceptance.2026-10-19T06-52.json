@@ -1,0 +1,198 @@
+{
+  "acceptance_criteria": {
+    "newly_checked": [],
+    "passed": 13,
+    "promoted_input_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+    "reason": "Full-feature authority is spec.md and user-story.md; issue.md remains the preserved promoted input. AC-31 and AC-32 are already accepted. AC-33 through AC-36 require remaining analyzer implementations, registry/integration and wider verification; this task proves only configuration analysis.",
+    "total": 66,
+    "unchanged_sources": [
+      {
+        "passed": 13,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+        "total": 66
+      },
+      {
+        "passed": 13,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+        "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+        "total": 66
+      }
+    ]
+  },
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "atomic_execution_p4t4_final_acceptance",
+    "deployment_agent": "atomic-executor-c4",
+    "execution_context": "standalone",
+    "logical_agent": "atomic-executor",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T4_final_acceptance",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+  },
+  "bindings": {
+    "current_working_index_commit_streams": 8,
+    "executed_gate_harnesses": 3,
+    "final_harness_snapshots": 4,
+    "git_attributes_and_blob_ids_verified": true,
+    "individually_verified_evidence_and_dependency_hashes": 72,
+    "preserved_fixtures": 4,
+    "preserved_predecessors": 34,
+    "streams_exactly_identical": true
+  },
+  "bounded_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-repair-confirmation.2026-10-19T06-38.json",
+    "sha256": "761771c6a97b89dd28809a3d6bed9e36c9b8a8d2b0221f635793d243aee97281"
+  },
+  "candidate_commit": "5329894a0e8485c7837cc67f1700bf3764116fd2",
+  "closed_findings": [
+    "R1: prospective and aggregate encoded-text reservation",
+    "R2: shared linear INI option grammar",
+    "R3: immediate intent comments"
+  ],
+  "command": "poetry run python SCRATCH/issue-980-p4t4-final-acceptance.py",
+  "consolidated_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-review.2026-10-19T06-10.json",
+    "sha256": "eff5e903958412fc4fdf09b305481dd9788d905d8e2c4867969736a4d6b79990"
+  },
+  "coverage": {
+    "branch_destinations": 122,
+    "covered_branch_destinations": 116,
+    "covered_statements": 290,
+    "minimum_range_statement_percent": 95.23809523809523,
+    "named_ranges": 23,
+    "raw_reference": {
+      "path": "SCRATCH/p4t4-final-coverage.raw.json",
+      "sha256": "8eaa92d34148a20eefcdd9cf8830e38a9e50b70c4f34eb09173e4a30c993f850"
+    },
+    "reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-coverage.2026-10-19T06-41.json",
+      "sha256": "c659b61bf5ed7e4fb6f81f55eaf34b1f49000a2ace2dc6e999695b4542806e96"
+    },
+    "same_executed_and_missing_lines_arcs_as_repair_proof": true,
+    "statements": 293
+  },
+  "exit_code": 0,
+  "findings": [],
+  "finished_at": "2026-10-19T06:52:02.750300+00:00",
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-handoff.2026-10-19T06-43.json",
+    "sha256": "3ec7b97f6031bf122f192656f49faff77d0aa4750e489e9eb462f0e7b732ce53"
+  },
+  "limitations": [
+    "Three retained parser statements and six branch destinations remain uncovered; no 100% claim.",
+    "Finite supported formats; TOML and unsupported XML structures fail explicitly, JSON has no invented line numbers.",
+    "Detected declarations do not establish effective activation or runtime behavior.",
+    "Encoded-text reservations conservatively bound construction and output; they are not heap measurements.",
+    "Public analyzer registry remains P4-T9; Windows Python/Git composition does not prove coding-agent hosts or non-Windows CI.",
+    "No task-wide or feature-wide completion is claimed; parent owns commit/push and successor release."
+  ],
+  "native_authority_sha256": "b05cfda0ca11748af8da39b17bcac9e06676493547768e1dbfc97491592fa814",
+  "open_probes": [],
+  "ordered_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-ordered-stages.2026-10-19T06-41.json",
+    "sha256": "38ae69e3d78cef1aab6792d4455871967ec2ce0648325b2b7a557d483ec58aed"
+  },
+  "plan_checkoff": {
+    "after_sha256": "0ad30d9ecb0b9bd24be2d13359e9083a3df11b6e79cc1f4dd459fd57ed709ac6",
+    "before_sha256": "a89f7a9996dd61fcd42eb6cd9167400c6c0e10f079b745f4a0db5cd317b06c84",
+    "byte_changes": 1,
+    "only_task": "P4-T4",
+    "original_copy": "SCRATCH/p4t4-plan-before-final-acceptance.md",
+    "passed_after": 36,
+    "passed_before": 35,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "total": 84
+  },
+  "repair_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-freeze.2026-10-19T06-32.json",
+    "sha256": "59076e69064acac3b90609c73788d952d1774b59e8fb2477e5bb313526da335f"
+  },
+  "retained_diagnostics": "Original candidate resource findings, repair history and the corrected docstring requests false positive remain bound through the immutable repair manifest. One initial read-only PowerShell display used a nonexistent unit_coverage key, then was corrected to unit_ranges; it did not alter proof or run tests.",
+  "scope": "Receipt-only final reconciliation; no production import, behavioral probe, test replay, or predecessor implementation review.",
+  "stages": [
+    {
+      "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:39:54.908692+00:00",
+      "label": "format",
+      "seconds": 0.340709,
+      "stage": 1,
+      "started_at": "2026-10-19T06:39:54.567983+00:00"
+    },
+    {
+      "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:39:55.013903+00:00",
+      "label": "lint",
+      "seconds": 0.101769,
+      "stage": 2,
+      "started_at": "2026-10-19T06:39:54.912134+00:00"
+    },
+    {
+      "command": "poetry run python -m pyright",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:40:06.701913+00:00",
+      "label": "types",
+      "seconds": 11.684971,
+      "stage": 3,
+      "started_at": "2026-10-19T06:39:55.016942+00:00"
+    },
+    {
+      "command": "poetry run python SCRATCH\\issue-980-architecture.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p4t4-repair-freeze.2026-10-19T06-32.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:40:06.836320+00:00",
+      "label": "architecture",
+      "seconds": 0.130019,
+      "stage": 4,
+      "started_at": "2026-10-19T06:40:06.706301+00:00"
+    },
+    {
+      "command": "poetry run python -m pytest -v -o addopts= tests/discovery_runtime/analyzer/test_configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py --cov=drm_copilot_discovery.analyzer.configuration --cov=drm_copilot_discovery.analyzer.configuration_input --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/p4t4-final-coverage.raw.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:41:01.807282+00:00",
+      "label": "tests-reverse",
+      "seconds": 54.966804,
+      "stage": 5,
+      "started_at": "2026-10-19T06:40:06.840478+00:00"
+    },
+    {
+      "command": "poetry run python -m pytest -q -o addopts= --no-cov tests/schemas/discovery/test_v2_inventory_schemas.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:41:03.408741+00:00",
+      "label": "contracts",
+      "seconds": 1.589425,
+      "stage": 6,
+      "started_at": "2026-10-19T06:41:01.819316+00:00"
+    },
+    {
+      "command": "poetry run python SCRATCH\\issue-980-native.py SCRATCH\\p4t4-final-native-result.raw.json",
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:41:05.779387+00:00",
+      "label": "native",
+      "seconds": 2.36612,
+      "stage": 7,
+      "started_at": "2026-10-19T06:41:03.413267+00:00"
+    }
+  ],
+  "started_at": "2026-10-19T06:52:01.303499+00:00",
+  "status": "PASS",
+  "task": "P4-T4",
+  "task_acceptance": "Finite JSON, secure XML and strict INI declarations expose key locations and pinned provenance without values, raw conditions, evaluation or product semantics; exact reviewed repairs and all final applicable gates pass.",
+  "tests": {
+    "contracts": 176,
+    "executed_node_order_verified": true,
+    "native_assertions": 8,
+    "reversed": 91
+  },
+  "timestamp": "2026-10-19T06-52",
+  "verification_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-final-acceptance-harness.2026-10-19T06-52.txt",
+    "sha256": "848cd72ac56629ded28509b0acecfcd1a0598311742d769499bcb524ad2406d2"
+  }
+}
