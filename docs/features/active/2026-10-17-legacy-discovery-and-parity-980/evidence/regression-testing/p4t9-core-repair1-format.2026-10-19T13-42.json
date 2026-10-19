@@ -1,0 +1,95 @@
+{
+  "stage": "format",
+  "started": "2026-10-19T13:42:01.644209+00:00",
+  "finished": "2026-10-19T13:42:02.342753+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m black packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py tests/discovery_runtime/test_extension_validation_limits.py",
+  "exit_code": 0,
+  "duration_seconds": 0.699,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "6bd8b64b6862ba6e0e07791028aef90ce6039b48c85ecb69a67f0113c7938355",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "f8b9930afca0a8fb5cf80e56686c0b76f72c0ec72ced726d1eabc186c7f68397",
+      "physical_lines": 327
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "8137cf194d6b8626c4e1cb98635591a000c7f93e4cacd29668c0a81fa4010c64",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "82a29c155f6fbf89d641eac53c430fc81ffa770175fbae4dcedef68ad127799c",
+      "physical_lines": 301
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "6bd8b64b6862ba6e0e07791028aef90ce6039b48c85ecb69a67f0113c7938355",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "f8b9930afca0a8fb5cf80e56686c0b76f72c0ec72ced726d1eabc186c7f68397",
+      "physical_lines": 327
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "4987ef977a257f90eb87bfdaa52fefd378373e69db37538e1f2eca853b47ddf0",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair1-format-134202.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair1-format-134202.stderr.bin",
+      "raw_sha256": "463ad81c11d8bbab87794a846bc260f15956abc816221460ac80a78e9582c97c",
+      "raw_bytes": 216,
+      "presentation": "reformatted tests\\discovery_runtime\\test_extension_inventory_merge.py\r\nreformatted tests\\discovery_runtime\\test_extension_validation_limits.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted, 3 files left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}

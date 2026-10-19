@@ -1,0 +1,131 @@
+{
+  "task": "P4-T9",
+  "status": "CORE_R2_R3_CONFIRMED_READY_FOR_CHECKED_COMMIT_AND_FINAL_GATES",
+  "findings": [],
+  "open_probes": [],
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "deployment_agent": "atomic-executor-c4",
+    "execution_context": "standalone",
+    "logical_agent": "atomic-executor",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P4T9_core_repair_confirmation",
+    "delegation_id": "atomic_execution_p4t9_core_repair_confirmation",
+    "profile_path": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+  },
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-core-freeze.2026-10-19T13-45.json",
+    "sha256": "5c39693cb1f753fbe36b3c7dd427b78497f5f6fac5119b991dab2c3ec04b7a5b",
+    "bytes": 28480
+  },
+  "owner_stage_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-core-stage-closure.2026-10-19T13-45.json",
+    "sha256": "330ce7482e8c053a2a461f95dc3c2c7f0f894dac29681ca81e0a57a719791530",
+    "bytes": 38318
+  },
+  "retained_complete_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+    "sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5",
+    "bytes": 27418
+  },
+  "executed_payloads": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-executor-core-confirmation-executed-payloads.2026-10-19T13-52.json",
+    "sha256": "358a509e5ba595006eee2f4bb4099233c183e19872b99fc6dfde5156de2c459d",
+    "bytes": 53899
+  },
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+    "tests/discovery_runtime/test_extension_results.py",
+    "tests/discovery_runtime/test_extension_inventory_merge.py",
+    "tests/discovery_runtime/test_extension_validation_limits.py"
+  ],
+  "working_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "physical_lines": 328
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "physical_lines": 459
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "checks": {
+    "R2": "The original three counted reproductions pass with zero decimal rendering; both overflowing values retain zero charged bytes, and the allowed 1001-digit integer reserves exactly 1002 bytes. Bit-length bounds reject before bounded power comparisons; no process-global digit ceiling is used.",
+    "R3": "All 50 enumerated contracts now state the required input types/roles, return and relevant failure/effect semantics. The numeric helper and counted seam have intent documentation. All five files remain below 500 lines.",
+    "preservation": "33 original top-level test/helper definitions and all 125 case identities remain. Seven definitions relocate to the approved test-only split. Their executable AST/decorators/assertions remain identical except the single approved count-limit profile fixture; its EXTENSION_LIMIT expectation remains. extension_results is documentation-only. Other validation methods retain executable AST; _integer and the exact-int dispatch are the only production behavior delta.",
+    "receipt_binding": "All five ordered focused receipts, 95 lossless originals, exact 144-node order, 20 prechecks, borrowed shared/registry bytes and six owner harness representations reconcile. Raw coverage agrees with 336/336 statements and 148/148 branches across 30 measured ranges.",
+    "reuse": "The prior shared/registry and complete core semantic review remain authoritative. No full test population, predecessor suite, manifest/accounting review or additional behavioral investigation was repeated."
+  },
+  "numeric_probe": {
+    "status": "R2_ORIGINAL_THREE_PROBES_PASS",
+    "timestamp_utc": "2026-10-19T13:50:26.570737+00:00",
+    "freeze_sha256": "5c39693cb1f753fbe36b3c7dd427b78497f5f6fac5119b991dab2c3ec04b7a5b",
+    "cases": [
+      {
+        "decimal_digits": 3,
+        "configured_bytes": 2,
+        "numeric_rendering_lengths": [],
+        "status": "EXTENSION_LIMIT",
+        "charged_bytes": 0
+      },
+      {
+        "decimal_digits": 1001,
+        "configured_bytes": 10,
+        "numeric_rendering_lengths": [],
+        "status": "EXTENSION_LIMIT",
+        "charged_bytes": 0
+      },
+      {
+        "decimal_digits": 1001,
+        "configured_bytes": 1002,
+        "numeric_rendering_lengths": [],
+        "status": "accepted",
+        "charged_bytes": 1002
+      }
+    ],
+    "timing_assertions": false,
+    "source_test_mutations": false
+  },
+  "coverage": {
+    "covered_lines": 336,
+    "num_statements": 336,
+    "covered_branches": 148,
+    "num_branches": 148
+  },
+  "measured_ranges": 30,
+  "owner_stage_paths_bound": 93,
+  "qualifications": [
+    "The first reconciliation failed solely on a Windows coverage-key separator assumption; original checker and diagnostic are retained in the exact payload archive. The corrected checker passed without a toolchain or behavioral rerun.",
+    "All earlier owner fixture failures, source-window qualifications and raw presentation transforms remain unchanged in the owner freeze and lossless archive.",
+    "This confirmation binds working bytes; coordinator owns later Git index/commit normalization bindings.",
+    "Core artifacts describe validated data and grant no publication authority. Full P4-T9 final ordered gates and task acceptance remain pending; no installed-host or cross-platform proof is inferred."
+  ],
+  "command": "poetry run python SCRATCH/issue-980-p4t9-core-repair-check.py; poetry run python SCRATCH/issue-980-p4t9-core-probe-capture.py",
+  "exit_code": 0,
+  "counts": {
+    "tasks_accepted": 40,
+    "tasks_total": 84,
+    "ac_accepted": 13,
+    "ac_total": 66
+  },
+  "mutations": "New verification evidence only; no production, tests, plan, AC, checkpoint or Git writes.",
+  "published_utc": "2026-10-19T13:52:22.538754+00:00"
+}

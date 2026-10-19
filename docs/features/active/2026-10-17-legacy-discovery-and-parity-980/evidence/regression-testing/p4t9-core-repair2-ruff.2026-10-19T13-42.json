@@ -1,0 +1,95 @@
+{
+  "stage": "ruff",
+  "started": "2026-10-19T13:42:18.238393+00:00",
+  "finished": "2026-10-19T13:42:18.349970+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py tests/discovery_runtime/test_extension_results.py tests/discovery_runtime/test_extension_inventory_merge.py tests/discovery_runtime/test_extension_validation_limits.py",
+  "exit_code": 1,
+  "duration_seconds": 0.112,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "6bd8b64b6862ba6e0e07791028aef90ce6039b48c85ecb69a67f0113c7938355",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "f8b9930afca0a8fb5cf80e56686c0b76f72c0ec72ced726d1eabc186c7f68397",
+      "physical_lines": 327
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "4987ef977a257f90eb87bfdaa52fefd378373e69db37538e1f2eca853b47ddf0",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "6bd8b64b6862ba6e0e07791028aef90ce6039b48c85ecb69a67f0113c7938355",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "f8b9930afca0a8fb5cf80e56686c0b76f72c0ec72ced726d1eabc186c7f68397",
+      "physical_lines": 327
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "4987ef977a257f90eb87bfdaa52fefd378373e69db37538e1f2eca853b47ddf0",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair2-ruff-134218.stdout.bin",
+      "raw_sha256": "ed0d20a0f1150d06cd0f643df501d5a4527101918a1139b08b6c967c996919fe",
+      "raw_bytes": 2018,
+      "presentation": "E501 Line too long (89 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_results.py:209:89\n    |\n208 |     snapshot (DiscoverySnapshot) must be configured and load-valid. manifest_paths\n209 |     (tuple[str, ...] or None) selects a configured subset or all paths. Returns immutable\n    |                                                                                         ^\n210 |     descriptive carriers. Raises ExtensionResultError for invalid data; draft profile\n211 |     rejection remains fail closed. Performs no filesystem/process/network operation.\n    |\n\nE501 Line too long (90 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\extension_validation.py:420:89\n    |\n418 |         self, document: JsonObject, diagnostics: tuple[JsonObject, ...]\n419 |     ) -> None:\n420 |         \"\"\"Check document (JsonObject), diagnostics (tuple[JsonObject, ...]); return None.\n    |                                                                                         ^^\n421 |\n422 |         Raises EXTENSION_ACCOUNTING for omitted/changed inputs or broken diagnostic\n    |\n\nF401 [*] `tests.discovery_runtime.test_extension_results.MANIFEST` imported but unused\n  --> tests\\discovery_runtime\\test_extension_inventory_merge.py:38:5\n   |\n36 |     ADAPTER,\n37 |     AUTHOR,\n38 |     MANIFEST,\n   |     ^^^^^^^^\n39 |     MEMBER,\n40 |     STAMP,\n   |\nhelp: Remove unused import: `tests.discovery_runtime.test_extension_results.MANIFEST`\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_extension_inventory_merge.py:266:89\n    |\n265 |     def forged(*args: object, **kwargs: object) -> tuple[ValidatedExtension, ...]:\n266 |         \"\"\"Return retained tuple[ValidatedExtension, ...] for ignored object args/kwargs.\n    |                                                                                         ^\n267 |\n268 |         Supplies deliberately untrusted proof; no input mutation, failure or I/O.\n    |\n\nFound 4 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair2-ruff-134218.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}

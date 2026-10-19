@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-10-19T13:37:54.089149+00:00",
+  "absent_before_creation": "tests/discovery_runtime/test_extension_validation_limits.py",
+  "approved_scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py",
+    "tests/discovery_runtime/test_extension_results.py",
+    "tests/discovery_runtime/test_extension_inventory_merge.py",
+    "tests/discovery_runtime/test_extension_validation_limits.py"
+  ],
+  "retained_before_repair": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "42f5da1edf150ee820a1b0541a5494a1e0d979f5a4110e20f721833302403402",
+      "bytes": 14752,
+      "definitions": [
+        "_analysis",
+        "_member",
+        "_references",
+        "_manifest",
+        "_validated",
+        "validate_extension_results",
+        "_merge_budget",
+        "merge_extension_inventory"
+      ],
+      "scratch_identifier": "SCRATCH/p4t9-core-before-repair-2026-10-19T13-37/extension_results.py"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "950fd2457bbf31485850df691ad3bf51061a080692308bf7b1567722eeb285bc",
+      "bytes": 18586,
+      "definitions": [
+        "budget",
+        "object_rows",
+        "check_link_work"
+      ],
+      "scratch_identifier": "SCRATCH/p4t9-core-before-repair-2026-10-19T13-37/extension_validation.py"
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "eb7cdf2dd054ada3888d1d41aa8944f3ecd19493c6da11ded6fdcc19c8fd35e4",
+      "bytes": 18102,
+      "definitions": [
+        "extension_snapshot",
+        "bundle",
+        "documents",
+        "edit_bundle",
+        "set_field",
+        "test_valid_bundle_preserves_versions_uncertainty_and_bytes",
+        "test_invalid_claims_fail_closed",
+        "test_selection_is_an_explicit_configured_tuple",
+        "test_transport_and_independent_pin_failures",
+        "test_line_ranges_share_cached_physical_bounds",
+        "test_generic_artifact_capture_remains_compatible",
+        "test_unexplained_capture_exclusion_has_fixed_input_error",
+        "test_diagnostic_link_work_has_an_independent_operation_ceiling"
+      ],
+      "scratch_identifier": "SCRATCH/p4t9-core-before-repair-2026-10-19T13-37/test_extension_results.py"
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "7e9474868f09f5fae7b483024c065b77f54c85227c0ea383f51d9db079c63d81",
+      "bytes": 18417,
+      "definitions": [
+        "test_merge_reconstructs_complete_core_and_external_rows",
+        "test_empty_selection_retains_exact_builtin_output",
+        "test_incomplete_external_diagnostics_remain_blocking_data",
+        "test_invalid_diagnostic_ownership_cannot_weaken_core",
+        "test_core_pin_failure_is_preserved_without_falsely_validating_documentation",
+        "test_core_component_collision_fails_without_overwriting",
+        "test_merge_does_not_trust_public_validation_carriers",
+        "test_untyped_snapshot_is_rejected_before_analysis",
+        "test_load_blockers_precede_valid_extension_claims",
+        "test_carriers_are_immutable_descriptions_with_checked_field_types",
+        "test_resource_limits_require_positive_exact_integers",
+        "test_utf8_json_reservation_matches_canonical_boundary",
+        "test_independent_traversal_record_and_numeric_limits",
+        "test_raw_member_aggregate_is_independent_of_each_document_limit",
+        "test_manifest_member_paths_use_portable_containment",
+        "test_reused_member_paths_and_result_ids_are_rejected",
+        "test_merge_metadata_errors_remain_fixed_and_nonpublishing",
+        "test_capture_index_count_is_bounded_before_projection",
+        "test_unreadable_accounting_requires_a_blocking_diagnostic",
+        "test_metadata_budget_precedes_builtin_emission"
+      ],
+      "scratch_identifier": "SCRATCH/p4t9-core-before-repair-2026-10-19T13-37/test_extension_inventory_merge.py"
+    }
+  },
+  "retained_harnesses": {
+    "p4t9-core-gate.py": {
+      "sha256": "c6350c0c3999ad512e8407b842e6977df26b3547089b6b880d30f8fbc9c2ee97",
+      "bytes": 4385
+    },
+    "p4t9-core-coverage.py": {
+      "sha256": "7edb4012c6783526db7e7f4f4942a4870fac6b278634a8d2d4b9ec95e6cf47f6",
+      "bytes": 2080
+    },
+    "p4t9-core-freeze.py": {
+      "sha256": "33034fbafc34efa80480516c9a3084c1e9cd3a7c9fa43cc5bace88fc1d9bb250",
+      "bytes": 9593
+    }
+  },
+  "shared_baseline": "evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+  "review": "evidence/qa-gates/p4t9-executor-shared-core-review.2026-10-19T13-31.json",
+  "review_sha256": "cf6834b4361d243f28255374ed9151a2cd8e0916403b4b9b75149bc13cf05bc5",
+  "route": "workspace_operations_p4t9_core_repair",
+  "profile": ".codex/agents/python-typed-engineer-c4.toml",
+  "source_test_mutation": false,
+  "prior_proof_replayed": false
+}

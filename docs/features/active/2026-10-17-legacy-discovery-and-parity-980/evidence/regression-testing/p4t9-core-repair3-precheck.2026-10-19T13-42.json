@@ -1,0 +1,95 @@
+{
+  "stage": "precheck",
+  "started": "2026-10-19T13:42:52.196032+00:00",
+  "finished": "2026-10-19T13:42:53.913492+00:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m pytest -o addopts= tests/discovery_runtime/test_extension_validation_limits.py::test_capture_index_count_is_bounded_before_projection tests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation -v --tb=short",
+  "exit_code": 0,
+  "duration_seconds": 1.717,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "physical_lines": 328
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py": {
+      "sha256": "83bbca128610e5265501e801e8a768cd1a81fc0985c9cb839bd6bb46826cd05c",
+      "physical_lines": 459
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": {
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "physical_lines": 328
+    },
+    "tests/discovery_runtime/test_extension_results.py": {
+      "sha256": "56b895af16e2bec9360072043fdf1a81f6154d1f21caa338bd13a8015e31ef63",
+      "physical_lines": 429
+    },
+    "tests/discovery_runtime/test_extension_inventory_merge.py": {
+      "sha256": "2310d3cd15aa37cb4cb411da62a99d7df044041b3f8ca419a297798b6b590857",
+      "physical_lines": 457
+    },
+    "tests/discovery_runtime/test_extension_validation_limits.py": {
+      "sha256": "d2e5bee27831c4fbfad6a7e95cb1cab40164ce083061f09a50385a3b62ec5805",
+      "physical_lines": 314
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py": {
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "physical_lines": 442
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "physical_lines": 164
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair3-precheck-134253.stdout.bin",
+      "raw_sha256": "133707d6949a1f29aed9c691dca45d3ef4afa6b2d2a97a69b6a32b8cf3192466",
+      "raw_bytes": 3437,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 20 items\r\n\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_capture_index_count_is_bounded_before_projection PASSED [  5%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[zero-exact] PASSED [ 10%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[zero-short] PASSED [ 15%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[single-exact] PASSED [ 20%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-exact] PASSED [ 25%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-short] PASSED [ 30%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-exact] PASSED [ 35%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-short] PASSED [ 40%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-power-exact] PASSED [ 45%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-power-short] PASSED [ 50%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-small-overflow] PASSED [ 55%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[below-power-exact] PASSED [ 60%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[power-width-overflow] PASSED [ 65%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-large-overflow] PASSED [ 70%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-large-overflow] PASSED [ 75%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[review-large-exact] PASSED [ 80%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[negative-large-exact] PASSED [ 85%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[beyond-rendering-ceiling] PASSED [ 90%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[remaining-exact] PASSED [ 95%]\r\ntests/discovery_runtime/test_extension_validation_limits.py::test_integer_budget_never_renders_before_reservation[remaining-short] PASSED [100%]\r\n\r\n============================= 20 passed in 1.32s ==============================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t9-core-repair3-precheck-134253.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "c64b35435d1c1597830d8dd03e661d7944192065"
+}
