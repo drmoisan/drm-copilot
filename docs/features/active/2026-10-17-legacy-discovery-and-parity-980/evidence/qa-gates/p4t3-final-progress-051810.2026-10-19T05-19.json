@@ -1,0 +1,70 @@
+{
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-repair-freeze.2026-10-19T05-08.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-format-051811.2026-10-19T05-18.json",
+      "sha256": "68eb0105d88a7e447dc1c01bc6cc89fa990f448b53ee37038642b520b233272a",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-lint-051811.2026-10-19T05-18.json",
+      "sha256": "a79bfd5f5c2ba8aee76534a8fb6d6797ddfd116096624c0df381c1a32d00d636",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-types-051823.2026-10-19T05-18.json",
+      "sha256": "36401e9524a054639403de36641b266c5f3e2350760d21098f6605e79cad9530",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-architecture-051823.2026-10-19T05-18.json",
+      "sha256": "6aa9ca15dcf13c20b675a338c952928a462119663adad3eb3da1550bff99dba0",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "tests-reverse",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-tests-reverse-051856.2026-10-19T05-18.json",
+      "sha256": "5e2a282b75b3445cbbcd0540f5943f47dd655ac13476524db61b9602a5a3134f",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-contracts-051858.2026-10-19T05-18.json",
+      "sha256": "d4348cb1743af1f160c98828e1041e8944bc8c6160a43643e1f75799551006ef",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-native-051901.2026-10-19T05-19.json",
+      "sha256": "6dac7583d26317f3e7879bb4e0e77178b2f903b825969daf1dddda1bf4bd6c2a",
+      "stage": 7
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/discovery_runtime/analyzer/test_source_masking.py": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+  }
+}

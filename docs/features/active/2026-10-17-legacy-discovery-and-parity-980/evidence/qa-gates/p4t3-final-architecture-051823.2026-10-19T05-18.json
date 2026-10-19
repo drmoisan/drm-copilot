@@ -1,0 +1,57 @@
+{
+  "command": "poetry run python SCRATCH\\architecture_gate.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p4t3-repair-freeze.2026-10-19T05-08.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T05:18:23.497215+00:00",
+  "harness_hashes": {
+    "SCRATCH/architecture_gate.py": "f9c3a48806fb32c2d6fc0b6f41b7a325a16a9ba7ceaeb921684bb8ef0714deb2",
+    "SCRATCH/final_gates.py": "01a3271493bc0415ad0230942b63108497c3780f15c36f822fc3916b95ca3646",
+    "SCRATCH/native_gate.py": "efcb2232c8e2e9c984a9e9e0c83e99f979203e47471d4a3683af837de6bc92d6"
+  },
+  "label": "architecture",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t3-final-architecture-051823.2026-10-19T05-18.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t3-final-architecture-051823.2026-10-19T05-18.stdout.txt",
+    "sha256": "3da730fe0061d21e6677bf14bfc4b05a1726c0cdd0394602f9304f56448a466f"
+  },
+  "seconds": 0.117506,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/discovery_runtime/analyzer/test_source_masking.py": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py": "fa71336458b39ed00478d48db3ad53de501c63feed3cd09681280ed4476cbc32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py": "686c03553f7122f87a0effe5bb9296e5bba37706fac63b3d63a777f74b2b0db9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py": "d51fc5c6c42d52da46f9f150c9b7c4a94abf9f1cf0c90b8eb01827f23952f0b9",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+    "scripts/dev_tools/discovery/analyzer/dotnet_inventory.py": "87e73d5a408d3c09a6cc2f72553d42fff240c7d1a98a77934f8d1721b135f6c3",
+    "scripts/dev_tools/discovery/analyzer/source_text.py": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+    "tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py": "8c09225f7347353a2dc6784f078cf726bb8e66f6397500affa5517fc28c82b83",
+    "tests/discovery_runtime/analyzer/test_csharp_declarations.py": "88266c69604dc66e6499350abcc4c1dac77b2e59e103d60458377c0711c279c9",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "88d0e38fd75b7c1e7c95f110449e78dc764efe70410314271b69054dc0a006c7",
+    "tests/discovery_runtime/analyzer/test_event_subscriptions.py": "91e486098412c9282add7fbca2714be6e48419a48a6ac29e421256e0472dfbe6",
+    "tests/discovery_runtime/analyzer/test_source_masking.py": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be"
+  },
+  "stage": 4,
+  "started_at": "2026-10-19T05:18:23.379709+00:00",
+  "stderr": "",
+  "stdout": "{\r\n  \"checks\": [\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py\",\r\n      \"boundary\": \"pure lexical adapters; only legacy parse may read its injected seam\"\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py\",\r\n      \"boundary\": \"pure lexical adapters; only legacy parse may read its injected seam\"\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_declarations.py\",\r\n      \"boundary\": \"pure lexical adapters; only legacy parse may read its injected seam\"\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/event_subscriptions.py\",\r\n      \"boundary\": \"pure lexical adapters; only legacy parse may read its injected seam\"\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_inventory.py\",\r\n      \"boundary\": \"pure lexical adapters; only legacy parse may read its injected seam\"\r\n    },\r\n    {\r\n      \"path\": \"scripts/dev_tools/discovery/analyzer/source_text.py\",\r\n      \"boundary\": \"identity-preserving re-export only\"\r\n    },\r\n    {\r\n      \"path\": \"scripts/dev_tools/discovery/analyzer/dotnet_inventory.py\",\r\n      \"boundary\": \"identity-preserving re-export only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/analyzer/test_source_masking.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/analyzer/test_csharp_tokens.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/analyzer/test_csharp_declarations.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/analyzer/test_event_subscriptions.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/scripts/dev_tools/discovery/analyzer/test_source_text.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/analyzer/test_csharp_declaration_regressions.py\",\r\n      \"boundary\": \"in-memory units; writes confined to mem_fs_path fake; resources read-only\"\r\n    }\r\n  ],\r\n  \"passed\": 14\r\n}\r\n",
+  "timestamp": "2026-10-19T05-18"
+}

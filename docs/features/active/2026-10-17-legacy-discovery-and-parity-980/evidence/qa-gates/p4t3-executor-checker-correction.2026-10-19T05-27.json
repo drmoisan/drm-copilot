@@ -1,0 +1,14 @@
+{
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T05:27:34.831231+00:00",
+  "status": "BOOKKEEPING_CORRECTION_ONLY",
+  "command": "poetry run python SCRATCH/issue-980-p4t3-final-reconcile.py SCRATCH/worker",
+  "original_exit_code": 1,
+  "original_error": "AssertionError at line119 comparing the native checks list to integer8. The handoff stores eight exact check names, not a scalar count.",
+  "before_sha256": "ffd5dcbc806b4727ebc4284c1aedebacddc2dc016c4593b58a77c1b7ad682538",
+  "after_sha256": "9961db569ec9afbbe6d81fed17782eefd999f25f566834d39508aa668f705e8d",
+  "preserved_original": "SCRATCH/issue-980-p4t3-final-reconcile.before-native-list.py",
+  "old_expression": "assert native['platform'] == 'win32' and len(native['checks']) == handoff['native_checks'] == 8",
+  "corrected_expression": "assert native['platform'] == 'win32' and native['checks'] == handoff['native_checks'] and len(native['checks']) == 8",
+  "meaning": "Compare exact check-name lists and count8. No source/test/handoff/receipt/harness/raw-data change or behavioral gate rerun."
+}

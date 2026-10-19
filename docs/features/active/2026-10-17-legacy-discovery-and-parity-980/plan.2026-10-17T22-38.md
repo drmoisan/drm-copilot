@@ -263,7 +263,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover .sln/.slnx, project/props/targets XML, project/package/COM references, target frameworks, conditions, implicit SDK/unresolved expressions, malformed XML, DTD/entity/network rejection, and source spans/hashes.
   - Acceptance: Explicit declarations are machine-readable detected facts with provenance; unresolved/evaluated build semantics are not presented as a resolved dependency or runtime graph.
 
-- [ ] [P4-T3] Preserve C# lexical inventory and classify event candidates honestly.
+- [x] [P4-T3] Preserve C# lexical inventory and classify event candidates honestly.
   - Files and behavior: Move/split DT/discovery/analyzer/{source_text,dotnet_inventory}.py into R/analyzer/{source_text,csharp_declarations,event_subscriptions,dotnet_inventory}.py with thin old adapters. Add PT/analyzer/test_{csharp_declarations,event_subscriptions}.py and update Set F source-text/.NET assertions.
   - Tests and proof: Preserve namespace/type/record/delegate/event/member candidates and comment/string/raw-string masking; cover arithmetic +=/-= false positives, handler candidates, multiline declarations, Unicode, line endings, and unsupported preprocessing/binding diagnostics.
   - Acceptance: Detected syntax and inferred event relationships remain separate, source references identify inspected bytes, and no module exceeds 500 physical lines.
