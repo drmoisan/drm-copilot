@@ -1,0 +1,45 @@
+{
+  "stage": "lint",
+  "label": "p4t7-python-focused5-lint",
+  "started": "2026-10-19T10:09:05.428732+00:00",
+  "finished": "2026-10-19T10:09:06.844145+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.415,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "31b1d096ac933773e9a03cabe01317f74985dfd5c8551ff8b81a3e5750ec6f05",
+      "physical_lines": 265
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "38ea6ef8bcee5ee763d89558dc1b06654d25f531f40d4a986a439bacaf1a363e",
+      "physical_lines": 308
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "31b1d096ac933773e9a03cabe01317f74985dfd5c8551ff8b81a3e5750ec6f05",
+      "physical_lines": 265
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "38ea6ef8bcee5ee763d89558dc1b06654d25f531f40d4a986a439bacaf1a363e",
+      "physical_lines": 308
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused5-lint-100906.stdout.bin",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_bytes": 19,
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused5-lint-100906.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

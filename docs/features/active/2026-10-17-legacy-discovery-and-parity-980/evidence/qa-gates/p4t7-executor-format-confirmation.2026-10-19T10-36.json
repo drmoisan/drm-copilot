@@ -1,0 +1,254 @@
+{
+  "status": "FORMAT_REPAIR_CONFIRMED",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-36",
+  "published_utc": "2026-10-19T10:36:55.222174+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-format-confirmation.py",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t7_format_confirmation",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": true
+  },
+  "scope": "Only frozen Python/.NET FR1-FR3 repair; shared hashes are bindings, not a repeated review.",
+  "freezes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json",
+      "sha256": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7",
+      "bytes": 32524
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-freeze.2026-10-19T10-30.json",
+      "sha256": "02e7fa6de5f8a895a1738777e1effcba1e973ade848b17347f3ce2e916956f96",
+      "bytes": 21021
+    }
+  ],
+  "source_test_and_shared_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "bytes": 13384,
+      "physical_lines": 311
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d",
+      "bytes": 18793,
+      "physical_lines": 473
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "bytes": 20798,
+      "physical_lines": 500
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "bytes": 7771,
+      "physical_lines": 208
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "bytes": 14804,
+      "physical_lines": 365
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811",
+      "bytes": 17468,
+      "physical_lines": 465
+    }
+  ],
+  "focused_receipts_reused": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-format.2026-10-19T10-31.json",
+      "sha256": "7a9126c44aed899e4989bb228e4d3181238fe76f8e97c52344be785b0782e3f7",
+      "bytes": 2813
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-lint.2026-10-19T10-31.json",
+      "sha256": "c7a42421ab686844bdd72fd0f862751f1cb8b616453c3eeac564787432b7b475",
+      "bytes": 2746
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-types.2026-10-19T10-31.json",
+      "sha256": "31e6f0371a061ef584d6bef709ff0ef71346225fe97955f1441fe8c42df46b48",
+      "bytes": 2929
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-focused2-unit.2026-10-19T10-31.json",
+      "sha256": "c631d77e6ad5d94f9248802e37a293017bee61bc7def8e28d9d1e870b0b596b5",
+      "bytes": 23345
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-format.2026-10-19T10-29.json",
+      "sha256": "8eb37fc8b25d1b5cfde3a5e61ea502c99fb77fc6827181158c10d68daef64c2c",
+      "bytes": 2921
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-lint.2026-10-19T10-29.json",
+      "sha256": "cd184893022995600760549f899ecf25893826389dd45e2a7853a1d04c93b74a",
+      "bytes": 2872
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-types.2026-10-19T10-29.json",
+      "sha256": "a947c40b57cd993553b6c92faa913bf6df07823a420a3ba85bd67664cf5d7044",
+      "bytes": 3054
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair3-unit.2026-10-19T10-30.json",
+      "sha256": "31ddf6a0dbc96b0667ca9d5c9285899d557534a1eb975a4da164200c735be0e0",
+      "bytes": 17077
+    }
+  ],
+  "raw_coverage_reconciled": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-coverage.2026-10-19T10-32.json",
+      "sha256": "16f45876ed3b4640480ed5c15102761b04929d29cd5a6bcc6a96fbb684b230ce",
+      "bytes": 32808,
+      "lines": 156,
+      "branches": 86,
+      "named_class_callable_ranges": 8
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-coverage.2026-10-19T10-30.json",
+      "sha256": "8f6ed3db68b10cd33d240e268540c53f5ca29f9372ae7f0f4d8ab418c7fb5c29",
+      "bytes": 31190,
+      "lines": 141,
+      "branches": 72,
+      "named_class_callable_ranges": 10
+    }
+  ],
+  "proof_reused": {
+    "python": "116 cases: original 98 plus 18; 156/156 statements and 86/86 branches",
+    "dotnet": "73 cases: original 63 plus 10; 141/141 statements and 72/72 branches",
+    "original_tests_and_assertions": "Owner AST/preservation proof retained unchanged in each frozen manifest; no suite replay."
+  },
+  "closure": {
+    "FR1": "Actual ConfigParser instance selects the fixed disjoint equals-only matcher. Both valid and invalid retained whitespace inputs produce correct outcomes; pre-parser aggregate reservations and deterministic worker controls remain bound.",
+    "FR2": "Opaque ancestor masks propagate before interpreting descendants, including nested Project/ItemGroup data. Original false-positive input now yields only Declared. Genuine Project/Target/Choose/Otherwise, condition and bounds controls are preserved in the 73-case proof.",
+    "FR3": "Affected Python helper/test contracts specify types, return/error behavior and side effects; identified comprehensions have immediate intent comments; files remain 311/473 lines."
+  },
+  "original_ini_reproductions": [
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "input_bytes": 4013,
+      "parser_seconds": 0.00017590000061318278,
+      "fixed_matcher_identity": true,
+      "valid": false,
+      "whitespace_count": 4000
+    },
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "input_bytes": 8013,
+      "parser_seconds": 0.00023380000493489206,
+      "fixed_matcher_identity": true,
+      "valid": false,
+      "whitespace_count": 8000
+    },
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "input_bytes": 16013,
+      "parser_seconds": 0.00033090001670643687,
+      "fixed_matcher_identity": true,
+      "valid": false,
+      "whitespace_count": 16000
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "consumed_nodes": 8043,
+      "consumed_text_bytes": 20095,
+      "input_bytes": 4019,
+      "parser_seconds": 0.00020209999638609588,
+      "fixed_matcher_identity": true,
+      "valid": true,
+      "whitespace_count": 4000
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "consumed_nodes": 16043,
+      "consumed_text_bytes": 40095,
+      "input_bytes": 8019,
+      "parser_seconds": 0.00021490000654011965,
+      "fixed_matcher_identity": true,
+      "valid": true,
+      "whitespace_count": 8000
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "consumed_nodes": 32043,
+      "consumed_text_bytes": 80095,
+      "input_bytes": 16019,
+      "parser_seconds": 0.000298400002066046,
+      "fixed_matcher_identity": true,
+      "valid": true,
+      "whitespace_count": 16000
+    }
+  ],
+  "opaque_reproduction": {
+    "candidate_names": [
+      "Declared"
+    ],
+    "diagnostics": [],
+    "original_input_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+      "sha256": "8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52",
+      "bytes": 4018
+    }
+  },
+  "timing_qualification": "Timings are diagnostic only. Correctness relies on actual fixed matcher identity, disjoint grammar, reserved aggregate work and deterministic regression assertions; no timing threshold was added.",
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.json",
+    "sha256": "3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415",
+    "bytes": 11510
+  },
+  "original_evidence_preserved": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.json",
+      "sha256": "3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415",
+      "bytes": 11510
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review.2026-10-19T10-23.md",
+      "sha256": "d864523ef9f1f830a8103c67cfabbde9a3cf58c9ba5af3fdca87af6d269c51a0",
+      "bytes": 1964
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review-harness.2026-10-19T10-23.txt",
+      "sha256": "746fa46b2d8982e2f4ad9a1b7cf131be43e58421cb3175a088c792ed2ce466ea",
+      "bytes": 12614
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+      "sha256": "8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52",
+      "bytes": 4018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+      "sha256": "d03a2314d7b3fba6bac99f07bd8602d184bcc15b701e293a6d8557e7cdbc18c5",
+      "bytes": 7089
+    }
+  ],
+  "dotnet_publication_qualification": "Original captured/raw/rendered CR/LF qualification remains in the designated owner publication index referenced by the frozen repair. No original receipt or raw stream was changed or forensically re-reviewed.",
+  "open_probes": [],
+  "remaining_findings": [],
+  "pending": [
+    "Central integration candidate review",
+    "Composed final ordered gates",
+    "P4-T7 task acceptance; registry/CLI exposure remains P4-T9"
+  ],
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-confirmation-harness.2026-10-19T10-36.txt",
+    "sha256": "e3424fe9d7afce134ec7e1b0f2a8d90ea48b1a50cc41f737c1e87318425c650c",
+    "bytes": 12983
+  },
+  "task_or_ac_checkoff": false
+}

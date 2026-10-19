@@ -1,0 +1,45 @@
+{
+  "stage": "lint",
+  "label": "p4t7-python-focused2-lint",
+  "started": "2026-10-19T10:06:55.272608+00:00",
+  "finished": "2026-10-19T10:06:56.435404+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 1,
+  "duration_seconds": 1.163,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "689fa1aa6545c404d689b390325ba3221610f801bdd856eb970ff22acaaa96b2",
+      "physical_lines": 263
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "9eaf028cca40d194fc521488b465a3170bf5704c15ab61733e6711c29496dfa1",
+      "physical_lines": 283
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "689fa1aa6545c404d689b390325ba3221610f801bdd856eb970ff22acaaa96b2",
+      "physical_lines": 263
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "9eaf028cca40d194fc521488b465a3170bf5704c15ab61733e6711c29496dfa1",
+      "physical_lines": 283
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused2-lint-100656.stdout.bin",
+      "raw_sha256": "321a4e1786eeeec6ea5bcb71fdd919f050b8a2fcd2203c814c7f83c448b59be5",
+      "raw_bytes": 3101,
+      "presentation": "TC003 Move standard library import `collections.abc.Iterator` into a type-checking block\n  --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_python.py:12:29\n   |\n10 | import configparser\n11 | import re\n12 | from collections.abc import Iterator\n   |                             ^^^^^^^^\n13 | from typing import Literal\n   |\nhelp: Move into type-checking block\n\nB008 Do not perform function call `DependencyLimits` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_python.py:19:32\n   |\n17 |     *,\n18 |     format: Literal[\"requirements\", \"setup-cfg\"] = \"requirements\",\n19 |     limits: DependencyLimits = DependencyLimits(),\n   |                                ^^^^^^^^^^^^^^^^^^\n20 | ) -> DependencyResult:\n21 |     \"\"\"Encode synthetic text and return the public parser's immutable result.\"\"\"\n   |\n\nE501 Line too long (100 > 88)\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_python.py:57:89\n   |\n55 |     \"\"\"Keep safe extras and marker names while omitting quoted values and comments.\"\"\"\n56 |     result = parse(\n57 |         \"pkg[b,a,b] >= 1, < 3 ; python_version >= 'SECRET#VALUE' and os_name != \\\"SECRET\\\" # SECRET\"\n   |                                                                                         ^^^^^^^^^^^^\n58 |     )\n59 |     item = result.candidates[0]\n   |\n\nE501 Line too long (178 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_python.py:168:89\n    |\n166 | \u2026ne:\n167 | \u2026d section anchors.\"\"\"\n168 | \u2026 = first>=1\\n    second[a]\\n# comment\\n[options.extras_require]\\ntest = third; extra == 'SECRET'\\n    fourth\\n\"\n    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n169 | \u2026\n170 | \u2026tes] == [\n    |\n\nE501 Line too long (121 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_python.py:184:89\n    |\n182 | def test_setup_cfg_nonselected_continuations_cannot_become_options() -> None:\n183 |     \"\"\"An unrelated multiline value cannot introduce a false install requirement.\"\"\"\n184 |     text = \"[options]\\nother = initial\\n    install_requires = fake\\n    another\\n\\ninstall_requires = real\\n; ignored\\n\"\n    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n185 |     result = parse(text, format=\"setup-cfg\")\n186 |     assert [(c.name, c.anchor.line) for c in result.candidates] == [(\"real\", 6)]\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_python.py:238:89\n    |\n236 |     format: Literal[\"requirements\", \"setup-cfg\"], field: str\n237 | ) -> None:\n238 |     \"\"\"A constrained resource rejects the complete captured input, including prefixes.\"\"\"\n    |                                                                                         ^\n239 |     text = (\n240 |         \"first\\nsecond\"\n    |\n\nFound 6 errors.\nNo fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused2-lint-100656.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

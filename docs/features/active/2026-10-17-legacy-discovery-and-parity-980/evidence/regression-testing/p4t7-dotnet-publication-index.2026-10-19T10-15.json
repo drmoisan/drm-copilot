@@ -1,0 +1,533 @@
+{
+  "timestamp": "2026-10-19T10-15",
+  "qualification": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-staging-qualification.2026-10-19T10-14.json",
+  "qualification_sha256": "69990783b2cb9bd6ae4afdf39da948bf3404af1dfe23cd3d50d8c2581f26c079",
+  "clarification": "The initial index generic captured-output cause label includes two original LF-only Pyright stdout lines. Numeric CR counts are correct. This index distinguishes those two lines explicitly:188 raw CRLF lines acquire another CR;2 raw LF output lines and110 LF wrapper lines acquire one CR.",
+  "mapping": [
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.md",
+        "working_sha256": "970105f1b350c493a23f09ffa8f45ff7cbcde17dcd699ef180f5215c576144de",
+        "staged_blob_sha256": "970105f1b350c493a23f09ffa8f45ff7cbcde17dcd699ef180f5215c576144de",
+        "staged_git_object_id": "350e1c51750f4bde3b584ab391b71b3cab33049c",
+        "working_bytes": 588,
+        "staged_bytes": 588,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 16
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.json",
+      "immutable_receipt_working_sha256": "7ef1db533a5a144c8bc139f189481e8ccc0e513e5862a455cb50bafb127b2d28",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          15,
+          16
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.md",
+        "working_sha256": "421fb0d68138cba23a46d3e2e574f9f60d0d29634a146733cffca43eb814b03f",
+        "staged_blob_sha256": "421fb0d68138cba23a46d3e2e574f9f60d0d29634a146733cffca43eb814b03f",
+        "staged_git_object_id": "0a3980557ab143b14f01902e69c27a55fa73d072",
+        "working_bytes": 418,
+        "staged_bytes": 418,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 13
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.json",
+      "immutable_receipt_working_sha256": "3c941d6a6ed7fd4b2c673e00f766109084982d376ebd86477c24ed45c16095db",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          12,
+          13
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.md",
+        "working_sha256": "6ec720c7bf63b7279412d64444fcb96500f275ad488d52a2ee91555e46103ffb",
+        "staged_blob_sha256": "6ec720c7bf63b7279412d64444fcb96500f275ad488d52a2ee91555e46103ffb",
+        "staged_git_object_id": "eb74d7eece31d4a5dce0cd136d96b20f43ff97c2",
+        "working_bytes": 513,
+        "staged_bytes": 513,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 15
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.json",
+      "immutable_receipt_working_sha256": "c3c108a59393b360b5678c47b22eb329216c6bb1bb642d6f022270e4d00291b7",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11,
+          12,
+          13
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.md",
+        "working_sha256": "fad4e79b37145baef114b705ad60e7dce3df391c76aff9fdccd5e09b8777241d",
+        "staged_blob_sha256": "fad4e79b37145baef114b705ad60e7dce3df391c76aff9fdccd5e09b8777241d",
+        "staged_git_object_id": "95e253e80bb599d364b0a471d8a944aaa7828db8",
+        "working_bytes": 418,
+        "staged_bytes": 418,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 13
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.json",
+      "immutable_receipt_working_sha256": "a6efaef27b9fc674b4f654ea63b4a7b19ec4ed6c3ffe54f1262645954802cf56",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          12,
+          13
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.md",
+        "working_sha256": "cd5b9dde4a41fc34d8bb982cc4aa70ded264f6c190566abebd1c74d77234e9f1",
+        "staged_blob_sha256": "cd5b9dde4a41fc34d8bb982cc4aa70ded264f6c190566abebd1c74d77234e9f1",
+        "staged_git_object_id": "ac505cba25f0b723b8c809289c5d25bd76482d6a",
+        "working_bytes": 555,
+        "staged_bytes": 555,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 15
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.json",
+      "immutable_receipt_working_sha256": "fcb21003eb65e13fa2ac0b6a186cee477aa6bb78825fb8ea205327f5e6ad54e6",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          11,
+          12,
+          13
+        ],
+        "captured_LF_plus_renderer_CR": [
+          10
+        ],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.md",
+        "working_sha256": "934e34d65003d0847d9bc01f218ba5fb85bfee7632efb25ac3614f5495cc1f7e",
+        "staged_blob_sha256": "934e34d65003d0847d9bc01f218ba5fb85bfee7632efb25ac3614f5495cc1f7e",
+        "staged_git_object_id": "97ff710021842a5ae607180550af47400eaf3ebc",
+        "working_bytes": 12468,
+        "staged_bytes": 12468,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 92
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.json",
+      "immutable_receipt_working_sha256": "4e3709d940fb5d0bac39b9e35a70a18aaf7930bca8b65e38790b4293f31a14d3",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          91,
+          92
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.md",
+        "working_sha256": "6937295dabbe269d9ce77bf18613ca1c79b5ef78a8361700183e9a7c764ac3e2",
+        "staged_blob_sha256": "6937295dabbe269d9ce77bf18613ca1c79b5ef78a8361700183e9a7c764ac3e2",
+        "staged_git_object_id": "b7850414d594b2a36339eb83ca12a32b60862a93",
+        "working_bytes": 513,
+        "staged_bytes": 513,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 15
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.json",
+      "immutable_receipt_working_sha256": "7eaf991f11b0e442fe7a0f6d612a06704c184a0483dd231aa3be2a38cc7c4aed",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11,
+          12,
+          13
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.md",
+        "working_sha256": "7fabb6d4ebcd283715253b515d8d500f3b0ceed4a2d369021793dd01789f2f1d",
+        "staged_blob_sha256": "7fabb6d4ebcd283715253b515d8d500f3b0ceed4a2d369021793dd01789f2f1d",
+        "staged_git_object_id": "fcea8caeb4456911bf9aba21d25167fb5c82cf55",
+        "working_bytes": 418,
+        "staged_bytes": 418,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 13
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "immutable_receipt_working_sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          12,
+          13
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.md",
+        "working_sha256": "a7a2a1ca183d2c45d1e6d71220a71ff96b13864e2c1ff2786e375acbfa5c4b89",
+        "staged_blob_sha256": "a7a2a1ca183d2c45d1e6d71220a71ff96b13864e2c1ff2786e375acbfa5c4b89",
+        "staged_git_object_id": "8c34057ce43e8b6b54642ee1118d5630d9428b3c",
+        "working_bytes": 555,
+        "staged_bytes": 555,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 15
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "immutable_receipt_working_sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          11,
+          12,
+          13
+        ],
+        "captured_LF_plus_renderer_CR": [
+          10
+        ],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "original_to_staged_identity": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.md",
+        "working_sha256": "b87fe3715dfc8ddd0030011818658ab97fe032c44587708e76c5911b3c8071bb",
+        "staged_blob_sha256": "b87fe3715dfc8ddd0030011818658ab97fe032c44587708e76c5911b3c8071bb",
+        "staged_git_object_id": "4c87928b71f047a95c39aa62b490b9fb6c41b910",
+        "working_bytes": 12607,
+        "staged_bytes": 12607,
+        "exact_equal": true,
+        "git_removed_one_cr_before_lf": false,
+        "whitespace_finding_count": 93
+      },
+      "immutable_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "immutable_receipt_working_sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "exact_line_groups": {
+        "captured_CRLF_plus_renderer_CR": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ],
+        "captured_LF_plus_renderer_CR": [],
+        "wrapper_LF_plus_renderer_CR": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          92,
+          93
+        ]
+      }
+    }
+  ],
+  "ordinary_authored_space_tab_correction_needed": false,
+  "normalized_readable_view": "Existing immutable JSON receipt presentation fields preserve escaped CR/LF sequences without literal trailing control bytes; references above avoid duplicating transcripts.",
+  "authorization": "Original files remain unchanged; no source/test/Git mutation or rerun. Any normalization/replacement of originals remains coordinator-owned."
+}

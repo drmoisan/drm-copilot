@@ -1,0 +1,177 @@
+"""Confirm only the frozen FR1-FR3 delta and retained bounded reproductions."""
+
+import hashlib
+import json
+import multiprocessing
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+REG = FEATURE / 'evidence/regression-testing'
+QA = FEATURE / 'evidence/qa-gates'
+R = 'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/'
+
+
+def binding(path, expected=None):
+    raw = (ROOT / path).read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if expected is not None:
+        assert digest == expected, str(path)
+    return {'path': str(path).replace('\\', '/'), 'sha256': digest, 'bytes': len(raw)}
+
+
+def read(path, expected=None):
+    item = binding(path, expected)
+    return json.loads((ROOT / path).read_bytes()), item
+
+
+def ini_child(connection, width, valid):
+    from drm_copilot_discovery.analyzer.dependency_inputs import DependencyInputError, DependencyLimits
+    from drm_copilot_discovery.analyzer.dependency_python import _IniParser, parse_python_dependencies
+    text = '[metadata]\nx' + ' ' * width + ('!=value' if valid else '!')
+    parser = _IniParser(interpolation=None, strict=True, empty_lines_in_values=False)
+    assert parser._optcre is parser.OPTCRE
+    assert parser.OPTCRE.pattern == r'(?P<option>[^=]+)(?P<vi>=)(?P<value>.*)$'
+    started = time.perf_counter()
+    try:
+        result = parse_python_dependencies(text.encode(), format='setup-cfg', limits=DependencyLimits())
+    except DependencyInputError as error:
+        observed = {'status': 'fixed-error', 'code': error.code}
+    else:
+        observed = {'status': 'returned', 'candidate_count': len(result.candidates), 'consumed_nodes': result.consumed_nodes, 'consumed_text_bytes': result.consumed_text_bytes}
+    connection.send({**observed, 'input_bytes': len(text.encode()), 'parser_seconds': time.perf_counter() - started, 'fixed_matcher_identity': True})
+    connection.close()
+
+
+def main():
+    py, py_binding = read(REG / 'p4t7-python-repair-freeze.2026-10-19T10-32.json', 'f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7')
+    dn, dn_binding = read(REG / 'p4t7-dotnet-repair-freeze.2026-10-19T10-30.json', '02e7fa6de5f8a895a1738777e1effcba1e973ade848b17347f3ce2e916956f96')
+    original, original_binding = read(QA / 'p4t7-executor-format-review.2026-10-19T10-23.json', '3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415')
+    probe, probe_binding = read(QA / 'p4t7-executor-format-probe.2026-10-19T10-18.json', '8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52')
+    sources = {path: value['sha256'] for path, value in py['bindings'].items()}
+    sources.update({item['path']: item['sha256'] for item in dn['source_test']})
+    checked = []
+    for path, digest in sources.items():
+        item = binding(path, digest)
+        item['physical_lines'] = len((ROOT / path).read_bytes().splitlines())
+        assert item['physical_lines'] <= 500
+        checked.append(item)
+    assert py['proof_binds_repaired_shared'] is True
+    assert dn['old_cases_preserved'] == 63 and dn['new_cases'] == 10
+    assert len(py['nodes']) == 116 and len(dn['nodes']) == 73
+    for path, value in dn['shared'].items():
+        assert value['sha256'] == sources[path]
+    gates = []
+    for records in ([{'path': path, 'sha256': py['artifacts'][path]} for path in py['gate_records']], dn['checks']):
+        stages = []
+        for record in records:
+            gate, bound_gate = read(record['path'], record['sha256'])
+            assert gate['exit_code'] == 0 and gate['source_before'] == gate['source_after']
+            for path, value in gate['source_before'].items():
+                assert value['sha256'] == sources[path]
+            if 'shared_before' in gate:
+                assert gate['shared_before'] == gate['shared_after'] == dn['shared']
+            stages.append(gate['stage'])
+            gates.append(bound_gate)
+        assert stages == ['format', 'lint', 'types', 'unit']
+    coverage = []
+    for name, path, digest, lines, branches in (
+        ('python', REG / 'p4t7-python-repair-coverage.2026-10-19T10-32.json', '16f45876ed3b4640480ed5c15102761b04929d29cd5a6bcc6a96fbb684b230ce', 156, 86),
+        ('dotnet', dn['coverage']['path'], dn['coverage']['sha256'], 141, 72),
+    ):
+        raw, item = read(path, digest)
+        data = next(value for key, value in raw['files'].items() if key.replace('\\', '/').endswith('/dependency_' + name + '.py'))
+        summary = data['summary']
+        assert summary['num_statements'] == summary['covered_lines'] == lines
+        assert summary['num_branches'] == summary['covered_branches'] == branches
+        units = [value['summary'] for kind in ('functions', 'classes') for key, value in data[kind].items() if key]
+        assert all(unit['missing_lines'] == unit['missing_branches'] == 0 for unit in units)
+        coverage.append({**item, 'lines': lines, 'branches': branches, 'named_class_callable_ranges': len(units)})
+
+    observations = []
+    context = multiprocessing.get_context('spawn')
+    # Reuse the original six small inputs with independent operational caps only.
+    for valid in (False, True):
+        for width in (4000, 8000, 16000):
+            parent, child = context.Pipe(duplex=False)
+            process = context.Process(target=ini_child, args=(child, width, valid))
+            process.start()
+            child.close()
+            process.join(timeout=2)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=2)
+                raise AssertionError('Retained bounded INI reproduction did not finish')
+            assert process.exitcode == 0 and parent.poll()
+            observation = parent.recv()
+            parent.close()
+            assert observation['status'] == ('returned' if valid else 'fixed-error')
+            if valid:
+                assert observation['candidate_count'] == 0
+            else:
+                assert observation['code'] == 'dependency-malformed'
+            observations.append({**observation, 'valid': valid, 'whitespace_count': width})
+    from drm_copilot_discovery.analyzer.dependency_inputs import DependencyLimits
+    from drm_copilot_discovery.analyzer.dependency_dotnet import parse_dotnet_dependencies
+    opaque = parse_dotnet_dependencies(probe['dotnet_opaque_data_observation']['input'].encode(), format='project', limits=DependencyLimits())
+    assert [(item.name, item.kind) for item in opaque.candidates] == [('Declared', 'declaration')]
+    assert opaque.diagnostics == ()
+    for path, digest in sources.items():
+        binding(path, digest)
+
+    original_paths = [
+        QA / 'p4t7-executor-format-review.2026-10-19T10-23.json',
+        QA / 'p4t7-executor-format-review.2026-10-19T10-23.md',
+        QA / 'p4t7-executor-format-review-harness.2026-10-19T10-23.txt',
+        QA / 'p4t7-executor-format-probe.2026-10-19T10-18.json',
+        QA / 'p4t7-executor-format-probe-harness.2026-10-19T10-18.txt',
+    ]
+    originals = [binding(path) for path in original_paths]
+    now = datetime.now(UTC)
+    stamp = now.strftime('%Y-%m-%dT%H-%M')
+    harness = QA / ('p4t7-executor-format-confirmation-harness.' + stamp + '.txt')
+    (ROOT / harness).write_bytes(Path(__file__).read_bytes())
+    result = {
+        'status': 'FORMAT_REPAIR_CONFIRMED', 'task': 'P4-T7', 'timestamp': stamp,
+        'published_utc': datetime.now(UTC).isoformat(),
+        'command': 'poetry run python SCRATCH/issue-980-p4t7-format-confirmation.py', 'exit_code': 0,
+        'authority': {'receipt': 'atomic_execution_p4t7_format_confirmation', 'profile_sha256': 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9', 'native_routing_launch_provenance': True},
+        'scope': 'Only frozen Python/.NET FR1-FR3 repair; shared hashes are bindings, not a repeated review.',
+        'freezes': [py_binding, dn_binding], 'source_test_and_shared_bindings': checked,
+        'focused_receipts_reused': gates, 'raw_coverage_reconciled': coverage,
+        'proof_reused': {'python': '116 cases: original 98 plus 18; 156/156 statements and 86/86 branches', 'dotnet': '73 cases: original 63 plus 10; 141/141 statements and 72/72 branches', 'original_tests_and_assertions': 'Owner AST/preservation proof retained unchanged in each frozen manifest; no suite replay.'},
+        'closure': {'FR1': 'Actual ConfigParser instance selects the fixed disjoint equals-only matcher. Both valid and invalid retained whitespace inputs produce correct outcomes; pre-parser aggregate reservations and deterministic worker controls remain bound.', 'FR2': 'Opaque ancestor masks propagate before interpreting descendants, including nested Project/ItemGroup data. Original false-positive input now yields only Declared. Genuine Project/Target/Choose/Otherwise, condition and bounds controls are preserved in the 73-case proof.', 'FR3': 'Affected Python helper/test contracts specify types, return/error behavior and side effects; identified comprehensions have immediate intent comments; files remain 311/473 lines.'},
+        'original_ini_reproductions': observations,
+        'opaque_reproduction': {'candidate_names': [item.name for item in opaque.candidates], 'diagnostics': list(opaque.diagnostics), 'original_input_reference': probe_binding},
+        'timing_qualification': 'Timings are diagnostic only. Correctness relies on actual fixed matcher identity, disjoint grammar, reserved aggregate work and deterministic regression assertions; no timing threshold was added.',
+        'original_review': original_binding, 'original_evidence_preserved': originals,
+        'dotnet_publication_qualification': 'Original captured/raw/rendered CR/LF qualification remains in the designated owner publication index referenced by the frozen repair. No original receipt or raw stream was changed or forensically re-reviewed.',
+        'open_probes': [], 'remaining_findings': [],
+        'pending': ['Central integration candidate review', 'Composed final ordered gates', 'P4-T7 task acceptance; registry/CLI exposure remains P4-T9'],
+        'exact_executed_harness': binding(harness), 'task_or_ac_checkoff': False,
+    }
+    json_path = QA / ('p4t7-executor-format-confirmation.' + stamp + '.json')
+    (ROOT / json_path).write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8', newline='\n')
+    md_now = datetime.now(UTC)
+    md_path = QA / ('p4t7-executor-format-confirmation.' + md_now.strftime('%Y-%m-%dT%H-%M') + '.md')
+    lines = ['# P4-T7 bounded format repair confirmation', '',
+        'Timestamp: ' + md_now.strftime('%Y-%m-%dT%H-%M'), 'Published UTC: ' + md_now.isoformat(),
+        'Command: `poetry run python SCRATCH/issue-980-p4t7-format-confirmation.py`', 'EXIT_CODE: 0', '',
+        'Output Summary: FORMAT_REPAIR_CONFIRMED. FR1-FR3 are closed within the frozen Python/.NET scope. No finding or behavioral probe remains open.', '',
+        'The actual INI parser uses the disjoint equals-only matcher. All six original valid/invalid whitespace inputs have the expected outcome; aggregate reservations and deterministic controls are preserved. Timings remain diagnostics only. The original opaque ProjectExtensions input now returns only the genuine Declared dependency. Typed contracts and immediate intent comments are repaired.', '',
+        'Reused proof: Python 116 cases, 156/156 statements and 86/86 branches; .NET 73 cases, 141/141 statements and 72/72 branches. Eight clean focused receipts bind current source and shared bytes. No suite replay or predecessor review occurred.', '',
+        'The original .NET raw/rendered newline qualification and all original finding/probe artifacts remain unchanged. Central integration review, composed final gates and P4-T7 task acceptance remain pending. No task or acceptance-criteria checkbox changed.', '',
+        'Exact bindings and probe observations: `' + json_path.as_posix() + '`.']
+    (ROOT / md_path).write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    staging_now = datetime.now(UTC)
+    staging_path = QA / ('p4t7-executor-format-staging.' + staging_now.strftime('%Y-%m-%dT%H-%M') + '.json')
+    streams = originals + [binding(json_path), binding(md_path), binding(harness)]
+    staging = {'timestamp': staging_now.strftime('%Y-%m-%dT%H-%M'), 'published_utc': staging_now.isoformat(), 'streams': streams, 'staging_paths': [item['path'] for item in streams] + [staging_path.as_posix()], 'scope': 'Original five format finding/probe/harness artifacts plus bounded confirmation and this staging index only.'}
+    (ROOT / staging_path).write_text(json.dumps(staging, indent=2) + '\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'status': result['status'], 'artifacts': [binding(json_path), binding(md_path), binding(harness), binding(staging_path)], 'remaining_findings': [], 'stage_count': 9}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

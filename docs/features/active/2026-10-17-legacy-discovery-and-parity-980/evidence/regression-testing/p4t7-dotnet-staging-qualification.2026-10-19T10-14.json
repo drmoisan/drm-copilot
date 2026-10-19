@@ -1,0 +1,2943 @@
+{
+  "status": "QUALIFIED_RENDERING_WHITESPACE_NOT_A_CLEAN_DIFF_CHECK",
+  "timestamp": "2026-10-19T10-14",
+  "counts": {
+    "staged_files": 38,
+    "affected_files": 10,
+    "findings": 300,
+    "captured_output_lines": 190,
+    "authored_wrapper_rendering_lines": 110,
+    "clean_staged_files": 28,
+    "working_equals_git": 13,
+    "git_crlf_normalized": 25
+  },
+  "initial_diagnostic": {
+    "command": "git diff --cached --check",
+    "exit_code": 2,
+    "stdout": {
+      "path": "SCRATCH/p4t7-dotnet-staged-whitespace.2026-10-19T10-14.stdout.bin",
+      "sha256": "70c5c97fe436a0f107750147c42acab22c91558b5958ab53ab20b929cd81547a",
+      "bytes": 78363
+    },
+    "stderr": {
+      "path": "SCRATCH/p4t7-dotnet-staged-whitespace.2026-10-19T10-14.stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "frozen_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-staging-manifest.2026-10-19T10-09.json",
+    "working_sha256": "bf43f870e96c0a4bda63fabb859d7e6e3a5ce7bea3e927d38f3743a3dd064d17"
+  },
+  "transformation": "capture bytes -> UTF-8 decode(errors=replace) -> path substitutions only -> concatenate LF wrapper -> Windows Path.write_text(newline=None) replaces each LF with CRLF. Raw CRLF becomes CRCRLF; wrapper LF becomes CRLF. Git identities reported independently.",
+  "all_existing_files_unchanged": true,
+  "staged_set_unchanged": true,
+  "ordinary_authored_space_tab_defects": 0,
+  "line_classification": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.json",
+      "receipt_working_sha256": "7ef1db533a5a144c8bc139f189481e8ccc0e513e5862a455cb50bafb127b2d28",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 16,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.json",
+      "receipt_working_sha256": "3c941d6a6ed7fd4b2c673e00f766109084982d376ebd86477c24ed45c16095db",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.json",
+      "receipt_working_sha256": "c3c108a59393b360b5678c47b22eb329216c6bb1bb642d6f022270e4d00291b7",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.json",
+      "receipt_working_sha256": "a6efaef27b9fc674b4f654ea63b4a7b19ec4ed6c3ffe54f1262645954802cf56",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.json",
+      "receipt_working_sha256": "fcb21003eb65e13fa2ac0b6a186cee477aa6bb78825fb8ea205327f5e6ad54e6",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.json",
+      "receipt_working_sha256": "4e3709d940fb5d0bac39b9e35a70a18aaf7930bca8b65e38790b4293f31a14d3",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 16,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 17,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 18,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 19,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 20,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 21,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 22,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 23,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 24,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 25,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 26,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 27,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 28,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 29,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 30,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 31,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 32,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 33,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 34,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 35,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 36,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 37,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 38,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 39,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 40,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 41,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 42,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 43,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 44,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 45,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 46,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 47,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 48,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 49,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 50,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 51,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 52,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 53,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 54,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 55,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 56,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 57,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 58,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 59,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 60,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 61,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 62,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 63,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 64,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 65,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 66,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 67,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 68,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 69,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 70,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 71,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 72,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 73,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 74,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 75,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 76,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 77,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 78,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 79,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 80,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 81,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 82,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 83,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 84,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 85,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 86,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 87,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 88,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 89,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 90,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 91,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 92,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.json",
+      "receipt_working_sha256": "7eaf991f11b0e442fe7a0f6d612a06704c184a0483dd231aa3be2a38cc7c4aed",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "receipt_working_sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "receipt_working_sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.md",
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "receipt_working_sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "renderer_reconstruction_exact": true,
+      "findings": [
+        {
+          "line": 1,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 2,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 3,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 4,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 5,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 6,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 7,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 8,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 9,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 10,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 11,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 12,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 13,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 14,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 15,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 16,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 17,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 18,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 19,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 20,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 21,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 22,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 23,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 24,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 25,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 26,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 27,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 28,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 29,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 30,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 31,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 32,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 33,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 34,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 35,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 36,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 37,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 38,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 39,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 40,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 41,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 42,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 43,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 44,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 45,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 46,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 47,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 48,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 49,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 50,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 51,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 52,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 53,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 54,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 55,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 56,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 57,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 58,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 59,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 60,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 61,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 62,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 63,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 64,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 65,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 66,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 67,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 68,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 69,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 70,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 71,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 72,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 73,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 74,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 75,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 76,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 77,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 78,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 79,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 80,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 81,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 82,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 83,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 84,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 85,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 86,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 87,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 88,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 89,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 90,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 91,
+          "region": "captured_command_output",
+          "cause": "preserved_output_CR_plus_Windows_LF_to_CRLF",
+          "captured_cr_at_end": 1,
+          "staged_cr_at_end": 2,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 92,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        },
+        {
+          "line": 93,
+          "region": "authored_wrapper",
+          "cause": "Windows_write_text_LF_to_CRLF_on_authored_wrapper",
+          "captured_cr_at_end": 0,
+          "staged_cr_at_end": 1,
+          "ordinary_authored_trailing_space_or_tab": false
+        }
+      ]
+    }
+  ],
+  "all_staged_identities": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-coverage.2026-10-19T10-09.json",
+      "working_sha256": "c60e3cbaef0b3eefccd13260631ab30b10c2891b85d081d23bb867735660a934",
+      "staged_blob_sha256": "c60e3cbaef0b3eefccd13260631ab30b10c2891b85d081d23bb867735660a934",
+      "staged_git_object_id": "04c040aaebff5a7df6d7dd81604aa9b21cad7150",
+      "working_bytes": 11360,
+      "staged_bytes": 11360,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-executed-harnesses.2026-10-19T10-09.json",
+      "working_sha256": "9c13babfa742babb8fc5e69e6409f90fc31511628f6a89210a264ed9a83e37e3",
+      "staged_blob_sha256": "1443bce95cfd5d5e212aecf1594339ef3f9e0f11912fd1f0282b712b1b727cc2",
+      "staged_git_object_id": "d0f658e4cf67f82a8d1295f6d9c6c479f44c2900",
+      "working_bytes": 18226,
+      "staged_bytes": 18202,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.json",
+      "working_sha256": "7ef1db533a5a144c8bc139f189481e8ccc0e513e5862a455cb50bafb127b2d28",
+      "staged_blob_sha256": "8ba36e5c81fe29828381a35e69bc0a44908e47fb3a79ee60e25c05fcf02bce0b",
+      "staged_git_object_id": "a4879f05a06c9a961fd25eaf50e1383cba89d43e",
+      "working_bytes": 2259,
+      "staged_bytes": 2212,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused1-format.2026-10-19T10-04.md",
+      "working_sha256": "970105f1b350c493a23f09ffa8f45ff7cbcde17dcd699ef180f5215c576144de",
+      "staged_blob_sha256": "970105f1b350c493a23f09ffa8f45ff7cbcde17dcd699ef180f5215c576144de",
+      "staged_git_object_id": "350e1c51750f4bde3b584ab391b71b3cab33049c",
+      "working_bytes": 588,
+      "staged_bytes": 588,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 16
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.json",
+      "working_sha256": "3c941d6a6ed7fd4b2c673e00f766109084982d376ebd86477c24ed45c16095db",
+      "staged_blob_sha256": "7d3040977d1c30279958378b2be9d2a9237b8b840527ef7147a368151317f947",
+      "staged_git_object_id": "1489b1940d83ba5b34fb26aa6f8d428b30576930",
+      "working_bytes": 2077,
+      "staged_bytes": 2030,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-format.2026-10-19T10-04.md",
+      "working_sha256": "421fb0d68138cba23a46d3e2e574f9f60d0d29634a146733cffca43eb814b03f",
+      "staged_blob_sha256": "421fb0d68138cba23a46d3e2e574f9f60d0d29634a146733cffca43eb814b03f",
+      "staged_git_object_id": "0a3980557ab143b14f01902e69c27a55fa73d072",
+      "working_bytes": 418,
+      "staged_bytes": 418,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 13
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-lint.2026-10-19T10-04.json",
+      "working_sha256": "0ddcad398c9366b58cfa588281536d964f87d6c4031834f4987ce2a7de7b9b1b",
+      "staged_blob_sha256": "ca50d71193497ce1de6bde6f9f292036e5c8bd738c3ebcc9e9bd0a881c53493a",
+      "staged_git_object_id": "d6a21dfb586d2b4c99d01fab6a0e1181d5cbac3a",
+      "working_bytes": 8762,
+      "staged_bytes": 8715,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused2-lint.2026-10-19T10-04.md",
+      "working_sha256": "45e3ee82b92fc11bb7b92e189e5ba4ec41ec0d1173bf9028645c24d4d003378a",
+      "staged_blob_sha256": "47ca42648b785fd73ecac2cd466196a9d74d24a1b834b97b695ef829fdcfea00",
+      "staged_git_object_id": "0542d3d8c2e6a80571a591bfb1c93003886878ea",
+      "working_bytes": 6919,
+      "staged_bytes": 6760,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.json",
+      "working_sha256": "c3c108a59393b360b5678c47b22eb329216c6bb1bb642d6f022270e4d00291b7",
+      "staged_blob_sha256": "8e03b86a61d82a47583daae68a28121582e90de6bb42761afd6480dbebdea574",
+      "staged_git_object_id": "47f602a788ce99476fd2356042f55fe8c69c8530",
+      "working_bytes": 2179,
+      "staged_bytes": 2132,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-format.2026-10-19T10-05.md",
+      "working_sha256": "6ec720c7bf63b7279412d64444fcb96500f275ad488d52a2ee91555e46103ffb",
+      "staged_blob_sha256": "6ec720c7bf63b7279412d64444fcb96500f275ad488d52a2ee91555e46103ffb",
+      "staged_git_object_id": "eb74d7eece31d4a5dce0cd136d96b20f43ff97c2",
+      "working_bytes": 513,
+      "staged_bytes": 513,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 15
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-lint.2026-10-19T10-05.json",
+      "working_sha256": "920a30ecb31cd39e026ab6c2b7d7e56714e8d3024c47773b8dcf7db481dab94d",
+      "staged_blob_sha256": "812b77a2ad0505bf1639996fbeb4de26b64b75f16ffa4cad52e7915b55d91aad",
+      "staged_git_object_id": "dd275fc057c3a86599354458cf1997a353ba43ff",
+      "working_bytes": 2861,
+      "staged_bytes": 2814,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused3-lint.2026-10-19T10-05.md",
+      "working_sha256": "8c7c05674e078f4ed6a19603f345e19aaa32374207987eb4306436ac8a083620",
+      "staged_blob_sha256": "ef6a9c1be02aae3e9c45f3a1984982f6e21a86d3bed461d0b916805278387e64",
+      "staged_git_object_id": "b008899a95143e43a5d35e466fe99296706569e7",
+      "working_bytes": 1202,
+      "staged_bytes": 1166,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.json",
+      "working_sha256": "a6efaef27b9fc674b4f654ea63b4a7b19ec4ed6c3ffe54f1262645954802cf56",
+      "staged_blob_sha256": "b39ca2a6eaab79f14547e37e908b92c64fe7fa291370a8d2f5ab47a5264c6b0f",
+      "staged_git_object_id": "6e9c6b319993af517a3948ed3c35d284a1f43722",
+      "working_bytes": 2078,
+      "staged_bytes": 2031,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-format.2026-10-19T10-05.md",
+      "working_sha256": "fad4e79b37145baef114b705ad60e7dce3df391c76aff9fdccd5e09b8777241d",
+      "staged_blob_sha256": "fad4e79b37145baef114b705ad60e7dce3df391c76aff9fdccd5e09b8777241d",
+      "staged_git_object_id": "95e253e80bb599d364b0a471d8a944aaa7828db8",
+      "working_bytes": 418,
+      "staged_bytes": 418,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 13
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lint.2026-10-19T10-05.json",
+      "working_sha256": "bda738b36b8a7ba37334ecfb39179e63cc6487513f761b46486e4da14da26af0",
+      "staged_blob_sha256": "9644d77ca17d8d246daa12f369ee46f60996939a562e4bd500c19922b1ca6326",
+      "staged_git_object_id": "e4f2d99e77ae973e51d63d85378bb7913bb85560",
+      "working_bytes": 2029,
+      "staged_bytes": 1982,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lint.2026-10-19T10-05.md",
+      "working_sha256": "a910445e787b325ded6e4d4607f5f1f2ce7f570ef9a030c89a36356eeb80ee83",
+      "staged_blob_sha256": "a92d06b5402189467bad48066877a2ed6398914736f045ba69c1ae25bb7c829e",
+      "staged_git_object_id": "606f0f8e644eda6b8d9099cf750f96739df62f40",
+      "working_bytes": 380,
+      "staged_bytes": 368,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lintfix.2026-10-19T10-05.json",
+      "working_sha256": "71f04be9dc860cb7ff4ba183abf1bfc4e64a50676c0d30d43a54d0b72ac72eb7",
+      "staged_blob_sha256": "0254b1f757773169fe962fd14ef1644a0e8d59584f03be2b11b9b1ddc36e8251",
+      "staged_git_object_id": "5b4df0fb6d7b4f7c931ecfe2f641f087ca084f78",
+      "working_bytes": 2188,
+      "staged_bytes": 2141,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-lintfix.2026-10-19T10-05.md",
+      "working_sha256": "dcfbeea38cc7d9e63c4e1278eff02dd48c065e57bf9192c762972097d2b50506",
+      "staged_blob_sha256": "5eb7444391ebda13b5a040141e5f85d51db5a71b32e1033b60cfb17653a9197e",
+      "staged_git_object_id": "e40f0195d9ae037a2f00c16fcc7943175aac3810",
+      "working_bytes": 522,
+      "staged_bytes": 505,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.json",
+      "working_sha256": "fcb21003eb65e13fa2ac0b6a186cee477aa6bb78825fb8ea205327f5e6ad54e6",
+      "staged_blob_sha256": "53655dc67783ea2a0760c5d0b2f781fc1592242fc721fe3b6e45fb2436ee0bf6",
+      "staged_git_object_id": "286a9fdf3c03755c07185c310836824ce514af0c",
+      "working_bytes": 2211,
+      "staged_bytes": 2164,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-types.2026-10-19T10-05.md",
+      "working_sha256": "cd5b9dde4a41fc34d8bb982cc4aa70ded264f6c190566abebd1c74d77234e9f1",
+      "staged_blob_sha256": "cd5b9dde4a41fc34d8bb982cc4aa70ded264f6c190566abebd1c74d77234e9f1",
+      "staged_git_object_id": "ac505cba25f0b723b8c809289c5d25bd76482d6a",
+      "working_bytes": 555,
+      "staged_bytes": 555,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 15
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.json",
+      "working_sha256": "4e3709d940fb5d0bac39b9e35a70a18aaf7930bca8b65e38790b4293f31a14d3",
+      "staged_blob_sha256": "7959440d5b23f33f2a760a39021c06ae7e151e85e7c00f57b35a3c253ef07a16",
+      "staged_git_object_id": "786864714a406b93374728502d0a012e61a95367",
+      "working_bytes": 14444,
+      "staged_bytes": 14397,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused4-unit.2026-10-19T10-05.md",
+      "working_sha256": "934e34d65003d0847d9bc01f218ba5fb85bfee7632efb25ac3614f5495cc1f7e",
+      "staged_blob_sha256": "934e34d65003d0847d9bc01f218ba5fb85bfee7632efb25ac3614f5495cc1f7e",
+      "staged_git_object_id": "97ff710021842a5ae607180550af47400eaf3ebc",
+      "working_bytes": 12468,
+      "staged_bytes": 12468,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 92
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.json",
+      "working_sha256": "7eaf991f11b0e442fe7a0f6d612a06704c184a0483dd231aa3be2a38cc7c4aed",
+      "staged_blob_sha256": "ee6de5a3d8f47c8aff56b5faa134fe347629c4bf214b85594e4f96016ff140f1",
+      "staged_git_object_id": "de23181ccec0705505c8811e246203c202911b7e",
+      "working_bytes": 2178,
+      "staged_bytes": 2131,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused5-format.2026-10-19T10-07.md",
+      "working_sha256": "6937295dabbe269d9ce77bf18613ca1c79b5ef78a8361700183e9a7c764ac3e2",
+      "staged_blob_sha256": "6937295dabbe269d9ce77bf18613ca1c79b5ef78a8361700183e9a7c764ac3e2",
+      "staged_git_object_id": "b7850414d594b2a36339eb83ca12a32b60862a93",
+      "working_bytes": 513,
+      "staged_bytes": 513,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 15
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "working_sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "staged_blob_sha256": "9f3d1e700ee5993bfb7c665466b3db7325af1fb37e26526bb3779e668fd375e3",
+      "staged_git_object_id": "f0e2ef1c7975e011a89374bcd56e77f0a9779d75",
+      "working_bytes": 2253,
+      "staged_bytes": 2204,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.md",
+      "working_sha256": "7fabb6d4ebcd283715253b515d8d500f3b0ceed4a2d369021793dd01789f2f1d",
+      "staged_blob_sha256": "7fabb6d4ebcd283715253b515d8d500f3b0ceed4a2d369021793dd01789f2f1d",
+      "staged_git_object_id": "fcea8caeb4456911bf9aba21d25167fb5c82cf55",
+      "working_bytes": 418,
+      "staged_bytes": 418,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 13
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.json",
+      "working_sha256": "82cec0e77841af3196e90a35cf7ed57fbac746f139d62d22ac8bcde23c144a8c",
+      "staged_blob_sha256": "f94a688a1ea1256a69af0f00af78255cee1f7bdf4df0a673124cf6db5e4bf8dc",
+      "staged_git_object_id": "6d1a99402e4a025c0921b071a40d1c08151110f5",
+      "working_bytes": 2204,
+      "staged_bytes": 2155,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.md",
+      "working_sha256": "b29ceb1a93967bf42aff987238dad9fbfc0b6fc210c139908f4d7d16151fe3b5",
+      "staged_blob_sha256": "5f2ba0d267b3581223769e8e3007288d88623b74c8830aaf2ad8d5bcf793fdb9",
+      "staged_git_object_id": "5458a56648bbdf761b80047458c56a95c1f0a677",
+      "working_bytes": 380,
+      "staged_bytes": 368,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "working_sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "staged_blob_sha256": "d585819b0466ee9d68abb3ae7da680da5580d3f2b441e77c9b3ccc9cf02415d8",
+      "staged_git_object_id": "7517bd598b2e22ffd73c05bbbb2f4a3d83dd22ef",
+      "working_bytes": 2386,
+      "staged_bytes": 2337,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.md",
+      "working_sha256": "a7a2a1ca183d2c45d1e6d71220a71ff96b13864e2c1ff2786e375acbfa5c4b89",
+      "staged_blob_sha256": "a7a2a1ca183d2c45d1e6d71220a71ff96b13864e2c1ff2786e375acbfa5c4b89",
+      "staged_git_object_id": "8c34057ce43e8b6b54642ee1118d5630d9428b3c",
+      "working_bytes": 555,
+      "staged_bytes": 555,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 15
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "working_sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "staged_blob_sha256": "6f950a8e47a28f0bb77974230e8223ebbe77ad0845ddf67ce436f4ab9085cfff",
+      "staged_git_object_id": "bccbdd430dae7df82bca30ebb4e97d8f853adf0b",
+      "working_bytes": 14760,
+      "staged_bytes": 14711,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.md",
+      "working_sha256": "b87fe3715dfc8ddd0030011818658ab97fe032c44587708e76c5911b3c8071bb",
+      "staged_blob_sha256": "b87fe3715dfc8ddd0030011818658ab97fe032c44587708e76c5911b3c8071bb",
+      "staged_git_object_id": "4c87928b71f047a95c39aa62b490b9fb6c41b910",
+      "working_bytes": 12607,
+      "staged_bytes": 12607,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 93
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-freeze.2026-10-19T10-09.json",
+      "working_sha256": "7ad5bb106f6904f99be9b6c1649a77ba2318a1091e5abc1ec05177ae1b99d1b1",
+      "staged_blob_sha256": "a6a97febeca34b9667b9cdbbe6052b1784fe1b020c2d7b6bb503b46e0c6d425f",
+      "staged_git_object_id": "83f5602e11a3e25985c64b2ecbe488c9ae4ff10e",
+      "working_bytes": 10777,
+      "staged_bytes": 10422,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-handoff.2026-10-19T10-09.md",
+      "working_sha256": "3e97921a105f174973dc2c6e4818f6b68f767928f94c0c94f31399daf4ef18b1",
+      "staged_blob_sha256": "57a2a8098db492a678b762e06c63ac3e4b40045c4edc2e9b3005ad500276c342",
+      "staged_git_object_id": "ccbaa813a18fe0d3f409fa02d8f862b8c902445e",
+      "working_bytes": 1043,
+      "staged_bytes": 1032,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-nodes.2026-10-19T10-09.json",
+      "working_sha256": "8c4093aab60f8240e22f58ad2f0fac23442c1a0efe42bd044911c0bd38a27644",
+      "staged_blob_sha256": "9977d8fe6aa6a52186ec25ce16a463cc1b62a75ead6b2eee3aef7be13037981d",
+      "staged_git_object_id": "dc977f6713e620017b21d451a5886f84a3d18c4c",
+      "working_bytes": 10925,
+      "staged_bytes": 10852,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-staging-manifest.2026-10-19T10-09.json",
+      "working_sha256": "bf43f870e96c0a4bda63fabb859d7e6e3a5ce7bea3e927d38f3743a3dd064d17",
+      "staged_blob_sha256": "e0eece39dd8786d9a21e675ed236fd0c010dbd13579b42b4f3df4cc31c09e9ce",
+      "staged_git_object_id": "335a4659a6672be2e93644306abf7eb529c31aa4",
+      "working_bytes": 10216,
+      "staged_bytes": 10026,
+      "exact_equal": false,
+      "git_removed_one_cr_before_lf": true,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "working_sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "staged_blob_sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "staged_git_object_id": "94116cc5c352a657f830c546dd10043d67b99c22",
+      "working_bytes": 13310,
+      "staged_bytes": 13310,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 0
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "working_sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "staged_blob_sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "staged_git_object_id": "2d7bcb8ce1b196eecad952e0ea4abd6dfb1fc9b5",
+      "working_bytes": 15042,
+      "staged_bytes": 15042,
+      "exact_equal": true,
+      "git_removed_one_cr_before_lf": false,
+      "whitespace_finding_count": 0
+    }
+  ],
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-staging-qualification.py",
+    "sha256": "58972261214f4c9fa8cad2643031f6b88dc6fec06d286659b81b81627e4b518e"
+  },
+  "action": "No source/test correction indicated. Existing Markdown renderer output causes the failing check, including wrapper lines. Preserve originals and use explicit evidence qualification; any normalization requires separate authorization and new identity bindings. No bypass or staging change performed."
+}

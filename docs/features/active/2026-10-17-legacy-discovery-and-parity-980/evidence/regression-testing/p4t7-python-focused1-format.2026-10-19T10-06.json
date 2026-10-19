@@ -1,0 +1,45 @@
+{
+  "stage": "format",
+  "label": "p4t7-python-focused1-format",
+  "started": "2026-10-19T10:06:41.508850+00:00",
+  "finished": "2026-10-19T10:06:43.304294+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py tests/discovery_runtime/analyzer/test_dependency_python.py",
+  "exit_code": 0,
+  "duration_seconds": 1.795,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "d8ea8ac15c0664046538aa6059a36e9c5f82f8e65fa48c6b44cbb77bdbbe78c7",
+      "physical_lines": 258
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "65ae90c6a340c207d18c13ee0c2d2b18de26755b3cdf98638e0dbea1a8d1b35f",
+      "physical_lines": 207
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "689fa1aa6545c404d689b390325ba3221610f801bdd856eb970ff22acaaa96b2",
+      "physical_lines": 263
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": {
+      "sha256": "9eaf028cca40d194fc521488b465a3170bf5704c15ab61733e6711c29496dfa1",
+      "physical_lines": 283
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused1-format-100643.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-python-focused1-format-100643.stderr.bin",
+      "raw_sha256": "dc05c87df07f3c61c0fef30281643ea655b117a0c9ad2ea347a1f252f50f4601",
+      "raw_bytes": 216,
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_python.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dependency_python.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted.\r\n"
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 Python parser only"
+}

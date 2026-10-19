@@ -1,0 +1,47 @@
+{
+  "stage": "lintfix",
+  "command": "poetry run ruff check --fix packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+  "started": "2026-10-19T10:05:40.569369+00:00",
+  "finished": "2026-10-19T10:05:41.734777+00:00",
+  "duration_seconds": 1.166,
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "5febe4dbe9d682b46f91b74f049ee7332a8d3c2318ee950e8440f5464844d645",
+      "physical_lines": 374
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "998a51ba7fa4c10f21c2d1be15a6804e7ee63d29414113bf5e136e40169f82ae",
+      "physical_lines": 331
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": {
+      "sha256": "29581b603ac837da31beb5fde6a8a711b87ddccc66f7feda42ca4c942bbbdcce",
+      "physical_lines": 375
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-lintfix.100541734777.stdout.bin",
+      "raw_sha256": "ee90d533949412e2365a8db4ff6206f8b0374f24a192ffdf5f3c3e7d8bbabd45",
+      "raw_bytes": 150,
+      "presentation": "\nFixed 1 error:\n- tests\\discovery_runtime\\analyzer\\test_dependency_dotnet.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 1 error (1 fixed, 0 remaining).\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/p4t7-dotnet-focused4-lintfix.100541734777.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "harness": {
+    "path": "SCRATCH/p4t7-dotnet-gates.py",
+    "sha256": "e5954b7ef4514589ed5a1f764d4fd701f73600c3007966366463ae6a1402744c"
+  },
+  "baseline": "shared 09:44 absent-path baseline; checked contract 1dd386135f0f52c247d7b85ccd766cbc63ebaf4d"
+}

@@ -1,0 +1,212 @@
+{
+  "status": "SCOPED_FORMAT_REPAIR_REQUIRED",
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-23",
+  "published_utc": "2026-10-19T10:23:22.725912+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-format-review.py",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t7_frozen_formats",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": "verified before review; unchanged exact C4 Astra/max"
+  },
+  "source_test_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "dcbf0058a783a54264f7defd8c874cdcb561667c007b4799838d1be014ce875b",
+      "bytes": 12079,
+      "physical_lines": 289
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+      "bytes": 12386,
+      "physical_lines": 309
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+      "bytes": 13310,
+      "physical_lines": 332
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce",
+      "bytes": 15042,
+      "physical_lines": 408
+    }
+  ],
+  "immutable_subset_freezes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-freeze.2026-10-19T10-12.json",
+      "sha256": "1ec6826e8b621ff41bf5a38eb959a179541bf802e3cacd740bfff6915a08259a",
+      "bytes": 32961
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-freeze.2026-10-19T10-09.json",
+      "sha256": "7ad5bb106f6904f99be9b6c1649a77ba2318a1091e5abc1ec05177ae1b99d1b1",
+      "bytes": 10777
+    }
+  ],
+  "ordered_focused_receipts_reused": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-format.2026-10-19T10-11.json",
+      "sha256": "ddf4d818a19ee2290e640e7ec109fa7c6027ce3c6359afc0ab26a9481daf0cc8",
+      "bytes": 2370,
+      "stage": "format",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-lint.2026-10-19T10-11.json",
+      "sha256": "acd474aeb8b6a56b802681c1932eb5525c415b46e4452019fe5a74bdb9a47aad",
+      "bytes": 2302,
+      "stage": "lint",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-types.2026-10-19T10-11.json",
+      "sha256": "a2fd7c96376e2a044aaf5270ffca3a5f81a2d1988d649df4e5cd3f3559fa08cf",
+      "bytes": 2486,
+      "stage": "types",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-focused7-unit.2026-10-19T10-11.json",
+      "sha256": "984275d9daf0b436bc3550e796a0a94edb55b6bc3069158a8b623631030d7775",
+      "bytes": 20190,
+      "stage": "unit",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-format.2026-10-19T10-08.json",
+      "sha256": "6f759a6917ad63ecddfc0bba2de8e8ab916f10abf208d2b2ff136dd15c5dbfed",
+      "bytes": 2253,
+      "stage": "format",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-lint.2026-10-19T10-08.json",
+      "sha256": "82cec0e77841af3196e90a35cf7ed57fbac746f139d62d22ac8bcde23c144a8c",
+      "bytes": 2204,
+      "stage": "lint",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-types.2026-10-19T10-08.json",
+      "sha256": "73f090ed87b3e07190f81b60d04edfa5040377b265bce1fdeafa16feb0acf7a5",
+      "bytes": 2386,
+      "stage": "types",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-focused6-unit.2026-10-19T10-08.json",
+      "sha256": "46237e2ea73c3a1badac95b06c0c902dc14f6252f0395aa3beb7000f0ac1860f",
+      "bytes": 14760,
+      "stage": "unit",
+      "exit_code": 0
+    }
+  ],
+  "raw_coverage_reconciled": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-coverage.2026-10-19T10-12.json",
+      "sha256": "fa65c49f678b970d27e2252e5e7d3018f54f4d3bfc9f31c1f2f7efe3e4fab6e5",
+      "bytes": 31819,
+      "statements": 154,
+      "branches": 86,
+      "named_callables": 7,
+      "all_named_ranges_fully_covered": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-coverage.2026-10-19T10-09.json",
+      "sha256": "c60e3cbaef0b3eefccd13260631ab30b10c2891b85d081d23bb867735660a934",
+      "bytes": 11360,
+      "statements": 126,
+      "branches": 66,
+      "named_callables": 9,
+      "all_named_ranges_fully_covered": true
+    }
+  ],
+  "focused_cases_reused": {
+    "python": 98,
+    "dotnet": 63
+  },
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe.2026-10-19T10-18.json",
+    "sha256": "8b01c5aac30cf80b9dff0602bbd30d921fbdc181dba03002002a2c511f14ed52",
+    "bytes": 4018
+  },
+  "exact_probe_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+    "sha256": "d03a2314d7b3fba6bac99f07bd8602d184bcc15b701e293a6d8557e7cdbc18c5",
+    "bytes": 7089
+  },
+  "shared_dependency": {
+    "commit": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+    "sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+    "live_repair_loaded": false,
+    "retained_shared_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-shared-review.2026-10-19T10-07.json",
+      "sha256": "0bd89530074639e96b6c31027546c6124f0c1ebd6b4278bb85c9d2b8b1b396a8",
+      "bytes": 9398
+    }
+  },
+  "findings": [
+    {
+      "id": "P4T7-FR1",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "line": 181,
+      "title": "Default INI option matching performs unbounded quadratic work",
+      "evidence": "The default ConfigParser option matcher accepts overlapping lazy-name and whitespace searches. Six retained probes cover valid and invalid option lines at 4,000, 8,000 and 16,000 whitespace characters; parser time grows approximately fourfold per input doubling.",
+      "impact": "The parser work is not bounded by the declared per-character reservation, including options in an unselected metadata section.",
+      "required_change": "Use a fixed linear option grammar or equivalent deterministic bounded preflight for both valid and invalid whitespace cases; preserve strict duplicate, continuation, selected-section and default rejection semantics. Add deterministic matcher/work-count regressions, not timing thresholds.",
+      "timing_qualification": "All six observations completed within independent two-second operational limits; timings are diagnostic evidence only."
+    },
+    {
+      "id": "P4T7-FR2",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "line": 77,
+      "title": "Opaque ProjectExtensions content is reported as a declaration",
+      "evidence": "The retained synthetic project returns both OpaqueData inside ProjectExtensions and the genuine Declared PackageReference as declaration records, without diagnostics.",
+      "impact": "The extractor converts non-MSBuild data into a declared dependency because it checks only the immediate ItemGroup parent.",
+      "required_change": "Exclude opaque non-MSBuild subtrees or fail closed on unsupported context before declaration extraction. Preserve genuine Project/Target/Choose declarations and condition-presence semantics without build evaluation. Add an opaque-data negative case and genuine-declaration control.",
+      "reference": "https://learn.microsoft.com/en-us/visualstudio/msbuild/projectextensions-element-msbuild?view=visualstudio"
+    },
+    {
+      "id": "P4T7-FR3",
+      "severity": "blocking-policy",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+        "tests/discovery_runtime/analyzer/test_dependency_python.py"
+      ],
+      "title": "Complete the scoped typed contracts and intent comments",
+      "evidence": "Python helper contracts at source lines 70 and 116 do not explicitly type all parameters. The test parse helper at line 21 and parameterized test contracts omit the required typed inputs, returns, raises and side effects. Nontrivial comprehensions around test lines 119-122, 178-186 and 250 lack immediate intent comments.",
+      "required_change": "Complete the affected helper/test contracts and immediately preceding intent comments under self-explanatory-code-commenting. Preserve all existing assertions and parametrizations; keep each file at most 500 lines.",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md"
+    }
+  ],
+  "open_behavioral_probes": [],
+  "reviewed_boundaries": [
+    "finite grammar and declaration/lock-edge distinctions",
+    "honest physical/XML/JSON anchors and nullable target bindings",
+    "selected key/value/condition redaction and fixed public errors",
+    "secure existing XML/JSON seams and documented JSON node-budget mapping",
+    "prospective limits, sorting and whole-result overflow behavior",
+    "unit isolation, source size, public contracts and intent comments"
+  ],
+  "qualifications": [
+    "This is the complete scoped finding set for the frozen Python/.NET pairs, not full-task acceptance.",
+    "The shared repair, Node parser and integration remain outside this scope until frozen; original shared proof is not silently replaced.",
+    "The separate .NET raw/rendered newline qualification remains with its designated owner and does not affect these source/test bindings.",
+    "Existing focused suites and accepted predecessor proof were reused; no suite or predecessor review was replayed.",
+    "The probe publication timestamp carries an explicit UTC-04:00 offset; its 10-18 filename is the corresponding UTC minute. Original bytes remain unchanged.",
+    "One earlier read-only PowerShell metadata query rejected an empty coverage key; subsequent metadata reads used AsHashtable. No behavioral or artifact failure resulted."
+  ],
+  "exact_executed_review_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-review-harness.2026-10-19T10-23.txt",
+    "sha256": "746fa46b2d8982e2f4ad9a1b7cf131be43e58421cb3175a088c792ed2ce466ea",
+    "bytes": 12614
+  },
+  "plan_or_acceptance_criteria_changed": false
+}

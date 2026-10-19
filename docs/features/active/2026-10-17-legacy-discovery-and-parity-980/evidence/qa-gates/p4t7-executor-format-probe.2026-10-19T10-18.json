@@ -1,0 +1,99 @@
+{
+  "timestamp": "2026-10-19T10-18",
+  "published_utc": "2026-10-19T10:18:03.843016+00:00",
+  "exit_code": 0,
+  "command": "poetry run python SCRATCH/issue-980-p4t7-format-probe.py",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": "dcbf0058a783a54264f7defd8c874cdcb561667c007b4799838d1be014ce875b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": "cfc546fd234408e3e2fcad9df18a1d3b8d169cc69039f29436c6a98c934894c5",
+    "tests/discovery_runtime/analyzer/test_dependency_python.py": "97e3b22f403a174efd0abc04807b16a7a458e154432d2a3be36767b070f97f8a",
+    "tests/discovery_runtime/analyzer/test_dependency_dotnet.py": "8a2c09669472194651ed39470b5d8b32c9bd531e985c360d185bcae6a35f5dce"
+  },
+  "shared_commit": "1dd386135f0f52c247d7b85ccd766cbc63ebaf4d",
+  "shared_original_sha256": "3b55bb3f4c79348851d2e8838c7233ab26aee1274526f916b55e2443d6289253",
+  "live_shared_repair_loaded": false,
+  "python_input_recipe": "'[metadata]\\nx' + ' ' * whitespace_count + ('!=value' if valid_ini_option else '!')",
+  "python_ini_observations": [
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "parser_seconds": 0.028108300000894815,
+      "whitespace_count": 4000,
+      "valid_ini_option": false,
+      "input_bytes": 4013,
+      "parent_elapsed_seconds": 0.15936190000502393
+    },
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "parser_seconds": 0.10852400001022033,
+      "whitespace_count": 8000,
+      "valid_ini_option": false,
+      "input_bytes": 8013,
+      "parent_elapsed_seconds": 0.2274819000158459
+    },
+    {
+      "status": "fixed-error",
+      "code": "dependency-malformed",
+      "parser_seconds": 0.45533399999840185,
+      "whitespace_count": 16000,
+      "valid_ini_option": false,
+      "input_bytes": 16013,
+      "parent_elapsed_seconds": 0.5807319000014104
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "parser_seconds": 0.027769000007538125,
+      "whitespace_count": 4000,
+      "valid_ini_option": true,
+      "input_bytes": 4019,
+      "parent_elapsed_seconds": 0.15992730000289157
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "parser_seconds": 0.11132090000319295,
+      "whitespace_count": 8000,
+      "valid_ini_option": true,
+      "input_bytes": 8019,
+      "parent_elapsed_seconds": 0.23509840000770055
+    },
+    {
+      "status": "returned",
+      "candidate_count": 0,
+      "parser_seconds": 0.43525330000557005,
+      "whitespace_count": 16000,
+      "valid_ini_option": true,
+      "input_bytes": 16019,
+      "parent_elapsed_seconds": 0.5599717000150122
+    }
+  ],
+  "dotnet_opaque_data_observation": {
+    "input": "<Project><ProjectExtensions><ItemGroup><PackageReference Include=\"OpaqueData\" Version=\"1.0\"/></ItemGroup></ProjectExtensions><ItemGroup><PackageReference Include=\"Declared\" Version=\"2.0\"/></ItemGroup></Project>",
+    "candidates": [
+      {
+        "name": "OpaqueData",
+        "kind": "declaration",
+        "role": "PackageReference",
+        "line": 1,
+        "occurrence": 4
+      },
+      {
+        "name": "Declared",
+        "kind": "declaration",
+        "role": "PackageReference",
+        "line": 1,
+        "occurrence": 6
+      }
+    ],
+    "diagnostics": [],
+    "official_semantics": "ProjectExtensions contains non-MSBuild information ignored by MSBuild.",
+    "reference": "https://learn.microsoft.com/en-us/visualstudio/msbuild/projectextensions-element-msbuild?view=visualstudio"
+  },
+  "timing_qualification": "Operational timeout and diagnostics only; deterministic regressions must check matching/work rather than wall-clock thresholds.",
+  "exact_executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-format-probe-harness.2026-10-19T10-18.txt",
+    "sha256": "d03a2314d7b3fba6bac99f07bd8602d184bcc15b701e293a6d8557e7cdbc18c5"
+  }
+}

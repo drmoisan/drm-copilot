@@ -1,0 +1,123 @@
+"""Freeze FR1/FR3 proof while checking original evidence and tests remain intact."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+owned = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py", "tests/discovery_runtime/analyzer/test_dependency_python.py"]
+shared = {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+}
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def bind(path):
+    source = repo / path
+    return {"sha256": digest(source), "physical_lines": len(source.read_text("utf-8").splitlines())}
+
+
+bindings = {path: bind(path) for path in owned + list(shared)}
+assert all(item["physical_lines"] <= 500 for item in bindings.values())
+assert all(bindings[path]["sha256"] == expected for path, expected in shared.items())
+baseline_path = evidence / "p4t7-python-freeze.2026-10-19T10-12.json"
+assert digest(baseline_path) == "1ec6826e8b621ff41bf5a38eb959a179541bf802e3cacd740bfff6915a08259a"
+baseline = json.loads(baseline_path.read_text("utf-8"))
+assert all(digest(repo / path) == expected for path, expected in baseline["artifacts"].items())
+
+# Compare complete old test bodies and parametrizations after removing only docstrings.
+old_tree = ast.parse((evidence / "p4t7-python-full-file-2.2026-10-19T10-12.txt").read_text("utf-8"))
+new_tree = ast.parse((repo / owned[1]).read_text("utf-8"))
+
+
+def functions(tree):
+    result = {}
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            if ast.get_docstring(node) is not None:
+                node.body = node.body[1:]
+            result[node.name] = ast.dump(node, include_attributes=False)
+    return result
+
+
+old_functions, new_functions = functions(old_tree), functions(new_tree)
+assert all(new_functions[name] == body for name, body in old_functions.items())
+records = sorted(evidence.glob("p4t7-python-repair-focused2-*.json"))
+assert len(records) == 4
+for path in records:
+    record = json.loads(path.read_text("utf-8"))
+    assert record["exit_code"] == 0
+    assert record["source_before"] == record["source_after"] == bindings
+    for stream in record["streams"].values():
+        assert digest(scratch / stream["scratch_identifier"].removeprefix("SCRATCH/")) == stream["raw_sha256"]
+unit = json.loads(next(evidence.glob("p4t7-python-repair-focused2-unit.*.json")).read_text("utf-8"))
+nodes = re.findall(r"^(tests/.*) PASSED", unit["streams"]["stdout"]["presentation"], re.M)
+assert len(nodes) == 116 and set(baseline["nodes"]) <= set(nodes)
+coverage = json.loads((scratch / "issue-980-p4t7-python-repair-coverage.json").read_text("utf-8"))
+covered = next(iter(coverage["files"].values()))
+assert covered["summary"]["missing_lines"] == covered["summary"]["missing_branches"] == 0
+for collection in ("functions", "classes"):
+    assert all(item["summary"]["missing_lines"] == item["summary"]["missing_branches"] == 0 for item in covered.get(collection, {}).values())
+(evidence / f"p4t7-python-repair-coverage.{stamp}.json").write_bytes((json.dumps(coverage, indent=2) + "\n").encode())
+for suffix in ("gate", "freeze"):
+    (evidence / f"p4t7-python-repair-{suffix}-harness.{stamp}.txt").write_bytes((scratch / f"issue-980-p4t7-python-repair-{suffix}.py").read_bytes())
+for index, path in enumerate(owned, 1):
+    (evidence / f"p4t7-python-repair-full-file-{index}.{stamp}.txt").write_bytes((repo / path).read_bytes())
+
+handoff = f"""# P4-T7 Python FR1/FR3 repair handoff
+
+Timestamp: {stamp}
+Command: poetry run python SCRATCH/issue-980-p4t7-python-repair-freeze.py
+EXIT_CODE: 0
+Output Summary: FROZEN_REPAIR_READY; independent review and whole-task acceptance pending.
+
+Scope: only dependency_python.py and test_dependency_python.py, plus p4t7-python-repair evidence. No shared-source, other-parser, checkpoint, plan or Git changes by this worker.
+
+Baseline: original 98-case freeze and every artifact it binds were rehashed unchanged. AST comparison proves every original test/helper body, signature and parametrization is unchanged except docstrings; no assertions were removed. Original 154/154 statements and 86/86 branches remain preserved as historical proof.
+
+FR1: a local ConfigParser subclass supplies `(?P<option>[^=]+)(?P<vi>=)(?P<value>.*)$`. The name repetition cannot consume its equals delimiter and has no overlapping whitespace repetition. Successful and failed matching use linear scans. ConfigParser still owns strict duplicate handling and continuation grouping; extraction remains restricted to explicit selected lists, rejects DEFAULT, and uses original physical source lines. Whole-input work/storage is reserved before parser construction and normalization, including unselected sections. Existing secret redaction and fixed-error boundaries remain.
+
+Regressions: 18 deterministic cases cover 4000/8000/16000 whitespace characters, valid/invalid matching, selected options and unselected metadata. Tests inspect the actual parser through its public read method, assert the disjoint grammar, and verify exact linear work/storage charges. No elapsed-time assertions. All original 98 cases still execute.
+
+FR3: helper and test contracts now include typed inputs, returns, errors and side effects; immediate intent comments cover the identified comprehensions and control flow. Public entrypoint and shared signatures are unchanged. Production/test physical lines: {bindings[owned[0]]['physical_lines']}/{bindings[owned[1]]['physical_lines']}.
+
+QA: final focused2 Black check, Ruff, strict scoped Pyright and Pytest pass on identical source/shared bytes. 116 tests; 156/156 statements and 86/86 branches. Every function and the new class has 100% coverage. New lint/type/failing-test deltas: zero; changed-file coverage loss: zero. Initial test-only private-import type finding was corrected without suppression; its receipt remains retained.
+
+Proof explicitly binds repaired shared inputs `{shared[next(iter(shared))]}` and values `{shared[list(shared)[1]]}`, verified against shared freeze `p4t7-shared-repair-freeze.2026-10-19T10-28.json` (`de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749`). Original pre-repair proof is not relabeled. Shared/predecessor suites were not rerun.
+
+Exact source snapshots, raw command stream hashes/scratch-relative paths, executed gate/freeze harnesses, nodes, per-function/class coverage and timings are bound in `p4t7-python-repair-freeze.{stamp}.json`. The separate staging manifest names only this worker's pair/evidence. Full integration/review/acceptance remains pending.
+"""
+(evidence / f"p4t7-python-repair-handoff.{stamp}.md").write_bytes(handoff.encode())
+shared_freeze = evidence / "p4t7-shared-repair-freeze.2026-10-19T10-28.json"
+assert digest(shared_freeze) == "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749"
+manifest = {
+    "status": "FROZEN_REPAIR_READY_NOT_TASK_ACCEPTANCE", "timestamp": stamp,
+    "command": "poetry run python SCRATCH/issue-980-p4t7-python-repair-freeze.py", "exit_code": 0,
+    "review_sha256": "3b83dee865b21e85e5a76cd81f2de56e72ee650613f3c504fec7298f85f4e415",
+    "addressed": ["P4T7-FR1", "P4T7-FR3"], "bindings": bindings,
+    "authority": {"route": "source_inspection_p4t7_python_repair", "attestation_key": "8c04f3a3fe50ba17fbccaeea1ac48b0e041f0d2d43733042fe4427dff9d50221", "profile_sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363", "native_routing_launch_provenance_verified": True},
+    "original_freeze_sha256": digest(baseline_path), "original_evidence_unchanged": True,
+    "preserved_original_function_asts": sorted(old_functions), "nodes": nodes,
+    "shared_repair_freeze_sha256": digest(shared_freeze), "proof_binds_repaired_shared": True,
+    "coverage_summary": covered["summary"],
+    "callable_coverage": {name: item["summary"] for name, item in covered["functions"].items()},
+    "class_coverage": {name: item["summary"] for name, item in covered["classes"].items()},
+    "gate_records": [path.relative_to(repo).as_posix() for path in records],
+    "durations_seconds": {json.loads(p.read_text())["stage"]: json.loads(p.read_text())["duration_seconds"] for p in records},
+    "artifacts": {path.relative_to(repo).as_posix(): digest(path) for path in sorted(evidence.glob("p4t7-python-repair-*"))},
+}
+freeze = evidence / f"p4t7-python-repair-freeze.{stamp}.json"
+freeze.write_bytes((json.dumps(manifest, indent=2) + "\n").encode())
+stage = {"status": "REVIEWABLE_STAGING_LIST_ONLY", "timestamp": stamp, "files": {path: digest(repo / path) for path in owned}}
+stage["files"].update({path.relative_to(repo).as_posix(): digest(path) for path in sorted(evidence.glob("p4t7-python-repair-*"))})
+staging = evidence / f"p4t7-python-repair-staging.{stamp}.json"
+staging.write_bytes((json.dumps(stage, indent=2) + "\n").encode())
+print(json.dumps({"freeze": freeze.relative_to(repo).as_posix(), "freeze_sha256": digest(freeze), "staging": staging.relative_to(repo).as_posix(), "staging_sha256": digest(staging), "bindings": bindings, "coverage": covered["summary"]}, indent=2))
