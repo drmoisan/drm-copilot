@@ -1,0 +1,35 @@
+{
+  "batch": "typed-behavior",
+  "command": "poetry run python -m pytest -q -o addopts= tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py --cov=drm_copilot_discovery.analyzer.test_references --cov=drm_copilot_discovery.analyzer.test_reference_syntax --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\p4t6-test-reference-typed-behavior-coverage.raw.json",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:54:20.678669+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-typed-behavior-tests-085420.2026-10-19T08-54.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-typed-behavior-tests-085420.2026-10-19T08-54.stdout.txt",
+      "sha256": "38b991e3d4925fd2e41115b32e149bd7c8f3c385f6b8fd4cbd8bf234d0e5714b"
+    }
+  },
+  "seconds": 132.314335,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cea9d7da013b76efcb67eccbcc946db7ae5ac25570fdda37695271f29f414053",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "cea9d7da013b76efcb67eccbcc946db7ae5ac25570fdda37695271f29f414053",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "8e17871369f91f26e2f36d8b4cfa09d7d1f4459baf0014ca24d0517d9c3321b6"
+  },
+  "stage": "tests",
+  "started_at": "2026-10-19T08:52:08.364334+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 53%]\r\n..............................................................           [100%]\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                     Stmts   Miss Branch BrPart  Cover   Missing\r\n------------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_reference_syntax.py      62      1     38      1    98%   55\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py           135      2     44      2    98%   317, 351\r\n------------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                      197      3     82      3    98%\r\nCoverage JSON written to file SCRATCH\\p4t6-test-reference-typed-behavior-coverage.raw.json\r\n134 passed in 131.70s (0:02:11)\r\n",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-54"
+}

@@ -1,0 +1,16 @@
+{
+  "command": "poetry run python SCRATCH/issue-980-p4t6/issue-980-syntax-split.py",
+  "exit_code": 0,
+  "head": "6804041b88ea80e386948a0327dca8f0d7a89471",
+  "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py",
+  "reason": "In-memory Black preview of the initial combined draft is 510 physical lines. Approved helper separates pure bounded C#/MSBuild extraction from capture/provenance/index/projection without new capability.",
+  "recorded_at": "2026-10-19T08:38:11.506569+00:00",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t6-shared-baseline.2026-10-19T08-29.json",
+    "sha256": "bdf686a47676d9599c1bf2172068118caa8f0b092b9e37287108028d51b62ed4"
+  },
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-38",
+  "tracked": false,
+  "working_exists": false
+}

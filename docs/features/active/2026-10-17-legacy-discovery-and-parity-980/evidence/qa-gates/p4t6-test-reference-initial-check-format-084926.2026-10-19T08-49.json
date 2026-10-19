@@ -1,0 +1,35 @@
+{
+  "batch": "initial-check",
+  "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:49:26.827918+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-initial-check-format-084926.2026-10-19T08-49.stderr.txt",
+      "sha256": "ce29a48ef7d7d961badb0f7aec2eb4c319c19c85fc5e9b698ba6b9b4bec2d2c7"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-initial-check-format-084926.2026-10-19T08-49.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.323806,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "7aef0052209fbd4c06b50d30cba47c24a711b9e6e1c776683af27c3df262cb4a",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "90cbf0a670d4430faa2e1485ae151d54f6e537ae7bbc96070c121880eb83ef76",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "791a915dcd92df92cb55c6829109075c1bc7054760dcdb9f74996c79a8d8df86"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "7aef0052209fbd4c06b50d30cba47c24a711b9e6e1c776683af27c3df262cb4a",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "90cbf0a670d4430faa2e1485ae151d54f6e537ae7bbc96070c121880eb83ef76",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "791a915dcd92df92cb55c6829109075c1bc7054760dcdb9f74996c79a8d8df86"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T08:49:26.504112+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n4 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-49"
+}

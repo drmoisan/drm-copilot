@@ -1,0 +1,35 @@
+{
+  "batch": "first-behavior",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T08:51:51.123151+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-first-behavior-types-085151.2026-10-19T08-51.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-first-behavior-types-085151.2026-10-19T08-51.stdout.txt",
+      "sha256": "ed4d5ad878f5ed3c1fb061d6a894d4f242d68c06b1de9bd72189ca9f65127be2"
+    }
+  },
+  "seconds": 0.92856,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "c06165dd2406dbafac1bc37544075a60a6637689204f879b9cb2001b9ee92a30",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T08:51:50.194591+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:59:5 - error: Type of \"values\" is partially unknown\n  \u00a0\u00a0Type of \"values\" is \"dict[Unknown, Unknown]\" (reportUnknownVariableType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:104:5 - error: Type of \"components\" is partially unknown\n  \u00a0\u00a0Type of \"components\" is \"list[Unknown]\" (reportUnknownVariableType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:105:5 - error: Type of \"findings\" is partially unknown\n  \u00a0\u00a0Type of \"findings\" is \"list[Unknown]\" (reportUnknownVariableType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:106:5 - error: Type of \"relationships\" is partially unknown\n  \u00a0\u00a0Type of \"relationships\" is \"list[Unknown]\" (reportUnknownVariableType)\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\test_references.py:107:5 - error: Type of \"diagnostics\" is partially unknown\n  \u00a0\u00a0Type of \"diagnostics\" is \"list[Unknown]\" (reportUnknownVariableType)\nWORKSPACE\\tests\\discovery_runtime\\analyzer\\test_test_references.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_test_references.py:450:40 - error: \"_Output\" is private and used outside of the module in which it is declared (reportPrivateUsage)\n6 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-51"
+}

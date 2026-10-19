@@ -1,0 +1,35 @@
+{
+  "batch": "consolidated-check",
+  "command": "poetry run python -m black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py tests/discovery_runtime/analyzer/test_test_references.py tests/discovery_runtime/analyzer/test_test_reference_syntax.py",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:51:40.675089+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t6-test-reference-consolidated-check-format-085140.2026-10-19T08-51.stderr.txt",
+      "sha256": "ce29a48ef7d7d961badb0f7aec2eb4c319c19c85fc5e9b698ba6b9b4bec2d2c7"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t6-test-reference-consolidated-check-format-085140.2026-10-19T08-51.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "seconds": 0.324057,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "f04e79d16571b54edb244e482001724f303507cc0e3d791982c9617b05ed7fe0",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_reference_syntax.py": "bddc8f8035f42ab743b558e3e928bec432470da99a50c434315790e948b1bb8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/test_references.py": "52a28436ae34f60b553872ac404d49fe63353be6eb97b49e77f6940515647bb1",
+    "tests/discovery_runtime/analyzer/test_test_reference_syntax.py": "f04e79d16571b54edb244e482001724f303507cc0e3d791982c9617b05ed7fe0",
+    "tests/discovery_runtime/analyzer/test_test_references.py": "b391a5ca0beda6b9ac8a5aee6134fc51b48b9363547c6e1f18375023255497db"
+  },
+  "stage": "format",
+  "started_at": "2026-10-19T08:51:40.351032+00:00",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\r\n4 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T6",
+  "timestamp": "2026-10-19T08-51"
+}
