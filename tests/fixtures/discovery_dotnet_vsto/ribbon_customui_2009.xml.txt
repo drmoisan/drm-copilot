@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="OnLoad">
+  <ribbon><tabs><tab id="genericTab"><group id="genericGroup">
+    <toggleButton id="genericToggle" onAction="OnToggle" />
+  </group></tab></tabs></ribbon>
+</customUI>

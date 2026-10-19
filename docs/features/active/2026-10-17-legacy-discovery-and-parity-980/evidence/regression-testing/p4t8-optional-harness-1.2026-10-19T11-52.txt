@@ -1,0 +1,228 @@
+"""Prepare optional adapter implementation from the approved immutable baseline."""
+from pathlib import Path
+
+root=Path.cwd()/"packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional"
+root.mkdir(exist_ok=True)
+(root/'__init__.py').write_bytes(b'"""Explicitly selected platform adapters; ordinary inventories import none."""\n')
+old=Path('scripts/dev_tools/discovery/analyzer/vsto_patterns.py').read_text('utf-8')
+# Keep historical data exports while moving all active scans onto accepted seams.
+header='''"""Bound optional syntax candidates behind explicit configured consent.
+
+Historical pattern names remain inert compatibility data. Active classifiers use
+secure XML and shared C# / COM seams, never source evaluation or external access.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import replace
+
+from drm_copilot_discovery.analyzer.com_interop import com_project_candidates, com_source_candidates
+from drm_copilot_discovery.analyzer.csharp_declarations import declaration_candidates
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError, tokenize_csharp
+from drm_copilot_discovery.analyzer.source_text import Detection, strip_comments_and_strings
+from drm_copilot_discovery.analyzer.xml_input import XmlInputError, parse_xml
+from drm_copilot_discovery.profile_v2 import ProfileV2
+
+'''
+constants=old[old.index('CUSTOMUI_URIS'):]
+body='''
+
+_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z_0-9.]*\\Z", re.ASCII)
+_BUILD = "http://schemas.microsoft.com/developer/msbuild/2003"
+_CONTAINERS = frozenset("Project Target Choose When Otherwise ItemGroup ItemDefinitionGroup".split())
+_RIBBON_ELEMENTS = frozenset("customUI ribbon tabs tab group button toggleButton checkBox editBox comboBox dropDown gallery menu splitButton box buttonGroup dialogBoxLauncher separator labelControl contextualTabs tabSet officeMenu qat sharedControls documentControls".split())
+_CALLBACKS = frozenset("onAction getVisible getEnabled getLabel getImage getPressed getText getContent getItemCount getItemLabel getItemImage getSelectedItemIndex".split())
+
+
+def require_consent(profile: ProfileV2 | None) -> ProfileV2:
+    """Return configured ProfileV2 with explicit consent, or raise SourceScanError.
+
+    profile must be validated and select office-vsto. Draft ProfileError propagates.
+    This guard precedes parsing/traversal; it performs no I/O or input mutation.
+    """
+    if not isinstance(profile, ProfileV2):
+        raise SourceScanError("office-consent", "Configure a v2 profile selecting office-vsto; migrate legacy execution.")
+    profile.require_configured()
+    if "office-vsto" not in profile.analyzers.enabled:
+        raise SourceScanError("office-consent", "Explicit office-vsto selection is required.")
+    return profile
+
+
+def capacity(value: int, ceiling: int) -> int:
+    """Return positive int value capped by int ceiling; reject bool/noninteger.
+
+    Invalid public capacities raise ValueError before allocation. No I/O/mutation.
+    """
+    if type(value) is not int or value < 1:
+        raise ValueError("Optional analyzer capacities must be positive integers")
+    return min(value, ceiling)
+
+
+def text_bytes(text: str, maximum: int) -> bytes:
+    """Return UTF-8 bytes only after exact bounded str accounting; no I/O.
+
+    maximum (int) bounds encoded allocation. SourceScanError rejects nontext,
+    oversized text or surrogate scalars without copying source into diagnostics.
+    """
+    if type(text) is not str or len(text) > maximum:
+        raise SourceScanError("source-limit", "Optional source exceeds its byte limit.")
+    count = 0
+    # Count scalar encoding widths before allocating the complete encoded buffer.
+    for character in text:
+        scalar = ord(character)
+        if 0xD800 <= scalar <= 0xDFFF:
+            raise SourceScanError("source-encoding", "Optional source encoding is unsupported.")
+        count += 1 if scalar < 128 else 2 if scalar < 2048 else 3 if scalar < 65536 else 4
+        if count > maximum:
+            raise SourceScanError("source-limit", "Optional source exceeds its byte limit.")
+    return text.encode("utf-8")
+
+
+def _append(results: list[Detection], candidate: Detection, limit: int) -> None:
+    """Append one bounded sanitized Detection or raise SourceScanError; return None.
+
+    results is private run state; candidate and int limit cap retained candidates.
+    Long names fail before retention and never enter IDs/errors. No external I/O.
+    """
+    if len(results) >= limit:
+        raise SourceScanError("office-candidate-limit", "Optional candidates exceed their limit.")
+    if len(candidate.symbol) > 256:
+        raise SourceScanError("source-limit", "Optional declaration name exceeds its limit.")
+    results.append(candidate)
+
+
+def csharp_candidates(path: str, text: str, *, max_tokens: int, max_candidates: int) -> list[Detection]:
+    """Return bounded optional C# markers from validated str path/text; pure.
+
+    Positive int capacities come from consented wrappers. Shared parser errors
+    propagate. Three independent bounded scans preserve lexical anchors; no symbol
+    resolution or runtime claim occurs. Only fixed markers and safe names remain.
+    """
+    results: list[Detection] = []
+    # Reuse the generic detector so COM attributes/calls have one canonical grammar.
+    for candidate in com_source_candidates(path, text, max_tokens=max_tokens, max_candidates=max_candidates):
+        name = candidate.symbol.rsplit(".", 1)[-1].removesuffix("Attribute")
+        kind = candidate.detection_kind
+        if kind in {"com_lifetime_call", "marshal_call"}:
+            kind = "marshal_call"
+        elif kind == "com_type_lookup" and name == "GetTypeFromProgID":
+            kind = "progid_activation"
+        _append(results, replace(candidate, detection_kind=kind, symbol=name), max_candidates)
+    # Shared member placement prevents executable/local spellings becoming methods.
+    for candidate in declaration_candidates(path, text, max_tokens=max_tokens):
+        metadata = dict(candidate.extra)
+        kind = None
+        if candidate.detection_kind == "member" and candidate.symbol_kind == "method":
+            if candidate.symbol == "GetCustomUI":
+                kind = "ribbon_extensibility"
+            elif metadata.get("declaring_type") == "ThisAddIn" and candidate.symbol in {"Startup", "Shutdown", "ThisAddIn_Startup", "ThisAddIn_Shutdown"}:
+                kind = "addin_lifecycle"
+        elif candidate.detection_kind == "type" and candidate.symbol == "ThisAddIn":
+            kind = "addin_lifecycle"
+        if kind is not None:
+            # Keep only bounded anchor metadata, not arbitrary declaring-type text.
+            extra = tuple((key, value) for key, value in candidate.extra if key in {"offset", "end_offset", "end_line"})
+            _append(results, replace(candidate, detection_kind=kind, extra=extra + (("binding", "unresolved"),)), max_candidates)
+    tokens = tokenize_csharp(strip_comments_and_strings(text), max_tokens=max_tokens)
+    index = 0
+    pending_type = in_base = False
+    # Consume complete qualified chains once; no suffix is rescanned as a new API.
+    while index < len(tokens):
+        token = tokens[index]
+        if token.value in {"class", "interface", "struct", "record"}:
+            pending_type = True
+        elif token.value == ":" and pending_type:
+            in_base = True
+        elif token.value in {"{", "}", ";"}:
+            pending_type = in_base = False
+        if not token.identifier:
+            index += 1
+            continue
+        end = index + 1
+        # Bound each chain by the already bounded token stream and name ceiling.
+        while end + 1 < len(tokens) and tokens[end].value in {".", "::"} and tokens[end + 1].identifier:
+            end += 2
+        if tokens[end - 1].end - token.start > 256:
+            index = end
+            continue
+        name = "".join(part.value for part in tokens[index:end]).removeprefix("global::")
+        previous = tokens[index - 1].value if index else ""
+        following = tokens[end].value if end < len(tokens) else ""
+        kind, symbol, extra = "", name, ()
+        # Only base lists imply interface relevance; using declarations retain data.
+        if in_base and name in {"IRibbonExtensibility", "Microsoft.Office.Core.IRibbonExtensibility"}:
+            kind, symbol = "ribbon_extensibility", "IRibbonExtensibility"
+        elif in_base and name.startswith(DESIGNER_RIBBON_LITERAL + "."):
+            kind, symbol = "ribbon_extensibility", DESIGNER_RIBBON_LITERAL
+        elif name.startswith("Microsoft.Office.Interop.") and following == ";" and previous in {"using", "static", "="}:
+            # '=' must be the alias slot in a using directive, not an assignment.
+            using = previous != "=" or (index >= 3 and tokens[index - 3].value == "using")
+            if using and _IDENTIFIER.fullmatch(name):
+                kind = "interop_using"
+                extra = (("interop_target", name.split(".")[3]),)
+        if kind:
+            anchor = (("offset", token.start), ("end_offset", tokens[end - 1].end), ("end_line", tokens[end - 1].line), ("binding", "unresolved"))
+            _append(results, Detection(path, token.line, kind, symbol, "interface" if in_base else "namespace", anchor + extra), max_candidates)
+        index = end
+    return sorted(results, key=lambda item: (item.line, dict(item.extra).get("offset", 0), item.detection_kind, item.symbol))
+
+
+def xml_candidates(path: str, content: bytes, *, project: bool, max_bytes: int, max_elements: int, max_depth: int, max_candidates: int) -> list[Detection]:
+    """Return secure XML declarations from str path and original captured bytes.
+
+    project (bool) selects MSBuild versus Ribbon; positive int limits precede parse.
+    XmlInputError/SourceScanError propagate on malformed or excessive input. Opaque
+    subtrees stay uninterpreted. Parser-reported containing-element anchors are
+    retained; no callback, condition, GUID or reference target is evaluated.
+    """
+    nodes = parse_xml(content, max_bytes=max_bytes, max_elements=max_elements, max_depth=max_depth)
+    namespace = nodes[0].tag[1:].split("}", 1)[0] if nodes[0].tag.startswith("{") else ""
+    names = tuple(node.tag.rsplit("}", 1)[-1] for node in nodes)
+    results: list[Detection] = []
+    active: list[bool] = []
+    generations = dict((uri, generation) for generation, uri in CUSTOMUI_URIS)
+    # Select only the fixed grammar associated with the actual document root.
+    if project:
+        if names[0] != "Project" or namespace not in {"", _BUILD}:
+            raise XmlInputError("xml-root", "Optional project root is unsupported.")
+    elif names[0] != "customUI" or namespace not in generations:
+        return []
+    # Inherited opacity prevents nested fake project/markup spellings reactivating.
+    for index, node in enumerate(nodes):
+        same_namespace = node.tag == (f"{{{namespace}}}" if namespace else "") + names[index]
+        parent_active = node.parent is None or active[node.parent]
+        allowed = _CONTAINERS if project else _RIBBON_ELEMENTS
+        active.append(parent_active and same_namespace and names[index] in allowed)
+        anchor = (("ordinal", index), ("end_line", node.line), ("binding", "unresolved"))
+        if not parent_active or not same_namespace:
+            continue
+        if project:
+            # Keep literal assembly names only; paths and nonliteral targets vanish.
+            if names[index] == "Reference" and node.parent is not None and names[node.parent] in {"ItemGroup", "ItemDefinitionGroup"}:
+                include = node.attribute("Include") or ""
+                if len(include) <= 256 and include.startswith("Microsoft.Office.Interop.") and _IDENTIFIER.fullmatch(include):
+                    _append(results, Detection(path, node.line, "com_reference", include, "assembly", anchor), max_candidates)
+            continue
+        if index == 0:
+            _append(results, Detection(path, node.line, "ribbon_xml", "customui-" + generations[namespace], "element", anchor + (("customui_schema", namespace),)), max_candidates)
+            _append(results, Detection(path, node.line, "ribbon_xml", "customUI", "element", anchor), max_candidates)
+        if not active[index]:
+            continue
+        # Inspect literal callback declarations only on recognized live XML nodes.
+        for attribute, value in node.attributes:
+            if attribute not in (_CALLBACKS if index else {"onLoad"}):
+                continue
+            if len(value) > 256 or not _IDENTIFIER.fullmatch(value):
+                continue
+            _append(results, Detection(path, node.line, "ribbon_callback", value, "method-name", anchor + (("attribute", attribute), ("line_semantics", "parser-reported"))), max_candidates)
+    if project:
+        # Generic COM owns declaration semantics; the optional grammar filters opacity.
+        for candidate in com_project_candidates(path, content, max_bytes=max_bytes, max_elements=max_elements, max_depth=max_depth, max_candidates=max_candidates):
+            ordinal = int(dict(candidate.extra)["ordinal"])
+            parent = nodes[ordinal].parent
+            if parent is not None and active[parent]:
+                _append(results, candidate, max_candidates)
+    return results
+'''
+(root/'vsto_patterns.py').write_bytes((header+constants.rstrip()+'\n'+body).encode())

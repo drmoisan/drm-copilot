@@ -1,0 +1,6 @@
+from pathlib import Path
+import black
+for path in sorted(Path('packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional').glob('*.py')):
+    text=path.read_text('utf-8')
+    formatted=black.format_str(text,mode=black.Mode())
+    print(path.name,len(text.splitlines()),len(formatted.splitlines()))

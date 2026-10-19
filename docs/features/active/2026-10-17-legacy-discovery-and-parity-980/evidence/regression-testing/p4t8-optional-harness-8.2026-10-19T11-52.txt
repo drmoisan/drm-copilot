@@ -1,0 +1,63 @@
+"""Preserve exact failed streams and shorten only repeated synthetic payload runs."""
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+feature = repo / 'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence'
+prefix = feature / 'regression-testing/p4t8-optional-focused4-pytest.2026-10-19T11-40'
+original_json = Path(str(prefix) + '.json').read_bytes()
+record = json.loads(original_json)
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+saved = scratch / ('p4t8-optional-original-failure-' + now.strftime('%Y%m%dT%H%M%S'))
+saved.mkdir(exist_ok=False)
+payload = b'x' * 2200000
+digest = lambda raw: hashlib.sha256(raw).hexdigest()
+marker = ('<synthetic-payload-run: bytes=2200000; sha256=' + digest(payload) + '>').encode()
+archives = []
+changes = []
+sources = [(name, Path(str(prefix) + suffix), True) for name, suffix in [('json', '.json'), ('markdown', '.md')]]
+for channel in ('stdout', 'stderr'):
+    source = scratch / Path(record['streams'][channel]['scratch_identifier']).name
+    sources.append((channel, source, False))
+for name, path, readable in sources:
+    raw = path.read_bytes()
+    target = saved / (name + '.bin')
+    target.write_bytes(raw)
+    packed = gzip.compress(raw, mtime=0)
+    encoded = base64.b64encode(packed).decode('ascii')
+    restored = gzip.decompress(base64.b64decode(encoded))
+    assert restored == raw
+    archives.append({'name': name, 'encoding': 'gzip+base64', 'original_bytes': len(raw),
+                     'original_sha256': digest(raw), 'compressed_sha256': digest(packed),
+                     'scratch_identifier': 'SCRATCH/' + saved.name + '/' + target.name,
+                     'decode_verified': True, 'payload': encoded})
+    if readable:
+        count = raw.count(payload)
+        assert count > 0
+        transformed = raw.replace(payload, marker)
+        assert transformed.replace(marker, payload) == raw
+        path.write_bytes(transformed)
+        changes.append({'path': path.relative_to(repo).as_posix(), 'original_sha256': digest(raw),
+                        'readable_sha256': digest(transformed), 'original_bytes': len(raw),
+                        'readable_bytes': len(transformed), 'exact_run_substitutions': count})
+archive_path = feature / 'regression-testing' / ('p4t8-optional-failure-lossless.' + stamp + '.json')
+assert not archive_path.exists()
+archive_path.write_bytes((json.dumps({'schema_version': '1.0', 'created': now.isoformat(),
+    'purpose': 'Exact original failed receipt views and separate raw process streams',
+    'entries': archives}, indent=2) + '\n').encode())
+qualification = {'created': now.isoformat(), 'exit_code': 0,
+    'command': 'poetry run python SCRATCH/issue-980-p4t8-optional-normalize.py',
+    'archive': {'path': archive_path.relative_to(repo).as_posix(), 'sha256': digest(archive_path.read_bytes())},
+    'marker': marker.decode(), 'changes': changes,
+    'unchanged_result': {'pytest_passed': 92, 'pytest_failed': 1, 'pytest_errors': 2, 'collected_cases': 94},
+    'qualification': 'Only exact 2200000-byte runs of synthetic x bytes were replaced in readable JSON/Markdown. Raw process streams, result fields, traceback context and coverage are preserved. Archive decode and inverse readable transformation verified byte-for-byte. No source/test changes or behavioral rerun.'}
+qual_path = feature / 'regression-testing' / ('p4t8-optional-failure-qualification.' + stamp + '.json')
+qual_path.write_bytes((json.dumps(qualification, indent=2) + '\n').encode())
+qual_path.with_suffix('.md').write_bytes((f'# Optional failure presentation qualification\n\nTimestamp: {stamp}\nCommand: {qualification["command"]}\nEXIT_CODE: 0\nOutput Summary: exact failed JSON/Markdown and raw stdout/stderr are recoverable from the verified gzip+base64 archive. Only repeated synthetic payload runs were shortened in readable views.\n\nThe original result remains 92 passed, 1 failed, 2 errors across 94 collected cases. The actual large test input remains unchanged. Source/test bytes and coverage were not modified by this operation. Archive and per-stream hashes, decoded lengths, substitutions and original/readable bindings are recorded in the paired JSON.\n').encode())
+print(json.dumps({'qualification': qual_path.relative_to(repo).as_posix(), 'archive': archive_path.relative_to(repo).as_posix(), 'changes': changes}, indent=2))

@@ -1,0 +1,108 @@
+"""Capture one unchanged P4-T8 legacy baseline for both implementation owners."""
+import ast
+import datetime as dt
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+evidence = feature / 'evidence/baseline'
+head = subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+assert head == 'e5223d18ca0cfb92653efa75b56e6c5ec079b817'
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+progress = state['execution_progress']['p4t8_progress']
+owned = sum(progress['ownership'].values(), [])
+fixtures = sorted(p.as_posix() for p in Path('tests/fixtures/discovery_dotnet_vsto').glob('*.txt'))
+new_fixtures = ['tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2006.xml.txt','tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2009.xml.txt']
+absent = [p for p in owned if not Path(p).exists()] + new_fixtures
+assert len(absent) == 7 and all(not Path(p).exists() for p in absent)
+existing = [p for p in owned if Path(p).exists()] + fixtures
+unchanged_guard = 'tests/scripts/dev_tools/discovery/test_domain_neutrality.py'
+existing.append(unchanged_guard)
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+def ref(path):
+    return {'path':path.as_posix(),'sha256':sha(path.read_bytes())}
+
+def sanitize(text):
+    for path, replacement in ((scratch,'SCRATCH'),(repo,'.')):
+        for spelling in (str(path),path.as_posix()):
+            text=re.sub(re.escape(spelling),lambda m:replacement,text,flags=re.I)
+    return text
+
+prior_path=feature/'evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json'
+handoff_path=feature/'evidence/qa-gates/p4t7-final-handoff.2026-10-19T11-09.json'
+prior=json.loads(prior_path.read_bytes())['preserved_files']
+latest=json.loads(handoff_path.read_bytes())['source_files']
+for item in prior+latest:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256'],item['path']
+profile=Path('.codex/agents/python-typed-engineer-c4.toml')
+assert sha(profile.read_bytes())=='0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+start=dt.datetime.now(dt.timezone.utc)
+originals=scratch/('issue-980-p4t8-baseline-originals-'+start.strftime('%Y-%m-%dT%H-%M-%S'))
+originals.mkdir()
+files=[]
+for name in sorted(existing):
+    raw=Path(name).read_bytes()
+    saved=originals/name
+    saved.parent.mkdir(parents=True,exist_ok=True)
+    saved.write_bytes(raw)
+    committed=subprocess.check_output(['git','show','HEAD:'+name])
+    assert raw==committed or raw.replace(b'\r\n',b'\n')==committed,name
+    files.append({'path':name,'sha256':sha(raw),'commit_sha256':sha(committed),'lines':len(raw.splitlines()),
+      'stream_relation':'identical' if raw==committed else 'CRLF-to-LF-only',
+      'original':'SCRATCH/'+saved.relative_to(scratch).as_posix()})
+python_paths=[p for p in existing if p.endswith('.py')]
+tests=[p for p in python_paths if p.startswith('tests/')]
+coverage=scratch/'issue-980-p4t8-shared-baseline-coverage.json'
+modules=['scripts.dev_tools.discovery.analyzer.vsto_office','scripts.dev_tools.discovery.analyzer.vsto_patterns','scripts.dev_tools.discovery.analyzer.stack_cli','drm_copilot_discovery.analyzer.registry']
+commands=[('black',[sys.executable,'-m','black','--check',*python_paths]),('ruff',[sys.executable,'-m','ruff','check',*python_paths]),('pyright',[sys.executable,'-m','pyright',*python_paths]),('pytest',[sys.executable,'-m','pytest','-o','addopts=',*tests,'-v','--tb=short',*[f'--cov={m}' for m in modules],'--cov-branch','--cov-report=term-missing','--cov-report=json:'+str(coverage)])]
+receipts=[]
+env=dict(os.environ,PYTHONIOENCODING='utf-8',COVERAGE_FILE=str(scratch/'issue-980-p4t8-baseline.coverage'))
+for stage,command in commands:
+    begun=dt.datetime.now(dt.timezone.utc); timer=time.monotonic()
+    result=subprocess.run(command,cwd=repo,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    finish=dt.datetime.now(dt.timezone.utc); stamp=finish.strftime('%Y-%m-%dT%H-%M')
+    streams={}
+    for channel,raw in (('stdout',result.stdout),('stderr',result.stderr)):
+        saved=scratch/f'issue-980-p4t8-baseline-{stage}-{finish.strftime("%H%M%S")}.{channel}.bin'
+        saved.write_bytes(raw)
+        streams[channel]={'raw_sha256':sha(raw),'scratch_identifier':'SCRATCH/'+saved.name,'bytes':len(raw),'presentation':sanitize(raw.decode('utf-8',errors='replace'))}
+    record={'stage':stage,'started':begun.isoformat(),'finished':finish.isoformat(),'duration_seconds':round(time.monotonic()-timer,3),'command':sanitize(subprocess.list2cmdline(command)),'exit_code':result.returncode,'streams':streams}
+    prefix=evidence/f'p4t8-shared-baseline-{stage}.{stamp}'
+    out=Path(str(prefix)+'.json'); assert not out.exists()
+    out.write_bytes((json.dumps(record,indent=2)+'\n').encode())
+    shown='\n'.join(line.rstrip() for line in (streams['stdout']['presentation']+streams['stderr']['presentation']).splitlines()).rstrip()
+    Path(str(prefix)+'.md').write_bytes((f'# P4-T8 shared baseline {stage}\n\nTimestamp: {begun.strftime("%Y-%m-%dT%H-%M")}\nCommand: {record["command"]}\nEXIT_CODE: {result.returncode}\nOutput Summary: affected unchanged legacy {stage}; {record["duration_seconds"]} seconds. Raw streams retained separately; presentation paths sanitized.\n\n```text\n{shown}\n```\n').encode())
+    receipts.append(ref(out)); print(stage,result.returncode,record['duration_seconds'],flush=True)
+    if result.returncode:
+        print(shown,flush=True); sys.exit(result.returncode)
+finished=dt.datetime.now(dt.timezone.utc); stamp=finished.strftime('%Y-%m-%dT%H-%M')
+coverage_out=evidence/f'p4t8-shared-baseline-coverage.{stamp}.json'
+coverage_out.write_bytes(coverage.read_bytes())
+covered=json.loads(coverage.read_bytes())
+for item in files:
+    assert sha(Path(item['path']).read_bytes())==item['sha256'],item['path']
+for item in prior+latest:
+    assert sha(Path(item['path']).read_bytes())==item['sha256'],item['path']
+harness=evidence/f'p4t8-shared-baseline-harness.{stamp}.txt'; harness.write_bytes(Path(__file__).read_bytes())
+record={'head':head,'started':start.isoformat(),'finished':finished.isoformat(),'command':'poetry run python SCRATCH/issue-980-p4t8-shared-baseline.py','exit_code':0,
+ 'scope':'Both P4-T8 owners; source/test mutation prohibited until this receipt','existing_files':files,'absent_paths':absent,
+ 'preserved_predecessors':{'baseline':ref(prior_path),'handoff':ref(handoff_path),'validated_streams':len(prior)+len(latest),'detail_reused':True},
+ 'authority':{'receipt':'workspace_operations_p4t8_optional_adapter','phase':'S5_P4T8_shared_baseline_and_optional_adapter','profile':ref(profile),'native_routing_valid':True,'native_launch_authority_valid':True,'native_provenance_valid':True},
+ 'receipts':receipts,'coverage':ref(coverage_out),'coverage_summary':{p:d['summary'] for p,d in covered['files'].items()},
+ 'harness':ref(harness),'unit_order':re.findall(r'^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)',streams['stdout']['presentation'],re.M),
+ 'unchanged_original_ribbon':'tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt','raw_coverage_qualification':'Exact original JSON bytes; may have no terminal newline.',
+ 'source_test_mutations':False,'git_mutations':False,'accepted_predecessor_suites_replayed':False}
+out=evidence/f'p4t8-shared-baseline.{stamp}.json'; assert not out.exists(); out.write_bytes((json.dumps(record,indent=2)+'\n').encode())
+md=evidence/f'p4t8-shared-baseline.{stamp}.md'
+md.write_bytes((f'# P4-T8 shared baseline\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: PASS; {len(record["unit_order"])} affected cases; {len(absent)} new paths absent; {len(existing)} existing source/test/fixture streams preserved; {len(prior)+len(latest)} predecessor streams verified through immutable references.\n\nOnly affected legacy optional, CLI, registry and neutrality tests ran. Accepted predecessor suites were not replayed. Original two-root Ribbon bytes are retained as the forthcoming invalid-input fixture. Exact raw command streams, original source copies, coverage and executed harness are bound by the paired JSON. Working and committed byte normalization is explicitly recorded.\n').encode())
+print(json.dumps({'baseline':ref(out),'markdown':ref(md),'harness':ref(harness),'cases':len(record['unit_order']),'coverage':record['coverage_summary']},indent=2))

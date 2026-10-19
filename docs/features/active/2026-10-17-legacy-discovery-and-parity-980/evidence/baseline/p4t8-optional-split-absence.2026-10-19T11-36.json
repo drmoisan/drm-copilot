@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-10-19T11-36",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-split.py",
+  "exit_code": 0,
+  "approved_absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_syntax.py",
+    "tests/discovery_runtime/analyzer/test_optional_limits.py"
+  ],
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline.2026-10-19T11-23.json",
+    "sha256": "3ad8ba07b77d445d5d2bbb14e70f6d1913cada57d5bd3694f93292d4d28a4a68"
+  },
+  "purpose": "Separate historical data from consented pure syntax; separate boundary tests without removing assertions."
+}

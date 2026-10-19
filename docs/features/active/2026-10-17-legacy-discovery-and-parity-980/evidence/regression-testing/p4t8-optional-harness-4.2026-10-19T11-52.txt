@@ -1,0 +1,60 @@
+"""Record approved split absence, then move the existing optional draft responsibilities."""
+import ast
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+repo=Path.cwd()
+feature=Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+r=Path('packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional')
+t=Path('tests/discovery_runtime/analyzer')
+new=[r/'vsto_syntax.py', t/'test_optional_limits.py']
+assert all(not path.exists() for path in new)
+stamp=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+baseline=feature/'evidence/baseline/p4t8-shared-baseline.2026-10-19T11-23.json'
+record={'timestamp':stamp,'command':'poetry run python SCRATCH/issue-980-p4t8-split.py','exit_code':0,'approved_absent_paths':[p.as_posix() for p in new],'shared_baseline':{'path':baseline.as_posix(),'sha256':hashlib.sha256(baseline.read_bytes()).hexdigest()},'purpose':'Separate historical data from consented pure syntax; separate boundary tests without removing assertions.'}
+prefix=feature/'evidence/baseline'/('p4t8-optional-split-absence.'+stamp)
+Path(str(prefix)+'.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())
+Path(str(prefix)+'.md').write_bytes((f'# P4-T8 approved split absence\n\nTimestamp: {stamp}\nCommand: {record["command"]}\nEXIT_CODE: 0\nOutput Summary: Both approved paths were absent before this split; shared baseline remains authoritative.\n\nNo public signature changes or assertion removal. The pure syntax module owns parsing and consent; historical pattern names remain data-only.\n').encode())
+source=(r/'vsto_patterns.py').read_text('utf-8')
+first=source.index('CUSTOMUI_URIS:')
+last=source.index('_IDENTIFIER =')
+header=source[:first]
+constants=source[first:last]
+body=source[last:]
+header=header.replace('from drm_copilot_discovery.profile_v2 import ProfileV2','from drm_copilot_discovery.profile_v2 import ProfileV2\nfrom drm_copilot_discovery.path_models import relative_path\nfrom drm_copilot_discovery.analyzer.optional.vsto_patterns import CUSTOMUI_URIS, DESIGNER_RIBBON_LITERAL')
+(r/'vsto_syntax.py').write_bytes((header+body).encode())
+(r/'vsto_patterns.py').write_bytes(('"""Retain historical pattern data exports; active parsing lives in vsto_syntax.\n\nThese inert expressions preserve imports only and are not the secure classifier.\n"""\n\nfrom __future__ import annotations\n\nimport re\n\n'+constants.rstrip()+'\n').encode())
+p=r/'vsto_office.py'; p.write_bytes(p.read_bytes().replace(b'import vsto_patterns as patterns',b'import vsto_syntax as patterns'))
+p=t/'test_optional_adapter.py'; source=p.read_text('utf-8').replace('import vsto_patterns as patterns','import vsto_syntax as patterns')
+move={'test_consent_fails_before_source_processing','test_invalid_public_limits_fail_before_processing','test_encoded_bytes_are_bounded_before_buffer_allocation','test_runtime_parser_failures_are_fixed_and_source_bound','test_aggregate_exhaustion_discards_all_partial_rows','test_adapter_rejects_untyped_capture_and_insufficient_fallback'}
+lines=source.splitlines(keepends=True)
+chunks=[]; remove=set()
+for node in ast.parse(source).body:
+    if isinstance(node,ast.FunctionDef) and node.name in move:
+        start=min([node.lineno]+[d.lineno for d in node.decorator_list])-1
+        chunks.append(''.join(lines[start:node.end_lineno]))
+        remove.update(range(start,node.end_lineno))
+p.write_bytes(''.join(line for i,line in enumerate(lines) if i not in remove).encode())
+imports='''"""Verify optional consent, exact limit types, encoding and aggregate exhaustion."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.models import InventoryCapture
+from drm_copilot_discovery.analyzer.optional import vsto_syntax as patterns
+from drm_copilot_discovery.analyzer.optional.vsto_office import VstoOfficeAnalyzer, classify_csharp, classify_project, classify_xml
+from drm_copilot_discovery.profile_v2 import ProfileError, ProfileV2
+from tests.discovery_runtime.analyzer.test_optional_adapter import captured, profile as profile, profile_for, rendered
+from tests.discovery_runtime.analyzer.test_repository import analyzer_catalog as analyzer_catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.catalog import SchemaCatalog
+
+'''
+(t/'test_optional_limits.py').write_bytes((imports+'\n\n'.join(chunks).rstrip()+'\n').encode())
+print(str(prefix)+'.json')

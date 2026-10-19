@@ -1,0 +1,74 @@
+"""Publish the completed bounded optional source review without behavioral runs."""
+from pathlib import Path
+import datetime as dt
+import hashlib
+import json
+
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+qa = feature / 'evidence/qa-gates'
+freeze_path = feature / 'evidence/regression-testing/p4t8-optional-freeze.2026-10-19T11-52.json'
+sha = lambda content: hashlib.sha256(content).hexdigest()
+assert sha(freeze_path.read_bytes()) == 'bc5e0282808ff51b21ca2973ec78d908be376a450ee157341344754500090ad1'
+freeze = json.loads(freeze_path.read_bytes())
+scope = freeze['source_files'] + freeze['fixtures']
+assert len(scope) == 8
+for item in scope:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256'], item['path']
+authority = json.loads((Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json').read_bytes())
+assert authority['profile_sha256'] == sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes()) == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+assert all(authority[key] is True for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+
+
+def write(stem, suffix, data):
+    stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+    path = qa / (stem + '.' + stamp + suffix)
+    assert not path.exists()
+    path.write_bytes(data)
+    return path
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+command = 'poetry run python SCRATCH/issue-980-p4t8-optional-review.py'
+result = {
+    'status': 'OPTIONAL_CANDIDATE_REVIEW_CLEAR', 'task': 'P4-T8', 'timestamp': stamp,
+    'published_utc': dt.datetime.now(dt.timezone.utc).isoformat(), 'command': command, 'exit_code': 0,
+    'authority_receipt': 'atomic_execution_p4t8_candidate_review', 'native_authority_valid': True,
+    'freeze': ref(freeze_path), 'reviewed_bindings': scope,
+    'checks': [
+        'Configured typed consent precedes source processing at each public classifier and adapter entry point.',
+        'Positive integer capacities are independently narrowed by profile byte, record and depth limits.',
+        'Aggregate input/work/pin/output reservations reject excessive analysis and discard partial rows.',
+        'Secure XML consumes original captured bytes; shared generic COM and C# syntax seams are reused.',
+        'Project/Ribbon namespaces and inherited opaque subtrees preserve finite declaration scope.',
+        'Pinned original source hashes are preserved; syntax relevance and callback binding do not imply execution.',
+        'Fixed diagnostics withhold source values; output names and metadata are bounded.',
+        'Legacy pattern exports are inert compatibility data; no consumer product semantics were introduced.',
+        'Intent documentation, immutable fixture usage, memory-only tests and source/test size limits reviewed.',
+    ],
+    'retained_focused_proof': {'cases': 100, 'statements': '305/305', 'branches': '126/126', 'measured_ranges': 18},
+    'findings': [], 'open_behavioral_probes': [], 'new_behavioral_runs': 0,
+    'pending': ['Combined compatibility review and final evidence reconciliation', 'Ordered combined final gates and independent task acceptance'],
+    'qualification': 'This is the optional source/test portion of one consolidated task review. The combined receipt will bind the retained failed-output archive; no original evidence is changed and no task/AC checkoff is authorized here.',
+}
+proof = write('p4t8-executor-optional-review', '.json', (json.dumps(result, indent=2) + '\n').encode())
+markdown = write('p4t8-executor-optional-review', '.md', (
+    f'# P4-T8 optional subset review\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n'
+    'Output Summary: OPTIONAL_CANDIDATE_REVIEW_CLEAR; no findings or open behavioral probes.\n\n'
+    'The six frozen source/test files and two valid Ribbon fixtures match the 11:52 freeze. '
+    'Configured consent, independent limits, aggregate reservations, captured-byte provenance, finite secure parsing, '
+    'truthful classification, fixed diagnostics and repository source/test policies were reviewed. '
+    'The retained focused proof has 100 cases, 305/305 statements, 126/126 branches and 18 fully covered ranges. '
+    'No behavioral suite or probe was replayed.\n\n'
+    'Compatibility/evidence consolidation and final task gates remain pending. This receipt does not check off P4-T8 or any source AC.\n'
+).encode())
+harness = write('p4t8-executor-optional-review-harness', '.txt', Path(__file__).read_bytes())
+paths = [proof, markdown, harness]
+stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+staging = qa / ('p4t8-executor-optional-staging.' + stamp + '.json')
+assert not staging.exists()
+staging.write_bytes((json.dumps({'task': 'P4-T8', 'timestamp': stamp, 'files': [ref(p) for p in paths], 'stage_paths': [p.as_posix() for p in paths + [staging]], 'source_test_plan_ac_git_mutations': False}, indent=2) + '\n').encode())
+print(json.dumps({'status': result['status'], 'review': ref(proof), 'staging': ref(staging)}))

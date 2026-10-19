@@ -1,0 +1,22 @@
+{
+  "stage": "ruff",
+  "started": "2026-10-19T11:23:14.808493+00:00",
+  "finished": "2026-10-19T11:23:14.911031+00:00",
+  "duration_seconds": 0.104,
+  "command": ".\\.venv\\Scripts\\python.exe -m ruff check scripts/dev_tools/discovery/analyzer/vsto_office.py scripts/dev_tools/discovery/analyzer/vsto_patterns.py scripts/dev_tools/discovery/analyzer/stack_cli.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py tests/discovery_runtime/analyzer/test_registry.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+  "exit_code": 0,
+  "streams": {
+    "stdout": {
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-baseline-ruff-112314.stdout.bin",
+      "bytes": 19,
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-baseline-ruff-112314.stderr.bin",
+      "bytes": 0,
+      "presentation": ""
+    }
+  }
+}

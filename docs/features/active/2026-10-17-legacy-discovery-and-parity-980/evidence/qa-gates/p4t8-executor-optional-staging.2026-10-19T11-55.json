@@ -1,0 +1,25 @@
+{
+  "task": "P4-T8",
+  "timestamp": "2026-10-19T11-55",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.json",
+      "sha256": "2abbe88ae82f0ec18e78078d01ecbf48bb08d859739386d5922ce6ec1a9561e6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.md",
+      "sha256": "d1e66c477c98769b1029b6255bc207be6e3352de0ab3fa23c7103ea476a240df"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review-harness.2026-10-19T11-55.txt",
+      "sha256": "42abae0190d9e7a59cb5daf639d0c17d4da1601091331b04c076feca94401186"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review.2026-10-19T11-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-review-harness.2026-10-19T11-55.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t8-executor-optional-staging.2026-10-19T11-55.json"
+  ],
+  "source_test_plan_ac_git_mutations": false
+}

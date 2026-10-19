@@ -1,0 +1,383 @@
+{
+  "head": "e5223d18ca0cfb92653efa75b56e6c5ec079b817",
+  "started": "2026-10-19T11:23:13.930570+00:00",
+  "finished": "2026-10-19T11:23:26.829749+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p4t8-shared-baseline.py",
+  "exit_code": 0,
+  "scope": "Both P4-T8 owners; source/test mutation prohibited until this receipt",
+  "existing_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "commit_sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c",
+      "lines": 57,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+      "commit_sha256": "c4deed498726d01a493f653c5a117eb9b7841519f2b159502562263283a9c5fd",
+      "lines": 214,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/scripts/dev_tools/discovery/analyzer/stack_cli.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_office.py",
+      "sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+      "commit_sha256": "34dcdcf022ad258bf92434bab44999f130a44b59c165e0a590c2a22380f8e722",
+      "lines": 451,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/scripts/dev_tools/discovery/analyzer/vsto_office.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/vsto_patterns.py",
+      "sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+      "commit_sha256": "fce4a759b05315c92ecf28287ab128d437fc5b93661df2043e94b7e2596d4c4c",
+      "lines": 87,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/scripts/dev_tools/discovery/analyzer/vsto_patterns.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "commit_sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a",
+      "lines": 201,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/discovery_runtime/analyzer/test_registry.py"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt",
+      "sha256": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e",
+      "commit_sha256": "c906e0433e2464eb5c3a08e3edd2ea9616b6878daf768ff3c29f47806baee67e",
+      "lines": 47,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/com_interop.cs.txt"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt",
+      "sha256": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8",
+      "commit_sha256": "f4aafeabc426e18b1a0a5fdd7855fec257d8ffe30d3e2c10e28643397148d6b8",
+      "lines": 91,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/csharp_declarations.cs.txt"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt",
+      "sha256": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7",
+      "commit_sha256": "49e3c125889094ff9dd9438e318f4276672a7ab7509314e061bc9be16e429cf7",
+      "lines": 60,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/csharp_events.cs.txt"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt",
+      "sha256": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524",
+      "commit_sha256": "dc2e28c21fa474139ebd18839060a63e7c7b53b2ef9062d8ebe8aa2350465524",
+      "lines": 20,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/project_com_reference.xmlproj.txt"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt",
+      "sha256": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3",
+      "commit_sha256": "b05dc096cf7394bfc175b76af5453ecc0fd5184984345638ce31a5443176faf3",
+      "lines": 26,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt"
+    },
+    {
+      "path": "tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt",
+      "sha256": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2",
+      "commit_sha256": "214b7199237bfc40b3914b35cd9a8cb2e63c29c4869b58c0820659d8e707c5e2",
+      "lines": 41,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/fixtures/discovery_dotnet_vsto/vsto_ribbon.cs.txt"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "commit_sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86",
+      "lines": 90,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "commit_sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732",
+      "lines": 210,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "commit_sha256": "626e5f05811fa7312e7048baa7fe3561c62d3c402b0087882b6befb3073fe9be",
+      "lines": 142,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "commit_sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732",
+      "lines": 486,
+      "stream_relation": "identical",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+      "sha256": "768e81d6aeb425f31ab5ed8eaa61e6f1a0fb59491fa7324192494cc0adfb5595",
+      "commit_sha256": "17193b8118c06301730780095ef100409cd432d8b1abc2471bfa6c4a9f823113",
+      "lines": 79,
+      "stream_relation": "CRLF-to-LF-only",
+      "original": "SCRATCH/issue-980-p4t8-baseline-originals-2026-10-19T11-23-13/tests/scripts/dev_tools/discovery/test_domain_neutrality.py"
+    }
+  ],
+  "absent_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/__init__.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_office.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/vsto_patterns.py",
+    "tests/discovery_runtime/analyzer/test_optional_adapter.py",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_compatibility.py",
+    "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2006.xml.txt",
+    "tests/fixtures/discovery_dotnet_vsto/ribbon_customui_2009.xml.txt"
+  ],
+  "preserved_predecessors": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+      "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-final-handoff.2026-10-19T11-09.json",
+      "sha256": "0bb22689574e3acdc8eaba593593c2bbaa23640637ba4e9cb3223219514726f8"
+    },
+    "validated_streams": 76,
+    "detail_reused": true
+  },
+  "authority": {
+    "receipt": "workspace_operations_p4t8_optional_adapter",
+    "phase": "S5_P4T8_shared_baseline_and_optional_adapter",
+    "profile": {
+      "path": ".codex/agents/python-typed-engineer-c4.toml",
+      "sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    },
+    "native_routing_valid": true,
+    "native_launch_authority_valid": true,
+    "native_provenance_valid": true
+  },
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-black.2026-10-19T11-23.json",
+      "sha256": "81d3eb60454b121d3071434fdb4b96717a18526c18a4e0a682f482df6f51708d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-ruff.2026-10-19T11-23.json",
+      "sha256": "c160a4cb654234a740ac601ba0aca8b5a5f7733470bbc0db73fcb736e78eead5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-pyright.2026-10-19T11-23.json",
+      "sha256": "8cdbb4818988a54160831184f4f29f1f4b64eb2c69b2a77cd7e25ff710f240d6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-pytest.2026-10-19T11-23.json",
+      "sha256": "309250584e4ead45d97b9174e9cea1fa414de343ce6b5ccc2b5030a3c6d4da0e"
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-coverage.2026-10-19T11-23.json",
+    "sha256": "718db0d3330311e6d053b92c1d1c352855f8eca517cb76ff3701daaa67f7ac00"
+  },
+  "coverage_summary": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\registry.py": {
+      "covered_lines": 14,
+      "num_statements": 14,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 8,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 2,
+      "num_partial_branches": 0,
+      "covered_branches": 2,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "scripts\\dev_tools\\discovery\\analyzer\\stack_cli.py": {
+      "covered_lines": 49,
+      "num_statements": 52,
+      "percent_covered": 94.44444444444444,
+      "percent_covered_display": "94",
+      "missing_lines": 3,
+      "excluded_lines": 3,
+      "percent_statements_covered": 94.23076923076923,
+      "percent_statements_covered_display": "94",
+      "num_branches": 2,
+      "num_partial_branches": 0,
+      "covered_branches": 2,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "scripts\\dev_tools\\discovery\\analyzer\\vsto_office.py": {
+      "covered_lines": 123,
+      "num_statements": 134,
+      "percent_covered": 91.23711340206185,
+      "percent_covered_display": "91",
+      "missing_lines": 11,
+      "excluded_lines": 4,
+      "percent_statements_covered": 91.7910447761194,
+      "percent_statements_covered_display": "92",
+      "num_branches": 60,
+      "num_partial_branches": 4,
+      "covered_branches": 54,
+      "missing_branches": 6,
+      "percent_branches_covered": 90.0,
+      "percent_branches_covered_display": "90"
+    },
+    "scripts\\dev_tools\\discovery\\analyzer\\vsto_patterns.py": {
+      "covered_lines": 16,
+      "num_statements": 16,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "covered_branches": 0,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    }
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t8-shared-baseline-harness.2026-10-19T11-23.txt",
+    "sha256": "df77ac4e0838cd3269fc4b54d24d1f2392472127dc5e6d9092fb90975fae7013"
+  },
+  "unit_order": [
+    "tests/discovery_runtime/analyzer/test_registry.py::test_registry_loads_only_explicit_core_adapters",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled0]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled1]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_registry_rejects_unavailable_selections_without_fallback[enabled2]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[bad-None-None]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-None-None]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[inspected-Not allowed-file2]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-None-None]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[unreadable- -None]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_input_model_rejects_dishonest_or_ambiguous_accounting[excluded-Excluded-file5]",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_models_reject_untyped_rows_profile_inputs_and_collisions",
+    "tests/discovery_runtime/analyzer/test_registry.py::test_draft_and_input_count_limits_fail_closed",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_customui_uri_and_root[<customUI xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\">-http://schemas.microsoft.com/office/2006/01/customui]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_customui_uri_and_root[<customUI xmlns=\"http://schemas.microsoft.com/office/2009/07/customui\">-http://schemas.microsoft.com/office/2009/07/customui]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public class R : IRibbonExtensibility {-IRibbonExtensibility]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public class R : Microsoft.Office.Core.IRibbonExtensibility {-IRibbonExtensibility]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[public string GetCustomUI(string id) {-GetCustomUI]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_extensibility_signals[class D : Microsoft.Office.Tools.Ribbon.RibbonBase {-Microsoft.Office.Tools.Ribbon]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_cs_comment_ribbon_trap_ignored_but_xml_unstripped",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRibbonDetection::test_ribbon_fixtures",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[ComImport]-ComImport]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[ComVisible(true)]-ComVisible]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]-InterfaceType]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_attribute_forms[[DispId(1)]-DispId]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_guid_attribute_captures_com_guid",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_marshal_member_captured_into_symbol",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_progid_activation",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using Microsoft.Office.Interop.Excel;-Excel]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using static Microsoft.Office.Interop.Excel.XlDirection;-Excel]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_interop_using_captures_target_as_data[using GenericApp = Microsoft.Office.Interop.Word;-Word]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_string_literal_attribute_trap_rejected",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<COMReference Include=\"GenericLib\">-GenericLib]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<EmbedInteropTypes>true</EmbedInteropTypes>-EmbedInteropTypes]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_project_com_references[<Reference Include=\"Microsoft.Office.Interop.Word\">-Microsoft.Office.Interop.Word]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestComInteropDetection::test_com_fixtures",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_routing_by_extension",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_classify_rejects_plain_parse_result",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_parse_unreachable_root_raises_analyzer_error",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include0-exclude0-expected0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include1-exclude1-expected1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestRoutingAndErrors::test_include_exclude_routing[include2-exclude2-expected2]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestEndToEndEmission::test_emits_schema_valid_instances",
+    "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py::TestEndToEndEmission::test_byte_identical_on_rerun",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_success_keeps_default_run_read_only[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_success_keeps_default_run_read_only[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_json_summary[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_json_summary[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_output_dir_override[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestSuccessPaths::test_output_dir_override[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_malformed_profile_exits_one[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_malformed_profile_exits_one[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_unreachable_root_exits_one[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_unreachable_root_exits_one[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_usage_error_exits_two[main_dotnet]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py::TestErrorPaths::test_usage_error_exits_two[main_vsto]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_stack_modules_present",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[csharp_declarations.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[csharp_tokens.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[dotnet_inventory.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[event_subscriptions.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[source_text.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[dotnet_inventory.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[source_text.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[stack_cli.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[vsto_office.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_module_has_no_consumer_identifier_or_app_hardcoding[vsto_patterns.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[com_interop.cs.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[csharp_declarations.cs.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[csharp_events.cs.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[project_com_reference.xmlproj.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[ribbon_customui.xml.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_fixture_has_no_consumer_identifier[vsto_ribbon.cs.txt]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py::test_permitted_stack_literals_do_not_trip_the_ban",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_production_modules_exist",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_access.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[api_syntax.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_interop.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[com_syntax.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[configuration_input.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_declarations.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[csharp_tokens.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependencies.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_dotnet.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_inputs.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_node.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_python.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dependency_values.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[dotnet_projects.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[event_subscriptions.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[filesystem_access.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[findings.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[input_capture.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py0]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[registry_access.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[solution_input.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_reference_syntax.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[test_references.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[ui_callbacks.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[xml_input.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__init__.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[__main__.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[cli.py]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[emitter.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[inventory.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[models.py1]",
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py::test_module_contains_no_banned_identifier[pipeline.py1]",
+    "tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_domain_neutrality_templates_contain_no_disallowed_tokens",
+    "tests/scripts/dev_tools/discovery/test_domain_neutrality.py::test_rendered_v2_drafts_use_only_caller_identity_and_empty_knowledge"
+  ],
+  "unchanged_original_ribbon": "tests/fixtures/discovery_dotnet_vsto/ribbon_customui.xml.txt",
+  "raw_coverage_qualification": "Exact original JSON bytes; may have no terminal newline.",
+  "source_test_mutations": false,
+  "git_mutations": false,
+  "accepted_predecessor_suites_replayed": false
+}
