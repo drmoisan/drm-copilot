@@ -1,0 +1,201 @@
+{
+  "task": "P4-T3",
+  "task_status": "PASS",
+  "timestamp": "2026-10-19T05-30",
+  "command": "Receipt-only final acceptance; purpose-built file edits for the audit and single task checkbox",
+  "exit_code": 0,
+  "authority": {
+    "receipt": "atomic_execution_p4t3_final_acceptance",
+    "phase": "S5_P4T3_final_acceptance",
+    "profile": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "max",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_authority": "Unchanged routing/launch/provenance attestation remains valid; fresh persisted receipt and current profile verified."
+  },
+  "accepted_baseline": "6a94e5789e8622d4f1aaa2f3aa2c45e1a9c92f89",
+  "checked_complete_candidate_commit": "8c09e297905278c5233db3ec5a98ec27278b481c",
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-final-handoff.2026-10-19T05-22.json",
+    "sha256": "affe16f6f18ffd44bee4f3ad5e76564288a2b94e1d6b6c6018d1e4da37a56b6d"
+  },
+  "independent_reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-reconciliation.2026-10-19T05-27.json",
+    "sha256": "b58df5a93d22da648286ce31f7f7a8218909eabe3c094c894c98b52cba9ccc53"
+  },
+  "retained_candidate_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-candidate-review.2026-10-19T05-00.json",
+    "sha256": "53b9c90086d370d4de177fc9edc8d69326134efd0ca6ea9074b220d8d18b2150"
+  },
+  "retained_repair_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-repair-confirmation.2026-10-19T05-15.json",
+    "sha256": "e61c1a3054b7a12d8a203ec9254b0bf4cada419cca4e133ce9b569cd5aac33a5"
+  },
+  "reconciliation_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-reconciliation-harness.2026-10-19T05-27.txt",
+    "sha256": "9961db569ec9afbbe6d81fed17782eefd999f25f566834d39508aa668f705e8d"
+  },
+  "gates": [
+    {
+      "stage": 1,
+      "name": "Black --check",
+      "seconds": 0.327224,
+      "exit_code": 0
+    },
+    {
+      "stage": 2,
+      "name": "Ruff check",
+      "seconds": 0.106908,
+      "exit_code": 0
+    },
+    {
+      "stage": 3,
+      "name": "Whole-repository Pyright",
+      "seconds": 11.78065,
+      "exit_code": 0
+    },
+    {
+      "stage": 4,
+      "name": "Architecture and test-isolation boundary checks",
+      "seconds": 0.117506,
+      "exit_code": 0
+    },
+    {
+      "stage": 5,
+      "name": "386 changed/direct-caller tests in recorded reversed module order",
+      "seconds": 33.168514,
+      "exit_code": 0
+    },
+    {
+      "stage": 6,
+      "name": "176 affected schema/package/quality contracts",
+      "seconds": 1.883671,
+      "exit_code": 0
+    },
+    {
+      "stage": 7,
+      "name": "Eight native Windows Python/Git composition checks",
+      "seconds": 2.446387,
+      "exit_code": 0
+    }
+  ],
+  "gate_provenance": "All seven exact receipts/raw stdout/stderr hashes, command scopes, ordered timestamps, unchanged pre/post source hashes and three executed harness hashes are verified in the linked reconciliation. All 386 node identities are extracted from the successful verbose execution output.",
+  "coverage": {
+    "covered_lines": 610,
+    "statements": 611,
+    "covered_branches": 259,
+    "branches": 260,
+    "named_measured_class_callable_records": 52,
+    "minimum_required_statement_percent": 90,
+    "all_named_measured_records_meet_threshold": true,
+    "baseline_responsibility_mappings": 22,
+    "qualification": "Scoped application coverage, not repository-wide coverage. Only the unchanged tokenizer defensive 64 MiB direct-text guard remains uncovered. Relocated/refactored legacy responsibilities are fully covered; rewritten line counts are not represented as unchanged source. Earlier AST-range counts also include class-body records that do not appear as nonempty callable coverage contexts."
+  },
+  "preservation": {
+    "source_test_working_index_commit_bindings": 14,
+    "accepted_predecessor_paths": 38,
+    "preserved_caller_fixture_paths": 12,
+    "evidence_bindings": 158,
+    "qualified_crlf_to_lf_evidence_paths": 20,
+    "exact_final_harness_snapshots": 3,
+    "source_index_qualification": "Current working/index/commit representations are recorded separately. The legacy source_text adapter retains exact CRLF-to-LF qualification under text=auto/eol=lf.",
+    "failed_history": "Original R1/R2/R3 reproductions, earlier worker diagnostics and the checker-only native-list comparison failure remain preserved."
+  },
+  "task_acceptance": [
+    {
+      "requirement": "Preserve lexical declaration and masking responsibilities with thin compatibility imports",
+      "result": "PASS",
+      "basis": "Retained source/interface review, original carrier/helper contracts, unchanged direct callers and final 386-test execution."
+    },
+    {
+      "requirement": "Separate detected syntax from inferred member/event relationships",
+      "result": "PASS",
+      "basis": "R1/R2 declaration-context fixes, inferred unresolved handler targets, arithmetic negatives and native composed-inventory checks."
+    },
+    {
+      "requirement": "Reference inspected original bytes and bound analysis",
+      "result": "PASS",
+      "basis": "Exact retained payload hashes, no evidence reread, strict decode/token/output limits, aggregate-work bound and pinned native Git captures."
+    },
+    {
+      "requirement": "Code/test size and applicable quality gates",
+      "result": "PASS",
+      "basis": "All 14 paths at most 470 lines; one clean ordered seven-stage loop including full Pyright."
+    }
+  ],
+  "review_reuse": "The complete original review and bounded eight-probe repair confirmation are reused for their exact bytes. No behavioral tests/probes or broad source review were repeated during final acceptance.",
+  "checker_diagnostic": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-checker-correction.2026-10-19T05-27.json",
+    "meaning": "The first receipt checker compared a native check-name list to integer 8. The exact script/error is retained. Corrected comparison verifies exact lists and their length; receipt reconciliation then passed. No behavioral gate failed or reran."
+  },
+  "file_write_hook_diagnostic": {
+    "code": "PROMOTION_MCP_ONLY_BLOCKED",
+    "attempt": "Combined documentation-write and task-checkoff shell command",
+    "stated_reason": "Direct GitHub issue creation via gh bypasses the approved MCP promotion path.",
+    "assessment": "The command contained no GitHub operation and was blocked before execution. Authorized documentation edits were completed through the purpose-built file-edit tool. No promotion action or enforcement policy was changed."
+  },
+  "language_gates": {
+    "Python": "PASS: Black, Ruff, full Pyright, scoped tests, affected contracts and native Windows/Git proof.",
+    "TypeScript": "Not applicable; no TypeScript change in this task.",
+    "PowerShell": "Not applicable; no PowerShell change in this task.",
+    "CSharp": "No compiled C# source change. Existing synthetic text fixtures are analyzer inputs; compiler gates are not applicable to this Python task."
+  },
+  "plan_checkoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "task": "P4-T3",
+    "before_sha256": "4cb6128ba58b1a960047d2380c5a29a974e3182a55ec2b026434a045d12b4022",
+    "after_sha256": "a89f7a9996dd61fcd42eb6cd9167400c6c0e10f079b745f4a0db5cd317b06c84",
+    "changed_bytes": 1,
+    "preserved_crlf_count": 559,
+    "completed_tasks": 35,
+    "total_tasks": 84,
+    "next_task": "P4-T4"
+  },
+  "acceptance_criteria": {
+    "work_mode": "full-feature",
+    "sources": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a",
+        "checked": 13,
+        "total": 66,
+        "remaining": 53
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+        "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344",
+        "checked": 13,
+        "total": 66,
+        "remaining": 53
+      }
+    ],
+    "newly_checked_ids": [],
+    "reason": "AC-31/32 were already satisfied. AC-33 through AC-36 cover the complete analyzer population; remaining analyzers, registry integration and designated host/integration proof are still pending."
+  },
+  "downstream_interfaces": [
+    "Runtime source_text exports preserve old helper/carrier object identity, constructors and decoded-character/physical-line masking contracts.",
+    "decode_source and tokenize_csharp retain strict BOM-aware decoding, literal identifiers, original decoded offsets and bounded inputs.",
+    "declaration_candidates supplies literal declarations plus explicitly inferred direct members; SourceScanError reports aggregate-work/declaration/token failures.",
+    "subscription_candidates supplies possible handler assignments with inferred, unresolved relationships.",
+    "CSharpDeclarationAnalyzer and EventSubscriptionAnalyzer consume only InventoryCapture bytes/pins and produce bounded Analysis results; registry exposure belongs to P4-T9.",
+    "Legacy DotnetInventoryAnalyzer parses once into private byte-bearing carriers, maps the same payload hashes and rejects direct emit in favor of guarded publication."
+  ],
+  "limitations": [
+    "Lexical analysis is not compiler binding or complete C# grammar; preprocessing, namespace/alias resolution and #line mappings remain unresolved.",
+    "Member/handler relationships remain inferred and do not establish runtime event activation.",
+    "Source anchors refer to decoded characters; evidence hashes refer to original bytes.",
+    "Public registry integration remains P4-T9.",
+    "Operational proof covers Windows Python/Git; coding-agent hosts and non-Windows CI remain later work.",
+    "Repository-wide final quality gates and full-feature acceptance remain pending."
+  ],
+  "changed_verifier_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-checker-correction.2026-10-19T05-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-checker-correction.2026-10-19T05-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-reconciliation.2026-10-19T05-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-reconciliation-harness.2026-10-19T05-27.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-acceptance.2026-10-19T05-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t3-executor-final-acceptance.2026-10-19T05-30.md"
+  ],
+  "next_step": "Parent commits and pushes accepted evidence/checkoff before releasing P4-T4. No successor task work was started."
+}

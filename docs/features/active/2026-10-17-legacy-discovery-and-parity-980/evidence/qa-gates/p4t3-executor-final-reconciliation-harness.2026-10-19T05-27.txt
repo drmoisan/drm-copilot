@@ -1,0 +1,164 @@
+"""Reconcile completed P4-T3 proof only; never rerun behavioral gates."""
+import hashlib
+import json
+import re
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+QA = FEATURE / 'evidence/qa-gates'
+WORKER = Path(sys.argv[1])
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': digest(Path(path).read_bytes())}
+
+
+def git_bytes(reference):
+    return subprocess.run(['git', 'show', reference], capture_output=True, check=True).stdout
+
+
+handoff_path = QA / 'p4t3-final-handoff.2026-10-19T05-22.json'
+assert digest(handoff_path.read_bytes()) == 'affe16f6f18ffd44bee4f3ad5e76564288a2b94e1d6b6c6018d1e4da37a56b6d'
+handoff = read(handoff_path)
+commit = handoff['checked_complete_candidate_wip_commit']
+assert subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True, text=True).stdout.strip() == commit
+assert digest(Path('.codex/agents/atomic-executor-c4.toml').read_bytes()) == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+freeze = read(QA / 'p4t3-repair-freeze.2026-10-19T05-08.json')
+expected = {row['path']: row['sha256'] for row in freeze['files']}
+source_bindings = []
+for row in handoff['files']:
+    path = row['path']
+    data = Path(path).read_bytes()
+    indexed = git_bytes(':' + path)
+    committed = git_bytes(commit + ':' + path)
+    assert digest(data) == row['sha256'] == expected[path], path
+    assert digest(indexed) == row['current_git_binding']['index_sha256'], path
+    assert indexed == committed and data.replace(b'\r\n', b'\n') == indexed, path
+    oid = subprocess.run(['git', 'rev-parse', commit + ':' + path], capture_output=True, check=True, text=True).stdout.strip()
+    assert oid == row['checked_wip_blob_oid'], path
+    source_bindings.append({'path': path, 'working_sha256': digest(data), 'index_sha256': digest(indexed), 'commit_sha256': digest(committed), 'working_index_exact': data == indexed, 'exact_crlf_to_lf_mapping': data.replace(b'\r\n', b'\n') == indexed, 'blob_oid': oid, 'lines': len(data.splitlines())})
+assert len(source_bindings) == 14
+
+harness_hashes = {}
+for row in handoff['harnesses']:
+    source = WORKER / row['original_path'].removeprefix('SCRATCH/')
+    canonical = Path(row['canonical_snapshot']['path'])
+    data = source.read_bytes()
+    assert data == canonical.read_bytes()
+    assert digest(data) == row['original_sha256'] == row['canonical_snapshot']['working_sha256']
+    assert b'\r' not in data and not re.search(rb'[A-Za-z]:[/\\]Users[/\\]', data)
+    harness_hashes[row['original_path']] = digest(data)
+
+stage_receipts = []
+for stage in handoff['ordered_receipts']:
+    path = Path(stage['path'])
+    assert digest(path.read_bytes()) == stage['sha256']
+    actual = read(path)
+    assert actual['exit_code'] == stage['exit_code'] == 0
+    assert actual['source_before'] == actual['source_after'] == expected
+    assert actual['harness_hashes'] == harness_hashes
+    assert actual['command'] == stage['command']
+    assert actual['started_at'] == stage['started_at'] and actual['finished_at'] == stage['finished_at']
+    for stream in ['raw_stdout', 'raw_stderr']:
+        reference = actual[stream]
+        assert digest((WORKER / reference['path'].removeprefix('SCRATCH/')).read_bytes()) == reference['sha256'] == stage[stream]['sha256']
+    stage_receipts.append(actual)
+assert [x['label'] for x in stage_receipts] == ['format', 'lint', 'types', 'architecture', 'tests-reverse', 'contracts', 'native']
+assert all(a['finished_at'] <= b['started_at'] for a, b in zip(stage_receipts, stage_receipts[1:]))
+ordered = read(QA / 'p4t3-final-ordered-stages.2026-10-19T05-19.json')
+assert ordered['source_hashes'] == expected and ordered['harness_hashes'] == harness_hashes
+assert [row['path'] for row in ordered['receipts']] == [row['path'] for row in handoff['ordered_receipts']]
+nodes = [line.split(' PASSED')[0] for line in stage_receipts[4]['stdout'].splitlines() if line.startswith('tests/') and ' PASSED' in line]
+assert nodes == handoff['test_nodes'] == ordered['test_nodes'] and len(nodes) == len(set(nodes)) == 386
+assert list(dict.fromkeys(node.split('::')[0] for node in nodes)) == handoff['test_module_order'] == ordered['test_module_order']
+assert '386 passed' in stage_receipts[4]['stdout'] and '176 passed' in stage_receipts[5]['stdout']
+assert 'All checks passed' in stage_receipts[1]['stdout']
+assert '0 errors, 0 warnings' in stage_receipts[2]['stdout']
+
+for name in ['raw_coverage', 'raw_native']:
+    row = handoff[name]
+    assert digest((WORKER / row['path'].removeprefix('SCRATCH/')).read_bytes()) == row['sha256']
+coverage_path = Path(ordered['coverage_path'])
+native_path = Path(ordered['native_path'])
+assert digest(coverage_path.read_bytes()) == handoff['raw_coverage']['sha256']
+assert digest(native_path.read_bytes()) == handoff['raw_native']['sha256']
+coverage = read(coverage_path)
+native = read(native_path)
+assert coverage['totals'] == handoff['coverage']['totals']
+assert (coverage['totals']['covered_lines'], coverage['totals']['num_statements'], coverage['totals']['covered_branches'], coverage['totals']['num_branches']) == (610, 611, 259, 260)
+by_path = {path.replace('\\', '/'): value for path, value in coverage['files'].items()}
+assert {path: value['summary'] for path, value in by_path.items()} == handoff['coverage']['per_module']
+unit_keys = set()
+for row in handoff['coverage']['per_class_callable']:
+    actual = by_path[row['path']][row['family']][row['name']]
+    assert actual['summary'] == row['summary'] and actual['executed_lines'] == row['executed_lines'] and actual['missing_lines'] == row['missing_lines']
+    assert actual['summary']['percent_statements_covered'] >= 90
+    unit_keys.add((row['path'], row['family'], row['name']))
+raw_unit_keys = {(path, family, name) for path, value in by_path.items() for family in ['functions', 'classes'] for name, unit in value[family].items() if name and unit['summary']['num_statements']}
+assert unit_keys == raw_unit_keys and len(unit_keys) == 52
+baseline = read(FEATURE / 'evidence/baseline/p4t3-baseline-coverage.2026-10-19T04-20.json')
+baseline_paths = {path.replace('\\', '/'): value for path, value in baseline['files'].items()}
+mapping = handoff['coverage']['baseline_responsibility_mapping']
+assert len(mapping) == 22
+for row in mapping:
+    assert baseline_paths[row['old_path']][row['family']][row['old_unit']]['summary'] == row['baseline_summary']
+    for new in row['replacement_units']:
+        actual = by_path[new['path']][row['family']][new['name']]['summary']
+        assert actual == new['summary'] and actual['percent_statements_covered'] == 100
+assert native['platform'] == 'win32' and native['checks'] == handoff['native_checks'] and len(native['checks']) == 8
+assert native['source_tree_unchanged'] and native['git_status_unchanged']
+assert all('PASS ' + name in stage_receipts[6]['stdout'] for name in native['checks'])
+
+for row in handoff['preserved_predecessors_and_callers']:
+    assert digest(Path(row['path']).read_bytes()) == row['sha256'], row['path']
+evidence_bindings = []
+for row in handoff['evidence_git_bindings']:
+    path = row['path']
+    data = Path(path).read_bytes()
+    assert digest(data) == row['working_sha256'], path
+    if row.get('index_blob_oid'):
+        indexed = git_bytes(':' + path)
+        assert digest(indexed) == row['index_sha256'] and data.replace(b'\r\n', b'\n') == indexed, path
+        evidence_bindings.append({'path': path, 'working_sha256': digest(data), 'index_sha256': digest(indexed), 'qualification': 'exact' if data == indexed else 'CRLF-to-LF only'})
+    else:
+        evidence_bindings.append({'path': path, 'working_sha256': digest(data), 'qualification': 'new evidence; parent staging pending'})
+for row in handoff['proofs']:
+    assert digest(Path(row['path']).read_bytes()) == row['working_sha256']
+confirmation = read(QA / 'p4t3-executor-repair-confirmation.2026-10-19T05-15.json')
+assert confirmation['status'] == 'READY_FOR_CHECKED_WIP_AND_FINAL_GATES'
+assert {row['path']: row['sha256'] for row in confirmation['files']} == expected
+assert confirmation['independent_reproduction_count'] == 8 and confirmation['remaining_findings'] == []
+
+plan = FEATURE / 'plan.2026-10-17T22-38.md'
+plan_bytes = plan.read_bytes()
+tasks = re.findall(rb'^- \[([ x])\] \[(P\d+-T\d+)\]', plan_bytes, re.M)
+assert len(tasks) == 84 and sum(state == b'x' for state, _ in tasks) == 34
+assert [state for state, task in tasks if task == b'P4-T3'] == [b' ']
+ac_sources = []
+for name in ['spec.md', 'user-story.md']:
+    path = FEATURE / name
+    text = path.read_text(encoding='utf-8')
+    section = text.split('## Acceptance Criteria\n', 1)[1].split('\n## ', 1)[0]
+    criteria = re.findall(r'^- \[([ x])\] (.+)$', section, re.M)
+    assert len(criteria) == 66 and sum(value == 'x' for value, _ in criteria) == 13
+    ac_sources.append({'path': path.as_posix(), 'sha256': digest(path.read_bytes()), 'total': 66, 'checked': 13, 'remaining': 53, 'analyzer_ac_31_to_36': [{'id': f'AC-{index + 1}', 'checked': criteria[index][0] == 'x', 'text': criteria[index][1]} for index in range(30, 36)]})
+
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+output = {'task': 'P4-T3', 'timestamp': now.isoformat(), 'status': 'FINAL_EVIDENCE_RECONCILED_TASK_CHECKOFF_READY', 'command': 'poetry run python SCRATCH/issue-980-p4t3-final-reconcile.py SCRATCH/worker', 'exit_code': 0, 'handoff': ref(handoff_path), 'commit': commit, 'source_bindings': source_bindings, 'harnesses': handoff['harnesses'], 'ordered_gates': handoff['ordered_receipts'], 'executed_node_count': len(nodes), 'contract_count': 176, 'native_count': 8, 'coverage': handoff['coverage'], 'raw_coverage': ref(coverage_path), 'raw_native': ref(native_path), 'evidence_bindings': evidence_bindings, 'preserved_predecessor_count': 38, 'preserved_caller_fixture_count': 12, 'retained_review': ref(QA / 'p4t3-executor-candidate-review.2026-10-19T05-00.json'), 'retained_repair_confirmation': ref(QA / 'p4t3-executor-repair-confirmation.2026-10-19T05-15.json'), 'plan_before': {'path': plan.as_posix(), 'sha256': digest(plan_bytes), 'checked': 34, 'total': 84}, 'ac_sources_unchanged': ac_sources, 'administrative_diagnostic': 'The first read of the native harness failed to display its Greek fixture characters through CP1252 stdout. Re-reading with UTF-8 stdout succeeded; no harness, source, raw receipt or gate changed.', 'tests_or_probes_reexecuted': False, 'limits': handoff['limitations']}
+target = QA / f'p4t3-executor-final-reconciliation.{stamp}.json'
+target.write_text(json.dumps(output, indent=2, ensure_ascii=True) + '\n', encoding='utf-8', newline='\n')
+snapshot = QA / f'p4t3-executor-final-reconciliation-harness.{stamp}.txt'
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'status': output['status'], 'artifact': ref(target), 'harness': ref(snapshot), 'sources': 14, 'units': 52, 'baseline_mappings': 22, 'evidence_bindings': len(evidence_bindings), 'normalizations': sum(row['qualification'] == 'CRLF-to-LF only' for row in evidence_bindings), 'ac_counts_unchanged': [13, 66]}, ensure_ascii=True))
