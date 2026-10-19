@@ -1,0 +1,43 @@
+{
+  "batch": "repair-2",
+  "command": "poetry run python -m pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T06:23:02.743402+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-2-types-062302.2026-10-19T06-23.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-2-types-062302.2026-10-19T06-23.stdout.txt",
+      "sha256": "7efaa1f25eeceef4a4c1d0bccd61643c6021fbc820794a32374d0461effe9da2"
+    }
+  },
+  "seconds": 0.9923,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "48bc7e7e636ac613d0dd066dfa751098524d4f40d8bab70370c93b2ea4ad6093",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "f3cb2b037efe5a7ef8ab87e0b90db8957a9263460550520110ad8a40bd89bc7e",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "516a3cb7e9c73dc11b5314bddea19ae3c3fcc4a4c2d33a88e66843800cca3e44",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "48bc7e7e636ac613d0dd066dfa751098524d4f40d8bab70370c93b2ea4ad6093",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "f3cb2b037efe5a7ef8ab87e0b90db8957a9263460550520110ad8a40bd89bc7e",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "516a3cb7e9c73dc11b5314bddea19ae3c3fcc4a4c2d33a88e66843800cca3e44",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "types",
+  "started_at": "2026-10-19T06:23:01.751102+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py\n  WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\configuration.py:192:15 - error: Argument of type \"str | None\" cannot be assigned to parameter \"obj\" of type \"Sized\" in function \"len\"\n  \u00a0\u00a0Type \"str | None\" is not assignable to type \"Sized\"\n  \u00a0\u00a0\u00a0\u00a0\"None\" is incompatible with protocol \"Sized\"\n  \u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\"__len__\" is not present (reportArgumentType)\nWORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration.py:402:37 - error: \"_project\" is private and used outside of the module in which it is declared (reportPrivateUsage)\nWORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration_input.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration_input.py:185:29 - error: \"child_pointer\" is not exported from module \"drm_copilot_discovery.analyzer.configuration_input\" (reportPrivateImportUsage)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration_input.py:218:29 - error: \"child_pointer\" is not exported from module \"drm_copilot_discovery.analyzer.configuration_input\" (reportPrivateImportUsage)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration_input.py:295:29 - error: \"_IniParser\" is private and used outside of the module in which it is declared (reportPrivateUsage)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_configuration_input.py:312:38 - error: \"_IniParser\" is private and used outside of the module in which it is declared (reportPrivateUsage)\n6 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-23"
+}

@@ -1,0 +1,44 @@
+"""Check whether a delimiter-presence precheck addresses the observed INI cost."""
+import configparser
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import time
+
+from drm_copilot_discovery.analyzer.configuration_input import parse_configuration
+
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+freeze = json.loads((feature / "evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json").read_bytes())
+before = {item["path"]: hashlib.sha256(Path(item["path"]).read_bytes()).hexdigest() for item in freeze["files"]}
+assert all(before[item["path"]] == item["sha256"] for item in freeze["files"])
+started = dt.datetime.now(dt.timezone.utc)
+results = []
+# The delimiter exists, but internal whitespace precedes a further key fragment.
+for count in (1024, 2048, 4096):
+    key = "K" + " " * count + "Suffix"
+    payload = ("[S]\n" + key + "=VALUE_SENTINEL").encode()
+    tick = time.perf_counter()
+    result = parse_configuration(payload, format="ini", max_bytes=8192, max_keys=8)
+    seconds = time.perf_counter() - tick
+    assert len(result) == 2 and result[1].name == key
+    assert "VALUE_SENTINEL" not in repr(result)
+    results.append({"spaces": count, "input_bytes": len(payload),
+                    "input_sha256": hashlib.sha256(payload).hexdigest(),
+                    "seconds": seconds, "delimiter_present": True,
+                    "accepted_key_length": len(result[1].name), "value_redacted": True})
+after = {item["path"]: hashlib.sha256(Path(item["path"]).read_bytes()).hexdigest() for item in freeze["files"]}
+assert before == after
+stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+report = {"task": "P4-T4", "started_at": started.isoformat(),
+          "finished_at": dt.datetime.now(dt.timezone.utc).isoformat(), "exit_code": 0,
+          "candidate_before": before, "candidate_after": after,
+          "stdlib_option_pattern": configparser.ConfigParser.OPTCRE.pattern,
+          "timing_claim": "Observed timings only; no timing threshold is an acceptance gate.",
+          "outcomes": results}
+output = feature / "evidence/qa-gates" / f"p4t4-executor-ini-work-probe.{stamp}.json"
+output.write_bytes((json.dumps(report, indent=2, sort_keys=True) + "\n").encode())
+harness = feature / "evidence/qa-gates" / f"p4t4-executor-ini-work-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"report": output.as_posix(), "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+                  "outcomes": results}))

@@ -174,6 +174,37 @@ def _failure(code: str, path: str | None) -> JsonObject:
     )
 
 
+def _output_cost(
+    capture: InventoryCapture,
+    item: InventoryInput,
+    keys: tuple[ConfigurationKey, ...] = (),
+) -> int:
+    """Return a conservative encoded-byte bound before constructing output rows.
+
+    capture/item provide source identifiers; keys contain retained declarations.
+    Twelve bytes per Unicode character cover compact UTF-8 JSON with either
+    ensure_ascii setting, including surrogate-pair escapes. Each row reserves
+    1024 additional bytes for fixed fields, IDs and numeric anchors; three base rows
+    cover the component and both possible diagnostics. No I/O/allocation of rows.
+    """
+    source = (
+        len(capture.profile.repository.id)
+        + len(capture.profile.repository.revision or "")
+        + len(item.path)
+    )
+    cost = 3 * (1024 + 12 * source)
+    # Charge repeated provenance and every variable declaration field per finding.
+    for key in keys:
+        cost += 1024 + 12 * (
+            source
+            + len(key.name)
+            + len(key.pointer)
+            + len(key.kind)
+            + len(key.origin_pointer or "")
+        )
+    return cost
+
+
 class ConfigurationAnalyzer:
     """Inventory declared configuration keys without leaking or evaluating values.
 
@@ -187,13 +218,17 @@ class ConfigurationAnalyzer:
     def analyze(self, capture: InventoryCapture) -> Analysis:
         """Return bounded Analysis from InventoryCapture; no source or state writes.
 
-        Profile limits constrain parsing/output. Input failures become sanitized
-        diagnostics, never raw exceptions or rationales. No values are returned.
+        Profile document_bytes bounds aggregate projected encoded text through a
+        conservative reservation before each row batch. Parser text is separately
+        bounded by the smaller file/remaining budget. Input failures become fixed
+        diagnostics; aggregate overflow discards all rows. No values are returned.
         """
         components: list[JsonObject] = []
         findings: list[JsonObject] = []
         diagnostics: list[JsonObject] = []
         limit = min(capture.profile.limits.artifact_records, 100000)
+        remaining_text = capture.profile.limits.document_bytes
+        overflow = "analysis-limit"
         max_bytes = min(
             capture.profile.limits.document_bytes,
             capture.profile.analyzers.max_file_bytes,
@@ -207,6 +242,11 @@ class ConfigurationAnalyzer:
             used = len(components) + len(findings) + len(diagnostics)
             if used >= limit:
                 break
+            base_cost = _output_cost(capture, item)
+            if base_cost > remaining_text:
+                overflow = "analysis-text-limit"
+                break
+            remaining_text -= base_cost
             if item.file is None:
                 diagnostics.append(_failure("input-unreadable", item.path))
                 continue
@@ -222,12 +262,22 @@ class ConfigurationAnalyzer:
                     max_bytes=max_bytes,
                     max_keys=limit - used,
                     max_depth=capture.profile.limits.nesting_depth,
+                    max_text_bytes=min(max_bytes, max(1, remaining_text)),
                 )
             except ConfigurationInputError as error:
+                # Text exhaustion invalidates the whole aggregate, not one file.
+                if error.code == "configuration-text-limit":
+                    overflow = "analysis-text-limit"
+                    break
                 diagnostics.append(_failure(error.code, item.path))
                 continue
             if used + len(keys) + 2 + int(not pinned_matches(capture, item)) > limit:
                 break
+            extra_cost = _output_cost(capture, item, keys) - base_cost
+            if extra_cost > remaining_text:
+                overflow = "analysis-text-limit"
+                break
+            remaining_text -= extra_cost
             result = _project(capture, item, format, keys)
             components.extend(result.components)
             findings.extend(result.findings)
@@ -238,4 +288,4 @@ class ConfigurationAnalyzer:
                 findings=tuple(findings),
                 diagnostics=tuple(diagnostics),
             )
-        return Analysis(diagnostics=(_failure("analysis-limit", None),))
+        return Analysis(diagnostics=(_failure(overflow, None),))

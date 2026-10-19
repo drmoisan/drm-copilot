@@ -1,0 +1,93 @@
+"""Bounded independent P4-T4 parser-risk probes; never edit candidate files."""
+from __future__ import annotations
+
+import dataclasses
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import time
+
+from drm_copilot_discovery.analyzer.configuration_input import (
+    ConfigurationInputError,
+    parse_configuration,
+)
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+FREEZE = FEATURE / "evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json"
+
+
+def digest(data: bytes) -> str:
+    """Return exact SHA-256 for immutable bytes; no side effects."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def run() -> dict[str, object]:
+    """Probe bounded expansion, malformed INI, Unicode value and line guard cases."""
+    freeze = json.loads(FREEZE.read_bytes())
+    before = {entry["path"]: digest(Path(entry["path"]).read_bytes()) for entry in freeze["files"]}
+    assert all(before[entry["path"]] == entry["sha256"] for entry in freeze["files"])
+    outcomes: list[dict[str, object]] = []
+    # Repeated long prefixes expose output amplification without large allocations.
+    for count in (64, 128, 256):
+        prefix = "p" * 2048
+        payload = json.dumps({prefix: {"key" + str(i): 0 for i in range(count)}}, separators=(",", ":")).encode()
+        result = parse_configuration(payload, format="json", max_bytes=8192, max_keys=count + 1)
+        outcomes.append({"probe": "json-expanded-path-budget", "children": count,
+                         "input_bytes": len(payload), "input_sha256": digest(payload),
+                         "configured_max_bytes": 8192, "configured_max_keys": count + 1,
+                         "returned_keys": len(result), "total_pointer_utf8_bytes": sum(len(item.pointer.encode()) for item in result),
+                         "outcome": "returned"})
+    # Small malformed lines measure an uncovered grammar cost; timings are observations only.
+    for count in (1024, 2048, 4096):
+        payload = ("[S]\nK" + " " * count + "VALUE_SENTINEL").encode()
+        started = time.perf_counter()
+        try:
+            parse_configuration(payload, format="ini", max_bytes=8192, max_keys=8)
+        except ConfigurationInputError as error:
+            outcomes.append({"probe": "ini-delimiter-free-line", "spaces": count,
+                             "input_sha256": digest(payload), "seconds": time.perf_counter() - started,
+                             "code": error.code, "exception_context_absent": error.__context__ is None,
+                             "exception_cause_absent": error.__cause__ is None,
+                             "source_redacted": "VALUE_SENTINEL" not in str(error) + repr(error) + repr(error.args)})
+        else:
+            raise AssertionError("Malformed delimiter-free INI was accepted")
+    # Unicode separators in values must not become physical declarations.
+    payload = "[S]\nK=value\u2028VALUE_SENTINEL=other\nEnd=yes".encode()
+    result = parse_configuration(payload, format="ini", max_bytes=8192, max_keys=8)
+    assert [(item.name, item.line) for item in result] == [("S", 1), ("K", 2), ("End", 3)]
+    outcomes.append({"probe": "ini-unicode-value-separator", "input_sha256": digest(payload),
+                     "records": [dataclasses.asdict(item) for item in result], "source_redacted": "VALUE_SENTINEL" not in repr(result)})
+    # The documented physical-line guard must fail before creating INI grammar state.
+    payload = b"[S]\n" + b"\n" * 100000
+    try:
+        parse_configuration(payload, format="ini", max_bytes=200000, max_keys=8)
+    except ConfigurationInputError as error:
+        assert error.code == "configuration-limit"
+        outcomes.append({"probe": "ini-physical-line-limit", "input_sha256": digest(payload),
+                         "code": error.code, "context_absent": error.__context__ is None})
+    else:
+        raise AssertionError("Physical-line budget was not enforced")
+    after = {entry["path"]: digest(Path(entry["path"]).read_bytes()) for entry in freeze["files"]}
+    assert before == after
+    return {"task": "P4-T4", "candidate_freeze": FREEZE.as_posix(),
+            "candidate_freeze_sha256": digest(FREEZE.read_bytes()), "source_before": before,
+            "source_after": after, "probes": outcomes, "suite_replayed": False}
+
+
+started = dt.datetime.now(dt.timezone.utc)
+report = run()
+report["started_at"] = started.isoformat()
+report["finished_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+report["harness_sha256"] = digest(Path(__file__).read_bytes())
+report["exit_code"] = 0
+written = dt.datetime.now(dt.timezone.utc)
+stamp = written.strftime("%Y-%m-%dT%H-%M")
+destination = FEATURE / "evidence/qa-gates" / f"p4t4-executor-candidate-probes.{stamp}.json"
+destination.write_bytes((json.dumps(report, indent=2, sort_keys=True) + "\n").encode())
+snapshot = FEATURE / "evidence/qa-gates" / f"p4t4-executor-candidate-probe-harness.{stamp}.txt"
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"report": destination.as_posix(), "sha256": digest(destination.read_bytes()),
+                  "harness": snapshot.as_posix(), "probes": report["probes"]}, ensure_ascii=True))

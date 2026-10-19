@@ -1,0 +1,47 @@
+{
+  "cause": "Raw text scan matched requests inside a test docstring. The corrected scan removes AST-identified docstrings and comment tokens, retaining executable identifiers and all other literals.",
+  "corrected_harness": {
+    "path": "SCRATCH/issue-980-architecture.py",
+    "sha256": "ef0d0db019e111592b25b61dd36afeac5e02268bcdecc2de4ea6fa86de96009e"
+  },
+  "followup": "Rerun only the structural binding while composing the repair freeze. The clean 91-case ordered proof remains valid.",
+  "original_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-rejected-structural-harness.2026-10-19T06-32.txt",
+    "sha256": "bd275297905c6f3038be733105a1cab97730bfdb7338fa36ee14dd0006d11036"
+  },
+  "production_test_changes": false,
+  "raw_stderr": {
+    "path": "SCRATCH/repair-structure-rejected.stderr.txt",
+    "sha256": "ca6b341d6fc43edd3d63207ef92d569a8132723fd1d1a1be432bfcca5d591d88"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/repair-structure-rejected.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "recorded_at": "2026-10-19T06:32:03.748707+00:00",
+  "rejected_exit_code": 1,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "started_at": "2026-10-19T06:32:03.637376+00:00",
+  "status": "SCRATCH_CHECKER_ONLY_CORRECTION",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-32"
+}

@@ -8,6 +8,7 @@ it never evaluates interpolation or substitutes for grammar validation.
 from __future__ import annotations
 
 import configparser
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -58,14 +59,39 @@ class ConfigurationKey:
 class _Keys:
     """Own one bounded declaration buffer; reject before allocating another row.
 
-    Parsing passes sanitized fields to add. limit bounds the private values list;
-    an overflow raises a fixed error and no partial tuple is returned to callers.
+    Parsing passes sanitized fields to add. Count and encoded-text budgets bound
+    records and every constructed path. Twelve bytes per Unicode character bound
+    compact UTF-8 JSON with ensure_ascii either true or false, including surrogate
+    pair escapes; 128 bytes per record cover fixed fields. Overflow returns no tuple.
     """
 
-    def __init__(self, limit: int) -> None:
-        """Bind positive int limit and allocate an empty private list; return None."""
+    def __init__(self, limit: int, text_limit: int) -> None:
+        """Bind positive int record/text limits; allocate an empty list, return None."""
         self.limit = limit
+        self.remaining = text_limit
         self.values: list[ConfigurationKey] = []
+
+    def reserve(self, cost: int) -> None:
+        """Charge prospective int cost; return None or fixed error before allocation.
+
+        Only this private budget is mutated. No source text or I/O is involved.
+        """
+        if cost > self.remaining:
+            raise ConfigurationInputError("configuration-text-limit")
+        self.remaining -= cost
+
+    def address(self, parent: str, part: str | int) -> str:
+        """Return escaped address only after charging prospective text allocation.
+
+        parent (str) and part (str | int) are structural segments. Fixed error
+        rejects expansion before child_pointer allocates it; no external effects.
+        """
+        segment = str(part)
+        length = (
+            len(parent) + 1 + len(segment) + segment.count("~") + segment.count("/")
+        )
+        self.reserve(12 * length)
+        return child_pointer(parent, part)
 
     def add(
         self,
@@ -85,6 +111,10 @@ class _Keys:
         """
         if len(self.values) >= self.limit:
             raise ConfigurationInputError("configuration-limit")
+        self.reserve(
+            128
+            + 12 * (len(name) + len(pointer) + len(kind) + len(origin_pointer or ""))
+        )
         value = ConfigurationKey(
             name=name,
             pointer=pointer,
@@ -108,13 +138,13 @@ def _json_walk(value: JsonValue, pointer: str, keys: _Keys) -> None:
     if isinstance(value, JsonObject):
         # Accepted parsing already sorts keys and bounds recursive depth.
         for name, child in value.members:
-            address = child_pointer(pointer, name)
+            address = keys.address(pointer, name)
             keys.add(name, address, "json-key")
             _json_walk(child, address, keys)
     elif isinstance(value, tuple):
         # Preserve actual array indexes when nested objects contain settings keys.
         for index, child in enumerate(value):
-            _json_walk(child, child_pointer(pointer, index), keys)
+            _json_walk(child, keys.address(pointer, index), keys)
 
 
 def _json(content: bytes, limits: ParseLimits, keys: _Keys) -> None:
@@ -227,7 +257,7 @@ def _xml(content: bytes, limits: ParseLimits, keys: _Keys) -> None:
         ordinal = siblings.get(node.parent, 0)
         siblings[node.parent] = ordinal + 1
         prefix = pointers[node.parent] if node.parent is not None else ""
-        pointer = child_pointer(prefix, ordinal)
+        pointer = keys.address(prefix, ordinal)
         pointers.append(pointer)
         inherited = conditional[node.parent] if node.parent is not None else False
         conditioned = (
@@ -246,16 +276,30 @@ def _xml(content: bytes, limits: ParseLimits, keys: _Keys) -> None:
         kind = "xml-key-removal" if node.tag == "remove" else "xml-key"
         keys.add(
             name,
-            child_pointer(pointer, "@" + attribute),
+            keys.address(pointer, "@" + attribute),
             kind,
             line=node.line,
             conditional=conditioned,
         )
 
 
-def _preserve_case(optionstr: str) -> str:
-    """Return str optionstr unchanged for ConfigParser; no I/O or side effects."""
-    return optionstr
+class _IniParser(configparser.ConfigParser):
+    """Keep strict stdlib grammar while removing overlapping option backtracking.
+
+    Fixed delimiters make the negated class consume each name character once.
+    ConfigParser trims names/values itself. Both locator and parser use OPTCRE;
+    defaults, continuations, comments and duplicate handling stay in ConfigParser.
+    """
+
+    OPTCRE = re.compile(r"(?P<option>[^=:]*)(?P<vi>[=:])(?P<value>.*)$")
+
+    def __init__(self) -> None:
+        """Configure fixed strict/no-interpolation grammar; return None without I/O."""
+        super().__init__(interpolation=None, strict=True, empty_lines_in_values=True)
+
+    def optionxform(self, optionstr: str) -> str:
+        """Return str optionstr unchanged; no I/O or external side effects."""
+        return optionstr
 
 
 def _ini(content: bytes, keys: _Keys) -> None:
@@ -279,10 +323,7 @@ def _ini(content: bytes, keys: _Keys) -> None:
     if text.count("\n") >= 100000:
         raise ConfigurationInputError("configuration-limit")
     lines = text.split("\n")
-    parser = configparser.ConfigParser(
-        interpolation=None, strict=True, empty_lines_in_values=True
-    )
-    parser.optionxform = _preserve_case
+    parser = _IniParser()
     section: str | None = None
     option: str | None = None
     indentation = 0
@@ -305,7 +346,7 @@ def _ini(content: bytes, keys: _Keys) -> None:
             option = None
             keys.add(
                 section,
-                child_pointer("/section_declarations", declarations),
+                keys.address("/section_declarations", declarations),
                 "ini-section",
                 line=number,
             )
@@ -317,10 +358,10 @@ def _ini(content: bytes, keys: _Keys) -> None:
                 # OPTCRE requires the option group whenever its match succeeds.
                 option = cast("str", match.group("option")).rstrip()
                 default = section == parser.default_section
-                prefix = "/defaults" if default else child_pointer("/sections", section)
+                prefix = "/defaults" if default else keys.address("/sections", section)
                 key = keys.add(
                     option,
-                    child_pointer(prefix, option),
+                    keys.address(prefix, option),
                     "ini-default-key" if default else "ini-key",
                     line=number,
                 )
@@ -339,6 +380,7 @@ def _ini(content: bytes, keys: _Keys) -> None:
     # Check the locator against parser-owned names without inspecting their values.
     if set(defaults) != set(parser.defaults()):
         raise ConfigurationInputError("configuration-ini-anchors")
+    # Reject locator drift before constructing any inherited declaration paths.
     for name in parser.sections():
         if explicit[name] | set(defaults) != set(parser.options(name)):
             raise ConfigurationInputError("configuration-ini-anchors")
@@ -347,7 +389,7 @@ def _ini(content: bytes, keys: _Keys) -> None:
             if option not in explicit[name]:
                 keys.add(
                     option,
-                    child_pointer(child_pointer("/sections", name), option),
+                    keys.address(keys.address("/sections", name), option),
                     "ini-inherited-key",
                     line=origin.line,
                     origin_pointer=origin.pointer,
@@ -361,11 +403,17 @@ def parse_configuration(
     max_bytes: int,
     max_keys: int,
     max_depth: int = 64,
+    max_text_bytes: int | None = None,
 ) -> tuple[ConfigurationKey, ...]:
     """Return bounded identifiers/locations only from one retained configuration.
 
     content (bytes), format (json/xml/ini), max_bytes/max_keys/max_depth (int)
-    select fixed parsing and finite bounds. Raises ValueError for invalid caller
+    select fixed parsing and finite bounds. max_text_bytes (int | None) separately
+    bounds constructed paths and retained identifier text. Its default is four
+    times max_bytes, capped at 64 MiB, allowing fixed output overhead for short
+    input. Twelve bytes per Unicode character cover compact UTF-8
+    JSON with either ensure_ascii setting, including surrogate-pair escapes;
+    128 bytes per key cover fixed fields. Raises ValueError for invalid caller
     limits; ConfigurationInputError contains all selected-input failures. No I/O,
     interpolation, condition evaluation or external resource loading occurs.
     """
@@ -374,9 +422,14 @@ def parse_configuration(
     )
     if max_keys > 100000 or format not in {"json", "xml", "ini"}:
         raise ValueError("Configuration format and key budget must be supported")
+    text_limit = (
+        min(4 * max_bytes, 67108864) if max_text_bytes is None else max_text_bytes
+    )
+    if type(text_limit) is not int or not 1 <= text_limit <= 67108864:
+        raise ValueError("Configuration text budget must be between 1 and 67108864")
     if len(content) > max_bytes:
         raise ConfigurationInputError("configuration-limit")
-    keys = _Keys(max_keys)
+    keys = _Keys(max_keys, text_limit)
     # Fixed format dispatch cannot execute a configured parser or module name.
     if format == "json":
         _json(content, limits, keys)
