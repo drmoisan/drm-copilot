@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "native capture includes all seven selected declared build inputs",
+    "real Git identity and retained immutable bytes agree",
+    "native XML and BOM-marked solution files emit declarations without blockers",
+    "composed inventory semantic identity ignores analyzer order and capture clock",
+    "every declared dependency target remains unresolved",
+    "ledger proposals remain uninspected and unassigned",
+    "analysis leaves source bytes and native Git status unchanged"
+  ],
+  "component_count": 7,
+  "finding_count": 30,
+  "git_status_unchanged": true,
+  "inputs": {
+    "src/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "src/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "src/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "src/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "src/Unicode.sln": "cc7bec1ede19e3f7723319bf47815215119bb90cd021c686adecf3e0d6c0cf45",
+    "src/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "src/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "inventory_id": "inventory-6d9bfb5ae5e9f1c533af5ed4b973e037ae2aba7056bea431cda666f03712519d",
+  "platform": "win32",
+  "relationship_count": 21,
+  "revision": "1f13711b38290c9487223d3e5b75ffece569ffcb",
+  "scratch_repository": "SCRATCH/native-dotnet-39c8a9fc9b634038b5ff2d0e08159bf2",
+  "semantic_sha256": "6d9bfb5ae5e9f1c533af5ed4b973e037ae2aba7056bea431cda666f03712519d",
+  "source_tree_unchanged": true,
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T04:06:39.830033+00:00"
+}

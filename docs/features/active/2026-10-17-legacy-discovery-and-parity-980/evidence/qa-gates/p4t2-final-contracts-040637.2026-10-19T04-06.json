@@ -1,0 +1,53 @@
+{
+  "command": "poetry run python -m pytest -q -o addopts= --no-cov tests/schemas/discovery/test_v2_inventory_schemas.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T04:06:37.046833+00:00",
+  "harness_hashes": {
+    "SCRATCH/architecture_gate.py": "b933a9831cfa8cdad73d29a0eb4924b65450a440a12aa9d621f9d15c7b71ab6e",
+    "SCRATCH/final_gates.py": "a7fd1de29ec63d272b91992f360f9e16d8caa94d2240eba6c3d9b0d95f4a7c2f",
+    "SCRATCH/native_gate.py": "13fc23ce16deb7324d6ddb07e5c83576b14f5d9ac16031e52e4b9aaa2c770de2"
+  },
+  "label": "contracts",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-final-contracts-040637.2026-10-19T04-06.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-final-contracts-040637.2026-10-19T04-06.stdout.txt",
+    "sha256": "70058baa985b1edd87571e058397b9060489d970fb7a578ea73d2b30e028e9e0"
+  },
+  "seconds": 1.563422,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "stage": 6,
+  "started_at": "2026-10-19T04:06:35.483411+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 40%]\r\n........................................................................ [ 81%]\r\n................................                                         [100%]\r\n176 passed in 1.18s\r\n",
+  "timestamp": "2026-10-19T04-06"
+}

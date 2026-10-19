@@ -80,7 +80,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [ ] Implementation planning can be gated on discovery completion.
 ### Analyzers
 - [x] A generic repository/project inventory analyzer exists.
-- [ ] At least one meaningful C#/.NET analyzer exists.
+- [x] At least one meaningful C#/.NET analyzer exists.
 - [ ] Output is deterministic and machine-readable.
 - [ ] Findings include source references.
 - [ ] Facts are distinguished from inference.
