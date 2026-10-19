@@ -1,0 +1,158 @@
+"""Bind the four-file P4-T4 repair and retained tests without task acceptance."""
+import ast
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+evidence = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence')
+qa = evidence / 'qa-gates'
+binding_path = qa / 'p4t4-repair-7-binding.2026-10-19T06-28.json'
+original_path = qa / 'p4t4-focused-wip-freeze.2026-10-19T05-54.json'
+review_path = qa / 'p4t4-executor-candidate-review.2026-10-19T06-10.json'
+baseline_path = evidence / 'baseline/p4t4-baseline-binding.2026-10-19T05-38.json'
+binding = json.loads(binding_path.read_bytes())
+original = json.loads(original_path.read_bytes())
+coverage = json.loads(Path(binding['coverage']['path']).read_bytes())
+old_coverage = json.loads(Path(original['coverage']['path']).read_bytes())
+assert sha256(review_path.read_bytes()).hexdigest() == 'eff5e903958412fc4fdf09b305481dd9788d905d8e2c4867969736a4d6b79990'
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha256(path.read_bytes()).hexdigest()}
+
+def executable_dump(node):
+    copied = ast.parse(ast.unparse(node)).body[0]
+    for child in ast.walk(copied):
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and ast.get_docstring(child):
+            child.body.pop(0)
+    return ast.dump(copied, include_attributes=False)
+
+files = []
+changed = []
+original_functions = []
+new_functions = []
+units = []
+module_coverage = []
+documentation = []
+old_files = {item['path']: item for item in original['files']}
+for path, expected in binding['sources'].items():
+    content = Path(path).read_bytes()
+    actual = sha256(content).hexdigest()
+    assert actual == expected, path
+    old = old_files[path]
+    preserved = scratch / 'original-reviewed' / path
+    assert sha256(preserved.read_bytes()).hexdigest() == old['sha256'], path
+    count = len(content.decode().splitlines())
+    assert count <= 500, (path, count)
+    disposition = 'repaired' if actual != old['sha256'] else 'unchanged'
+    files.append({'path': path, 'sha256': actual, 'original_sha256': old['sha256'], 'physical_lines': count, 'disposition': disposition})
+    if disposition == 'repaired':
+        changed.append(path)
+    if not path.endswith('.py'):
+        continue
+    tree = ast.parse(content)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            assert ast.get_docstring(node), (path, node.name)
+            documentation.append({'path': path, 'name': node.name, 'line': node.lineno})
+    if path.startswith('tests/'):
+        old_nodes = {node.name: node for node in ast.parse(preserved.read_bytes()).body if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))}
+        new_nodes = {node.name: node for node in tree.body if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))}
+        for name, old_node in old_nodes.items():
+            assert name in new_nodes and executable_dump(old_node) == executable_dump(new_nodes[name]), (path, name)
+            original_functions.append({'path': path, 'name': name, 'assertions_and_parameters_preserved': True})
+        new_functions.extend({'path': path, 'name': name} for name in new_nodes.keys() - old_nodes.keys())
+    if path not in coverage['files']:
+        continue
+    data = coverage['files'][path]
+    module_coverage.append({'path': path, 'original': old_coverage['files'][path]['summary'], 'repaired': data['summary'], 'missing_lines': data['missing_lines'], 'missing_branches': data['missing_branches']})
+    assert data['summary']['percent_statements_covered'] >= old_coverage['files'][path]['summary']['percent_statements_covered']
+    assert data['summary']['percent_branches_covered'] >= old_coverage['files'][path]['summary']['percent_branches_covered']
+    eligible = set(data['executed_lines']) | set(data['missing_lines'])
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            span = set(range(node.lineno, node.end_lineno + 1))
+            statements = eligible & span
+            covered = set(data['executed_lines']) & span
+            assert not statements or len(covered) / len(statements) >= .90, (path, node.name)
+            units.append({'path': path, 'name': node.name, 'kind': type(node).__name__, 'start': node.lineno, 'end': node.end_lineno, 'statements': len(statements), 'covered_statements': len(covered)})
+assert len(changed) == 4
+assert not any('fixtures/' in path for path in changed)
+baseline = json.loads(baseline_path.read_bytes())
+for item in baseline['predecessor_files']:
+    assert sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256'], item['path']
+for item in binding['receipts']:
+    receipt = json.loads(Path(item['path']).read_bytes())
+    assert ref(Path(item['path'])) == item
+    assert receipt['exit_code'] == 0
+    assert receipt['source_before'] == receipt['source_after'] == binding['sources']
+    for raw in receipt['raw'].values():
+        assert sha256((scratch / Path(raw['path']).name).read_bytes()).hexdigest() == raw['sha256']
+test_receipt = json.loads(Path(binding['receipts'][-1]['path']).read_bytes())
+assert '91 passed' in test_receipt['stdout']
+assert sha256((scratch / Path(binding['coverage']['raw_path']).name).read_bytes()).hexdigest() == binding['coverage']['raw_sha256']
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+manifest_path = qa / ('p4t4-repair-freeze.' + stamp + '.json')
+structural_manifest = scratch / 'repair-structural-input.json'
+structural_manifest.write_text(json.dumps({'files': files}), encoding='utf-8', newline='\n')
+structure = subprocess.run(['poetry', 'run', 'python', str(scratch / 'issue-980-architecture.py'), str(structural_manifest)], capture_output=True, check=True)
+(scratch / 'repair-structure.stdout.txt').write_bytes(structure.stdout)
+(scratch / 'repair-structure.stderr.txt').write_bytes(structure.stderr)
+structure_result = json.loads(structure.stdout)
+assert structure_result['passed'] == 8
+snapshots = []
+for name in ('issue-980-repair-freeze.py', 'issue-980-focused.py', 'issue-980-architecture.py'):
+    source = scratch / name
+    destination = qa / ('p4t4-repair-' + name.removeprefix('issue-980-').removesuffix('.py') + '-harness.' + stamp + '.txt')
+    destination.write_bytes(source.read_bytes())
+    snapshots.append({'source': 'SCRATCH/' + name, **ref(destination)})
+history = sorted([*qa.glob('p4t4-repair-*.json'), *(evidence / 'regression-testing').glob('p4t4-repair-*.json')])
+history_refs = [ref(path) for path in history]
+failed_coverage = scratch / 'p4t4-repair-5-coverage.raw.json'
+document = {
+    'task': 'P4-T4', 'state': 'REPAIR_FROZEN_BOUNDED_CONFIRMATION_PENDING',
+    'timestamp': stamp, 'recorded_at': now.isoformat(),
+    'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+    'files': files, 'changed_paths': changed, 'focused_binding': ref(binding_path),
+    'original_candidate': ref(original_path), 'consolidated_review': ref(review_path),
+    'original_commit': 'd6d00ae2a5a612fdfb026bf954f868edf4c5ff9e',
+    'baseline': ref(baseline_path), 'preserved_predecessor_count': len(baseline['predecessor_files']),
+    'receipts': binding['receipts'], 'coverage': binding['coverage'],
+    'totals': coverage['totals'], 'module_coverage': module_coverage, 'unit_ranges': units,
+    'tests': {'passed': 91, 'original_cases_retained': 61, 'new_cases': 30, 'command_seconds': test_receipt['seconds'], 'module_order': ['tests/discovery_runtime/analyzer/test_configuration.py', 'tests/discovery_runtime/analyzer/test_configuration_input.py']},
+    'original_test_definitions': original_functions, 'new_test_definitions': sorted(new_functions, key=lambda entry: (entry['path'], entry['name'])),
+    'documentation_units': documentation, 'structural_checks': structure_result,
+    'structural_checker_correction': ref(qa / 'p4t4-structural-harness-correction.2026-10-19T06-32.json'),
+    'structure_raw': {'stdout': {'path': 'SCRATCH/repair-structure.stdout.txt', 'sha256': sha256(structure.stdout).hexdigest()}, 'stderr': {'path': 'SCRATCH/repair-structure.stderr.txt', 'sha256': sha256(structure.stderr).hexdigest()}},
+    'repair_history': history_refs, 'failed_run_coverage': {'path': 'SCRATCH/' + failed_coverage.name, 'sha256': sha256(failed_coverage.read_bytes()).hexdigest(), 'status': 'unaccepted fixture assertion failure; retained, not used for acceptance'},
+    'harness_snapshots': snapshots,
+    'R1': {'unit': 'conservative encoded-byte reservation', 'coefficient': '12 bytes per Unicode character; compact UTF-8 JSON with ensure_ascii true or false, including 12-byte surrogate-pair escapes', 'paths': 'prospective RFC6901 escaped length is charged before child_pointer construction', 'parser_default': 'min(4 * max_bytes, 67108864); explicit positive max_text_bytes overrides it', 'parser_record_overhead': 128, 'projection_row_overhead': 1024, 'projection_base_rows': 3, 'aggregate_limit': 'profile.limits.document_bytes; reserve before each projection; any text exhaustion returns one fixed analysis-text-limit diagnostic and no partial claims', 'new_proofs': ['original long-prefix family', 'BMP/control/astral/RFC6901 prospective construction', 'INI default inheritance', 'cross-file base and finding projection limits', 'parser exhaustion and 4096-astral-character expansion', 'complete compact serialization with both ensure_ascii settings']},
+    'R2': {'matcher': '(?P<option>[^=:]*)(?P<vi>[=:])(?P<value>.*)$', 'ownership': 'private fixed ConfigParser subclass; locator and stdlib parser share the same linear option expression', 'proofs': ['original valid/invalid 1024/2048/4096-space reproducers prohibit the overlapping inherited matcher', '64 admissible option lines use exactly 128 matches, with summed matched input length <= twice source length', 'both delimiters, trimming, case, defaults and continuation behavior retained']},
+    'R3': 'Immediate intent comments added at the section-validation loop, listed assertion comprehensions and new decision/traversal sites; all production/test classes and callables retain typed intent documentation.',
+    'remaining_uncovered': ['configuration_input.py:324 retains the 100000-physical-line rejection', 'configuration_input.py:382 and :386 retain defensive locator/ConfigParser anchor disagreement guards; unchanged semantics from original 280/341/344'],
+    'remaining': ['Bounded independent R1/R2/R3 confirmation', 'Parent checked-WIP commit and final-gate release', 'One scoped seven-stage final loop', 'Executor task acceptance'],
+    'limitations': original['limitations'],
+    'normalization': 'Working SHA256 only; parent qualifies actual Git index/commit streams. New JSON/Markdown are LF UTF-8; original raw streams remain external SCRATCH and are hash-bound.'
+}
+manifest_path.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+markdown = f'''# P4-T4 bounded repair freeze
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-repair-freeze.py`
+EXIT_CODE: 0
+Output Summary: Four production/test files are frozen after 91 passing cases and a clean ordered Black/Ruff/Pyright/Pytest sequence. The four fixtures and 34 accepted predecessor paths remain unchanged. Task acceptance remains pending.
+
+R1 now charges a conservative encoded-byte reservation before pointer construction and before aggregate Analysis projection. Twelve bytes per Unicode character cover compact UTF-8 JSON with either ensure_ascii setting, including surrogate-pair escapes. The parser defaults to four times its input-byte limit, capped at 64 MiB; the adapter supplies an explicit remaining aggregate limit. Output exhaustion returns a fixed blocking diagnostic without partial claims.
+
+R2 uses one fixed linear option expression in both the INI locator and ConfigParser. Original valid and malformed internal-whitespace reproducers pass. The 64-line regression observes exactly 128 matcher calls and total matched characters at most twice source length; no timing threshold is used. R3 intent comments and structural/documentation checks are complete.
+
+All original 61 cases are preserved, with exact executable AST and parametrization equivalence for their test definitions. Thirty new cases cover the repair. Coverage is 290/293 statements and 116/122 branch destinations; every measured class/callable is at least 90% statements. The three uncovered statements are retained defensive guards, identified in JSON. Initial failed formatting/lint/type and fixture diagnostics are retained separately.
+
+The complete prior review remains authoritative for unchanged behavior. The next review is bounded to R1–R3. No registry exposure, task checkoff, final-gate execution or coding-agent host proof is claimed here.
+'''
+manifest_path.with_suffix('.md').write_text(markdown, encoding='utf-8', newline='\n')
+print(json.dumps({'manifest': manifest_path.as_posix(), 'sha256': sha256(manifest_path.read_bytes()).hexdigest(), 'changed': changed, 'files': len(files), 'units': len(units), 'original_test_definitions': len(original_functions), 'new_test_definitions': len(new_functions), 'harness_snapshots': snapshots}))

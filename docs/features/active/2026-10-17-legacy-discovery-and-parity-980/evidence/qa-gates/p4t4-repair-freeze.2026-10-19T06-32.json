@@ -1,0 +1,1081 @@
+{
+  "R1": {
+    "aggregate_limit": "profile.limits.document_bytes; reserve before each projection; any text exhaustion returns one fixed analysis-text-limit diagnostic and no partial claims",
+    "coefficient": "12 bytes per Unicode character; compact UTF-8 JSON with ensure_ascii true or false, including 12-byte surrogate-pair escapes",
+    "new_proofs": [
+      "original long-prefix family",
+      "BMP/control/astral/RFC6901 prospective construction",
+      "INI default inheritance",
+      "cross-file base and finding projection limits",
+      "parser exhaustion and 4096-astral-character expansion",
+      "complete compact serialization with both ensure_ascii settings"
+    ],
+    "parser_default": "min(4 * max_bytes, 67108864); explicit positive max_text_bytes overrides it",
+    "parser_record_overhead": 128,
+    "paths": "prospective RFC6901 escaped length is charged before child_pointer construction",
+    "projection_base_rows": 3,
+    "projection_row_overhead": 1024,
+    "unit": "conservative encoded-byte reservation"
+  },
+  "R2": {
+    "matcher": "(?P<option>[^=:]*)(?P<vi>[=:])(?P<value>.*)$",
+    "ownership": "private fixed ConfigParser subclass; locator and stdlib parser share the same linear option expression",
+    "proofs": [
+      "original valid/invalid 1024/2048/4096-space reproducers prohibit the overlapping inherited matcher",
+      "64 admissible option lines use exactly 128 matches, with summed matched input length <= twice source length",
+      "both delimiters, trimming, case, defaults and continuation behavior retained"
+    ]
+  },
+  "R3": "Immediate intent comments added at the section-validation loop, listed assertion comprehensions and new decision/traversal sites; all production/test classes and callables retain typed intent documentation.",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t4-baseline-binding.2026-10-19T05-38.json",
+    "sha256": "bf962d9c9ea871d01c867d41566f60d9f5e36999871d1ca1b3c1713853cce7ba"
+  },
+  "changed_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+    "tests/discovery_runtime/analyzer/test_configuration.py",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py"
+  ],
+  "consolidated_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-review.2026-10-19T06-10.json",
+    "sha256": "eff5e903958412fc4fdf09b305481dd9788d905d8e2c4867969736a4d6b79990"
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-7-coverage.2026-10-19T06-28.json",
+    "raw_path": "SCRATCH/p4t4-repair-7-coverage.raw.json",
+    "raw_sha256": "811a85f9a4089641d4c72b6abfd4f65a9bf4f9ebdad0beccafed7f9cfb9cedb0",
+    "sha256": "0bfa7edc78d30c6d1d996b022064efecfb718f4eb864aba38b4d9873579ccf53"
+  },
+  "documentation_units": [
+    {
+      "line": 37,
+      "name": "_format",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 61,
+      "name": "_project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 162,
+      "name": "_failure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 177,
+      "name": "_output_cost",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 208,
+      "name": "ConfigurationAnalyzer",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 218,
+      "name": "analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+    },
+    {
+      "line": 28,
+      "name": "ConfigurationInputError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 42,
+      "name": "ConfigurationKey",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 59,
+      "name": "_Keys",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 130,
+      "name": "_json_walk",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 150,
+      "name": "_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 175,
+      "name": "_xml_attribute",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 225,
+      "name": "_xml",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 286,
+      "name": "_IniParser",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 305,
+      "name": "_ini",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 399,
+      "name": "parse_configuration",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 35,
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 68,
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 74,
+      "name": "reserve",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 83,
+      "name": "address",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 96,
+      "name": "add",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 296,
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 300,
+      "name": "optionxform",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    },
+    {
+      "line": 47,
+      "name": "serialized",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 63,
+      "name": "extension",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 96,
+      "name": "test_fixtures_project_only_identifiers_with_valid_provenance",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 165,
+      "name": "test_finite_supported_filename_families",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 191,
+      "name": "test_unrelated_files_are_ignored_without_payload_diagnostics",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 209,
+      "name": "test_json_uses_exact_pointer_segments_without_inventing_lines",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 243,
+      "name": "test_malformed_and_unsupported_selected_inputs_fail_closed",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 258,
+      "name": "test_repeated_default_headers_keep_distinct_declaration_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 297,
+      "name": "test_value_and_condition_changes_do_not_define_semantic_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 321,
+      "name": "test_excluded_and_unreadable_inputs_do_not_leak_read_rationales",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 348,
+      "name": "test_missing_immutable_provenance_is_low_confidence_and_blocking",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 374,
+      "name": "test_aggregate_output_limit_drops_partial_claims",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 390,
+      "name": "test_text_overflow_rejects_before_projecting_an_excess_batch",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 445,
+      "name": "test_complete_serialized_projection_fits_the_documented_byte_bound",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 421,
+      "name": "counted_project",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "line": 63,
+      "name": "test_parser_failures_never_expose_source_through_error_surfaces",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 81,
+      "name": "test_ini_defaults_continuations_and_case_have_physical_anchors",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 127,
+      "name": "test_parser_budgets_reject_partial_output",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 140,
+      "name": "test_byte_budget_and_invalid_caller_limits_fail_explicitly",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 154,
+      "name": "test_repeated_long_json_prefixes_fail_within_a_finite_text_budget",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 173,
+      "name": "test_pointer_expansion_is_charged_before_construction",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 204,
+      "name": "test_inherited_ini_paths_cannot_exceed_accumulated_text_reservations",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 247,
+      "name": "test_ini_internal_spaces_use_only_the_fixed_linear_matcher",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 289,
+      "name": "test_many_ini_lines_have_linear_aggregate_match_input",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 328,
+      "name": "test_invalid_encoded_text_budgets_fail_as_caller_errors",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 188,
+      "name": "guarded_pointer",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 221,
+      "name": "bounded_pointer",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 256,
+      "name": "ProhibitedMatcher",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 303,
+      "name": "CountedMatcher",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 259,
+      "name": "match",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "line": 306,
+      "name": "match",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    }
+  ],
+  "failed_run_coverage": {
+    "path": "SCRATCH/p4t4-repair-5-coverage.raw.json",
+    "sha256": "566ca3c7b3bd73adf9002d3e78aebddc32796c4a13b330dcef34492ba71c3f3b",
+    "status": "unaccepted fixture assertion failure; retained, not used for acceptance"
+  },
+  "files": [
+    {
+      "disposition": "repaired",
+      "original_sha256": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "physical_lines": 291,
+      "sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6"
+    },
+    {
+      "disposition": "repaired",
+      "original_sha256": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "physical_lines": 440,
+      "sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c"
+    },
+    {
+      "disposition": "repaired",
+      "original_sha256": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py",
+      "physical_lines": 468,
+      "sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858"
+    },
+    {
+      "disposition": "repaired",
+      "original_sha256": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "physical_lines": 336,
+      "sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5"
+    },
+    {
+      "disposition": "unchanged",
+      "original_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "physical_lines": 9,
+      "sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631"
+    },
+    {
+      "disposition": "unchanged",
+      "original_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "physical_lines": 1,
+      "sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6"
+    },
+    {
+      "disposition": "unchanged",
+      "original_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "physical_lines": 13,
+      "sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668"
+    },
+    {
+      "disposition": "unchanged",
+      "original_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "physical_lines": 3,
+      "sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+    }
+  ],
+  "focused_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-binding.2026-10-19T06-28.json",
+    "sha256": "cdff09d800d05dcdf191f6e7cbdccb2062eb04d5536a7cb9072dea78d2c5cdbf"
+  },
+  "harness_snapshots": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-repair-freeze-harness.2026-10-19T06-32.txt",
+      "sha256": "9775ce05225daa8bf19486f73906df730eea9193850b83116fb9a14f91432b8a",
+      "source": "SCRATCH/issue-980-repair-freeze.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-focused-harness.2026-10-19T06-32.txt",
+      "sha256": "23ffca04dd9bc71313fab80778b8cbef04da55d99dff063dbc70154487ad5ce8",
+      "source": "SCRATCH/issue-980-focused.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-architecture-harness.2026-10-19T06-32.txt",
+      "sha256": "ef0d0db019e111592b25b61dd36afeac5e02268bcdecc2de4ea6fa86de96009e",
+      "source": "SCRATCH/issue-980-architecture.py"
+    }
+  ],
+  "head": "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e",
+  "limitations": [
+    "Only finite documented JSON/XML/INI declarations are recognized; TOML is explicitly unsupported.",
+    "JSON lines are not fabricated; XML/INI use declaration anchors.",
+    "Values and conditions are neither exported nor evaluated.",
+    "Registry integration remains P4-T9; this direct adapter proof is not native coding-agent-host proof."
+  ],
+  "module_coverage": [
+    {
+      "missing_branches": [],
+      "missing_lines": [],
+      "original": {
+        "covered_branches": 24,
+        "covered_lines": 68,
+        "excluded_lines": 3,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 24,
+        "num_partial_branches": 0,
+        "num_statements": 68,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "repaired": {
+        "covered_branches": 32,
+        "covered_lines": 89,
+        "excluded_lines": 3,
+        "missing_branches": 0,
+        "missing_lines": 0,
+        "num_branches": 32,
+        "num_partial_branches": 0,
+        "num_statements": 89,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100",
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100"
+      }
+    },
+    {
+      "missing_branches": [
+        [
+          199,
+          222
+        ],
+        [
+          208,
+          210
+        ],
+        [
+          216,
+          222
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          381,
+          382
+        ],
+        [
+          385,
+          386
+        ]
+      ],
+      "missing_lines": [
+        324,
+        382,
+        386
+      ],
+      "original": {
+        "covered_branches": 80,
+        "covered_lines": 183,
+        "excluded_lines": 3,
+        "missing_branches": 6,
+        "missing_lines": 3,
+        "num_branches": 86,
+        "num_partial_branches": 6,
+        "num_statements": 186,
+        "percent_branches_covered": 93.02325581395348,
+        "percent_branches_covered_display": "93",
+        "percent_covered": 96.69117647058823,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.38709677419355,
+        "percent_statements_covered_display": "98"
+      },
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "repaired": {
+        "covered_branches": 84,
+        "covered_lines": 201,
+        "excluded_lines": 3,
+        "missing_branches": 6,
+        "missing_lines": 3,
+        "num_branches": 90,
+        "num_partial_branches": 6,
+        "num_statements": 204,
+        "percent_branches_covered": 93.33333333333333,
+        "percent_branches_covered_display": "93",
+        "percent_covered": 96.93877551020408,
+        "percent_covered_display": "97",
+        "percent_statements_covered": 98.52941176470588,
+        "percent_statements_covered_display": "99"
+      }
+    }
+  ],
+  "new_test_definitions": [
+    {
+      "name": "test_complete_serialized_projection_fits_the_documented_byte_bound",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "name": "test_text_overflow_rejects_before_projecting_an_excess_batch",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "name": "test_inherited_ini_paths_cannot_exceed_accumulated_text_reservations",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "name": "test_ini_internal_spaces_use_only_the_fixed_linear_matcher",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "name": "test_invalid_encoded_text_budgets_fail_as_caller_errors",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "name": "test_many_ini_lines_have_linear_aggregate_match_input",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "name": "test_pointer_expansion_is_charged_before_construction",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "name": "test_repeated_long_json_prefixes_fail_within_a_finite_text_budget",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    }
+  ],
+  "normalization": "Working SHA256 only; parent qualifies actual Git index/commit streams. New JSON/Markdown are LF UTF-8; original raw streams remain external SCRATCH and are hash-bound.",
+  "original_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+    "sha256": "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48"
+  },
+  "original_commit": "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e",
+  "original_test_definitions": [
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "serialized",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "extension",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_fixtures_project_only_identifiers_with_valid_provenance",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_finite_supported_filename_families",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_unrelated_files_are_ignored_without_payload_diagnostics",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_json_uses_exact_pointer_segments_without_inventing_lines",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_malformed_and_unsupported_selected_inputs_fail_closed",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_repeated_default_headers_keep_distinct_declaration_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_value_and_condition_changes_do_not_define_semantic_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_excluded_and_unreadable_inputs_do_not_leak_read_rationales",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_missing_immutable_provenance_is_low_confidence_and_blocking",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_aggregate_output_limit_drops_partial_claims",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_parser_failures_never_expose_source_through_error_surfaces",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_ini_defaults_continuations_and_case_have_physical_anchors",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_parser_budgets_reject_partial_output",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "assertions_and_parameters_preserved": true,
+      "name": "test_byte_budget_and_invalid_caller_limits_fail_explicitly",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    }
+  ],
+  "preserved_predecessor_count": 34,
+  "receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-format-062742.2026-10-19T06-27.json",
+      "sha256": "dda8d86e5ff6b371b90036a7a7a7a95a2a9aa4611141f58b32ddb4446ddfd814"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-lint-062742.2026-10-19T06-27.json",
+      "sha256": "8235e443c3b7d075fca2f7c2bae64860cc44b5077dda8ca235eeb0674b82d53c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-types-062743.2026-10-19T06-27.json",
+      "sha256": "b0849ff90fdacd705026227c0da69b72d56004c1023d561e2518f44ee55b9425"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-7-tests-062839.2026-10-19T06-28.json",
+      "sha256": "4fbdd83918248e8014e40802a704a9b3de4392df6feb19e0c8dd905e499ca993"
+    }
+  ],
+  "recorded_at": "2026-10-19T06:32:21.270279+00:00",
+  "remaining": [
+    "Bounded independent R1/R2/R3 confirmation",
+    "Parent checked-WIP commit and final-gate release",
+    "One scoped seven-stage final loop",
+    "Executor task acceptance"
+  ],
+  "remaining_uncovered": [
+    "configuration_input.py:324 retains the 100000-physical-line rejection",
+    "configuration_input.py:382 and :386 retain defensive locator/ConfigParser anchor disagreement guards; unchanged semantics from original 280/341/344"
+  ],
+  "repair_history": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-1-format-062249.2026-10-19T06-22.json",
+      "sha256": "06a67319fbbf357bbf6ac6513154a6f254a263754cec421af33c50d4767910e0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-1-lint-062249.2026-10-19T06-22.json",
+      "sha256": "51e419b536929088a09f9fbcad1b491d0e613348fc688cc9d3f3cf306c44c8e3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-2-format-062301.2026-10-19T06-23.json",
+      "sha256": "4a184811297f97140a841bcb5150f73e781cabd0b5aea55c82891491a2a61025"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-2-lint-062301.2026-10-19T06-23.json",
+      "sha256": "041a9bc035256331088dd68dce139f4b315d53e0cb6dbc1b5dd6a9171bcf1f7f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-2-types-062302.2026-10-19T06-23.json",
+      "sha256": "71a57a28e05332a1ed7396b96a24e602ca62019a61d82fb21a3fb9b567ca765a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-3-format-062336.2026-10-19T06-23.json",
+      "sha256": "c0da66784324577ad9a7475ead6e3a9fcf3d72006f8497351123f18ec48932fc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-3-lint-062336.2026-10-19T06-23.json",
+      "sha256": "879752841dc0681b87f5e8d3347d18b0bfc3029896e54f26acc3c22115da266d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-4-format-062357.2026-10-19T06-23.json",
+      "sha256": "8faabd5d6440e35338960c284c0dd68d11e3955f8f79adca2aa532e94997a14d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-4-lint-062357.2026-10-19T06-23.json",
+      "sha256": "4dbe458a0ca59fe1859175ad85569fa75d39e69666fcfdd549cdbe3ab11e8f6a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-4-types-062358.2026-10-19T06-23.json",
+      "sha256": "57426925369d47396f586506a0510ba22c9c69711ae73fd257550fdf4de2f1f5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-5-format-062421.2026-10-19T06-24.json",
+      "sha256": "d9fab791523723cee0bb1e2f2647a3848aabad71bca67a58e9f751990ec93cf0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-5-lint-062421.2026-10-19T06-24.json",
+      "sha256": "0b67548b695aa53d91946752373ce95186baf777c857b862839b071afa8facd7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-5-types-062422.2026-10-19T06-24.json",
+      "sha256": "71f239df7479fd414fc18bd9d73710256f6f68f1fb091e1643fc5c877051b607"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-binding.2026-10-19T06-26.json",
+      "sha256": "876d7fb67670a5a58b07d55c918bbda6110c5b68c2c37d4c716f382421feeb2e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-format-062601.2026-10-19T06-26.json",
+      "sha256": "9d69cd0aea95c0a7d2a0c95afd52a230c0d532b52ba775278d2809b5598389b2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-lint-062602.2026-10-19T06-26.json",
+      "sha256": "b0cd1ef0de36372a351fc3bb94b9b82a0684b3936908af11cba7a184348e9e2f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-6-types-062602.2026-10-19T06-26.json",
+      "sha256": "2709092867a9c64b4e484b123555352c271cbca9bfe0f147e445a38fbbfed282"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-binding.2026-10-19T06-28.json",
+      "sha256": "cdff09d800d05dcdf191f6e7cbdccb2062eb04d5536a7cb9072dea78d2c5cdbf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-format-062742.2026-10-19T06-27.json",
+      "sha256": "dda8d86e5ff6b371b90036a7a7a7a95a2a9aa4611141f58b32ddb4446ddfd814"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-lint-062742.2026-10-19T06-27.json",
+      "sha256": "8235e443c3b7d075fca2f7c2bae64860cc44b5077dda8ca235eeb0674b82d53c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-types-062743.2026-10-19T06-27.json",
+      "sha256": "b0849ff90fdacd705026227c0da69b72d56004c1023d561e2518f44ee55b9425"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-format-2-format-062330.2026-10-19T06-23.json",
+      "sha256": "995262152f059a882ffd404f117b05f79a9e7481617984f9baa073b380f79910"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-format-3-format-062414.2026-10-19T06-24.json",
+      "sha256": "8e1d843c7cfa7398a49d7a9aeadb8ba3db2fa5c48bc60c7c2a16bda60ec743be"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-format-format-062240.2026-10-19T06-22.json",
+      "sha256": "1d9cf67ea2191ff8da83dc426b27a8ff6f3f01259ea3a90c89ef90064b13f6b9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-start.2026-10-19T06-13.json",
+      "sha256": "206e3da7c22f1a64304f38c01f9a15aa543568d582d3bdddd5b9f12751c50988"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-5-tests-062516.2026-10-19T06-25.json",
+      "sha256": "f32c890374335284058d586dad8025828cab8e27255f4f3d7c14f309b1cb90ce"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-6-coverage.2026-10-19T06-26.json",
+      "sha256": "40558fe0f58e9964cf68f37dce6bf506675a4ab1e99908a795b92f27cb34ad99"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-6-tests-062656.2026-10-19T06-26.json",
+      "sha256": "54c21271fcb16920bd1dacfb51fd50a7550dba95860313d80564b3e5c9dc0296"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-7-coverage.2026-10-19T06-28.json",
+      "sha256": "0bfa7edc78d30c6d1d996b022064efecfb718f4eb864aba38b4d9873579ccf53"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-7-tests-062839.2026-10-19T06-28.json",
+      "sha256": "4fbdd83918248e8014e40802a704a9b3de4392df6feb19e0c8dd905e499ca993"
+    }
+  ],
+  "state": "REPAIR_FROZEN_BOUNDED_CONFIRMATION_PENDING",
+  "structural_checker_correction": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-structural-harness-correction.2026-10-19T06-32.json",
+    "sha256": "b0be8fdd9dacc5f1a8353434fefb3301f443d0f68c88ae0626275717c86cf20b"
+  },
+  "structural_checks": {
+    "checks": [
+      {
+        "boundary": "pure captured-byte parsing and value-free projection; fixed stdlib and accepted JSON/XML parsers",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py"
+      },
+      {
+        "boundary": "pure captured-byte parsing and value-free projection; fixed stdlib and accepted JSON/XML parsers",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+      },
+      {
+        "boundary": "in-memory unit cases and read-only immutable text resources",
+        "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+      },
+      {
+        "boundary": "in-memory unit cases and read-only immutable text resources",
+        "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+      },
+      {
+        "boundary": "read-only synthetic text fixture",
+        "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt"
+      },
+      {
+        "boundary": "read-only synthetic text fixture",
+        "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt"
+      },
+      {
+        "boundary": "read-only synthetic text fixture",
+        "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt"
+      },
+      {
+        "boundary": "read-only synthetic text fixture",
+        "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt"
+      }
+    ],
+    "passed": 8
+  },
+  "structure_raw": {
+    "stderr": {
+      "path": "SCRATCH/repair-structure.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/repair-structure.stdout.txt",
+      "sha256": "91b472e7d50ed5a0cba82c3caf5d66d7bcf88641f6016f65257eeea22dd4f505"
+    }
+  },
+  "task": "P4-T4",
+  "tests": {
+    "command_seconds": 55.590691,
+    "module_order": [
+      "tests/discovery_runtime/analyzer/test_configuration.py",
+      "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    ],
+    "new_cases": 30,
+    "original_cases_retained": 61,
+    "passed": 91
+  },
+  "timestamp": "2026-10-19T06-32",
+  "totals": {
+    "covered_branches": 116,
+    "covered_lines": 290,
+    "excluded_lines": 6,
+    "missing_branches": 6,
+    "missing_lines": 3,
+    "num_branches": 122,
+    "num_partial_branches": 6,
+    "num_statements": 293,
+    "percent_branches_covered": 95.08196721311475,
+    "percent_branches_covered_display": "95",
+    "percent_covered": 97.83132530120481,
+    "percent_covered_display": "98",
+    "percent_statements_covered": 98.97610921501706,
+    "percent_statements_covered_display": "99"
+  },
+  "unit_ranges": [
+    {
+      "covered_statements": 11,
+      "end": 58,
+      "kind": "FunctionDef",
+      "name": "_format",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 37,
+      "statements": 11
+    },
+    {
+      "covered_statements": 14,
+      "end": 159,
+      "kind": "FunctionDef",
+      "name": "_project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 61,
+      "statements": 14
+    },
+    {
+      "covered_statements": 2,
+      "end": 174,
+      "kind": "FunctionDef",
+      "name": "_failure",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 162,
+      "statements": 2
+    },
+    {
+      "covered_statements": 6,
+      "end": 205,
+      "kind": "FunctionDef",
+      "name": "_output_cost",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 177,
+      "statements": 6
+    },
+    {
+      "covered_statements": 49,
+      "end": 291,
+      "kind": "ClassDef",
+      "name": "ConfigurationAnalyzer",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 208,
+      "statements": 49
+    },
+    {
+      "covered_statements": 47,
+      "end": 291,
+      "kind": "FunctionDef",
+      "name": "analyze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "start": 218,
+      "statements": 47
+    },
+    {
+      "covered_statements": 4,
+      "end": 38,
+      "kind": "ClassDef",
+      "name": "ConfigurationInputError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 28,
+      "statements": 4
+    },
+    {
+      "covered_statements": 7,
+      "end": 56,
+      "kind": "ClassDef",
+      "name": "ConfigurationKey",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 42,
+      "statements": 7
+    },
+    {
+      "covered_statements": 21,
+      "end": 127,
+      "kind": "ClassDef",
+      "name": "_Keys",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 59,
+      "statements": 21
+    },
+    {
+      "covered_statements": 9,
+      "end": 147,
+      "kind": "FunctionDef",
+      "name": "_json_walk",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 130,
+      "statements": 9
+    },
+    {
+      "covered_statements": 11,
+      "end": 172,
+      "kind": "FunctionDef",
+      "name": "_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 150,
+      "statements": 11
+    },
+    {
+      "covered_statements": 25,
+      "end": 222,
+      "kind": "FunctionDef",
+      "name": "_xml_attribute",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 175,
+      "statements": 25
+    },
+    {
+      "covered_statements": 30,
+      "end": 283,
+      "kind": "FunctionDef",
+      "name": "_xml",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 225,
+      "statements": 30
+    },
+    {
+      "covered_statements": 6,
+      "end": 302,
+      "kind": "ClassDef",
+      "name": "_IniParser",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 286,
+      "statements": 6
+    },
+    {
+      "covered_statements": 60,
+      "end": 396,
+      "kind": "FunctionDef",
+      "name": "_ini",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 305,
+      "statements": 63
+    },
+    {
+      "covered_statements": 16,
+      "end": 440,
+      "kind": "FunctionDef",
+      "name": "parse_configuration",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 399,
+      "statements": 16
+    },
+    {
+      "covered_statements": 3,
+      "end": 38,
+      "kind": "FunctionDef",
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 35,
+      "statements": 3
+    },
+    {
+      "covered_statements": 4,
+      "end": 72,
+      "kind": "FunctionDef",
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 68,
+      "statements": 4
+    },
+    {
+      "covered_statements": 4,
+      "end": 81,
+      "kind": "FunctionDef",
+      "name": "reserve",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 74,
+      "statements": 4
+    },
+    {
+      "covered_statements": 5,
+      "end": 94,
+      "kind": "FunctionDef",
+      "name": "address",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 83,
+      "statements": 5
+    },
+    {
+      "covered_statements": 7,
+      "end": 127,
+      "kind": "FunctionDef",
+      "name": "add",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 96,
+      "statements": 7
+    },
+    {
+      "covered_statements": 2,
+      "end": 298,
+      "kind": "FunctionDef",
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 296,
+      "statements": 2
+    },
+    {
+      "covered_statements": 2,
+      "end": 302,
+      "kind": "FunctionDef",
+      "name": "optionxform",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "start": 300,
+      "statements": 2
+    }
+  ]
+}

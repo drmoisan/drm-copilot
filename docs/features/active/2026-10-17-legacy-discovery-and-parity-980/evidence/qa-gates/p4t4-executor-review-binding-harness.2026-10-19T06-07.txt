@@ -1,0 +1,145 @@
+"""Reconcile retained P4-T4 candidate proof without executing behavioral suites."""
+from __future__ import annotations
+
+import ast
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+
+ROOT = Path.cwd()
+WORKER = (Path(tempfile.gettempdir()) / "issue-980-p4t4").resolve()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+FREEZE = QA / "p4t4-focused-wip-freeze.2026-10-19T05-54.json"
+INDEX = QA / "p4t4-wip-evidence-index.2026-10-19T05-55.json"
+HEAD = "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e"
+started = dt.datetime.now(dt.timezone.utc)
+checks: list[dict[str, object]] = []
+
+
+def digest(raw: bytes) -> str:
+    """Return immutable-byte SHA-256; no side effects."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def check(condition: bool, name: str) -> None:
+    """Record each read-only boolean comparison without hiding later differences."""
+    checks.append({"name": name, "passed": condition})
+
+
+def portable(value: str) -> str:
+    """Apply the worker's documented host-path rendering to retained text."""
+    for path, label in ((ROOT, "WORKSPACE"), (WORKER, "SCRATCH")):
+        value = re.sub(re.escape(str(path)), label, value, flags=re.IGNORECASE)
+        value = re.sub(re.escape(path.as_posix()), label, value, flags=re.IGNORECASE)
+    return value
+
+
+freeze = json.loads(FREEZE.read_bytes())
+index = json.loads(INDEX.read_bytes())
+check(digest(FREEZE.read_bytes()) == "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48", "released freeze")
+check(digest(INDEX.read_bytes()) == "0c29164ad3fc73f73362905aed4b2b809801f425fac4c474a7549151602e5651", "released evidence index")
+check(subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip() == HEAD, "checked WIP head")
+source_bindings = []
+policy_structure = []
+# Inspect only the released source/test/fixture population and actual Git attributes.
+for item in freeze["files"]:
+    path = item["path"]
+    raw = Path(path).read_bytes()
+    staged = subprocess.check_output(["git", "show", ":" + path])
+    committed = subprocess.check_output(["git", "show", HEAD + ":" + path])
+    attrs = subprocess.check_output(["git", "check-attr", "text", "eol", "--", path]).decode().splitlines()
+    check(digest(raw) == item["sha256"], "working " + path)
+    check(staged == committed, "index/commit " + path)
+    check(raw.replace(b"\r\n", b"\n") == staged, "only LF qualification " + path)
+    source_bindings.append({"path": path, "working_sha256": digest(raw), "index_sha256": digest(staged),
+                            "commit_sha256": digest(committed), "raw_equal": raw == staged,
+                            "crlf_to_lf_equal": raw.replace(b"\r\n", b"\n") == staged, "attributes": attrs})
+    if path.endswith(".py"):
+        tree = ast.parse(raw.decode("utf-8-sig"))
+        missing = [node.lineno for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and not ast.get_docstring(node)]
+        lines = len(raw.splitlines())
+        check(not missing and lines <= 500, "docstring presence and size " + path)
+        policy_structure.append({"path": path, "physical_lines": lines, "missing_docstrings": missing,
+                                 "loop_lines": sorted(node.lineno for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))),
+                                 "comprehension_lines": sorted(node.lineno for node in ast.walk(tree) if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)))})
+preserved = []
+# Preserve predecessor proof by hash only, without reopening its implementation.
+for item in freeze["preserved_predecessors"]:
+    current = digest(Path(item["path"]).read_bytes())
+    check(current == item["sha256"], "predecessor " + item["path"])
+    preserved.append({"path": item["path"], "sha256": current})
+evidence = []
+# Exact index bindings include repaired historical failures as well as passing proof.
+for item in index["evidence"]:
+    raw = Path(item["path"]).read_bytes()
+    check(digest(raw) == item["sha256"], "evidence " + item["path"])
+    check(b"\r" not in raw, "LF rendering " + item["path"])
+    evidence.append({"path": item["path"], "sha256": digest(raw)})
+stages = []
+expected = {item["path"]: item["sha256"] for item in freeze["files"]}
+# Read the successful ordered receipts and their actual retained raw streams.
+for item in freeze["receipts"]:
+    receipt = json.loads(Path(item["path"]).read_bytes())
+    check(receipt["exit_code"] == 0, "exit " + receipt["stage"])
+    check(receipt["source_before"] == expected == receipt["source_after"], "stage source binding " + receipt["stage"])
+    for stream in ("stdout", "stderr"):
+        raw_ref = receipt["raw"][stream]
+        raw = (WORKER / raw_ref["path"].removeprefix("SCRATCH/")).read_bytes()
+        check(digest(raw) == raw_ref["sha256"], "raw " + receipt["stage"] + " " + stream)
+        check(portable(raw.decode("utf-8", errors="replace")) == receipt[stream], "rendered " + receipt["stage"] + " " + stream)
+    stages.append({"stage": receipt["stage"], "exit_code": receipt["exit_code"], "seconds": receipt["seconds"],
+                   "started_at": receipt["started_at"], "finished_at": receipt["finished_at"],
+                   "command": receipt["command"], "path": item["path"], "sha256": item["sha256"]})
+check([item["stage"] for item in stages] == ["format", "lint", "types", "tests"], "ordered clean loop")
+check(all(stages[i]["finished_at"] <= stages[i + 1]["started_at"] for i in range(3)), "sequential timestamps")
+coverage_ref = freeze["coverage"]
+raw_cov = (WORKER / coverage_ref["raw_path"].removeprefix("SCRATCH/")).read_bytes()
+coverage = json.loads(Path(coverage_ref["path"]).read_bytes())
+check(digest(raw_cov) == coverage_ref["raw_sha256"], "raw coverage identity")
+check(digest(Path(coverage_ref["path"]).read_bytes()) == coverage_ref["sha256"], "portable coverage identity")
+check(coverage["totals"] == freeze["totals"], "coverage totals")
+ranges = []
+# Reconcile named class/callable numerators against exact executed/missing line sets.
+for item in freeze["unit_ranges"]:
+    match = next(data for path, data in coverage["files"].items() if path.replace("\\", "/").endswith(item["path"]))
+    span = set(range(item["start"], item["end"] + 1))
+    covered = len(set(match["executed_lines"]) & span)
+    total = len((set(match["executed_lines"]) | set(match["missing_lines"])) & span)
+    check(covered == item["covered_statements"] and total == item["statements"] and covered / total >= .9, "coverage range " + item["path"] + ":" + str(item["start"]))
+    ranges.append(dict(item, independently_covered=covered, independently_total=total))
+harnesses = []
+# Canonical snapshots are compared to their exact retained executable originals.
+for item in index["harnesses"]:
+    canonical = Path(item["path"]).read_bytes()
+    raw = (WORKER / item["raw_path"].removeprefix("SCRATCH/")).read_bytes()
+    check(digest(raw) == item["raw_sha256"] and digest(canonical) == item["sha256"], "harness digest " + item["path"])
+    check(canonical == raw if item["byte_identical"] else canonical == raw.replace(b"\r\n", b"\n"), "harness representation " + item["path"])
+    harnesses.append(item)
+checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+receipt = next(item for item in checkpoint["codex_model_routing_receipts"] if item.get("delegation_id") == "atomic_execution_p4t4_candidate_review")
+check(receipt["profile_sha256"] == digest(Path(receipt["profile_path"]).read_bytes()), "current exact C4 profile")
+authority = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json"
+attestation = json.loads(authority.read_bytes())
+check(all(attestation[name] is True for name in ("routing_valid", "launch_authority_valid", "provenance_valid")), "native authority")
+check(attestation["profile_sha256"] == receipt["profile_sha256"] and attestation["actual_model"] == receipt["model"] and attestation["actual_reasoning_effort"] == receipt["model_reasoning_effort"], "native route agreement")
+stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+failed = [item for item in checks if not item["passed"]]
+result = {"task": "P4-T4", "started_at": started.isoformat(), "finished_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+          "exit_code": int(bool(failed)), "checks": checks, "findings": failed, "source_bindings": source_bindings,
+          "preserved_dependencies": preserved, "evidence": evidence, "stages": stages, "coverage": coverage["totals"],
+          "ranges": ranges, "harnesses": harnesses, "policy_structure": policy_structure,
+          "model_receipt": receipt, "native_authority_sha256": digest(authority.read_bytes()),
+          "no_behavioral_suite_rerun": True, "canonical_input_freeze": FREEZE.as_posix()}
+output = QA / f"p4t4-executor-review-bindings.{stamp}.json"
+output.write_bytes((json.dumps(result, indent=2, sort_keys=True) + "\n").encode())
+harness = QA / f"p4t4-executor-review-binding-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"path": output.as_posix(), "sha256": digest(output.read_bytes()), "checks": len(checks),
+                  "failures": failed, "sources": len(source_bindings), "predecessors": len(preserved),
+                  "evidence": len(evidence), "ranges": len(ranges), "stages": len(stages)}))
+raise SystemExit(int(bool(failed)))

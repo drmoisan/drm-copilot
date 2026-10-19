@@ -1,0 +1,221 @@
+{
+  "task": "P4-T4",
+  "review_kind": "single consolidated frozen-candidate review",
+  "timestamp": "2026-10-19T06-10",
+  "recorded_at": "2026-10-19T06:10:10.8543244Z",
+  "status": "REVISIONS_REQUIRED",
+  "ready_for_final_gates": false,
+  "blocking_findings": 3,
+  "command": "poetry run python SCRATCH/issue-980-p4t4-review-bindings.py",
+  "exit_code": 0,
+  "command_result_scope": "Read-only binding checker passed; this is not a task acceptance or a passing semantic review.",
+  "accepted_baseline": "132a8be5c2088926e92b20df33bd17ee57d9f987",
+  "candidate_commit": "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e",
+  "scope": {
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/analyzer/test_configuration.py",
+      "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    ],
+    "fixtures": [
+      "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt"
+    ]
+  },
+  "authoritative_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+      "sha256": "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-wip-evidence-index.2026-10-19T05-55.json",
+      "sha256": "0c29164ad3fc73f73362905aed4b2b809801f425fac4c474a7549151602e5651"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-bindings.2026-10-19T06-07.json",
+      "sha256": "6dbc755c0a817d0689814712b51c2e6fba81588354af3d1e36f47f11d4d5c135"
+    }
+  ],
+  "binding_result": {
+    "checks_passed": 179,
+    "checks_failed": 0,
+    "candidate_paths": 8,
+    "preserved_dependencies": 34,
+    "indexed_evidence": 29,
+    "exact_retained_worker_harnesses": 3,
+    "unit_ranges": 18,
+    "git_qualification": "Separate actual working/index/commit hashes and Git text/eol attributes are recorded in the binding receipt; raw identity is not assumed."
+  },
+  "reused_quality": {
+    "tests_passed": 61,
+    "test_reported_seconds": 37.1,
+    "sequence": [
+      "Black --check",
+      "Ruff",
+      "scoped Pyright",
+      "Pytest"
+    ],
+    "statements": "251/254",
+    "branch_destinations": "104/110",
+    "named_ranges_at_least_90_percent": 18,
+    "coverage_gaps": "The original three missing statements and six branch destinations remain disclosed in the immutable worker index. The new physical-line probe closes that behavior independently without changing the original coverage claim.",
+    "source_and_raw_receipts_verified": true
+  },
+  "completed_checks": [
+    "Exact persisted C4 profile and native routing/launch/provenance attestation agree.",
+    "Finite filename/format selection, unsupported TOML behavior and absent public registry integration are explicit.",
+    "JSON uses the accepted strict immutable parser; secure XML uses the unchanged accepted parser and recognized placement allowlist; INI disables interpolation and preserves case/strict grammar.",
+    "Values, raw XML conditions, read-error rationales and source-bearing parser exception representations/args/chains do not enter projected findings in the retained cases.",
+    "Source SHA-256 and revision references derive from immutable captured bytes; unmatched pins remain low confidence with blocking diagnostic.",
+    "Detected declarations and default origins preserve unresolved effective presence; no evaluated product configuration or runtime activation is asserted.",
+    "Core candidate performs no filesystem/network/subprocess/publication operations and imports no optional domain analyzer.",
+    "Deterministic identity excludes values/conditions/source checksums/line shifts; structured addresses retain escaped JSON paths and physical XML/INI anchors.",
+    "Unit tests use immutable fixtures and injected in-memory capture, with no temporary files, process/network dependencies or mutable external configuration.",
+    "All four Python files are at most 387 lines and all classes/functions have docstrings; the specific intent-comment gaps are consolidated in R3."
+  ],
+  "independent_probes": {
+    "count": 11,
+    "scope": "Three small JSON expansion probes, three malformed INI work probes, Unicode-value physical-line check, line-limit check, three valid INI work probes.",
+    "timing_limitation": "Timings are diagnostic observations supporting the inspected regex structure; no timing threshold is claimed as proof of a fix.",
+    "no_large_stress_inputs": true,
+    "no_broad_suite_replay": true
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "priority": "P1",
+      "category": "resource-bounds",
+      "blocking": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "lines": [
+        86,
+        111,
+        230,
+        321,
+        350
+      ],
+      "related_path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "related_lines": [
+        207,
+        229,
+        231
+      ],
+      "title": "Bound expanded identifier and structural-path text before allocation",
+      "observation": "The only _Keys output limit counts records. JSON child_pointer constructs a full ancestor prefix for each descendant before _Keys.add, and the adapter likewise accounts only row counts. The public parser returned 65/129/257 keys with 133559/265107/528275 UTF-8 pointer bytes from 2684/3352/4760-byte inputs, each under max_bytes=8192. These measurements do not redefine the input byte limit as an output limit: they establish that no separate aggregate text budget exists.",
+      "impact": "At the accepted 64 MiB document and 100000-key ceilings, repeated long prefixes permit impractical output allocations despite bounded source bytes and record counts. INI section/default-derived paths and aggregation across multiple files need the same explicit accounting.",
+      "required_change": "Introduce a finite documented text/identifier/pointer allocation budget; charge prospective expanded addresses before constructing them and account for complete projected output across files before rows are retained. Keep fixed redacted limit diagnostics and discard partial failed-file or aggregate-overflow claims. Do not weaken input, key-count, depth or source-provenance checks.",
+      "required_proof": "Retain the small long-prefix reproductions and add deterministic allocation/work assertions for over-budget path construction, multibyte/escaped identifiers, inherited INI paths, and aggregate output across files. Assert rejection before the prohibited allocation, plus ordinary supported inputs and stable identities.",
+      "evidence": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-probes.2026-10-19T06-02.json"
+    },
+    {
+      "id": "R2",
+      "priority": "P1",
+      "category": "parser-work",
+      "blocking": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "lines": [
+        315,
+        331
+      ],
+      "title": "Bound or remove INI option-regex backtracking for invalid and valid lines",
+      "observation": "The locator invokes ConfigParser.OPTCRE and parser.read_file later uses the same permissive option grammar. The overlapping lazy option match and whitespace match repeatedly scan internal spaces. Malformed delimiter-free lines with 1024/2048/4096 spaces took about 0.005/0.019/0.078 seconds. Valid keys K + spaces + Suffix=VALUE_SENTINEL also took about 0.005/0.020/0.079 seconds and were accepted. Both samples remain below 8192 input bytes.",
+      "impact": "The physical-line count and total byte limits do not supply a practical aggregate parser-work bound; a single much longer permitted line can consume excessive CPU. Rejecting lines with no delimiter alone leaves the valid-line reproduction unchanged.",
+      "required_change": "Remove the overlapping backtracking path or establish deterministic preflight line/aggregate work limits before both locator and ConfigParser option matching. Preserve the explicitly supported strict/case-preserving/default/continuation grammar and fixed redacted errors. A delimiter-presence check alone is insufficient.",
+      "required_proof": "Add regressions for the exact invalid and valid whitespace cases, with operation/allocation counters or fail-before-parser seams. Include many individually admissible lines to demonstrate the aggregate bound, and positive whitespace/continuation/default cases. Do not use wall-clock timing thresholds as correctness gates.",
+      "evidence": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-probes.2026-10-19T06-02.json",
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-ini-work-probe.2026-10-19T06-05.json"
+      ]
+    },
+    {
+      "id": "R3",
+      "priority": "P2",
+      "category": "repository-policy",
+      "blocking": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "lines": [
+        342
+      ],
+      "related_test_locations": {
+        "tests/discovery_runtime/analyzer/test_configuration.py": [
+          97,
+          100,
+          198,
+          203,
+          247
+        ],
+        "tests/discovery_runtime/analyzer/test_configuration_input.py": [
+          96
+        ]
+      },
+      "title": "Complete the required immediate intent comments in the same repair",
+      "observation": "The section-validation for loop at line 342 has no immediately preceding intent comment. The listed nontrivial test comprehensions perform fixture projection, disposition checks, pointer validation, filtered inheritance assertions or combined anchor projection without immediate intent comments. All class/function docstrings are present; all four Python files are below 500 lines.",
+      "required_change": "Add concise intent comments at the identified iteration/assertion sites while making the resource fixes. Preserve assertions and all 61 existing cases. Recheck documentation accuracy for any new budget or parsing behavior before the final ordered sequence.",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md#Loops and Comprehensions — Intent Comments Required",
+      "required_proof": "Bounded source-policy confirmation of only the repair delta; retain the completed remaining candidate review and existing proof bindings."
+    }
+  ],
+  "preserved_diagnostics": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-bindings.2026-10-19T06-06.json",
+      "sha256": "85c77d3ed73ed5f8640ad4f955c4565f3693d49bf83c4f28744f92ae194f414e",
+      "classification": "Checker bookkeeping only",
+      "detail": "Initial checker EXIT_CODE 1: one rendered-test-stdout mismatch because tempfile supplied the Windows short user-directory alias while the worker rendered its resolved long path. Raw bytes/hashes were correct. Resolving only the checker WORKER path produced 179/179 passing comparisons; both harness versions and both results remain preserved. No worker source/evidence changed and no tests reran."
+    },
+    {
+      "classification": "Read-tool diagnostics only",
+      "detail": "An initial guessed evidence-index filename was absent and was corrected to the supplied exact wip index. PowerShell object conversion cannot represent coverage's empty-string function key; the retained JSON was then parsed with Python. These were inspection-tool errors, not product or gate failures."
+    }
+  ],
+  "proof_artifacts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-probe-harness.2026-10-19T06-02.txt",
+      "sha256": "e343c5e74a0434191ee0dcc3b000418962e09ea2ca2d01a33050c8e4d2948149"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-probes.2026-10-19T06-02.json",
+      "sha256": "d8b055dd33b0440c73d412be9d838dfcb3a35f384ff14f343445f9021c569a63"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-ini-work-harness.2026-10-19T06-05.txt",
+      "sha256": "060155c0f1ed1934999ca3023ec66da4dae4ae0e36c6ddcba82fd1e372ab8172"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-ini-work-probe.2026-10-19T06-05.json",
+      "sha256": "19a253a35bc7ffec7dda405930896b16f48181086d20c1c56b1bfbefadeba585"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-binding-harness.2026-10-19T06-06.txt",
+      "sha256": "0b75fdb27c0b129aa94b38197bb82a130d0b82841d0491a08e2becc35e968e04"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-binding-harness.2026-10-19T06-07.txt",
+      "sha256": "950587ab4ff0e24e49a8a83be0a31e934f7e193df8708cb00784a57454ea268c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-bindings.2026-10-19T06-06.json",
+      "sha256": "85c77d3ed73ed5f8640ad4f955c4565f3693d49bf83c4f28744f92ae194f414e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-review-bindings.2026-10-19T06-07.json",
+      "sha256": "6dbc755c0a817d0689814712b51c2e6fba81588354af3d1e36f47f11d4d5c135"
+    }
+  ],
+  "handoff": {
+    "open_probes": [],
+    "complete_finding_set": true,
+    "source_tests_frozen": true,
+    "task_checkbox_changed": false,
+    "ac_checkboxes_changed": false,
+    "plan_complete": 35,
+    "plan_total": 84,
+    "ac_complete": 13,
+    "ac_total": 66,
+    "next_action": "Parent may authorize one cohesive R1/R2/R3 repair after this immutable receipt is published. Confirm only that delta using the retained probes and proof; run the scoped final ordered sequence after correction. Parent owns commit/push and successor release."
+  }
+}

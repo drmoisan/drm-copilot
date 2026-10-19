@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery.analyzer import configuration as configuration_module
 from drm_copilot_discovery.analyzer.configuration import ConfigurationAnalyzer
 from drm_copilot_discovery.analyzer.emitter import inventory_result
 from drm_copilot_discovery.analyzer.findings import row
@@ -16,11 +18,28 @@ from drm_copilot_discovery.models import canonical_json
 
 from tests.discovery_runtime.analyzer.test_dotnet_projects import capture, properties
 from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
 
 if TYPE_CHECKING:
-    from drm_copilot_discovery.analyzer.models import Analysis
+    from collections.abc import Callable
+
+    from drm_copilot_discovery.analyzer.configuration_input import (
+        ConfigurationFormat,
+        ConfigurationKey,
+    )
+    from drm_copilot_discovery.analyzer.models import Analysis, InventoryCapture
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.models import JsonObject
+
+    Projector = Callable[
+        [
+            InventoryCapture,
+            InventoryInput,
+            ConfigurationFormat,
+            tuple[ConfigurationKey, ...],
+        ],
+        Analysis,
+    ]
 
 FIXTURES = Path(__file__).parents[2] / "fixtures/discovery_analyzers/configuration"
 
@@ -94,14 +113,18 @@ def test_fixtures_project_only_identifiers_with_valid_provenance(
         author_or_agent=row(kind="tool", id="fixture"),
         catalog=catalog,
     )
+    # Compare the complete declared key set rather than selected successful rows.
     assert {properties(item)["key"] for item in analysis.findings} == keys
     assert "VALUE_SENTINEL" not in serialized(analysis)
+    # Every diagnostic must preserve this valid fixture's nonblocking status.
     assert not any(item["blocking"] for item in analysis.diagnostics)
+    # Inventory proposals cannot claim completed inspection or approved disposition.
     assert all(
         item["inspection_status"] == "uninspected"
         and item["disposition"] == "unassigned"
         for item in result.ledger_components
     )
+    # Distinct declarations must remain independently traceable.
     assert len({item["finding_id"] for item in analysis.findings}) == len(
         analysis.findings
     )
@@ -195,11 +218,13 @@ def test_json_uses_exact_pointer_segments_without_inventing_lines(
             catalog, (("src/config.json", b'{"a/b~c":[{}, {"N":null}],"Empty":{}}'),)
         )
     )
+    # Check each escaped object address, including the actual array index.
     assert {properties(item)["structural_path"] for item in result.findings} == {
         "/a~1b~0c",
         "/a~1b~0c/1/N",
         "/Empty",
     }
+    # JSON parsing supplies structural addresses without fabricated line anchors.
     assert all(
         "line_range" not in cast("JsonObject", item["source"])
         for item in result.findings
@@ -243,12 +268,15 @@ def test_repeated_default_headers_keep_distinct_declaration_ids(
     result = ConfigurationAnalyzer().analyze(
         capture(catalog, (("src/settings.ini", payload),))
     )
+    # Repeated DEFAULT headers have separate declarations and stable unique IDs.
     assert len({item["finding_id"] for item in result.findings}) == len(result.findings)
+    # Only the non-overridden default becomes inherited in the target section.
     assert [
         properties(item)["key"]
         for item in result.findings
         if item["kind"] == "ini-inherited-key"
     ] == ["B"]
+    # Legal repeated DEFAULT headers do not introduce a blocking diagnostic.
     assert not any(item["blocking"] for item in result.diagnostics)
 
 
@@ -279,6 +307,7 @@ def test_value_and_condition_changes_do_not_define_semantic_ids(
     changed = ConfigurationAnalyzer().analyze(
         capture(catalog, (("src/" + name, second),))
     )
+    # Compare all semantic identities while allowing whole-file provenance to vary.
     assert [item["finding_id"] for item in original.findings] == [
         item["finding_id"] for item in changed.findings
     ]
@@ -326,7 +355,9 @@ def test_missing_immutable_provenance_is_low_confidence_and_blocking(
     result = ConfigurationAnalyzer().analyze(
         capture(catalog, (("src/config.json", b'{"K":1}'),), pinned=False)
     )
+    # No declaration may infer verified provenance from an unpinned working file.
     assert all(item["confidence"] == "low" for item in result.findings)
+    # The missing immutable source must also remain an explicit blocking finding.
     assert any(
         item["code"] == "source-revision-unverified" and item["blocking"]
         for item in result.diagnostics
@@ -351,4 +382,87 @@ def test_aggregate_output_limit_drops_partial_claims(
         capture(catalog, payloads, records=records)
     )
     assert not result.components and not result.findings
+    # Overflow replaces every partial finding with one fixed limit diagnostic.
     assert [item["code"] for item in result.diagnostics] == ["analysis-limit"]
+
+
+@pytest.mark.parametrize("kind", ["base", "findings", "parser", "astral"])
+def test_text_overflow_rejects_before_projecting_an_excess_batch(
+    catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    """Catalog/patch fixture and str kind exercise aggregate allocation boundaries.
+
+    Returns None; counts actual projection calls and requires whole-result failure.
+    All captures and patches remain local memory; no source values may escape.
+    """
+    first = ("src/a/config.json", b"{}")
+    second = ("src/b/config.json", b'{"K":"VALUE_SENTINEL"}')
+    budget = 10000
+    # Choose inputs that exhaust distinct gates before any excess row batch exists.
+    if kind == "findings":
+        payloads = (("src/config.json", b'{"A":1,"B":2,"C":3}'),)
+        budget = 8192
+    elif kind == "parser":
+        payloads = (("src/config.json", b'{"' + b"K" * 256 + b'":1}'),)
+        budget = 8192
+    elif kind == "astral":
+        payload = json.dumps({"\U0001f680" * 4096: 0}, ensure_ascii=False).encode()
+        payloads = (("src/config.json", payload),)
+        budget = 80000
+    else:
+        payloads = (first, second)
+    inputs = replace(
+        capture(catalog, payloads),
+        profile=inventory_profile(catalog, limits={"document_bytes": budget}),
+    )
+    projected: list[str] = []
+    original = cast("Projector", vars(configuration_module)["_project"])
+
+    def counted_project(
+        captured: InventoryCapture,
+        item: InventoryInput,
+        format: ConfigurationFormat,
+        keys: tuple[ConfigurationKey, ...],
+    ) -> Analysis:
+        """Record immutable capture/item/format/key projection; return real Analysis.
+
+        Mutates only the test's path list; underlying invariant errors propagate.
+        """
+        projected.append(item.path)
+        return original(captured, item, format, keys)
+
+    monkeypatch.setattr(configuration_module, "_project", counted_project)
+    result = ConfigurationAnalyzer().analyze(inputs)
+    assert projected == ([first[0]] if kind == "base" else [])
+    assert not result.components and not result.findings and not result.relationships
+    assert len(result.diagnostics) == 1
+    assert result.diagnostics[0]["code"] == "analysis-text-limit"
+    assert "VALUE_SENTINEL" not in serialized(result)
+
+
+@pytest.mark.parametrize("key", ["Ω/~", 'Control\n\t"\\', "\U0001f680/~"])
+@pytest.mark.parametrize("ensure_ascii", [False, True])
+def test_complete_serialized_projection_fits_the_documented_byte_bound(
+    catalog: SchemaCatalog, key: str, ensure_ascii: bool
+) -> None:
+    """Catalog, Unicode str key and bool encoding cover compact JSON representations.
+
+    Returns None; compares full encoded Analysis to the prospective byte bound.
+    Astral, BMP, control and pointer escapes stay identifiers; values stay absent.
+    """
+    payload = json.dumps({key: "VALUE_SENTINEL"}, ensure_ascii=False).encode()
+    inputs = replace(
+        capture(catalog, (("src/config.json", payload),)),
+        profile=inventory_profile(catalog, limits={"document_bytes": 16384}),
+    )
+    result = ConfigurationAnalyzer().analyze(inputs)
+    encoded = json.dumps(
+        json.loads(serialized(result)), ensure_ascii=ensure_ascii, separators=(",", ":")
+    ).encode()
+    assert len(result.findings) == 1 and len(result.components) == 1
+    assert properties(result.findings[0])["key"] == key
+    assert properties(result.findings[0])["structural_path"] == (
+        "/" + key.replace("~", "~0").replace("/", "~1")
+    )
+    assert len(encoded) <= inputs.profile.limits.document_bytes
+    assert "VALUE_SENTINEL" not in encoded.decode()

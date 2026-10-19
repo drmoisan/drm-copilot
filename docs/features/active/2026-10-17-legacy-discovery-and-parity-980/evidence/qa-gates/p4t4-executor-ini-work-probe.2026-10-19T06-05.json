@@ -1,0 +1,57 @@
+{
+  "candidate_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "candidate_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "exit_code": 0,
+  "finished_at": "2026-10-19T06:05:24.916594+00:00",
+  "outcomes": [
+    {
+      "accepted_key_length": 1031,
+      "delimiter_present": true,
+      "input_bytes": 1050,
+      "input_sha256": "f22222db60b2bb6aca229417f8bee8a8fec6b815fb298697c6e3725a65446b41",
+      "seconds": 0.005061800009571016,
+      "spaces": 1024,
+      "value_redacted": true
+    },
+    {
+      "accepted_key_length": 2055,
+      "delimiter_present": true,
+      "input_bytes": 2074,
+      "input_sha256": "1c696e43fc0508e6a3438dce55c1580b6601f17fea25805601192da46c4dffa0",
+      "seconds": 0.019541699992259964,
+      "spaces": 2048,
+      "value_redacted": true
+    },
+    {
+      "accepted_key_length": 4103,
+      "delimiter_present": true,
+      "input_bytes": 4122,
+      "input_sha256": "afe9af10894b2f07d79b288edaed1c7e4c939dcc3e9b737cd5ec18a9c2ada86b",
+      "seconds": 0.07905090000713244,
+      "spaces": 4096,
+      "value_redacted": true
+    }
+  ],
+  "started_at": "2026-10-19T06:05:24.812136+00:00",
+  "stdlib_option_pattern": "\n        (?P<option>.*?)                    # very permissive!\n        \\s*(?P<vi>=|:)\\s*              # any number of space/tab,\n                                           # followed by any of the\n                                           # allowed delimiters,\n                                           # followed by any space/tab\n        (?P<value>.*)$                     # everything up to eol\n        ",
+  "task": "P4-T4",
+  "timing_claim": "Observed timings only; no timing threshold is an acceptance gate."
+}

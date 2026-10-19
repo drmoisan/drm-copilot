@@ -1,0 +1,43 @@
+{
+  "batch": "repair-1",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py tests/discovery_runtime/analyzer/test_configuration.py tests/discovery_runtime/analyzer/test_configuration_input.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T06:22:49.590283+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t4-repair-1-lint-062249.2026-10-19T06-22.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t4-repair-1-lint-062249.2026-10-19T06-22.stdout.txt",
+      "sha256": "055c0dd4ebfbf6afcb7bf5dfd2e9c67401172deb77dcb4fdd99c59b0a61734bd"
+    }
+  },
+  "seconds": 0.103421,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "48bc7e7e636ac613d0dd066dfa751098524d4f40d8bab70370c93b2ea4ad6093",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "f3cb2b037efe5a7ef8ab87e0b90db8957a9263460550520110ad8a40bd89bc7e",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "6bf5c784236beaf66e9f0567e91623c2803b1247b8cf807c6966e97bfe7b2de6",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "48bc7e7e636ac613d0dd066dfa751098524d4f40d8bab70370c93b2ea4ad6093",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "f3cb2b037efe5a7ef8ab87e0b90db8957a9263460550520110ad8a40bd89bc7e",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "6bf5c784236beaf66e9f0567e91623c2803b1247b8cf807c6966e97bfe7b2de6",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T06:22:49.486862+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (91 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_configuration_input.py:302:89\n    |\n301 |         def match(self, text: str) -> re.Match[str] | None:\n302 |             \"\"\"Append str text length, return Match-or-None; no I/O or source retention.\"\"\"\n    |                                                                                         ^^^\n303 |             visits.append(len(text))\n304 |             return original.match(text)\n    |\n\nFound 1 error.\n",
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06-22"
+}
