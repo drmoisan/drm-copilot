@@ -1,0 +1,34 @@
+{
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py",
+  "duration_seconds": 2.164,
+  "exit_code": 1,
+  "finished_at": "2026-10-19T03:36:42.634772+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-parser-types-033642.2026-10-19T03-36.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-parser-types-033642.2026-10-19T03-36.stdout.txt",
+    "sha256": "f842f805c4ff6b8602145dc04b4b1c1d7fddcb4f1e7b133afbef46270aaae314"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "67c467fc12f227cf9793734680d9febc718546188a5eb90ac5deb90f39e37a8b",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "fbe461aa0b0a9a959434f82083535d243b1d8961b5f4a22538b3199a2f3a0004"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "67c467fc12f227cf9793734680d9febc718546188a5eb90ac5deb90f39e37a8b",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "fbe461aa0b0a9a959434f82083535d243b1d8961b5f4a22538b3199a2f3a0004"
+  },
+  "stage": "parser-types",
+  "started_at": "2026-10-19T03:36:40.471905+00:00",
+  "stderr": "",
+  "stdout": "WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:14:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:14:24 - error: Type of \"given\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:15:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:15:38 - error: Type of \"st\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:199:2 - error: Untyped function decorator obscures type of function; ignoring decorator (reportUntypedFunctionDecorator)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_solution_input.py:199:8 - error: Type of \"text\" is unknown (reportUnknownMemberType)\nWORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:12:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:12:24 - error: Type of \"given\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:13:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:13:38 - error: Type of \"st\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:243:2 - error: Untyped function decorator obscures type of function; ignoring decorator (reportUntypedFunctionDecorator)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:244:5 - error: Type of \"text\" is unknown (reportUnknownMemberType)\n  WORKSPACE\\tests\\discovery_runtime\\analyzer\\test_xml_input.py:245:5 - error: Type of \"integers\" is unknown (reportUnknownMemberType)\n13 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-36"
+}

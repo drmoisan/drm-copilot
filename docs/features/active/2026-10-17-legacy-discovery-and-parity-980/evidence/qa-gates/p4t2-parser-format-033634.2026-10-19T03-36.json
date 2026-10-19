@@ -1,0 +1,34 @@
+{
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py",
+  "duration_seconds": 1.751,
+  "exit_code": 0,
+  "finished_at": "2026-10-19T03:36:34.049417+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-parser-format-033634.2026-10-19T03-36.stderr.txt",
+    "sha256": "4b1034bb98a0bc2fd289124a9b39cb6a2ca13359ac5871d167b9ee99c7c781b8"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-parser-format-033634.2026-10-19T03-36.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "67c467fc12f227cf9793734680d9febc718546188a5eb90ac5deb90f39e37a8b",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "fbe461aa0b0a9a959434f82083535d243b1d8961b5f4a22538b3199a2f3a0004"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "eda2b9badb675b018ab0f94336c4716a6a45c1402ad8c3a9467a2631350adff2",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "16e55e187209d3169fc8a0bfb251bda6ce6a9817d4f6e19cdd0bf7069747aba7"
+  },
+  "stage": "parser-format",
+  "started_at": "2026-10-19T03:36:32.299619+00:00",
+  "stderr": "reformatted tests\\discovery_runtime\\analyzer\\test_solution_input.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_xml_input.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted, 3 files left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-36"
+}

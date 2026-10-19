@@ -1,0 +1,34 @@
+{
+  "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_xml_input.py tests/discovery_runtime/analyzer/test_solution_input.py",
+  "duration_seconds": 1.733,
+  "exit_code": 1,
+  "finished_at": "2026-10-19T03:37:19.726955+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-parser-format-033719.2026-10-19T03-37.stderr.txt",
+    "sha256": "1f322eb8586f4e5489a3221342d9791430bd3ead25d86d425362da9b3c7b3b05"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-parser-format-033719.2026-10-19T03-37.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "c2981cceabee017c0c5a234d7e4626a20fad387e6f6f95261f6990bc35a1f2bf",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "7d2bb5bc013db6c8de60ef663b0eea3f9b80b8a512ca5b493f2f0cce52822b20",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "c2981cceabee017c0c5a234d7e4626a20fad387e6f6f95261f6990bc35a1f2bf",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+  },
+  "stage": "parser-format",
+  "started_at": "2026-10-19T03:37:17.994622+00:00",
+  "stderr": "would reformat tests\\discovery_runtime\\analyzer\\test_solution_input.py\r\n\r\nOh no! \ud83d\udca5 \ud83d\udc94 \ud83d\udca5\r\n1 file would be reformatted, 4 files would be left unchanged.\r\n",
+  "stdout": "",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-37"
+}
