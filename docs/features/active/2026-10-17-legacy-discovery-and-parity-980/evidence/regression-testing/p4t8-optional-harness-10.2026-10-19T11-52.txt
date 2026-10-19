@@ -1,0 +1,185 @@
+"""Bind the checked optional subset without changing sources or replaying tests."""
+import ast
+import base64
+import datetime
+import gzip
+import hashlib
+import inspect
+import json
+from pathlib import Path
+import re
+import subprocess
+
+from drm_copilot_discovery.analyzer.optional.vsto_office import VstoOfficeAnalyzer, classify_csharp, classify_xml, classify_project
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence')
+regression = evidence / 'regression-testing'
+paths = ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/optional/' + name + '.py'
+         for name in ('__init__', 'vsto_office', 'vsto_patterns', 'vsto_syntax')]
+paths += ['tests/discovery_runtime/analyzer/' + name + '.py' for name in ('test_optional_adapter', 'test_optional_limits')]
+fixtures = ['tests/fixtures/discovery_dotnet_vsto/ribbon_customui_' + year + '.xml.txt' for year in ('2006', '2009')]
+command = 'poetry run python SCRATCH/issue-980-p4t8-optional-freeze.py'
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+def reference(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+def write(path, raw):
+    assert not path.exists(), path
+    path.write_bytes(raw)
+
+def save(path, value):
+    write(path, (json.dumps(value, indent=2) + '\n').encode())
+
+baseline_path = evidence / 'baseline/p4t8-shared-baseline.2026-10-19T11-23.json'
+assert sha(baseline_path.read_bytes()) == '3ad8ba07b77d445d5d2bbb14e70f6d1913cada57d5bd3694f93292d4d28a4a68'
+baseline = json.loads(baseline_path.read_bytes())
+other_owned = {
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py',
+    'tests/discovery_runtime/analyzer/test_registry.py',
+    *('scripts/dev_tools/discovery/analyzer/' + name + '.py' for name in ('vsto_office', 'vsto_patterns', 'stack_cli')),
+    *('tests/scripts/dev_tools/discovery/analyzer/' + name + '.py' for name in ('test_vsto_office', 'test_stack_cli', 'test_stack_neutrality', 'test_domain_neutrality', 'test_vsto_compatibility')),
+}
+predecessors = []
+for key, field in (('baseline', 'preserved_files'), ('handoff', 'source_files')):
+    bound = baseline['preserved_predecessors'][key]
+    path = Path(bound['path'])
+    assert sha(path.read_bytes()) == bound['sha256']
+    predecessors += json.loads(path.read_bytes())[field]
+preserved = [item for item in predecessors if item['path'] not in other_owned]
+assert all(sha(Path(item['path']).read_bytes()) == item['sha256'] for item in preserved)
+existing_preserved = [item for item in baseline['existing_files'] if item['path'] not in other_owned]
+assert all(sha(Path(item['path']).read_bytes()) == item['sha256'] for item in existing_preserved)
+sources = []
+for name in paths:
+    raw = Path(name).read_bytes()
+    text = raw.decode('utf-8')
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))]
+    assert len(lines) <= 500, (name, len(lines))
+    assert all(ast.get_docstring(node) for node in definitions), name
+    assert all(lines[node.lineno - 2].strip().startswith('#') for node in loops), name
+    assert re.search(r'\b(?:tmp_path|tmpdir|tempfile|subprocess|requests|socket)\b', text) is None, name
+    sources.append({'path': name, 'sha256': sha(raw), 'physical_lines': len(lines),
+        'lf_normalized_sha256': sha(raw.replace(b'\r\n', b'\n')), 'crlf_count': raw.count(b'\r\n'),
+        'git_attributes': subprocess.check_output(['git', 'check-attr', '--all', '--', name], text=True).splitlines(),
+        'definitions_with_docstrings': len(definitions), 'loops_with_immediate_intent_comments': len(loops)})
+ordered = []
+for stage in ('black', 'ruff', 'pyright', 'pytest'):
+    path = next(regression.glob('p4t8-optional-focused5-' + stage + '.*.json'))
+    receipt = json.loads(path.read_bytes())
+    assert receipt['exit_code'] == 0 and not receipt['changed']
+    assert all(receipt['source_before'][item['path']]['sha256'] == receipt['source_after'][item['path']]['sha256'] == item['sha256'] for item in sources)
+    assert receipt['borrowed_before'] == receipt['borrowed_after']
+    assert all(sha(Path(name).read_bytes()) == value['sha256'] for name, value in receipt['borrowed_after'].items())
+    ordered.append({**reference(path), 'stage': stage, 'started': receipt['started'], 'finished': receipt['finished'], 'duration_seconds': receipt['duration_seconds']})
+assert all(left['finished'] <= right['started'] for left, right in zip(ordered, ordered[1:]))
+stdout = receipt['streams']['stdout']['presentation']
+nodes = re.findall(r'^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)', stdout, flags=re.M)
+assert len(nodes) == len(set(nodes)) == 100 and '100 passed' in stdout
+coverage_raw = (scratch / 'issue-980-p4t8-optional-focused5-coverage.json').read_bytes()
+coverage = json.loads(coverage_raw)
+ranges = {}
+for path, data in coverage['files'].items():
+    assert not data['missing_lines'] and not data['missing_branches']
+    ranges[path] = {'summary': data['summary'], 'functions': {key: value['summary'] for key, value in data['functions'].items() if key},
+                    'classes': {key: value['summary'] for key, value in data['classes'].items() if key}}
+    assert all(value['covered_lines'] == value['num_statements'] for family in ('functions', 'classes') for value in ranges[path][family].values())
+original_patterns = next(item for item in baseline['existing_files'] if item['path'] == 'scripts/dev_tools/discovery/analyzer/vsto_patterns.py')
+old = (scratch / original_patterns['original'].removeprefix('SCRATCH/')).read_bytes()
+def assignments(raw):
+    values = {}
+    for node in ast.parse(raw).body:
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target] if isinstance(node, ast.AnnAssign) else []
+        for target in targets:
+            if isinstance(target, ast.Name):
+                values[target.id] = ast.dump(node.value, include_attributes=False)
+    return values
+assert assignments(old) == assignments(Path(paths[2]).read_bytes())
+assert len(assignments(old)) == 14
+archive = next(regression.glob('p4t8-optional-failure-lossless.*.json'))
+archive_data = json.loads(archive.read_bytes())
+for entry in archive_data['entries']:
+    raw = gzip.decompress(base64.b64decode(entry['payload']))
+    assert len(raw) == entry['original_bytes'] and sha(raw) == entry['original_sha256']
+qualification = next(regression.glob('p4t8-optional-failure-qualification.*.json'))
+qualification_data = json.loads(qualification.read_bytes())
+for item in qualification_data['changes']:
+    readable = Path(item['path']).read_bytes()
+    assert sha(readable) == item['readable_sha256']
+    restored = readable.replace(qualification_data['marker'].encode(), b'x' * 2200000)
+    assert sha(restored) == item['original_sha256']
+raw_streams = []
+for path in sorted(regression.glob('p4t8-optional-*.json')):
+    item = json.loads(path.read_bytes())
+    for channel, stream in item.get('streams', {}).items():
+        raw = (scratch / Path(stream['scratch_identifier']).name).read_bytes()
+        assert sha(raw) == stream['sha256']
+        raw_streams.append({'receipt': path.as_posix(), 'channel': channel, 'bytes': len(raw), 'sha256': sha(raw),
+                           'encoding': 'gzip+base64', 'payload': base64.b64encode(gzip.compress(raw, mtime=0)).decode('ascii')})
+coverage_path = regression / f'p4t8-optional-coverage.{stamp}.json'
+write(coverage_path, coverage_raw)
+failed_coverage = regression / f'p4t8-optional-initial-coverage.{stamp}.json'
+write(failed_coverage, (scratch / 'issue-980-p4t8-optional-focused4-coverage.json').read_bytes())
+streams_path = regression / f'p4t8-optional-raw-streams.{stamp}.json'
+save(streams_path, {'encoding': 'gzip+base64', 'entries': raw_streams})
+harnesses = []
+names = ('issue-980-p4t8-optional-create.py', 'issue-980-p4t8-size-preview.py', 'issue-980-p4t8-test-size.py',
+         'issue-980-p4t8-split.py', 'issue-980-p4t8-optional-gate-initial.py', 'issue-980-p4t8-optional-gate.py',
+         'issue-980-p4t8-failure-summary.py', 'issue-980-p4t8-optional-normalize.py', 'issue-980-p4t8-optional-freeze-first.py', Path(__file__).name)
+for ordinal, name in enumerate(names, 1):
+    raw = (scratch / name).read_bytes()
+    readable = '\n'.join(line.rstrip() for line in raw.decode().splitlines()).rstrip() + '\n'
+    target = regression / f'p4t8-optional-harness-{ordinal}.{stamp}.txt'
+    write(target, readable.encode())
+    harnesses.append({'scratch_identifier': 'SCRATCH/' + name, 'raw_sha256': sha(raw), 'raw_bytes': len(raw),
+                     'raw_base64': base64.b64encode(raw).decode(), 'readable_snapshot': reference(target),
+                     'readable_matches_original': readable.encode() == raw,
+                     'qualification': 'Original payload bytes retained exactly; readable view normalizes CR/LF and terminal whitespace only.'})
+harness_path = regression / f'p4t8-optional-harnesses.{stamp}.json'
+save(harness_path, {'entries': harnesses, 'initial_console_fault': 'Initial Black formatting completed and its receipts were saved; subsequent console printing raised CP1252 UnicodeEncodeError. The preserved original harness was replaced by a UTF-8-printing version before the focused loops.',
+                    'blocked_attempt': 'A command-text hook rejected an earlier large shell write with PROMOTION_MCP_ONLY before writing. The normal patch tool was used within approved scope; no hook was changed or bypassed.'})
+handoff = regression / f'p4t8-optional-handoff.{stamp}.md'
+write(handoff, (f'# Optional adapter subset handoff\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\nOutput Summary: FROZEN_READY for bounded review and a checked WIP commit; P4-T8 remains unaccepted.\n\n'
+    'Scope: four runtime optional modules, two tests and two valid Ribbon-generation fixtures. The original two-root Ribbon fixture and all unaffected generic fixtures remain byte-identical. The shared 114-case baseline and approved two-path absence supplement precede mutation. Other-owner compatibility/registry/CLI paths are excluded from this subset; their work is preserved.\n\n'
+    'Canonical analysis consumes immutable InventoryCapture and requires configured explicit office-vsto selection before traversal. Public positional path/text classifiers retain their approved keyword-only profile/capacity contracts and shared Detection identity. Historical 14 pattern data exports retain exact AST values; active syntax is isolated in the approved helper. XML uses original retained bytes and the accepted secure parser. Generic C#/COM syntax provides bounded candidates. Safe literal assembly declaration names remain visible; COMReference targets, GUID/ProgID arguments, paths and raw conditions do not. AddRef is outside the accepted finite generic method set and is explicitly unsupported. Generic helpers and core schemas remain unchanged.\n\n'
+    'Observed XML declarations are detected facts; C# optional relevance and callback relationships remain inferred with unresolved binding and unverified execution. New v2 IDs retain historical evidence IDs as metadata. Independent budgets cover source/pin bytes, counts, numeric parser work and conservative complete output serialization, including diagnostics and fallback. Aggregate exhaustion discards all partial rows. Token work uses the document_bytes numeric ceiling independently of artifact_records. Existing InventoryCapture validates unique selected paths and source counts.\n\n'
+    'QA: focused5 passed Black, Ruff, scoped Pyright and all 100 tests. Coverage is 305/305 executable statements and 126/126 branches; every measured class/callable is 100%. The initializer has no executable statements. Original format/lint/type diagnostics and the 92-pass, 1-failure, 2-error batch remain bound. The production correction separated token/output limits; the unchanged large-input case received a short pytest ID to avoid Windows environment-length failure. Concrete independent pin/candidate/byte boundaries were added. All six code/test files remain within 500 physical lines, with documented definitions and explicit-loop intent comments.\n\n'
+    'Exact raw coverage, node order, command durations, separate stdout/stderr, source/Git-normalization bindings and executable harness bytes are preserved. The large failed presentation has a lossless canonical archive: decoding and inverse marker substitution recover the original JSON/Markdown exactly. Only repeated synthetic payload runs were shortened in readable views.\n\n'
+    'Pending: consolidated independent task review, combined final ordered gates/contracts/native composition and P4-T8 acceptance. This subset proves no installed Office host, callback execution, non-Windows behavior, external service, source mutation or successful legacy-v1 emission. Parent owns checkpoints, task/AC acceptance and Git operations.\n').encode())
+evidence_files = sorted(regression.glob('p4t8-optional-*')) + sorted((evidence / 'baseline').glob('p4t8-optional-*'))
+for path in evidence_files:
+    raw = path.read_bytes()
+    assert b'\r' not in raw, path
+    assert all(line == line.rstrip() for line in raw.splitlines()), path
+    if path not in (coverage_path, failed_coverage):
+        assert raw.endswith(b'\n') and not raw.endswith(b'\n\n'), path
+freeze = regression / f'p4t8-optional-freeze.{stamp}.json'
+manifest = {'status': 'FROZEN_READY', 'timestamp': stamp, 'command': command, 'exit_code': 0,
+    'accepted_baseline': baseline['head'], 'shared_baseline': reference(baseline_path),
+    'source_files': sources, 'fixtures': [reference(Path(path)) for path in fixtures],
+    'ordered_focused_gates': ordered, 'borrowed_sources': receipt['borrowed_after'],
+    'coverage': reference(coverage_path), 'initial_coverage': reference(failed_coverage), 'coverage_ranges': ranges,
+    'test_count': 100, 'test_nodes_in_execution_order': nodes, 'public_signatures': {
+        function.__name__: str(inspect.signature(function)) for function in (classify_csharp, classify_xml, classify_project, VstoOfficeAnalyzer.analyze)},
+    'historical_data_exports_ast_identical': 14, 'preserved_predecessors': {**baseline['preserved_predecessors'],
+        'unchanged_streams_in_subset': len(preserved), 'other_owner_paths': sorted(other_owned)},
+    'unchanged_generic_and_original_fixture_bindings': existing_preserved,
+    'executed_harnesses': reference(harness_path), 'raw_streams': reference(streams_path),
+    'lossless_failure_archive': reference(archive), 'readable_failure_qualification': reference(qualification),
+    'handoff': reference(handoff), 'evidence_files': [reference(path) for path in evidence_files],
+    'stage_paths': paths + fixtures + [path.as_posix() for path in evidence_files] + [freeze.as_posix()],
+    'changed_line_coverage': 'All new executable statements/branches and measured class/callable ranges are 100%; accepted predecessor source is unchanged within this ownership.',
+    'raw_coverage_qualification': 'Coverage-generator JSON is retained byte-for-byte, including its original EOF convention.',
+    'pending': ['consolidated independent review', 'parent checked WIP', 'combined final gates', 'P4-T8 acceptance'],
+    'source_test_edits_during_freeze': False, 'behavioral_reruns_during_freeze': False, 'git_mutations': False}
+save(freeze, manifest)
+print(json.dumps({'freeze': reference(freeze), 'source_files': sources, 'stage_count': len(manifest['stage_paths']),
+    'coverage_totals': coverage['totals'], 'measured_ranges': sum(len(value[kind]) for value in ranges.values() for kind in ('functions', 'classes'))}, indent=2))

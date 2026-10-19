@@ -1,0 +1,22 @@
+{
+  "stage": "pyright",
+  "started": "2026-10-19T11:23:14.913148+00:00",
+  "finished": "2026-10-19T11:23:15.989507+00:00",
+  "duration_seconds": 1.077,
+  "command": ".\\.venv\\Scripts\\python.exe -m pyright scripts/dev_tools/discovery/analyzer/vsto_office.py scripts/dev_tools/discovery/analyzer/vsto_patterns.py scripts/dev_tools/discovery/analyzer/stack_cli.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py tests/discovery_runtime/analyzer/test_registry.py tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py tests/scripts/dev_tools/discovery/test_domain_neutrality.py",
+  "exit_code": 0,
+  "streams": {
+    "stdout": {
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-baseline-pyright-112315.stdout.bin",
+      "bytes": 194,
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scratch_identifier": "SCRATCH/issue-980-p4t8-baseline-pyright-112315.stderr.bin",
+      "bytes": 0,
+      "presentation": ""
+    }
+  }
+}

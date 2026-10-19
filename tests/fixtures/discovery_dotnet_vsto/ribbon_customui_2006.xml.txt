@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+  <ribbon><tabs><tab id="genericTab"><group id="genericGroup">
+    <button id="genericButton" onAction="OnDo" />
+  </group></tab></tabs></ribbon>
+</customUI>

@@ -1,0 +1,4 @@
+from pathlib import Path
+import black
+path=Path('tests/discovery_runtime/analyzer/test_optional_adapter.py')
+print(path.as_posix(),len(black.format_str(path.read_text('utf-8'),mode=black.Mode()).splitlines()))
