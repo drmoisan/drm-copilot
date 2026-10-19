@@ -1,0 +1,126 @@
+"""Bind the first central integration review without replaying passing suites."""
+
+import ast
+import base64
+import hashlib
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path.cwd()
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+REG = FEATURE / 'evidence/regression-testing'
+QA = FEATURE / 'evidence/qa-gates'
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def binding(path, expected=None):
+    raw = (ROOT / path).read_bytes()
+    digest = sha(raw)
+    if expected is not None:
+        assert digest == expected, str(path)
+    return {'path': str(path).replace('\\', '/'), 'sha256': digest, 'bytes': len(raw)}
+
+
+def read(path, expected=None):
+    result = binding(path, expected)
+    return json.loads((ROOT / path).read_bytes()), result
+
+
+freeze, freeze_binding = read(REG / 'p4t7-integration-freeze.2026-10-19T10-53.json', '28975f0cd0dd00c11c1595135e9832ae502a8039c1c0d990c1b5ae034e5e4266')
+sources = {item['path']: item['sha256'] for item in freeze['source_files']}
+source_bindings = []
+for path, digest in sources.items():
+    item = binding(path, digest)
+    raw = (ROOT / path).read_bytes()
+    item['physical_lines'] = len(raw.splitlines())
+    assert item['physical_lines'] <= 500 and b'\r' not in raw
+    nodes = [node for node in ast.walk(ast.parse(raw)) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    assert all(ast.get_docstring(node) for node in nodes)
+    source_bindings.append(item)
+borrowed = [binding(path, value['sha256']) for path, value in freeze['borrowed_sources'].items()]
+assert len(source_bindings) == 3 and len(borrowed) == 5
+gates = []
+assert [item['stage'] for item in freeze['ordered_focused_gates']] == ['format', 'lint', 'types', 'unit']
+for item in freeze['ordered_focused_gates']:
+    gate, gate_binding = read(item['path'], item['sha256'])
+    assert gate['exit_code'] == 0 and gate['source_before'] == gate['source_after']
+    assert gate['borrowed_before'] == gate['borrowed_after'] == freeze['borrowed_sources']
+    assert {path: value['sha256'] for path, value in gate['source_before'].items()} == sources
+    gates.append(gate_binding)
+raw, raw_binding = read(freeze['coverage']['path'], freeze['coverage']['sha256'])
+assert raw['totals']['num_statements'] == raw['totals']['covered_lines'] == 149
+assert raw['totals']['num_branches'] == raw['totals']['covered_branches'] == 62
+ranges = [value for module in freeze['coverage_ranges'].values() for kind in ('functions', 'classes') for value in module[kind].values()]
+assert len(ranges) == 13 and all(item['missing_lines'] == item['missing_branches'] == 0 for item in ranges)
+assert freeze['test_count'] == 66 and len(freeze['test_nodes_in_execution_order']) == 66
+assert len(set(freeze['test_nodes_in_execution_order'])) == 66
+archive, archive_binding = read(freeze['executed_harnesses']['path'], freeze['executed_harnesses']['sha256'])
+harness_bindings = []
+for item in archive['harnesses']:
+    raw_harness = base64.b64decode(item['raw_base64'], validate=True)
+    assert sha(raw_harness) == item['raw_sha256']
+    harness_bindings.append({'scratch_identifier': item['scratch_identifier'], 'raw_sha256': item['raw_sha256']})
+initial_coverage = binding(freeze['initial_coverage']['path'], freeze['initial_coverage']['sha256'])
+handoff = binding(freeze['handoff']['path'], freeze['handoff']['sha256'])
+prior = [
+    binding(QA / 'p4t7-executor-shared-node-confirmation.2026-10-19T10-32.json', '89fa8d3c97da9343e8b83d855ce6d8dc8ca28f758b6e7ef2489ddbd0de7beac0'),
+    binding(QA / 'p4t7-executor-format-confirmation.2026-10-19T10-36.json', '226d6b3885d34e6bfe53dcda7f98c3f48318704a3dbfb6230d7257f4027b7208'),
+]
+for path, digest in sources.items():
+    binding(path, digest)
+now = datetime.now(UTC)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+harness_path = QA / ('p4t7-executor-integration-review-harness.' + stamp + '.txt')
+(ROOT / harness_path).write_bytes(Path(__file__).read_bytes())
+report = {
+    'status': 'INTEGRATION_REVIEW_PASS_READY_FOR_FINAL_GATES', 'task': 'P4-T7',
+    'timestamp': stamp, 'published_utc': datetime.now(UTC).isoformat(),
+    'command': 'poetry run python SCRATCH/issue-980-p4t7-integration-review.py', 'exit_code': 0,
+    'authority': {'receipt': 'atomic_execution_p4t7_central_integration_review', 'profile_sha256': 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9', 'native_routing_launch_provenance': True},
+    'scope': 'First review of central dependencies.py and its two frozen tests only. Five borrowed parser/shared sources are hash bindings, not repeated reviews.',
+    'freeze': freeze_binding, 'source_test_bindings': source_bindings, 'borrowed_bindings': borrowed,
+    'focused_receipts_reused': gates, 'raw_coverage': raw_binding,
+    'test_and_coverage_summary': {'cases': 66, 'statements': '149/149', 'branches': '62/62', 'named_class_callable_ranges': 13, 'all_ranges_fully_covered': True},
+    'review_checks': [
+        {'boundary': 'Aggregate pin and selected input work', 'result': 'One bounded retained-pin index, prospective pin count/byte/path work and selected input byte limits precede allocations. Exact same-path pin groups retain any valid immutable identity/byte match.'},
+        {'boundary': 'Remaining parser budgets', 'result': 'Independent work, input, text and record domains are propagated through the finite public parser calls. Successful usage is checked before refund; failure retains conservative reserved work.'},
+        {'boundary': 'Complete output and error reservation', 'result': 'Full components, findings, inferred relationships and deduplicated diagnostics reserve counts and conservative serialized bytes before construction. Aggregate failure replaces partial output with the reserved fixed fallback; impossible fallback envelopes raise.'},
+        {'boundary': 'Source ownership and confidence', 'result': 'Captured digest/path/repository/revision remain explicit. Confidence is high only with exact retained pin identity and bytes. No installed, executed, evaluated, target architecture or coverage-completion claim is introduced.'},
+        {'boundary': 'Facts and inferred relationships', 'result': 'Observed declarations/lock records are detected facts. Edges retain requested versions and nullable targets with inferred low-confidence relevance; conditions and all target execution/binding states remain unresolved.'},
+        {'boundary': 'Determinism and schema composition', 'result': 'Validated captures canonicalize paths; fixed dispatch, within-file ordinals and semantic identifiers produce stable output. The retained real three-parser/emitter composition validates schemas and uninspected/unassigned ledger proposals.'},
+        {'boundary': 'Policy and test isolation', 'result': 'The three files remain 467/467/339 lines with typed contracts and intent comments. Tests use captured memory values, bounded injection and existing immutable catalog resources; no temporary files or external processes.'},
+    ],
+    'resolved_read_only_question': 'InventoryCapture already enforces configured input count during construction. This interface check required no new probe or predecessor code change.',
+    'new_behavioral_probes': [], 'findings': [], 'open_probes': [],
+    'retained_subset_confirmations': prior,
+    'worker_executed_harness_archive': archive_binding, 'decoded_harness_hashes': harness_bindings,
+    'prior_failure_preservation': {'initial_coverage': initial_coverage, 'handoff': handoff, 'qualification': 'Original 64-pass/2-fail fixture diagnostics and earlier lint/type history remain in the immutable worker freeze; fixture-only pin order and computed-profile setup were corrected before the clean 66-case loop.'},
+    'raw_coverage_qualification': freeze['raw_coverage_qualification'],
+    'no_replay': 'No behavioral suite or independent behavioral probe was run; existing 66-case proof and prior subset confirmations were reused. The 62-stream predecessor manifest was referenced, not recaptured.',
+    'pending': ['Parent checked checkpoint', 'Combined final ordered toolchain and native composition', 'P4-T7 final receipt acceptance and task/AC mapping'],
+    'limitations': ['Registry/CLI publication remains P4-T9.', 'No native coding-agent host or non-Windows acceptance is asserted.', 'This candidate review does not mark P4-T7 accepted.'],
+    'exact_executed_harness': binding(harness_path), 'task_or_ac_checkoff': False,
+}
+json_path = QA / ('p4t7-executor-integration-review.' + stamp + '.json')
+(ROOT / json_path).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')
+md_now = datetime.now(UTC)
+md_path = QA / ('p4t7-executor-integration-review.' + md_now.strftime('%Y-%m-%dT%H-%M') + '.md')
+lines = ['# P4-T7 central integration candidate review', '',
+    'Timestamp: ' + md_now.strftime('%Y-%m-%dT%H-%M'), 'Published UTC: ' + md_now.isoformat(),
+    'Command: `poetry run python SCRATCH/issue-980-p4t7-integration-review.py`', 'EXIT_CODE: 0', '',
+    'Output Summary: INTEGRATION_REVIEW_PASS_READY_FOR_FINAL_GATES. No new defect or open behavioral probe remains in the frozen central integration scope.', '',
+    'Reviewed the three owned source/test files: aggregate resource reservations, one-pass pin indexing, remaining parser capacities, complete output/error accounting, exact source confidence, detected facts versus inferred nullable edges, deterministic schema projection, contracts, intent comments and isolated tests. The configured input-count bound is enforced by InventoryCapture construction.', '',
+    'Reused 66 passing cases, 149/149 statements, 62/62 branches and 13 fully covered ranges. Four clean gate receipts bind the exact three source/test streams and five unchanged shared/parser streams. The exact executed worker harness payloads decode to their recorded hashes. No suite or behavioral probe was replayed.', '',
+    'Prior shared/Node and Python/.NET confirmations remain valid. Original fixture failures and raw coverage newline conventions are preserved. Parent checkpoint, combined final gates and P4-T7 acceptance remain pending; registry/CLI publication remains P4-T9. No source/test/checkpoint/Git or checkbox change occurred.', '',
+    'Exact bindings and prior confirmations: `' + json_path.as_posix() + '`.']
+(ROOT / md_path).write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+staging_now = datetime.now(UTC)
+staging_path = QA / ('p4t7-executor-integration-staging.' + staging_now.strftime('%Y-%m-%dT%H-%M') + '.json')
+streams = [binding(json_path), binding(md_path), binding(harness_path)]
+staging = {'timestamp': staging_now.strftime('%Y-%m-%dT%H-%M'), 'published_utc': staging_now.isoformat(), 'streams': streams, 'staging_paths': [item['path'] for item in streams] + [staging_path.as_posix()], 'scope': 'Only new central-review evidence; prior subset evidence remains linked by immutable hashes.'}
+(ROOT / staging_path).write_text(json.dumps(staging, indent=2) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'status': report['status'], 'artifacts': streams + [binding(staging_path)], 'stage_count': 4, 'findings': []}, indent=2))

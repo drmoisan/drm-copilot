@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-10-19T11-03",
+  "published_utc": "2026-10-19T11:03:03.127659+00:00",
+  "streams": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.json",
+      "sha256": "0dfeef26d6d6c334df9489a57226a62610ef27c3c4617b81be2c813547c045a1",
+      "bytes": 10543
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.md",
+      "sha256": "bafd35ea216ec12279bfc7d9efe4671054b661f4e44b1d94257a0c0cdf77e6f3",
+      "bytes": 1571
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review-harness.2026-10-19T11-03.txt",
+      "sha256": "f4fad3d870c892b1266210d02e7d3e5454fdec2085b51aa3515c8b976a16b90b",
+      "bytes": 11179
+    }
+  ],
+  "staging_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review.2026-10-19T11-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-review-harness.2026-10-19T11-03.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t7-executor-integration-staging.2026-10-19T11-03.json"
+  ],
+  "scope": "Only new central-review evidence; prior subset evidence remains linked by immutable hashes."
+}

@@ -1,0 +1,97 @@
+{
+  "stage": "unit",
+  "label": "p4t7-integration-focused7-unit",
+  "started": "2026-10-19T10:51:30.738172+00:00",
+  "finished": "2026-10-19T10:52:37.371620+00:00",
+  "command": "poetry run pytest tests/discovery_runtime/analyzer/test_dependencies.py tests/discovery_runtime/analyzer/test_dependency_projection_limits.py -o addopts= -v --cov=drm_copilot_discovery.analyzer.dependencies --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/p4t7-integration-focused7-coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 66.633,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "physical_lines": 339
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf",
+      "physical_lines": 339
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused7-unit-105237.stdout.bin",
+      "raw_sha256": "1cb8333a1e64f9cc3fedda3213f498763afda25c582b13d945c964b1991ff7c8",
+      "raw_bytes": 10932,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 66 items\r\n\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/package.json-package-json] PASSED [  1%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/PACKAGE-LOCK.JSON-package-lock] PASSED [  3%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/npm-shrinkwrap.json-package-lock] PASSED [  4%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/setup.cfg-setup-cfg] PASSED [  6%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/requirements.txt-requirements] PASSED [  7%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/requirements-dev.txt-requirements] PASSED [  9%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.csproj-project] PASSED [ 10%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.vbproj-project] PASSED [ 12%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.fsproj-project] PASSED [ 13%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.proj-project] PASSED [ 15%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/Directory.Packages.props-project] PASSED [ 16%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/app.targets-project] PASSED [ 18%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/packages.config-packages-config] PASSED [ 19%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/packages.lock.json-packages-lock] PASSED [ 21%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/setup.py-unsupported] PASSED [ 22%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/pyproject.toml-unsupported] PASSED [ 24%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/poetry.lock-unsupported] PASSED [ 25%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/yarn.lock-unsupported] PASSED [ 27%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/pnpm-lock.yaml-unsupported] PASSED [ 28%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_path_dispatch_is_finite_and_platform_independent[src/readme.txt-None] PASSED [ 30%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[package-json-parse_node_dependencies] PASSED [ 31%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[package-lock-parse_node_dependencies] PASSED [ 33%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[requirements-parse_python_dependencies] PASSED [ 34%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[setup-cfg-parse_python_dependencies] PASSED [ 36%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[project-parse_dotnet_dependencies] PASSED [ 37%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[packages-config-parse_dotnet_dependencies] PASSED [ 39%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_dispatch_passes_exact_bytes_and_limits[packages-lock-parse_dotnet_dependencies] PASSED [ 40%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_projected_facts_and_edges_preserve_source_semantics PASSED [ 42%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_redacted_edge_and_repeated_container_identity PASSED [ 43%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[absent] PASSED [ 45%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-bytes] PASSED [ 46%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-revision] PASSED [ 48%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-path] PASSED [ 50%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[wrong-repository] PASSED [ 51%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_pin_identity_controls_confidence[duplicate] PASSED [ 53%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_unavailable_excluded_and_unsupported_inputs_do_not_parse PASSED [ 54%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-malformed] PASSED [ 56%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-encoding] PASSED [ 57%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-unsupported] PASSED [ 59%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_parser_failures_use_fixed_diagnostics[dependency-limit] PASSED [ 60%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_analysis_is_deterministic_and_schema_valid PASSED [ 62%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_empty_capture_and_irrelevant_inputs_have_no_fabricated_fact PASSED [ 63%]\r\ntests/discovery_runtime/analyzer/test_dependencies.py::test_real_parser_families_compose_with_inventory_schema PASSED [ 65%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_all_diagnostics_and_error_fallbacks_share_output_limits PASSED [ 66%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_impossible_error_envelope_raises_instead_of_emitting_over_budget[1] PASSED [ 68%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_impossible_error_envelope_raises_instead_of_emitting_over_budget[1023] PASSED [ 69%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[artifact_records-1] PASSED [ 71%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[document_bytes-1024] PASSED [ 72%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_complete_output_budget_precedes_projection[document_bytes-4096] PASSED [ 74%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[pin-count] PASSED [ 75%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[pin-bytes] PASSED [ 77%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[input-bytes] PASSED [ 78%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[scan-work] PASSED [ 80%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_independent_aggregate_resource_limits[path-work] PASSED [ 81%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[candidates] PASSED [ 83%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[diagnostics] PASSED [ 84%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[nodes] PASSED [ 86%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[text] PASSED [ 87%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[ordinal] PASSED [ 89%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_parser_contract_violations_cannot_escape[line] PASSED [ 90%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_invalid_public_capture_and_internal_reservations PASSED [ 92%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_pin_lookup_visits_only_each_inputs_retained_group PASSED [ 93%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_remaining_parser_resources_are_independent PASSED [ 95%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[maximum-file] PASSED [ 96%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[nodes] PASSED [ 98%]\r\ntests/discovery_runtime/analyzer/test_dependency_projection_limits.py::test_exhausted_parser_budget_stops_before_next_call[retained-text] PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                            Stmts   Miss Branch BrPart  Cover   Missing\r\n---------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependencies.py     149      0     62      0   100%\r\n---------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                             149      0     62      0   100%\r\nCoverage JSON written to file SCRATCH/p4t7-integration-focused7-coverage.json\r\n======================== 66 passed in 64.90s (0:01:04) ========================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused7-unit-105237.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 central integration only"
+}

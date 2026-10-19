@@ -1,0 +1,202 @@
+{
+  "task": "P4-T7",
+  "timestamp": "2026-10-19T10-58",
+  "state": "PREPARED_NOT_EXECUTED",
+  "source_head": "72fa9433622f61fe61f7bd8d1f0c9e2e45d88deb",
+  "command": "poetry run python SCRATCH/issue-980-p4t7-final-prepare2.py",
+  "exit_code": 0,
+  "authority": "workspace_operations_p4t7_integration_resume / S5_P4T7_dependency_integration_resume; preparation only",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "prepared_harnesses": [
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-gates.py",
+      "sha256": "db43345ce517e9183f5c67d9985368c298a319f9d1bad6da9247889da81e471b",
+      "lines": 145,
+      "syntax_parse": "passed",
+      "executed": false
+    },
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-architecture.py",
+      "sha256": "be199f474702a9e7043643431977f253a18d8c6e5792138c933d122d42f8d45f",
+      "lines": 55,
+      "syntax_parse": "passed",
+      "executed": false
+    },
+    {
+      "path": "SCRATCH/issue-980-p4t7-final-native.py",
+      "sha256": "0ac5549cde10be30354db14936e6a2d46e02ac9e1a02beccea18bec63c6aff89",
+      "lines": 172,
+      "syntax_parse": "passed",
+      "executed": false
+    }
+  ],
+  "preparation_harness": {
+    "path": "SCRATCH/issue-980-p4t7-final-prepare2.py",
+    "sha256": "56d7d670679296ade86fb074d861b6aaa837e867836cdca798c572e68067d4d8"
+  },
+  "adaptation_harness": {
+    "path": "SCRATCH/issue-980-p4t7-final-adapt.py",
+    "sha256": "56c8a94ddcda0f50f7efe548a5728104d7e7fe3dd79c9881620ccef91f0cf240"
+  },
+  "candidate_manifest": {
+    "path": "SCRATCH/issue-980-p4t7-final-candidate.preparation2.json",
+    "sha256": "4dc2544ff6d1033fb55a6c3d2916054ac607bb20d45a8170dd1c721f664c0c50"
+  },
+  "source_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_input_limits.py",
+      "sha256": "ca1ccdf80bf116338e0c86c3c18d52189b0ad632806310a2d068699c9ce7e91f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py",
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "sha256": "bd290fc03711b3a89046ec3082020b52cba981e1a71d0637d5b5a06303827cbf"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_node_limits.py",
+      "sha256": "801d5b4fa22a967001d221c668652496837a8de4281ba5555dc285e1b5b821b7"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py",
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_python.py",
+      "sha256": "fe829a66b827d303fa138e7a2fce370bc2975782169d39afc53b4957b457023d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py",
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_dotnet.py",
+      "sha256": "8962f1d12b7acff23f793eb46fb2ec7b18d6c1f1dad198ef1a48d0a15dc3d811"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+      "sha256": "ad3ce3da4068f955051013e7c63cce0c5ed1777cffe97f5a60ed5b4978e680ad"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "sha256": "696396124b78cdb9c6fce6e7119258fe3c8560aaddd9f59c0c1ff80d9c5d6f3e"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+      "sha256": "df70d018d834c2fc010bdcf7d104ff942d41b6d788278c9657804abcd47996bf"
+    }
+  ],
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+      "sha256": "de307b717e0ac1b8a2e3babce56238213ce6ec7496e7b77676c00b159f7b5749"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-node-freeze.2026-10-19T10-24.json",
+      "sha256": "d8bc7e62f27dadfa1093122e36482de9da1e0016f41c405516743c2e66ed1642"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-python-repair-freeze.2026-10-19T10-32.json",
+      "sha256": "f1dcbc459210449e2a4bc938f26d391b04921725175e0e89885b3305a8309ec7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-dotnet-repair-freeze.2026-10-19T10-30.json",
+      "sha256": "02e7fa6de5f8a895a1738777e1effcba1e973ade848b17347f3ce2e916956f96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t7-integration-freeze.2026-10-19T10-53.json",
+      "sha256": "28975f0cd0dd00c11c1595135e9832ae502a8039c1c0d990c1b5ae034e5e4266"
+    }
+  ],
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t7-shared-baseline.2026-10-19T09-44.json",
+    "sha256": "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+  },
+  "retained_prior_preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t6-final-preparation.2026-10-19T09-13.json",
+    "sha256": "b3ce1ac6cbafd8c775ac7d48b1c675b5d1a4be20dae8bee08336cb32e2eb74d8"
+  },
+  "retained_successful_publication_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t1-final-native-result.2026-10-19T02-54.json",
+    "sha256": "d97897c6d73d64f239a52eef017b4e9ef5c49ebd66836a0756ad697dbcfd27ea"
+  },
+  "stages": [
+    "Scoped Black on 14 files",
+    "Scoped Ruff on the same files",
+    "Whole-repository Pyright",
+    "Architecture, size, docstrings/loops, purity, neutrality and isolation",
+    "Five isolated reverse-module-order batches, 557 cases, six modules and every class/callable measured",
+    "Actual inventory schema, quality tier/classification, package metadata/tooling and domain-neutrality contracts",
+    "Sixteen native Windows/Git retained-byte composition assertions and expected closed-registry refusal"
+  ],
+  "forward_test_module_order": {
+    "shared": [
+      "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+      "tests/discovery_runtime/analyzer/test_dependency_input_limits.py"
+    ],
+    "node": [
+      "tests/discovery_runtime/analyzer/test_dependency_node.py",
+      "tests/discovery_runtime/analyzer/test_dependency_node_limits.py"
+    ],
+    "python": [
+      "tests/discovery_runtime/analyzer/test_dependency_python.py"
+    ],
+    "dotnet": [
+      "tests/discovery_runtime/analyzer/test_dependency_dotnet.py"
+    ],
+    "integration": [
+      "tests/discovery_runtime/analyzer/test_dependencies.py",
+      "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py"
+    ]
+  },
+  "expected_test_counts": {
+    "shared": 191,
+    "node": 111,
+    "python": 116,
+    "dotnet": 73,
+    "integration": 66
+  },
+  "native_assertions": [
+    "native capture retains all seven configured finite-format inputs",
+    "real Git provenance retains exact CRLF and Unicode working bytes",
+    "all finite Node Python and NET formats produce detected file components",
+    "declaration lock records and lock edges remain distinct syntax kinds",
+    "declared graph relevance remains inferred with unresolved null targets",
+    "all ecosystems retain unverified installed state and unevaluated binding",
+    "locations marker values conditions and lock target keys are redacted",
+    "declared lock edge requests stay separate from observed package versions",
+    "valid retained syntax has no blocking diagnostics",
+    "every source anchor carries exact original hashes and immutable revisions",
+    "missing pins remain low confidence with explicit provenance diagnostics",
+    "aggregate exhaustion discards all facts and emits one bounded fixed blocker",
+    "schema-valid inventory identity is independent of adapter order and clock",
+    "ledger proposals remain uninspected and unassigned",
+    "closed registry refuses dependency dispatch before publication planning",
+    "analysis and refused publication preserve all source and Git state"
+  ],
+  "output_contract": "Preserve exact stdout/stderr, source/predecessor hashes, actual UTC command times and durations, raw coverage, full node populations/order and exact executed LF harness snapshots. No final gate execution is authorized by this preparation.",
+  "pending": [
+    "All 14 source/test streams remain identical",
+    "Existing scoped reviews and final integration review are bound",
+    "Any required bounded repair confirmation is bound",
+    "Coordinator explicitly releases execution with a fresh routing receipt"
+  ],
+  "gate_execution": false,
+  "source_test_mutation": false,
+  "git_mutation": false,
+  "limits": "No installation, restore, dependency execution or evaluated graph. Native Windows Python/Git only; no coding-agent host or non-Windows claim. Adapter dispatch and successful publication remain P4-T9."
+}

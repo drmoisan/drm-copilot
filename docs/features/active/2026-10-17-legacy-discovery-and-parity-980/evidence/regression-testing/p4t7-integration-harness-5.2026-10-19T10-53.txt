@@ -1,0 +1,139 @@
+"""Freeze the checked central adapter without replaying accepted parser proofs."""
+import ast
+import base64
+import datetime
+import hashlib
+import inspect
+import json
+from pathlib import Path
+import re
+import subprocess
+
+from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer
+
+repo, scratch = Path.cwd(), Path(__file__).parent
+evidence = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence")
+paths = ["packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py",
+         "tests/discovery_runtime/analyzer/test_dependencies.py",
+         "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py"]
+command = "poetry run python SCRATCH/issue-980-p4t7-integration-freeze.py"
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def write(path, raw):
+    assert not path.exists(), path
+    path.write_bytes(raw)
+
+
+def save(path, value):
+    write(path, (json.dumps(value, indent=2) + "\n").encode())
+
+
+baseline_path = evidence / "baseline/p4t7-shared-baseline.2026-10-19T09-44.json"
+baseline = json.loads(baseline_path.read_bytes())
+assert sha(baseline_path.read_bytes()) == "9cb208fa71e124558d4262c2eef1dc9312b5ae34f7fe0d9e872733f9409d6f17"
+assert all(sha(Path(item["path"]).read_bytes()) == item["sha256"] for item in baseline["preserved_files"])
+sources = []
+for name in paths:
+    raw = Path(name).read_bytes()
+    text = raw.decode()
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    definitions = [node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    loops = [node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))]
+    assert len(lines) <= 500 and all(ast.get_docstring(node) for node in definitions)
+    assert all(lines[node.lineno - 2].strip().startswith("#") for node in loops)
+    assert re.search(r"\b(?:tmp_path|tmpdir|tempfile|subprocess|requests|socket)\b", text) is None
+    sources.append({"path": name, "sha256": sha(raw), "physical_lines": len(lines),
+        "lf_normalized_sha256": sha(raw.replace(b"\r\n", b"\n")), "crlf_count": raw.count(b"\r\n"),
+        "git_attributes": subprocess.check_output(["git", "check-attr", "--all", "--", name], text=True).splitlines(),
+        "definitions_with_docstrings": len(definitions), "loops_with_immediate_intent_comments": len(loops)})
+ordered = []
+for stage in ("format", "lint", "types", "unit"):
+    path = max((evidence / "regression-testing").glob("p4t7-integration-focused7-" + stage + ".*.json"))
+    receipt = json.loads(path.read_bytes())
+    assert receipt["exit_code"] == 0
+    assert all(receipt["source_before"][item["path"]]["sha256"] == receipt["source_after"][item["path"]]["sha256"] == item["sha256"] for item in sources)
+    assert receipt["borrowed_before"] == receipt["borrowed_after"]
+    assert all(sha(Path(path).read_bytes()) == value["sha256"] for path, value in receipt["borrowed_after"].items())
+    for stream in receipt["streams"].values():
+        assert sha((scratch / Path(stream["scratch_identifier"]).name).read_bytes()) == stream["raw_sha256"]
+    ordered.append({**reference(path), "stage": stage, "started": receipt["started"], "finished": receipt["finished"], "duration_seconds": receipt["duration_seconds"]})
+assert all(left["finished"] <= right["started"] for left, right in zip(ordered, ordered[1:]))
+stdout = receipt["streams"]["stdout"]["presentation"]
+nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", stdout, flags=re.M)
+assert len(nodes) == len(set(nodes)) == 66 and "66 passed" in stdout
+coverage_raw = (scratch / "p4t7-integration-focused7-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+assert len(coverage["files"]) == 1
+ranges = {}
+for path, data in coverage["files"].items():
+    assert not data["missing_lines"] and not data["missing_branches"]
+    ranges[path] = {"summary": data["summary"], "functions": {key: value["summary"] for key, value in data["functions"].items() if key},
+                    "classes": {key: value["summary"] for key, value in data["classes"].items() if key}}
+    assert all(value["covered_lines"] == value["num_statements"] for family in ("functions", "classes") for value in ranges[path][family].values())
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+coverage_path = evidence / f"regression-testing/p4t7-integration-coverage.{stamp}.json"
+write(coverage_path, coverage_raw)
+failed_coverage = evidence / f"regression-testing/p4t7-integration-initial-coverage.{stamp}.json"
+write(failed_coverage, (scratch / "p4t7-integration-focused6-coverage.json").read_bytes())
+harnesses = []
+for ordinal, name in enumerate(("issue-980-p4t7-integration-test-split.py", "issue-980-p4t7-integration-preformat.py", "issue-980-p4t7-integration-resume.py", "issue-980-p4t7-integration-gate.py", Path(__file__).name), 1):
+    raw = (scratch / name).read_bytes()
+    assert not re.search(rb"[A-Za-z]:[\\/]", raw)
+    readable = "\n".join(line.rstrip() for line in raw.decode().splitlines()).rstrip() + "\n"
+    snapshot = evidence / f"regression-testing/p4t7-integration-harness-{ordinal}.{stamp}.txt"
+    write(snapshot, readable.encode())
+    harnesses.append({"scratch_identifier": "SCRATCH/" + name, "raw_sha256": sha(raw),
+        "raw_base64": base64.b64encode(raw).decode(), "readable_snapshot": reference(snapshot),
+        "crlf_count": raw.count(b"\r\n"), "readable_matches_executed": readable.encode() == raw,
+        "qualification": "Raw executed bytes are immutable and base64-bound; readable view removes trailing whitespace, normalizes CR/LF and retains one terminal newline only."})
+harness_path = evidence / f"regression-testing/p4t7-integration-executed-harnesses.{stamp}.json"
+save(harness_path, {"timestamp": stamp, "harnesses": harnesses, "new_gate_and_freeze_harnesses_lf_before_execution": True})
+references = []
+for pattern in ("p4t7-shared-repair-freeze.*.json", "p4t7-node-freeze.*.json", "p4t7-python-repair-freeze.*.json", "p4t7-dotnet-repair-freeze.*.json"):
+    matches = sorted((evidence / "regression-testing").glob(pattern))
+    assert matches, pattern
+    references.append(reference(matches[-1]))
+handoff = evidence / f"regression-testing/p4t7-integration-handoff.{stamp}.md"
+write(handoff, (f"# Central dependency integration handoff\n\nTimestamp: {stamp}\nCommand: {command}\nEXIT_CODE: 0\n"
+    "Output Summary: FROZEN_READY for the existing task review and a checked WIP commit; P4-T7 remains unaccepted.\n\n"
+    "Scope: analyzer/dependencies.py, test_dependencies.py and test_dependency_projection_limits.py. The approved original shared baseline records absence of the production/main-test paths; the approved test split records its own absence. All 62 predecessor streams remain identical. Original paused integration drafts were preserved before resumption; the frozen shared and three parser implementations were not edited.\n\n"
+    "The adapter selects finite Node, Python and .NET formats from captured paths. One retained-pin index supplies exact per-input provenance comparisons. Independent prospective budgets cover pin bytes/counts, selected input bytes, parser work and retained candidate text, complete emitted row/diagnostic counts, and conservative JSON serialization. One reserved fixed blocker replaces every partial result on aggregate exhaustion. Detected declaration and lock-record syntax remains separate from inferred null-target graph relevance; installed state, binding and execution remain unresolved or unverified. No I/O, installation, restore or evaluation is introduced.\n\n"
+    "QA: focused7 Black, Ruff and scoped Pyright pass; all 66 integration cases pass. Coverage is 149/149 statements and 62/62 branches, with every measured class/callable at 100%. Earlier format/import/type diagnostics and the first 64-pass/2-failure batch are preserved. Those two failures were fixture assumptions about canonical lexical order and computed profile fields; only those fixtures changed before the clean restart. Real Node/Python/.NET parser composition passes the existing inventory schema. Inventory proposals remain uninspected and unassigned.\n\n"
+    "The public entrypoint is DependencyAnalyzer().analyze(capture: InventoryCapture) -> Analysis, identifier dependencies. Parser entrypoints/carriers remain unchanged. The private reservation and routing units are accessed through typed test-only reflection for isolated boundary assertions; they are not a public extension API. Sources, raw coverage, ordered nodes, separate stdout/stderr bindings, immutable parser manifests and exact executed harness bytes are bound in the adjacent freeze. New harnesses were written LF with one terminal newline before execution; older executed bytes are preserved in base64 with explicitly qualified readable views.\n\n"
+    "Pending: the existing independent integration review, combined whole-repository ordered gates, affected contracts and native Windows/Git direct composition. Closed-registry dispatch/publication remains P4-T9; no coding-agent-host, non-Windows, installed-dependency, package execution or discovery-completion proof is claimed. Parent owns checkpoint, commits and task/AC acceptance.\n").encode())
+evidence_files = sorted((evidence / "regression-testing").glob("p4t7-integration-*"))
+evidence_files += sorted((evidence / "baseline").glob("p4t7-integration-*"))
+for path in evidence_files:
+    raw = path.read_bytes()
+    assert b"\r" not in raw, path
+    if path not in (coverage_path, failed_coverage):
+        assert raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path
+    else:
+        json.loads(raw)  # Exact coverage-generator JSON may omit its final newline.
+    assert all(line == line.rstrip() for line in raw.splitlines()), path
+freeze = evidence / f"regression-testing/p4t7-integration-freeze.{stamp}.json"
+manifest = {"status": "FROZEN_READY", "timestamp": stamp, "command": command, "exit_code": 0,
+    "accepted_baseline": baseline["head"], "shared_baseline": reference(baseline_path),
+    "source_files": sources, "ordered_focused_gates": ordered, "borrowed_sources": receipt["borrowed_after"],
+    "frozen_subset_references": references, "coverage": reference(coverage_path), "initial_coverage": reference(failed_coverage),
+    "coverage_ranges": ranges, "test_count": 66, "test_nodes_in_execution_order": nodes,
+    "public_signatures": {"DependencyAnalyzer.analyze": str(inspect.signature(DependencyAnalyzer.analyze))},
+    "predecessor_streams_preserved": len(baseline["preserved_files"]), "executed_harnesses": reference(harness_path),
+    "handoff": reference(handoff), "evidence_files": [reference(path) for path in evidence_files],
+    "stage_paths": paths + [path.as_posix() for path in evidence_files] + [freeze.as_posix()],
+    "changed_line_coverage": "New module: 100% measured statements and branches; all measured classes/callables 100%. No predecessor production changes.",
+    "raw_coverage_qualification": "Coverage-generator JSON is retained byte-for-byte, including its original terminal-newline convention.",
+    "pending": ["existing independent integration review", "parent checked WIP commit", "combined final ordered gates/native composition", "P4-T7 acceptance"],
+    "source_test_edits_during_freeze": False, "behavioral_reruns_during_freeze": False, "git_mutations": False}
+save(freeze, manifest)
+print(json.dumps({"freeze": reference(freeze), "source_files": sources, "stage_count": len(manifest["stage_paths"]),
+    "coverage": coverage["totals"], "measured_ranges": sum(len(value[kind]) for value in ranges.values() for kind in ("functions", "classes"))}, indent=2))

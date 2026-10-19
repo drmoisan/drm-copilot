@@ -1,0 +1,97 @@
+{
+  "stage": "lint",
+  "label": "p4t7-integration-focused2-lint",
+  "started": "2026-10-19T10:46:55.072928+00:00",
+  "finished": "2026-10-19T10:46:56.240179+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py tests/discovery_runtime/analyzer/test_dependencies.py tests/discovery_runtime/analyzer/test_dependency_projection_limits.py",
+  "exit_code": 1,
+  "duration_seconds": 1.167,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "c8d3b838e8ae4a530690fab283809d404cd780d60eace1e1070a840d05ce6888",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "39b6541f1499a93c77fd825796639efccf78b01874b451355c52be35840fad12",
+      "physical_lines": 466
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "4ca33aef4e88b84a35fe9b369ac6afca3e763dd394da828f5121e5c76f39cd37",
+      "physical_lines": 342
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependencies.py": {
+      "sha256": "c8d3b838e8ae4a530690fab283809d404cd780d60eace1e1070a840d05ce6888",
+      "physical_lines": 467
+    },
+    "tests/discovery_runtime/analyzer/test_dependencies.py": {
+      "sha256": "39b6541f1499a93c77fd825796639efccf78b01874b451355c52be35840fad12",
+      "physical_lines": 466
+    },
+    "tests/discovery_runtime/analyzer/test_dependency_projection_limits.py": {
+      "sha256": "4ca33aef4e88b84a35fe9b369ac6afca3e763dd394da828f5121e5c76f39cd37",
+      "physical_lines": 342
+    }
+  },
+  "borrowed_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "borrowed_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "sha256": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py": {
+      "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+      "physical_lines": 208
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_node.py": {
+      "sha256": "05d8e961e37527147823d6a2932ef52c5cdd06456f4402e001c4a1fd0139d505",
+      "physical_lines": 299
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_python.py": {
+      "sha256": "b63a19e3b83c3359ccb64921d045bf88445edd8be4b6e3918fa6e06e42014ef7",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_dotnet.py": {
+      "sha256": "4b1b0fb7fc6bcfae0cf2bc703ce68e8a6b9ac884154e930f331a534a05fdd51e",
+      "physical_lines": 365
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused2-lint-104656.stdout.bin",
+      "raw_sha256": "c714d1f48c524291af8a2a949d7816a9eb38558bca00d3d2f4627a4d2552d0a0",
+      "raw_bytes": 5853,
+      "presentation": "E501 Line too long (96 > 88)\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependencies.py:452:89\n    |\n450 |         try:\n451 |             state = _Run(capture)\n452 |             # Capture selection/exclusion remains authoritative; payloads cannot select parsers.\n    |                                                                                         ^^^^^^^^\n453 |             for item in capture.inputs:\n454 |                 state.work -= len(item.path) + 1\n    |\n\nE501 Line too long (89 > 88)\n --> tests\\discovery_runtime\\analyzer\\test_dependencies.py:1:89\n  |\n1 | \"\"\"Verify dependency projection, provenance and aggregate budgets with captured bytes.\"\"\"\n  |                                                                                         ^\n2 |\n3 | from __future__ import annotations\n  |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependencies.py:3:1\n   |\n 1 |   \"\"\"Verify dependency projection, provenance and aggregate budgets with captured bytes.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import hashlib\n 6 | | from dataclasses import replace\n 7 | | from typing import TYPE_CHECKING, cast\n 8 | |\n 9 | | import pytest\n10 | |\n11 | | from drm_copilot_discovery.analyzer import dependencies\n12 | | from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer\n13 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n14 | |     DependencyAnchor,\n15 | |     DependencyCandidate,\n16 | |     DependencyInputError,\n17 | |     DependencyLimits,\n18 | |     DependencyResult,\n19 | |     DependencyValue,\n20 | | )\n21 | | from drm_copilot_discovery.analyzer.emitter import inventory_result\n22 | | from drm_copilot_discovery.analyzer.findings import row\n23 | | from drm_copilot_discovery.analyzer.models import (\n24 | |     Analysis,\n25 | |     InventoryCapture,\n26 | |     InventoryInput,\n27 | | )\n28 | | from drm_copilot_discovery.models import JsonObject, canonical_json\n29 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import capture\n30 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog\n31 | | from tests.discovery_runtime.analyzer.test_repository import inventory_profile\n   | |______________________________________________________________________________^\n32 |\n33 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nB009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_dependencies.py:139:52\n    |\n137 |     No I/O, evaluation, mutation or expected exception occurs.\n138 |     \"\"\"\n139 |     selector = cast(\"Callable[[str], str | None]\", getattr(dependencies, \"_format\"))\n    |                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n140 |     assert selector(path) == expected\n    |\nhelp: Replace `getattr` with attribute access\n\nB009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_dependencies.py:178:9\n    |\n176 |     dispatch = cast(\n177 |         \"Callable[[bytes, str, DependencyLimits], DependencyResult]\",\n178 |         getattr(dependencies, \"_parse\"),\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n179 |     )\n180 |     assert dispatch(b\"original\", format, limits) == DependencyResult()\n    |\nhelp: Replace `getattr` with attribute access\n\nE501 Line too long (106 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_dependencies.py:438:89\n    |\n436 |         (\n437 |             \"src/app.csproj\",\n438 |             b'<Project><ItemGroup><PackageReference Include=\"Delta\" Version=\"2\" /></ItemGroup></Project>',\n    |                                                                                         ^^^^^^^^^^^^^^^^^^\n439 |         ),\n440 |     )\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\analyzer\\test_dependency_projection_limits.py:3:1\n   |\n 1 |   \"\"\"Enforce aggregate dependency projection limits without filesystem or process use.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from dataclasses import replace\n 6 | | from typing import TYPE_CHECKING, Protocol, cast\n 7 | |\n 8 | | import pytest\n 9 | | from drm_copilot_discovery.analyzer import dependencies\n10 | | from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer\n11 | | from drm_copilot_discovery.analyzer.dependency_inputs import (\n12 | |     DependencyAnchor,\n13 | |     DependencyInputError,\n14 | |     DependencyLimits,\n15 | |     DependencyResult,\n16 | | )\n17 | | from drm_copilot_discovery.analyzer.models import InventoryCapture, InventoryInput\n18 | | from drm_copilot_discovery.models import canonical_json\n19 | | from tests.discovery_runtime.analyzer.test_dependencies import (\n20 | |     codes,\n21 | |     configured,\n22 | |     item,\n23 | |     stub,\n24 | | )\n25 | | from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog\n   | |____________________________________________________________________________________^\n26 |\n27 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nB009 [*] Do not call `getattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_dependency_projection_limits.py:214:54\n    |\n212 |         DependencyAnalyzer().analyze(cast(\"InventoryCapture\", None))\n213 |     factory = cast(\n214 |         \"Callable[[InventoryCapture], _Projection]\", getattr(dependencies, \"_Run\")\n    |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n215 |     )\n216 |     run = factory(configured(catalog))\n    |\nhelp: Replace `getattr` with attribute access\n\nFound 8 errors.\n[*] 5 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t7-integration-focused2-lint-104656.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "28b03c185f32fdeb9ccfdafd1bb7decce959161d",
+  "scope": "P4-T7 central integration only"
+}
