@@ -1,0 +1,49 @@
+{
+  "command": "poetry run python -m pyright",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T08:07:01.154489+00:00",
+  "harness_hashes": {
+    "SCRATCH/issue-980-architecture.py": "0e5d572f7e47decde387962005edf942d032e76b1ac527aa1444d892e8672fe9",
+    "SCRATCH/issue-980-final-gates.py": "5fb2ece4ac241137fd29b66908ee23117691de020ff4b0cbdb90ab860ad03135",
+    "SCRATCH/issue-980-native.py": "96ddbdad6f15b04ce6eaaf0330eb4d46339654157a7a6b7dc5da3a6f31830784"
+  },
+  "label": "types",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t5-final-types-080701.2026-10-19T08-07.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t5-final-types-080701.2026-10-19T08-07.stdout.txt",
+    "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+  },
+  "seconds": 11.588563,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+    "tests/discovery_runtime/analyzer/test_com_interop.py": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+    "tests/discovery_runtime/analyzer/test_com_interop.py": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+  },
+  "stage": 3,
+  "started_at": "2026-10-19T08:06:49.565926+00:00",
+  "stderr": "",
+  "stdout": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+  "timestamp": "2026-10-19T08-07"
+}

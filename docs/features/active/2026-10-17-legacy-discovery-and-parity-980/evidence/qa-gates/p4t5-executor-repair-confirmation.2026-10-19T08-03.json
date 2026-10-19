@@ -1,0 +1,277 @@
+{
+  "checker_correction": {
+    "behavioral_rerun": false,
+    "change": "Use repaired summary missing_statements/missing_branches == 0; raw totals are checked independently. Earlier summary used total statements/branches fields.",
+    "diagnostic": "SCRATCH/issue-980-p4t5-confirm-repair-initial.stderr.txt",
+    "diagnostic_qualification": "Exact displayed traceback text transcribed from the first tool result; the original command stream was not separately redirected.",
+    "diagnostic_sha256": "91a05971fd98abe11da6ca96f3b8de9cca1d3d255c80c36549975dec417e0a8a",
+    "error": "KeyError: 'statements'",
+    "initial_exit_code": 1,
+    "initial_harness": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-repair-checker-initial.2026-10-19T08-03.txt",
+      "sha256": "818b28fcf34d72313b0b964095d827cf3431656ecd139293b351b169a6445f86"
+    },
+    "source_test_change": false
+  },
+  "command": "poetry run python SCRATCH/issue-980-p4t5-confirm-repair.py",
+  "confirmed_checks": [
+    {
+      "id": "R1",
+      "proof": "All five retained syntax-negative probes and both positive controls pass. Single-pass delimiter indexes and right-to-left attribute propagation avoid repeated suffix scans; exact declaration/body tests and counted access traversal are retained in owner proof.",
+      "status": "PASS"
+    },
+    {
+      "id": "R2",
+      "proof": "Retained True/False/fractional capacities fail with source-record-limit. The real 64 MiB-plus-one probe returns source-limit before masking; no mask call or timing threshold. Exact token/candidate type/range checks precede allocation.",
+      "status": "PASS"
+    },
+    {
+      "id": "R3",
+      "proof": "The three metadata assertions now have immediate intent comments; all original assertions and cases are retained.",
+      "status": "PASS"
+    },
+    {
+      "id": "approved-COM-split",
+      "proof": "com_syntax.py contains pure lexical work; com_interop explicitly re-exports the identical callable with unchanged keyword defaults. XML, provenance and projection definitions remain in com_interop and preserve their ASTs in owner evidence.",
+      "status": "PASS"
+    }
+  ],
+  "coverage": {
+    "COM": {
+      "added": 26,
+      "branches": [
+        88,
+        88
+      ],
+      "cases": 137,
+      "lines": [
+        206,
+        206
+      ],
+      "ranges": 12,
+      "retained": 111
+    },
+    "access": {
+      "added": 24,
+      "branches": [
+        94,
+        94
+      ],
+      "cases": 180,
+      "lines": [
+        226,
+        226
+      ],
+      "ranges": 15,
+      "retained": 156
+    }
+  },
+  "exit_code": 0,
+  "findings": [],
+  "finished_at": "2026-10-19T08:03:24.021120+00:00",
+  "focused_receipts_reused": [
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-format-075202.2026-10-19T07-52.json",
+        "sha256": "47703350d304bcd626765b7d3c3695736aa7ce2abc8ba9fa33cc66b0b7e81fea"
+      },
+      "stage": "format",
+      "subset": "access"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-lint-075202.2026-10-19T07-52.json",
+        "sha256": "ffe31a9e1361de296255e5da43dc0dc1bc96c18b24ed5a0874f9820918837df2"
+      },
+      "stage": "lint",
+      "subset": "access"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-review-repair-types-075203.2026-10-19T07-52.json",
+        "sha256": "cafd4625502021070a384eb85fda51638f17461cbb44763ad84e2849934f2098"
+      },
+      "stage": "types",
+      "subset": "access"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-review-repair-tests-075350.2026-10-19T07-53.json",
+        "sha256": "be9345bd75c56295839de7090498d10b2c049fd1dca6e4abb8884e0913b32608"
+      },
+      "stage": "tests",
+      "subset": "access"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair2-format.2026-10-19T07-55.json",
+        "sha256": "73088d4daef17e7e607f21f1358284476e841e1d2004262b38b65023350446f7"
+      },
+      "stage": "format",
+      "subset": "COM"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair2-lint.2026-10-19T07-55.json",
+        "sha256": "4a98084d1af5ed95777e6b300c8170ba1a62107312a708e8a77c4d3287ee0d08"
+      },
+      "stage": "lint",
+      "subset": "COM"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair2-types.2026-10-19T07-55.json",
+        "sha256": "19bd66e8b24b5c3b7e37840d0f3fbe9f5be6f7e4835d6d72f8159ef82b3e957b"
+      },
+      "stage": "types",
+      "subset": "COM"
+    },
+    {
+      "exit_code": 0,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair2-unit.2026-10-19T07-56.json",
+        "sha256": "5270c630e3d5dd5a835dcf782932b3d14aef30c55d82b714c11216207eaefafe"
+      },
+      "stage": "unit",
+      "subset": "COM"
+    }
+  ],
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-repair-confirmation-harness.2026-10-19T08-03.txt",
+    "sha256": "58fd354a032dee495b0d0979dd254e2eb344d215416610cd9d57217e9a5d5144"
+  },
+  "limitations": [
+    "Lexical candidates remain inferred; aliases, receiver binding, runtime paths and actual platform execution remain unresolved.",
+    "COM receipt output is path-sanitized combined text, not separate unsanitized stdout/stderr.",
+    "Final ordered gates and final task acceptance are still pending; no P4-T5 or AC checkoff occurred."
+  ],
+  "mutations": "Only executor evidence and inert harness snapshots. No production/test, plan/AC, checkpoint or Git writes.",
+  "native_authority": "Actual gpt-6-astra/max; routing_valid, launch_authority_valid and provenance_valid all true, verified at confirmation entry.",
+  "plan_status": {
+    "ac_completed": 13,
+    "ac_total": 66,
+    "completed": 36,
+    "total": 84
+  },
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "publication_time_utc": "2026-10-19T08:03:24.021120+00:00",
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-repair-freeze.2026-10-19T07-56.json",
+      "sha256": "ac19d12cb7096d9c30e86470cff02032a9d1ac87055db3c39292f875bc76b3c4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair-freeze.2026-10-19T07-58.json",
+      "sha256": "d3914889c412fd3c0e81d9aaedb4284328dcda050a47a943b9800f3fa1eebfc4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-repair-probes.2026-10-19T07-59.json",
+      "sha256": "cc6986519a4eb11a7350967379f2a72e90a06c6ee77ddd77efc4a02cf7d111a5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-candidate-review.2026-10-19T07-42.json",
+      "sha256": "95773ccf65e1e9f7891338871b4699e13ac51515979bc57943389d4e3fd71726"
+    }
+  ],
+  "reuse": "The complete original candidate review remains authoritative outside R1-R3 and the approved split. All 267 original cases remain, plus 50 focused additions. No suite, final gate or predecessor review was repeated.",
+  "routing_receipt": "atomic_execution_p4t5_repair_confirmation",
+  "started_at": "2026-10-19T08:03:23.624971+00:00",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T08-03",
+  "timestamp_qualification": {
+    "actual_original_review_publication_utc": "2026-10-19T07:45:10Z",
+    "meaning": "07:42 was binding execution; the original candidate review files were published at 07:45:10 UTC.",
+    "original_review_filename_time": "2026-10-19T07-42",
+    "original_review_files_mutated": false
+  },
+  "working_and_index_bindings": [
+    {
+      "index_sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "lines": 284,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011"
+    },
+    {
+      "index_sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+      "lines": 267,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34"
+    },
+    {
+      "index_sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "lines": 134,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5"
+    },
+    {
+      "index_sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "lines": 56,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c"
+    },
+    {
+      "index_sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+      "lines": 471,
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989"
+    },
+    {
+      "index_sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35",
+      "lines": 470,
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35"
+    },
+    {
+      "index_sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "lines": 356,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e"
+    },
+    {
+      "index_sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "lines": 229,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4"
+    },
+    {
+      "index_sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "lines": 367,
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c"
+    },
+    {
+      "index_sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "lines": 429,
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "qualification": "Working bytes are the reviewed repair; the coordinator owns staging and commit.",
+      "working_equals_index": true,
+      "working_sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6"
+    }
+  ]
+}

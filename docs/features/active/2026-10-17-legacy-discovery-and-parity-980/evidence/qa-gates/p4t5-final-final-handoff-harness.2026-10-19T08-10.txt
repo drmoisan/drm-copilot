@@ -1,0 +1,118 @@
+"""Bind completed P4-T5 final receipts without repeating validation or acceptance."""
+import ast
+import base64
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+root=Path.cwd()
+scratch=Path(__file__).parent
+feature=root/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+qa=feature/'evidence/qa-gates'
+stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+ordered_path=root/sys.argv[1]
+ordered=json.loads(ordered_path.read_bytes())
+candidate_path=scratch/ordered['candidate_manifest'].removeprefix('SCRATCH/')
+candidate=json.loads(candidate_path.read_bytes())
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+def ref(path):
+    return {'path':path.relative_to(root).as_posix(),'sha256':sha(path.read_bytes())}
+
+def write(path,value):
+    path.write_text(json.dumps(value,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+
+assert sha(candidate_path.read_bytes())==ordered['candidate_manifest_sha256']
+assert [(entry['stage'],entry['label']) for entry in ordered['receipts']]==[(1,'format'),(2,'lint'),(3,'types'),(4,'architecture'),(5,'tests-access-reverse'),(5,'tests-com-reverse'),(6,'contracts'),(7,'native')]
+assert len(ordered['test_nodes'])==ordered['test_node_count']==317
+assert len(set(ordered['test_nodes']))==317
+receipts=[]
+for entry in ordered['receipts']:
+    path=root/entry['path']
+    assert sha(path.read_bytes())==entry['sha256']
+    receipt=json.loads(path.read_bytes())
+    assert receipt['exit_code']==0 and receipt['source_before']==receipt['source_after']==ordered['source_hashes']
+    assert receipt['harness_hashes']==ordered['harness_hashes']
+    for stream in ('raw_stdout','raw_stderr'):
+        raw=receipt[stream]
+        assert sha((scratch/raw['path'].removeprefix('SCRATCH/')).read_bytes())==raw['sha256']
+    receipts.append({**entry,'seconds':receipt['seconds'],'markdown':ref(path.with_suffix('.md'))})
+contracts=json.loads((root/ordered['receipts'][-2]['path']).read_bytes())
+contract_count=int(re.findall(r'(\d+) passed',contracts['stdout'])[-1])
+native=json.loads((root/ordered['native_path']).read_bytes())
+assert len(native['checks'])==11 and native['source_tree_unchanged'] and native['git_status_unchanged']
+assert sha((scratch/ordered['raw_native']['path'].removeprefix('SCRATCH/')).read_bytes())==ordered['raw_native']['sha256']
+head=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,check=True).stdout.decode().strip()
+files=[]
+unit_ranges=[]
+module_coverage={}
+coverage_refs=[]
+for batch in ordered['coverage_batches']:
+    path=root/batch['coverage_path']
+    assert sha(path.read_bytes())==batch['coverage_sha256']
+    assert sha((scratch/batch['raw_coverage']['path'].removeprefix('SCRATCH/')).read_bytes())==batch['raw_coverage']['sha256']
+    coverage=json.loads(path.read_bytes())
+    assert coverage['totals']['missing_lines']==coverage['totals']['missing_branches']==0
+    coverage_refs.append({'batch':batch['batch'],**ref(path),'totals':coverage['totals'],'raw':batch['raw_coverage'],'test_count':len(batch['test_nodes']),'test_module_order':batch['test_module_order']})
+    for relative,values in coverage['files'].items():
+        assert relative not in module_coverage
+        module_coverage[relative]=values['summary']
+        tree=ast.parse((root/relative).read_text(encoding='utf-8'))
+        def collect(nodes,prefix=''):
+            for node in nodes:
+                if isinstance(node,(ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef)):
+                    statements=[line for line in values['executed_lines'] if node.lineno<=line<=node.end_lineno]
+                    arcs=[arc for arc in values['executed_branches'] if node.lineno<=arc[0]<=node.end_lineno]
+                    unit_ranges.append({'path':relative,'name':prefix+node.name,'kind':type(node).__name__,'start':node.lineno,'end':node.end_lineno,'covered_statements':len(statements),'missing_statements':0,'covered_branches':len(arcs),'missing_branches':0})
+                    collect(node.body,prefix+node.name+'.')
+        collect(tree.body)
+assert len(module_coverage)==6
+for entry in candidate['files']:
+    relative=entry['path']
+    content=(root/relative).read_bytes()
+    assert sha(content)==entry['sha256']==ordered['source_hashes'][relative]
+    index=subprocess.run(['git','show',':'+relative],capture_output=True,check=True).stdout
+    commit=subprocess.run(['git','show','HEAD:'+relative],capture_output=True,check=True).stdout
+    assert content==index==commit
+    blob=subprocess.run(['git','hash-object','--no-filters','--stdin'],input=content,capture_output=True,check=True).stdout.decode().strip()
+    filtered=subprocess.run(['git','hash-object','--path='+relative,'--stdin'],input=content,capture_output=True,check=True).stdout.decode().strip()
+    attributes=subprocess.run(['git','check-attr','text','eol','--',relative],capture_output=True,check=True).stdout.decode().strip()
+    assert blob==filtered
+    files.append({'path':relative,'sha256':sha(content),'lines':len(content.splitlines()),'working_git_blob':blob,'filtered_git_blob':filtered,'index_sha256':sha(index),'commit_sha256':sha(commit),'commit':head,'git_attributes':attributes,'stream_relation':'Exact working/index/commit byte identity at final handoff.'})
+baseline=feature/'evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json'
+preserved=json.loads(baseline.read_bytes())['preserved_files']
+for entry in preserved:
+    assert sha((root/entry['path']).read_bytes())==entry['sha256']
+harnesses=[]
+snapshot_inputs=dict(ordered['harness_hashes'])
+snapshot_inputs['SCRATCH/'+Path(__file__).name]=sha(Path(__file__).read_bytes())
+for relative,digest in snapshot_inputs.items():
+    source=scratch/relative.removeprefix('SCRATCH/')
+    content=source.read_bytes()
+    assert sha(content)==digest
+    companion=qa/('p4t5-final-'+source.stem.removeprefix('issue-980-')+'-harness.'+stamp+'.txt')
+    companion.write_bytes(content.replace(b'\r\n',b'\n'))
+    harnesses.append({'executed_path':relative,'executed_sha256':digest,'role':'final-gate-harness' if relative in ordered['harness_hashes'] else 'handoff-binding-only','encoding':'base64','executed_content_base64':base64.b64encode(content).decode('ascii'),'readable_lf_companion':ref(companion),'normalization':'The readable companion changes only CRLF to LF; base64 retains every exact executed byte.'})
+harness_path=qa/('p4t5-final-executed-harnesses.'+stamp+'.json')
+write(harness_path,{'task':'P4-T5','timestamp':stamp,'snapshots':harnesses})
+candidate_copy=qa/('p4t5-final-candidate-binding.'+stamp+'.json')
+candidate_copy.write_bytes(candidate_path.read_bytes())
+range_path=qa/('p4t5-final-coverage-ranges.'+stamp+'.json')
+write(range_path,{'task':'P4-T5','timestamp':stamp,'module_summaries':module_coverage,'unit_ranges':unit_ranges,'coverage_batches':coverage_refs,'baseline_disposition':'All six task production modules are new at accepted baseline 957908053; COM source extraction relocation and the repaired access/COM deltas retain their independent review bindings. All current measured statements/branches are covered; unchanged predecessor proof remains bound.'})
+confirmation=qa/'p4t5-executor-repair-confirmation.2026-10-19T08-03.json'
+review=qa/'p4t5-executor-candidate-review.2026-10-19T07-42.json'
+for entry in candidate['subset_manifests']:
+    assert sha((root/entry['path']).read_bytes())==entry['sha256']
+handoff=qa/('p4t5-final-handoff.'+stamp+'.json')
+document={'task':'P4-T5','timestamp':stamp,'state':'EXECUTOR_ACCEPTANCE_PENDING','checked_repair_commit':head,'ordered_stages':ref(ordered_path),'ordered_receipts':receipts,'candidate':ref(candidate_copy),'source_files':files,'repair_manifests':candidate['subset_manifests'],'retained_review':ref(review),'bounded_confirmation':ref(confirmation),'executed_harnesses':ref(harness_path),'coverage_ranges':ref(range_path),'test_cases':{'access':180,'com':137,'total':317,'contracts':contract_count,'native_assertions':11},'native_result':ref(root/ordered['native_path']),'shared_baseline':ref(baseline),'preserved_predecessors':len(preserved),'toolchain_deltas':{'new_lint_findings':0,'new_type_diagnostics':0,'new_test_failures':0,'uncovered_current_statements':0,'uncovered_current_branch_destinations':0},'downstream_interfaces':{'FilesystemAccessAnalyzer.analyze':'Accepts immutable InventoryCapture and returns Analysis; identifier filesystem-access.','RegistryAccessAnalyzer.analyze':'Same immutable input/result contract; identifier registry-access.','ComInteropAnalyzer.analyze':'Same immutable input/result contract; identifier com-interop.','access_sites':'Pure fixed-name lexical matching; exact integer token/site capacities and decoded-character limit are enforced before masking; returns immutable AccessSite tuple.','com_source_candidates':'Retains its public com_interop import identity through explicit re-export from com_syntax; pure bounded lexical candidates.','com_project_candidates':'Pure secure XML declaration extraction from captured bytes; no project evaluation.'},'limitations':['Registry registration/CLI exposure remains P4-T9; this task exercises direct adapter composition.','Source candidates remain inferred and compiler binding, aliases, dataflow, platform applicability and execution remain unresolved.','Fixed generic API allowlists omit unrecognized and instance-variable receivers; runtime paths, key names and argument values are not collected.','The native proof ran Windows Python/Git only; native coding-agent hosts and Linux/macOS execution are not claimed.','Legacy optional adapters and CLI dispatch were unchanged; retained predecessor proofs were reused without broad replay.','No actual filesystem API, registry operation, COM activation or consuming-repository analysis was performed.','Task and AC acceptance remain executor-owned.']}
+write(handoff,document)
+summary_rows='\n'.join('| '+Path(path).name+' | '+str(values['covered_lines'])+'/'+str(values['num_statements'])+' | '+str(values['covered_branches'])+'/'+str(values['num_branches'])+' |' for path,values in module_coverage.items())
+markdown=f'# P4-T5 final task handoff\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-final-handoff.py <ordered-stages>`\nEXIT_CODE: 0\nOutput Summary: EXECUTOR_ACCEPTANCE_PENDING. All seven ordered stages passed on ten frozen source/test files at checked repair commit `{head}`.\n\nThe final run passed scoped Black and Ruff, whole-repository Pyright, ten-path architecture/size/purity/isolation, reversed access **180** and COM **137** case batches, **{contract_count}** applicable contract cases, and **11** Windows/Git capture/composition assertions. No source/test byte changed during the loop. All ten working/index/commit streams match exactly.\n\n| Module | Statements | Branch destinations |\n|---|---:|---:|\n{summary_rows}\n\nAll {len(unit_ranges)} measured class/callable ranges are fully covered. The JSON binds every stage/raw stream, exact case order, both coverage populations, current source/Git hashes, immutable repair manifests, the complete review and bounded confirmation. Exact executed harness bytes are durably preserved as base64 with readable LF-only companions. The original shared baseline still binds all {len(preserved)} predecessor streams. No predecessor suite was repeated.\n\nPublic registry and CLI exposure remain P4-T9. Direct adapters retain immutable captured-byte provenance, deterministic source anchors/IDs, fixed redacted diagnostics and prospective work/output bounds. Source syntax is inferred; runtime binding, paths, keys, arguments and execution remain unresolved. The native proof covers Windows Python/Git, not native coding-agent hosts or non-Windows execution. Optional legacy adapters and dispatch remain unchanged. No real registry/COM operation or consuming-repository inspection occurred.\n\nThe executor owns task/AC acceptance; this handoff does not mark the feature complete.\n'
+handoff.with_suffix('.md').write_text(markdown,encoding='utf-8',newline='\n')
+print(json.dumps({'handoff':ref(handoff),'markdown':ref(handoff.with_suffix('.md')),'case_counts':document['test_cases'],'unit_ranges':len(unit_ranges),'source_files':len(files),'modules':len(module_coverage)}),flush=True)

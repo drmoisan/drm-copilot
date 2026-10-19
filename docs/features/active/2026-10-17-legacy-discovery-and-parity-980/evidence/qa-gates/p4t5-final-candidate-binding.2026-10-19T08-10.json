@@ -1,0 +1,143 @@
+{
+  "expected_test_counts": {
+    "access": 180,
+    "com": 137
+  },
+  "files": [
+    {
+      "filtered_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 284,
+      "original_sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "working_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc"
+    },
+    {
+      "filtered_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 267,
+      "original_sha256": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "7dd984ba1687924a7d40b54863c429cdf8ab11b20c4a9a74121060348a706f34",
+      "working_git_blob": "0e13a47629abc928cc6d689a513ef6d5769eff02"
+    },
+    {
+      "filtered_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 134,
+      "original_sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "working_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7"
+    },
+    {
+      "filtered_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 56,
+      "original_sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "working_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff"
+    },
+    {
+      "filtered_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_filesystem_access.py: text: auto\ntests/discovery_runtime/analyzer/test_filesystem_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 471,
+      "original_sha256": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "59e496fb743b7239c99618cc2e2ee1a3a131beeec30c3a1b93e29e74a5745989",
+      "working_git_blob": "57c6dcd2a01fce7a015f4f031bd0984b4128bad3"
+    },
+    {
+      "filtered_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry_access.py: text: auto\ntests/discovery_runtime/analyzer/test_registry_access.py: eol: lf",
+      "index_qualification": "Current index remains the reviewed WIP until parent stages the repair.",
+      "lines": 470,
+      "original_sha256": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db",
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "c00387ec8a12c39f31d64bb1bfa7eb643f02567f925d082d2bf1639ca5dfcb35",
+      "working_git_blob": "01407354b51ed1d1445dbdea9c8a364dd810225b"
+    },
+    {
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py: eol: lf"
+      ],
+      "lf_normalized_sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py",
+      "physical_lines": 356,
+      "sha256": "32c88b6aabc13a9552799a062b4e023e4a534b2219c68a48fcce35ec5cad140e"
+    },
+    {
+      "crlf_count": 0,
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py: eol: lf"
+      ],
+      "lf_normalized_sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_syntax.py",
+      "physical_lines": 229,
+      "sha256": "845a468e8e1a1078cc2b76a0b61a2e2a14088fb71234d8e30220586d426192a4"
+    },
+    {
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_interop.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_interop.py: eol: lf"
+      ],
+      "lf_normalized_sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c",
+      "path": "tests/discovery_runtime/analyzer/test_com_interop.py",
+      "physical_lines": 367,
+      "sha256": "1104b9744e88a58060f7332d4cfd34c8ced40ae6d7e9143a85bbfade8aa1054c"
+    },
+    {
+      "crlf_count": 0,
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_com_candidates.py: eol: lf"
+      ],
+      "lf_normalized_sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6",
+      "path": "tests/discovery_runtime/analyzer/test_com_candidates.py",
+      "physical_lines": 429,
+      "sha256": "2e667e3e2871fab26593c67db01b36fdd01fddea8b2067ea8c6d408f23f084d6"
+    }
+  ],
+  "final_test_contract": "One stage5 with separate isolated reversed access then COM batches; actual analyzer domain-neutrality caller in stage6; no predecessor suite replay.",
+  "harnesses": [
+    {
+      "path": "SCRATCH/issue-980-final-gates.py",
+      "sha256": "5fb2ece4ac241137fd29b66908ee23117691de020ff4b0cbdb90ab860ad03135",
+      "syntax": "parsed without execution"
+    },
+    {
+      "path": "SCRATCH/issue-980-architecture.py",
+      "sha256": "0e5d572f7e47decde387962005edf942d032e76b1ac527aa1444d892e8672fe9",
+      "syntax": "parsed without execution"
+    },
+    {
+      "path": "SCRATCH/issue-980-native.py",
+      "sha256": "96ddbdad6f15b04ce6eaaf0330eb4d46339654157a7a6b7dc5da3a6f31830784",
+      "syntax": "parsed without execution"
+    }
+  ],
+  "native_fixture_contract": "two src inputs plus tracked attributes preserving exact CRLF Git blobs; accepted profile example; direct adapters, no registry exposure; 11 explicit assertions",
+  "state": "PREPARED_NOT_EXECUTED",
+  "subset_manifests": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-repair-freeze.2026-10-19T07-56.json",
+      "sha256": "ac19d12cb7096d9c30e86470cff02032a9d1ac87055db3c39292f875bc76b3c4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-com-repair-freeze.2026-10-19T07-58.json",
+      "sha256": "d3914889c412fd3c0e81d9aaedb4284328dcda050a47a943b9800f3fa1eebfc4"
+    }
+  ],
+  "task": "P4-T5"
+}

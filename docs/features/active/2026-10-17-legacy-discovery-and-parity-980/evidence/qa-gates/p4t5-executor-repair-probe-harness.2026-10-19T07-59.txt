@@ -1,0 +1,144 @@
+"""Replay the retained R1/R2 probes and check the approved COM public re-export."""
+from dataclasses import asdict
+from datetime import datetime, timezone
+from hashlib import sha256
+import inspect
+import json
+from pathlib import Path
+import sys
+from unittest.mock import patch
+
+from drm_copilot_discovery.analyzer import api_syntax, com_interop, com_syntax
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.filesystem_access import FILESYSTEM_SURFACE
+from drm_copilot_discovery.analyzer.registry_access import REGISTRY_SURFACE
+
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+ORIGINAL = QA / "p4t5-executor-candidate-probes.2026-10-19T07-34.json"
+
+
+def digest(data):
+    return sha256(data).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": digest(path.read_bytes())}
+
+
+started = datetime.now(timezone.utc)
+assert digest(ORIGINAL.read_bytes()) == "6504b78d3b627259799ccefbbbcd798a8f8eae8ce41c1be7ced36289f2a7cb71"
+original = json.loads(ORIGINAL.read_bytes())
+references = []
+expected = {}
+# Read only the exact supplied frozen manifests, with expected digests from release.
+for path_text, expected_sha in zip(sys.argv[1::2], sys.argv[2::2], strict=True):
+    path = Path(path_text)
+    assert digest(path.read_bytes()) == expected_sha, path_text
+    manifest = json.loads(path.read_bytes())
+    references.append(reference(path))
+    for item in manifest.get("files", manifest.get("source_files", [])):
+        expected[item["path"]] = item["sha256"]
+assert len(expected) == 10
+assert all(digest(Path(path).read_bytes()) == value for path, value in expected.items())
+results = []
+
+
+class MaskReached(Exception):
+    """Signal forbidden mask allocation for an already over-limit input."""
+
+
+mask_calls = []
+
+
+def forbidden_mask(text):
+    mask_calls.append(len(text))
+    raise MaskReached("Masking entered before source-size rejection")
+
+
+# Reuse the original exact source inputs and expected counts, not reconstructed cases.
+for old in original["cases"]:
+    name = old["case"]
+    if "input" in old:
+        source = old["input"]
+        assert digest(source.encode()) == old["input_sha256"]
+        if name == "explicit-file-member-declaration":
+            observed = api_syntax.access_sites(source, FILESYSTEM_SURFACE)
+        elif name == "explicit-registry-member-declaration":
+            observed = api_syntax.access_sites(source, REGISTRY_SURFACE)
+        else:
+            observed = com_interop.com_source_candidates("src/probe.cs", source)
+        results.append({"case": name, "input_sha256": old["input_sha256"],
+                        "expected_count": old["expected_count"], "actual_count": len(observed),
+                        "observed": [asdict(value) for value in observed],
+                        "expectation_met": len(observed) == old["expected_count"]})
+    elif "max_sites" in old:
+        try:
+            api_syntax.access_sites("", FILESYSTEM_SURFACE, max_sites=old["max_sites"])
+        except SourceScanError as error:
+            result = {"rejected": True, "code": error.code}
+        else:
+            result = {"rejected": False, "code": None}
+        results.append({"case": name, "max_sites": old["max_sites"], **result,
+                        "expectation_met": result["rejected"] and result["code"] == "source-record-limit"})
+    else:
+        assert name == "public-source-limit-precedes-masking"
+        source = "x" * old["input_characters"]
+        with patch.object(api_syntax, "strip_comments_and_strings", forbidden_mask):
+            try:
+                api_syntax.access_sites(source, FILESYSTEM_SURFACE)
+            except SourceScanError as error:
+                code, error_type = error.code, type(error).__name__
+            except MaskReached as error:
+                code, error_type = None, type(error).__name__
+            else:
+                code, error_type = None, None
+        results.append({"case": name, "input_characters": len(source),
+                        "mask_calls": mask_calls, "code": code, "error_type": error_type,
+                        "expectation_met": not mask_calls and code == "source-limit",
+                        "allocation_scope": old["allocation_scope"]})
+        del source
+
+signature = inspect.signature(com_interop.com_source_candidates)
+parameters = list(signature.parameters.values())
+public_contract = {
+    "case": "approved-com-reexport-public-contract",
+    "same_callable": com_interop.com_source_candidates is com_syntax.com_source_candidates,
+    "signature": str(signature),
+    "expectation_met": (
+        com_interop.com_source_candidates is com_syntax.com_source_candidates
+        and [p.name for p in parameters] == ["path", "text", "max_tokens", "max_candidates"]
+        and all(p.kind == inspect.Parameter.KEYWORD_ONLY and p.default == 100000 for p in parameters[2:])
+    ),
+}
+results.append(public_contract)
+assert all(digest(Path(path).read_bytes()) == value for path, value in expected.items())
+finished = datetime.now(timezone.utc)
+failures = sum(not result["expectation_met"] for result in results)
+# Name each artifact from the clock immediately before its immutable write.
+harness_time = datetime.now(timezone.utc)
+harness = QA / ("p4t5-executor-repair-probe-harness." + harness_time.strftime("%Y-%m-%dT%H-%M") + ".txt")
+assert not harness.exists()
+harness.write_bytes(Path(__file__).read_bytes())
+write_time = datetime.now(timezone.utc)
+stamp = write_time.strftime("%Y-%m-%dT%H-%M")
+output = QA / ("p4t5-executor-repair-probes." + stamp + ".json")
+assert not output.exists()
+document = {
+    "task": "P4-T5", "timestamp": stamp, "publication_time_utc": write_time.isoformat(),
+    "started_at": started.isoformat(), "finished_at": finished.isoformat(),
+    "command": "poetry run python SCRATCH/issue-980-p4t5-repair-probes.py <access-manifest> <sha256> <com-manifest> <sha256>",
+    "exit_code": int(bool(failures)), "original_probes": reference(ORIGINAL), "manifests": references,
+    "source_before_and_after": expected, "cases": results, "case_count": len(results),
+    "failed_expectations": failures, "harness": reference(harness),
+    "scope": "Eleven retained memory-only probes plus the approved COM split/re-export contract; no unit suite or predecessor test rerun.",
+    "timestamp_qualification": {
+        "original_review_filename_time": "2026-10-19T07-42",
+        "meaning": "07:42 was binding execution; the original candidate review files were published at 07:45:10 UTC.",
+        "actual_original_review_publication_utc": "2026-10-19T07:45:10Z",
+        "original_review_files_mutated": False,
+    },
+}
+output.write_bytes((json.dumps(document, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+print(json.dumps({"result": reference(output), "harness": reference(harness), "cases": len(results), "failed": failures}))
+sys.exit(int(bool(failures)))

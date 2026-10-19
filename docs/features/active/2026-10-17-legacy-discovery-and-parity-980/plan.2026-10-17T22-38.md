@@ -273,7 +273,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Parse JSON, secure XML, INI/settings declarations and key paths; cover conditions, duplicates/malformed input, secret-looking key values, deterministic ordering, and unsupported-format diagnostics. TOML value evaluation is not claimed without an approved compatible parser.
   - Acceptance: Findings expose key/declaration locations and provenance but no credential/secret values, executable configuration evaluation, or product-specific settings catalog.
 
-- [ ] [P4-T5] Detect generic filesystem, registry, and COM constructs.
+- [x] [P4-T5] Detect generic filesystem, registry, and COM constructs.
   - Files and behavior: Create R/analyzer/{filesystem_access,registry_access,com_interop}.py and PT/analyzer/test_{filesystem_access,registry_access,com_interop}.py; extract reusable COM logic from the existing optional platform adapter without importing it from core.
   - Tests and proof: Test recognized file/directory/stream APIs, generic registry APIs/platform applicability, COM attributes/references/activation/marshal declarations, masked false positives, and unresolved runtime paths.
   - Acceptance: Static candidates are labeled inferred where appropriate and source-referenced; generic interop analysis is usable without loading any optional platform module.

@@ -1,0 +1,46 @@
+"""Verify exact P4-T5 purity, bounded file sizes and in-memory test ownership."""
+import ast
+import hashlib
+import io
+import tokenize
+import json
+from pathlib import Path
+import sys
+
+manifest=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+checked=[]
+for entry in manifest['files']:
+    path=Path(entry['path']); content=path.read_bytes()
+    assert hashlib.sha256(content).hexdigest()==entry['sha256'],path
+    if path.suffix!='.py':
+        checked.append({'path':path.as_posix(),'boundary':'read-only synthetic text fixture'})
+        continue
+    assert len(content.splitlines())<=500,path
+    tree=ast.parse(content)
+    imports=[]
+    for node in ast.walk(tree):
+        if isinstance(node,ast.ImportFrom) and node.module: imports.append(node.module)
+        elif isinstance(node,ast.Import): imports.extend(value.name for value in node.names)
+        if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)):
+            assert ast.get_docstring(node),(path,node.name)
+    if path.as_posix().startswith('packages/'):
+        assert not any(value.startswith(('scripts','subprocess','socket','requests','http','urllib','os','io')) for value in imports),(path,imports)
+        assert not any('office' in value or 'vsto' in value for value in imports),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call):
+                called=ast.unparse(node.func)
+                assert called not in {'open','eval','exec','compile','import_module'},(path,called)
+                assert not called.endswith(('.read_bytes','.read_text','.write_bytes','.write_text','.unlink','.mkdir','.glob','.rglob')),(path,called)
+        # Fixed C# and XML parsing consume retained bytes; analysis never opens a path.
+        checked.append({'path':path.as_posix(),'boundary':'pure captured-byte parsing and redacted API/COM syntax projection; fixed stdlib and accepted XML parser'})
+    else:
+        text=content.decode('utf-8')
+        # Ignore documentation/comments, retaining executable identifiers and literals.
+        docstrings={(node.body[0].lineno,node.body[0].col_offset) for node in ast.walk(tree) if isinstance(node,(ast.Module,ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef)) and ast.get_docstring(node)}
+        code_text=' '.join(token.string for token in tokenize.generate_tokens(io.StringIO(text).readline) if token.type!=tokenize.COMMENT and token.start not in docstrings)
+        assert not any(word in code_text for word in ('tmp_path','tmpdir','TemporaryDirectory','NamedTemporaryFile','tempfile','subprocess','requests','socket')),path
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call):
+                assert not ast.unparse(node.func).endswith(('.write_bytes','.write_text','.mkdir','.unlink')),(path,ast.unparse(node.func))
+        checked.append({'path':path.as_posix(),'boundary':'in-memory unit cases and read-only immutable text resources'})
+print(json.dumps({'checks':checked,'passed':len(checked)},indent=2))

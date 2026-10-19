@@ -1,0 +1,204 @@
+"""Reconcile final P4-T5 receipts and immutable bytes without executing tests."""
+import base64
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import re
+import subprocess
+
+ROOT = Path.cwd().resolve()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+Q = FEATURE / "evidence/qa-gates"
+WORKER = (Path.home() / "AppData/Local/Temp/issue-980-p4t5").resolve()
+START = datetime.now(timezone.utc)
+HANDOFF = Q / "p4t5-final-handoff.2026-10-19T08-10.json"
+PLAN = FEATURE / "plan.2026-10-17T22-38.md"
+
+
+def digest(data):
+    return sha256(data).hexdigest()
+
+
+def ref(path):
+    return {"path": Path(path).as_posix(), "sha256": digest(Path(path).read_bytes())}
+
+
+def load(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def raw_path(portable_path):
+    assert portable_path.startswith("SCRATCH/")
+    path = (WORKER / portable_path.removeprefix("SCRATCH/")).resolve()
+    assert path.is_relative_to(WORKER)
+    return path
+
+
+def portable(text):
+    for path, name in ((ROOT, "WORKSPACE"), (WORKER, "SCRATCH")):
+        text = re.sub(re.escape(str(path)), lambda _: name, text, flags=re.IGNORECASE)
+        text = re.sub(re.escape(path.as_posix()), lambda _: name, text, flags=re.IGNORECASE)
+    return text
+
+
+def verify_refs(value):
+    if isinstance(value, dict):
+        if "path" in value and "sha256" in value and value["path"].startswith("docs/"):
+            assert ref(value["path"])["sha256"] == value["sha256"], value["path"]
+        for item in value.values():
+            verify_refs(item)
+    elif isinstance(value, list):
+        for item in value:
+            verify_refs(item)
+
+
+assert ref(HANDOFF)["sha256"] == "e7f3050a2efb160041f7b5b90659a73150ffe3e812649b132fe97bb2a0fd39d4"
+assert ref(HANDOFF.with_suffix(".md"))["sha256"] == "2c2b6b5e813fc946d9db4bd906c874703e2f0055934be0e250fe322f9348ccae"
+handoff = load(HANDOFF)
+verify_refs(handoff)
+ordered = load(handoff["ordered_stages"]["path"])
+candidate = load(handoff["candidate"]["path"])
+assert ordered["candidate_manifest_sha256"] == handoff["candidate"]["sha256"]
+assert digest(raw_path(ordered["candidate_manifest"]).read_bytes()) == ordered["candidate_manifest_sha256"]
+expected = {item["path"]: item["sha256"] for item in handoff["source_files"]}
+assert len(expected) == 10 and expected == ordered["source_hashes"]
+assert expected == {item["path"]: item["sha256"] for item in candidate["files"]}
+commit = handoff["checked_repair_commit"]
+assert commit == "5de4c099aa565874c2427a6a71a2a81488cf4ef0"
+source_rows = []
+for item in handoff["source_files"]:
+    path = item["path"]
+    working = Path(path).read_bytes()
+    index = subprocess.check_output(["git", "show", ":" + path])
+    committed = subprocess.check_output(["git", "show", commit + ":" + path])
+    assert working == index == committed
+    assert digest(working) == item["sha256"] == item["index_sha256"] == item["commit_sha256"]
+    assert b"\r" not in working and len(working.splitlines()) <= 500
+    source_rows.append({"path": path, "sha256": digest(working), "streams": "working=index=checked-repair-commit"})
+
+snapshots = load(handoff["executed_harnesses"]["path"])["snapshots"]
+harness_rows = []
+for item in snapshots:
+    raw = base64.b64decode(item["executed_content_base64"], validate=True)
+    assert digest(raw) == item["executed_sha256"]
+    assert raw == raw_path(item["executed_path"]).read_bytes()
+    companion = Path(item["readable_lf_companion"]["path"]).read_bytes()
+    assert raw.replace(b"\r\n", b"\n") == companion
+    assert digest(companion) == item["readable_lf_companion"]["sha256"]
+    if item["role"] == "final-gate-harness":
+        assert ordered["harness_hashes"][item["executed_path"]] == digest(raw)
+    harness_rows.append({"path": item["executed_path"], "role": item["role"],
+                         "raw_sha256": digest(raw), "lf_sha256": digest(companion),
+                         "raw_crlf_count": raw.count(b"\r\n"), "exact_base64_and_scratch_match": True})
+assert len(harness_rows) == 4 and len(ordered["harness_hashes"]) == 3
+
+labels = ["format", "lint", "types", "architecture", "tests-access-reverse", "tests-com-reverse", "contracts", "native"]
+assert [r["label"] for r in handoff["ordered_receipts"]] == labels
+assert [r["stage"] for r in handoff["ordered_receipts"]] == [1, 2, 3, 4, 5, 5, 6, 7]
+last = None
+receipt_rows, receipts_by_label = [], {}
+for item in handoff["ordered_receipts"]:
+    receipt = load(item["path"])
+    assert receipt["exit_code"] == item["exit_code"] == 0
+    assert receipt["source_before"] == expected == receipt["source_after"]
+    assert receipt["harness_hashes"] == ordered["harness_hashes"]
+    start, finish = [datetime.fromisoformat(receipt[key]) for key in ("started_at", "finished_at")]
+    assert start <= finish and (last is None or last <= start)
+    last = finish
+    for stream in ("stdout", "stderr"):
+        entry = receipt["raw_" + stream]
+        raw = raw_path(entry["path"]).read_bytes()
+        assert digest(raw) == entry["sha256"]
+        assert portable(raw.decode("utf-8", errors="replace")) == receipt[stream]
+    receipts_by_label[item["label"]] = receipt
+    receipt_rows.append({"stage": item["stage"], "label": item["label"], "exit_code": 0,
+                         "seconds": receipt["seconds"], "command": receipt["command"], "receipt": ref(item["path"])})
+assert receipts_by_label["types"]["command"].endswith("-m pyright")
+assert "0 errors" in receipts_by_label["types"]["stdout"]
+assert "206 passed" in receipts_by_label["contracts"]["stdout"]
+assert "test_domain_neutrality.py" in receipts_by_label["contracts"]["command"]
+assert json.loads(receipts_by_label["architecture"]["stdout"])["passed"] == 10
+
+all_nodes, coverage_totals = [], {"lines": 0, "branches": 0}
+raw_modules = {}
+for batch in ordered["coverage_batches"]:
+    name = batch["batch"]
+    receipt = receipts_by_label["tests-" + name + "-reverse"]
+    nodes = [line.split(" PASSED")[0] for line in receipt["stdout"].splitlines() if line.startswith("tests/") and " PASSED" in line]
+    count = 180 if name == "access" else 137
+    assert len(nodes) == len(set(nodes)) == count
+    assert nodes == batch["test_nodes"]
+    assert str(count) + " passed" in receipt["stdout"]
+    all_nodes.extend(nodes)
+    raw_bytes = raw_path(batch["raw_coverage"]["path"]).read_bytes()
+    assert digest(raw_bytes) == batch["raw_coverage"]["sha256"]
+    raw = json.loads(raw_bytes)
+    raw["files"] = {portable(path).replace("\\", "/"): item for path, item in raw["files"].items()}
+    canonical = load(batch["coverage_path"])
+    assert raw == canonical and ref(batch["coverage_path"])["sha256"] == batch["coverage_sha256"]
+    raw_modules.update(raw["files"])
+    totals = raw["totals"]
+    assert totals["num_statements"] == totals["covered_lines"] and totals["missing_lines"] == 0
+    assert totals["num_branches"] == totals["covered_branches"] and totals["missing_branches"] == 0
+    coverage_totals["lines"] += totals["num_statements"]
+    coverage_totals["branches"] += totals["num_branches"]
+assert all_nodes == ordered["test_nodes"] and len(set(all_nodes)) == ordered["test_node_count"] == 317
+assert coverage_totals == {"lines": 432, "branches": 182} and len(raw_modules) == 6
+ranges = load(handoff["coverage_ranges"]["path"])
+for path, summary in ranges["module_summaries"].items():
+    assert raw_modules[path]["summary"] == summary
+for unit in ranges["unit_ranges"]:
+    assert unit["missing_statements"] == unit["missing_branches"] == 0
+    raw = raw_modules[unit["path"]]
+    assert unit["covered_statements"] == sum(unit["start"] <= n <= unit["end"] for n in raw["executed_lines"])
+    assert unit["covered_branches"] == sum(unit["start"] <= edge[0] <= unit["end"] for edge in raw["executed_branches"])
+assert len(ranges["unit_ranges"]) == 27
+
+raw_native = raw_path(ordered["raw_native"]["path"]).read_bytes()
+assert digest(raw_native) == ordered["raw_native"]["sha256"]
+native = load(handoff["native_result"]["path"])
+assert json.loads(raw_native) == native
+assert len(native["checks"]) == 11 and native["platform"] == "win32"
+assert native["source_tree_unchanged"] and native["git_status_unchanged"]
+baseline = load(handoff["shared_baseline"]["path"])
+for item in baseline["preserved_files"]:
+    assert ref(item["path"])["sha256"] == item["sha256"]
+assert len(baseline["preserved_files"]) == handoff["preserved_predecessors"] == 45
+assert load(handoff["bounded_confirmation"]["path"])["status"] == "READY_FOR_CHECKED_WIP_AND_FINAL_GATES"
+before_docs = [ref(PLAN), ref(FEATURE / "spec.md"), ref(FEATURE / "user-story.md")]
+plan_text = PLAN.read_text("utf-8")
+assert len(re.findall(r"^- \[x\] \[P\d+-T\d+\]", plan_text, re.M)) == 36
+assert len(re.findall(r"^- \[[ x]\] \[P\d+-T\d+\]", plan_text, re.M)) == 84
+assert "- [ ] [P4-T5] Detect generic filesystem, registry, and COM constructs." in plan_text
+for name in ("spec.md", "user-story.md"):
+    section = (FEATURE / name).read_text("utf-8").split("## Acceptance Criteria", 1)[1]
+    marks = re.findall(r"^- \[([ x])\]", section, re.M)[:66]
+    assert len(marks) == 66 and marks.count("x") == 13
+
+write_time = datetime.now(timezone.utc)
+stamp = write_time.strftime("%Y-%m-%dT%H-%M")
+harness = Q / ("p4t5-executor-final-reconciliation-harness." + stamp + ".txt")
+assert not harness.exists()
+harness.write_bytes(Path(__file__).read_bytes())
+write_time = datetime.now(timezone.utc)
+stamp = write_time.strftime("%Y-%m-%dT%H-%M")
+target = Q / ("p4t5-executor-final-reconciliation." + stamp + ".json")
+assert not target.exists()
+result = {"task": "P4-T5", "status": "PASS_READY_FOR_PLAN_CHECKOFF", "timestamp": stamp,
+          "publication_time_utc": write_time.isoformat(), "started_at": START.isoformat(),
+          "command": "poetry run python SCRATCH/issue-980-p4t5-final-reconcile.py", "exit_code": 0,
+          "handoff": ref(HANDOFF), "harness": ref(harness), "checked_repair_commit": commit,
+          "source_bindings": source_rows, "raw_harness_bindings": harness_rows, "final_receipts": receipt_rows,
+          "verification": {"unit_cases": 317, "contract_cases": 206, "native_assertions": 11,
+                           "statements": [432, 432], "branches": [182, 182], "ranges": 27,
+                           "preserved_predecessor_streams": 45, "behavioral_replays": 0},
+          "retained_review": handoff["retained_review"], "bounded_confirmation": handoff["bounded_confirmation"],
+          "documents_before": before_docs, "acceptance_mapping": "Only P4-T5 is complete. No new aggregate analyzer or public-surface AC is fully delivered; source ACs remain 13/66.",
+          "qualifications": ["All executed harnesses decoded from canonical base64 and matched scratch raw bytes; LF companions checked separately.",
+                             "Original review timestamp qualification and the corrected coverage-field checker diagnostic remain in the retained confirmation.",
+                             "Earlier COM focused receipts contain sanitized combined output; the final loop additionally binds separate raw streams.",
+                             "No public registry/CLI exposure, coding-agent host proof or non-Windows execution is claimed."],
+          "mutations": "Only this result and inert harness; plan checkoff is separately performed with the file-edit tool."}
+target.write_bytes((json.dumps(result, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+print(json.dumps({"status": result["status"], "result": ref(target), "harness": ref(harness)}))

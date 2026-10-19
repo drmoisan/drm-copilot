@@ -1,0 +1,123 @@
+{
+  "task": "P4-T5",
+  "task_status": "PASS",
+  "timestamp": "2026-10-19T08-18",
+  "publication_time_utc": "2026-10-19T08:18:58.6030014Z",
+  "scope": "Receipt-only final acceptance; retained candidate review and bounded repair confirmation reused.",
+  "routing_receipt": "atomic_execution_p4t5_final_reconciliation",
+  "profile": {
+    "deployment": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": true
+  },
+  "checked_repair_commit": "5de4c099aa565874c2427a6a71a2a81488cf4ef0",
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-reconciliation.2026-10-19T08-17.json",
+    "sha256": "bc79105d96f2091405425e4b742104e8b384f3e1a0779d574c5758731e68c6fc"
+  },
+  "reconciliation_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-reconciliation-harness.2026-10-19T08-17.txt",
+    "sha256": "d0d5daa25810ce70cc8b5438230a6aac4ad7bb1bfd1a0c5a7ab38058208d8fd6"
+  },
+  "worker_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-final-handoff.2026-10-19T08-10.json",
+    "sha256": "e7f3050a2efb160041f7b5b90659a73150ffe3e812649b132fe97bb2a0fd39d4"
+  },
+  "acceptance": [
+    "Generic filesystem/registry/COM candidates are fixed-name, inferred where appropriate and source-referenced; runtime values and binding remain unresolved.",
+    "Generic COM analysis imports no optional platform module; its approved pure split preserves the existing public callable.",
+    "R1-R3 are closed by the immutable review, 12/12 bounded repair proof and final exact-byte gates.",
+    "All seven final stages passed in order; two isolated reversed unit batches comprise stage five."
+  ],
+  "verification": {
+    "format": "PASS: scoped Black --check",
+    "lint": "PASS: scoped Ruff",
+    "types": "PASS: whole-repository Pyright, zero errors",
+    "architecture": "PASS: ten scoped files",
+    "unit_cases": {
+      "access": 180,
+      "com": 137,
+      "total": 317
+    },
+    "contract_cases": 206,
+    "native_windows_git_assertions": 11,
+    "coverage": {
+      "statements": [
+        432,
+        432
+      ],
+      "branches": [
+        182,
+        182
+      ],
+      "modules": 6,
+      "named_ranges": 27
+    },
+    "current_working_index_commit_streams": 10,
+    "preserved_predecessor_streams": 45,
+    "behavioral_reruns_during_acceptance": 0,
+    "typescript_powershell_csharp": "No production/test additions in these languages in this task; their execution gates were not invoked."
+  },
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "working_sha256": "5db7cb1316cb4bb544295917a70bb2e5adb6cff18b8fd74405c542f2265e0e44",
+    "exact_edit": "Only P4-T5 checkbox changes from [ ] to [x]; reversing that byte reproduces the recorded precheck hash.",
+    "completed_before": 36,
+    "completed_after": 37,
+    "total": 84,
+    "git_qualification": "This is the current working-byte hash. Git text normalization may change the stored blob; staging and commit remain coordinator-owned."
+  },
+  "acceptance_criteria": {
+    "completed": 13,
+    "total": 66,
+    "changed": [],
+    "reason": "Aggregate analyzer, public-surface, publishing and final-quality criteria still depend on later tasks; no partial criterion was checked off.",
+    "authoritative_sources": [
+      "spec.md",
+      "user-story.md"
+    ],
+    "source_bytes_unchanged": true
+  },
+  "documents_before": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "0ad30d9ecb0b9bd24be2d13359e9083a3df11b6e79cc1f4dd459fd57ed709ac6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "9d25e9a6d14fce7a57f6069e6914fafcf4d220e5cfc0a8b046c06b3cb11ff50a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "sha256": "aa65ca970c12903fe4d19cf964c7fc72b16e2027867abaf613f25ab415cff344"
+    }
+  ],
+  "historical_qualifications": [
+    "The original review's 07:42 label denotes binding execution; actual review publication was 07:45:10 UTC. Original files remain unchanged.",
+    "The repaired-summary field-name checker failure and exact initial checker are retained; only its bookkeeping was corrected.",
+    "Earlier COM focused evidence is path-sanitized combined output. The final loop additionally has independently bound raw stdout/stderr.",
+    "Four executed/binding harnesses decode exactly from canonical base64 and match raw scratch bytes; LF companions were checked separately."
+  ],
+  "limitations": [
+    "Static lexical analysis does not prove compiler binding, arbitrary receiver types, aliases, runtime paths or execution.",
+    "Public registry/CLI wiring is deferred to P4-T9 and subsequent surfaces.",
+    "Native proof covers Windows Python/Git only; coding-agent hosts and Linux/macOS remain unproven.",
+    "No real COM activation, registry operation or consuming-repository analysis was performed."
+  ],
+  "changed_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-reconciliation.2026-10-19T08-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-reconciliation-harness.2026-10-19T08-17.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-executor-final-acceptance.2026-10-19T08-18.json"
+  ],
+  "ownership": "No production/test, checkpoint, staging or commit changes. Coordinator owns the accepted-task commit/push and successor release.",
+  "next_tasks": [
+    "P4-T6",
+    "P4-T7",
+    "P4-T8",
+    "P4-T9",
+    "P5-T1"
+  ]
+}
