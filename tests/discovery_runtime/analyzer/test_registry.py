@@ -82,18 +82,12 @@ def test_registry_loads_only_explicit_core_adapters(
 
 @pytest.mark.parametrize(
     "enabled",
-    [
-        [],
-        ["dotnet"],
-        ["repository", "csharp-symbols"],
-        ["office-vsto", "dotnet"],
-        ["office-vsto", "csharp-symbols"],
-    ],
+    [[]],
 )
 def test_registry_rejects_unavailable_selections_without_fallback(
     analyzer_catalog: SchemaCatalog, enabled: list[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Unimplemented adapter identifiers never silently produce a partial inventory.
+    """An empty selection never silently produces a fallback inventory.
 
     Parameters: analyzer_catalog (SchemaCatalog): immutable installed schema
     fixture. enabled (list[str]): explicit configured adapter names. monkeypatch

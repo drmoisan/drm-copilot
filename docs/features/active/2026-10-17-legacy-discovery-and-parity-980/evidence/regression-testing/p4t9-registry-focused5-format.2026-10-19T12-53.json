@@ -1,0 +1,77 @@
+{
+  "stage": "format",
+  "label": "p4t9-registry-focused5-format",
+  "started": "2026-10-19T12:53:11.908071+00:00",
+  "finished": "2026-10-19T12:53:13.625734+00:00",
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py tests/discovery_runtime/analyzer/test_registry.py tests/discovery_runtime/analyzer/test_registry_dispatch.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+  "exit_code": 0,
+  "duration_seconds": 1.718,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "c7a773b2131d7c668993a7c0d2ac99c67814952e5c8a4cfb302b028de3fdce26",
+      "physical_lines": 164
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "e162e36155606aa2bf0fbd94e9905d6e177d9394815e2ae69a24aece09686138",
+      "physical_lines": 392
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "physical_lines": 228
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "c7a773b2131d7c668993a7c0d2ac99c67814952e5c8a4cfb302b028de3fdce26",
+      "physical_lines": 164
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "020655ea876a8e4242df4739b06ab057058c783b8499907868c9924325a9898a",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "e162e36155606aa2bf0fbd94e9905d6e177d9394815e2ae69a24aece09686138",
+      "physical_lines": 392
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "physical_lines": 228
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-focused5-format-125313.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-focused5-format-125313.stderr.bin",
+      "raw_sha256": "c420ae91e90facb2a8c349ca26f892ed129b5cb2d542b8579d9122eefed8614b",
+      "raw_bytes": 49,
+      "presentation": "All done! \u2728 \ud83c\udf70 \u2728\r\n5 files left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "p4t9-shared-baseline.2026-10-19T12-41.json",
+  "scope": "P4-T9 registry subset"
+}

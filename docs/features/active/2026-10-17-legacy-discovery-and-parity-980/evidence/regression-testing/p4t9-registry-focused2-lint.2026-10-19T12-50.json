@@ -1,0 +1,77 @@
+{
+  "stage": "lint",
+  "label": "p4t9-registry-focused2-lint",
+  "started": "2026-10-19T12:50:45.375671+00:00",
+  "finished": "2026-10-19T12:50:46.575120+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py tests/discovery_runtime/analyzer/test_registry.py tests/discovery_runtime/analyzer/test_registry_dispatch.py tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+  "exit_code": 1,
+  "duration_seconds": 1.199,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "233742a7553fb2f3ce45a13dd4594e2423dcb52c2d7f376030c5e65ae08aa923",
+      "physical_lines": 165
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "6467502ea68b4ecedc2e161c6b5e9ff5cf2a9cc24c39d61c716f63ce78fd4efc",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "17c3b777e3bcbd37134a3821eeb8aa5611445da6908a27a99ec1128b730e9a96",
+      "physical_lines": 342
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "physical_lines": 228
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "233742a7553fb2f3ce45a13dd4594e2423dcb52c2d7f376030c5e65ae08aa923",
+      "physical_lines": 165
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py": {
+      "sha256": "6467502ea68b4ecedc2e161c6b5e9ff5cf2a9cc24c39d61c716f63ce78fd4efc",
+      "physical_lines": 9
+    },
+    "tests/discovery_runtime/analyzer/test_registry.py": {
+      "sha256": "af74ab55dd2bcd7c990ea688f3f4776b477a5187e2606498db207464d2fc1f92",
+      "physical_lines": 304
+    },
+    "tests/discovery_runtime/analyzer/test_registry_dispatch.py": {
+      "sha256": "17c3b777e3bcbd37134a3821eeb8aa5611445da6908a27a99ec1128b730e9a96",
+      "physical_lines": 342
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py": {
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "physical_lines": 233
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "physical_lines": 228
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-focused2-lint-125046.stdout.bin",
+      "raw_sha256": "a18a2f1f62ecc599ca01348ec9fa327c2f0f1c140619b5429f2f81a82ffe0b60",
+      "raw_bytes": 3114,
+      "presentation": "I001 [*] Import block is un-sorted or un-formatted\n --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\__init__.py:3:1\n  |\n1 |   \"\"\"Provide typed, read-only discovery analyzers with explicit guarded publication.\"\"\"\n2 |\n3 | / from drm_copilot_discovery.analyzer.registry import (\n4 | |     InventoryAdapter as Analyzer,\n5 | |     builtin_analyzer_identities,\n6 | |     select_analyzers,\n7 | | )\n  | |_^\n8 |\n9 |   __all__ = [\"Analyzer\", \"builtin_analyzer_identities\", \"select_analyzers\"]\n  |\nhelp: Organize imports\n\nS101 Use of `assert` detected\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\registry.py:126:5\n    |\n124 |         return UiCallbackAnalyzer()\n125 |     # The complete public selector check leaves only the dependency adapter here.\n126 |     assert identifier == \"dependencies\"\n    |     ^^^^^^\n127 |     from drm_copilot_discovery.analyzer.dependencies import DependencyAnalyzer\n    |\n\nE501 Line too long (101 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_dispatch.py:101:89\n    |\n 99 |             b'<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup>'\n100 |             b\"<TargetFramework>net8.0</TargetFramework></PropertyGroup><ItemGroup>\"\n101 |             b'<COMReference Include=\"Interop\"/><PackageReference Include=\"Example\" Version=\"1.2.3\"/>'\n    |                                                                                         ^^^^^^^^^^^^^\n102 |             b\"</ItemGroup></Project>\",\n103 |         ),\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_dispatch.py:106:89\n    |\n104 |         (\n105 |             \"src/view.xaml\",\n106 |             b'<Window xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" '\n    |                                                                                         ^\n107 |             b'xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" x:Class=\"Demo.View\">'\n108 |             b'<Button Click=\"OnClick\"/></Window>',\n    |\n\nE501 Line too long (90 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_dispatch.py:107:89\n    |\n105 |             \"src/view.xaml\",\n106 |             b'<Window xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" '\n107 |             b'xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" x:Class=\"Demo.View\">'\n    |                                                                                         ^^\n108 |             b'<Button Click=\"OnClick\"/></Window>',\n109 |         ),\n    |\n\nE501 Line too long (101 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_registry_dispatch.py:119:89\n    |\n117 |             \"src/ribbon.xml\",\n118 |             b'<customUI xmlns=\"http://schemas.microsoft.com/office/2009/07/customui\">'\n119 |             b'<ribbon><tabs><tab id=\"tab\"><group id=\"group\"><button id=\"button\" onAction=\"OnClick\"/>'\n    |                                                                                         ^^^^^^^^^^^^^\n120 |             b\"</group></tab></tabs></ribbon></customUI>\",\n121 |         ),\n    |\n\nFound 6 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p4t9-registry-focused2-lint-125046.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p4t9-shared-baseline.2026-10-19T12-41.json",
+  "scope": "P4-T9 registry subset"
+}

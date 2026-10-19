@@ -1,0 +1,129 @@
+"""Capture the single P4-T9 baseline using exact accepted proof without replay."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+now = datetime.datetime.now(datetime.timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+destination = feature / 'evidence/baseline'
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+progress = state['execution_progress']['p4t9_progress']
+ownership = progress['ownership']
+owned = sorted(path for paths in ownership.values() for path in paths)
+assert len(owned) == len(set(owned)) == 12
+head = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, check=True).stdout.decode().strip()
+assert head == progress['accepted_baseline'] == 'c64b35435d1c1597830d8dd03e661d7944192065'
+
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha(path.read_bytes())}
+
+
+def read_ref(reference):
+    path = Path(reference['path'])
+    assert sha(path.read_bytes()) == reference['sha256'], path
+    return json.loads(path.read_bytes())
+
+
+def records(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from records(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from records(child)
+
+
+route = next(item for item in records(state) if item.get('delegation_id') == 'workspace_operations_p4t9_baseline_core' and item.get('profile_sha256'))
+assert route['profile_sha256'] == sha(Path('.codex/agents/python-typed-engineer-c4.toml').read_bytes()) == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+attestation_path = Path('C:/Users/DanMoisan/.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json')
+attestation = json.loads(attestation_path.read_bytes())
+assert all(attestation[key] for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+assert attestation['profile_sha256'] == route['profile_sha256'] and attestation['actual_model'] == 'gpt-6-astra' and attestation['actual_reasoning_effort'] == 'max'
+p4t1_path = feature / 'evidence/qa-gates/p4t1-analyzer-final-handoff.2026-10-19T02-55.json'
+p4t8_path = feature / 'evidence/qa-gates/p4t8-final-handoff.2026-10-19T12-25.json'
+p4t1, p4t8 = json.loads(p4t1_path.read_bytes()), json.loads(p4t8_path.read_bytes())
+p4t1_sources = {item['path']: item for item in p4t1['files']}
+p4t8_sources = {item['path']: item for item in p4t8['source_files']}
+p4t1_coverage = read_ref(p4t1['coverage'])
+p4t1_coverage['files'] = {path.replace('\\', '/'): value for path, value in p4t1_coverage['files'].items()}
+p4t8_ranges = read_ref(p4t8['coverage_ranges'])
+p4t8_candidate = read_ref(p4t8['candidate'])
+originals = scratch / ('issue-980-p4t9-baseline-originals-' + now.strftime('%Y-%m-%dT%H-%M-%S'))
+originals.mkdir()
+existing, absent, coverage, callers = [], [], [], []
+for relative in owned:
+    path = Path(relative)
+    if not path.exists():
+        absent.append(relative)
+        continue
+    content = path.read_bytes()
+    committed = subprocess.run(['git', 'show', 'HEAD:' + relative], capture_output=True, check=True).stdout
+    assert content.replace(b'\r\n', b'\n') == committed
+    original = originals / relative
+    original.parent.mkdir(parents=True, exist_ok=True)
+    original.write_bytes(content)
+    prior = p4t8_sources.get(relative) or p4t1_sources.get(relative)
+    assert prior is not None, relative
+    expected = prior.get('sha256', prior.get('working_sha256'))
+    assert sha(content) == expected, relative
+    existing.append({'path': relative, 'sha256': sha(content), 'commit_sha256': sha(committed), 'lines': len(content.splitlines()),
+        'stream_relation': 'identical' if content == committed else 'CRLF-to-LF-only',
+        'original': 'SCRATCH/' + original.relative_to(scratch).as_posix(),
+        'proof': ref(p4t8_path if relative in p4t8_sources else p4t1_path)})
+    if '/src/' in relative:
+        if relative in p4t8_ranges['module_summaries']:
+            summary = p4t8_ranges['module_summaries'][relative]
+            units = [item for item in p4t8_ranges['unit_ranges'] if item['path'] == relative]
+            source = p4t8['coverage_ranges']
+        else:
+            data = p4t1_coverage['files'][relative]
+            summary = data['summary']
+            units = [{'name': name, 'kind': family, 'summary': item['summary'], 'missing_lines': item['missing_lines']}
+                     for family in ('functions', 'classes') for name, item in data[family].items() if name]
+            source = p4t1['coverage']
+        coverage.append({'path': relative, 'summary': summary, 'units': units, 'proof': source})
+assert len(existing) == 5 and len(absent) == 7
+for relative in ('tests/discovery_runtime/analyzer/test_pipeline.py', 'tests/scripts/dev_tools/discovery/analyzer/test_emitter.py'):
+    prior = p4t1_sources[relative]
+    assert sha(Path(relative).read_bytes()) == prior['working_sha256']
+    callers.append({'path': relative, 'sha256': prior['working_sha256'], 'proof': ref(p4t1_path)})
+preserved = {item['path']: item['sha256'] for item in p4t8_candidate['preserved_files'] + p4t8_candidate['files'] + p4t8_candidate['fixtures'] if item['path'] not in owned}
+for relative, digest in preserved.items():
+    assert sha(Path(relative).read_bytes()) == digest, relative
+for relative in absent:
+    assert not Path(relative).exists()
+for item in existing:
+    assert sha(Path(item['path']).read_bytes()) == item['sha256']
+reuse = {'emitter_and_initializer': {'handoff': ref(p4t1_path), 'ordered_stages': p4t1['ordered_stages'], 'coverage': p4t1['coverage'],
+    'reason': 'Existing emitter, initializer and affected emitter/pipeline test bytes exactly match the accepted P4-T1 proof; no behavior or dependency prerequisite changed.'},
+    'registry_and_neutrality_callers': {'handoff': ref(p4t8_path), 'ordered_stages': p4t8['ordered_stages'], 'coverage_ranges': p4t8['coverage_ranges'],
+    'reason': 'Existing registry and affected registry/domain-neutrality tests exactly match the just-accepted P4-T8 proof.'}}
+path = destination / ('p4t9-shared-baseline.' + stamp + '.json')
+assert not path.exists()
+document = {'task': 'P4-T9', 'timestamp': stamp, 'written_at': now.isoformat(), 'head': head, 'state': 'BASELINE_READY',
+    'ownership': ownership, 'existing_files': existing, 'absent_paths': absent, 'coverage_baselines': coverage,
+    'affected_existing_callers': callers, 'retained_proof': reuse,
+    'unrelated_predecessors': {'candidate': p4t8['candidate'], 'handoff': ref(p4t8_path), 'validated_stream_count': len(preserved),
+        'derivation': 'Union of candidate preserved_files, files and fixtures, excluding the exact 12 owned task paths; no copied predecessor metadata.'},
+    'authority': {'delegation_id': route['delegation_id'], 'profile_sha256': route['profile_sha256'], 'attestation_sha256': sha(attestation_path.read_bytes()),
+        'agent_id': attestation['agent_id'], 'routing_valid': True, 'launch_authority_valid': True, 'provenance_valid': True, 'model': 'gpt-6-astra', 'reasoning_effort': 'max'},
+    'tests_run': False, 'newly_necessary_existing_caller_tests': [],
+    'test_reuse_reason': 'Exact current source/caller hashes and complete passing immutable receipts satisfy this baseline. No accepted analyzer suite was replayed.',
+    'mutation_scope': 'Read-only source/test capture; only canonical baseline evidence and external SCRATCH originals written. Coordinator releases each owner separately.'}
+path.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+path.with_suffix('.md').write_text(f'# P4-T9 shared baseline\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-p4t9-shared-baseline.py`\nEXIT_CODE: 0\nOutput Summary: BASELINE_READY at {head}; five existing paths and seven absent paths bound before mutation.\n\nCurrent emitter and caller bytes exactly match accepted P4-T1 proof (50/50 statements, 14/14 branches). Current registry and affected tests exactly match accepted P4-T8 proof (23/23 statements, 8/8 branches). The existing package initializer has no executable statements. All affected callable coverage is retained through the bound reports. No test suite was rerun.\n\nOriginal bytes are preserved in external SCRATCH with exact hashes. The baseline verifies {len(preserved)} unrelated predecessor streams through the retained immutable candidate manifest. Fresh C4 native authority/profile matches; source, test, Git, checkpoint, plan and acceptance state were not changed. All new evidence is LF with one final newline; no raw diff or lossy normalization is introduced.\n', encoding='utf-8', newline='\n')
+snapshot = destination / ('p4t9-shared-baseline-harness.' + stamp + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'baseline': ref(path), 'markdown': ref(path.with_suffix('.md')), 'harness': ref(snapshot), 'existing': len(existing), 'absent': len(absent), 'preserved': len(preserved)}), flush=True)
