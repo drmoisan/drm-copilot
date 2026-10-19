@@ -1,0 +1,449 @@
+{
+  "status": "FROZEN_READY_CHECKED_WIP",
+  "task": "P4-T3 masking/carrier subset",
+  "accepted_baseline": "6a94e5789e8622d4f1aaa2f3aa2c45e1a9c92f89",
+  "timestamp_utc": "2026-10-19T04-35",
+  "authority_receipt": "workspace_operations_p4t3_masking_tests",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "physical_lines": 330,
+      "crlf_count": 0,
+      "normalized_lf_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "git_attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py: eol: lf"
+      ]
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26,
+      "crlf_count": 26,
+      "normalized_lf_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "git_attributes": [
+        "scripts/dev_tools/discovery/analyzer/source_text.py: text: auto",
+        "scripts/dev_tools/discovery/analyzer/source_text.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413,
+      "crlf_count": 0,
+      "normalized_lf_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "git_attributes": [
+        "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: text: auto",
+        "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py: eol: lf"
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "physical_lines": 205,
+      "crlf_count": 0,
+      "normalized_lf_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "git_attributes": [
+        "tests/discovery_runtime/analyzer/test_source_masking.py: text: auto",
+        "tests/discovery_runtime/analyzer/test_source_masking.py: eol: lf"
+      ]
+    }
+  ],
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-baseline-binding.2026-10-19T04-20.json",
+    "sha256": "7588f43e0cee2cfdf43ee69143cf145395d9a8e538bd384c4da8194dfb5cad91"
+  },
+  "ordered_focused_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json",
+      "sha256": "8b5ec94a911435083b2b71f08692196fba6556c108a9049aecdb67b43b584189",
+      "stage": 1,
+      "duration_seconds": 1.478
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json",
+      "sha256": "f4426e59f3872aa8966f5250dbc94a1e456c7300b379c73b4261eca27a4126f9",
+      "stage": 2,
+      "duration_seconds": 1.179
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json",
+      "sha256": "4e2bacc91ab7817092fdf236b62fccc16f9c726493871fe0ee86d2c45658abfd",
+      "stage": 3,
+      "duration_seconds": 2.018
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json",
+      "sha256": "ff684b1ab5f120c84f0c5307c4f9daff0df9a3fcc98462bfff2d367376d6a418",
+      "stage": 4,
+      "duration_seconds": 2.023
+    }
+  ],
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+    "sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d"
+  },
+  "coverage": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "summary": {
+        "covered_lines": 145,
+        "num_statements": 145,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 50,
+        "num_partial_branches": 0,
+        "covered_branches": 50,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": [
+        {
+          "name": "_Frame",
+          "kind": "ClassDef",
+          "start": 30,
+          "end": 42,
+          "covered_lines": 6,
+          "measured_lines": 6,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_Masker",
+          "kind": "ClassDef",
+          "start": 45,
+          "end": 193,
+          "covered_lines": 99,
+          "measured_lines": 99,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "strip_comments_and_strings",
+          "kind": "FunctionDef",
+          "start": 196,
+          "end": 205,
+          "covered_lines": 2,
+          "measured_lines": 2,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "numbered_lines",
+          "kind": "FunctionDef",
+          "start": 208,
+          "end": 214,
+          "covered_lines": 2,
+          "measured_lines": 2,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "slugify",
+          "kind": "FunctionDef",
+          "start": 217,
+          "end": 226,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "build_evidence_id",
+          "kind": "FunctionDef",
+          "start": 229,
+          "end": 245,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "TextParseResult",
+          "kind": "ClassDef",
+          "start": 248,
+          "end": 257,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "build_evidence_record",
+          "kind": "FunctionDef",
+          "start": 260,
+          "end": 300,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "Detection",
+          "kind": "ClassDef",
+          "start": 303,
+          "end": 318,
+          "covered_lines": 8,
+          "measured_lines": 8,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "DetectionResult",
+          "kind": "ClassDef",
+          "start": 321,
+          "end": 330,
+          "covered_lines": 3,
+          "measured_lines": 3,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "start": 54,
+          "end": 59,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_blank",
+          "kind": "FunctionDef",
+          "start": 61,
+          "end": 70,
+          "covered_lines": 6,
+          "measured_lines": 6,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_run_end",
+          "kind": "FunctionDef",
+          "start": 72,
+          "end": 78,
+          "covered_lines": 5,
+          "measured_lines": 5,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_comment",
+          "kind": "FunctionDef",
+          "start": 80,
+          "end": 94,
+          "covered_lines": 10,
+          "measured_lines": 10,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_open_string",
+          "kind": "FunctionDef",
+          "start": 96,
+          "end": 111,
+          "covered_lines": 10,
+          "measured_lines": 10,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_code",
+          "kind": "FunctionDef",
+          "start": 113,
+          "end": 140,
+          "covered_lines": 23,
+          "measured_lines": 23,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "_literal",
+          "kind": "FunctionDef",
+          "start": 142,
+          "end": 180,
+          "covered_lines": 32,
+          "measured_lines": 32,
+          "percent": 100.0,
+          "missing_lines": []
+        },
+        {
+          "name": "run",
+          "kind": "FunctionDef",
+          "start": 182,
+          "end": 193,
+          "covered_lines": 7,
+          "measured_lines": 7,
+          "percent": 100.0,
+          "missing_lines": []
+        }
+      ]
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "summary": {
+        "covered_lines": 8,
+        "num_statements": 8,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "units": []
+    }
+  ],
+  "old_source_sha256": "5fb87349ca8c817d6939319db0c606e20c9d1399e34f40311744c5838e769319",
+  "old_test_sha256": "2109820f4584f96cab5d022bffdc38f1fe6ebe7338a8e5c27407a296978e1add",
+  "preserved_public_ast_except_docstrings": {
+    "slugify": true,
+    "build_evidence_id": true,
+    "build_evidence_record": true,
+    "TextParseResult": true,
+    "Detection": true,
+    "DetectionResult": true
+  },
+  "preserved_original_test_definitions": {
+    "TestStripper": true,
+    "TestNumberedLines": true,
+    "TestSlugify": true,
+    "TestBuildEvidenceId": true,
+    "TestTextParseResult": true
+  },
+  "original_test_assertion_count": 32,
+  "changed_line_coverage": "Every executable line in the new runtime and replacement adapter was executed (153/153). Legacy source helper baseline was 144/144. No line coverage regression; every measured class/callable range is 100%.",
+  "scope_of_proof": "108 in-memory tests, including 2,197 generated lexical inputs and 49 generated identifier/evidence inputs inside two deterministic property tests. No runtime filesystem or subprocess use by tests.",
+  "retained_attempts": [
+    "Initial formatter changes and Ruff import/B010 diagnostics are retained.",
+    "Pass 3 retained a coverage target spelling error that omitted the adapter from measurement. No source/test defect; corrected target and repeated ordered focused loop in pass 4."
+  ],
+  "rendered_evidence_normalization": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.md",
+      "before_sha256": "6e2ec29ea3b8b683ddb232f23545465b19320bdbdfec448272947729a110cf6f",
+      "after_sha256": "5ede920ae1827e73acf4d1a60aa6d2294cef238147f926f7a119a76d6f24d6d2",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.md",
+      "before_sha256": "a30d3c0d07165f9dc9246d0b53a71c04801356c7383579c2e9eb18b174257b13",
+      "after_sha256": "9e98cf5d00b922a1ee497de5f2eda11dfa05a66fed788a0271105cd0ac3bcb88",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.md",
+      "before_sha256": "528032cee0d077c01711be832b205eb34ea954ee9858fed9199765be2c4501dd",
+      "after_sha256": "6ec2fd3cbfff67d2017160875b88409a64b9bf5f300e84f257e6df62c8d76732",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.md",
+      "before_sha256": "01f9c2916a61b998f13e6540474a7170cb6fb1429afbf6124683a8d6c3a23985",
+      "after_sha256": "e7e0e4b54c97c5bf2a0b36393eaf78cce6766a91153e8273715309965464cc39",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.md",
+      "before_sha256": "74510052636a605e852b35f3aa7610ddcad2a02de417096166ea65525b9fc6d6",
+      "after_sha256": "97981697b38ce00a0b0e4e1b67ae50f855639bde11abb4c68c8f44489793dfda",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.md",
+      "before_sha256": "64d38df1a1d2c1e9ee0777e73609d219cecea99b502890a924e318ee48a2c9c9",
+      "after_sha256": "cc62af1115d4aad5b83d3b0bd5fb59335f68b8fa78128a05185a72a831aad6b9",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.md",
+      "before_sha256": "4ea676d58ed7cdecf574862bd3f4dd4850a22b3e38a85f6397ef93b253451b69",
+      "after_sha256": "ca3fec3cc73ecbbaf9ccb629dc60136c07252bb2af067e71673ff636fbf1f6df",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.md",
+      "before_sha256": "c96b3c343130805d46ffdaa56c69d1e9df33db57c5d2a50a540b62679f6ec79f",
+      "after_sha256": "e3f5e97ef1fc5873facb76b646c2d67620b893542eb29e34a6df93973e2198e5",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.md",
+      "before_sha256": "ef4dc6ae8357bb6903a9a58406cebdd0e5220aba1ad3d005ba056c8c92954924",
+      "after_sha256": "7e626535e7b65d82a0c77faf09fcc3d9e553ae7bb433115c79a3cdf5d25085a0",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.md",
+      "before_sha256": "3ddc9e81984088fffe0558a05e05529b59ab3435b1cc034682bb53a0efbd9afe",
+      "after_sha256": "d3f94b8d33aa64a274be716495416f21035490fadbaae7ae9f79149fd27eb373",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.md",
+      "before_sha256": "3081eea345ad7316d310723b5a6bbd2fafcf7d39daed936d4d4eaaf57392383d",
+      "after_sha256": "eba87401f7502e33923220cf2fd711db184938cce12f598214eaab4206b674d5",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.md",
+      "before_sha256": "312aacfc1265b130ac71527a4ad5b08e3264801daef728605b3af00010d85b96",
+      "after_sha256": "71b14be6560b0deb5fb0a458fefcb137c2f710af38f3405b1b264a866019a201",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.md",
+      "before_sha256": "735b6ffc229f81f45ea15eb3705aebd3efb7eb3c962e4d99a069f365a8fff38a",
+      "after_sha256": "7cf15fc2b9c22a5e0ae98d7583b9ed43fa88131ec59078d15c447d62510afce0",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.md",
+      "before_sha256": "e60429b8bf07293281ac93e021d20911fc98d9108fcfc50ab1a13acee4cadcb6",
+      "after_sha256": "4ae40db71805007375ce02b62d3b40e6105724ae499d0aef878cc58c99e371e6",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.md",
+      "before_sha256": "9d64065e41a4ae860d8eff8ababff84fb195f1393d54a4299f2252ef5b7c9a03",
+      "after_sha256": "ab06d31714f7cf45be1958d0f217eec345c1eaee889b8535f9b25a4849359040",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.md",
+      "before_sha256": "cd3d3583addce446b03e31ca7cffc6a19bc2747bcea1a0d7c1390005ab3806ce",
+      "after_sha256": "e3d86b50c49095be3e05cb812acf6f68c12a04b99ae4334c58a318d58793f98a",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.md",
+      "before_sha256": "e21a4a90339858964ab43fad266da9f37308c764d738b1676a38905e340f6c36",
+      "after_sha256": "daa5c2e472969459e66e9d77bc17108b9757ca8b9d6f7a82885e790cdf1374b9",
+      "change": "Rendered Markdown trailing whitespace/newline normalization only; paired raw JSON unchanged."
+    }
+  ],
+  "pending": [
+    "One consolidated full P4-T3 semantic/policy review across both owners",
+    "Single combined final seven-stage sequence owned by inventory_analyzers",
+    "Independent executor acceptance and parent commit/checkpoint updates"
+  ],
+  "limitations": [
+    "Lexical masking does not compile C# or establish semantic/runtime facts.",
+    "Working-byte hashes and LF-normalized hashes are distinct where CRLF exists; Git attributes are recorded.",
+    "This subset receipt is not task or feature acceptance; global test coverage is not claimed."
+  ]
+}

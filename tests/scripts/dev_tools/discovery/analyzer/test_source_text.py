@@ -12,8 +12,10 @@ import dataclasses
 import re
 
 import pytest
+from drm_copilot_discovery.analyzer import source_text as canonical
 
-from scripts.dev_tools.discovery.analyzer.models import ParseResult
+from scripts.dev_tools.discovery.analyzer import source_text as compatibility
+from scripts.dev_tools.discovery.analyzer.models import ClassifyResult, ParseResult
 from scripts.dev_tools.discovery.analyzer.source_text import (
     TextParseResult,
     build_evidence_id,
@@ -323,3 +325,89 @@ class TestTextParseResult:
 
         # Assert
         assert result.file_texts == ()
+
+
+def test_runtime_and_old_imports_share_every_public_helper_and_carrier() -> None:
+    """Keep eight runtime/compatibility exports identical; return None, no I/O."""
+    assert (
+        canonical.strip_comments_and_strings is compatibility.strip_comments_and_strings
+    )
+    assert canonical.numbered_lines is compatibility.numbered_lines
+    assert canonical.slugify is compatibility.slugify
+    assert canonical.build_evidence_id is compatibility.build_evidence_id
+    assert canonical.build_evidence_record is compatibility.build_evidence_record
+    assert canonical.TextParseResult is compatibility.TextParseResult
+    assert canonical.Detection is compatibility.Detection
+    assert canonical.DetectionResult is compatibility.DetectionResult
+
+
+def test_shared_carriers_preserve_positional_defaults_slots_and_base_identity() -> None:
+    """Keep legacy constructors and immutable layouts exact; return None, no I/O."""
+    parsed = canonical.TextParseResult(("source.cs",))
+    detection = canonical.Detection("source.cs", 2, "type", "Widget", "class")
+    classified = canonical.DetectionResult((), (detection,))
+    assert isinstance(parsed, ParseResult) and parsed.file_texts == ()
+    assert isinstance(classified, ClassifyResult) and classified.units == ()
+    assert classified.detections == (detection,)
+    assert canonical.DetectionResult(()).detections == ()
+    assert detection.extra == ()
+    assert not hasattr(parsed, "__dict__") and not hasattr(detection, "__dict__")
+    assert not hasattr(classified, "__dict__")
+    # Exact field names reject accidental shared payload or constructor expansion.
+    assert tuple(field.name for field in dataclasses.fields(parsed)) == (
+        "paths",
+        "file_texts",
+    )
+    assert tuple(field.name for field in dataclasses.fields(detection)) == (
+        "path",
+        "line",
+        "detection_kind",
+        "symbol",
+        "symbol_kind",
+        "extra",
+    )
+    assert tuple(field.name for field in dataclasses.fields(classified)) == (
+        "units",
+        "detections",
+    )
+    # Apply the same frozen-field contract to both newly relocated carrier types.
+    for instance, attribute, changed in (
+        (detection, "line", 3),
+        (classified, "detections", ()),
+    ):
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            setattr(instance, attribute, changed)
+
+
+def test_evidence_projection_keeps_keyword_contract_and_ordered_metadata() -> None:
+    """Preserve evidence fields/extras and deterministic projection; return None.
+    Use only immutable synthetic inputs; neither helper modifies the detection.
+    """
+    detection = canonical.Detection(
+        "src/Widget.cs", 7, "type", "Widget", "class", (("arity", 2),)
+    )
+    record = canonical.build_evidence_record(
+        analyzer_name="synthetic",
+        id_prefix="synthetic",
+        tool="inventory",
+        description="Observed lexical candidate",
+        detection=detection,
+        captured_at="2026-01-01T00:00:00Z",
+        digest="a" * 64,
+    )
+    assert record.id == build_evidence_id(
+        "synthetic", "type", "Widget", "src/Widget.cs", 7
+    )
+    assert record.kind == "file" and record.location == "src/Widget.cs"
+    assert record.content_hash == ("sha256", "a" * 64)
+    assert record.tool == "inventory" and record.captured_at == "2026-01-01T00:00:00Z"
+    assert record.description == "Observed lexical candidate"
+    assert record.metadata == (
+        ("analyzer", "synthetic"),
+        ("detection_kind", "type"),
+        ("symbol", "Widget"),
+        ("symbol_kind", "class"),
+        ("line", 7),
+        ("arity", 2),
+    )
+    assert detection.extra == (("arity", 2),)
