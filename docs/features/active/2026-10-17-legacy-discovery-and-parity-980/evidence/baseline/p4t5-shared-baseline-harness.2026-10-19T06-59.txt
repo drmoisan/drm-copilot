@@ -1,0 +1,79 @@
+"""Bind the shared P4-T5 six-path absence and immutable accepted dependencies."""
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+scratch = Path(__file__).resolve().parent
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+evidence = feature / 'evidence'
+expected_head = '957908053625c5a22099bafe5b6fd3dde2aedde2'
+
+def git(*arguments):
+    return subprocess.run(['git', *arguments], capture_output=True, check=True).stdout
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha256(path.read_bytes()).hexdigest()}
+
+head = git('rev-parse', 'HEAD').decode().strip()
+assert head == expected_head
+status = git('status', '--porcelain=v1', '-z')
+assert status == b'', status
+profile_path = Path('.codex/agents/python-typed-engineer-c4.toml')
+assert sha256(profile_path.read_bytes()).hexdigest() == '0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6'
+checkpoint = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+
+def receipts(value):
+    if isinstance(value, dict):
+        if value.get('delegation_id') == 'inventory_analyzers_p4t5_filesystem_registry':
+            yield value
+        for nested in value.values():
+            yield from receipts(nested)
+    elif isinstance(value, list):
+        for nested in value:
+            yield from receipts(nested)
+
+routing = list(receipts(checkpoint))
+assert len(routing) == 1
+assert routing[0]['profile_sha256'] == sha256(profile_path.read_bytes()).hexdigest()
+assert routing[0]['model'] == 'gpt-6-astra' and routing[0]['model_reasoning_effort'] == 'max'
+names = ('filesystem_access', 'registry_access', 'com_interop')
+new_paths = ['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/' + name + '.py' for name in names]
+new_paths += ['tests/discovery_runtime/analyzer/test_' + name + '.py' for name in names]
+assert not any(Path(path).exists() for path in new_paths)
+assert git('ls-tree', '-z', 'HEAD', '--', *new_paths) == b''
+previous_baseline = evidence / 'baseline/p4t4-baseline-binding.2026-10-19T05-38.json'
+previous_final = evidence / 'qa-gates/p4t4-final-handoff.2026-10-19T06-43.json'
+baseline = json.loads(previous_baseline.read_bytes())
+final = json.loads(previous_final.read_bytes())
+paths = {item['path'] for item in baseline['predecessor_files']}
+paths.update(item['path'] for item in final['source_index_commit_bindings'])
+paths.update(('scripts/dev_tools/discovery/analyzer/vsto_patterns.py', 'scripts/dev_tools/discovery/analyzer/vsto_office.py', 'tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py'))
+preserved = []
+for path in sorted(paths):
+    content = Path(path).read_bytes()
+    committed = git('show', head + ':' + path)
+    attributes = git('check-attr', '-z', '--all', '--', path).decode().split('\0')
+    attributes = {attributes[index + 1]: attributes[index + 2] for index in range(0, len(attributes) - 1, 3)}
+    relation = 'identical' if content == committed else 'CRLF-to-LF-only'
+    assert content == committed or (content.replace(b'\r\n', b'\n') == committed and attributes.get('eol') == 'lf'), path
+    preserved.append({'path': path, 'sha256': sha256(content).hexdigest(), 'physical_lines': len(content.decode().splitlines()), 'commit_sha256': sha256(committed).hexdigest(), 'attributes': attributes, 'stream_relation': relation})
+prior_expected = {item['path']: item['sha256'] for item in baseline['predecessor_files']}
+prior_expected.update({item['path']: item['working_sha256'] for item in final['source_index_commit_bindings']})
+assert all(item['sha256'] == prior_expected.get(item['path'], item['sha256']) for item in preserved)
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+destination = evidence / 'baseline' / ('p4t5-shared-baseline.' + stamp + '.json')
+snapshot = destination.with_name('p4t5-shared-baseline-harness.' + stamp + '.txt')
+snapshot.write_bytes(Path(__file__).read_bytes())
+(scratch / 'baseline-git-status.raw.txt').write_bytes(status)
+document = {'task': 'P4-T5', 'state': 'BASELINE_READY_NO_PRODUCTION_MUTATIONS', 'timestamp': stamp, 'recorded_at': now.isoformat(), 'head': head, 'git_status': {'clean': True, 'raw_path': 'SCRATCH/baseline-git-status.raw.txt', 'sha256': sha256(status).hexdigest()}, 'planned_absent_paths': new_paths, 'owned_paths': [path for path in new_paths if 'com_interop' not in path], 'parallel_owner_paths': [path for path in new_paths if 'com_interop' in path], 'parallel_owner': '/root/legacy_discovery_orchestrator/workspace_operations', 'preserved_files': preserved, 'retained_previous_baseline': ref(previous_baseline), 'retained_previous_final': ref(previous_final), 'routing_receipt': routing[0], 'actual_profile': ref(profile_path), 'native_authority': 'Parent reverified existing native routing/launch/provenance; worker matched fresh receipt and current profile bytes.', 'plan': ref(feature / 'plan.2026-10-17T22-38.md'), 'scope': 'Only P4-T5. Filesystem/registry owner and generic COM owner remain disjoint. No public registry edits or optional caller rewiring.', 'quality_baseline': {'new_path_executable_baseline': 'Absent: six planned files do not exist in working tree or accepted commit. No pre-existing executable units to measure.', 'ruff_pyright_tests_coverage': 'Accepted dependency proofs retained by exact working/commit bytes and prior manifests. No accepted suite was replayed.', 'required_post_change': 'Scoped focused loops, one combined candidate review, then one combined seven-stage final loop and executor acceptance.'}, 'harness': ref(snapshot)}
+initial = scratch / 'issue-980-baseline-initial.py'
+initial_snapshot = destination.with_name('p4t5-initial-baseline-harness.' + stamp + '.txt')
+initial_snapshot.write_bytes(initial.read_bytes())
+document['initial_binder_correction'] = {'harness': ref(initial_snapshot), 'failure': 'AssertionError: scripts/dev_tools/discovery/analyzer/source_text.py', 'cause': 'Existing accepted CRLF working bytes normalize to LF in Git; bind actual attributes and separate stream hashes rather than assume raw equality.', 'source_mutation': False}
+destination.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+destination.with_suffix('.md').write_text(f'# P4-T5 shared baseline\n\nTimestamp: {stamp}\nCommand: `poetry run python SCRATCH/issue-980-baseline.py`\nEXIT_CODE: 0\nOutput Summary: The six planned production/test paths are absent from the clean accepted commit {head}; {len(preserved)} accepted source/test/fixture working hashes are preserved. Commit hashes and actual Git normalization are recorded separately. No production or test mutation occurred.\n\nFilesystem and registry ownership covers four paths; the separate COM specialist owns its two paths. Exact paths, retained proof references, hashes, fresh routing receipt and profile binding are in JSON. Existing accepted suites were not rerun. New modules have no executable baseline; all required post-change gates remain pending. Public registry exposure remains P4-T9. The original binder and its normalization-assumption failure are retained.\n', encoding='utf-8', newline='\n')
+print(json.dumps({'baseline': destination.as_posix(), 'sha256': sha256(destination.read_bytes()).hexdigest(), 'absent_paths': len(new_paths), 'preserved_paths': len(preserved), 'head': head}))

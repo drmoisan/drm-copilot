@@ -1,0 +1,75 @@
+"""Snapshot newly executed COM evidence harnesses without rerunning their work."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+repo = Path.cwd()
+scratch = Path(__file__).parent
+evidence = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+freeze = evidence / "regression-testing/p4t5-com-wip-freeze.2026-10-19T07-27.json"
+original_freeze = freeze.read_bytes()
+manifest = json.loads(original_freeze)
+hash_value = lambda content: hashlib.sha256(content).hexdigest()
+tracked = subprocess.run(["git", "ls-files", "--", evidence.relative_to(repo).as_posix()], check=True,
+                         text=True, capture_output=True).stdout.splitlines()
+existing = {}
+for path in tracked:
+    if path.endswith(".txt"):
+        content = subprocess.run(["git", "show", "HEAD:" + path], check=True, capture_output=True).stdout
+        existing[hash_value(content)] = path
+bindings = []
+added = []
+for name, label in (("issue-980-p4t5-com-gate.py", "focused-run"),
+                    ("issue-980-p4t5-com-split.py", "test-split"),
+                    ("issue-980-p4t5-com-freeze.py", "coverage-structure-freeze"),
+                    (Path(__file__).name, "harness-binding")):
+    content = (scratch / name).read_bytes()
+    assert re.search(rb"(?<![A-Za-z])[A-Za-z]:[\\/]", content) is None
+    digest = hash_value(content)
+    if digest in existing:
+        target = repo / existing[digest]
+        disposition = "reused exact committed bytes"
+    else:
+        prior = [path for path in (evidence / "regression-testing").glob(f"p4t5-com-{label}-harness.*.txt")
+                 if path.read_bytes() == content]
+        target = prior[0] if prior else evidence / f"regression-testing/p4t5-com-{label}-harness.{stamp}.txt"
+        if not prior:
+            assert not target.exists()
+            target.write_bytes(content)
+        added.append(target.relative_to(repo).as_posix())
+        disposition = "new exact raw snapshot; no sanitizer required"
+    bindings.append({"scratch_identifier": "SCRATCH/" + name, "path": target.relative_to(repo).as_posix(),
+                     "raw_sha256": digest, "snapshot_sha256": hash_value(target.read_bytes()),
+                     "disposition": disposition, "crlf_count": content.count(b"\r\n"),
+                     "lf_normalized_sha256": hash_value(content.replace(b"\r\n", b"\n"))})
+for source in manifest["source_files"]:
+    assert hash_value((repo / source["path"]).read_bytes()) == source["sha256"]
+for receipt in manifest["ordered_focused_gates"]:
+    assert hash_value((repo / receipt["path"]).read_bytes()) == receipt["sha256"]
+assert freeze.read_bytes() == original_freeze
+prefix = evidence / f"regression-testing/p4t5-com-harness-supplement.{stamp}"
+json_path, md_path = Path(str(prefix) + ".json"), Path(str(prefix) + ".md")
+assert not json_path.exists() and not md_path.exists()
+record = {"timestamp": stamp, "command": "python SCRATCH/issue-980-p4t5-com-harness-binding.py", "exit_code": 0,
+          "freeze_manifest": {"path": freeze.relative_to(repo).as_posix(), "sha256": hash_value(original_freeze)},
+          "harnesses": bindings, "additional_stage_paths": added + [json_path.relative_to(repo).as_posix(), md_path.relative_to(repo).as_posix()],
+          "source_test_passing_receipt_mutations": False, "behavioral_reruns": False,
+          "initial_binding_failure": {"error": "AssertionError in host-path detector: an HTTPS URL was mistaken for a drive prefix.",
+                                      "preserved_harness": "SCRATCH/issue-980-p4t5-com-harness-binding-failed.py",
+                                      "sha256": hash_value((scratch / "issue-980-p4t5-com-harness-binding-failed.py").read_bytes()),
+                                      "partial_snapshots_preserved": ["focused-run", "test-split"],
+                                      "source_test_or_gate_mutation": False}}
+json_path.write_bytes((json.dumps(record, indent=2) + "\n").encode())
+md_path.write_bytes(("# P4-T5 COM harness preservation supplement\n\nTimestamp: " + stamp +
+                     "\nCommand: " + record["command"] + "\nEXIT_CODE: 0\nOutput Summary: Exact executed harness bytes are preserved; no behavioral work was repeated.\n\n"
+                     "The paired JSON adds only the new harness snapshots and this supplement to the existing 41-path freeze manifest. "
+                     "It binds raw SHA-256, published SHA-256, SCRATCH-relative identifiers and newline relationships. "
+                     "Identical committed text snapshots were checked before adding new copies. No snapshot contains a host path, "
+                     "so the raw bytes required no sanitization. The focused-run wrapper, original test-split operation, combined coverage/structure/freeze operation, "
+                     "and this preservation operation are included. The freeze manifest, source/test bytes and all passing receipts remain unchanged.\n").encode())
+print(json.dumps({"supplement": json_path.relative_to(repo).as_posix(), "sha256": hash_value(json_path.read_bytes()),
+                  "additional_stage_paths": record["additional_stage_paths"], "harnesses": bindings}, indent=2))

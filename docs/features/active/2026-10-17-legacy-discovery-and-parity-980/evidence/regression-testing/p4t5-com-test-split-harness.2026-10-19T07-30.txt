@@ -1,0 +1,89 @@
+"""Record approved test-path absence before preserving and relocating test nodes."""
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+repo = Path.cwd()
+feature = repo / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+source = repo / "tests/discovery_runtime/analyzer/test_com_interop.py"
+target = repo / "tests/discovery_runtime/analyzer/test_com_candidates.py"
+if target.exists():
+    raise ValueError("The approved new test path is no longer absent")
+baseline = feature / "evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json"
+baseline_hash = hashlib.sha256(baseline.read_bytes()).hexdigest()
+if baseline_hash != "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7":
+    raise ValueError("Shared baseline does not match the accepted receipt")
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+evidence = feature / "evidence/baseline" / ("p4t5-com-test-split-absence." + stamp + ".md")
+evidence.write_bytes(("# P4-T5 COM test-split absence supplement\n\nTimestamp: " + stamp +
+    "\nCommand: python SCRATCH/issue-980-p4t5-com-split.py\nEXIT_CODE: 0\nOutput Summary: The approved new path was absent immediately before creation. Original baseline and all prior receipts remain unchanged.\n\n" +
+    "Approved additional path: `tests/discovery_runtime/analyzer/test_com_candidates.py`. Authority: `workspace_operations_p4t5_com_test_split` / `S5_P4T5_com_test_split`; exact Python C4 profile unchanged.\n\n" +
+    "Shared baseline: `evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json`, SHA-256 `" + baseline_hash + "`. Its original six-path scope is retained. This supplement adds only the approved test path. Source/project candidate cases and deterministic properties move together; adapter/provenance/budget cases stay in the planned test module. No production scope expands.\n").encode("utf-8"))
+
+text = source.read_text("utf-8")
+lines = text.splitlines(keepends=True)
+nodes = [node for node in ast.parse(text).body if isinstance(node, ast.FunctionDef)]
+adapter_names = {"serialized", "test_direct_com_selection_is_schema_valid_and_never_claims_execution", "test_original_encoding_and_physical_anchor_are_preserved", "test_missing_pin_read_failures_exclusions_and_unrelated_inputs_are_honest", "test_adapter_sanitizes_encoding_size_and_parser_failures", "test_aggregate_budgets_discard_partial_output", "test_projection_determinism_redaction_and_no_file_io"}
+
+def pieces(selected):
+    result = []
+    for node in selected:
+        start = min([node.lineno, *(item.lineno for item in node.decorator_list)]) - 1
+        result.append("".join(lines[start:node.end_lineno]).rstrip())
+    return "\n\n\n".join(result) + "\n"
+
+candidate_header = '''"""Verify pure COM syntax/project candidates with bounded in-memory inputs."""
+
+from __future__ import annotations
+
+from itertools import product
+
+import pytest
+from drm_copilot_discovery.analyzer.com_interop import (
+    com_project_candidates,
+    com_source_candidates,
+)
+from drm_copilot_discovery.analyzer.csharp_tokens import SourceScanError
+from drm_copilot_discovery.analyzer.source_text import Detection
+from drm_copilot_discovery.analyzer.xml_input import XmlInputError
+
+
+'''
+adapter_header = '''"""Verify generic COM provenance, redaction and aggregate resource budgets."""
+
+from __future__ import annotations
+
+import codecs
+import hashlib
+from dataclasses import replace
+from pathlib import Path
+from typing import TYPE_CHECKING, cast
+
+import pytest
+from drm_copilot_discovery.analyzer.com_interop import ComInteropAnalyzer
+from drm_copilot_discovery.analyzer.emitter import inventory_result
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.models import InventoryInput
+from drm_copilot_discovery.models import canonical_json
+
+from tests.discovery_runtime.analyzer.test_dotnet_projects import capture
+from tests.discovery_runtime.analyzer.test_dotnet_projects import catalog as catalog
+from tests.discovery_runtime.analyzer.test_repository import inventory_profile
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.analyzer.models import Analysis
+    from drm_copilot_discovery.catalog import SchemaCatalog
+    from drm_copilot_discovery.models import JsonObject
+
+
+'''
+candidate = candidate_header + pieces(node for node in nodes if node.name not in adapter_names)
+adapter = adapter_header + pieces(node for node in nodes if node.name in adapter_names)
+pooled = {node.name: ast.dump(node, include_attributes=False) for body in (candidate, adapter) for node in ast.parse(body).body if isinstance(node, ast.FunctionDef)}
+assert pooled == {node.name: ast.dump(node, include_attributes=False) for node in nodes}
+target.write_bytes(candidate.encode("utf-8"))
+source.write_bytes(adapter.encode("utf-8"))
+print("Preserved all " + str(len(nodes)) + " test/helper definitions and decorators across the approved split.")
+print("Absence supplement: " + evidence.relative_to(repo).as_posix())

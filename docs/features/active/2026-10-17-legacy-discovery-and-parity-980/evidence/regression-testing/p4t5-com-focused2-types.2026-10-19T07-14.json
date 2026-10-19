@@ -1,0 +1,40 @@
+{
+  "stage": "3",
+  "label": "p4t5-com-focused2-types",
+  "started": "2026-10-19T07:14:03.301020+00:00",
+  "finished": "2026-10-19T07:14:05.415687+00:00",
+  "command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 0,
+  "duration_seconds": 2.115,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "cb50480e8d58b2b403b8c94ab9b933fa7140b190ae0df6d6c236920c31b6e420",
+      "physical_lines": 479
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "4d45ce3a818928082501d30cdac737c95adece6a50cf755d2b102da70775230d",
+      "physical_lines": 221
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "21259be215984ccb2af2c9cd2c91aeda377d6c7708f9529cfd6cac3b341d1672",
+      "physical_lines": 318
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "cb50480e8d58b2b403b8c94ab9b933fa7140b190ae0df6d6c236920c31b6e420",
+      "physical_lines": 479
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "4d45ce3a818928082501d30cdac737c95adece6a50cf755d2b102da70775230d",
+      "physical_lines": 221
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "21259be215984ccb2af2c9cd2c91aeda377d6c7708f9529cfd6cac3b341d1672",
+      "physical_lines": 318
+    }
+  },
+  "output": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}

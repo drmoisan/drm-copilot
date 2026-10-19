@@ -1,0 +1,40 @@
+{
+  "stage": "1",
+  "label": "p4t5-com-focused1-format",
+  "started": "2026-10-19T07:13:03.348025+00:00",
+  "finished": "2026-10-19T07:13:05.113057+00:00",
+  "command": "poetry run black --check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py tests/discovery_runtime/analyzer/test_com_interop.py tests/discovery_runtime/analyzer/test_com_candidates.py",
+  "exit_code": 0,
+  "duration_seconds": 1.765,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "670c25c517323fd0c8818c714df4d2bd68c3b88ba6dd9dc0dc12cd709d9c1d66",
+      "physical_lines": 477
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "16c2896215517fca021684417228dd5a32972bc1677efe32f30fc705b7ffd239",
+      "physical_lines": 224
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e236ab229568320d3ef39afa4d6a8c3a6cb545cd2371017571bc218204790ad",
+      "physical_lines": 298
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/com_interop.py": {
+      "sha256": "670c25c517323fd0c8818c714df4d2bd68c3b88ba6dd9dc0dc12cd709d9c1d66",
+      "physical_lines": 477
+    },
+    "tests/discovery_runtime/analyzer/test_com_interop.py": {
+      "sha256": "16c2896215517fca021684417228dd5a32972bc1677efe32f30fc705b7ffd239",
+      "physical_lines": 224
+    },
+    "tests/discovery_runtime/analyzer/test_com_candidates.py": {
+      "sha256": "2e236ab229568320d3ef39afa4d6a8c3a6cb545cd2371017571bc218204790ad",
+      "physical_lines": 298
+    }
+  },
+  "output": "All done! \u2728 \ud83c\udf70 \u2728\n3 files would be left unchanged.\n",
+  "accepted_baseline": "957908053625c5a22099bafe5b6fd3dde2aedde2",
+  "scope": "P4-T5 COM subset only"
+}
