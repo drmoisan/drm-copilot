@@ -1,0 +1,582 @@
+{
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+    "sha256": "4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a"
+  },
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-coverage-ranges.2026-10-19T13-40.json",
+    "sha256": "c97cd87b1f852ffad528373abf61408d086ba25c0cb161fc637dd7f3aa383ca9"
+  },
+  "current_head": "765dabd96c996ae3b581064c47f59b3c3ec2f03c",
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+    "tests/discovery_runtime/analyzer/test_pipeline.py": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+  },
+  "evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-inputs-test-split.2026-10-19T13-02.json",
+      "sha256": "37e5f0267d393b92aa923e2f79cb1e00182e745b7df000693f48e133352ba958"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-inputs-test-split.2026-10-19T13-02.md",
+      "sha256": "6b2759dbc1c82fdc47a4bdeac0f57886b1f344dfaa293c498662312d3a010579"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-draft-split-diagnostic.2026-10-19T13-10.json",
+      "sha256": "c6f8bc7cef47d1e593a073038181044aad8ca3cf50c2b50f10c7090007a188ea"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-draft-split-diagnostic.2026-10-19T13-10.md",
+      "sha256": "072e35b5c8d5c28248d40af220cd9e77cef59be0f1138ba7bb4416b075416426"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused1-format-130520.2026-10-19T13-05.json",
+      "sha256": "7cc1df600270278dde52dbaf3245567d19fd3e8c601caacf86b24a4b585bc98f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused1-format-130520.2026-10-19T13-05.md",
+      "sha256": "3c643df5796e53b73073cbd6712b4d1541b77c38e5227f4bbf2ed226130aba31"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-format-130532.2026-10-19T13-05.json",
+      "sha256": "21831fefb43e0c04e0e58b720c084a7375ee495a51c2b2cb22b9acc2ccd68dbd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-format-130532.2026-10-19T13-05.md",
+      "sha256": "b86a2f17761d3a9c06a1c8766e265e529ba71c7c89d400c83c95acbdb039d438"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.json",
+      "sha256": "005ce10ce34fcbc70e7d9c480598afccbd30ed4a20234377976257c2eb3dbfcb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.md",
+      "sha256": "efddd546dd69c3c789d7d7f1f48a6d59218b60b790e60998aa86035bf9f95ea7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-format-130548.2026-10-19T13-05.json",
+      "sha256": "98f0913831bef49ef62cd146f128f0582e6d620408030177b6d1522aefa2f2bb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-format-130548.2026-10-19T13-05.md",
+      "sha256": "04cdc1b25d84163736356bd7aa34c004f05d8b9607b0ae58dcff1ad0f91117bf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-lint-130548.2026-10-19T13-05.json",
+      "sha256": "e2fbb490c141561b3de695cf4cc81aa04f61f2d3e8c51b294ac02bfe061f2b63"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-lint-130548.2026-10-19T13-05.md",
+      "sha256": "cbb69c45691d9ff073e339232f56f1a25d5e746f0cf67629782680bfc4896d79"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.json",
+      "sha256": "830c2bd06de2eb842c6302f50c5910472ccbb9052fbf6cd7ddebbd1f940d0387"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.md",
+      "sha256": "5eba821b68139256cebc87d1d4e24462320654ec9f93ef82b6607d893e2542f4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused4-format-130945.2026-10-19T13-09.json",
+      "sha256": "71ab54f815e641d61fac31272f9995301bb502332f02dec0025acbdcbded3a08"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused4-format-130945.2026-10-19T13-09.md",
+      "sha256": "e7afb67a35a77d1697bdd4fc7976f0e79a44d9ab4bba3a22a50f8321f77b393a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.json",
+      "sha256": "d1ae9cd56337c28c78dc9313fec15ea0e9459a737169c69d3ff76fa045588949"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.md",
+      "sha256": "7490a276277db0a7009f73e1f3dbbd99632ea7f24882217e02ec3f72fa37378d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-lint-130958.2026-10-19T13-09.json",
+      "sha256": "f104c4a9252e54c7d974e446a5456474eee68600b729924ace6c3b7bc31f5467"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-lint-130958.2026-10-19T13-09.md",
+      "sha256": "af2b0b1dbde5fe6db3b1fdcb05b328853f0f6e468d957e3bdb545ca86105138c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-types-130959.2026-10-19T13-09.json",
+      "sha256": "f952827717936f164f1b48d405d34b16a2a31c925a811731cd0add23104cb99a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-types-130959.2026-10-19T13-09.md",
+      "sha256": "112c0eab0a9f9515ada18bf3eff0b0e789523056a8d5c80da2a3c4c7a7e36461"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-format-131017.2026-10-19T13-10.json",
+      "sha256": "54dd63b7ff07d71e0fcca6b355076cc837f7f6ae607a8a609b2950e12d90fd3b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-format-131017.2026-10-19T13-10.md",
+      "sha256": "7522942c1aa8f2d6bb9174d6de3364263cc0eac98a2b1daf31395e92bea8a098"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-lint-131017.2026-10-19T13-10.json",
+      "sha256": "a4e514f1069e9877c81d46a6ddda35f3c09ed028ec127b8b4be41fafac87ba55"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-lint-131017.2026-10-19T13-10.md",
+      "sha256": "3272bbda76c5f8539c2119768314ab745043b2bb382e63a22f67b22f97e1421c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-types-131018.2026-10-19T13-10.json",
+      "sha256": "df13246a4ab14aaeec37cb773e91821230a15265fc5585d180c38e06db7b15c8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-types-131018.2026-10-19T13-10.md",
+      "sha256": "3186cdad6a73bbe576b7d38472762dd9dc0233281e61c3d00e7d1284cb038ea0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused7-format-132032.2026-10-19T13-20.json",
+      "sha256": "87d83caec765709caa9b5297c5d64cb8fad362638ee31a350c910bba159b739b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused7-format-132032.2026-10-19T13-20.md",
+      "sha256": "6716ce7a735d29e2ba3c6710e7021fe183b2e6f68c96bb4258c74e81230540aa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-format-132054.2026-10-19T13-20.json",
+      "sha256": "a5ba9df40a1de633c20cd1a4334106fb64f4997e5deed51020893139e12cc991"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-format-132054.2026-10-19T13-20.md",
+      "sha256": "92627e0d8cad9d6c6f74b6a32e0d5a51440523993681d8ab95d7bbfbb88d4d83"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-lint-132054.2026-10-19T13-20.json",
+      "sha256": "9ce355602561fb142d797cdec2fb05349513cb6e99671a21ec595a799ee4c6c0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-lint-132054.2026-10-19T13-20.md",
+      "sha256": "8efbcfbd1382ebbeab6f4183836b9fbd72ecfa11c220ab0a88addff59fda277d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-types-132055.2026-10-19T13-20.json",
+      "sha256": "9cb0a2f9a11282894c4480e4aba635cb8e5fc58b606bf5cc62fb021fc53882b6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-types-132055.2026-10-19T13-20.md",
+      "sha256": "fb32d36b3379940f465cf95da49c3450fd3a08810d624f7f27b86a5a207934e8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-binding.2026-10-19T13-39.json",
+      "sha256": "3dee193dd986e7c5525d24cd5dcf1af4ec8fb0e28c8444b5f5c71fea563cec4e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.json",
+      "sha256": "a7a5025881c329c444e79fb5ee1022025b6f5c8b4e86787586ba78f6923c82b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.md",
+      "sha256": "761a6cf32155890b0ac90943d4b3434c4d7c1d2a2324557f178881ece2159d37"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.json",
+      "sha256": "6d8796c9c760ec3f5873b78eb9a5737dd970898a0a0c5e32e3e97a25f9be871a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.md",
+      "sha256": "1367672826a3792a44a29a7435de4bb82c052a522e130f9c626936e999e61904"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.json",
+      "sha256": "06c91fdba6911076ca5f6da9b52beba78825996d9560b07ffb166c2784f5e5e8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.md",
+      "sha256": "1b7c7bcf7d043c19bfc6c8e89631b78a7efb11936f4f08a48130a13caea0063b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused-before-fixture-precheck.2026-10-19T13-40.txt",
+      "sha256": "244b9a2728fd848f053ccb8a3b827a6163a2c09df28190c36dc5adde5b455b7f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused.2026-10-19T13-40.txt",
+      "sha256": "66f69cb04861539f1c18dd3e8a2d7111c93f5a9053735bea886708efca00e932"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-freeze.2026-10-19T13-40.txt",
+      "sha256": "77d2ba5123e33f3ef48e5bbc4a9526a7351625d16cc46f91bc1a38f10bfaee67"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-precheck.2026-10-19T13-40.txt",
+      "sha256": "4d91020717973fc949f9fa05290f7981577398bb19808d59fff30d3fd5db8d9a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-split.2026-10-19T13-40.txt",
+      "sha256": "889213cd585e8f184c5a9d6c36398b0aa52744275338a71448272144487b1fe1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-lossless-streams.2026-10-19T13-40.json",
+      "sha256": "3cf6bd8ca3534fbd51bff4b4d93ede671a1d93f6bbcf37ebb670fdd80cf8e210"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-pre-r1-source.2026-10-19T13-40.txt",
+      "sha256": "32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-coverage-ranges.2026-10-19T13-40.json",
+      "sha256": "c97cd87b1f852ffad528373abf61408d086ba25c0cb161fc637dd7f3aa383ca9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused6-tests-131602.2026-10-19T13-16.json",
+      "sha256": "2d28d7ad79c2e82d0d88feb04049a4fc452a025091dfc32e2c80d5d536bc4022"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused6-tests-131602.2026-10-19T13-16.md",
+      "sha256": "b16c80c01d0decc1f180a9d1e3a0bc16db56adf2ecb7e51fb6a6b04f03061258"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.json",
+      "sha256": "3f7550a93c9b40b2933fa61508922d09a89591a054e3731d7293790ca27f2c75"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.md",
+      "sha256": "6b1abb6fbf49cca13e18c2edc6ba04db9fa56b88beffc4f789daa32b5e1d2e70"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-coverage.2026-10-19T13-39.json",
+      "sha256": "73371df895ffdda758597830021f3a7da501932bc38461d47b880204a9ba3166"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.json",
+      "sha256": "d1d27c2de2cda9869ea206728095ffe858bb6c7a4fae79c7d0c2fef3f045feb3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.md",
+      "sha256": "0549af5360b970d0281b57d76adf5295090abb95cc56d63ef9c292f9199708e5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.json",
+      "sha256": "cef415b686c94bbcc4fa451547c3c26211c17a3aa3ae45134ceeabbb7e87fb07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.md",
+      "sha256": "c7a02c0e1b17018161f82c56783e9c468ffc446cd579da81a59600142f383a6e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-handoff.2026-10-19T13-40.md",
+      "sha256": "c239bc1c8b2d5a884a1cb949034697795344600e9166319e93a73d3f672ef8cc"
+    }
+  ],
+  "focused_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-binding.2026-10-19T13-39.json",
+    "sha256": "3dee193dd986e7c5525d24cd5dcf1af4ec8fb0e28c8444b5f5c71fea563cec4e"
+  },
+  "git_attributes": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py: text: auto",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py: eol: lf",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py: text: auto",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py: eol: lf",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py: text: auto",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py: eol: lf",
+    "tests/discovery_runtime/test_extension_input_limits.py: text: auto",
+    "tests/discovery_runtime/test_extension_input_limits.py: eol: lf",
+    "tests/discovery_runtime/test_extension_inputs.py: text: auto",
+    "tests/discovery_runtime/test_extension_inputs.py: eol: lf"
+  ],
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-handoff.2026-10-19T13-40.md",
+    "sha256": "c239bc1c8b2d5a884a1cb949034697795344600e9166319e93a73d3f672ef8cc"
+  },
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused-before-fixture-precheck.2026-10-19T13-40.txt",
+      "scratch_path": "SCRATCH/issue-980-shared-inputs-focused-before-fixture-precheck.py",
+      "sha256": "244b9a2728fd848f053ccb8a3b827a6163a2c09df28190c36dc5adde5b455b7f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused.2026-10-19T13-40.txt",
+      "scratch_path": "SCRATCH/issue-980-shared-inputs-focused.py",
+      "sha256": "66f69cb04861539f1c18dd3e8a2d7111c93f5a9053735bea886708efca00e932"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-freeze.2026-10-19T13-40.txt",
+      "scratch_path": "SCRATCH/issue-980-shared-inputs-freeze.py",
+      "sha256": "77d2ba5123e33f3ef48e5bbc4a9526a7351625d16cc46f91bc1a38f10bfaee67"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-precheck.2026-10-19T13-40.txt",
+      "scratch_path": "SCRATCH/issue-980-shared-inputs-precheck.py",
+      "sha256": "4d91020717973fc949f9fa05290f7981577398bb19808d59fff30d3fd5db8d9a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-split.2026-10-19T13-40.txt",
+      "scratch_path": "SCRATCH/issue-980-shared-inputs-split.py",
+      "sha256": "889213cd585e8f184c5a9d6c36398b0aa52744275338a71448272144487b1fe1"
+    }
+  ],
+  "raw_streams": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-lossless-streams.2026-10-19T13-40.json",
+    "sha256": "3cf6bd8ca3534fbd51bff4b4d93ede671a1d93f6bbcf37ebb670fdd80cf8e210"
+  },
+  "source_bindings": [
+    {
+      "filtered_git_object": "a630c208636ea707fa0e97afd839cfff3a5029e9",
+      "index_sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d",
+      "lines": 319,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b",
+      "working_git_object": "a630c208636ea707fa0e97afd839cfff3a5029e9"
+    },
+    {
+      "filtered_git_object": "e80eb8b83492d9926bb314ac5f0763d10b311d5f",
+      "index_sha256": null,
+      "lines": 442,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+      "sha256": "67aef6715ff93ea180811e4a18d6b1f3885e7692575c74d80bf77b81c455f46a",
+      "working_git_object": "e80eb8b83492d9926bb314ac5f0763d10b311d5f"
+    },
+    {
+      "filtered_git_object": "076c3458a2decf4f5d894dc638b16f835ec229ad",
+      "index_sha256": null,
+      "lines": 447,
+      "path": "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+      "sha256": "7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca",
+      "working_git_object": "076c3458a2decf4f5d894dc638b16f835ec229ad"
+    },
+    {
+      "filtered_git_object": "98344d81bdade075697436e48320ae9ffca80025",
+      "index_sha256": null,
+      "lines": 324,
+      "path": "tests/discovery_runtime/test_extension_input_limits.py",
+      "sha256": "218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033",
+      "working_git_object": "98344d81bdade075697436e48320ae9ffca80025"
+    },
+    {
+      "filtered_git_object": "afb928c56a22d72b0844a85516a92419b6c48eaf",
+      "index_sha256": null,
+      "lines": 400,
+      "path": "tests/discovery_runtime/test_extension_inputs.py",
+      "sha256": "140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf",
+      "working_git_object": "afb928c56a22d72b0844a85516a92419b6c48eaf"
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-inputs-test-split.2026-10-19T13-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t9-shared-inputs-test-split.2026-10-19T13-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-draft-split-diagnostic.2026-10-19T13-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-draft-split-diagnostic.2026-10-19T13-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused1-format-130520.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused1-format-130520.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-format-130532.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-format-130532.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused2-lint-130532.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-format-130548.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-format-130548.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-lint-130548.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-lint-130548.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused3-types-130549.2026-10-19T13-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused4-format-130945.2026-10-19T13-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused4-format-130945.2026-10-19T13-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-format-130958.2026-10-19T13-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-lint-130958.2026-10-19T13-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-lint-130958.2026-10-19T13-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-types-130959.2026-10-19T13-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused5-types-130959.2026-10-19T13-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-format-131017.2026-10-19T13-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-format-131017.2026-10-19T13-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-lint-131017.2026-10-19T13-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-lint-131017.2026-10-19T13-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-types-131018.2026-10-19T13-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused6-types-131018.2026-10-19T13-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused7-format-132032.2026-10-19T13-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused7-format-132032.2026-10-19T13-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-format-132054.2026-10-19T13-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-format-132054.2026-10-19T13-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-lint-132054.2026-10-19T13-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-lint-132054.2026-10-19T13-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-types-132055.2026-10-19T13-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused8-types-132055.2026-10-19T13-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-binding.2026-10-19T13-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-format-133343.2026-10-19T13-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-lint-133343.2026-10-19T13-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-focused9-types-133344.2026-10-19T13-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused-before-fixture-precheck.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-focused.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-freeze.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-precheck.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-harness-split.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-lossless-streams.2026-10-19T13-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-shared-inputs-pre-r1-source.2026-10-19T13-40.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-coverage-ranges.2026-10-19T13-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused6-tests-131602.2026-10-19T13-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused6-tests-131602.2026-10-19T13-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-coverage.2026-10-19T13-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-133932.2026-10-19T13-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-focused9-tests-fixture-precheck-133345.2026-10-19T13-33.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-freeze.2026-10-19T13-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t9-shared-inputs-handoff.2026-10-19T13-40.md",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py",
+    "tests/discovery_runtime/test_extension_input_limits.py",
+    "tests/discovery_runtime/test_extension_inputs.py"
+  ],
+  "stage_seconds": {
+    "format": 0.603691,
+    "lint": 0.10511,
+    "tests": 346.391142,
+    "tests-fixture-precheck": 1.448649,
+    "types": 1.065133
+  },
+  "state": "FOCUSED_SUBSET_FROZEN_REVIEW_PENDING",
+  "task": "P4-T9",
+  "test_count": 133,
+  "test_node_order": [
+    "tests/discovery_runtime/test_extension_inputs.py::test_projection_retains_exact_roles_statuses_and_pins",
+    "tests/discovery_runtime/test_extension_inputs.py::test_unavailable_inputs_retain_rationale_without_fabricated_bytes[excluded]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_unavailable_inputs_retain_rationale_without_fabricated_bytes[unreadable]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[reports]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[inventory]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[acceptance]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_generated_output_insertion_does_not_change_input_identity[evidence]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_manifest_filter_requires_the_configured_inventory_root",
+    "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src/generated]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[tests]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_output_source_overlap_fails_instead_of_hiding_inputs[src/main.cs]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_unconfigured_or_misclassified_inputs_fail_closed[outside/a.cs-source]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_unconfigured_or_misclassified_inputs_fail_closed[src/a.cs-test]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_exact_entrypoints_override_test_roots_without_prefix_scope",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[source]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[document]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[pin]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[absence]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[exclusion]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_each_selected_input_dimension_changes_digest[profile]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[duplicate]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[revision]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_malformed_local_pins_are_not_silently_discarded[type]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_unrelated_foreign_and_generated_pins_do_not_enter_projection",
+    "tests/discovery_runtime/test_extension_inputs.py::test_manifest_hash_excludes_only_root_checksum_and_preserves_authored_arrays",
+    "tests/discovery_runtime/test_extension_inputs.py::test_repository_roles_retain_pins_and_reject_conflicting_local_identity[False]",
+    "tests/discovery_runtime/test_extension_inputs.py::test_repository_roles_retain_pins_and_reject_conflicting_local_identity[True]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[source-bytes]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[pin-bytes]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[file-bytes]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[count]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[records]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[depth]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projection_reserves_resources_before_complete_result_allocation[work]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[ASCII]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\xe9]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\u4e2d]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\U0001f600]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\x00]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\\n\\t]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes[\"\\\\/~]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[None]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[invalid1]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_public_hash_inputs_require_validated_immutable_carriers[invalid2]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[None]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[True]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[False]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[123]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[-7]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[1.25]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[value6]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_hash_preserves_supported_json_scalars[value7]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[nodes]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[records]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[depth]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[integer]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[unicode]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_manifest_limits_reject_before_canonical_serialization[scalar]",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_pin_budget_is_checked_before_any_content_hash",
+    "tests/discovery_runtime/test_extension_input_limits.py::test_projected_mappings_reserve_records_before_row_construction",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_absent_and_empty_external_metadata_preserve_default_bytes",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[0.3.7]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[release-candidate]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[2026.10+local]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_version_is_preserved_on_every_source_bearing_row[\\xe9.\\U0001f600]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_external_metadata_is_sorted_without_changing_versions",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[repository]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[office-vsto]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[dependencies]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_identity_cannot_be_declared_by_an_external_adapter[ui-callbacks]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_duplicate_external_ids_fail_even_when_versions_differ[descriptors0]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_duplicate_external_ids_fail_even_when_versions_differ[descriptors1]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor0]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor1]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor2]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor3]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor4]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor5]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor6]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor7]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor8]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor9]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_malformed_external_metadata_has_fixed_actionable_failures[descriptor10]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers0]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers1]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_builtin_selectors_require_unique_reserved_metadata[identifiers2]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-components]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-findings]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor0-relationships]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-components]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-findings]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor1-relationships]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-components]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-findings]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor2-relationships]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-components]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-findings]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_each_row_family_requires_its_exact_declared_pair[descriptor3-relationships]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[ids-list]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[extensions-list]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[descriptor-type]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[id-type]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[id-size]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[extension-size]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[count]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_identity_and_row_limits_are_checked_before_aggregation[rows]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_reserved_versions_are_taken_from_the_single_registry_authority",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_empty_batch_limit_is_rejected_before_iteration",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[component_id]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[from_component_id]",
+    "tests/discovery_runtime/analyzer/test_emitter_extensions.py::test_declared_external_rows_reject_missing_component_targets[to_component_id]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_default_and_dry_run_analysis_are_identical_and_do_not_write",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[None]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated1]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_inventory_publication_is_explicit_idempotent_and_scope_preserving[generated2]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_publication_rejects_wrong_grants_and_changed_inputs",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_unverified_source_provenance_blocks_publication",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[duplicate]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[reference]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[schema]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[timestamp]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[limit]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_invalid_adapter_results_and_capture_metadata_fail_closed[identifier]",
+    "tests/discovery_runtime/analyzer/test_pipeline.py::test_null_relationship_target_preserves_unresolved_binding",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_document_has_exact_field_set_and_valid_patterns",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_schema_ref_is_scheme_less_relative_posix",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_wraps_relpath_value_error",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_rejects_absolute_result",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_compute_schema_ref_handles_sibling_directories",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_captured_at_derives_from_injected_clock",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_emit_rejects_unguarded_writes_and_retains_serialization",
+    "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py::test_emitted_instance_validates_against_v1_schema"
+  ],
+  "timestamp": "2026-10-19T13-40",
+  "written_at": "2026-10-19T13:40:13.203905+00:00"
+}

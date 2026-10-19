@@ -1,0 +1,179 @@
+"""Freeze the completed shared/core finding set without replaying behavioral suites."""
+from pathlib import Path
+import ast
+import datetime as dt
+import hashlib
+import json
+
+F = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+E = F / 'evidence'
+Q = E / 'qa-gates'
+S = Path(__file__).parent
+sha = lambda raw: hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {'path': Path(path).as_posix(), 'sha256': sha(Path(path).read_bytes())}
+
+
+def walk(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
+
+def publish(stem, suffix, value):
+    now = dt.datetime.now(dt.timezone.utc)
+    path = Q / (stem + '.' + now.strftime('%Y-%m-%dT%H-%M') + suffix)
+    assert not path.exists(), str(path)
+    raw = ((json.dumps({**value, 'published_utc': now.isoformat()}, indent=2) + '\n').encode()
+           if isinstance(value, dict) else value)
+    assert b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n')
+    assert all(line == line.rstrip() for line in raw.splitlines())
+    path.write_bytes(raw)
+    return path
+
+
+state = json.loads(Path('artifacts/orchestration/orchestrator-state.json').read_bytes())
+route_ids = ('atomic_execution_p4t9_shared_review', 'atomic_execution_p4t9_core_review')
+profile_hash = sha(Path('.codex/agents/atomic-executor-c4.toml').read_bytes())
+assert profile_hash == 'ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9'
+for identifier in route_ids:
+    route = [item for item in walk(state) if item.get('delegation_id') == identifier and item.get('deployment_agent')]
+    assert len(route) == 1
+    route = route[0]
+    assert (route['deployment_agent'], route['model'], route['model_reasoning_effort'], route['profile_sha256']) == ('atomic-executor-c4', 'gpt-6-astra', 'max', profile_hash)
+authority = json.loads((Path.home() / '.codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json').read_bytes())
+assert authority['profile_sha256'] == profile_hash
+assert all(authority[key] is True for key in ('routing_valid', 'launch_authority_valid', 'provenance_valid'))
+
+bindings = {
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py': '32077557de25328ffe76f258bd794fb48c44f490c310415e974d06ca017d07bf',
+    'packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py': 'ed16b1abe971e968592653869d209335e5181821acb5d1f674861049a229f69b',
+    'tests/discovery_runtime/test_extension_inputs.py': '140793de351df1706faa4af62eec28468f84b3afd6d06edeee0079c91a06f2cf',
+    'tests/discovery_runtime/test_extension_input_limits.py': '218a21cac597117a22ddd4bb6269ae0f56b251b9ef9be6b5b551d57aaa5ca033',
+    'tests/discovery_runtime/analyzer/test_emitter_extensions.py': '7139ef43e7bb1810b116a05108b01f7075ecd109ba569dbdb1cbe144fa15a3ca',
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py': '42f5da1edf150ee820a1b0541a5494a1e0d979f5a4110e20f721833302403402',
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py': '950fd2457bbf31485850df691ad3bf51061a080692308bf7b1567722eeb285bc',
+    'tests/discovery_runtime/test_extension_results.py': 'eb7cdf2dd054ada3888d1d41aa8944f3ecd19493c6da11ded6fdcc19c8fd35e4',
+    'tests/discovery_runtime/test_extension_inventory_merge.py': '7e9474868f09f5fae7b483024c065b77f54c85227c0ea383f51d9db079c63d81',
+}
+for path, digest in bindings.items():
+    assert sha(Path(path).read_bytes()) == digest, path
+    assert len(Path(path).read_bytes().splitlines()) <= 500, path
+
+production_docstrings = {
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py': {
+        '_member': 'State the types/roles of context, reference and adapter; schema-shaped alone does not identify their carrier types.',
+        '_validated': 'Name the ExtensionValidation type of context and its operation-local state role.',
+        'validate_extension_results': 'State snapshot DiscoverySnapshot and manifest_paths tuple[str, ...] | None explicitly.',
+        'merge_extension_inventory': 'State snapshot, timestamp, author_or_agent and manifest_paths types explicitly.',
+    },
+    'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py': {
+        'ValidatedExtension.__post_init__': 'Name the contract-relevant ExtensionResultError/EXTENSION_CARRIER failure.',
+        'ExtensionBudget.__init__': 'State the capacity parameter meanings/types, None return and counter initialization effects.',
+        'ExtensionBudget.reserve': 'State JsonValue and int parameter types and the counters mutated by reservation.',
+        'budget': 'State ProfileLimits input, ExtensionBudget return and construction failure contract.',
+        'object_rows': 'State JsonObject and str inputs and tuple[JsonObject, ...] result; explain schema-validated narrowing.',
+        'ExtensionValidation.inventory_path': 'State str parameter/result and pure path-validation boundary.',
+        'ExtensionValidation.read': 'State str parameters and tuple[SnapshotFile, JsonObject] result, plus used-path/raw-byte counter mutation.',
+        'ExtensionValidation.unique': 'State str parameters, retained identity-set mutation and EXTENSION_COLLISION failure.',
+        'ExtensionValidation.diagnostics': 'State tuple[JsonObject, ...] and JsonObject parameter types with the already described counters.',
+        'ExtensionValidation.accounting': 'State the diagnostics tuple[JsonObject, ...] parameter type alongside the existing document contract.',
+    },
+}
+locations = []
+
+
+def definitions(nodes, prefix=''):
+    for node in nodes:
+        if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            name = prefix + node.name
+            yield name, node
+            yield from definitions(node.body, name + '.')
+
+
+for path, names in production_docstrings.items():
+    found = dict(definitions(ast.parse(Path(path).read_bytes()).body))
+    for name, missing in names.items():
+        node = found[name]
+        locations.append({'path': path, 'definition': name, 'line': node.lineno, 'required_delta': missing})
+for path in ('tests/discovery_runtime/test_extension_results.py', 'tests/discovery_runtime/test_extension_inventory_merge.py'):
+    for name, node in definitions(ast.parse(Path(path).read_bytes()).body):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            locations.append({'path': path, 'definition': name, 'line': node.lineno, 'required_delta': 'Complete the short purpose-only contract with parameter types/roles, result (None for tests), relevant expected/assertion failures and isolated memory-only effects; retain existing purpose and assertions.'})
+
+probe_observation = {
+    'status': 'REPRODUCED_NUMERIC_ALLOCATION_BEFORE_BYTE_LIMIT',
+    'command': 'poetry run python SCRATCH/issue-980-p4t9-core-numeric-probe.py',
+    'execution_utc': '2026-10-19T13:28:23.272076+00:00', 'exit_code': 0,
+    'output_provenance': 'Structured transcription of the observed exec_command tool result; not claimed to be a redirected raw stdout file.',
+    'cases': [
+        {'decimal_digits': 3, 'configured_bytes': 2, 'numeric_rendering_lengths': [3], 'status': 'EXTENSION_LIMIT'},
+        {'decimal_digits': 1001, 'configured_bytes': 10, 'numeric_rendering_lengths': [1001], 'status': 'EXTENSION_LIMIT'},
+        {'decimal_digits': 1001, 'configured_bytes': 1002, 'numeric_rendering_lengths': [1001], 'status': 'accepted'},
+    ],
+    'method': 'An isolated subprocess replaces only module-local str with a behavior-preserving string subclass that counts the resulting numeric text length. It is restored immediately. No timing threshold or external service is used.',
+    'bindings': {path: digest for path, digest in bindings.items() if 'extension_results.py' in path or 'extension_validation.py' in path or 'extension_inventory_merge.py' in path},
+    'initial_binding_diagnostic': {'exit_code': 1, 'kind': 'AssertionError before any probe case', 'cause': 'The authorized merge-test fixture repair changed its hash from 776622f2... to 7e947486... while the initial checker still expected the former. Production bytes were unchanged. The rerun changed only that expected test hash.', 'transcription_not_raw_stream': True},
+}
+probe = publish('p4t9-executor-numeric-probe', '.json', probe_observation)
+probe_script = publish('p4t9-executor-numeric-probe-harness', '.txt', (S / 'issue-980-p4t9-core-numeric-probe.py').read_bytes())
+probe_original = publish('p4t9-executor-numeric-probe-before-fixture-rebind', '.txt', (S / 'issue-980-p4t9-core-numeric-probe-before-fixture-rebind.py').read_bytes())
+policy = ref('.agents/skills/self-explanatory-code-commenting/SKILL.md')
+findings = [
+    {'id': 'P4T9-R1', 'scope': 'shared', 'kind': 'required-policy', 'path': 'packages/discovery-runtime/src/drm_copilot_discovery/extension_inputs.py', 'line': 29, 'definition': '_Budget', 'issue': 'The one-line class docstring states purpose but omits required lifecycle/usage, scope, counter invariants and side effects.', 'rule': 'Mandatory Class Docstrings, lines 16-24', 'repair': 'Add a concise class-level contract for one operation-local reservation object, prospective counters, fail-closed exhaustion and absence of I/O/input mutation. Existing constructor/method contracts need no redundant rewrite.'},
+    {'id': 'P4T9-R2', 'scope': 'core', 'kind': 'prospective-resource-bound', 'path': 'packages/discovery-runtime/src/drm_copilot_discovery/extension_validation.py', 'line': 159, 'definition': 'ExtensionBudget._visit', 'issue': 'Integer str(value) is allocated before checking remaining bytes. A 10-byte limit permitted construction of a 1,001-character string before raising EXTENSION_LIMIT.', 'proof': ref(probe), 'repair': 'Reject integers whose bounded decimal rendering cannot fit before calling str; retain exact valid boundaries, sign/zero cases and fixed errors. Add deterministic conversion-order/count tests, not timing assertions. Do not rely on the process-wide integer-to-string digit ceiling.'},
+    {'id': 'P4T9-R3', 'scope': 'core', 'kind': 'required-policy', 'issue': 'New short core helper/test docstrings omit required parameter types and, in listed cases, return/raises/effect contracts despite type hints in signatures.', 'rule': 'Mandatory Function and Method Docstrings, lines 30-36: types included even when type hints are present.', 'locations': locations, 'repair': 'Complete only the listed missing contracts while retaining behavior/assertions. Keep files within 500 lines through coordinator-approved cohesive splits if needed; do not remove tests/comments.'},
+]
+result = {
+    'status': 'SHARED_CORE_REVIEW_REVISIONS_REQUIRED', 'task': 'P4-T9', 'authority_receipts': list(route_ids), 'native_authority_valid': True, 'profile_sha256': profile_hash,
+    'reviewed_and_current_bindings': bindings,
+    'registry_review_reused': ref(Q / 'p4t9-executor-registry-review.2026-10-19T13-08.json'),
+    'policy': policy,
+    'findings': findings, 'open_behavioral_probes': [],
+    'completed_checks': [
+        'Output-independent projection includes selected source/test/docs/entrypoints, captured status/hash/size/rationale, ordered exclusions, profile, role pins and exact retained local objects; configured output overlap and manifest escape fail closed.',
+        'Shared UTF-8, structural and path-work reservations precede copied projection/serialization; manifest hash excludes only the root checksum.',
+        'Emitter keeps the single fixed reserved-ID source and exact external versions, rejects identity/reference collisions and preserves empty-default compatibility. Its added identity/batch checks do not claim standalone preflight for arbitrary untrusted row text.',
+        'Core reconstructs manifest/member validation from raw snapshot bytes and pins, preserves full built-in accounting and diagnostics, excludes documentation from source-bearing extension claims, and validates within-bundle references without trusting a caller proof carrier.',
+        'Core merge reserves complete added row/adapter/diagnostic-linkage costs and an independent input-times-diagnostic work bound before merged emission; numeric conversion order is the isolated resource finding.',
+        'No publication or installed-host acceptance is claimed. Registry review and unchanged predecessor proof are reused; no broad suite or predecessor review was repeated.',
+    ],
+    'behavioral_evidence_state': {
+        'shared_focused8': ref(E / 'regression-testing/p4t9-shared-inputs-focused8-tests-132643.2026-10-19T13-26.json'),
+        'shared_status': '132 passed / 1 fixture-count assertion failure; no clean success claim. The already authorized count-fixture correction changed test_extension_input_limits from 5c9ba9e1... to current 218a21ca..., with production unchanged.',
+        'core_focused10': ref(E / 'regression-testing/p4t9-core-focused10-pytest.2026-10-19T13-26.json'),
+        'core_status': '123 passed / 2 fixture-only failures. Focused11 is in progress on the authorized merge-test fixture correction, with production unchanged; no final behavioral conclusion is made.',
+        'earlier_shared_128_of_129': 'Retained in owner evidence; not superseded by a success claim.',
+    },
+    'probe': ref(probe), 'source_test_plan_ac_checkpoint_git_mutations': False,
+    'task_checkoff': False, 'counts': {'accepted_tasks': 40, 'total_tasks': 84, 'accepted_ac': 13, 'total_ac': 66},
+    'next_action': 'Coordinator releases the complete finite repair set after active owner runs end, then bounded correction confirmation and one final ordered task sequence.',
+}
+review = publish('p4t9-executor-shared-core-review', '.json', result)
+now = dt.datetime.now(dt.timezone.utc)
+markdown = publish('p4t9-executor-shared-core-review', '.md', (
+    '# P4-T9 shared/core candidate review\n\n'
+    f'Timestamp: {now.strftime("%Y-%m-%dT%H-%M")}\n'
+    'Command: poetry run python SCRATCH/issue-980-p4t9-shared-core-review.py\n'
+    'EXIT_CODE: 0\nOutput Summary: SHARED_CORE_REVIEW_REVISIONS_REQUIRED; three finite findings; no open behavioral probe.\n\n'
+    'P4T9-R1: Expand only the shared _Budget class contract required by the class-docstring policy. Its existing method contracts remain adequate.\n\n'
+    'P4T9-R2: The core numeric reservation allocates str(integer) before checking its byte cost. A counted, non-timing probe observed 1,001 rendered characters with a 10-byte ceiling before rejection. Check integer render capacity prospectively and preserve exact accepted boundaries.\n\n'
+    'P4T9-R3: Complete the exact core helper/test docstrings enumerated in the JSON receipt with required typed parameter, return, exception and effect contracts. Retain all behavior and assertions and the 500-line limit.\n\n'
+    'All nine current source/test streams are bound. Production is unchanged from review release; two separately authorized fixture repairs are explicitly qualified. The failed shared/core focused runs remain evidence, and their unfinished successors are not claimed as passing. Registry review is retained. No suite was replayed or source/test/checklist/checkpoint/Git state modified.\n\n'
+    'The emitter remains a minimal metadata seam; core merge preflight owns complete external-row text reservation. Validation and merge return data eligibility only, with publication still deferred. Counts remain 40/84 tasks and 13/66 AC.\n'
+).encode())
+harness = publish('p4t9-executor-shared-core-review-harness', '.txt', Path(__file__).read_bytes())
+for path, digest in bindings.items():
+    assert sha(Path(path).read_bytes()) == digest, path
+paths = [review, markdown, probe, probe_script, probe_original, harness]
+stage_minute = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+stage_path = Q / f'p4t9-executor-shared-core-staging.{stage_minute}.json'
+stage = publish('p4t9-executor-shared-core-staging', '.json', {'task': 'P4-T9', 'status': result['status'], 'files': [ref(path) for path in paths], 'stage_paths': [path.as_posix() for path in paths + [stage_path]], 'mutations': 'Review evidence only'})
+assert stage == stage_path
+print(json.dumps({'status': result['status'], 'review': ref(review), 'markdown': ref(markdown), 'staging': ref(stage), 'findings': ['P4T9-R1', 'P4T9-R2', 'P4T9-R3'], 'open_probes': []}))

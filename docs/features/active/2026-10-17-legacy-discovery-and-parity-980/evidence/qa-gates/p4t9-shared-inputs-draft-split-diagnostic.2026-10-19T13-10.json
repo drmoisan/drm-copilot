@@ -1,0 +1,15 @@
+{
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-10",
+  "event_minute": "2026-10-19T13-02",
+  "command": "poetry run python SCRATCH/issue-980-shared-inputs-split.py",
+  "exit_code": 1,
+  "diagnostic": "AssertionError in the optional draft-mover AST comparison after copying the four approved test functions.",
+  "harness": "SCRATCH/issue-980-shared-inputs-split.py",
+  "harness_sha256": "889213cd585e8f184c5a9d6c36398b0aa52744275338a71448272144487b1fe1",
+  "confirmed_cause": "The comparison read its new UTF-8 target with Path.read_text() without an encoding. The Windows default was cp1252. A bounded comparison identified only the Unicode parameter-matrix function as different under that incorrect decoder.",
+  "affected_function": "test_manifest_serialization_accounts_for_exact_utf8_and_json_escapes",
+  "production_changes": false,
+  "accepted_test_changes": false,
+  "qualification": "This failed draft check is retained and is not accepted AST-equivalence evidence. The copied Unicode cases remain in UTF-8 source and are exercised by the focused behavioral suite. Subsequent evidence readers specify UTF-8 explicitly."
+}

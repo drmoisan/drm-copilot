@@ -1,0 +1,13 @@
+{
+  "task": "P4-T9",
+  "timestamp": "2026-10-19T13-02",
+  "command": "Test-Path tests/discovery_runtime/test_extension_input_limits.py",
+  "exit_code": 0,
+  "observed_exists": false,
+  "path": "tests/discovery_runtime/test_extension_input_limits.py",
+  "authorization": "Parent approved the test-only resource/Unicode/serialization split before creation.",
+  "baseline": "evidence/baseline/p4t9-shared-baseline.2026-10-19T12-41.json",
+  "baseline_sha256": "4db1465e45dc14de9ae028e1f0ab04eed05f165f31f796fa73a19729af357e2a",
+  "formatted_original_test_lines": 509,
+  "production_scope_unchanged": true
+}
