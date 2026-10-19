@@ -1,0 +1,230 @@
+{
+  "budget_domains": {
+    "exhaustion": "whole Analysis replaced by one fixed blocker; no partial claims",
+    "pin_bytes": "independent document_bytes for all supplied pins including duplicates/foreign/unused",
+    "pin_count": "source_files before indexing",
+    "projected_output_bytes": "independent document_bytes; 12 encoded bytes per Unicode character plus fixed overhead; both compact ensure_ascii policies",
+    "selected_input_bytes": "independent document_bytes before decoding each selected file"
+  },
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-coverage-ranges.2026-10-19T07-30.json",
+    "sha256": "5e60f266068c1b27480dc9e4917408526f174b25274fbb510ec02ce5cf0e60ac"
+  },
+  "files": [
+    {
+      "filtered_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py: eol: lf",
+      "lines": 284,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+      "sha256": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "30db422dda93a50a311ecb5ad950a32333d284fc"
+    },
+    {
+      "filtered_git_blob": "e626eeec46fdc72f8a778891ab97250dac3f47f0",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py: eol: lf",
+      "lines": 249,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+      "sha256": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "e626eeec46fdc72f8a778891ab97250dac3f47f0"
+    },
+    {
+      "filtered_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py: eol: lf",
+      "lines": 134,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+      "sha256": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "dfdb392d3868d9a50a1da6027d5f3c543566bca7"
+    },
+    {
+      "filtered_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff",
+      "git_attributes": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: text: auto\npackages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py: eol: lf",
+      "lines": 56,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+      "sha256": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "f26b3e4202a733803f3add9e7917cd421d236fff"
+    },
+    {
+      "filtered_git_blob": "4534ddd2e54203987f67261b26bbfa141ea02525",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_filesystem_access.py: text: auto\ntests/discovery_runtime/analyzer/test_filesystem_access.py: eol: lf",
+      "lines": 419,
+      "path": "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+      "sha256": "9145b1301141ec018e3b4fc776c598f36b0db14c91cf95e788ea2dd5cbd111c7",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "4534ddd2e54203987f67261b26bbfa141ea02525"
+    },
+    {
+      "filtered_git_blob": "12aba11da45b370875582e796006136f38b651aa",
+      "git_attributes": "tests/discovery_runtime/analyzer/test_registry_access.py: text: auto\ntests/discovery_runtime/analyzer/test_registry_access.py: eol: lf",
+      "lines": 422,
+      "path": "tests/discovery_runtime/analyzer/test_registry_access.py",
+      "sha256": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db",
+      "stream_relation": "working bytes equal LF-filtered bytes; index/commit are parent-owned",
+      "working_git_blob": "12aba11da45b370875582e796006136f38b651aa"
+    }
+  ],
+  "focused_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-binding.2026-10-19T07-28.json",
+    "sha256": "aa106e2d1e8a2414022df663ff42dc653055828be1153490137c43e6d379e385"
+  },
+  "harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-focused-harness.2026-10-19T07-30.txt",
+      "sha256": "084e7b28649c0a62530f9ab893613febf3c94ef4c790f8c3128cbbb3ed1f0b3c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-freeze-harness.2026-10-19T07-30.txt",
+      "sha256": "15fec594500fc80de765dedf8ec87acdcd81a4df9403f6e30afe7aef382ec755"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-failure-harness.2026-10-19T07-30.txt",
+      "sha256": "2f0a7565c5474606d6334d58e117b3648a45193988b8767588cef7f6f81d5900"
+    }
+  ],
+  "limitations": [
+    "Lexical inferred candidates only; no compiler binding, alias/dataflow resolution, evaluated platform applicability or runtime path/key values",
+    "Fixed System.IO and Microsoft.Win32 allowlists; instance receiver variables and unlisted calls omitted",
+    "Malformed delimiters fail closed; conditional compilation is not evaluated",
+    "Public registry exposure is reserved for P4-T9; no coding-agent-host proof or task acceptance claimed"
+  ],
+  "ordered_receipts": [
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072710.2026-10-19T07-27.md",
+        "sha256": "f7d35f54dfc3f114f28c969304ccfbb360d003426e581770cf4a95ae07569a6d"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072710.2026-10-19T07-27.json",
+      "seconds": 0.584519,
+      "sha256": "c746d1c3e5a123cd0c249625521d002d5cc4c76656fff2d47df80346f05790de",
+      "stage": "format"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072710.2026-10-19T07-27.md",
+        "sha256": "9f383d91720a26c81736da698ca41f379f751b07a4682ebe151b6d8582d97be8"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072710.2026-10-19T07-27.json",
+      "seconds": 0.100529,
+      "sha256": "f1e78a084285a6966963a7be267396361f5b3af8a962c6f4c6b0857aa37cb6c3",
+      "stage": "lint"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-types-072711.2026-10-19T07-27.md",
+        "sha256": "005e73bcd90f5df13e819fac7ec9aaa2459bbde63f3c2945a9bcc11c65154910"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-types-072711.2026-10-19T07-27.json",
+      "seconds": 0.995418,
+      "sha256": "770ceef1d581d51f5e6749d94089d09946f0101a66944271b6ad67d5170f5fe6",
+      "stage": "types"
+    },
+    {
+      "markdown": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-tests-072850.2026-10-19T07-28.md",
+        "sha256": "f97a72a568553a68cab3bdad5e54e504a87146d63c1fd811b74e056fdc3ad305"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-tests-072850.2026-10-19T07-28.json",
+      "seconds": 99.479036,
+      "sha256": "8a65b6cfa2dfdf1e49580495a432a1d56a1a943f224178f772fca8f578756037",
+      "stage": "tests"
+    }
+  ],
+  "preserved_predecessors": 45,
+  "provenance_correction": "One captured-input index and one retained-pin scan preserve any exact repo/revision/path/bytes match; counted 32-pin regression proves <= 2 identity reads per pin. No accepted helper was edited.",
+  "retained_history": [
+    "151-case corrected ordering proof remains pre-provenance evidence",
+    "148-pass/3-failure initial ordering assertions and original raw coverage remain retained",
+    "Initial format/lint/type diagnostics remain under scoped evidence prefixes"
+  ],
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-shared-baseline.2026-10-19T06-59.json",
+    "sha256": "f54663e1890aa3de755d7131d3468f34768f3c09266b0b435123b2eb0d3ba5e7"
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-api-helper-absence.2026-10-19T07-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-api-helper-absence.2026-10-19T07-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-api-syntax-absence.2026-10-19T07-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t5-api-syntax-absence.2026-10-19T07-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-candidate-freeze.2026-10-19T07-30.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-binding.2026-10-19T07-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-format-072033.2026-10-19T07-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-format-072033.2026-10-19T07-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-lint-072033.2026-10-19T07-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-lint-072033.2026-10-19T07-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-types-072034.2026-10-19T07-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-corrected-types-072034.2026-10-19T07-20.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071637.2026-10-19T07-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071637.2026-10-19T07-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071649.2026-10-19T07-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071649.2026-10-19T07-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071715.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071715.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071730.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071730.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071747.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071747.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071756.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-format-071756.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071650.2026-10-19T07-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071650.2026-10-19T07-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071715.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071715.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071730.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071730.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071747.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071747.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071756.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-lint-071756.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-types-071731.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-types-071731.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-types-071757.2026-10-19T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-development-types-071757.2026-10-19T07-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-failure-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-focused-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-freeze-harness.2026-10-19T07-30.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-binding.2026-10-19T07-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072415.2026-10-19T07-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072415.2026-10-19T07-24.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072645.2026-10-19T07-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072645.2026-10-19T07-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072656.2026-10-19T07-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072656.2026-10-19T07-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072710.2026-10-19T07-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-format-072710.2026-10-19T07-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072656.2026-10-19T07-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072656.2026-10-19T07-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072710.2026-10-19T07-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-lint-072710.2026-10-19T07-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-types-072711.2026-10-19T07-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-provenance-types-072711.2026-10-19T07-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-structure.2026-10-19T07-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-corrected-coverage.2026-10-19T07-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-corrected-tests-072207.2026-10-19T07-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-corrected-tests-072207.2026-10-19T07-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-coverage-ranges.2026-10-19T07-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-development-tests-071926.2026-10-19T07-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-development-tests-071926.2026-10-19T07-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-initial-ordering-failure-binding.2026-10-19T07-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-initial-ordering-failure-coverage.2026-10-19T07-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-coverage.2026-10-19T07-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-tests-072850.2026-10-19T07-28.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t5-access-provenance-tests-072850.2026-10-19T07-28.md",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py",
+    "tests/discovery_runtime/analyzer/test_registry_access.py"
+  ],
+  "state": "ACCESS_SUBSET_FROZEN_REVIEW_PENDING",
+  "structural_checks": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t5-access-structure.2026-10-19T07-30.json",
+    "sha256": "b3a325e54a2b0b0ff5563d2b783bc1224fd6cfd64bc2137c579a843c7409315d"
+  },
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-30"
+}

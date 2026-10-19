@@ -1,0 +1,39 @@
+{
+  "batch": "provenance",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py tests/discovery_runtime/analyzer/test_filesystem_access.py tests/discovery_runtime/analyzer/test_registry_access.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T07:26:56.968703+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t5-access-provenance-lint-072656.2026-10-19T07-26.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t5-access-provenance-lint-072656.2026-10-19T07-26.stdout.txt",
+      "sha256": "f9ebc12e618cd52760e6bea32d32bba01521afff14f35df0dc63fb6121115dac"
+    }
+  },
+  "seconds": 0.104465,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "2340e4a3d24bc71d50f71a9873ac710f19fbc3f2a89402827aed70234ba047a1",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_access.py": "0f243cfd01ed2fc41a28f30c290ab4f2d5c52072bd4a383353312cd8e30b0011",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/api_syntax.py": "8ab70c6adc52a37ce6fb6bbee05aa89df1c9deee2dc4b0d954f4287da68925d8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/filesystem_access.py": "dd0842b9a95096e38cfd005b07ce77311b8a27522191c42e6e55ba003436a1a5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry_access.py": "5ed36f6cb8f292b064ffaf62c912f174192e444579d075ad8ccdf1d7f48f1a0c",
+    "tests/discovery_runtime/analyzer/test_filesystem_access.py": "2340e4a3d24bc71d50f71a9873ac710f19fbc3f2a89402827aed70234ba047a1",
+    "tests/discovery_runtime/analyzer/test_registry_access.py": "82eedce0b1b1815f74e81f930d83461434efdb71ecb79a06edbd3c878506f2db"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T07:26:56.864238+00:00",
+  "stderr": "",
+  "stdout": "E501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\analyzer\\test_filesystem_access.py:296:89\n    |\n295 | class CountedPin:\n296 |     \"\"\"Expose retained immutable pin data while counting identity inspections locally.\"\"\"\n    |                                                                                         ^\n297 |\n298 |     def __init__(self, source: RepositoryFile, visits: list[int]) -> None:\n    |\n\nFound 1 error.\n",
+  "task": "P4-T5",
+  "timestamp": "2026-10-19T07-26"
+}

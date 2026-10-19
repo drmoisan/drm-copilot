@@ -1,0 +1,131 @@
+"""Freeze the exact access subset and retain focused evidence without acceptance."""
+import ast
+import datetime
+import hashlib
+import io
+import json
+from pathlib import Path
+import subprocess
+import tokenize
+
+root=Path.cwd()
+scratch=Path(__file__).resolve().parent
+feature=root/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+evidence=feature/'evidence'
+stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+production=['packages/discovery-runtime/src/drm_copilot_discovery/analyzer/'+name+'.py' for name in ('api_access','api_syntax','filesystem_access','registry_access')]
+tests=['tests/discovery_runtime/analyzer/test_'+name+'.py' for name in ('filesystem_access','registry_access')]
+paths=production+tests
+
+def sha(content):
+    return hashlib.sha256(content).hexdigest()
+
+def reference(path):
+    return {'path':path.relative_to(root).as_posix(),'sha256':sha(path.read_bytes())}
+
+def write_json(path, document):
+    path.write_text(json.dumps(document,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+
+baseline=evidence/'baseline/p4t5-shared-baseline.2026-10-19T06-59.json'
+preserved=json.loads(baseline.read_bytes())['preserved_files']
+for entry in preserved:
+    assert sha((root/entry['path']).read_bytes())==entry['sha256'],entry['path']
+
+bindings=sorted((evidence/'qa-gates').glob('p4t5-access-provenance-binding.*.json'))
+assert bindings,'Successful focused provenance binding required'
+binding_path=bindings[-1]
+binding=json.loads(binding_path.read_bytes())
+for path in paths:
+    assert sha((root/path).read_bytes())==binding['sources'][path],path
+receipts=[]
+for item in binding['receipts']:
+    path=root/item['path']
+    assert sha(path.read_bytes())==item['sha256']
+    document=json.loads(path.read_bytes())
+    assert document['exit_code']==0 and document['source_before']==document['source_after']==binding['sources']
+    for stream in document['raw'].values():
+        assert sha((scratch/stream['path'].removeprefix('SCRATCH/')).read_bytes())==stream['sha256']
+    receipts.append({'stage':document['stage'],'seconds':document['seconds'],**item,'markdown':reference(path.with_suffix('.md'))})
+assert [item['stage'] for item in receipts]==['format','lint','types','tests']
+coverage_path=root/binding['coverage']['path']
+assert sha(coverage_path.read_bytes())==binding['coverage']['sha256']
+coverage=json.loads(coverage_path.read_bytes())
+assert coverage['totals']['missing_lines']==0
+assert coverage['totals']['missing_branches']==0
+raw_coverage=scratch/binding['coverage']['raw_path'].removeprefix('SCRATCH/')
+assert sha(raw_coverage.read_bytes())==binding['coverage']['raw_sha256']
+
+files=[]
+units=[]
+checks=[]
+for relative in paths:
+    path=root/relative
+    content=path.read_bytes()
+    text=content.decode('utf-8')
+    tree=ast.parse(text)
+    assert len(text.splitlines())<=500
+    assert b'\r' not in content
+    attributes=subprocess.run(['git','check-attr','text','eol','--',relative],check=True,capture_output=True).stdout.decode().strip()
+    raw_blob=subprocess.run(['git','hash-object','--no-filters','--stdin'],input=content,check=True,capture_output=True).stdout.decode().strip()
+    filtered_blob=subprocess.run(['git','hash-object','--path='+relative,'--stdin'],input=content,check=True,capture_output=True).stdout.decode().strip()
+    assert raw_blob==filtered_blob
+    files.append({'path':relative,'sha256':sha(content),'lines':len(text.splitlines()),'git_attributes':attributes,'working_git_blob':raw_blob,'filtered_git_blob':filtered_blob,'stream_relation':'working bytes equal LF-filtered bytes; index/commit are parent-owned'})
+    for node in ast.walk(tree):
+        if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)):
+            assert ast.get_docstring(node),(relative,node.name)
+    if relative in production:
+        imports=[]
+        for node in ast.walk(tree):
+            if isinstance(node,ast.ImportFrom) and node.module: imports.append(node.module)
+            elif isinstance(node,ast.Import): imports.extend(value.name for value in node.names)
+            if isinstance(node,ast.Call):
+                called=ast.unparse(node.func)
+                assert called not in {'open','eval','exec','compile','import_module'},(relative,called)
+                assert not called.endswith(('.read_bytes','.read_text','.write_bytes','.write_text','.unlink','.mkdir','.glob','.rglob')),(relative,called)
+        assert not any(value.startswith(('scripts','subprocess','socket','requests','http','urllib','os','io')) for value in imports),(relative,imports)
+        assert not any('office' in value or 'vsto' in value for value in imports),(relative,imports)
+        measured=coverage['files'][relative]
+        executed=set(measured['executed_lines']); missing=set(measured['missing_lines'])
+        branches=measured['executed_branches']+measured['missing_branches']
+        def collect(nodes,prefix=''):
+            for node in nodes:
+                if isinstance(node,(ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef)):
+                    name=prefix+node.name
+                    statements=sorted(line for line in executed|missing if node.lineno<=line<=node.end_lineno)
+                    arcs=[arc for arc in branches if node.lineno<=arc[0]<=node.end_lineno]
+                    uncovered=[line for line in statements if line in missing]
+                    missed_arcs=[arc for arc in measured['missing_branches'] if node.lineno<=arc[0]<=node.end_lineno]
+                    assert not uncovered and not missed_arcs
+                    units.append({'path':relative,'name':name,'kind':type(node).__name__,'start':node.lineno,'end':node.end_lineno,'statements':len(statements),'covered_statements':len(statements)-len(uncovered),'branches':len(arcs),'covered_branches':len(arcs)-len(missed_arcs)})
+                    collect(node.body,name+'.')
+        collect(tree.body)
+        checks.append({'path':relative,'checks':['size <= 500','documented definitions','no optional-domain imports','no process/network/native I/O','all measured units fully covered']})
+    else:
+        docs={(node.body[0].lineno,node.body[0].col_offset) for node in ast.walk(tree) if isinstance(node,(ast.Module,ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef)) and ast.get_docstring(node)}
+        executable=' '.join(token.string for token in tokenize.generate_tokens(io.StringIO(text).readline) if token.type!=tokenize.COMMENT and token.start not in docs)
+        assert not any(word in executable for word in ('tmp_path','tmpdir','TemporaryDirectory','NamedTemporaryFile','tempfile','subprocess','requests','socket'))
+        checks.append({'path':relative,'checks':['size <= 500','documented definitions','isolated memory fixtures','no temp files/processes/network']})
+
+snapshots=[]
+for script in ('issue-980-access-focused.py','issue-980-access-freeze.py','issue-980-access-failure.py'):
+    source=scratch/script
+    target=evidence/'qa-gates'/('p4t5-access-'+script.removeprefix('issue-980-access-').removesuffix('.py')+'-harness.'+stamp+'.txt')
+    target.write_bytes(source.read_bytes())
+    snapshots.append(reference(target))
+coverage_manifest=evidence/'regression-testing'/('p4t5-access-coverage-ranges.'+stamp+'.json')
+write_json(coverage_manifest,{'task':'P4-T5','timestamp':stamp,'files':files,'coverage':binding['coverage'],'totals':coverage['totals'],'units':units,'baseline':'All four production modules are new; accepted predecessor proofs are retained under the shared baseline.'})
+structure=evidence/'qa-gates'/('p4t5-access-structure.'+stamp+'.json')
+write_json(structure,{'task':'P4-T5','timestamp':stamp,'checks':checks,'preserved_predecessors':len(preserved),'baseline':reference(baseline),'files':files})
+stage_paths=set(paths)
+for directory in ('qa-gates','regression-testing'):
+    for path in (evidence/directory).glob('p4t5-access-*'):
+        stage_paths.add(path.relative_to(root).as_posix())
+for path in (evidence/'baseline').glob('p4t5-api-*-absence.*'):
+    stage_paths.add(path.relative_to(root).as_posix())
+manifest=evidence/'qa-gates'/('p4t5-access-candidate-freeze.'+stamp+'.json')
+stage_paths.update((manifest.relative_to(root).as_posix(),manifest.with_suffix('.md').relative_to(root).as_posix()))
+document={'task':'P4-T5','timestamp':stamp,'state':'ACCESS_SUBSET_FROZEN_REVIEW_PENDING','files':files,'shared_baseline':reference(baseline),'preserved_predecessors':len(preserved),'focused_binding':reference(binding_path),'ordered_receipts':receipts,'coverage_ranges':reference(coverage_manifest),'structural_checks':reference(structure),'harnesses':snapshots,'budget_domains':{'pin_count':'source_files before indexing','pin_bytes':'independent document_bytes for all supplied pins including duplicates/foreign/unused','selected_input_bytes':'independent document_bytes before decoding each selected file','projected_output_bytes':'independent document_bytes; 12 encoded bytes per Unicode character plus fixed overhead; both compact ensure_ascii policies','exhaustion':'whole Analysis replaced by one fixed blocker; no partial claims'},'provenance_correction':'One captured-input index and one retained-pin scan preserve any exact repo/revision/path/bytes match; counted 32-pin regression proves <= 2 identity reads per pin. No accepted helper was edited.','retained_history':['151-case corrected ordering proof remains pre-provenance evidence','148-pass/3-failure initial ordering assertions and original raw coverage remain retained','Initial format/lint/type diagnostics remain under scoped evidence prefixes'],'limitations':['Lexical inferred candidates only; no compiler binding, alias/dataflow resolution, evaluated platform applicability or runtime path/key values','Fixed System.IO and Microsoft.Win32 allowlists; instance receiver variables and unlisted calls omitted','Malformed delimiters fail closed; conditional compilation is not evaluated','Public registry exposure is reserved for P4-T9; no coding-agent-host proof or task acceptance claimed'],'stage_paths':sorted(stage_paths)}
+write_json(manifest,document)
+markdown=f'# P4-T5 access subset frozen candidate\n\nTimestamp: {stamp}\n\nStatus: ACCESS_SUBSET_FROZEN_REVIEW_PENDING\n\nThe six source/test files are frozen for consolidated review. The focused Black, Ruff, Pyright and 156-case unit sequence passed. Four new production modules have full measured line and branch coverage; {len(units)} unit ranges are retained. All {len(preserved)} shared-baseline predecessor hashes remain unchanged.\n\nThe JSON manifest binds exact files, ordered raw receipts, portable coverage, per-unit ranges, structural checks, harness snapshots and the exact paths proposed for staging. It retains the prior 151-case proof and original ordering failure without replacing either.\n\nRetained-pin count, retained-pin bytes, selected-input bytes and projected-output bytes are independent bounds. Overflow emits a fixed diagnostic and discards partial claims. API spellings are inferred; runtime argument values, key paths, platform applicability, aliases and compiler bindings remain unresolved. Registry publication remains P4-T9. This is a checked subset, not P4-T5 acceptance.\n'
+manifest.with_suffix('.md').write_text(markdown,encoding='utf-8',newline='\n')
+print(json.dumps({'manifest':reference(manifest),'markdown':reference(manifest.with_suffix('.md')),'files':len(files),'unit_ranges':len(units),'coverage':coverage['totals'],'staging_paths':len(stage_paths)}),flush=True)

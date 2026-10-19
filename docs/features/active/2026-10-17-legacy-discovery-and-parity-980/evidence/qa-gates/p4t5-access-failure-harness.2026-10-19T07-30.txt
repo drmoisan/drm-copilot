@@ -1,0 +1,23 @@
+"""Preserve the initial access ordering-assertion failure before a scoped repair."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+root=Path.cwd()
+scratch=Path(__file__).resolve().parent
+feature=root/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence'
+raw=scratch/'p4t5-access-development-coverage.raw.json'
+saved=scratch/'p4t5-access-initial-ordering-failure-coverage.raw.json'
+saved.write_bytes(raw.read_bytes())
+test=root/'tests/discovery_runtime/analyzer/test_filesystem_access.py'
+(scratch/'p4t5-access-initial-ordering-test.py.txt').write_bytes(test.read_bytes())
+data=json.loads(saved.read_bytes())
+data['files']={key.replace('\\','/'):value for key,value in data['files'].items()}
+stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H-%M')
+destination=feature/'regression-testing'/('p4t5-access-initial-ordering-failure-coverage.'+stamp+'.json')
+destination.write_text(json.dumps(data,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+document={'task':'P4-T5','timestamp':stamp,'result':'148 passed, 3 ordering assertions failed','retained_test_sha256':hashlib.sha256(test.read_bytes()).hexdigest(),'retained_test':'SCRATCH/p4t5-access-initial-ordering-test.py.txt','raw_coverage':{'path':'SCRATCH/'+saved.name,'sha256':hashlib.sha256(saved.read_bytes()).hexdigest()},'portable_coverage':{'path':destination.relative_to(root).as_posix(),'sha256':hashlib.sha256(destination.read_bytes()).hexdigest()},'repair':'Compare complete finding rows in the existing emitter finding_id order; production bytes unchanged.'}
+receipt=feature/'regression-testing'/('p4t5-access-initial-ordering-failure-binding.'+stamp+'.json')
+receipt.write_text(json.dumps(document,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(receipt.relative_to(root).as_posix())
