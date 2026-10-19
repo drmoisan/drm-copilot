@@ -1,0 +1,46 @@
+{
+  "stage": 2,
+  "label": "p4t3-masking-pass3-lint",
+  "started": "2026-10-19T04:33:32.496938+00:00",
+  "finished": "2026-10-19T04:33:33.740901+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+  "exit_code": 0,
+  "duration_seconds": 1.244,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "physical_lines": 330
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "physical_lines": 205
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "physical_lines": 330
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "physical_lines": 205
+    }
+  },
+  "output": "All checks passed!\n"
+}

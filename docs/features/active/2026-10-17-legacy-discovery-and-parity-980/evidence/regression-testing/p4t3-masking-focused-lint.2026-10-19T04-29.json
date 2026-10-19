@@ -1,0 +1,46 @@
+{
+  "stage": 2,
+  "label": "p4t3-masking-focused-lint",
+  "started": "2026-10-19T04:29:52.162370+00:00",
+  "finished": "2026-10-19T04:29:53.532583+00:00",
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py tests/discovery_runtime/analyzer/test_source_masking.py",
+  "exit_code": 1,
+  "duration_seconds": 1.37,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ddcf6cb429631a4b56d7634d3d2bead16bbaf725256427fd7e1d1bb3e825d3d9",
+      "physical_lines": 33
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "98810131c8658af63a146da43eb54395f9c27ab03a8a952285b23f8e367adbe5",
+      "physical_lines": 411
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ddcf6cb429631a4b56d7634d3d2bead16bbaf725256427fd7e1d1bb3e825d3d9",
+      "physical_lines": 33
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "98810131c8658af63a146da43eb54395f9c27ab03a8a952285b23f8e367adbe5",
+      "physical_lines": 411
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "output": "I001 [*] Import block is un-sorted or un-formatted\n  --> scripts\\dev_tools\\discovery\\analyzer\\source_text.py:3:1\n   |\n 1 |   \"\"\"Preserve legacy imports through explicit aliases to the discovery runtime.\"\"\"\n 2 |\n 3 | / from drm_copilot_discovery.analyzer.source_text import (\n 4 | |     Detection as Detection,\n 5 | | )\n 6 | |\n 7 | | from drm_copilot_discovery.analyzer.source_text import (\n 8 | |     DetectionResult as DetectionResult,\n 9 | | )\n10 | |\n11 | | from drm_copilot_discovery.analyzer.source_text import (\n12 | |     TextParseResult as TextParseResult,\n13 | | )\n14 | |\n15 | | from drm_copilot_discovery.analyzer.source_text import (\n16 | |     build_evidence_id as build_evidence_id,\n17 | | )\n18 | |\n19 | | from drm_copilot_discovery.analyzer.source_text import (\n20 | |     build_evidence_record as build_evidence_record,\n21 | | )\n22 | |\n23 | | from drm_copilot_discovery.analyzer.source_text import (\n24 | |     numbered_lines as numbered_lines,\n25 | | )\n26 | |\n27 | | from drm_copilot_discovery.analyzer.source_text import (\n28 | |     slugify as slugify,\n29 | | )\n30 | |\n31 | | from drm_copilot_discovery.analyzer.source_text import (\n32 | |     strip_comments_and_strings as strip_comments_and_strings,\n33 | | )\n   | |_^\n   |\nhelp: Organize imports\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\scripts\\dev_tools\\discovery\\analyzer\\test_source_text.py:9:1\n   |\n 7 |   \"\"\"\n 8 |\n 9 | / from __future__ import annotations\n10 | |\n11 | | import dataclasses\n12 | | import re\n13 | |\n14 | | import pytest\n15 | | from drm_copilot_discovery.analyzer import source_text as canonical\n16 | |\n17 | | from scripts.dev_tools.discovery.analyzer import source_text as compatibility\n18 | | from scripts.dev_tools.discovery.analyzer.models import ClassifyResult\n19 | | from scripts.dev_tools.discovery.analyzer.models import ParseResult\n20 | | from scripts.dev_tools.discovery.analyzer.source_text import (\n21 | |     TextParseResult,\n22 | |     build_evidence_id,\n23 | |     numbered_lines,\n24 | |     slugify,\n25 | |     strip_comments_and_strings,\n26 | | )\n   | |_^\n27 |\n28 |   # Shared discovery identifier grammar every evidence id must satisfy.\n   |\nhelp: Organize imports\n\nB010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\scripts\\dev_tools\\discovery\\analyzer\\test_source_text.py:375:9\n    |\n373 |     )\n374 |     with pytest.raises(dataclasses.FrozenInstanceError):\n375 |         setattr(detection, \"line\", 3)\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n376 |     with pytest.raises(dataclasses.FrozenInstanceError):\n377 |         setattr(classified, \"detections\", ())\n    |\nhelp: Replace `setattr` with assignment\n\nB010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\scripts\\dev_tools\\discovery\\analyzer\\test_source_text.py:377:9\n    |\n375 |         setattr(detection, \"line\", 3)\n376 |     with pytest.raises(dataclasses.FrozenInstanceError):\n377 |         setattr(classified, \"detections\", ())\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\nhelp: Replace `setattr` with assignment\n\nFound 4 errors.\n[*] 4 fixable with the `--fix` option.\n"
+}

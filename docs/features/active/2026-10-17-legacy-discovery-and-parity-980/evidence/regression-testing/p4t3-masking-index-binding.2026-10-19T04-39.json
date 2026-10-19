@@ -1,0 +1,886 @@
+{
+  "timestamp_utc": "2026-10-19T04-39",
+  "captured_at": "2026-10-19T04:39:36.401545+00:00",
+  "command": "python SCRATCH/issue-980-p4t3-index-binding.py",
+  "exit_code": 0,
+  "status": "PRESERVED_AND_BOUND_CHECKED_WIP_ONLY",
+  "authority_receipt": "workspace_operations_p4t3_masking_index_binding",
+  "staged_tree_before": "249b8fe3727b88242a46ed753b69fe6c5792cc1a",
+  "staged_tree_after": "249b8fe3727b88242a46ed753b69fe6c5792cc1a",
+  "path_count": 43,
+  "exact_byte_paths": 22,
+  "crlf_to_lf_only_paths": 21,
+  "git_object_format": "sha1",
+  "preservation_root": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36",
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-masking-worker-binding.2026-10-19T04-25.md",
+      "working_sha256": "78e75e0b9940e5b9d026ddab79835849510fb1b97473daf39f0e7921e386e4d7",
+      "index_sha256": "78e75e0b9940e5b9d026ddab79835849510fb1b97473daf39f0e7921e386e4d7",
+      "index_blob_id": "b55b1b162df8b613f49ca77af10833ae11e55f7a",
+      "working_byte_count": 2709,
+      "index_byte_count": 2709,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-masking-worker-binding.2026-10-19T04-25.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t3-masking-worker-binding.2026-10-19T04-25.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-evidence-index.2026-10-19T04-36.json",
+      "working_sha256": "6d02d530004add7ef350c92a831947e81aa77eee3b866ab61bc528db8dcedbe1",
+      "index_sha256": "97e33dc2d34361cca04f4a78b6037ef4d5938cd63c78cd737a27c108367a73e3",
+      "index_blob_id": "95d0cecd8567f300528551d8c6b89dc2d84ab2d2",
+      "working_byte_count": 9831,
+      "index_byte_count": 9673,
+      "working_crlf_count": 158,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-evidence-index.2026-10-19T04-36.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-evidence-index.2026-10-19T04-36.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+      "working_sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d",
+      "index_sha256": "ffc9f8e0fac787e074a3389e3644d0224cd56eb56d4c457fa36289199d22e50d",
+      "index_blob_id": "b2c7fc1b5cdc1bdfb7eaa788d083aceeea388731",
+      "working_byte_count": 17892,
+      "index_byte_count": 17892,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-coverage.2026-10-19T04-35.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.json",
+      "working_sha256": "e625a35724b6fc697f3de1caf7e6e5bac109b90a93c86bae1fb96b9514a20acf",
+      "index_sha256": "215b957f5e5f252bdab990407b5955f6a1936395f3a92e501371b18bcc490dd9",
+      "index_blob_id": "74f59d6973204d81e7b2c9fe19f0f3cc86ff3aff",
+      "working_byte_count": 2195,
+      "index_byte_count": 2149,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.md",
+      "working_sha256": "5ede920ae1827e73acf4d1a60aa6d2294cef238147f926f7a119a76d6f24d6d2",
+      "index_sha256": "5ede920ae1827e73acf4d1a60aa6d2294cef238147f926f7a119a76d6f24d6d2",
+      "index_blob_id": "a098e63885e800b000315984aef3f23b95629e80",
+      "working_byte_count": 550,
+      "index_byte_count": 550,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-format.2026-10-19T04-29.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+      "working_sha256": "92b7f1253e014c4efffa84b415a8a667bf42e410c2060cdc594ab4405e0647e4",
+      "index_sha256": "32e8d21f3bb86cd033c215621ae03d7b4bd6d6c37560dbfef9491e41c6cd578e",
+      "index_blob_id": "75b6f312f6fe23c364febb614d5ad650313fb63a",
+      "working_byte_count": 20310,
+      "index_byte_count": 19861,
+      "working_crlf_count": 449,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.md",
+      "working_sha256": "d3192346f70dfc9379e50b6b77df87e4a02557d5050aa209b5737e32caa896a6",
+      "index_sha256": "3286fb9bd0a1fe213d395bef8073435ab051dc0294ebcb655c896b006244cc98",
+      "index_blob_id": "7ef4b53e16a3d8aff99dea35d32d11b5c2f7bbc1",
+      "working_byte_count": 2756,
+      "index_byte_count": 2733,
+      "working_crlf_count": 23,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.json",
+      "working_sha256": "4ac7ca9fcc6d8e77f5b1fca7e07b1a64a103aa51c9026fa4bf8510d55ae67067",
+      "index_sha256": "bd16fc5fff49666122f5e502942fca7484016463faea60062863aafa7091fab5",
+      "index_blob_id": "8cb36fd5fc9685af19f42d90a307a0250dc83339",
+      "working_byte_count": 5468,
+      "index_byte_count": 5422,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.md",
+      "working_sha256": "9e98cf5d00b922a1ee497de5f2eda11dfa05a66fed788a0271105cd0ac3bcb88",
+      "index_sha256": "9e98cf5d00b922a1ee497de5f2eda11dfa05a66fed788a0271105cd0ac3bcb88",
+      "index_blob_id": "7b5a8dafb2cd844487af91b556c48fcecf7baa23",
+      "working_byte_count": 3710,
+      "index_byte_count": 3710,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-lint.2026-10-19T04-29.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.json",
+      "working_sha256": "5677828389a5a1f30389ab27938f2d1f664ba8a8f3a5b343eaf12a4b33b915fb",
+      "index_sha256": "39cb5333eda6281893bd1aa06df1c7d17e3a50e8c0a25638424eae1ca04e000e",
+      "index_blob_id": "1021fad35eb9557c14ad4eea967c13121e7bbdfb",
+      "working_byte_count": 2272,
+      "index_byte_count": 2226,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.md",
+      "working_sha256": "6ec2fd3cbfff67d2017160875b88409a64b9bf5f300e84f257e6df62c8d76732",
+      "index_sha256": "6ec2fd3cbfff67d2017160875b88409a64b9bf5f300e84f257e6df62c8d76732",
+      "index_blob_id": "136f7c2c6da6589f380fcaa86c85d53b1d629132",
+      "working_byte_count": 618,
+      "index_byte_count": 618,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-import-repair.2026-10-19T04-30.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.json",
+      "working_sha256": "aaf3bae17a87966360f5e461166b182cb10b58c8f7ba5af0b204f73698126592",
+      "index_sha256": "c4a4c21889f2037837103ece8aa7c2705b60bd77dde5f34e3bf376dc7dfad408",
+      "index_blob_id": "90611c6426aaa21b8ff18c62e8825f77abc24414",
+      "working_byte_count": 2354,
+      "index_byte_count": 2308,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.md",
+      "working_sha256": "e7e0e4b54c97c5bf2a0b36393eaf78cce6766a91153e8273715309965464cc39",
+      "index_sha256": "e7e0e4b54c97c5bf2a0b36393eaf78cce6766a91153e8273715309965464cc39",
+      "index_blob_id": "ea995544ca72c4fb93eb432fc4a3e213298d714a",
+      "working_byte_count": 698,
+      "index_byte_count": 698,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-initial-format.2026-10-19T04-29.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.json",
+      "working_sha256": "5c8e98eeb5906db10b5195993aaa2dae069ecbe5f8e7663e5c8361184956cc58",
+      "index_sha256": "5bfa473977a2f13c820fa75e3fe7786df3ffbbd75364d142cd8b296c4bc253a5",
+      "index_blob_id": "afff9cb65dcf3f4d32dcbacb8cd6f3111dafe88e",
+      "working_byte_count": 2193,
+      "index_byte_count": 2147,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.md",
+      "working_sha256": "97981697b38ce00a0b0e4e1b67ae50f855639bde11abb4c68c8f44489793dfda",
+      "index_sha256": "97981697b38ce00a0b0e4e1b67ae50f855639bde11abb4c68c8f44489793dfda",
+      "index_blob_id": "27677a477d4dc50e84aae508c348c06ca3a9d3d8",
+      "working_byte_count": 548,
+      "index_byte_count": 548,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-format.2026-10-19T04-30.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.json",
+      "working_sha256": "ceaaa71c6293212d14cff5f40c18270150df7eddd094cdf7530dd02885f839da",
+      "index_sha256": "46c45669dbc166c4e0b3aeab5e6c4a8cdd556d60bc273e195de5dc19e7833916",
+      "index_blob_id": "2bf0c1af2cfdcdc28576f750f3d1b11b97a652ce",
+      "working_byte_count": 2136,
+      "index_byte_count": 2090,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.md",
+      "working_sha256": "cc62af1115d4aad5b83d3b0bd5fb59335f68b8fa78128a05185a72a831aad6b9",
+      "index_sha256": "cc62af1115d4aad5b83d3b0bd5fb59335f68b8fa78128a05185a72a831aad6b9",
+      "index_blob_id": "da683c7f3100544c09f62a656e8d9db4fd255026",
+      "working_byte_count": 506,
+      "index_byte_count": 506,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-lint.2026-10-19T04-30.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.json",
+      "working_sha256": "ee93b4142551b120fc280df354412771d56eb54129a66a2199c398233d99d695",
+      "index_sha256": "398d89419fdb865bd9a4c6978090474fd923f829b6a36f0f01557088d0cb4be5",
+      "index_blob_id": "8684d452fc305fcc51d7c168b0e48144c264f279",
+      "working_byte_count": 2309,
+      "index_byte_count": 2263,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.md",
+      "working_sha256": "ca3fec3cc73ecbbaf9ccb629dc60136c07252bb2af067e71673ff636fbf1f6df",
+      "index_sha256": "ca3fec3cc73ecbbaf9ccb629dc60136c07252bb2af067e71673ff636fbf1f6df",
+      "index_blob_id": "7c7e0c3cf6a8bb95343e983b20136af17be46ffd",
+      "working_byte_count": 675,
+      "index_byte_count": 675,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-types.2026-10-19T04-30.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.json",
+      "working_sha256": "3bc5979d19c43fc512a9f7cefa26a59272c0657c07455b915a0df804858c03e5",
+      "index_sha256": "2a95ba4d82e6452b660f634ed4bc43925c49f0180c1c9f98423971d6e32e58e1",
+      "index_blob_id": "5f0eb0d597ce4176bcc9e2f5c6df75513d9fe65e",
+      "working_byte_count": 3353,
+      "index_byte_count": 3307,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.md",
+      "working_sha256": "e3f5e97ef1fc5873facb76b646c2d67620b893542eb29e34a6df93973e2198e5",
+      "index_sha256": "e3f5e97ef1fc5873facb76b646c2d67620b893542eb29e34a6df93973e2198e5",
+      "index_blob_id": "fec18701ea14330d3c50aaebefbc59b9911b5741",
+      "working_byte_count": 1702,
+      "index_byte_count": 1702,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass2-unit.2026-10-19T04-30.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.json",
+      "working_sha256": "3c585c773678aac9dcc93355e9e62f489b1794710a7a5ce923ff9c249c595118",
+      "index_sha256": "b95f79811f18f0f6b49eefb44c183fd86ef452560e21f43154002669f2bc6bbd",
+      "index_blob_id": "8d6b72aba466b9641c981187e931a9d4cd2cd3a9",
+      "working_byte_count": 2193,
+      "index_byte_count": 2147,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.md",
+      "working_sha256": "7e626535e7b65d82a0c77faf09fcc3d9e553ae7bb433115c79a3cdf5d25085a0",
+      "index_sha256": "7e626535e7b65d82a0c77faf09fcc3d9e553ae7bb433115c79a3cdf5d25085a0",
+      "index_blob_id": "2e1ef314d15c72630301585caabfd62d6d1a5074",
+      "working_byte_count": 548,
+      "index_byte_count": 548,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-format.2026-10-19T04-33.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.json",
+      "working_sha256": "700f52a5ddc6ea0fc932f99732fbd04eee74c4e2a16d624cc9c84e997962629f",
+      "index_sha256": "d51441f921310301461bce8f1baa504d1c0ee4355c82a6fc1237c6404e5ad62d",
+      "index_blob_id": "01050791cc84b0e238b101b050b9c37e846e0067",
+      "working_byte_count": 2136,
+      "index_byte_count": 2090,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.md",
+      "working_sha256": "d3f94b8d33aa64a274be716495416f21035490fadbaae7ae9f79149fd27eb373",
+      "index_sha256": "d3f94b8d33aa64a274be716495416f21035490fadbaae7ae9f79149fd27eb373",
+      "index_blob_id": "5e7bcd1c1dd64ce454d43828cedce6b45f452612",
+      "working_byte_count": 506,
+      "index_byte_count": 506,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-lint.2026-10-19T04-33.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.json",
+      "working_sha256": "fe367fbfb133f2fca830519333209438748ae13d2b9883bb9186be16252f1199",
+      "index_sha256": "08ec3b6076b9d5d190c7b399a2f2db5ac19e01edd9b2624f2b82120694812069",
+      "index_blob_id": "72b43b6effba868cdd6f768ca532594286014a32",
+      "working_byte_count": 2309,
+      "index_byte_count": 2263,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.md",
+      "working_sha256": "eba87401f7502e33923220cf2fd711db184938cce12f598214eaab4206b674d5",
+      "index_sha256": "eba87401f7502e33923220cf2fd711db184938cce12f598214eaab4206b674d5",
+      "index_blob_id": "4fd08554db8acb29c7075f2b52752b2507ff79c5",
+      "working_byte_count": 675,
+      "index_byte_count": 675,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-types.2026-10-19T04-33.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.json",
+      "working_sha256": "10412ba62e4c27f5c0304bd1bee9f6f5f637e6c4e7edc63616070f356ff9dc22",
+      "index_sha256": "c693b8c30981b241ee4fff79c5619bba36c9c6995a4d3faffd0c626cfc3e63ac",
+      "index_blob_id": "85aa855032af59886a4683f9bd78752d3a8cb7a8",
+      "working_byte_count": 3578,
+      "index_byte_count": 3532,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.md",
+      "working_sha256": "71b14be6560b0deb5fb0a458fefcb137c2f710af38f3405b1b264a866019a201",
+      "index_sha256": "71b14be6560b0deb5fb0a458fefcb137c2f710af38f3405b1b264a866019a201",
+      "index_blob_id": "ae6846e30de61ddf0778016587d126c6e67f4837",
+      "working_byte_count": 1921,
+      "index_byte_count": 1921,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass3-unit.2026-10-19T04-33.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json",
+      "working_sha256": "8b5ec94a911435083b2b71f08692196fba6556c108a9049aecdb67b43b584189",
+      "index_sha256": "e995eb4df61bf5f1b5e985bc100b9733b98b40a8f5d56b16aa30a59406a8bcf4",
+      "index_blob_id": "fde97ab26be39619dc395462c92ee0e0cbcf4a5f",
+      "working_byte_count": 2193,
+      "index_byte_count": 2147,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.md",
+      "working_sha256": "7cf15fc2b9c22a5e0ae98d7583b9ed43fa88131ec59078d15c447d62510afce0",
+      "index_sha256": "7cf15fc2b9c22a5e0ae98d7583b9ed43fa88131ec59078d15c447d62510afce0",
+      "index_blob_id": "221d5fed8556dc2f3311eabdacc2524b2d8bd634",
+      "working_byte_count": 548,
+      "index_byte_count": 548,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-format.2026-10-19T04-34.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json",
+      "working_sha256": "f4426e59f3872aa8966f5250dbc94a1e456c7300b379c73b4261eca27a4126f9",
+      "index_sha256": "35bf5c12a682883fe84ecf476155f062777a5afafaa966b779c50c27fc0d42b4",
+      "index_blob_id": "c6ed294289cbabe02c95c3ad3651a6542920d6f5",
+      "working_byte_count": 2136,
+      "index_byte_count": 2090,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.md",
+      "working_sha256": "4ae40db71805007375ce02b62d3b40e6105724ae499d0aef878cc58c99e371e6",
+      "index_sha256": "4ae40db71805007375ce02b62d3b40e6105724ae499d0aef878cc58c99e371e6",
+      "index_blob_id": "a7bb418e8bcbe7560babe54378a53e69dfab20d2",
+      "working_byte_count": 506,
+      "index_byte_count": 506,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-lint.2026-10-19T04-34.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json",
+      "working_sha256": "4e2bacc91ab7817092fdf236b62fccc16f9c726493871fe0ee86d2c45658abfd",
+      "index_sha256": "2f2bf0eda4231fda08164a02cb609d59024f4092bb7129ff3f3548d4d893fae8",
+      "index_blob_id": "fc2695bcb970f73d6b1b9361b1db6747bafb0b93",
+      "working_byte_count": 2309,
+      "index_byte_count": 2263,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.md",
+      "working_sha256": "ab06d31714f7cf45be1958d0f217eec345c1eaee889b8535f9b25a4849359040",
+      "index_sha256": "ab06d31714f7cf45be1958d0f217eec345c1eaee889b8535f9b25a4849359040",
+      "index_blob_id": "c76ed1cf5b10ff020755b6023bedc278c8506c1a",
+      "working_byte_count": 675,
+      "index_byte_count": 675,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-types.2026-10-19T04-34.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json",
+      "working_sha256": "ff684b1ab5f120c84f0c5307c4f9daff0df9a3fcc98462bfff2d367376d6a418",
+      "index_sha256": "74898f177a548f7302fd0fec6db5c9a5f1f9874f028acff161ca316f92852c94",
+      "index_blob_id": "a03d36dc0c1d8dbaabe17cfb8d9b216170db2681",
+      "working_byte_count": 3353,
+      "index_byte_count": 3307,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.md",
+      "working_sha256": "e3d86b50c49095be3e05cb812acf6f68c12a04b99ae4334c58a318d58793f98a",
+      "index_sha256": "e3d86b50c49095be3e05cb812acf6f68c12a04b99ae4334c58a318d58793f98a",
+      "index_blob_id": "1ee88e822cf9e8301d45f2263dcbafe2adcf32b6",
+      "working_byte_count": 1702,
+      "index_byte_count": 1702,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-pass4-unit.2026-10-19T04-34.md"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.json",
+      "working_sha256": "bc5ba63b45a5bf98b16d2fda77673c1032d7917f0779316df0e02316e93dbb78",
+      "index_sha256": "b57a693dfa73e98bc314156f7bcda062c9e6b16dd02980436cbdcb43a78ff234",
+      "index_blob_id": "b676032942b2958c6b4a7d26b32e0036f5bb648f",
+      "working_byte_count": 2279,
+      "index_byte_count": 2233,
+      "working_crlf_count": 46,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.json",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.json"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.md",
+      "working_sha256": "daa5c2e472969459e66e9d77bc17108b9757ca8b9d6f7a82885e790cdf1374b9",
+      "index_sha256": "daa5c2e472969459e66e9d77bc17108b9757ca8b9d6f7a82885e790cdf1374b9",
+      "index_blob_id": "afc4c32eb856e6d390d73dd5ce7b5d040bbb2053",
+      "working_byte_count": 627,
+      "index_byte_count": 627,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.md",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-repair-format.2026-10-19T04-30.md"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "working_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "index_sha256": "4c71348175dd8defb7927b991a415dca46efaa4e7141cbdc156dbc14fc339ad1",
+      "index_blob_id": "d000d812ed935384aff82225349e42a21254a5f5",
+      "working_byte_count": 12878,
+      "index_byte_count": 12878,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/source_text.py",
+      "working_sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "index_sha256": "b4c33a5741ded64fb8320bbd8da328bc378b45493235f8e330463e6fdfdf2fe3",
+      "index_blob_id": "51437b3a0618f6f5bce408bf8741d86e9fae51d8",
+      "working_byte_count": 908,
+      "index_byte_count": 882,
+      "working_crlf_count": 26,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "crlf-to-lf-only",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/scripts/dev_tools/discovery/analyzer/source_text.py",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/scripts/dev_tools/discovery/analyzer/source_text.py"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_source_masking.py",
+      "working_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "index_sha256": "88ea07008248ffe3a03d64ca4fd8438687fd4bf0998e490309863f0694c74f96",
+      "index_blob_id": "a275ec009ff2986904d6cc3c236fddd0dcae92b0",
+      "working_byte_count": 7822,
+      "index_byte_count": 7822,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/tests/discovery_runtime/analyzer/test_source_masking.py",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/tests/discovery_runtime/analyzer/test_source_masking.py"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "working_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "index_sha256": "c73eb2e44340d6d2ae6b24abeab53b4063176709d5326975b3c01125a004cf5c",
+      "index_blob_id": "eb6f6b77e5e1d1537fcf75063ff6e464d932f868",
+      "working_byte_count": 15996,
+      "index_byte_count": 15996,
+      "working_crlf_count": 0,
+      "index_crlf_count": 0,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf",
+        "working-tree-encoding": "unspecified",
+        "filter": "unspecified"
+      },
+      "equivalence": "exact",
+      "working_crlf_to_lf_equals_index": true,
+      "preserved_working": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/working/tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+      "preserved_index": "SCRATCH/p4t3-masking-index-originals-2026-10-19T04-39-36/index/tests/scripts/dev_tools/discovery/analyzer/test_source_text.py"
+    }
+  ],
+  "prior_rendered_markdown_repairs": {
+    "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t3-masking-focused-freeze.2026-10-19T04-35.json",
+    "receipt_working_sha256": "92b7f1253e014c4efffa84b415a8a667bf42e410c2060cdc594ab4405e0647e4",
+    "record_key": "rendered_evidence_normalization",
+    "count": 17,
+    "meaning": "These earlier, documented presentation repairs trimmed rendered Markdown whitespace and normalized rendered newlines before staging. Their old/new hashes remain in the freeze receipt. They did not alter paired raw JSON. This supplemental capture does not repeat or rewrite them."
+  },
+  "git_normalization_meaning": "For each affected path, the captured working byte stream differs from the indexed blob exclusively by replacing every CRLF pair with LF. Actual attributes and both SHA-256 hashes/blob IDs are recorded. Original working bytes and index bytes are preserved externally. No original receipt or evidence index was rewritten.",
+  "scope_limit": "Artifact preservation only. No source/test edits, staging, commit, test execution, quality-gate replay, or new task acceptance. The four frozen source/test paths and all 39 staged evidence paths remain byte-identical to this capture."
+}

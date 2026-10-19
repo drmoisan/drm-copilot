@@ -1,0 +1,46 @@
+{
+  "stage": 2,
+  "label": "p4t3-masking-import-repair",
+  "started": "2026-10-19T04:30:17.744772+00:00",
+  "finished": "2026-10-19T04:30:19.246695+00:00",
+  "command": "poetry run ruff check --select I --fix scripts/dev_tools/discovery/analyzer/source_text.py tests/scripts/dev_tools/discovery/analyzer/test_source_text.py",
+  "exit_code": 0,
+  "duration_seconds": 1.502,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ddcf6cb429631a4b56d7634d3d2bead16bbaf725256427fd7e1d1bb3e825d3d9",
+      "physical_lines": 33
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "a547169fc44d3ccc3cd25c1e7247e25453d4a761594a0571a8e4af8b21ff7132",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/source_text.py": {
+      "sha256": "a2cce1ea13957ae3a6d8a8b236681ca2335f6df398610dd8f3ea6d1df26029b9",
+      "physical_lines": 329
+    },
+    "scripts/dev_tools/discovery/analyzer/source_text.py": {
+      "sha256": "ccee1c8836650040c0315b330874700f79fddadb88b8ce6304fa15f213d7ba71",
+      "physical_lines": 26
+    },
+    "tests/scripts/dev_tools/discovery/analyzer/test_source_text.py": {
+      "sha256": "c2e21249e86515017d619865dff87daced083cd7d7e70aff8c9abf458d287468",
+      "physical_lines": 412
+    },
+    "tests/discovery_runtime/analyzer/test_source_masking.py": {
+      "sha256": "bbbe4fc7b08bfde95508817893ead60307cac95c96b9b3cfb71dd436f1033ea7",
+      "physical_lines": 204
+    }
+  },
+  "output": "\nFixed 2 errors:\n- scripts\\dev_tools\\discovery\\analyzer\\source_text.py:\n    1 \u00d7 I001 (unsorted-imports)\n- tests\\scripts\\dev_tools\\discovery\\analyzer\\test_source_text.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 2 errors (2 fixed, 0 remaining).\n"
+}
