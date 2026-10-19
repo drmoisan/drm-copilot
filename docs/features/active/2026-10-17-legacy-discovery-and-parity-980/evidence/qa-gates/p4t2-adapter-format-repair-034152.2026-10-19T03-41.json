@@ -1,0 +1,48 @@
+{
+  "command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+  "duration_seconds": 2.121,
+  "exit_code": 0,
+  "finished_at": "2026-10-19T03:41:52.736561+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-adapter-format-repair-034152.2026-10-19T03-41.stderr.txt",
+    "sha256": "500682ac7733af144294688f13359ac4d735d26084a666cc68490b180f813890"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-adapter-format-repair-034152.2026-10-19T03-41.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "5ef7115da3966de96260b246ce7c8e0a48fada40ed7d4fdd0da06828edfbfed1",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "a1de30a373a11a1210dc0ecbecbbe5a690aa9547b62698d42660ad7ca8996be4",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "5f1cf719e848e2c8c0e4a4cbc04598aef5fb6a5c00ab2b6180e04beaa650a20a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "fd9f83471a44ce101eab49fbab4b8a078934c82d60ad20de1dc73f55a5ddd748",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "stage": "adapter-format-repair",
+  "started_at": "2026-10-19T03:41:50.617004+00:00",
+  "stderr": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_projects.py\r\nreformatted tests\\discovery_runtime\\analyzer\\test_dotnet_projects.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted.\r\n",
+  "stdout": "",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-41"
+}

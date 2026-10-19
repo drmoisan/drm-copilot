@@ -1,0 +1,42 @@
+{
+  "task": "P4-T2",
+  "scope": "Two focused in-memory reproductions for one source-anchor/literal-text concern, not a suite rerun.",
+  "timestamp": "2026-10-19T03:53:43.626031+00:00",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "0c07b53cb291e44523035862d0f596a92c0fd728b3513b5c61e9b3c2ad07776f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json",
+    "sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7"
+  },
+  "cases": [
+    {
+      "case": "Unicode separator inside inert comment shifts reported anchor",
+      "input_utf8_sha256": "4d4174bde11e245feb8a424de29637af7a64ee85f838615f98957b4a8ab4fdf9",
+      "physical_project_line": 3,
+      "actual_project_line": 4,
+      "finding_reproduced": true
+    },
+    {
+      "case": "Unicode separator inside quoted literal path",
+      "input_utf8_sha256": "e0badc818761948237b54a5d9071a1a59a70494a28781f9cee43f076273f4d72",
+      "expected_literal": "src/App\u2028Name.csproj",
+      "actual_error": "solution-project",
+      "finding_reproduced": true
+    }
+  ],
+  "source_test_changes": false,
+  "expected_finding_count": 1,
+  "findings_reproduced": true
+}

@@ -1,0 +1,1274 @@
+{
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T04:00:24.252263+00:00",
+  "status": "REVISIONS_REQUIRED",
+  "review_scope": "One consolidated review of all twelve frozen paths; future confirmation limited to R1 repair.",
+  "baseline": "5db172f2bc104cfa0e7372f4f7b014a4d4d0ec99",
+  "checked_wip": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+  "routing_receipt": "atomic_execution_p4t2_candidate",
+  "profile": {
+    "agent": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_authority_verified_before_review": true
+  },
+  "manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-manifest.2026-10-19T03-49.json",
+    "sha256": "87d64d6d9201a91a07e432a464731e0b3affaf9f83fdf6a89c164f9725ea67a7"
+  },
+  "files": [
+    {
+      "disposition": "new",
+      "lines": 252,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "semantic_ast_sha256": "75df731e069cdf423bdc1f28a4867044e23c2aedf2f731b7c1fbbe94e20eb626",
+      "working_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0"
+    },
+    {
+      "disposition": "new",
+      "lines": 143,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "semantic_ast_sha256": "162abcf4b04c67045eccc32841d6c82bb99869422c4836ccb54fa50b79476e59",
+      "working_sha256": "0c07b53cb291e44523035862d0f596a92c0fd728b3513b5c61e9b3c2ad07776f"
+    },
+    {
+      "disposition": "new",
+      "lines": 462,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "semantic_ast_sha256": "fea33ffe811b95f9dc22e2ea477e5b0f1e4cc1ff8bbb4f74b220dc689e63cb0b",
+      "working_sha256": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af"
+    },
+    {
+      "disposition": "new",
+      "lines": 259,
+      "path": "tests/discovery_runtime/analyzer/test_xml_input.py",
+      "semantic_ast_sha256": "97aa5345853492a2d93e55984f8341e338276529569d0907886e06ca932030a9",
+      "working_sha256": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9"
+    },
+    {
+      "disposition": "new",
+      "lines": 207,
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py",
+      "semantic_ast_sha256": "7517642a5065e3ce10ad357c0765686157b2bd3af64ce84627cda80fb7766a80",
+      "working_sha256": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047"
+    },
+    {
+      "disposition": "new",
+      "lines": 472,
+      "path": "tests/discovery_runtime/analyzer/test_dotnet_projects.py",
+      "semantic_ast_sha256": "3c4a05b2ded511fed10940fa8bfa3a4549634b549d0b5771bf8b19206b68dfc6",
+      "working_sha256": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8"
+    },
+    {
+      "disposition": "new",
+      "lines": 16,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Application.csproj",
+      "working_sha256": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c"
+    },
+    {
+      "disposition": "new",
+      "lines": 10,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props",
+      "working_sha256": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e"
+    },
+    {
+      "disposition": "new",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets",
+      "working_sha256": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9"
+    },
+    {
+      "disposition": "new",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj",
+      "working_sha256": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda"
+    },
+    {
+      "disposition": "new",
+      "lines": 7,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln",
+      "working_sha256": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6"
+    },
+    {
+      "disposition": "new",
+      "lines": 6,
+      "path": "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx",
+      "working_sha256": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+    }
+  ],
+  "retained_predecessor_files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/__init__.py",
+      "sha256": "a1b8c4f0bc43990ce8e91eae6414aecf0e6fba6fa8cf03712b982d15a0dbe8d1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py",
+      "sha256": "2a2c9c79c389b9a1490c2cf0c93f9a25e76b8fdbfb3515f065e27ce8cf1a019d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/findings.py",
+      "sha256": "3a035b5dfb8033623fc7343be2b88b68730f5b054cc050d84bacb72e5bd58402"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/inventory.py",
+      "sha256": "9ea498620dfc751d67b9989a86b7ffa72b2b1fc5b36672a3b435685300e9f8e8"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/models.py",
+      "sha256": "f3e99a1d0f9f85ec3ac04670a6802a3a1d3b295d36fb238078874b4c684f94fe"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "2d317862e928f57a24ade949dec56ad3b68ded4015834d6a21159f4c659f595c"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/emitter.py",
+      "sha256": "513ff724143710de873589f604c3f95c2845007e60a10eb906525318f4ca02d9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/inventory.py",
+      "sha256": "ed56917f3bcf07ef808c1949898e3327f368b71b207cf121a98269d4245ec9a3"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/models.py",
+      "sha256": "de3c0adcf32a60dbcd89e929ee22a46c2d2b13a82f16aabb5b51646ece7eb1f9"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/pipeline.py",
+      "sha256": "9d7a756a9d1bb5b6934ffe1293298990313366ab652b846886ae100e06cdc793"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_input_capture.py",
+      "sha256": "ad681c67db07f2b30d9e1729ceaf0e904245aceac523006b356410f65ef2d185"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_pipeline.py",
+      "sha256": "bae65907bf98d5168050448b3bcd15c2f3851c2afee4291427ba0bffee1447e0"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_registry.py",
+      "sha256": "71d2f8f27ea991e75d3430983917737f7260996c11d0906cbf986f3c826fea1a"
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_repository.py",
+      "sha256": "cba7e312bf3cbd1a9238dddfaa2d557d6e85aae70d811ab542c2a2986c9ba0b2"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "e7cf8316b1352f436359a9b0f79fece72d1a2ed8f88f221d13c1a47eaf0f8c86"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_dotnet_inventory.py",
+      "sha256": "48ec26e4792c43bf21fd5bfa5c0b8cfa078677923122f3e90f28b4ae03b33749"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_emitter.py",
+      "sha256": "cbaff8ed163fdf2335c517283986cf132266dc3a04f00fd879cc4b6c586a0d81"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory.py",
+      "sha256": "3c94b0342ec79daea5c996212b5a96b9ff32d66144148783865dce3d0d30becb"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_inventory_e2e.py",
+      "sha256": "a7ce45b77913c103fd2cc9bdc8455c21735bdc434a8f8613f100c09ca596dd29"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_models.py",
+      "sha256": "c8d3644635c914ab351f3192572b504780653876adfa7b2f02420a9d1fd52042"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e3e6a7ef146ce3128f3931a8ceae181c13888b82343088866b83b97ff8acb732"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_vsto_office.py",
+      "sha256": "d0c2016309430c5e166f6119bdf1c458c8916d715a7f711d849418daded5a732"
+    }
+  ],
+  "retained_predecessor_count": 26,
+  "proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-format-034735.2026-10-19T03-47.json",
+      "sha256": "d7336d404b8e7c4504709309fabbc1f9ce82d73c7956b00f24d7998bcf7011df",
+      "stage": "candidate-format",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:47:33.642402+00:00",
+      "finished_at": "2026-10-19T03:47:35.378712+00:00",
+      "all_twelve_hashes_before_after_equal": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-lint-034739.2026-10-19T03-47.json",
+      "sha256": "75dac02e1e6a84f1ceabeafd913c66a50d8095648f4d1e25c3db88cb05085681",
+      "stage": "candidate-lint",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:47:38.127641+00:00",
+      "finished_at": "2026-10-19T03:47:39.280101+00:00",
+      "all_twelve_hashes_before_after_equal": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-types-034744.2026-10-19T03-47.json",
+      "sha256": "ac8a2221380224a514de5698a08449aa2a6ae720e5552242b73e2c77e1251cd3",
+      "stage": "candidate-types",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:47:41.915939+00:00",
+      "finished_at": "2026-10-19T03:47:44.333994+00:00",
+      "all_twelve_hashes_before_after_equal": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-tests-034834.2026-10-19T03-48.json",
+      "sha256": "e6ea83d38a27ddeb7210cada929d2ec6cb0bfb927f9e21d7d42bbf392e291608",
+      "stage": "candidate-tests",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:47:53.249978+00:00",
+      "finished_at": "2026-10-19T03:48:34.717533+00:00",
+      "all_twelve_hashes_before_after_equal": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-candidate-coverage.2026-10-19T03-47.json",
+      "sha256": "99257d193fb23cbe1d213db2294e42f42af3de7f97484281b5c8c4f25e728f84"
+    }
+  ],
+  "focused_suite_cases": 150,
+  "coverage_totals": {
+    "covered_lines": 290,
+    "num_statements": 290,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 23,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 116,
+    "num_partial_branches": 0,
+    "covered_branches": 116,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "coverage_units": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_local",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_context",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 7,
+        "num_statements": 7,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_declaration",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_xml_declarations",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 39,
+        "num_statements": 39,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 26,
+        "num_partial_branches": 0,
+        "covered_branches": 26,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_solution_declarations",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_project_rows",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 17,
+        "num_statements": 17,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "_overflow",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "functions",
+      "name": "DotnetProjectAnalyzer.analyze",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 31,
+        "num_statements": 31,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py",
+      "kind": "classes",
+      "name": "DotnetProjectAnalyzer",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 31,
+        "num_statements": 31,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "kind": "functions",
+      "name": "SolutionInputError.__init__",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "kind": "functions",
+      "name": "SolutionEntry.__post_init__",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "kind": "functions",
+      "name": "parse_solution",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 38,
+        "num_statements": 38,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 28,
+        "num_partial_branches": 0,
+        "covered_branches": 28,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "kind": "classes",
+      "name": "SolutionInputError",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "kind": "classes",
+      "name": "SolutionEntry",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "XmlInputError.__init__",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "XmlNode.__post_init__",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 13,
+        "num_statements": 13,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "covered_branches": 14,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "XmlNode.attribute",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Element.__iter__",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Builder.start",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Builder.end",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Builder.data",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Builder.close",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Library.TreeBuilder",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Library.XMLParser",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_Library.fromstring",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.__init__",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 4,
+        "num_statements": 4,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.reject",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.start",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 7,
+        "num_statements": 7,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.end",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 3,
+        "num_statements": 3,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.data",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.doctype",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 1,
+        "num_statements": 1,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "_GuardedTarget.close",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 3,
+        "num_statements": 3,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 2,
+        "num_partial_branches": 0,
+        "covered_branches": 2,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "functions",
+      "name": "parse_xml",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 24,
+        "num_statements": 24,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 12,
+        "num_partial_branches": 0,
+        "covered_branches": 12,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "XmlInputError",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "XmlNode",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 14,
+        "num_statements": 14,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 14,
+        "num_partial_branches": 0,
+        "covered_branches": 14,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "_Element",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 1,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "_Builder",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "_Library",
+      "measured": false,
+      "status": "N/A: protocol body has no executable statements",
+      "summary": {
+        "covered_lines": 0,
+        "num_statements": 0,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 3,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "kind": "classes",
+      "name": "_GuardedTarget",
+      "measured": true,
+      "status": "100%",
+      "summary": {
+        "covered_lines": 21,
+        "num_statements": 21,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    }
+  ],
+  "parser_wip_documentation_only": [
+    {
+      "change": "intent comments and parser-anchor documentation only",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py",
+      "semantic_ast_equal": true,
+      "wip_commit": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+      "wip_git_blob_sha256": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+      "working_sha256": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+      "independently_verified_semantic_ast_equal": true
+    },
+    {
+      "change": "intent comments and parser-anchor documentation only",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "semantic_ast_equal": true,
+      "wip_commit": "3ff78f81e6c507643f1df8dcd35a8c9b7ceb6148",
+      "wip_git_blob_sha256": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+      "working_sha256": "0c07b53cb291e44523035862d0f596a92c0fd728b3513b5c61e9b3c2ad07776f",
+      "independently_verified_semantic_ast_equal": true
+    }
+  ],
+  "parser_wip_test_bytes_unchanged": true,
+  "reviewed_candidate_copies": "SCRATCH/p4t2-reviewed-candidate/<repository-relative-path>",
+  "copy_capture_time": "2026-10-19T03:53:43.626031+00:00",
+  "current_nonrepair_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "authorized_repair_in_progress": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+    "tests/discovery_runtime/analyzer/test_solution_input.py"
+  ],
+  "checker_binding_correction": {
+    "initial_exit_code": 1,
+    "initial_error": "AssertionError: packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+    "reason": "Parent released the two-path repair while this historical candidate receipt was being finalized; current source bytes had changed as authorized.",
+    "correction": "Bind all twelve original candidate files to exact copies captured by the successful 03:53 probe, then independently check the ten unaffected current files. No production or test failure and no behavioral rerun."
+  },
+  "focused_probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json",
+    "sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b"
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "priority": "P2",
+      "blocking_task_acceptance": true,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+      "line": 96,
+      "title": "Use physical solution line endings when parsing literal declarations",
+      "cause": "str.splitlines() also splits Unicode separators that are literal characters in solution comments and quoted paths.",
+      "reproductions": [
+        {
+          "case": "Unicode separator inside inert comment shifts reported anchor",
+          "input_utf8_sha256": "4d4174bde11e245feb8a424de29637af7a64ee85f838615f98957b4a8ab4fdf9",
+          "physical_project_line": 3,
+          "actual_project_line": 4,
+          "finding_reproduced": true
+        },
+        {
+          "case": "Unicode separator inside quoted literal path",
+          "input_utf8_sha256": "e0badc818761948237b54a5d9071a1a59a70494a28781f9cee43f076273f4d72",
+          "expected_literal": "src/App\u2028Name.csproj",
+          "actual_error": "solution-project",
+          "finding_reproduced": true
+        }
+      ],
+      "required_repair": "Split CRLF, CR and LF only; preserve Unicode literal text. Add comment-anchor and quoted-path regressions while preserving all existing 150 cases.",
+      "permitted_confirmation_scope": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py",
+        "tests/discovery_runtime/analyzer/test_solution_input.py"
+      ]
+    }
+  ],
+  "retained_review_results": {
+    "security": "Bounded fixed lxml parser disables DTD/entity/network/recovery and rejects XInclude; strict encoding and independent byte/depth/element/projection limits inspected. No additional finding.",
+    "semantics": "Declarations, unresolved expressions, conditions, duplicate occurrences, implicit SDK and metadata remain descriptive; targets remain unbound and build evaluation is explicitly absent. No additional finding.",
+    "provenance": "Exact captured hashes and pinned-match classification remain explicit; XML uses parser-reported element anchors rather than complete spans. R1 is the sole solution-anchor finding.",
+    "boundaries": "Three pure modules use existing approved lxml dependency. No filesystem/network/build execution, host wrapper logic or registry activation added; public registration belongs to P4-T9.",
+    "policy": "All six Python files inspected for typed contract docstrings, intent comments, isolation and <=500 lines; maximum472. No additional finding.",
+    "fixtures": "All six synthetic fixtures inspected. Meaningful declaration families, conditions, literal paths, schema-valid composition and adversarial parsing tests retained; no consumer-specific source material."
+  },
+  "limitations": [
+    "Declaration extraction only; no MSBuild, SDK, imports, globs, target activation or dependency evaluation.",
+    "Relationships retain null target component IDs; paths are inert descriptive strings.",
+    "XML anchors use actual parser-reported element lines, not complete lexical spans.",
+    "XML outside empty or legacy MSBuild namespace fails closed; .slnx uses literal Solution/Folder/Project declarations.",
+    "Public dotnet registry selection remains P4-T9; direct adapter tests and composed inventory emission are implemented here.",
+    "UTF-8 and BOM-marked UTF-16/32 solution text are supported; other encodings fail closed."
+  ],
+  "no_suite_rerun": true,
+  "independent_in_memory_probe_count": 2,
+  "source_test_checkpoint_git_mutations": false,
+  "task_or_ac_checkoff": false,
+  "next_action": "Parent authorizes bounded R1 repair, then confirm only its delta and preserved cases before final ordered gates.",
+  "command": "poetry run python SCRATCH/issue-980-p4t2-candidate-review.py",
+  "exit_code": 0,
+  "exit_code_meaning": "Evidence reconciliation completed; REVISIONS_REQUIRED is the candidate result."
+}

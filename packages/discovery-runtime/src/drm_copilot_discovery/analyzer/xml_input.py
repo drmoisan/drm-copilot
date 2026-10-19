@@ -2,7 +2,7 @@
 
 The fixed lxml dependency stays behind typed protocols. A parser-local target
 rejects every DTD before its subset is processed, bounds elements/depth while
-building, and preserves actual opening-tag line anchors. No path, network,
+building, and preserves actual parser-reported tag line anchors. No path, network,
 XInclude, schema, or build evaluation API is exposed.
 """
 
@@ -31,7 +31,7 @@ class XmlInputError(ValueError):
 
 @dataclass(frozen=True, kw_only=True)
 class XmlNode:
-    """Retain one element's literal metadata and opening line after secure parsing.
+    """Retain literal metadata and the parser-reported element line after parsing.
 
     Nodes are returned in document order. parent indexes the same immutable node
     tuple; text contains only direct leading text, without synthesized child text.
@@ -50,6 +50,7 @@ class XmlNode:
         Uses the declared constructor fields. Raises ValueError for mutable or
         malformed attributes, non-text values, or invalid line/parent indexes.
         """
+        # Reject invalid scalar fields before traversing attribute metadata.
         if not self.tag or type(self.tag) is not str or type(self.text) is not str:
             raise ValueError("XML names and text must be strings")
         if type(self.line) is not int or self.line < 1:
@@ -189,7 +190,7 @@ class _GuardedTarget:
 def parse_xml(
     content: bytes, *, max_bytes: int, max_elements: int, max_depth: int = 64
 ) -> tuple[XmlNode, ...]:
-    """Return bounded immutable XML nodes with actual opening-line anchors.
+    """Return bounded immutable XML nodes with actual parser-reported tag anchors.
 
     content (bytes) is already captured source. max_bytes/max_elements/max_depth
     (int) are positive limits, with hard ceilings of 64 MiB/100000/128. Rejects

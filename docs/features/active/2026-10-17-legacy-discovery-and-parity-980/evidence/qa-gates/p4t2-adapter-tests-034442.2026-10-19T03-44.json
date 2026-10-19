@@ -1,0 +1,48 @@
+{
+  "command": "poetry run pytest -o addopts= tests/discovery_runtime/analyzer/test_dotnet_projects.py --cov=drm_copilot_discovery.analyzer.dotnet_projects --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-coverage.2026-10-19T03-43.json",
+  "duration_seconds": 41.306,
+  "exit_code": 0,
+  "finished_at": "2026-10-19T03:44:42.602097+00:00",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t2-adapter-tests-034442.2026-10-19T03-44.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t2-adapter-tests-034442.2026-10-19T03-44.stdout.txt",
+    "sha256": "4194f39e34bf4176b24892f55d47f407d20ad9e66072b09d04586789d0289fe6"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "51454451f252c1ec6da670bff75ef82ac23141b0992923198fd25ae00ca03396",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "1d7f89d9667fc92702bdc61cac911845adf5a88ccaf936826a18e10092c379a2",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "51454451f252c1ec6da670bff75ef82ac23141b0992923198fd25ae00ca03396",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "f00abd3b2c8584978bf812a6fcd94bb277cb1fa66b34a4175cdcf7c66d47ac7d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "8168ee5d11cfd5bcf8933e8454c295be346fb4e1bc805a190b28c1a986dfc1e4",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "1d7f89d9667fc92702bdc61cac911845adf5a88ccaf936826a18e10092c379a2",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "stage": "adapter-tests",
+  "started_at": "2026-10-19T03:44:01.297865+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollected 35 items\r\n\r\ntests\\discovery_runtime\\analyzer\\test_dotnet_projects.py ............... [ 42%]\r\n....................                                                     [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                               Stmts   Miss Branch BrPart  Cover   Missing\r\n------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dotnet_projects.py     126      0     50      0   100%\r\n------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                126      0     50      0   100%\r\nCoverage JSON written to file docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-adapter-coverage.2026-10-19T03-43.json\r\n============================= 35 passed in 39.61s =============================\r\n",
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T03-44"
+}

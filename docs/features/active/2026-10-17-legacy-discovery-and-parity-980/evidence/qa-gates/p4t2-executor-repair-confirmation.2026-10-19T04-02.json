@@ -1,0 +1,243 @@
+{
+  "task": "P4-T2",
+  "timestamp": "2026-10-19T04:02:44.638012+00:00",
+  "status": "READY_FOR_FINAL_GATES",
+  "scope": "Bounded R1 correction confirmation; retained consolidated review reused without repetition.",
+  "routing_receipt": "atomic_execution_p4t2_repair",
+  "native_profile": {
+    "agent": "atomic-executor-c4",
+    "model": "gpt-6-astra",
+    "reasoning": "max",
+    "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "fresh_receipt_matches_native_attestation": true
+  },
+  "repair_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-manifest.2026-10-19T04-01.json",
+    "sha256": "cc39a8362ab243ecdb9c3511dcf515b10be77f95e1b50319f791fde87d333e99"
+  },
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-review.2026-10-19T04-00.json",
+    "sha256": "e14da8e45a5dfcfaacab0d6b251c245d9c59319cc8a3fbacdfc12765efeefb70"
+  },
+  "original_reproduction": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-executor-candidate-probe.2026-10-19T03-53.json",
+    "sha256": "03dafefdbecdee602a858d9c9527dbda51656fa4ba181454b32bcf12df3ccb3b"
+  },
+  "repaired_files": [
+    {
+      "after_sha256": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+      "before_sha256": "0c07b53cb291e44523035862d0f596a92c0fd728b3513b5c61e9b3c2ad07776f",
+      "original_path": "SCRATCH/repair-before/solution_input.py",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py"
+    },
+    {
+      "after_sha256": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+      "before_sha256": "f88d907b92b27a8426bbbe47f1baeebfc9cad683f8b96ed924380537943b3047",
+      "original_path": "SCRATCH/repair-before/test_solution_input.py",
+      "path": "tests/discovery_runtime/analyzer/test_solution_input.py"
+    }
+  ],
+  "all_twelve_file_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/xml_input.py": "e293836a0576625e9820e1f57c2f032ed127f4edf7b12f9b950b9ef7c2caa2b0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/solution_input.py": "263382fc29bf6b49a52f711ce2feb18c9862ea8bc527cfc2a5d2bd47d0651fde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dotnet_projects.py": "875974742ccaf47dfb6f1ec5c99cb698d2b6d8f3bae24ebc0193db7fe8db68af",
+    "tests/discovery_runtime/analyzer/test_xml_input.py": "6274d50caf1b2ba1533cc648ad49baa38a6b8d6cc4777b284410c984ca7f8da9",
+    "tests/discovery_runtime/analyzer/test_solution_input.py": "110ec35dacd6d4b49f29474ddf1ad324bcdf6e6eea82cae1be8ff5aad0c2e632",
+    "tests/discovery_runtime/analyzer/test_dotnet_projects.py": "df821f405c586b402730e2e9598027c7edba08c63ee7ce9b0486a2be162c5da8",
+    "tests/fixtures/discovery_analyzers/dotnet/Application.csproj": "4d4aece7b1740d89a5b772c9e14952cc090bdec99f9cf52feaa41e9a7669343c",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.props": "b5b5d1dd7f7f06820aa9f6a4cb7b469a2d85a981920b815370f32ad37bc8dd8e",
+    "tests/fixtures/discovery_analyzers/dotnet/Directory.Build.targets": "7a5bcb46660579005d74ea38672ed8d9d0180f3f264a306bb62efd1d17e31cd9",
+    "tests/fixtures/discovery_analyzers/dotnet/Legacy.vbproj": "3556852190aa50d0ad5a80f871fa8277dad374f6cfbd6001bb5bd6ed951b2cda",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.sln": "ca6184280d2f8710fdaa78d978a94e7192d24d62413a87e69d9c9d80f81fa2e6",
+    "tests/fixtures/discovery_analyzers/dotnet/Workspace.slnx": "71dc426a53a1d7e98ddd0732d2f687f8a3fd52be9037a2a509608db40f5813b8"
+  },
+  "unchanged_candidate_paths": 10,
+  "unchanged_predecessor_paths": 26,
+  "production_ast_delta": "Only lines assignment changed from str.splitlines() to re.split CRLF/CR/LF; remaining AST identical.",
+  "all_original_test_ast_nodes_preserved": true,
+  "new_regressions": {
+    "new_cases": 48,
+    "retained_cases": 46,
+    "focused_cases_passed": 94,
+    "matrix": "8 Unicode separators x 3 CR/LF styles x 2 behaviors",
+    "complete_candidate_expected_cases": 198
+  },
+  "proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-format-035947.2026-10-19T03-59.json",
+      "sha256": "9cdabb52e5692f580b48cce0967cc506859f00ad899daf969dd11a60de8b81e1",
+      "stage": "repair-format",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:59:45.605973+00:00",
+      "finished_at": "2026-10-19T03:59:47.415150+00:00",
+      "all_twelve_hashes_bound": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-lint-035954.2026-10-19T03-59.json",
+      "sha256": "49b65ac3e667d56db2d0c73da0f14e2374ac7bbcfb191c073c0f56d3049ae3a8",
+      "stage": "repair-lint",
+      "exit_code": 0,
+      "started_at": "2026-10-19T03:59:53.181490+00:00",
+      "finished_at": "2026-10-19T03:59:54.316495+00:00",
+      "all_twelve_hashes_bound": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-types-040002.2026-10-19T04-00.json",
+      "sha256": "b8f826ae09b39ceb132e301ab2f4dfb1a1927fafcf80f7ea5604984f26a42817",
+      "stage": "repair-types",
+      "exit_code": 0,
+      "started_at": "2026-10-19T04:00:00.880674+00:00",
+      "finished_at": "2026-10-19T04:00:02.774911+00:00",
+      "all_twelve_hashes_bound": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-tests-040012.2026-10-19T04-00.json",
+      "sha256": "ba89f683fac644ac43da5fd4a6bd3edc29fb01f207b5ab2560504bdb21d324fe",
+      "stage": "repair-tests",
+      "exit_code": 0,
+      "started_at": "2026-10-19T04:00:10.536078+00:00",
+      "finished_at": "2026-10-19T04:00:12.385506+00:00",
+      "all_twelve_hashes_bound": true,
+      "raw_output_hashes_verified": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-repair-coverage.2026-10-19T04-00.json",
+      "sha256": "bfa02beb43c44a2405bab5e57d960105bd16a0e2a6f1f621ae9cb9894287791e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t2-newline-repair-diff.2026-10-19T04-01.md",
+      "sha256": "5062a45bbb3b96cbd31d8ac55fdbe4f83a03f621492d7f000ecdc545d5f69f73"
+    }
+  ],
+  "coverage_totals": {
+    "covered_lines": 63,
+    "num_statements": 63,
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "missing_lines": 0,
+    "excluded_lines": 0,
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100",
+    "num_branches": 34,
+    "num_partial_branches": 0,
+    "covered_branches": 34,
+    "missing_branches": 0,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100"
+  },
+  "changed_line": 97,
+  "changed_line_covered": true,
+  "unit_summaries": {
+    "functions": {
+      "SolutionInputError.__init__": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "SolutionEntry.__post_init__": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "parse_solution": {
+        "covered_lines": 38,
+        "num_statements": 38,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 28,
+        "num_partial_branches": 0,
+        "covered_branches": 28,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    },
+    "classes": {
+      "SolutionInputError": {
+        "covered_lines": 2,
+        "num_statements": 2,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "SolutionEntry": {
+        "covered_lines": 6,
+        "num_statements": 6,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      }
+    }
+  },
+  "independent_original_probes": [
+    {
+      "case": "Unicode separator inside inert comment shifts reported anchor",
+      "input_utf8_sha256": "4d4174bde11e245feb8a424de29637af7a64ee85f838615f98957b4a8ab4fdf9",
+      "physical_project_line": 3,
+      "actual_project_line": 3,
+      "passed": true
+    },
+    {
+      "case": "Unicode separator inside quoted literal path",
+      "input_utf8_sha256": "e0badc818761948237b54a5d9071a1a59a70494a28781f9cee43f076273f4d72",
+      "actual_literal": "src/App\u2028Name.csproj",
+      "actual_project_line": 2,
+      "passed": true
+    }
+  ],
+  "finding_R1": "CLOSED",
+  "policy_delta": "New comment explains physical line boundaries. Two tests have typed parameters and clear contracts; production144/test248 lines; no I/O or new dependency.",
+  "no_broad_suite_or_review_replay": true,
+  "source_test_checkpoint_git_mutations": false,
+  "task_or_ac_checkoff": false,
+  "final_gates_pending": true,
+  "command": "poetry run python SCRATCH/issue-980-p4t2-repair-confirmation.py",
+  "exit_code": 0
+}
