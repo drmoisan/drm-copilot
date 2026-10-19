@@ -1,0 +1,31 @@
+{
+  "batch": "tokenizer",
+  "command": "poetry run python -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py tests/discovery_runtime/analyzer/test_csharp_tokens.py",
+  "exit_code": 1,
+  "finished_at": "2026-10-19T04:30:25.134655+00:00",
+  "raw": {
+    "stderr": {
+      "path": "SCRATCH/p4t3-tokenizer-lint-043025.2026-10-19T04-30.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "path": "SCRATCH/p4t3-tokenizer-lint-043025.2026-10-19T04-30.stdout.txt",
+      "sha256": "d6a91eb6c05f2d6e7cbc334ccd82891a9c37e478b291fbbc113ec8281fdcb96a"
+    }
+  },
+  "seconds": 0.109371,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "d6be63fc9d505dcb61ad0d2620347ffa29450a3a9a0541fdcf96387db73511db"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/csharp_tokens.py": "abf56cd2626788efcea14b9ae54a65f632c92a1e195aec041eb75f73b2aa4ed2",
+    "tests/discovery_runtime/analyzer/test_csharp_tokens.py": "d6be63fc9d505dcb61ad0d2620347ffa29450a3a9a0541fdcf96387db73511db"
+  },
+  "stage": "lint",
+  "started_at": "2026-10-19T04:30:25.025284+00:00",
+  "stderr": "",
+  "stdout": "B010 [*] Do not call `setattr` with a constant attribute value. It is not any safer than normal property access.\n   --> tests\\discovery_runtime\\analyzer\\test_csharp_tokens.py:200:9\n    |\n198 |     token = tokenize_csharp(\"Name\")[0]\n199 |     with pytest.raises(FrozenInstanceError):\n200 |         setattr(token, \"line\", 2)\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\nhelp: Replace `setattr` with assignment\n\nFound 1 error.\n[*] 1 fixable with the `--fix` option.\n",
+  "task": "P4-T3",
+  "timestamp": "2026-10-19T04-30"
+}
