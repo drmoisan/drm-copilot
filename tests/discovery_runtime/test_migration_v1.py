@@ -24,6 +24,7 @@ from drm_copilot_discovery.migration_models import (
 from drm_copilot_discovery.models import JsonObject, canonical_json
 from drm_copilot_discovery.mutation_io import MutationArtifact, MutationResult
 from drm_copilot_discovery.mutation_plan import MutationError
+from drm_copilot_discovery.parsing import parse_document
 from drm_copilot_discovery.schema_validation import validate_document
 from drm_copilot_discovery.snapshot import SnapshotFile
 
@@ -44,7 +45,8 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.init_projection import InitializationTemplates
-    from drm_copilot_discovery.mutation_plan import CapturedWorkspace
+    from drm_copilot_discovery.mutation_io import MutationWriter
+    from drm_copilot_discovery.mutation_plan import CapturedWorkspace, MutationPlan
 
 ROOT = Path(__file__).resolve().parents[2]
 ENVIRONMENT = draft_object(
@@ -57,7 +59,8 @@ ENVIRONMENT = draft_object(
 
 
 def source_for(kind: str, **changes: object) -> MigrationSource:
-    """Read immutable historical examples; callers receive detached source values."""
+    """Read kind (str)'s committed fixture with changes (object keyword fields).
+    Return detached MigrationSource; fixture reads never write or mutate originals."""
     name = Path(schema_path(kind, "1.0.0")).name.replace(
         ".schema.json", ".example.json"
     )
@@ -74,13 +77,16 @@ def source_for(kind: str, **changes: object) -> MigrationSource:
 
 
 def migration_request(*sources: MigrationSource) -> MigrationRequest:
-    """Supply explicit context without manufacturing observations or source pins."""
+    """Return MigrationRequest from sources (MigrationSource varargs) or fixtures.
+    Read-only fixture inputs receive explicit context without verified claims."""
+    # Select all frozen kinds only when the caller did not choose a smaller case.
     selected = sources or tuple(source_for(kind) for kind in V1_KINDS)
     return MigrationRequest(
         initialization=replace(
             request_for("combined"), documentation_roots=("legacy",)
         ),
         sources=selected,
+        # Bind every source explicitly so individual tests can remove context.
         bindings=tuple(
             MigrationBinding(
                 source_id=str(json.loads(source.content)["id"]),
@@ -97,9 +103,11 @@ def migration_plan(
     initialization_catalog: SchemaCatalog,
     initialization_templates: InitializationTemplates,
 ) -> MigrationPlan:
-    """Compose one real immutable plan; mutable unit dependencies remain per test."""
+    """Return MigrationPlan from SchemaCatalog/InitializationTemplates fixtures.
+    Only this fixture's memory store changes; its returned plan is immutable."""
     case = InitializationCase(initialization_catalog)
     request = migration_request()
+    # Seed original captures before composing the real validated draft graph.
     for source in request.sources:
         case.disk.store.put(source.path, source.content)
     return migration_v1.plan_migration(
@@ -110,8 +118,10 @@ def migration_plan(
 def source_capture(
     plan: MigrationPlan, sources: tuple[MigrationSource, ...]
 ) -> CapturedWorkspace:
-    """Substitute captured source bytes for direct pure boundary tests only."""
+    """Return CapturedWorkspace for MigrationPlan and tuple[MigrationSource, ...].
+    Substitute detached captures in memory; the fixture plan remains unchanged."""
     baseline = plan.mutation.baseline
+    # Retain unrelated capture entries while selecting this test's source set.
     files = tuple(
         item
         for item in baseline.snapshot.manifest.files
@@ -120,6 +130,7 @@ def source_capture(
     manifest = replace(
         baseline.snapshot.manifest,
         files=files
+        # Project selected originals into the existing immutable capture contract.
         + tuple(
             SnapshotFile(path=item.path, content=item.content, category="documentation")
             for item in sources
@@ -131,12 +142,13 @@ def source_capture(
 def test_all_kinds_have_exact_mapping_and_honest_projected_graph(
     migration_plan: MigrationPlan,
 ) -> None:
-    """Every frozen kind maps exact bytes without completion claims."""
+    """Check MigrationPlan fixture mappings without writes; return None."""
     assert migration_plan.mutation.validation.ok
     report = migration_plan.report
     assert report["activation_switched"] is False and report["result"] == "pass"
     mappings = cast("tuple[JsonObject, ...]", report["mappings"])
     assert len(mappings) == len(V1_KINDS)
+    # Check every frozen kind against original and exact prospective output bytes.
     for source, mapping in zip(migration_plan.request.sources, mappings, strict=True):
         assert mapping["old_path"] == source.path
         assert mapping["old_sha256"] == sha256(source.content).hexdigest()
@@ -151,7 +163,7 @@ def test_all_kinds_have_exact_mapping_and_honest_projected_graph(
 def test_planning_order_and_transient_input_do_not_change_report(
     migration_plan: MigrationPlan,
 ) -> None:
-    """Request construction sorts inputs and detaches selectors deterministically."""
+    """Check MigrationPlan fixture input-order independence; return None."""
     reordered = replace(
         migration_plan.request,
         sources=tuple(reversed(migration_plan.request.sources)),
@@ -168,11 +180,13 @@ def test_planning_order_and_transient_input_do_not_change_report(
 def test_source_validation_fails_closed(
     monkeypatch: MonkeyPatch, migration_plan: MigrationPlan, change: str
 ) -> None:
-    """Captured input identity, exact schema and cross-kind uniqueness are mandatory."""
+    """Use MonkeyPatch/MigrationPlan fixtures and str change; return None.
+    Scoped memory patches exercise exact input/schema/identity rejection."""
     source = source_for("feature-contract")
     captured = (source,)
     requested = source
     code = "MIGRATION_SOURCE"
+    # Each case isolates capture, schema or cross-kind identity failure.
     if change == "missing":
         captured = ()
     elif change == "different":
@@ -186,6 +200,7 @@ def test_source_validation_fails_closed(
     elif change == "duplicate":
         other = source_for("product-decision", id="feature-alpha")
         captured, code = (source, other), "MIGRATION_ID"
+    # Duplicate IDs need both sources; other cases mutate a single source.
     if change == "duplicate":
         request = MigrationRequest(
             initialization=migration_plan.request.initialization, sources=captured
@@ -205,7 +220,8 @@ def project_sources(
     request: MigrationRequest,
     sources: tuple[MigrationSource, ...],
 ) -> MigrationPlan:
-    """Exercise public proposals while isolating previously proved graph rebuilding."""
+    """Use MonkeyPatch, MigrationPlan, MigrationRequest and a MigrationSource tuple.
+    Return MigrationPlan; scoped initializer/graph patches affect memory only."""
     capture = replace(
         plan.initialization.capture, proposal_base=source_capture(plan, sources)
     )
@@ -223,7 +239,7 @@ def test_yaml_and_identifier_mapping_keep_original_bytes(
     monkeypatch: MonkeyPatch,
     migration_plan: MigrationPlan,
 ) -> None:
-    """YAML input preserves its checksum and explicit legacy ID translation."""
+    """Use MonkeyPatch/MigrationPlan fixtures to check YAML mapping; return None."""
     source = replace(
         source_for("feature-contract", id="1feature"), path="legacy/one.yaml"
     )
@@ -238,7 +254,8 @@ def test_yaml_and_identifier_mapping_keep_original_bytes(
 def unit_commit_case(
     monkeypatch: MonkeyPatch, plan: MigrationPlan
 ) -> InitializationCase:
-    """Isolate the commit coordinator from already-proved graph/native algorithms."""
+    """Use MonkeyPatch and MigrationPlan to return an isolated InitializationCase.
+    Scoped graph/bootstrap patches affect memory only; no external I/O occurs."""
     case = InitializationCase(plan.mutation.baseline.snapshot.catalog)
     monkeypatch.setattr(migration_v1, "plan_migration", constant(plan))
     monkeypatch.setattr(
@@ -259,32 +276,15 @@ def unit_commit_case(
     return case
 
 
-def test_dry_run_never_bootstraps_or_revokes(
-    monkeypatch: MonkeyPatch, migration_plan: MigrationPlan
-) -> None:
-    """Reconstruction completes but dry-run does not touch publication capabilities."""
-    case = unit_commit_case(monkeypatch, migration_plan)
-
-    def forbidden(*args: object, **kwargs: object) -> None:
-        pytest.fail("dry-run bootstrap")
-
-    monkeypatch.setattr(case.io, "bootstrap", forbidden)
-    result = migration_v1.commit_migration(migration_plan, io=case.io, dry_run=True)
-    assert result.ok and result.report["dry_run"] is True
-    assert not case.disk.store.files and case.revocations == 0
-    assert all(
-        item["status"] == "planned"
-        for item in cast("tuple[JsonObject, ...]", result.report["mappings"])
-    )
-
-
 @pytest.mark.parametrize("success", [True, False])
 def test_returned_outcome_tracks_actual_partial_publication(
     monkeypatch: MonkeyPatch, migration_plan: MigrationPlan, success: bool
 ) -> None:
-    """A persisted planned mapping never becomes a false completion claim on failure."""
+    """Use MonkeyPatch/MigrationPlan fixtures and bool success; return None.
+    The scoped publication fake verifies projection/outcome separation in memory."""
     case = unit_commit_case(monkeypatch, migration_plan)
     mapping = cast("tuple[JsonObject, ...]", migration_plan.report["mappings"])[0]
+    # One writer result varies success/conflict while preserving exact path identity.
     publication = MutationResult(
         ok=success,
         artifacts=(
@@ -311,12 +311,19 @@ def test_returned_outcome_tracks_actual_partial_publication(
         authority_invalidated=True,
         uncertain_paths=() if success else (str(mapping["new_path"]),),
     )
-    monkeypatch.setattr(migration_v1, "commit_mutation", constant(publication))
+
+    def publish(plan: MutationPlan, *, writer: MutationWriter) -> MutationResult:
+        """Use MutationPlan/MutationWriter to check capture; return MutationResult."""
+        assert writer.capture() == plan.baseline
+        return publication
+
+    monkeypatch.setattr(migration_v1, "commit_mutation", publish)
     result = migration_v1.commit_migration(migration_plan, io=case.io)
     assert result.ok is success and result.publication is publication
     assert result.bootstrap_created == ("new-root",)
     assert result.uncertain_paths == publication.uncertain_paths
     assert result.report["result"] == ("pass" if success else "fail")
+    # An actual returned outcome must never mutate the persisted planned mappings.
     assert all(
         item["status"] == "planned"
         for item in cast("tuple[JsonObject, ...]", migration_plan.report["mappings"])
@@ -331,17 +338,27 @@ def test_returned_outcome_tracks_actual_partial_publication(
 
 
 @pytest.mark.parametrize(
-    "failure", ["reconstruct", "bootstrap", "physical", "projection", "revocation"]
+    "failure",
+    [
+        "reconstruct",
+        "bootstrap",
+        "physical",
+        "projection",
+        "revocation",
+        "dry-reconstruct",
+    ],
 )
 def test_commit_failures_preserve_truth_and_do_not_activate(
     monkeypatch: MonkeyPatch, migration_plan: MigrationPlan, failure: str
 ) -> None:
-    """Each coordinator boundary returns failure without erasing prior effects."""
+    """Use MonkeyPatch/MigrationPlan fixtures and str failure; return None.
+    Isolated memory faults verify retained effects and authority handling."""
     case = unit_commit_case(monkeypatch, migration_plan)
     changed = replace(
         migration_plan.mutation, prospective=migration_plan.mutation.baseline.snapshot
     )
-    if failure in {"reconstruct", "revocation"}:
+    # Route the selected fault to reconstruction, bootstrap, capture or projection.
+    if failure in {"reconstruct", "revocation", "dry-reconstruct"}:
         monkeypatch.setattr(
             migration_v1,
             "plan_migration",
@@ -380,10 +397,13 @@ def test_commit_failures_preserve_truth_and_do_not_activate(
     if failure == "revocation":
 
         def broken() -> None:
+            """Raise OSError for the scoped revocation fake; never return None."""
             raise OSError("revocation blocked")
 
         monkeypatch.setattr(case.io, "invalidate_authority", broken)
-    result = migration_v1.commit_migration(migration_plan, io=case.io)
+    result = migration_v1.commit_migration(
+        migration_plan, io=case.io, dry_run=failure == "dry-reconstruct"
+    )
     assert not result.ok and result.error
     assert result.report["activation_switched"] is False
     assert case.disk.store.files == {}
@@ -393,3 +413,84 @@ def test_commit_failures_preserve_truth_and_do_not_activate(
         )
     if failure == "revocation":
         assert "revocation blocked" in result.error
+    if failure == "dry-reconstruct":
+        assert case.revocations == 0
+
+
+@pytest.mark.parametrize(
+    "case", ["malformed-template", "record-conflict", "same-output", "different-output"]
+)
+def test_proposal_preserves_existing_bytes_or_reports_explicit_conflicts(
+    monkeypatch: MonkeyPatch,
+    migration_plan: MigrationPlan,
+    case: str,
+) -> None:
+    """Use MonkeyPatch/MigrationPlan fixtures and str case; return None.
+    Scoped memory substitutions distinguish template faults from output conflicts."""
+    plan, source = migration_plan, source_for("feature-contract")
+    # Existing-file cases alter captured outputs; template cases alter draft inputs.
+    if case.endswith("output"):
+        baseline = plan.mutation.baseline
+        path = (
+            baseline.snapshot.profile.artifacts["feature_contracts"]
+            + "/feature-alpha.json"
+        )
+        original = plan.mutation.prospective.file(path)
+        if case == "different-output":
+            original = replace(original, content=original.content + b" ")
+        manifest = replace(
+            baseline.snapshot.manifest,
+            files=baseline.snapshot.manifest.files + (original,),
+        )
+        plan = replace(
+            plan,
+            mutation=replace(
+                plan.mutation,
+                baseline=replace(
+                    baseline, snapshot=replace(baseline.snapshot, manifest=manifest)
+                ),
+            ),
+        )
+    else:
+        writes = list(plan.initialization.mutation.writes)
+        # Locate the unresolved collection whose ID merge must remain fail-closed.
+        index = next(
+            i
+            for i, item in enumerate(writes)
+            if item.change.artifact_kind == "unspecified-behavior-collection"
+        )
+        content = b"{"
+        if case == "record-conflict":
+            document = parse_document(writes[index].change.content, format="json").value
+            assert document is not None
+            fields = dict(document)
+            fields["records"] = (draft_object(id="unknown-feature-feature-alpha"),)
+            content = canonical_json(JsonObject(tuple(fields.items())))
+        writes[index] = replace(
+            writes[index], change=replace(writes[index].change, content=content)
+        )
+        initialization = replace(
+            plan.initialization,
+            mutation=replace(plan.initialization.mutation, writes=tuple(writes)),
+        )
+        plan = replace(plan, initialization=initialization)
+    # Exact bytes are reusable; malformed or conflicting inputs must raise.
+    if case == "same-output":
+        result = project_sources(
+            monkeypatch, plan, migration_request(source), (source,)
+        )
+        mapping = cast("tuple[JsonObject, ...]", result.report["mappings"])[0]
+        assert (
+            mapping["new_sha256"]
+            == migration_plan.mutation.prospective.file(str(mapping["new_path"])).sha256
+        )
+    else:
+        with pytest.raises(
+            MutationError,
+            match=(
+                "MIGRATION_TEMPLATE"
+                if case == "malformed-template"
+                else "MIGRATION_COLLISION"
+            ),
+        ):
+            project_sources(monkeypatch, plan, migration_request(source), (source,))

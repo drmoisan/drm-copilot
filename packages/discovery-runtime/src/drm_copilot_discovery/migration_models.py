@@ -30,6 +30,7 @@ class MigrationSource:
 
     Construction validates spelling only. Planning must verify these bytes against
     the configured workspace capture before interpreting or publishing anything.
+    The str path and kind identify bytes content; construction performs no I/O.
     """
 
     path: str
@@ -37,7 +38,10 @@ class MigrationSource:
     content: bytes
 
     def __post_init__(self) -> None:
-        """Reject unsupported kinds, unsafe paths and mutable content without I/O."""
+        """Validate this MigrationSource's typed fields without I/O; return None.
+
+        Raise ValueError for unsupported kinds, unsafe paths or mutable content.
+        """
         check_path_collisions((self.path,))
         if self.kind not in V1_KINDS or not isinstance(
             cast("object", self.content), bytes
@@ -55,6 +59,8 @@ class MigrationBinding:
 
     Feature IDs refer to feature-contract inputs in the same migration. The
     binding supplies configuration only and cannot approve an observed result.
+    Construction freezes and sorts tuple[str, ...] selectors without I/O; the
+    optional JsonObject environment supplies context, never execution evidence.
     """
 
     source_id: str
@@ -62,8 +68,12 @@ class MigrationBinding:
     environment: JsonObject | None = None
 
     def __post_init__(self) -> None:
-        """Detach selectors and reject ambiguous or malformed explicit context."""
+        """Normalize this MigrationBinding's selectors in memory; return None.
+
+        Raise ValueError for duplicate/empty IDs or mutable environment context.
+        """
         features = tuple(self.feature_ids)
+        # Reject ambiguous selectors before freezing their deterministic order.
         if (
             not self.source_id.strip()
             or any(
@@ -95,7 +105,11 @@ class MigrationRequest:
     to_version: int = 2
 
     def __post_init__(self) -> None:
-        """Reject unknown adapters and destination/source overlap before any reads."""
+        """Validate this MigrationRequest and freeze sorted inputs; return None.
+
+        Raise ValueError for unsupported versions, empty/colliding sources,
+        overlapping destinations or duplicate bindings. No reads or writes occur.
+        """
         if (
             type(self.from_version) is not int
             or type(self.to_version) is not int
@@ -107,10 +121,13 @@ class MigrationRequest:
         sources = tuple(sorted(self.sources, key=lambda item: item.path))
         if not sources:
             raise ValueError("Migration requires at least one explicit source artifact")
+        # Check portable identity before destinations can grant any write access.
         check_path_collisions(item.path for item in sources)
+        # Include configured overrides so every possible output protects originals.
         destinations = tuple(
             str(path) for path in self.initialization.artifact_paths().values()
         )
+        # Reject containment in both directions, including custom artifact roots.
         if any(
             path_contains(destination, source.path)
             or path_contains(source.path, destination)
@@ -121,6 +138,7 @@ class MigrationRequest:
                 "Migration destinations must not overlap original source artifacts"
             )
         bindings = tuple(sorted(self.bindings, key=lambda item: item.source_id))
+        # A source must have exactly one explicit context selection at most.
         if len({item.source_id for item in bindings}) != len(bindings):
             raise ValueError("Migration binding source IDs must be unique")
         object.__setattr__(self, "sources", sources)
@@ -129,7 +147,11 @@ class MigrationRequest:
 
 @dataclass(frozen=True, kw_only=True)
 class ConvertedArtifact:
-    """Retain a pure draft projection and its explicit unresolved obligations."""
+    """Retain a pure draft projection and its explicit unresolved obligations.
+
+    Conversion binds immutable source/original/document values and open questions;
+    the planner combines them into a graph. This value performs no I/O or approval.
+    """
 
     source: MigrationSource
     original: JsonObject
@@ -143,6 +165,7 @@ class MigrationPlan:
 
     The report is an immutable projection, never a completed-publication receipt.
     Commit reconstructs the proposal; serialized user data cannot mint this value.
+    Construction stores validated collaborators without I/O or activation.
     """
 
     request: MigrationRequest
@@ -157,6 +180,8 @@ class MigrationResult:
 
     Failed bootstrap or mutation retains confirmed creations and uncertain paths.
     The returned report reflects this invocation's outcome; it grants no authority.
+    Callers inspect ok, error and publication before retrying; this value performs
+    no I/O and cannot convert partial writes into a successful result.
     """
 
     ok: bool
@@ -173,7 +198,22 @@ def mapping_report(
     outputs: tuple[tuple[ConvertedArtifact, str], ...],
     documents: dict[str, JsonObject],
 ) -> JsonObject:
-    """Build a deterministic immutable mapping that asserts projection validity only."""
+    """Build a JsonObject mapping that asserts structural projection validity only.
+
+    Args:
+        request (MigrationRequest): Destination and explicit adapter selection.
+        outputs (tuple[tuple[ConvertedArtifact, str], ...]): Ordered output paths.
+        documents (dict[str, JsonObject]): Exact projected documents for hashing.
+
+    Returns:
+        JsonObject: Immutable source/output mappings and unresolved obligations.
+
+    Raises:
+        KeyError: An output is absent from the caller's complete projection.
+
+    No I/O occurs and no input is mutated; publication remains projection-only.
+    """
+    # Bind report identity to exact original bytes, independent of publication.
     manifest = tuple(
         draft_object(
             path=item.source.path,
@@ -186,6 +226,7 @@ def mapping_report(
     digest = sha256(canonical_json(manifest)).hexdigest()
     fields = draft_header("migration-report", "migration-" + digest)
     questions: list[JsonObject] = []
+    # Include both generated obligations and directly migrated open questions.
     for item, _ in outputs:
         questions.extend(item.questions)
         if item.source.kind == "unspecified-behavior":
@@ -198,6 +239,7 @@ def mapping_report(
         dry_run=False,
         activation_switched=False,
         result="pass",
+        # Hash the actual collection bytes even when several records share a file.
         mappings=tuple(
             draft_object(
                 old_path=item.source.path,
@@ -217,10 +259,12 @@ def mapping_report(
             )
             for item, path in outputs
         ),
+        # Sort obligations by stable identity so input ordering cannot alter bytes.
         unresolved_behavior_refs=tuple(
             draft_reference("unspecified-behavior", str(item["id"]))
             for item in sorted(questions, key=lambda value: str(value["id"]))
         ),
+        # Preserve every original field without treating it as validated v2 state.
         unmapped_metadata=tuple(
             draft_object(
                 old_path=item.source.path,
@@ -258,9 +302,23 @@ def publication_report(
     statuses: dict[str, str],
     error: str | None,
 ) -> JsonObject:
-    """Return actual dispositions without rewriting the immutable projection."""
+    """Return actual dispositions without rewriting the immutable projection.
+
+    Args:
+        plan (MigrationPlan): Validated projection copied into the returned report.
+        ok (bool): Whether this invocation succeeded, including every write.
+        dry_run (bool): Whether publication was intentionally omitted.
+        statuses (dict[str, str]): Confirmed dispositions keyed by output path.
+        error (str | None): Failure diagnostic retained for partial publication.
+
+    Returns:
+        JsonObject: Detached outcome; unmapped publication statuses stay planned.
+
+    Performs no I/O or input mutation; callers supply validated report structures.
+    """
     fields = dict(plan.report)
     mappings: list[JsonObject] = []
+    # Apply only confirmed outcomes; absent paths cannot claim created status.
     for original in cast("tuple[JsonObject, ...]", plan.report["mappings"]):
         mapping = dict(original)
         mapping["status"] = statuses.get(str(original["new_path"]), "planned")

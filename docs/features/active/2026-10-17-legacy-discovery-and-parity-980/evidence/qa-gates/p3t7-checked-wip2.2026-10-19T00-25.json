@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-10-19T00:25:57.991339+00:00",
+  "status": "checked-wip-not-accepted",
+  "accepted_baseline": "e58a61428bdf98a97f66f57f08793a743eff28f2",
+  "prior_wip_commit": "d3f3ad06d13a5995db5725161cc97427649478f8",
+  "sources": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py": {
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141",
+      "physical_lines": 358
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "physical_lines": 326
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py": {
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "physical_lines": 413
+    },
+    "tests/discovery_runtime/test_migration_v1.py": {
+      "sha256": "1ce7b99a6405f66c0bfb432058ef970f8040b936dd6a20b8d1e41bf9a5be3f55",
+      "physical_lines": 496
+    },
+    "tests/discovery_runtime/test_migration_unknowns.py": {
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "physical_lines": 478
+    }
+  },
+  "current_source_gates": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-format.2026-10-19T00-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-lint.2026-10-19T00-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-types.2026-10-19T00-25.json"
+  ],
+  "remaining_stages": [
+    "architecture",
+    "unit-coverage-reverse",
+    "contracts",
+    "native-composition"
+  ],
+  "preserved_behavioral_evidence": "qa-gates/p3t7-pass2-source-manifest.2026-10-19T00-23.json",
+  "prior_behavioral_result": {
+    "unit_cases": 75,
+    "reverse_cases": 75,
+    "covered_lines": 303,
+    "total_lines": 303,
+    "covered_branches": 94,
+    "total_branches": 94,
+    "units_at_100_percent": 27,
+    "contract_cases": 339,
+    "native_checks": 13,
+    "multi_case_native_seconds": 603.085
+  },
+  "qualification": "Pass-2 behavioral evidence is retained, not substituted for the required final clean ordered loop. Production differences are documentation-only; the dry-run test moved without assertion changes."
+}

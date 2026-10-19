@@ -51,13 +51,20 @@ _LOCATIONS: dict[str, ArtifactKey] = {
 def _sources(
     request: MigrationRequest, baseline: CapturedWorkspace
 ) -> tuple[tuple[MigrationSource, JsonObject], ...]:
-    """Require captured bytes and unique old/new identities before conversion."""
+    """Validate request (MigrationRequest) against baseline (CapturedWorkspace).
+
+    Return tuple[(MigrationSource, JsonObject), ...] for exact captured v1 bytes.
+    Missing/malformed/boundedness/identity errors raise MutationError. No I/O or
+    input mutation occurs; the supplied capture is the source of read authority.
+    """
     if len(request.sources) > baseline.snapshot.profile.limits.artifact_records:
         raise MutationError("MIGRATION_LIMIT", "Reduce the number of migration inputs")
+    # Resolve only captured files, never unchecked paths supplied by the caller.
     files = {item.path: item for item in baseline.snapshot.manifest.files}
     originals: list[tuple[MigrationSource, JsonObject]] = []
     identities: set[str] = set()
     translated: set[str] = set()
+    # Validate all originals before projection can derive any output identity.
     for source in request.sources:
         captured = files.get(source.path)
         if captured is None or captured.content != source.content:
@@ -91,6 +98,7 @@ def _sources(
         identities.add(identifier)
         translated.add(mapped)
         originals.append((source, result.document))
+    # Bindings cannot silently target unrelated or misspelled source identifiers.
     if any(binding.source_id not in identities for binding in request.bindings):
         raise MutationError(
             "MIGRATION_BINDING", "Every binding must name an original source ID"
@@ -99,7 +107,10 @@ def _sources(
 
 
 def _document(content: bytes) -> JsonObject:
-    """Decode already validated initialization output without new resource reads."""
+    """Decode content (bytes) into JsonObject without I/O or mutation.
+
+    Initialization has validated the template; malformed JSON raises MutationError.
+    """
     parsed = parse_document(content, format="json")
     if parsed.value is None:
         raise MutationError(
@@ -109,11 +120,17 @@ def _document(content: bytes) -> JsonObject:
 
 
 def _append(document: JsonObject, records: tuple[JsonObject, ...]) -> JsonObject:
-    """Merge exact collection members, rejecting identity reuse with different bytes."""
+    """Merge records (tuple[JsonObject, ...]) into document (JsonObject).
+
+    Return a detached JsonObject with sorted members; differing same-ID records
+    raise MutationError. Neither input is mutated and no I/O occurs.
+    """
+    # Index existing members so retries accept identical records without duplication.
     combined = {
         str(item["id"]): item
         for item in cast("tuple[JsonObject, ...]", document["records"])
     }
+    # Preserve prior members and reject divergent content under the same identity.
     for item in records:
         identifier = str(item["id"])
         if identifier in combined and combined[identifier] != item:
@@ -122,6 +139,7 @@ def _append(document: JsonObject, records: tuple[JsonObject, ...]) -> JsonObject
             )
         combined[identifier] = item
     fields = dict(document)
+    # Canonical member order keeps repeat migrations byte-identical.
     fields["records"] = tuple(combined[name] for name in sorted(combined))
     return JsonObject(tuple(fields.items()))
 
@@ -131,21 +149,30 @@ def _project(
     baseline: CapturedWorkspace,
     documents: dict[str, JsonObject],
 ) -> tuple[tuple[ConvertedArtifact, str], ...]:
-    """Project validated inputs while preserving unrelated existing root content."""
+    """Project request (MigrationRequest) against baseline (CapturedWorkspace).
+
+    Mutate documents (dict[str, JsonObject]) with drafts and return an ordered
+    tuple[(ConvertedArtifact, str), ...]. Context/identity conflicts raise
+    MutationError; conversion can raise ValueError. No external I/O occurs.
+    """
     originals = _sources(request, baseline)
+    # Only explicit feature-contract inputs may become context for other records.
     features = {
         str(value["id"]): migrated_id(str(value["id"]))
         for source, value in originals
         if source.kind == "feature-contract"
     }
+    # Match each validated source to its unique caller-supplied context.
     bindings = {item.source_id: item for item in request.bindings}
     profile = baseline.snapshot.profile
     outputs: list[tuple[ConvertedArtifact, str]] = []
     singleton_kinds: set[str] = set()
     questions: list[JsonObject] = []
+    # Project every input once and retain the exact configured destination.
     for source, original in originals:
         kind = source.kind
         location = profile.artifacts[_LOCATIONS[kind]]
+        # Ledger/parity outputs are singletons; multiple source collections conflict.
         if kind in {"coverage-ledger", "parity-matrix"}:
             if kind in singleton_kinds:
                 raise MutationError(
@@ -164,6 +191,8 @@ def _project(
             template=documents.get(location),
         )
         questions.extend(converted.questions)
+        # Decisions/questions share collections; other records use singleton paths
+        # or one ID-named file within their configured directory.
         if kind in {"product-decision", "unspecified-behavior"}:
             documents[location] = _append(documents[location], (converted.document,))
         else:
@@ -188,14 +217,22 @@ def plan_migration(
 ) -> MigrationPlan:
     """Validate captured originals and the complete new draft graph before any writes.
 
-    Root-owned I/O must be authenticated by the host. Invalid inputs, missing
-    context, unsafe paths or incompatible destinations raise ValueError/OSError.
+    Args:
+        request (MigrationRequest): Explicit inputs, context and draft destination.
+        io (InitializationIO): Host-authenticated read/bootstrap capability.
+        templates (InitializationTemplates | None): Optional packaged draft bytes.
+
+    Return MigrationPlan binding exact projected bytes and a projection-only report.
+    Invalid inputs/context/paths/destinations raise ValueError (including
+    MutationError); capture failures raise OSError. Reads occur through io, but
+    no directories, files, authority or activation are changed during planning.
     Existing exact bytes are reusable; different destination bytes are conflicts.
     """
     initialization = plan_initialization(
         request.initialization, io=io, templates=templates
     )
     baseline = initialization.capture.proposal_base
+    # Start from validated initializer documents rather than inventing root content.
     documents = {
         write.change.path: _document(write.change.content)
         for write in initialization.mutation.writes
@@ -206,9 +243,12 @@ def plan_migration(
         baseline.snapshot.profile.artifacts["reports"] + "/migration-report.json"
     )
     documents[report_path] = report
+    # Compare destination bytes against the same immutable captured input set.
     files = {item.path: item for item in baseline.snapshot.manifest.files}
     changes: list[MutationChange] = []
+    # Author exact deterministic writes only after protecting originals and conflicts.
     for path, document in sorted(documents.items()):
+        # Recheck containment using effective profile paths, including overrides.
         if any(
             path_contains(path, source.path) or path_contains(source.path, path)
             for source in request.sources
@@ -235,6 +275,7 @@ def plan_migration(
     mutation = plan_mutation(
         baseline,
         tuple(changes),
+        # Grant exactly the projected kind/ID/path triples, never a directory wildcard.
         grants=tuple(
             WriteGrant(
                 artifact_kind=item.artifact_kind,
@@ -254,6 +295,15 @@ def commit_migration(
 ) -> MigrationResult:
     """Reconstruct, bootstrap and publish through the accepted mutation boundary.
 
+    Args:
+        plan (MigrationPlan): Validated exact-byte projection to reconstruct.
+        io (InitializationIO): Authenticated capture/bootstrap/write capability.
+        dry_run (bool): Revalidate without publishing or invalidating authority.
+
+    Return MigrationResult with exact actual outcomes, including partial failures.
+    Contract ValueError/OSError failures become failed results; unexpected errors
+    propagate. Real execution creates the draft root and guarded artifact writes,
+    invalidates authority as required, and never overwrites original inputs.
     Dry-run does not write directories, artifacts, activation or authority. Real
     failures retain exact partial outcomes; originals are never output targets.
     An immutable projection report on disk cannot claim completed publication.
@@ -270,7 +320,9 @@ def commit_migration(
             raise MutationError(
                 "MIGRATION_PLAN", "Plan differs from its validated reconstruction"
             )
+        # Dry-run stops after reconstruction; only real publication may bootstrap.
         if dry_run:
+            # Expose reusable versus planned outputs without claiming new creations.
             statuses = {
                 write.change.path: "skipped" if write.skipped else "planned"
                 for write in plan.mutation.writes
@@ -304,6 +356,7 @@ def commit_migration(
             )
         current = plan_mutation(
             physical,
+            # Revalidate exactly the original proposal against its physical capture.
             tuple(write.change for write in plan.mutation.writes),
             grants=plan.mutation.grants,
         )
@@ -319,6 +372,7 @@ def commit_migration(
                 primitives=io.primitives,
             ),
         )
+        # Retain every publication diagnostic instead of losing partial-write context.
         error = "; ".join(item.message for item in result.findings) or None
         return MigrationResult(
             ok=result.ok,
@@ -326,6 +380,7 @@ def commit_migration(
                 plan,
                 ok=result.ok,
                 dry_run=False,
+                # Report only actual writer dispositions; absent outputs stay planned.
                 statuses={item.path: item.status for item in result.artifacts},
                 error=error,
             ),
@@ -336,6 +391,8 @@ def commit_migration(
             error=error,
         )
     except (OSError, ValueError) as error:
+        # A failed real invocation must revoke authority unless bootstrap already did;
+        # dry-run never revokes, and a revocation failure remains an explicit error.
         if not dry_run and not revoked:
             try:
                 io.invalidate_authority()

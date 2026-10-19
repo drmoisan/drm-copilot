@@ -1,0 +1,134 @@
+{
+  "timestamp": "2026-10-19T00:26:55.902784+00:00",
+  "command": "poetry run python SCRATCH/issue-980-p3t7-normalize.py",
+  "exit_code": 0,
+  "scope": "Only UTC Markdown Timestamp presentation; source/tests, exact commands, recorded results and paired JSON precision are unchanged.",
+  "changes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-checked-wip2.2026-10-19T00-25.md",
+      "old_sha256": "61b773c2aff284f22fdb37a573099f7cf209d518e6be9f4bd9797ac3e13e602c",
+      "new_sha256": "30cc65703ca41693947e4bb7db432d040e178cd3fa5c8ca82d3b4849f7005fa4",
+      "original_timestamp": "2026-10-19T00:25:57.991339+00:00",
+      "normalized_timestamp": "2026-10-19T00-25"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t7-pass2-harnesses.2026-10-19T00-23.md",
+      "old_sha256": "0e3fe7b2fa9a8b0381e93a147d71a0e30fa313ba432d650b9a558554ec4d801c",
+      "new_sha256": "11bff0c4af4047956d32785d9e530a4af0d483937214002c61470b886fb5e2d7",
+      "original_timestamp": "2026-10-19T00:23:05.017198+00:00",
+      "normalized_timestamp": "2026-10-19T00-23"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-additional-repaired-diagnostics.2026-10-19T00-09.md",
+      "old_sha256": "bc9eef025332b4a6f18cf0054480958683fe65c840cfaca00be1a85f324c4924",
+      "new_sha256": "52c242361b4d1b07a23342e7859b7432a112cd9f01845182f319fbdc61b30eef",
+      "original_timestamp": "2026-10-19T00:09:26Z",
+      "normalized_timestamp": "2026-10-19T00-09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass1-format.2026-10-19T00-06.md",
+      "old_sha256": "fe47bf2eedfe48646abd802fc34a5c79cca3942b251a27ff398eb74e451b9d52",
+      "new_sha256": "9d94da25bd13b2dcb860e4d2e0964885b818aed66ff52a635c6a70260c7c580f",
+      "original_timestamp": "2026-10-19T00:06:55.400015+00:00",
+      "normalized_timestamp": "2026-10-19T00-06"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass1-lint.2026-10-19T00-06.md",
+      "old_sha256": "c77b8b6bdcc87fdea06b9704468b87743acd52a0e7366aabcaf38276ddf4b5bd",
+      "new_sha256": "10d9d8aa7d5b3d4a78df331badb1d120b78315dfacfc8589cc46917f5b422ad6",
+      "original_timestamp": "2026-10-19T00:06:59.189501+00:00",
+      "normalized_timestamp": "2026-10-19T00-06"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass1-types.2026-10-19T00-07.md",
+      "old_sha256": "46c227f27d80ea2f67b16e9cb501c362b345b5b6af200a1a5c2eb2a9a498ecc6",
+      "new_sha256": "eb29a44aef7ea93432cfb9a19358da5c0412f75e82e897b2517f733118c08ee2",
+      "original_timestamp": "2026-10-19T00:07:13.553777+00:00",
+      "normalized_timestamp": "2026-10-19T00-07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-architecture.2026-10-19T00-08.md",
+      "old_sha256": "1f8f0bbd7b19dc42490533ee00b7ed5f14fec1f5c1fc439c0dd898c7d7e1d2a4",
+      "new_sha256": "7a6ad5f0fe95155d6ad179afaeb64ac6306022740a343c66968b68957b034d33",
+      "original_timestamp": "2026-10-19T00:08:26.823983+00:00",
+      "normalized_timestamp": "2026-10-19T00-08"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-contracts.2026-10-19T00-11.md",
+      "old_sha256": "13548c73ca35275d5cb9008e5b215b02637736bfebaf479a84bd514ed0d5a797",
+      "new_sha256": "64c914955a17a3b9615ca036fa259b3cfeb3b76f9661ad17e91b65dae8867892",
+      "original_timestamp": "2026-10-19T00:11:43.072141+00:00",
+      "normalized_timestamp": "2026-10-19T00-11"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-coverage-audit.2026-10-19T00-10.md",
+      "old_sha256": "0d099c90a5d07e3c88a1abf7ca16cca14c54d26b7e2e1065179400573d4e420e",
+      "new_sha256": "f8c5bf70e1979b39c44532af76215002e1e5a1774563aff648d291c1440261f5",
+      "original_timestamp": "2026-10-19T00:10:33.610570+00:00",
+      "normalized_timestamp": "2026-10-19T00-10"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-format.2026-10-19T00-07.md",
+      "old_sha256": "3e1466101df9351ae45f41e8622df51041a92de0aba61455cecffb48db58a75b",
+      "new_sha256": "b942d61151e88493c9edbdad0386ce5fe3420c6a780ec0a1d18eecb64658845d",
+      "original_timestamp": "2026-10-19T00:07:34.305504+00:00",
+      "normalized_timestamp": "2026-10-19T00-07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-lint.2026-10-19T00-07.md",
+      "old_sha256": "de10be0d1b887d38cbe3fd12aef9e0fb22185e4291aa06294b8f2628e6b19fb1",
+      "new_sha256": "f6ea9cec326eced81bb40edb23c723f1e3b2284a3795bfa1b62e073d96a9c4b6",
+      "original_timestamp": "2026-10-19T00:07:38.225841+00:00",
+      "normalized_timestamp": "2026-10-19T00-07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-native.2026-10-19T00-21.md",
+      "old_sha256": "b8707b1c695c472f45d9131e99efcbabfb3a8688e33591625b7fed482edce676",
+      "new_sha256": "46b80cd918d4ee8b33125ad9034a13d7eaa097c308298ea3e1b7f08f63a790eb",
+      "original_timestamp": "2026-10-19T00:21:55.212083+00:00",
+      "normalized_timestamp": "2026-10-19T00-21"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-reverse.2026-10-19T00-11.md",
+      "old_sha256": "50f7cbb284e4e82a4a71e0c84dcfbd8915f34b9a49fa5b345a7ecc1b2798b6ec",
+      "new_sha256": "98ffde9347a3f166b27a8b0170fa66872fe235ab16a462246159ae2eec2445ae",
+      "original_timestamp": "2026-10-19T00:11:23.761820+00:00",
+      "normalized_timestamp": "2026-10-19T00-11"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-types.2026-10-19T00-07.md",
+      "old_sha256": "c3f4c3d51f2e97fe8bf32806daab3d20900cbe9d99f13813d4c3bc8135505a0f",
+      "new_sha256": "aedd43077a5502c0bf666a7b455750f684bb33f43fea1f02a1600bbe5b164ce9",
+      "original_timestamp": "2026-10-19T00:07:52.484516+00:00",
+      "normalized_timestamp": "2026-10-19T00-07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass2-unit.2026-10-19T00-10.md",
+      "old_sha256": "f33856eb14260723011f6b3a5d751b68e5ab999277d6f63d31d8984bce0fbd36",
+      "new_sha256": "8bb98ff872af524e717cc87e8af8ed9a5309a1193a4aef69e1451025c35a3289",
+      "original_timestamp": "2026-10-19T00:10:25.482200+00:00",
+      "normalized_timestamp": "2026-10-19T00-10"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-format.2026-10-19T00-24.md",
+      "old_sha256": "f4bb707f5ef91db6d0bf92c2715918ba2d48419025fa19e026431652ff19f9e0",
+      "new_sha256": "cd0342f54d26170b707f68b8c3177879936bd69e32bf24ec12d0b2273c9951be",
+      "original_timestamp": "2026-10-19T00:24:49.772488+00:00",
+      "normalized_timestamp": "2026-10-19T00-24"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-lint.2026-10-19T00-24.md",
+      "old_sha256": "153ab7027d3af9e5d4997db8428315b4c0350a290eee60b631837a07eb82b0f3",
+      "new_sha256": "6d59d7081e4b28923f4e775aa0fb841e94fb227b05437d82c8049cb3600f6c62",
+      "original_timestamp": "2026-10-19T00:24:53.588631+00:00",
+      "normalized_timestamp": "2026-10-19T00-24"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p3t7-pass3-types.2026-10-19T00-25.md",
+      "old_sha256": "e5c02393b3ed9b07957aa83a76df2c872fe05ccf6827eae5488520bfb4224770",
+      "new_sha256": "c487c149917f304ec162f90fc6e811ca0ae0ba490bac41b8958eef6a6986ae46",
+      "original_timestamp": "2026-10-19T00:25:07.716360+00:00",
+      "normalized_timestamp": "2026-10-19T00-25"
+    }
+  ]
+}
