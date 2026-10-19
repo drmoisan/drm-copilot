@@ -1,0 +1,154 @@
+"""Bind the successful P4-T4 final loop; retain acceptance ownership with executor."""
+import ast
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+scratch = Path(__file__).resolve().parent
+evidence = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence')
+qa = evidence / 'qa-gates'
+ordered_path = Path(sys.argv[1])
+ordered = json.loads(ordered_path.read_bytes())
+freeze_path = Path(ordered['candidate_manifest'])
+freeze = json.loads(freeze_path.read_bytes())
+confirmation_path = qa / 'p4t4-executor-repair-confirmation.2026-10-19T06-38.json'
+assert sha256(confirmation_path.read_bytes()).hexdigest() == '761771c6a97b89dd28809a3d6bed9e36c9b8a8d2b0221f635793d243aee97281'
+assert sha256(freeze_path.read_bytes()).hexdigest() == ordered['candidate_manifest_sha256']
+expected = {item['path']: item['sha256'] for item in freeze['files']}
+assert expected == ordered['source_hashes']
+
+def ref(path):
+    return {'path': path.as_posix(), 'sha256': sha256(path.read_bytes()).hexdigest()}
+
+def git(*args):
+    return subprocess.run(['git', *args], capture_output=True, check=True).stdout
+
+head = git('rev-parse', 'HEAD').decode().strip()
+assert head == '5329894a0e8485c7837cc67f1700bf3764116fd2'
+bindings = []
+for path, digest in expected.items():
+    working = Path(path).read_bytes()
+    indexed = git('show', ':' + path)
+    committed = git('show', head + ':' + path)
+    assert sha256(working).hexdigest() == digest
+    assert working == indexed == committed, path
+    attributes = git('check-attr', '-z', '--all', '--', path).decode().split('\0')
+    attributes = [{'name': attributes[index + 1], 'value': attributes[index + 2]} for index in range(0, len(attributes) - 1, 3)]
+    bindings.append({'path': path, 'working_sha256': digest, 'index_sha256': sha256(indexed).hexdigest(), 'commit_sha256': sha256(committed).hexdigest(), 'index_blob': git('rev-parse', ':' + path).decode().strip(), 'commit_blob': git('rev-parse', head + ':' + path).decode().strip(), 'attributes': attributes, 'streams_identical': True})
+
+receipts = []
+prior_end = None
+for item in ordered['receipts']:
+    path = Path(item['path'])
+    value = json.loads(path.read_bytes())
+    assert sha256(path.read_bytes()).hexdigest() == item['sha256']
+    assert value['stage'] == len(receipts) + 1 and value['exit_code'] == 0
+    assert value['source_before'] == value['source_after'] == expected
+    start = datetime.fromisoformat(value['started_at'])
+    end = datetime.fromisoformat(value['finished_at'])
+    assert prior_end is None or start >= prior_end
+    prior_end = end
+    for key in ('raw_stdout', 'raw_stderr'):
+        raw = value[key]
+        assert sha256((scratch / Path(raw['path']).name).read_bytes()).hexdigest() == raw['sha256']
+    receipts.append({**item, 'seconds': value['seconds'], 'command': value['command'], 'raw_stdout': value['raw_stdout'], 'raw_stderr': value['raw_stderr']})
+assert len(receipts) == 7
+tests = json.loads(Path(receipts[4]['path']).read_bytes())
+contracts = json.loads(Path(receipts[5]['path']).read_bytes())
+assert '91 passed' in tests['stdout']
+contract_count = int(re.search(r'(\d+) passed', contracts['stdout']).group(1))
+assert contract_count == 176
+coverage_path = Path(ordered['coverage_path'])
+coverage = json.loads(coverage_path.read_bytes())
+native_path = Path(ordered['native_path'])
+native = json.loads(native_path.read_bytes())
+assert len(native['checks']) == 8 and native['source_tree_unchanged'] and native['git_status_unchanged']
+for key in ('raw_coverage', 'raw_native'):
+    raw = ordered[key]
+    assert sha256((scratch / Path(raw['path']).name).read_bytes()).hexdigest() == raw['sha256']
+for item in freeze['unit_ranges']:
+    measured = coverage['files'][item['path']]
+    span = set(range(item['start'], item['end'] + 1))
+    eligible = (set(measured['executed_lines']) | set(measured['missing_lines'])) & span
+    covered = set(measured['executed_lines']) & span
+    assert len(eligible) == item['statements'] and len(covered) == item['covered_statements']
+    assert not eligible or len(covered) / len(eligible) >= .90
+assert len(ordered['test_nodes']) == len(set(ordered['test_nodes'])) == 91
+baseline = json.loads(Path(freeze['baseline']['path']).read_bytes())
+for item in baseline['predecessor_files']:
+    assert sha256(Path(item['path']).read_bytes()).hexdigest() == item['sha256']
+
+now = datetime.now(timezone.utc)
+stamp = now.strftime('%Y-%m-%dT%H-%M')
+snapshots = []
+for source_path, digest in ordered['harness_hashes'].items():
+    source = scratch / Path(source_path).name
+    content = source.read_bytes()
+    assert sha256(content).hexdigest() == digest
+    ast.parse(content)
+    destination = qa / ('p4t4-final-' + source.stem.removeprefix('issue-980-') + '-harness.' + stamp + '.txt')
+    destination.write_bytes(content)
+    snapshots.append({'source': source_path, **ref(destination)})
+source = Path(__file__).resolve()
+destination = qa / ('p4t4-final-handoff-harness.' + stamp + '.txt')
+destination.write_bytes(source.read_bytes())
+snapshots.append({'source': 'SCRATCH/' + source.name, **ref(destination)})
+document = {
+    'task': 'P4-T4', 'state': 'EXECUTOR_ACCEPTANCE_PENDING', 'timestamp': stamp,
+    'recorded_at': now.isoformat(), 'head': head,
+    'ordered_proof': ref(ordered_path), 'repair_manifest': ref(freeze_path),
+    'bounded_confirmation': ref(confirmation_path),
+    'source_index_commit_bindings': bindings, 'receipts': receipts,
+    'coverage': ref(coverage_path), 'raw_coverage': ordered['raw_coverage'],
+    'totals': coverage['totals'],
+    'module_coverage': {path: value['summary'] for path, value in coverage['files'].items()},
+    'unit_range_binding': {'reference': ref(freeze_path), 'ranges': 23, 'exact_counts_reconfirmed': True, 'minimum_statement_percent': 90},
+    'test_module_order': ordered['test_module_order'],
+    'test_nodes_reference': ref(ordered_path), 'test_node_count': 91,
+    'applicable_contract_cases': contract_count, 'native_assertion_count': len(native['checks']),
+    'native_result': ref(native_path), 'raw_native': ordered['raw_native'],
+    'native_components': native['component_count'], 'native_findings': native['finding_count'],
+    'preserved_predecessor_count': len(baseline['predecessor_files']),
+    'harness_snapshots': snapshots,
+    'qa_deltas': {'new_ruff_findings': 0, 'new_pyright_diagnostics': 0, 'new_test_failures': 0, 'changed_module_coverage_regression': False, 'accepted_predecessor_proof': 'Retained via unchanged 34-path baseline bindings; no unrelated suite replay.'},
+    'downstream': {
+        'adapter': 'ConfigurationAnalyzer.identifier = configuration; analyze(capture: InventoryCapture) -> Analysis, pure and read-only.',
+        'parser': 'parse_configuration(content: bytes, *, format: ConfigurationFormat, max_bytes: int, max_keys: int, max_depth: int = 64, max_text_bytes: int | None = None) -> tuple[ConfigurationKey, ...].',
+        'record': 'Frozen keyword-only ConfigurationKey: name, pointer, kind; optional real line, conditional bool, origin_pointer. No values or raw conditions.',
+        'errors': 'ConfigurationInputError carries fixed code/message without source-bearing exception chains; invalid caller bounds raise ValueError.',
+        'budgets': 'Separate conservative encoded-byte reservations use 12 bytes per Unicode character for compact UTF-8 JSON under either ensure_ascii setting, plus documented fixed row overhead. These are finite allocation/output guards, not measured heap usage. Prospective paths and aggregate row batches are charged before construction.',
+        'formats': 'Finite JSON filename families and object roots; supported secure XML settings/configuration declarations; strict case-preserving INI with explicit/default/inherited origins. TOML and unsupported XML roots fail explicitly; unrelated files are ignored.',
+        'provenance': 'Exactly captured bytes and matching immutable pins back checksums. JSON uses RFC6901 addresses without fabricated line positions; XML/INI retain real declaration anchors. Presence and activation remain unresolved.',
+        'exposure': 'Public registry selection remains P4-T9; this task exposes the direct adapter only.'
+    },
+    'remaining_limitations': ['Final executor acceptance and parent commit are pending.', 'Native integration exercised Windows Python/Git only; no coding-agent-host execution or non-Windows CI proof.', 'No value/condition evaluation, TOML parser, arbitrary configuration format detection or runtime activation inference.', 'Three previously identified defensive parser statements remain uncovered; their exact line/range accounting is retained in the repair manifest.'],
+    'normalization': 'All eight current source/test/fixture working, index and committed byte streams are identical under recorded actual Git attributes. New final JSON/Markdown use LF UTF-8. Canonical harness snapshots retain the exact executed bytes; raw outputs and coverage remain hash-bound external SCRATCH.'
+}
+path = qa / ('p4t4-final-handoff.' + stamp + '.json')
+path.write_text(json.dumps(document, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+table = '\n'.join('| ' + str(item['stage']) + ' | ' + item['label'] + ' | ' + f"{item['seconds']:.6f}" + ' | Pass |' for item in receipts)
+text = f'''# P4-T4 final execution handoff
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-final-handoff.py {ordered_path.as_posix()}`
+EXIT_CODE: 0
+Output Summary: All seven final stages passed in one clean loop on checked WIP {head}. Executor acceptance is pending; no task or acceptance criterion was checked off by this worker.
+
+| Stage | Gate | Seconds | Result |
+| --- | --- | ---: | --- |
+{table}
+
+The reverse-order suite passed all 91 cases, the established applicable contracts passed 176 cases, and native Windows/Git composition passed eight assertions. Production coverage is 290/293 statements and 116/122 branch destinations. All 23 retained class/callable ranges retain their exact counts and exceed the 90% statement requirement. Ruff, whole-repository Pyright and new-test-failure deltas are zero. The 34 accepted predecessor paths remain unchanged.
+
+All eight source/test/fixture working, index and committed streams match exactly. The paired JSON binds actual Git attributes, blob IDs, raw outputs, module coverage and the exact test-node order. The original review and repair history are referenced through the immutable repair manifest and bounded R1–R3 confirmation; they are not repeated here. Exact final harness bytes are preserved as canonical text snapshots.
+
+Downstream callers may use ConfigurationAnalyzer.analyze(InventoryCapture) for pure declared-key Analysis and parse_configuration for immutable ConfigurationKey tuples. The parser's optional max_text_bytes bounds prospective escaped paths and retained identifiers; the adapter additionally bounds complete aggregate projection. The documented 12-byte Unicode reservation covers compact UTF-8 JSON under either ensure_ascii policy, including surrogate pairs. It is a conservative finite allocation guard, not a heap measurement. Values, raw conditions and effective activation are never reported.
+
+Public registry integration remains P4-T9. TOML is explicitly unsupported; JSON line positions are not invented. This proves direct Windows Python/Git integration, not native coding-agent-host execution or non-Windows CI. The three retained defensive parser gaps and exact supported format boundaries remain documented in the repair manifest.
+'''
+path.with_suffix('.md').write_text(text, encoding='utf-8', newline='\n')
+print(json.dumps({'handoff': path.as_posix(), 'json_sha256': sha256(path.read_bytes()).hexdigest(), 'markdown_sha256': sha256(path.with_suffix('.md').read_bytes()).hexdigest(), 'test_cases':91, 'contract_cases':contract_count, 'native_assertions':len(native['checks']), 'harness_snapshots':snapshots}))

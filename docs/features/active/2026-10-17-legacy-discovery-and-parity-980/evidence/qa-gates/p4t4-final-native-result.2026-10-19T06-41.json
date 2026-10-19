@@ -1,0 +1,128 @@
+{
+  "checks": [
+    "native capture retains all four selected configuration byte inputs",
+    "real Git identity and captured source bytes agree",
+    "native configuration declarations remain detected without blockers",
+    "all configuration values conditions and error details remain absent",
+    "declared configuration presence remains unresolved",
+    "composed inventory identity is independent of analyzer order and capture clock",
+    "ledger proposals remain uninspected and unassigned",
+    "analysis preserves the native source tree and Git status"
+  ],
+  "component_count": 8,
+  "finding_count": 25,
+  "git_status_unchanged": true,
+  "inputs": {
+    "src/application.config": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "src/config.json": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "src/settings.ini": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "src/settings.settings": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "inventory_id": "inventory-bfba4ba52652b0fc3ae0f11d6079e09dba6f3e155c2f4e446c19f8daa817f3e6",
+  "platform": "win32",
+  "profile": {
+    "$schema": "urn:drm-copilot:discovery:2.0.0:domain-profile",
+    "analyzers": {
+      "enabled": [
+        "repository",
+        "configuration"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [],
+      "options": {
+        "max_file_bytes": 16384
+      }
+    },
+    "artifact_kind": "domain-profile",
+    "artifacts": {
+      "acceptance": "docs/migration/discovery/acceptance",
+      "characterization": "docs/migration/discovery/characterization",
+      "coverage_ledger": "docs/migration/discovery/coverage-ledger.json",
+      "evidence": "docs/migration/discovery/evidence",
+      "feature_contracts": "docs/migration/discovery/feature-contracts",
+      "implementation_records": "docs/migration/discovery/implementation-records",
+      "inventory": "docs/migration/discovery/inventory",
+      "parity_matrix": "docs/migration/discovery/parity-matrix.json",
+      "product_decisions": "docs/migration/discovery/product-decisions.yaml",
+      "profile": "docs/migration/discovery/domain-profile.yaml",
+      "reports": "docs/migration/discovery/reports",
+      "root": "docs/migration/discovery",
+      "scope": "docs/migration/discovery/scope.yaml",
+      "source_snapshots": "docs/migration/discovery/source-snapshots",
+      "unspecified_behaviors": "docs/migration/discovery/unspecified-behaviors.yaml"
+    },
+    "clients": [],
+    "completion_gates": {
+      "block_on_unresolved_required_behavior": true,
+      "planning_prerequisite": "discovery-complete",
+      "require_acceptance_scenarios": true,
+      "require_all_dispositions": true,
+      "require_approved_deviations": true,
+      "require_confirmed_scope": true,
+      "require_current_inventory": true,
+      "require_feature_evidence": true,
+      "require_runtime_for_declared_features": true
+    },
+    "decision_owners": [
+      {
+        "id": "owner-example",
+        "required_evidence_types": [
+          "decision"
+        ]
+      }
+    ],
+    "documentation_roots": [],
+    "evidence_roots": [
+      "docs/migration/discovery/evidence"
+    ],
+    "excluded_paths": [],
+    "extensions": {
+      "example.discovery": {
+        "catalog_label": "Synthetic fixture",
+        "revision_notes": []
+      }
+    },
+    "id": "profile-example",
+    "production_roots": [
+      "src"
+    ],
+    "profile_state": "configured",
+    "profile_version": 2,
+    "project_entry_points": [],
+    "repositories": [],
+    "repository": {
+      "id": "workspace-example",
+      "revision": "2ee8641a5436c9aa563ba10f82cfe368046d9d46",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "required_feature_dimensions": [
+      "trigger",
+      "observable_outputs"
+    ],
+    "required_modes": [
+      "online"
+    ],
+    "required_platforms": [
+      "browser"
+    ],
+    "runtime": {
+      "capability": "manual",
+      "required_feature_ids": []
+    },
+    "schema_version": "2.0.0",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "legacy-source"
+    },
+    "test_roots": []
+  },
+  "relationship_count": 0,
+  "revision": "2ee8641a5436c9aa563ba10f82cfe368046d9d46",
+  "scratch_repository": "SCRATCH/native-configuration-eb34b1a6493a40c1a0f859446b3204d0",
+  "semantic_sha256": "bfba4ba52652b0fc3ae0f11d6079e09dba6f3e155c2f4e446c19f8daa817f3e6",
+  "source_tree_unchanged": true,
+  "task": "P4-T4",
+  "timestamp": "2026-10-19T06:41:05.722804+00:00"
+}

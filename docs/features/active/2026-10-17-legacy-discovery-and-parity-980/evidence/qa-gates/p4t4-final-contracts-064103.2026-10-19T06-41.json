@@ -1,0 +1,45 @@
+{
+  "command": "poetry run python -m pytest -q -o addopts= --no-cov tests/schemas/discovery/test_v2_inventory_schemas.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+  "exit_code": 0,
+  "finished_at": "2026-10-19T06:41:03.408741+00:00",
+  "harness_hashes": {
+    "SCRATCH/issue-980-architecture.py": "ef0d0db019e111592b25b61dd36afeac5e02268bcdecc2de4ea6fa86de96009e",
+    "SCRATCH/issue-980-final-gates.py": "874da1a9ea5bb7c66123846b10ca0d235768b271767038863fc2feeeaef97487",
+    "SCRATCH/issue-980-native.py": "0949d20fc4a1d77599a91058149cdcdc3c7947e770717c001c74978b09527491"
+  },
+  "label": "contracts",
+  "raw_stderr": {
+    "path": "SCRATCH/p4t4-final-contracts-064103.2026-10-19T06-41.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "raw_stdout": {
+    "path": "SCRATCH/p4t4-final-contracts-064103.2026-10-19T06-41.stdout.txt",
+    "sha256": "0b21f7d224fefa45c48fd40c12722fd60834f893ebac6e27eb00e351418893df"
+  },
+  "seconds": 1.589425,
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  },
+  "stage": 6,
+  "started_at": "2026-10-19T06:41:01.819316+00:00",
+  "stderr": "",
+  "stdout": "........................................................................ [ 40%]\r\n........................................................................ [ 81%]\r\n................................                                         [100%]\r\n176 passed in 1.20s\r\n",
+  "timestamp": "2026-10-19T06-41"
+}

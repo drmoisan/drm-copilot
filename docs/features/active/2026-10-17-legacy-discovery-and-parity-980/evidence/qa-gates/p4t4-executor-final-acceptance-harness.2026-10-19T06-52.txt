@@ -1,0 +1,238 @@
+"""Reconcile P4-T4 final receipts without importing or rerunning production code."""
+from __future__ import annotations
+
+import datetime as dt
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+
+ROOT = Path.cwd().resolve()
+WORKER = (Path(tempfile.gettempdir()) / "issue-980-p4t4").resolve()
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+HEAD = "5329894a0e8485c7837cc67f1700bf3764116fd2"
+started = dt.datetime.now(dt.timezone.utc)
+checked = {}
+
+
+def sha(data: bytes) -> str:
+    """Bind exact bytes, retaining raw and rendered identities separately."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def resolve(path: str) -> Path:
+    """Resolve only the two previously defined evidence namespaces."""
+    return WORKER / path[8:] if path.startswith("SCRATCH/") else ROOT / path
+
+
+def bind(reference: dict) -> bytes:
+    """Verify an existing digest before interpreting its evidence."""
+    raw = resolve(reference["path"]).read_bytes()
+    assert sha(raw) == reference["sha256"], reference["path"]
+    checked[reference["path"]] = reference["sha256"]
+    return raw
+
+
+def portable(text: str) -> str:
+    """Reproduce the worker's declared path substitution without changing raw data."""
+    for path, label in ((ROOT, "WORKSPACE"), (WORKER, "SCRATCH")):
+        text = re.sub(re.escape(str(path)), label, text, flags=re.IGNORECASE)
+        text = re.sub(re.escape(path.as_posix()), label, text, flags=re.IGNORECASE)
+    return text
+
+
+def git(*args: str) -> bytes:
+    """Inspect existing Git objects without staging or modifying the checkout."""
+    return subprocess.check_output(["git", *args])
+
+
+def ac_state(path: Path) -> dict:
+    """Count only authoritative acceptance criteria, preserving the entire file."""
+    raw = path.read_bytes()
+    section = re.search(r"(?ms)^## Acceptance Criteria[^\n]*\n(.*?)(?=^## |\Z)", raw.decode()).group(1)
+    states = re.findall(r"(?m)^- \[([ x])\] ", section)
+    assert len(states) == 66 and states.count("x") == 13, str(path)
+    return {"path": path.as_posix(), "sha256": sha(raw), "passed": 13, "total": 66}
+
+
+# Resolve the fresh delegated authority before producing acceptance evidence.
+state = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_text(encoding="utf-8-sig"))
+routes = [entry for entry in state["codex_model_routing_receipts"] if entry.get("delegation_id") == "atomic_execution_p4t4_final_acceptance"]
+assert len(routes) == 1
+route = routes[0]
+assert route["phase"] == "S5_P4T4_final_acceptance" and route["deployment_agent"] == "atomic-executor-c4"
+assert route["model"] == "gpt-6-astra" and route["model_reasoning_effort"] == "max"
+assert sha(Path(route["profile_path"]).read_bytes()) == route["profile_sha256"] == "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9"
+authority = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.bd7ea55fdce6bc54a7dfb6644ea0f5c59879f91c912f89c71b4a3e13ec787e74.json"
+native_authority = json.loads(authority.read_bytes())
+assert all(native_authority[key] is True for key in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+assert native_authority["profile_sha256"] == route["profile_sha256"]
+assert native_authority["actual_model"] == route["model"] and native_authority["actual_reasoning_effort"] == route["model_reasoning_effort"]
+assert git("rev-parse", "HEAD").decode().strip() == HEAD
+
+handoff_ref = {"path": (QA / "p4t4-final-handoff.2026-10-19T06-43.json").as_posix(), "sha256": "3ec7b97f6031bf122f192656f49faff77d0aa4750e489e9eb462f0e7b732ce53"}
+handoff = json.loads(bind(handoff_ref))
+bind({"path": str(Path(handoff_ref["path"]).with_suffix(".md")), "sha256": "02dda16edffef7f6789d0861945932fde7fd2e1afc090a9c3e880c6ae7abbe4a"})
+ordered = json.loads(bind(handoff["ordered_proof"]))
+freeze_ref = handoff["unit_range_binding"]["reference"]
+freeze = json.loads(bind(freeze_ref))
+confirmation = json.loads(bind(handoff["bounded_confirmation"]))
+assert confirmation["findings"] == [] and confirmation["open_probes"] == []
+review = json.loads(bind(freeze["consolidated_review"]))
+original = json.loads(bind(freeze["original_candidate"]))
+assert handoff["head"] == HEAD and handoff["task"] == ordered["task"] == "P4-T4"
+expected = {item["path"]: item["sha256"] for item in freeze["files"]}
+assert len(expected) == len(handoff["source_index_commit_bindings"]) == 8
+
+# Confirm the working bytes are the exact reviewed, indexed and committed streams.
+for item in handoff["source_index_commit_bindings"]:
+    path = item["path"]
+    raw = Path(path).read_bytes()
+    assert sha(raw) == expected[path] == item["working_sha256"]
+    assert raw == git("show", ":" + path) == git("show", HEAD + ":" + path)
+    assert item["index_sha256"] == item["commit_sha256"] == sha(raw) and item["streams_identical"] is True
+    assert git("rev-parse", ":" + path).decode().strip() == item["index_blob"]
+    assert git("rev-parse", HEAD + ":" + path).decode().strip() == item["commit_blob"]
+    fields = git("check-attr", "-z", "text", "eol", "--", path).decode().split("\0")[:-1]
+    actual = [{"name": fields[index + 1], "value": fields[index + 2]} for index in range(0, len(fields), 3)]
+    assert actual == item["attributes"]
+    assert len(raw.splitlines()) <= 500
+assert len(original["preserved_predecessors"]) == handoff["preserved_predecessor_count"] == 34
+for reference in original["preserved_predecessors"]:
+    bind(reference)
+assert ordered["source_hashes"] == expected
+assert ordered["candidate_manifest"] == freeze_ref["path"] and ordered["candidate_manifest_sha256"] == freeze_ref["sha256"]
+
+# Preserve the exact executed harnesses, including the already corrected architecture checker.
+for reference in handoff["harness_snapshots"]:
+    raw = bind(reference)
+    assert raw == resolve(reference["source"]).read_bytes()
+    assert b"\r" not in raw and raw.decode("utf-8").encode("utf-8") == raw
+    if reference["source"] in ordered["harness_hashes"]:
+        assert sha(raw) == ordered["harness_hashes"][reference["source"]]
+assert len(ordered["harness_hashes"]) == 3
+bind(freeze["structural_checker_correction"])
+
+labels = ["format", "lint", "types", "architecture", "tests-reverse", "contracts", "native"]
+stages = []
+receipt_data = {}
+assert [entry["label"] for entry in handoff["receipts"]] == labels
+assert [entry["label"] for entry in ordered["receipts"]] == labels
+# Match raw outputs, rendered outputs, source hashes and chronology for the one successful loop.
+for number, (reference, compact) in enumerate(zip(handoff["receipts"], ordered["receipts"]), 1):
+    assert all(reference[key] == compact[key] for key in compact)
+    receipt = json.loads(bind(reference))
+    assert receipt["stage"] == reference["stage"] == number and receipt["exit_code"] == reference["exit_code"] == 0
+    assert receipt["command"] == reference["command"] and receipt["seconds"] == reference["seconds"]
+    assert receipt["source_before"] == receipt["source_after"] == expected
+    assert receipt["harness_hashes"] == ordered["harness_hashes"]
+    begin = dt.datetime.fromisoformat(receipt["started_at"])
+    end = dt.datetime.fromisoformat(receipt["finished_at"])
+    assert end >= begin and abs((end - begin).total_seconds() - receipt["seconds"]) < .00001
+    if stages:
+        assert dt.datetime.fromisoformat(stages[-1]["finished_at"]) <= begin
+    for stream in ("stdout", "stderr"):
+        assert receipt["raw_" + stream] == reference["raw_" + stream]
+        raw = bind(receipt["raw_" + stream])
+        assert portable(raw.decode("utf-8", errors="replace")) == receipt[stream]
+    markdown = Path(reference["path"]).with_suffix(".md").read_bytes()
+    assert all(marker.encode() in markdown for marker in ("Timestamp:", "Command:", "EXIT_CODE: 0", "Output Summary:"))
+    assert b"\r" not in markdown
+    receipt_data[receipt["label"]] = receipt
+    stages.append({key: receipt[key] for key in ("stage", "label", "command", "started_at", "finished_at", "seconds", "exit_code")})
+assert receipt_data["types"]["command"] == "poetry run python -m pyright"
+assert "0 errors, 0 warnings, 0 informations" in receipt_data["types"]["stdout"]
+assert "All checks passed!" in receipt_data["lint"]["stdout"]
+assert "91 passed" in receipt_data["tests-reverse"]["stdout"]
+assert "176 passed" in receipt_data["contracts"]["stdout"]
+assert json.loads(receipt_data["architecture"]["stdout"])["passed"] == 8
+assert "4 files would be left unchanged" in receipt_data["format"]["stderr"]
+assert dt.datetime.fromisoformat(ordered["started_at"]) <= dt.datetime.fromisoformat(stages[0]["started_at"])
+assert dt.datetime.fromisoformat(ordered["finished_at"]) >= dt.datetime.fromisoformat(stages[-1]["finished_at"])
+
+# Extract only executed PASSED nodes; no collection command or behavioral test is run here.
+nodes = [line.split(" PASSED")[0] for line in receipt_data["tests-reverse"]["stdout"].splitlines() if line.startswith("tests/") and " PASSED" in line]
+assert nodes == ordered["test_nodes"] and len(nodes) == len(set(nodes)) == 91
+module_order = list(dict.fromkeys(node.split("::")[0] for node in nodes))
+assert module_order == ordered["test_module_order"] == handoff["test_module_order"]
+assert module_order == ["tests/discovery_runtime/analyzer/test_configuration_input.py", "tests/discovery_runtime/analyzer/test_configuration.py"]
+
+coverage = json.loads(bind(handoff["coverage"]))
+raw_coverage = json.loads(bind(handoff["raw_coverage"]))
+raw_coverage["files"] = {portable(path).replace("\\", "/"): value for path, value in raw_coverage["files"].items()}
+assert raw_coverage == coverage
+assert coverage["totals"] == handoff["totals"] == freeze["totals"]
+assert (coverage["totals"]["covered_lines"], coverage["totals"]["num_statements"], coverage["totals"]["covered_branches"], coverage["totals"]["num_branches"]) == (290, 293, 116, 122)
+prior_coverage = json.loads(bind(freeze["coverage"]))
+assert coverage["files"] == prior_coverage["files"]
+unit_results = []
+# Reconcile previously reviewed unit ranges to the final coverage without another source review.
+for unit in freeze["unit_ranges"]:
+    data = next(value for path, value in coverage["files"].items() if path.replace("\\", "/").endswith(unit["path"]))
+    span = set(range(unit["start"], unit["end"] + 1))
+    covered = len(set(data["executed_lines"]) & span)
+    total = len((set(data["executed_lines"]) | set(data["missing_lines"])) & span)
+    assert covered == unit["covered_statements"] and total == unit["statements"] and covered / total >= .9
+    unit_results.append(covered / total * 100)
+assert len(unit_results) == 23
+for path, data in coverage["files"].items():
+    assert data["summary"] == handoff["module_coverage"][path]
+
+native = json.loads(bind(handoff["native_result"]))
+assert native == json.loads(bind(handoff["raw_native"]))
+assert native["platform"] == "win32" and native["source_tree_unchanged"] and native["git_status_unchanged"]
+assert len(native["checks"]) == len(set(native["checks"])) == 8
+assert [line[5:] for line in receipt_data["native"]["stdout"].splitlines() if line.startswith("PASS ")] == native["checks"]
+assert native["component_count"] == handoff["native_components"] == 8
+assert native["finding_count"] == handoff["native_findings"] == 25
+for path, digest in native["inputs"].items():
+    fixture = Path("tests/fixtures/discovery_analyzers/configuration") / (Path(path).name + ".txt")
+    assert sha(fixture.read_bytes()) == digest
+assert len(native["inputs"]) == 4
+
+# Authorize only the one-byte task checkoff; preserve both full-feature AC sources.
+plan = FEATURE / "plan.2026-10-17T22-38.md"
+before = plan.read_bytes()
+old = b"- [ ] [P4-T4] Extract configuration keys without exposing values."
+new = old.replace(b"[ ]", b"[x]", 1)
+assert before.count(old) == 1
+after = before.replace(old, new, 1)
+tasks = re.findall(rb"(?m)^- \[([ x])\] \[P\d+-T\d+\]", before)
+assert len(tasks) == 84 and tasks.count(b"x") == 35
+assert len(before) == len(after) and sum(a != b for a, b in zip(before, after)) == 1
+assert "- Work Mode: full-feature" in (FEATURE / "issue.md").read_text(encoding="utf-8")
+ac_documents = [ac_state(FEATURE / name) for name in ("spec.md", "user-story.md")]
+backup = Path(__file__).with_name("p4t4-plan-before-final-acceptance.md")
+assert not backup.exists() or backup.read_bytes() == before
+backup.write_bytes(before)
+finished = dt.datetime.now(dt.timezone.utc)
+stamp = finished.strftime("%Y-%m-%dT%H-%M")
+base = QA / ("p4t4-executor-final-acceptance." + stamp)
+harness = QA / ("p4t4-executor-final-acceptance-harness." + stamp + ".txt")
+harness.write_bytes(Path(__file__).read_bytes())
+report = {
+    "task": "P4-T4", "status": "PASS", "timestamp": stamp,
+    "started_at": started.isoformat(), "finished_at": finished.isoformat(), "exit_code": 0,
+    "command": "poetry run python SCRATCH/issue-980-p4t4-final-acceptance.py",
+    "candidate_commit": HEAD, "authority": route, "native_authority_sha256": sha(authority.read_bytes()),
+    "handoff": handoff_ref, "ordered_proof": handoff["ordered_proof"], "repair_freeze": freeze_ref,
+    "consolidated_review": freeze["consolidated_review"], "bounded_confirmation": handoff["bounded_confirmation"],
+    "verification_harness": {"path": harness.as_posix(), "sha256": sha(harness.read_bytes())},
+    "scope": "Receipt-only final reconciliation; no production import, behavioral probe, test replay, or predecessor implementation review.",
+    "stages": stages, "tests": {"reversed": 91, "contracts": 176, "native_assertions": 8, "executed_node_order_verified": True},
+    "coverage": {"reference": handoff["coverage"], "raw_reference": handoff["raw_coverage"], "covered_statements": 290, "statements": 293, "covered_branch_destinations": 116, "branch_destinations": 122, "named_ranges": 23, "minimum_range_statement_percent": min(unit_results), "same_executed_and_missing_lines_arcs_as_repair_proof": True},
+    "bindings": {"current_working_index_commit_streams": 8, "streams_exactly_identical": True, "git_attributes_and_blob_ids_verified": True, "preserved_predecessors": 34, "preserved_fixtures": 4, "final_harness_snapshots": 4, "executed_gate_harnesses": 3, "individually_verified_evidence_and_dependency_hashes": len(checked)},
+    "closed_findings": ["R1: prospective and aggregate encoded-text reservation", "R2: shared linear INI option grammar", "R3: immediate intent comments"],
+    "findings": [], "open_probes": [],
+    "retained_diagnostics": "Original candidate resource findings, repair history and the corrected docstring requests false positive remain bound through the immutable repair manifest. One initial read-only PowerShell display used a nonexistent unit_coverage key, then was corrected to unit_ranges; it did not alter proof or run tests.",
+    "task_acceptance": "Finite JSON, secure XML and strict INI declarations expose key locations and pinned provenance without values, raw conditions, evaluation or product semantics; exact reviewed repairs and all final applicable gates pass.",
+    "plan_checkoff": {"path": plan.as_posix(), "before_sha256": sha(before), "after_sha256": sha(after), "byte_changes": 1, "only_task": "P4-T4", "passed_before": 35, "passed_after": 36, "total": 84, "original_copy": "SCRATCH/" + backup.name},
+    "acceptance_criteria": {"newly_checked": [], "passed": 13, "total": 66, "unchanged_sources": ac_documents, "promoted_input_sha256": sha((FEATURE / "issue.md").read_bytes()), "reason": "Full-feature authority is spec.md and user-story.md; issue.md remains the preserved promoted input. AC-31 and AC-32 are already accepted. AC-33 through AC-36 require remaining analyzer implementations, registry/integration and wider verification; this task proves only configuration analysis."},
+    "limitations": ["Three retained parser statements and six branch destinations remain uncovered; no 100% claim.", "Finite supported formats; TOML and unsupported XML structures fail explicitly, JSON has no invented line numbers.", "Detected declarations do not establish effective activation or runtime behavior.", "Encoded-text reservations conservatively bound construction and output; they are not heap measurements.", "Public analyzer registry remains P4-T9; Windows Python/Git composition does not prove coding-agent hosts or non-Windows CI.", "No task-wide or feature-wide completion is claimed; parent owns commit/push and successor release."],
+}
+output = Path(str(base) + ".json")
+output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+print(json.dumps({"status": "PASS", "task": "P4-T4", "output": output.as_posix(), "sha256": sha(output.read_bytes()), "harness": harness.as_posix(), "harness_sha256": sha(harness.read_bytes()), "checked_hashes": len(checked), "plan_before_sha256": sha(before), "plan_after_sha256": sha(after), "ac_counts": "13/66 unchanged"}))

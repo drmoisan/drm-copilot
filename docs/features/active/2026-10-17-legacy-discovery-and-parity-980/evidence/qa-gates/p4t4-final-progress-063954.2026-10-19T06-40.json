@@ -1,0 +1,43 @@
+{
+  "candidate_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-freeze.2026-10-19T06-32.json",
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-format-063954.2026-10-19T06-39.json",
+      "sha256": "46971626b21a253e298e6083286ad8ccfdaba19034d50bb3cc3077e928927af0",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-lint-063955.2026-10-19T06-39.json",
+      "sha256": "ae849bf578664afcc6d52210f1e11ebf810272a8cec72e1f41fb919aa84466f7",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-types-064006.2026-10-19T06-40.json",
+      "sha256": "9fbab47fcc3f08eaf20b4f157d928628a2ecd95c67de714b2726dd0426435d30",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "architecture",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-final-architecture-064006.2026-10-19T06-40.json",
+      "sha256": "62a78a382ad291e276a02b891aff038b694448e84dc763f25ce9287f47d57744",
+      "stage": 4
+    }
+  ],
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+    "tests/discovery_runtime/analyzer/test_configuration.py": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+    "tests/discovery_runtime/analyzer/test_configuration_input.py": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+    "tests/fixtures/discovery_analyzers/configuration/application.config.txt": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+    "tests/fixtures/discovery_analyzers/configuration/config.json.txt": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+    "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+    "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+  }
+}

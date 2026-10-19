@@ -1,0 +1,365 @@
+{
+  "ac_counts": "13/66",
+  "acceptance_scope": "R1-R3 bounded repair confirmation only",
+  "behavioral_suite_replayed": false,
+  "candidate_commit": "5329894a0e8485c7837cc67f1700bf3764116fd2",
+  "closed_findings": {
+    "R1": "Prospective RFC6901 addresses and key records reserve finite text before construction; aggregate projection charges complete source/key rows before retaining output. Twelve encoded bytes per Unicode character cover BMP/control/astral escapes under either compact-JSON policy. Retained new tests prove before-helper/before-project rejection, inherited INI expansion, cross-file exhaustion, whole-result failure and both serialization policies.",
+    "R2": "The same fixed disjoint-character option expression is used by locator and ConfigParser. All six original input hashes complete through exactly two linear matches with no inherited matcher; retained 64-line tests cover aggregate linear input work and both delimiters without timing gates.",
+    "R3": "Required intent comments are present at the prior named loop/assertions and repair iteration sites. All 16 original test/helper executable ASTs and parametrization remain unchanged; new code stays within the approved four Python paths and 500-line limit."
+  },
+  "command": "poetry run python SCRATCH/issue-980-p4t4-repair-confirmation.py",
+  "coverage": {
+    "covered_branches": 116,
+    "covered_lines": 290,
+    "excluded_lines": 6,
+    "missing_branches": 6,
+    "missing_lines": 3,
+    "num_branches": 122,
+    "num_partial_branches": 6,
+    "num_statements": 293,
+    "percent_branches_covered": 95.08196721311475,
+    "percent_branches_covered_display": "95",
+    "percent_covered": 97.83132530120481,
+    "percent_covered_display": "98",
+    "percent_statements_covered": 98.97610921501706,
+    "percent_statements_covered_display": "99"
+  },
+  "exit_code": 0,
+  "findings": [],
+  "finished_at": "2026-10-19T06:38:06.788491+00:00",
+  "focused_stages": [
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:27:42.401535+00:00",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-format-062742.2026-10-19T06-27.json",
+      "seconds": 0.626089,
+      "sha256": "dda8d86e5ff6b371b90036a7a7a7a95a2a9aa4611141f58b32ddb4446ddfd814",
+      "stage": "format",
+      "started_at": "2026-10-19T06:27:41.775446+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:27:42.509631+00:00",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-lint-062742.2026-10-19T06-27.json",
+      "seconds": 0.104798,
+      "sha256": "8235e443c3b7d075fca2f7c2bae64860cc44b5077dda8ca235eeb0674b82d53c",
+      "stage": "lint",
+      "started_at": "2026-10-19T06:27:42.404833+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:27:43.515755+00:00",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-types-062743.2026-10-19T06-27.json",
+      "seconds": 1.003359,
+      "sha256": "b0849ff90fdacd705026227c0da69b72d56004c1023d561e2518f44ee55b9425",
+      "stage": "types",
+      "started_at": "2026-10-19T06:27:42.512396+00:00"
+    },
+    {
+      "exit_code": 0,
+      "finished_at": "2026-10-19T06:28:39.109251+00:00",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p4t4-repair-7-tests-062839.2026-10-19T06-28.json",
+      "seconds": 55.590691,
+      "sha256": "4fbdd83918248e8014e40802a704a9b3de4392df6feb19e0c8dd905e499ca993",
+      "stage": "tests",
+      "started_at": "2026-10-19T06:27:43.518560+00:00"
+    }
+  ],
+  "independent_reproductions": [
+    {
+      "count": 64,
+      "family": "R1-original-long-prefix",
+      "input_sha256": "8e0979016562d34a2205af32683cb7b92c6777c00426b7fd0d57cdb36d33cb1b",
+      "partial_result": false,
+      "result": "configuration-text-limit"
+    },
+    {
+      "count": 128,
+      "family": "R1-original-long-prefix",
+      "input_sha256": "d27f949ee8ffa992db996d8bf0136d74a211f4e0432a1754066ebf82630bc16c",
+      "partial_result": false,
+      "result": "configuration-text-limit"
+    },
+    {
+      "count": 256,
+      "family": "R1-original-long-prefix",
+      "input_sha256": "37dc20ba8f4260e658cba41d7b56ce4ee5de7de3e1e4e6f25a963f757470cab7",
+      "partial_result": false,
+      "result": "configuration-text-limit"
+    },
+    {
+      "family": "R2-original-invalid",
+      "input_sha256": "3a17db5e6f864c5ffc1acd7e9e3a1d62c7dc2faeb8f15302b609d18fde8f9d03",
+      "matched_characters": 2078,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 2086,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "configuration-ini-invalid",
+      "spaces": 1024
+    },
+    {
+      "family": "R2-original-invalid",
+      "input_sha256": "e2a263dedb3592aa025a4f9f30fd79922c0a357c825b23fde7dde477f503e667",
+      "matched_characters": 4126,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 4134,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "configuration-ini-invalid",
+      "spaces": 2048
+    },
+    {
+      "family": "R2-original-invalid",
+      "input_sha256": "688fdf493e7ba290f51e963976178e20df7be755ea63f294a9750e3ec1c8ffcb",
+      "matched_characters": 8222,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 8230,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "configuration-ini-invalid",
+      "spaces": 4096
+    },
+    {
+      "family": "R2-original-valid",
+      "input_sha256": "f22222db60b2bb6aca229417f8bee8a8fec6b815fb298697c6e3725a65446b41",
+      "matched_characters": 2092,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 2100,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "valid key retained",
+      "spaces": 1024
+    },
+    {
+      "family": "R2-original-valid",
+      "input_sha256": "1c696e43fc0508e6a3438dce55c1580b6601f17fea25805601192da46c4dffa0",
+      "matched_characters": 4140,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 4148,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "valid key retained",
+      "spaces": 2048
+    },
+    {
+      "family": "R2-original-valid",
+      "input_sha256": "afe9af10894b2f07d79b288edaed1c7e4c939dcc3e9b737cd5ec18a9c2ada86b",
+      "matched_characters": 8236,
+      "matcher_calls": 2,
+      "maximum_matched_characters": 8244,
+      "qualification": "max_text_bytes=262144 isolates matcher work from the new independent text limit; no timing assertion",
+      "result": "valid key retained",
+      "spaces": 4096
+    }
+  ],
+  "known_limits": [
+    "Only finite documented JSON/XML/INI declarations are recognized; TOML is explicitly unsupported.",
+    "JSON lines are not fabricated; XML/INI use declaration anchors.",
+    "Values and conditions are neither exported nor evaluated.",
+    "Registry integration remains P4-T9; this direct adapter proof is not native coding-agent-host proof."
+  ],
+  "measured_ranges": 23,
+  "open_probes": [],
+  "original_review_commit": "d6d00ae2a5a612fdfb026bf954f868edf4c5ff9e",
+  "plan_counts": "35/84",
+  "predecessor_review_replayed": false,
+  "remaining": "Parent release of scoped final seven-stage sequence; no task/AC checkoff before final acceptance",
+  "repair_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-freeze.2026-10-19T06-32.json",
+    "sha256": "59076e69064acac3b90609c73788d952d1774b59e8fb2477e5bb313526da335f"
+  },
+  "retained_original_definitions": [
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "serialized",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "extension",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_fixtures_project_only_identifiers_with_valid_provenance",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_finite_supported_filename_families",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_unrelated_files_are_ignored_without_payload_diagnostics",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_json_uses_exact_pointer_segments_without_inventing_lines",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_malformed_and_unsupported_selected_inputs_fail_closed",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_repeated_default_headers_keep_distinct_declaration_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_value_and_condition_changes_do_not_define_semantic_ids",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_excluded_and_unreadable_inputs_do_not_leak_read_rationales",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_missing_immutable_provenance_is_low_confidence_and_blocking",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_aggregate_output_limit_drops_partial_claims",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_parser_failures_never_expose_source_through_error_surfaces",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_ini_defaults_continuations_and_case_have_physical_anchors",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_parser_budgets_reject_partial_output",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    },
+    {
+      "executable_ast_and_decorators_preserved": true,
+      "name": "test_byte_budget_and_invalid_caller_limits_fail_explicitly",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py"
+    }
+  ],
+  "retained_worker_harnesses": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-repair-freeze-harness.2026-10-19T06-32.txt",
+      "sha256": "9775ce05225daa8bf19486f73906df730eea9193850b83116fb9a14f91432b8a",
+      "source": "SCRATCH/issue-980-repair-freeze.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-focused-harness.2026-10-19T06-32.txt",
+      "sha256": "23ffca04dd9bc71313fab80778b8cbef04da55d99dff063dbc70154487ad5ce8",
+      "source": "SCRATCH/issue-980-focused.py"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-architecture-harness.2026-10-19T06-32.txt",
+      "sha256": "ef0d0db019e111592b25b61dd36afeac5e02268bcdecc2de4ea6fa86de96009e",
+      "source": "SCRATCH/issue-980-architecture.py"
+    }
+  ],
+  "reused_proofs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-executor-candidate-review.2026-10-19T06-10.json",
+      "sha256": "eff5e903958412fc4fdf09b305481dd9788d905d8e2c4867969736a4d6b79990"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-focused-wip-freeze.2026-10-19T05-54.json",
+      "sha256": "8259456707ebccae5a88a2d3863644a0d8974d7c149760f9773e3247658aae48"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-repair-7-binding.2026-10-19T06-28.json",
+      "sha256": "cdff09d800d05dcdf191f6e7cbdccb2062eb04d5536a7cb9072dea78d2c5cdbf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t4-structural-harness-correction.2026-10-19T06-32.json",
+      "sha256": "b0be8fdd9dacc5f1a8353434fefb3301f443d0f68c88ae0626275717c86cf20b"
+    }
+  ],
+  "source_bindings": [
+    {
+      "commit_sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+      "disposition": "repaired",
+      "index_sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6",
+      "original_sha256": "aeb4d1af3a2b169b6a3c64780d35133c84184a328f44c036619a15ef6274bfe8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration.py",
+      "raw_identity": true,
+      "working_sha256": "3b1a85657baa75cca3e3c53d0be297142dcc28d261d762ebc879c8ed28dd38b6"
+    },
+    {
+      "commit_sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+      "disposition": "repaired",
+      "index_sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c",
+      "original_sha256": "57b081b450180c5d4f52a05faaad8357c4ac671099a0f2d091dbcdbefd8e9ee9",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/configuration_input.py",
+      "raw_identity": true,
+      "working_sha256": "5d194f45d5415eb131b3551ef11a4e2efe3e0a19025125bbd5fc176db501a52c"
+    },
+    {
+      "commit_sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+      "disposition": "repaired",
+      "index_sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858",
+      "original_sha256": "42edf70fbf8d1cb2019071bdfe6a9da1f542f30fe19acb0d57435b1e9e50f65d",
+      "path": "tests/discovery_runtime/analyzer/test_configuration.py",
+      "raw_identity": true,
+      "working_sha256": "e9cf17b40ae5f1de5c8966f17fda37f3b7b0064038474331240b9843a6533858"
+    },
+    {
+      "commit_sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+      "disposition": "repaired",
+      "index_sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5",
+      "original_sha256": "1006c77e2ac25618eaa7203d27a7d3bd0d260fe092c19ce4504c5c9d7c1a9909",
+      "path": "tests/discovery_runtime/analyzer/test_configuration_input.py",
+      "raw_identity": true,
+      "working_sha256": "b048eed3c2f0cca785b3a66c0f53e5c9a24d81ff2623367d2dff1945f3ed62e5"
+    },
+    {
+      "commit_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "disposition": "unchanged",
+      "index_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "original_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631",
+      "path": "tests/fixtures/discovery_analyzers/configuration/application.config.txt",
+      "raw_identity": true,
+      "working_sha256": "10dd8448866e333f5e67123c1e106c15f8ede9fd5d4b017010d7dfa443894631"
+    },
+    {
+      "commit_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "disposition": "unchanged",
+      "index_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "original_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6",
+      "path": "tests/fixtures/discovery_analyzers/configuration/config.json.txt",
+      "raw_identity": true,
+      "working_sha256": "95a57a42cf13717518550afb9f54418b0c67d6f5831ceab8d06a126836380cc6"
+    },
+    {
+      "commit_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "disposition": "unchanged",
+      "index_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "original_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.ini.txt",
+      "raw_identity": true,
+      "working_sha256": "df086e47b64e375ff7186274297067bc141a7a52f62a996ccc79940852f69668"
+    },
+    {
+      "commit_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "disposition": "unchanged",
+      "index_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "original_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3",
+      "path": "tests/fixtures/discovery_analyzers/configuration/settings.settings.txt",
+      "raw_identity": true,
+      "working_sha256": "bdd7afee960d1defaaed8999a7d84430c1a0286b0ea7d51c553acad7b2c215f3"
+    }
+  ],
+  "started_at": "2026-10-19T06:38:06.088414+00:00",
+  "status": "PASS",
+  "task": "P4-T4",
+  "tests": "91 passed = 61 retained + 30 new; retained successful execution only",
+  "timestamp": "2026-10-19T06-38",
+  "unchanged_predecessors": 34
+}
