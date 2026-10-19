@@ -1,0 +1,141 @@
+"""Run an operational native analyzer proof outside the checkout and unit tests."""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+from uuid import uuid4
+
+import yaml
+from drm_copilot_discovery.analyzer.findings import row
+from drm_copilot_discovery.analyzer.input_capture import capture_inputs, capture_snapshot, pin_inventory_sources
+from drm_copilot_discovery.analyzer.pipeline import plan_inventory, run_inventory
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.models import canonical_json
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import GuardedMutationWriter, capture_workspace, commit_mutation
+from drm_copilot_discovery.path_models import WriteGrant
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+
+scratch = Path(__file__).parent.resolve()
+root = scratch / ('issue-980-p4t1-native-' + uuid4().hex)
+root.mkdir()
+assert root.resolve().parent == scratch
+checks, reads, metadata_calls, invalidations = [], [], [], []
+started = time.monotonic()
+catalog = load_catalog()
+
+def check(name, value):
+    if not value:
+        raise AssertionError(name)
+    checks.append(name)
+    print('PASS ' + name, flush=True)
+
+def put(path, data):
+    destination = root / path
+    assert root.resolve() in destination.resolve().parents
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(data)
+
+def tree():
+    return {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(root.rglob('*')) if path.is_file() and '.git' not in path.relative_to(root).parts}
+
+def git_setup(*args):
+    result = subprocess.run(['git', '-C', str(root), *args], capture_output=True, check=True)
+    return result.stdout.decode('utf-8').strip()
+
+def git_command(argv, *, output_limit):
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        data = process.stdout.read(output_limit + 1)
+        if len(data) > output_limit:
+            process.kill()
+            raise OSError('Operational Git output exceeded its requested byte limit')
+        if process.wait() != 0:
+            raise OSError('Operational Git object read failed')
+        return data
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+put('src/Example.csproj', b'<Project Sdk="Microsoft.NET.Sdk" />\n')
+put('src/Alpha.cs', 'class Alpha {}\r\n// État\r\n'.encode('utf-8'))
+put('tests/AlphaTests.cs', b'class AlphaTests {}\n')
+put('docs/guide.md', b'Observed synthetic guide.\n')
+put('src/vendor/hidden.cs', b'must not be analyzed\n')
+git_setup('init', '--quiet')
+git_setup('config', 'core.autocrlf', 'false')
+git_setup('add', 'src', 'tests', 'docs')
+git_setup('-c', 'user.name=Discovery fixture', '-c', 'user.email=discovery@example.invalid', '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=' + str(scratch / 'issue-980-no-hooks'), 'commit', '--quiet', '-m', 'Synthetic inventory baseline')
+revision = git_setup('rev-parse', 'HEAD')
+value = yaml.safe_load(Path('examples/discovery/v2/domain-profile.example.yaml').read_text(encoding='utf-8'))
+value.pop('extension_schemas')
+value['system']['role'] = 'legacy-source'
+value['repository']['revision'] = revision
+value['repositories'] = []
+value['clients'] = []
+value['analyzers'] = {'enabled': ['repository'], 'options': {'max_file_bytes': 4096}, 'ignored_paths': [], 'extension_result_manifests': []}
+profile = ProfileV2(json.dumps(value), format='json', catalog=catalog)
+put(profile.artifacts['profile'], canonical_json(profile.document))
+put(profile.artifacts['reports'] + '/existing.md', b'# Generated view\n')
+primitives = LocalMutationPrimitives(workspace_root=str(root), lock_path=str(scratch / ('issue-980-p4t1-' + uuid4().hex + '.lock')))
+repository = LocalGitReader(workspace_root=str(root), repository_id=profile.repository.id, run=git_command)
+
+def metadata(path):
+    metadata_calls.append(path)
+    return primitives.metadata(path)
+
+def read(path, *, limit):
+    reads.append(path)
+    return primitives.read_bytes(path, limit=limit)
+
+def captured():
+    baseline = capture_workspace(workspace_root=str(root), profile_path=profile.artifacts['profile'], metadata=primitives.metadata, read_bytes=primitives.read_bytes, repository=repository, catalog=catalog)
+    return pin_inventory_sources(baseline, repository)
+
+before = tree()
+selection = capture_inputs(profile, workspace_root=str(root), metadata=metadata, read_bytes=read)
+check('native capture includes configured source, test, project and documentation bytes', {item.path for item in selection.inputs if item.file is not None} == {'src/Alpha.cs', 'src/Example.csproj', 'tests/AlphaTests.cs', 'docs/guide.md'})
+check('native capture prunes dependency and output frontiers before metadata or bytes', 'src/vendor' not in metadata_calls and 'src/vendor/hidden.cs' not in reads and not any(path.startswith(profile.artifacts['root']) for path in reads))
+check('excluded dependency and artifact frontiers retain explicit accounting', {item.path for item in selection.inputs if item.status == 'excluded'} == {'src/vendor', profile.artifacts['root']})
+check('native source hash preserves CRLF and Unicode bytes', next(item.sha256 for item in selection.inputs if item.path == 'src/Alpha.cs') == hashlib.sha256((root / 'src/Alpha.cs').read_bytes()).hexdigest())
+baseline = captured()
+check('native precapture binds documentation to actual immutable Git bytes', any(item.path == 'docs/guide.md' and item.repository.revision == revision for item in baseline.snapshot.repository_files))
+result = run_inventory(capture_snapshot(baseline.snapshot), timestamp='2026-10-19T01:00:00Z', author_or_agent=row(kind='tool', id='native-proof'), catalog=catalog)
+varied = run_inventory(capture_snapshot(baseline.snapshot), timestamp='2026-10-20T01:00:00Z', author_or_agent=row(kind='tool', id='another-capture'), catalog=catalog, dry_run=True)
+check('native default and dry-run analysis preserve tree and semantic identity', tree() == before and result.semantic_sha256 == varied.semantic_sha256 and result.document['id'] == varied.document['id'])
+check('native ledger seed proposals remain uninspected and unassigned', all(item['inspection_status'] == 'uninspected' and item['disposition'] == 'unassigned' for item in result.ledger_components))
+identifier = result.document['id']
+grant = WriteGrant(artifact_kind='inventory-snapshot', artifact_id=identifier, path=profile.artifacts['inventory'] + '/' + identifier + '.json')
+plan = plan_inventory(baseline, result, grants=(grant,))
+writer = GuardedMutationWriter(capture=captured, invalidate_authority=lambda: invalidations.append('invalidated'), primitives=primitives)
+preview = commit_mutation(plan, writer=writer, dry_run=True)
+check('native mutation preview validates without publication or invalidation', preview.ok and tree() == before and invalidations == [])
+committed = commit_mutation(plan, writer=writer)
+check('native guarded first publication succeeds and invalidates prior authority', committed.ok and invalidations == ['invalidated'])
+after = tree()
+check('native publication creates exactly one inventory and preserves all existing bytes', set(after) == set(before) | {grant.path} and all(after[path] == digest for path, digest in before.items()) and (root / grant.path).read_bytes() == canonical_json(result.document))
+refreshed = captured()
+repeat_result = run_inventory(capture_snapshot(refreshed.snapshot), timestamp='2026-10-19T01:00:00Z', author_or_agent=row(kind='tool', id='native-proof'), catalog=catalog)
+repeat_plan = plan_inventory(refreshed, repeat_result, grants=(grant,))
+repeated = commit_mutation(repeat_plan, writer=writer)
+check('native repeat publication skips the exact existing artifact', repeated.ok and repeated.artifacts[0].status == 'skipped' and tree() == after and invalidations == ['invalidated'])
+put('docs/guide.md', b'changed after planning\n')
+stale_before = tree()
+stale = commit_mutation(repeat_plan, writer=writer)
+check('native changed source rejects stale request before publication', not stale.ok and stale.authority_invalidated and tree() == stale_before)
+put('src/oversize.bin', b'x' * 4097)
+limited = capture_inputs(profile, workspace_root=str(root), metadata=metadata, read_bytes=read)
+unreadable = next(item for item in limited.inputs if item.path == 'src/oversize.bin')
+check('native bounded read failure retains unavailable input without fabricated bytes', unreadable.status == 'unreadable' and unreadable.file is None and unreadable.sha256 is None and bool(unreadable.rationale))
+output = {'checks': checks, 'count': len(checks), 'elapsed_seconds': time.monotonic() - started, 'scope': 'Windows native operational fixture under SCRATCH; core analyzer remains pure and host Git execution is injected', 'working_tree_mutations': 'synthetic fixture only', 'pinned_revision': revision}
+Path(sys.argv[1]).write_text(json.dumps(output, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+print(json.dumps(output, indent=2), flush=True)

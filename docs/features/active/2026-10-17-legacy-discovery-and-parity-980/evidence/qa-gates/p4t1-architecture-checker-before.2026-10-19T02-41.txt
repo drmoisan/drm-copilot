@@ -1,0 +1,37 @@
+"""Verify package, optional-loading, compatibility and test boundaries."""
+import ast
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+manifest = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+for record in manifest['files']:
+    path = Path(record['path'])
+    data = path.read_bytes()
+    assert hashlib.sha256(data).hexdigest() == record['sha256'], path
+    assert len(data.decode('utf-8').splitlines()) <= 500, path
+    if record['category'] == 'canonical-production':
+        source = ast.parse(data.decode('utf-8'))
+        imports = []
+        for node in ast.walk(source):
+            if isinstance(node, ast.ImportFrom) and node.module:
+                imports.append(node.module)
+            elif isinstance(node, ast.Import):
+                imports.extend(alias.name for alias in node.names)
+        assert not any(value.startswith(('scripts', 'subprocess', 'socket', 'requests', 'http', 'urllib', 'os')) for value in imports), path
+        assert not any('vsto' in value or 'office' in value or 'lxml' in value for value in imports), path
+        if path.stem != 'pipeline':
+            assert not any(value.endswith(('mutation_filesystem', 'init_io')) for value in imports), path
+        print('PASS canonical package and optional-import boundary: ' + path.name)
+    if record['category'] == 'compatibility-adapter':
+        source = ast.parse(data.decode('utf-8'))
+        assert all(isinstance(node, (ast.ImportFrom, ast.Expr)) for node in source.body), path
+        assert any(isinstance(node, ast.ImportFrom) and node.module.startswith('drm_copilot_discovery.analyzer.') for node in source.body), path
+        print('PASS thin compatibility adapter: ' + path.name)
+    if path.as_posix().startswith('tests/discovery_runtime/analyzer/'):
+        text = data.decode('utf-8')
+        assert not any(token in text for token in ('tmp_path', 'tmpdir', 'TemporaryDirectory', 'NamedTemporaryFile', 'tempfile', 'subprocess')), path
+        print('PASS isolated in-memory unit test: ' + path.name)
+sys.exit(subprocess.call([sys.executable, '-m', 'pytest', '-q', '-o', 'addopts=', 'tests/discovery_runtime/test_package_contract.py', '-k', 'canonical_modules_do_not_import_repository_tooling', '--no-cov']))
