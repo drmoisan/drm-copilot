@@ -1,0 +1,101 @@
+"""Bind the accepted parity/report bodies and shared task absence before edits."""
+import base64
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+T = "tests/discovery_runtime/"
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def bind(path):
+    raw = Path(path).read_bytes()
+    return {"path": str(path).replace("\\", "/"), "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+
+def write(path, data):
+    Path(path).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+state = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_text(encoding="utf-8"))
+route = next(row for row in state["codex_model_routing_receipts"] if row["delegation_id"] == "inventory_analyzers_p5t2_baseline_interface_20261020")
+assert bind(route["profile_path"])["sha256"] == route["profile_sha256"]
+head = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+assert head == "7012d20245cd27d29bf66ede6ac9756dec354ed4"
+parity_path = F / "evidence/regression-testing/p2t8-coverage-metrics.2026-10-18T10-19.json"
+parity = json.loads(parity_path.read_text(encoding="utf-8"))
+preserved = []
+for path, digest in parity["owned_sha256"].items():
+    current = bind(path)
+    assert current["sha256"] == digest, path
+    preserved.append(current)
+models_path = F / "evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json"
+assert bind(R + "report_models.py")["sha256"] == "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b"
+assert bind(T + "test_report_models.py")["sha256"] == "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871"
+existing = [
+    R + "parity_rules.py", R + "report_models.py",
+    T + "test_parity_rules.py", T + "test_parity_clients.py", T + "test_report_models.py",
+    "scripts/dev_tools/discovery/parity_report.py",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py",
+    R + "validation.py", R + "coverage_population.py", R + "coverage_report.py",
+    R + "parity_target_rules.py", R + "dimension_rules.py", R + "decision_rules.py",
+]
+absent = [
+    R + "parity_report.py", R + "parity_entry_rules.py", R + "parity_models.py",
+    T + "test_parity_report.py", T + "test_parity_models.py",
+    T + "test_parity_report_projection.py",
+]
+assert all(not Path(path).exists() for path in absent)
+streams = {}
+adapter_path = F / "evidence/baseline/p5t2-adapter-integration-baseline.2026-10-20T05-44.json"
+adapter = json.loads(adapter_path.read_text(encoding="utf-8"))
+for path in existing:
+    current = Path(path).read_bytes()
+    raw = (
+        base64.b64decode(adapter["inputs"][path]["base64"])
+        if path in adapter["inputs"]
+        else current
+    )
+    committed = subprocess.check_output(["git", "show", head + ":" + path])
+    assert raw == committed or raw.replace(b"\r\n", b"\n") == committed, path
+    streams[path] = {
+        "path": path, "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw), "current_sha256": hashlib.sha256(current).hexdigest(),
+        "current_qualification": "unchanged" if raw == current else "authorized sibling edits after its separate pre-mutation baseline",
+        "git_stream_sha256": hashlib.sha256(committed).hexdigest(),
+        "normalization": "identical" if raw == committed else "CRLF to LF only",
+        "lines": len(raw.decode("utf-8").splitlines()), "base64": base64.b64encode(raw).decode(),
+    }
+output = F / f"evidence/baseline/p5t2-shared-baseline.{stamp}.json"
+payload = {
+    "task": "P5-T2", "head": head, "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "route": route, "existing": streams, "absent": absent,
+    "retained_parity_proof": {
+        **bind(parity_path), "matched_paths": preserved, "tests": 77,
+        "coverage": parity["coverage"],
+    },
+    "retained_models_proof": {**bind(models_path), "tests": 114, "statements": "141/141", "branches": "64/64"},
+    "legacy_baseline": {
+        **bind(adapter_path), "result": adapter["fresh_legacy"],
+        "qualification": "Reused the sibling's already completed seven-case baseline; no duplicate run.",
+    },
+    "binder_correction": {
+        "reason": "The initial binder expected every shared path to remain unchanged, but the released sibling had already captured its baseline and edited the legacy adapter/test. No producer mutation or test run occurred.",
+        "original_harness": base64.b64encode((Path(__file__).parent / "baseline.before-owner-qualification.py").read_bytes()).decode(),
+        "original_harness_sha256": bind(Path(__file__).parent / "baseline.before-owner-qualification.py")["sha256"],
+        "diagnostic": "AssertionError at baseline.py line 57: assert raw == committed or raw.replace(b'\\r\\n', b'\\n') == committed",
+    },
+}
+write(output, payload)
+harness = F / f"evidence/baseline/p5t2-shared-baseline-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+(F / f"evidence/baseline/p5t2-shared-baseline.{stamp}.md").write_text(
+    f"# P5-T2 shared baseline\n\nTimestamp: {stamp}\n\nCommand: Bind accepted parity/report proof and task absence.\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: Existing parity and report-helper hashes match retained passing proof. "
+    "The six planned new paths are absent. Exact working and committed bytes, including any LF qualification, "
+    "are retained. The sibling already measured all seven legacy parity cases before its edits; that exact proof is reused.\n", encoding="utf-8", newline="\n")
+print(json.dumps({"baseline": bind(output), "harness": bind(harness), "legacy": payload["legacy_baseline"]}))

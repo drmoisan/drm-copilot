@@ -1,0 +1,93 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:06:10.791682+00:00",
+  "status": "READY_FOR_CHECKED_HELPER_ADAPTER_WIP",
+  "head_at_reconciliation": "7012d20245cd27d29bf66ede6ac9756dec354ed4",
+  "helper_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-freeze.2026-10-20T06-00.json",
+    "sha256": "4a795e13b1b6b746e4664e7928fa6a971c3401a9b6d0ce83e9b5f6a3bccaee6a",
+    "bytes": 15786
+  },
+  "owner_staging": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-stage-paths.2026-10-20T06-00.json",
+      "sha256": "226a503e84082075f95fe056ba9dd75772ee902d92a63071d3b9c8cdbc250268",
+      "bytes": 8358
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-staging.2026-10-20T05-51.json",
+      "sha256": "dbb20a529daa3e94f6636aa82f019ec414dcffea4f2b40b2e36c602ce7ec41b7",
+      "bytes": 6578
+    }
+  ],
+  "retained_adapter_review": {
+    "payload": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-helper-adapter-review.2026-10-20T06-06-payload.json",
+      "sha256": "f36f7a2329032f222eb8034a76ecc9fd7e26ec16e1f755584f793b08f7748f28",
+      "bytes": 31138
+    },
+    "entry": "SCRATCH/issue-980-p5t2-adapter-reconcile-result.json"
+  },
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "physical_lines": 75,
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5"
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "physical_lines": 127,
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461"
+    },
+    "tests/discovery_runtime/test_parity_report.py": {
+      "physical_lines": 155,
+      "sha256": "676b0e6ba1589542a79e20c49f23298bb365531f948eec1ed47511d584e347d2"
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "physical_lines": 344,
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29"
+    }
+  },
+  "findings": [],
+  "open_probes": [],
+  "verified": {
+    "ordered_stages": [
+      "Black",
+      "Ruff",
+      "scoped Pyright",
+      "Pytest"
+    ],
+    "tests": 44,
+    "new_direct_helper_tests": 20,
+    "retained_adapter_tests": 24,
+    "helper_statements": "31/31",
+    "helper_branches": "8/8",
+    "adapter_statements": "38/38",
+    "adapter_branches": "4/4",
+    "measured_callable_ranges": 7,
+    "all_ranges_percent": 100
+  },
+  "source_review": [
+    "True-v1 rows and feature identity are preserved; explicit non-v1 input fails even with injected validator acceptance.",
+    "Unversioned entries remain compatibility-only; they establish no v2 validity or completeness.",
+    "Immutable member copying, prospective bounded JSON and pretty-render reservation, redacted helper errors, deterministic detached output, and I/O/argparse seams were reviewed.",
+    "Four files meet size, intent-documentation and memory-only test policies. Committed public dependencies suffice; no moving graph, outcome, projection or validator module is imported."
+  ],
+  "qualifications": [
+    "The original 24 adapter cases are repeated within the 44-case helper run, not 68 distinct cases. No tests were executed by this reconciliation.",
+    "Raw embedded streams, source bytes and coverage retain original SHA256 identities. Readable gate output normalizes workspace/scratch paths, line endings and trailing whitespace; coverage file keys replace backslashes with slashes.",
+    "Seven AST ranges use raw executed/missing lines and branch origins, including declaration lines; no coverage.py function denominator was substituted.",
+    "Earlier formatting, test-private-import and launcher diagnostics remain in the two owner closures. The rejected initial launcher failed before a child tool, as qualified by its owner.",
+    "The prior adapter receipt filename ordering is qualified by actual UTC gate chronology.",
+    "All existing source/dependency review is reused; new helper tests and proof close its sole pending item."
+  ],
+  "remaining": [
+    "P5-T2 graph/model/outcome/validator integration and final ordered acceptance remain pending.",
+    "No task or acceptance-criterion checkbox changed; plan remains 42/84 and source ACs 17/66."
+  ],
+  "next_five_pending_tasks": [
+    "P5-T2",
+    "P5-T3",
+    "P5-T4",
+    "P5-T5",
+    "P6-T1"
+  ]
+}

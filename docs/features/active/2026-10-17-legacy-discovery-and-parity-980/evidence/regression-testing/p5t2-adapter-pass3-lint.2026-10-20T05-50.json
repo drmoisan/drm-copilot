@@ -1,0 +1,125 @@
+{
+  "stage": "lint",
+  "label": "p5t2-adapter-pass3-lint",
+  "started": "2026-10-20T05:50:30.760619+00:00",
+  "finished": "2026-10-20T05:50:32.016352+00:00",
+  "duration_seconds": 1.256,
+  "command": "poetry run ruff check scripts/dev_tools/discovery/parity_report.py tests/scripts/dev_tools/discovery/test_parity_report.py",
+  "exit_code": 0,
+  "source_before": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "72f497f7160bbb2b59cf1798f2a23ac613c9efd41ec990a8ddc614ccc6b9bbff",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "8c04ec943c302f8ea38db3262fbe0459c8f3d7e47e6c57720a00e84947e9142f",
+      "physical_lines": 248
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "72f497f7160bbb2b59cf1798f2a23ac613c9efd41ec990a8ddc614ccc6b9bbff",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "8c04ec943c302f8ea38db3262fbe0459c8f3d7e47e6c57720a00e84947e9142f",
+      "physical_lines": 248
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-pass3-lint-055032.stdout.bin",
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_bytes": 19,
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-pass3-lint-055032.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}

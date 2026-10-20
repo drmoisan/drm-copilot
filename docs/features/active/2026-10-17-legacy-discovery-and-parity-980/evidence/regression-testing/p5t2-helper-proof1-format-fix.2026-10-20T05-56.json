@@ -1,0 +1,53 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "black",
+    "tests/discovery_runtime/test_parity_report.py"
+  ],
+  "duration_seconds": 1.461,
+  "exit_code": 0,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-proof1-format-fix-harness.2026-10-20T05-56.txt",
+    "sha256": "3c7073ed0266a9452072111425d4bf8428740711460a2530f8c0de7e5f178156"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "scripts/dev_tools/discovery/parity_report.py": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+    "tests/discovery_runtime/test_parity_clients.py": "f2de0b73de39032f1606e30b1aaf37e7f0af3a5b2220ccedbf61ff59fa0e323d",
+    "tests/discovery_runtime/test_parity_report.py": "297d49fd1515b843cfe487881c6fb2218bd80430992a9f9b669aa88ce2c87bf2",
+    "tests/discovery_runtime/test_parity_report_projection.py": "a6d3a178bc9a20af966f0fb4b03d7a7e8f951dac35020215ca077c5238e2b1fb",
+    "tests/discovery_runtime/test_parity_rules.py": "8da02e8961415be42ae0383b1a81442447993a457f28d9cb549e51031f60445c",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+    "scripts/dev_tools/discovery/parity_report.py": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+    "tests/discovery_runtime/test_parity_clients.py": "f2de0b73de39032f1606e30b1aaf37e7f0af3a5b2220ccedbf61ff59fa0e323d",
+    "tests/discovery_runtime/test_parity_report.py": "c01b212c11367d74e61f40bab800c6de4de82f15a8c5cde5f0154d09edbc084e",
+    "tests/discovery_runtime/test_parity_report_projection.py": "a6d3a178bc9a20af966f0fb4b03d7a7e8f951dac35020215ca077c5238e2b1fb",
+    "tests/discovery_runtime/test_parity_rules.py": "8da02e8961415be42ae0383b1a81442447993a457f28d9cb549e51031f60445c",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29"
+  },
+  "started_at": "2026-10-20T05:56:30.844028+00:00",
+  "stderr": {
+    "base64": "cmVmb3JtYXR0ZWQgdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9wYXJpdHlfcmVwb3J0LnB5DQoNCkFsbCBkb25lISDinKgg8J+NsCDinKgNCjEgZmlsZSByZWZvcm1hdHRlZC4NCg==",
+    "sha256": "4fc4364723bc38717edef5f4de806b439a992b962c0298f6dd535a06c93430eb"
+  },
+  "stdout": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T05:56:32.305060+00:00"
+}

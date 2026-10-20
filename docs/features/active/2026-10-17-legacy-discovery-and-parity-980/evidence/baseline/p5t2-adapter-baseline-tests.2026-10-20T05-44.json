@@ -1,0 +1,107 @@
+{
+  "stage": "tests",
+  "label": "p5t2-adapter-baseline-tests",
+  "started": "2026-10-20T05:44:32.849441+00:00",
+  "finished": "2026-10-20T05:44:34.718030+00:00",
+  "duration_seconds": 1.869,
+  "command": "poetry run pytest tests/scripts/dev_tools/discovery/test_parity_report.py -o addopts= -v --cov=scripts.dev_tools.discovery.parity_report --cov-config=SCRATCH/coverage.ini --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/baseline-coverage.json",
+  "exit_code": 0,
+  "source_before": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "738992a9532b06dcd6e9ed40be78ff99cc24aa266aec2902b5d24d94558da587",
+      "physical_lines": 208
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "620c0d94aadd9c31f1987ed0fe1d4f49b21c4e7d165225150960c81324a08536",
+      "physical_lines": 175
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+      "physical_lines": 461
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "738992a9532b06dcd6e9ed40be78ff99cc24aa266aec2902b5d24d94558da587",
+      "physical_lines": 208
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "620c0d94aadd9c31f1987ed0fe1d4f49b21c4e7d165225150960c81324a08536",
+      "physical_lines": 175
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+      "physical_lines": 461
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-baseline-tests-054434.stdout.bin",
+      "raw_sha256": "3865aec2ab64e2e0945b958338728452fbd7989d65b41ec4bc9b3ff01eacb8f2",
+      "raw_bytes": 2058,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 7 items\r\n\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_build_and_render_parity_report_sorts_and_counts_entries PASSED [ 14%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_render_parity_report_is_deterministic PASSED [ 28%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_1_and_prints_errors_on_validation_failure PASSED [ 42%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_build_parity_rows_handles_missing_entries_key PASSED [ 57%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_0_on_success PASSED [ 71%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_1_on_failure PASSED [ 85%]\r\ntests/scripts/dev_tools/discovery/test_parity_report.py::test_main_writes_to_stdout_when_output_omitted PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                           Stmts   Miss Branch BrPart  Cover   Missing\r\n------------------------------------------------------------------------------------------\r\nscripts\\dev_tools\\discovery\\parity_report.py      40      2      4      0    95%   129-133\r\n------------------------------------------------------------------------------------------\r\nTOTAL                                             40      2      4      0    95%\r\nCoverage JSON written to file SCRATCH/baseline-coverage.json\r\n============================== 7 passed in 0.18s ==============================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-baseline-tests-054434.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}
