@@ -1,0 +1,275 @@
+{
+  "bindings": [
+    {
+      "bytes": 38794,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json",
+      "sha256": "d82d917a2db50d3b6bcf808a2fb2f7726b7f5598bf11310b161eeecf8c7fa5a8"
+    },
+    {
+      "bytes": 472,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.md",
+      "sha256": "7cc0911bb6107209012f646c24570ea68d96697fbb4e92e584da7debdeec1362"
+    },
+    {
+      "bytes": 3093,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.txt",
+      "sha256": "d28b24f392ac23d331b999b2e517f974aa2e42dd8dd0f67c5970227166ae7068"
+    },
+    {
+      "bytes": 127898,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-archive.2026-10-20T04-59.json",
+      "sha256": "21193e22db52e5799909bd95e13000d402e918b28ae8f82a88b6b7fadbe61dec"
+    },
+    {
+      "bytes": 32918,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-coverage.2026-10-20T04-59.json",
+      "sha256": "111c685214aa0e2003890dcbc1e76b940d2f6cd291a67d428df871afbacff2d7"
+    },
+    {
+      "bytes": 4404,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-delta.2026-10-20T04-59.json",
+      "sha256": "a61d3b1b5554df14cae5fc1bca97ea3161534db052c3e6bd777f6d81358cd09e"
+    },
+    {
+      "bytes": 11719,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze-harness.2026-10-20T04-59.txt",
+      "sha256": "d46ec1340019d41daa75931a9f4e72384c2ecb7feded22b89301f395126d2b66"
+    },
+    {
+      "bytes": 7785,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.json",
+      "sha256": "19d4d84bd0410c896328f35b7e19b1205c1f6deec376e111213993a8b480f386"
+    },
+    {
+      "bytes": 1006,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.md",
+      "sha256": "08b5d66bb1f1eab8a3616251c6b8fcc7b09d2b8702ac3c24db6c2e6937da6353"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format-harness.2026-10-20T04-49.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 4076,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format.2026-10-20T04-49.json",
+      "sha256": "44e7943c4c54f5365b3a251edfd40fd7db1b2f6b92836d74be8195c70f2632f6"
+    },
+    {
+      "bytes": 517,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format.2026-10-20T04-49.md",
+      "sha256": "07342b90a5729b01759d3fc7974c5d55ab3916da1494b540b5a22c4e4846a52e"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format-harness.2026-10-20T04-49.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 3982,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format.2026-10-20T04-49.json",
+      "sha256": "e719c116e44c99a64df88f37e2f2bf0e5dc1877c32838481e6d918fd35917846"
+    },
+    {
+      "bytes": 445,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format.2026-10-20T04-49.md",
+      "sha256": "e69f2c8adefe4c24efc342ebed516640bf0fe85a316dc9f363b3eca98afca6a6"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint-harness.2026-10-20T04-50.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 7730,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint.2026-10-20T04-50.json",
+      "sha256": "259caebdd350d9ecf57f4551b253f5764cf8cf36062b225b21f0a5a3235c3c95"
+    },
+    {
+      "bytes": 3257,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint.2026-10-20T04-50.md",
+      "sha256": "c8fe1bf194ec08105a8d5bc57ee9198b8a6d56eed3b05a65ba5b0e9fe97ec20d"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format-harness.2026-10-20T04-50.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 3983,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format.2026-10-20T04-50.json",
+      "sha256": "bf504ca0c23115bff44867de0c2335d0fbf72b0d00b09e0017fc31b281b1c0a0"
+    },
+    {
+      "bytes": 445,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format.2026-10-20T04-50.md",
+      "sha256": "2a40cc658ffbaf02847a14d35d0f38290a4c448974f2d3ea65cf02dc748763c0"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint-harness.2026-10-20T04-50.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 3925,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint.2026-10-20T04-50.json",
+      "sha256": "3364292be7fae96060426e2bba8d763dbd4499727fd08406b29726545cef9917"
+    },
+    {
+      "bytes": 403,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint.2026-10-20T04-50.md",
+      "sha256": "58065b7b2ed6e385f1773c7e775b67f85715de44bdd4789a0165b9fd2af4650c"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests-harness.2026-10-20T04-51.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 25541,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests.2026-10-20T04-51.json",
+      "sha256": "e0a4f7c5b0ed16c1b3f19781dcaf33bd5cb1491f9d767c6b5ad991f2e3172781"
+    },
+    {
+      "bytes": 16213,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests.2026-10-20T04-51.md",
+      "sha256": "2a885e045c21d51a86760aa852cb51b37b36a0265526ec05582c54d1e43da5ac"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types-harness.2026-10-20T04-50.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 4149,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types.2026-10-20T04-50.json",
+      "sha256": "dbb9f14048cd887e523e7b238a3e6cf93701087b9684ec120ac416f80b6b8063"
+    },
+    {
+      "bytes": 573,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types.2026-10-20T04-50.md",
+      "sha256": "dd806b6359ae445b6116b87e9f7b88343fc1afcbd3137bb45ba30fa93ad9af13"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format-harness.2026-10-20T04-53.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 3983,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.json",
+      "sha256": "cec401b950923257b444e1e618395678bbe7e399483084ac8096690a7de64068"
+    },
+    {
+      "bytes": 445,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.md",
+      "sha256": "6b5f87fab04da02c6568f4cd348b5ecd137d078304f23a9486f153ceaaff82e4"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint-harness.2026-10-20T04-53.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 3926,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.json",
+      "sha256": "308193a1f71d82ef10c179aedea11986121594ebaa55bc3247d013db9626d338"
+    },
+    {
+      "bytes": 403,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.md",
+      "sha256": "d2740768fd762851ecd1086fc441fbba326e14ab55d88b51a848fe3b3a3f8643"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests-harness.2026-10-20T04-55.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 8625,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.json",
+      "sha256": "d8b9ab637bbdba9f14d20a9fc0a9e6c3f2582ff26ada61e1b3d1b5d8059d2157"
+    },
+    {
+      "bytes": 3758,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.md",
+      "sha256": "96e11c50cb4ee504072dd24b840dd8ba4678f33adf529796b197bdbc1a34f35a"
+    },
+    {
+      "bytes": 3636,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types-harness.2026-10-20T04-53.txt",
+      "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+    },
+    {
+      "bytes": 4148,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.json",
+      "sha256": "266f76e44249693758c461b6f7af2871a8e0c01f690a481702e66bdb411322df"
+    },
+    {
+      "bytes": 573,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.md",
+      "sha256": "68927ab8733d21eb5ffa6ae2f5dab1f55fa8bcd0dd77ede44968b2fb6f257e1c"
+    },
+    {
+      "bytes": 16758,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "sha256": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02"
+    },
+    {
+      "bytes": 14736,
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "sha256": "31d1a668bf3b5d1f7254da11c7ff4b8158bafb5c4cc9c070f84810fbc3a6a0a7"
+    }
+  ],
+  "manifest": {
+    "bytes": 7785,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.json",
+    "sha256": "19d4d84bd0410c896328f35b7e19b1205c1f6deec376e111213993a8b480f386"
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-archive.2026-10-20T04-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-coverage.2026-10-20T04-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-delta.2026-10-20T04-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze-harness.2026-10-20T04-59.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze.2026-10-20T04-59.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format-harness.2026-10-20T04-49.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format.2026-10-20T04-49.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary1-format.2026-10-20T04-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format-harness.2026-10-20T04-49.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format.2026-10-20T04-49.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-format.2026-10-20T04-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint-harness.2026-10-20T04-50.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint.2026-10-20T04-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary2-lint.2026-10-20T04-50.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format-harness.2026-10-20T04-50.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format.2026-10-20T04-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-format.2026-10-20T04-50.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint-harness.2026-10-20T04-50.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint.2026-10-20T04-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-lint.2026-10-20T04-50.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests-harness.2026-10-20T04-51.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests.2026-10-20T04-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-tests.2026-10-20T04-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types-harness.2026-10-20T04-50.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types.2026-10-20T04-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary3-types.2026-10-20T04-50.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format-harness.2026-10-20T04-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint-harness.2026-10-20T04-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests-harness.2026-10-20T04-55.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types-harness.2026-10-20T04-53.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.md",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+    "tests/discovery_runtime/test_coverage_report_contract.py"
+  ]
+}

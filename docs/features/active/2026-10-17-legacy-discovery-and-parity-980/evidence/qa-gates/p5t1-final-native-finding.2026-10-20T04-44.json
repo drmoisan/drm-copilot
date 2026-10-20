@@ -1,0 +1,78 @@
+{
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+    "sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe"
+  },
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-diagnosis.2026-10-20T04-41.json",
+    "sha256": "9236d6d256a76f2f5988d12d8cb2810ce86da13f5fe5b6a6200000f11567a7a3"
+  },
+  "diagnostic_scope": "One read-only recapture of base and previous variants and one recomputation; remaining fixture setup inspected statically. No suite replay.",
+  "failed_native": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-043934.2026-10-20T04-39.json",
+    "sha256": "3c53b5e49898f1ebaead216a8b18984e7f41dbc193b9847fcf9b09503025d032"
+  },
+  "failure_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-failed-originals.2026-10-20T04-41.json",
+    "sha256": "8e3e977bcacd63f6c92ca0bd674de4beae8c7461386578a1e4335bd5cefa32a8"
+  },
+  "finding": {
+    "blocking": true,
+    "contract": "Generated report outputs do not become discovery inputs. Genuine authored documentation still requires complete inventory.",
+    "digest_result": "report_input_digest is identical before and after; the failed compound assertion was report equality, not digest equality.",
+    "disposition": "source integration defect",
+    "fixture_disposition": "Exact accepted report filenames and generated JSON/Markdown bytes were used. No unrelated fixture correction was identified.",
+    "id": "P5T1-NATIVE-1",
+    "observed": "The generated Markdown is category=documentation and becomes an expected inventory scan input. COVERAGE_INPUTS and ACCEPTANCE_SCOPE change the previously passing report to fail.",
+    "related_evidence": "input_capture.exclusion_rules and capture_snapshot already distinguish generated artifact/evidence output locations before inventory claims.",
+    "scope": "Independent reviewer and coordinator must resolve the minimal source-owner repair. This worker performed no code, test or fixture edits.",
+    "source": "coverage_scope_rules._inventory expected input set, lines 248-252",
+    "trigger": "Actual loader adds a generated coverage-report.md under configured artifacts.reports."
+  },
+  "fixture_bytes_preserved": true,
+  "qualifications": [
+    "All candidate and dependency working hashes remain unchanged.",
+    "Full final-gate success and task acceptance are not claimed.",
+    "Original failure stdout/stderr/progress and exact native executable bytes are preserved losslessly."
+  ],
+  "retained_results": {
+    "callers_passed": 138,
+    "callers_seconds": 927.939,
+    "contracts_passed": 4,
+    "graph_passed": 49,
+    "native_assertions_not_executed": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "native_assertions_passed_before_failure": 8,
+    "native_failed_assertion": 9
+  },
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+    }
+  ],
+  "stages1_6": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-stages1-6.2026-10-20T04-39.json",
+    "sha256": "cd9b9f6e4f566f8f597a28407fa770ae00fe28a45d9f02ea952f5707987fd7f1"
+  },
+  "status": "final-stage-held-for-source-owner",
+  "task": "P5-T1",
+  "timestamp": "2026-10-20T04-44"
+}

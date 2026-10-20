@@ -19,13 +19,19 @@ from drm_copilot_discovery.references import index_references
 from drm_copilot_discovery.report_models import ReportLimitError
 from drm_copilot_discovery.snapshot import SnapshotFile
 from drm_copilot_discovery.snapshot_io import within_roots
+from drm_copilot_discovery.snapshot_loading import load_snapshot
 from drm_copilot_discovery.validation import report_input_digest
 
 from tests.discovery_runtime.test_coverage_report import change, summary
-from tests.discovery_runtime.test_coverage_rules import coverage_snapshot, detection
+from tests.discovery_runtime.test_coverage_rules import (
+    codes,
+    coverage_snapshot,
+    detection,
+)
 from tests.discovery_runtime.test_coverage_scope import profile_with
 from tests.discovery_runtime.test_references import artifact, reference
 from tests.discovery_runtime.test_snapshot import snapshot_profile as snapshot_profile
+from tests.discovery_runtime.test_snapshot_io import MemoryStore
 from tests.discovery_runtime.test_snapshot_io import (
     snapshot_catalog as snapshot_catalog,
 )
@@ -42,7 +48,7 @@ from tests.schemas.discovery.v2_schema_test_support import as_object
 if TYPE_CHECKING:
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.profile_v2 import ProfileV2
-    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot, InputCategory
 
 
 def test_public_report_renders_exact_fields_and_null_empty_percentages(
@@ -283,3 +289,86 @@ def test_selector_work_is_reserved_before_the_accepted_scope_query(
             <= profile.limits.parse_limits().expanded_nodes
             - population.budget.work_left
         )
+
+
+@pytest.mark.parametrize(
+    "folder,nested", [("reports", ""), ("generated/views", "nested/")]
+)
+def test_loaded_report_views_do_not_replace_authored_documentation_accounting(
+    snapshot_catalog: SchemaCatalog, folder: str, nested: str
+) -> None:
+    """Configured report views are outputs; authored documents remain required."""
+    profile = mode_profile(snapshot_catalog)
+    roots = as_object(to_plain_value(profile.document["artifacts"]))
+    roots["reports"] = ROOT + folder
+    profile = profile_with(profile, snapshot_catalog, artifacts=roots)
+    initial = no_scope_snapshot(snapshot_catalog, profile=profile)
+    store = MemoryStore()
+    # Real loader membership is derived from exact in-memory captured bytes.
+    for file in initial.manifest.files:
+        store.put(file.path, file.content)
+    baseline = load_snapshot(
+        io=store.io(),
+        profile_path=profile.artifacts["profile"],
+        catalog=snapshot_catalog,
+    )
+    assert baseline.ok
+    report = build_coverage_report(baseline)
+    assert report.document["discovery_result"] == "pass"
+    prefix = profile.artifacts["reports"] + "/" + nested + "coverage-report"
+    store.put(prefix + ".json", report.to_json().encode("utf-8"))
+    store.put(prefix + ".md", report.to_markdown().encode("utf-8"))
+    reloaded = load_snapshot(
+        io=store.io(),
+        profile_path=profile.artifacts["profile"],
+        catalog=snapshot_catalog,
+    )
+    assert reloaded.ok
+    assert reloaded.file(prefix + ".md").category == "documentation"
+    assert reloaded.file(prefix + ".md").content == report.to_markdown().encode("utf-8")
+    assert report_input_digest(reloaded) == report_input_digest(baseline)
+    assert build_coverage_report(reloaded).document == report.document
+
+    store.put("docs/architecture.md", b"Authored behavior description.")
+    authored = load_snapshot(
+        io=store.io(),
+        profile_path=profile.artifacts["profile"],
+        catalog=snapshot_catalog,
+    )
+    assert authored.ok
+    assert authored.file("docs/architecture.md").category == "documentation"
+    authored_report = build_coverage_report(authored)
+    assert authored_report.document["discovery_result"] == "fail"
+    # Public projection removes derived envelopes before resolving graph references.
+    assert "COVERAGE_INPUTS" in {
+        finding["code"]
+        for finding in json.loads(authored_report.to_json())["completion_findings"]
+    }
+
+
+@pytest.mark.parametrize(
+    "path,category,missing",
+    [
+        (ROOT + "reports/coverage-report.md", "documentation", False),
+        (ROOT + "reports/nested/coverage-report.md", "documentation", False),
+        (ROOT + "reports-other/coverage-report.md", "documentation", True),
+        (ROOT + "Reports/coverage-report.md", "documentation", True),
+        ("docs/coverage-report.md", "documentation", True),
+        (ROOT + "reports/coverage-report.md", "source", True),
+        (ROOT + "reports/coverage-report.md", "test", True),
+    ],
+)
+def test_report_output_scope_preserves_path_segments_and_input_categories(
+    snapshot_catalog: SchemaCatalog,
+    path: str,
+    category: InputCategory,
+    missing: bool,
+) -> None:
+    """Only documentation in the exact configured report subtree leaves scan inputs."""
+    snapshot = no_scope_snapshot(snapshot_catalog)
+    addition = SnapshotFile(path=path, content=b"Captured bytes.", category=category)
+    updated = replace(
+        snapshot,
+        manifest=replace(snapshot.manifest, files=(*snapshot.manifest.files, addition)),
+    )
+    assert ("COVERAGE_INPUTS" in codes(updated)) is missing

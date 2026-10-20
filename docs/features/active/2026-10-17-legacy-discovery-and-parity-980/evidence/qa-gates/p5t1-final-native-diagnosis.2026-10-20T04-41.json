@@ -1,0 +1,311 @@
+{
+  "base_checkout": {
+    "id": "workspace-example",
+    "revision": "3b8c2134e952ffc607c66f14a203eac7dc1d0a91"
+  },
+  "base_digest": "a3217303f3f77525746f51545b16f39148ca2036c854b56de744b0807144f0ff",
+  "base_excluded_paths": [],
+  "base_full_digest": "8274caa672217fb85aa35fadbd29bf5ecb8dc086131d0326a192ab3b3a84713b",
+  "elapsed_seconds": 6.868346899980679,
+  "failure_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-failed-originals.2026-10-20T04-41.json",
+    "sha256": "8e3e977bcacd63f6c92ca0bd674de4beae8c7461386578a1e4335bd5cefa32a8"
+  },
+  "fixture_bytes_preserved": true,
+  "loaded_artifacts": {
+    "base": [
+      {
+        "kind": "coverage-ledger",
+        "path": "docs/migration/discovery/coverage-ledger.json"
+      },
+      {
+        "kind": "evidence-reference",
+        "path": "docs/migration/discovery/evidence/confirmation.json"
+      },
+      {
+        "kind": "inventory-snapshot",
+        "path": "docs/migration/discovery/inventory/empty.json"
+      },
+      {
+        "kind": "scope",
+        "path": "docs/migration/discovery/scope.yaml"
+      }
+    ],
+    "previous": [
+      {
+        "kind": "coverage-ledger",
+        "path": "docs/migration/discovery/coverage-ledger.json"
+      },
+      {
+        "kind": "evidence-reference",
+        "path": "docs/migration/discovery/evidence/confirmation.json"
+      },
+      {
+        "kind": "inventory-snapshot",
+        "path": "docs/migration/discovery/inventory/empty.json"
+      },
+      {
+        "kind": "coverage-report",
+        "path": "docs/migration/discovery/reports/coverage-report.json"
+      },
+      {
+        "kind": "scope",
+        "path": "docs/migration/discovery/scope.yaml"
+      }
+    ]
+  },
+  "loader_findings": {
+    "base": [],
+    "previous": []
+  },
+  "manifest_differences": [
+    {
+      "base": [
+        {
+          "category": "artifact",
+          "path": "docs/migration/discovery/coverage-ledger.json",
+          "sha256": "c1ae664234740c08eb1c741d1f9e8dcfe33e3f2a55ded6c59a0b3f61160336a9",
+          "size": 395
+        },
+        {
+          "category": "profile",
+          "path": "docs/migration/discovery/domain-profile.yaml",
+          "sha256": "06aa5f9eaa7f2ab0c23ef661829cc3227588c6a3dd569717e61cf6bb49d7dcf5",
+          "size": 2739
+        },
+        {
+          "category": "artifact",
+          "path": "docs/migration/discovery/evidence/confirmation.json",
+          "sha256": "febc7068d13c0b3cff7349193ac325ea944ad146d85ee00d7fd5681b89571135",
+          "size": 831
+        },
+        {
+          "category": "evidence",
+          "path": "docs/migration/discovery/evidence/confirmation.txt",
+          "sha256": "a42ca9a5c529f3012fb5688c4cb0764c78e9ade8204fd586d8ba350c23a9eb88",
+          "size": 22
+        },
+        {
+          "category": "inventory",
+          "path": "docs/migration/discovery/inventory/empty.json",
+          "sha256": "6032e4d126f602b29dffe1b37e0f9baa4ccb2805d93c779fc025e4dbb2858d47",
+          "size": 633
+        },
+        {
+          "category": "scope",
+          "path": "docs/migration/discovery/scope.yaml",
+          "sha256": "343ece684369265da55a2b078de4e8d0152e487ea3391a9839b934504992e190",
+          "size": 737
+        }
+      ],
+      "path": "/entries",
+      "previous": [
+        {
+          "category": "artifact",
+          "path": "docs/migration/discovery/coverage-ledger.json",
+          "sha256": "c1ae664234740c08eb1c741d1f9e8dcfe33e3f2a55ded6c59a0b3f61160336a9",
+          "size": 395
+        },
+        {
+          "category": "profile",
+          "path": "docs/migration/discovery/domain-profile.yaml",
+          "sha256": "06aa5f9eaa7f2ab0c23ef661829cc3227588c6a3dd569717e61cf6bb49d7dcf5",
+          "size": 2739
+        },
+        {
+          "category": "artifact",
+          "path": "docs/migration/discovery/evidence/confirmation.json",
+          "sha256": "febc7068d13c0b3cff7349193ac325ea944ad146d85ee00d7fd5681b89571135",
+          "size": 831
+        },
+        {
+          "category": "evidence",
+          "path": "docs/migration/discovery/evidence/confirmation.txt",
+          "sha256": "a42ca9a5c529f3012fb5688c4cb0764c78e9ade8204fd586d8ba350c23a9eb88",
+          "size": 22
+        },
+        {
+          "category": "inventory",
+          "path": "docs/migration/discovery/inventory/empty.json",
+          "sha256": "6032e4d126f602b29dffe1b37e0f9baa4ccb2805d93c779fc025e4dbb2858d47",
+          "size": 633
+        },
+        {
+          "category": "artifact",
+          "path": "docs/migration/discovery/reports/coverage-report.json",
+          "sha256": "2165ea3ecfde26ed54d2e398fb5122da54b309a81c3b32f1a519caedd88e4607",
+          "size": 2467
+        },
+        {
+          "category": "documentation",
+          "path": "docs/migration/discovery/reports/coverage-report.md",
+          "sha256": "707ebec84a889bae028eff51186e09e2084ce6d0778f3f3e6c55bdb6b0031fce",
+          "size": 3448
+        },
+        {
+          "category": "scope",
+          "path": "docs/migration/discovery/scope.yaml",
+          "sha256": "343ece684369265da55a2b078de4e8d0152e487ea3391a9839b934504992e190",
+          "size": 737
+        }
+      ]
+    },
+    {
+      "base": [
+        "config/discovery.json",
+        "docs/migration/discovery/acceptance",
+        "docs/migration/discovery/characterization",
+        "docs/migration/discovery/feature-contracts",
+        "docs/migration/discovery/implementation-records",
+        "docs/migration/discovery/parity-matrix.json",
+        "docs/migration/discovery/product-decisions.yaml",
+        "docs/migration/discovery/reports",
+        "docs/migration/discovery/source-snapshots",
+        "docs/migration/discovery/unspecified-behaviors.yaml"
+      ],
+      "path": "/missing_paths",
+      "previous": [
+        "config/discovery.json",
+        "docs/migration/discovery/acceptance",
+        "docs/migration/discovery/characterization",
+        "docs/migration/discovery/feature-contracts",
+        "docs/migration/discovery/implementation-records",
+        "docs/migration/discovery/parity-matrix.json",
+        "docs/migration/discovery/product-decisions.yaml",
+        "docs/migration/discovery/source-snapshots",
+        "docs/migration/discovery/unspecified-behaviors.yaml"
+      ]
+    },
+    {
+      "base": "520888827ff86bba0d13b2e700aa054c41e475f83645eab9ce4209ffb9f91e09",
+      "path": "/sha256",
+      "previous": "d8a1d126e5cfa222a7cadb6e659cd4d0c7c49886f676b48510a593f5f10541d9"
+    }
+  ],
+  "previous_checkout": {
+    "id": "workspace-example",
+    "revision": "3b8c2134e952ffc607c66f14a203eac7dc1d0a91"
+  },
+  "previous_digest": "a3217303f3f77525746f51545b16f39148ca2036c854b56de744b0807144f0ff",
+  "previous_excluded_paths": [],
+  "previous_full_digest": "e7722c29e30f79ea800c856882647c5fb0529ee04c742024e918fdc2d4dfa932",
+  "recomputed_report_digest": "a3217303f3f77525746f51545b16f39148ca2036c854b56de744b0807144f0ff",
+  "remaining_setup": {
+    "changed_scope": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:scope",
+      "artifact_kind": "scope",
+      "confirmed_by": {
+        "evidence_refs": [
+          {
+            "artifact_kind": "evidence-reference",
+            "id": "confirmation"
+          }
+        ],
+        "owner": "owner-example",
+        "timestamp": "2026-01-01T00:00:00Z"
+      },
+      "disposition": "no-scope",
+      "exclusions": [],
+      "extensions": {},
+      "id": "scope",
+      "included_components": [],
+      "included_features": [],
+      "included_roots": [],
+      "inventory_snapshot_refs": [
+        {
+          "artifact_kind": "inventory-snapshot",
+          "id": "inventory"
+        }
+      ],
+      "no_scope_rationale": "Updated documented inspection rationale.",
+      "repository": {
+        "id": "workspace-example",
+        "revision": "3b8c2134e952ffc607c66f14a203eac7dc1d0a91"
+      },
+      "required_coverage": {
+        "client_ids": [],
+        "feature_refs": [],
+        "modes": []
+      },
+      "schema_version": "2.0.0",
+      "status": "confirmed"
+    },
+    "forged_total": 9,
+    "invalid_scope": "{}\n",
+    "uninventoried_authored_paths": [
+      "docs/migration/discovery/domain-profile.yaml"
+    ]
+  },
+  "report_differences": [
+    {
+      "base": [],
+      "path": "/completion_findings",
+      "previous": [
+        {
+          "artifact_path": null,
+          "code": "ACCEPTANCE_SCOPE",
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs.",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "code": "COVERAGE_INPUTS",
+          "message": "Captured scan inputs are missing from the selected inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "base": "pass",
+      "path": "/discovery_result",
+      "previous": "fail"
+    },
+    {
+      "base": [],
+      "path": "/findings",
+      "previous": [
+        {
+          "artifact_path": null,
+          "code": "ACCEPTANCE_SCOPE",
+          "message": "Zero features require justified scope and full inventory.",
+          "next_action": "Confirm scope and account for inventory inputs.",
+          "pointer": "",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/scope.yaml",
+          "code": "COVERAGE_INPUTS",
+          "message": "Captured scan inputs are missing from the selected inventory.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/inventory_snapshot_refs",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "base": "pass",
+      "path": "/validation_result",
+      "previous": "fail"
+    }
+  ],
+  "repository_files": {
+    "base": [],
+    "previous": []
+  },
+  "scope": "Read-only diagnosis of existing native fixtures; no suite rerun.",
+  "stored_report_digest": "a3217303f3f77525746f51545b16f39148ca2036c854b56de744b0807144f0ff",
+  "task": "P5-T1",
+  "timestamp": "2026-10-20T04-41"
+}
