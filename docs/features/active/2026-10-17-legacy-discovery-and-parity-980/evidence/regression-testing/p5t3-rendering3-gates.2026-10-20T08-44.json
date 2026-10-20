@@ -1,0 +1,148 @@
+{
+  "Timestamp": "2026-10-20T08-44",
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-coverage.2026-10-20T08-44.json",
+  "harness_sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba",
+  "label": "rendering3",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.33178370000678115,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-format-2026-10-20T08-44.stderr.bin",
+          "readable": "All done! \\u2728 \\U0001f370 \\u2728\r\n5 files would be left unchanged.\r\n",
+          "sha256": "e596d811ad77d1aca6625607cb038c0a1ea03728cc9f64d784a99381c9168af0"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-format-2026-10-20T08-44.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11192359999404289,
+      "stage": "lint",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-lint-2026-10-20T08-44.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-lint-2026-10-20T08-44.stdout.bin",
+          "readable": "All checks passed!\n",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9026858999859542,
+      "stage": "types",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-types-2026-10-20T08-44.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-types-2026-10-20T08-44.stdout.bin",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py",
+        "--cov=drm_copilot_discovery.report_models",
+        "--cov=drm_copilot_discovery.report_rendering",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p5t3-rendering3-coverage.2026-10-20T08-44.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9004306999850087,
+      "stage": "tests",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-tests-2026-10-20T08-44.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering3-tests-2026-10-20T08-44.stdout.bin",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollected 105 items\r\n\r\ntests\\discovery_runtime\\test_report_rendering.py ..................      [ 17%]\r\ntests\\discovery_runtime\\test_report_models.py .......................... [ 41%]\r\n......................................................                   [ 93%]\r\ntests\\scripts\\dev_tools\\discovery\\test_rendering.py .......              [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                       Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\report_models.py        138      0     64      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\report_rendering.py      17      0      4      0   100%\r\n----------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                        155      0     68      0   100%\r\nCoverage JSON written to file WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p5t3-rendering3-coverage.2026-10-20T08-44.json\r\n============================= 105 passed in 0.35s =============================\r\n",
+          "sha256": "03954186335b19e5f288d30d13f33e72bd1c9721c7466dde1e1c064b6973b469"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+    "tests/discovery_runtime/test_report_rendering.py",
+    "tests/discovery_runtime/test_report_models.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py"
+  ],
+  "status": "focused-pass-not-task-acceptance"
+}

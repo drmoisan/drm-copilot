@@ -1,0 +1,126 @@
+{
+  "status": "READY_FOR_CHECKED_WIP",
+  "Timestamp": "2026-10-20T08:57:22.846756+00:00",
+  "Command": "python SCRATCH/issue-980-p5t3-mechanical-final-reconcile.py",
+  "EXIT_CODE": 0,
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-freeze.2026-10-20T08-52.json",
+    "sha256": "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-staging.2026-10-20T08-52.json",
+    "sha256": "dc83c5f1bcacefb4d88d8f125f1dd9f28b07d01415828a68793fd56d5576657d"
+  },
+  "source_map": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-source-map.2026-10-20T08-48.json",
+    "sha256": "f8e84c3d478d025f6b756875432f50066e8f1979f4f36077c45de0585c44bfbd"
+  },
+  "accepted_base": "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+  "owned_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+    "tests/discovery_runtime/test_parity_report_projection.py",
+    "tests/discovery_runtime/test_agent_output.py"
+  ],
+  "owned_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+      "physical_lines": 234
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "sha256": "517cabe0e82456db27f7a7e637add28d4037fa848e65bfa9a20d63bd6e2ff06b",
+      "physical_lines": 287
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "4d53a1d6fb0451bfce590301e0431b332f153a21dae925e035ec5c5b7787ce97",
+      "physical_lines": 316
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+      "physical_lines": 494
+    }
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-lossless-archive.2026-10-20T08-52.json",
+    "sha256": "5a966a36b1345d82a67e428ef1622958e0f7ffdde41c9882c4b8cdad36f19d6c"
+  },
+  "decoded_entries": 37,
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-format.2026-10-20T08-48.json",
+      "sha256": "ce94111c4ed4aeff99d4e56763f1fc014b74aa4a875aa6b7ebc9a3ff860f63e2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-lint.2026-10-20T08-48.json",
+      "sha256": "c7fbdaf5fc9187135f0c22a7bad336e81bcf4b1e4d0aa34f4127659cb4b672d7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-types.2026-10-20T08-48.json",
+      "sha256": "ec8395a7895a93e8b95fa53dd1fd8ab1977145f41795d9c22e5c266fc5d2efa5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-tests.2026-10-20T08-50.json",
+      "sha256": "c762b0fdbe861fd71a11670dafef357ea4d1210fd008f2fc726015b0f2863498"
+    }
+  ],
+  "test_count": 8,
+  "pytest_seconds": 72.52,
+  "harness_seconds": 74.922,
+  "definition_AST_identities": 10,
+  "observer_modules_preserved": 2,
+  "alias_identity": {
+    "class_alias": true,
+    "collector_alias": true,
+    "caller_class": true,
+    "caller_collector": true
+  },
+  "coverage_raw": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "covered_lines": 72,
+      "num_statements": 82,
+      "covered_branches": 29,
+      "num_branches": 38
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "covered_lines": 91,
+      "num_statements": 92,
+      "covered_branches": 17,
+      "num_branches": 18
+    }
+  },
+  "named_class_callable_ranges": 10,
+  "coverage_qualification": "Exact accepted body and syntax-line/branch mapping is separate from current raw measurement; no remaining unproved points. Empty coverage.py aggregate entries are not named ranges.",
+  "retained_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-current-coverage.2026-10-20T08-12.json",
+      "sha256": "5db392065b039ab8247d93211d6696419adcdc9364fae62ef968b0b8d8e16b51"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-ranges.2026-10-20T08-12.json",
+      "sha256": "b99e911f9862e40f981166df38233312c8c4ed14ab9a4ac87258f84ad0d86616"
+    }
+  ],
+  "dependency_closure": "The only new import provider is the extracted validation_operation module. Every external imported symbol already exists in accepted validation.py's import set; no new report_models/report_rendering API is consumed.",
+  "semantic_changes": false,
+  "findings": [],
+  "open_probes": [],
+  "task_acceptance": false,
+  "independent_scope": "Mechanical assessment extraction only: two production modules and two observer relocation files. No completion/warning integration or rendering semantics acceptance.",
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-payload.2026-10-20T08-57.json",
+    "sha256": "cf2aff7a8ad30358772149015c94b13257cc6bf93717cda0577ed5b71ec76582"
+  },
+  "commit_boundary": {
+    "own_source_count": 4,
+    "external_API_compatibility": "Every external provider/symbol consumed by the extraction was already imported by the committed original validation module. No new report_rendering API is required by this subset.",
+    "executed_dependency_qualification": "The eight-case process used the frozen rendering owner's report_models/report_rendering hashes recorded in the owner freeze. This receipt does not review those disjoint implementations or add them to the mechanical staging union."
+  },
+  "preserved_diagnostics": [
+    "Owner initial formatting, Ruff import ordering/type-only import findings, and three Pyright private-boundary diagnostics remain in the owner freeze/archive.",
+    "Independent source reader first compared raw CRLF observer bytes directly to Git LF; exact raw supplement and LF identity resolve the comparison.",
+    "Independent source reader initially treated a redundant report_input_digest local re-export alias as a new provider dependency; exact provider/symbol identity resolves the comparison."
+  ],
+  "raw_readable_qualification": "Raw stream SHA identities and decoded bytes were checked independently. Readable output differs only by the owner's explicit scratch/repository path substitutions; current coverage JSON is unchanged.",
+  "plan_AC_changes": false,
+  "remaining_task": "P5-T3 completion/warning integration, producer/adapter consolidation and final task gates remain pending."
+}

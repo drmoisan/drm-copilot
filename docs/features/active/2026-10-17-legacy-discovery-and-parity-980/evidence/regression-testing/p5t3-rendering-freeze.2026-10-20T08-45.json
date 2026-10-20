@@ -1,0 +1,253 @@
+{
+  "Timestamp": "2026-10-20T08-45",
+  "cases": 105,
+  "corrections": [
+    "Black formatted new test only.",
+    "Unavailable optional Hypothesis removed in favor of explicit Unicode boundary cases; public encoder import resolves private-import type diagnostic. No dependencies added."
+  ],
+  "coverage_ranges": [
+    {
+      "covered": 3,
+      "end": 30,
+      "missing": [],
+      "name": "ReportLimitError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 21
+    },
+    {
+      "covered": 75,
+      "end": 172,
+      "missing": [],
+      "name": "ReportBudget",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 33
+    },
+    {
+      "covered": 8,
+      "end": 193,
+      "missing": [],
+      "name": "_freeze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 175
+    },
+    {
+      "covered": 5,
+      "end": 205,
+      "missing": [],
+      "name": "bounded_object",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 196
+    },
+    {
+      "covered": 4,
+      "end": 233,
+      "missing": [],
+      "name": "ratio",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 208
+    },
+    {
+      "covered": 12,
+      "end": 277,
+      "missing": [],
+      "name": "DiscoveryReport",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 237
+    },
+    {
+      "covered": 3,
+      "end": 288,
+      "missing": [],
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 280
+    },
+    {
+      "covered": 7,
+      "end": 302,
+      "missing": [],
+      "name": "parse_coverage_ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 291
+    },
+    {
+      "covered": 8,
+      "end": 325,
+      "missing": [],
+      "name": "build_coverage_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 305
+    },
+    {
+      "covered": 4,
+      "end": 339,
+      "missing": [],
+      "name": "render_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 328
+    },
+    {
+      "covered": 2,
+      "end": 30,
+      "missing": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 28
+    },
+    {
+      "covered": 9,
+      "end": 61,
+      "missing": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 44
+    },
+    {
+      "covered": 4,
+      "end": 71,
+      "missing": [],
+      "name": "work",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 63
+    },
+    {
+      "covered": 4,
+      "end": 80,
+      "missing": [],
+      "name": "spend",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 73
+    },
+    {
+      "covered": 15,
+      "end": 105,
+      "missing": [],
+      "name": "text",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 82
+    },
+    {
+      "covered": 42,
+      "end": 172,
+      "missing": [],
+      "name": "check",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 107
+    },
+    {
+      "covered": 2,
+      "end": 257,
+      "missing": [],
+      "name": "__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 250
+    },
+    {
+      "covered": 2,
+      "end": 261,
+      "missing": [],
+      "name": "to_dict",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 259
+    },
+    {
+      "covered": 2,
+      "end": 265,
+      "missing": [],
+      "name": "to_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 263
+    },
+    {
+      "covered": 3,
+      "end": 277,
+      "missing": [],
+      "name": "to_markdown",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "percentage": 100,
+      "start": 267
+    },
+    {
+      "covered": 12,
+      "end": 36,
+      "missing": [],
+      "name": "render_report_markdown",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "percentage": 100,
+      "start": 15
+    }
+  ],
+  "executed_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-rendering-gate-harness.2026-10-20T08-45.txt",
+    "physical_lines": 76,
+    "sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba"
+  },
+  "gates": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-gates.2026-10-20T08-44.json",
+    "physical_lines": 148,
+    "sha256": "257888af7f5d7b1cc96b87012d725bcc4c66c2d00426551b26393daee6557510"
+  },
+  "limits": [
+    "No full-task acceptance; legacy adapter and completion projection remain other/deferred slices.",
+    "Coverage/parity existing Markdown cases pass; new renderer adds only completion heading and retains existing fallback.",
+    "Unchanged model bodies reuse accepted P5T2 proof; focused retained model coverage and all new renderer ranges are 100 percent."
+  ],
+  "mechanical_proofs": {
+    "existing_model_test_only_import_and_observer_target_changed": true,
+    "model_except_to_markdown_ast_identical": true
+  },
+  "observer_supplement": "evidence/baseline/p5t3-rendering-observer-supplement.2026-10-20T08-41.json",
+  "prior_baseline": "evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-coverage.2026-10-20T08-44.json",
+    "physical_lines": 1,
+    "sha256": "caab3863e8384c2f4b4bcb410be11e17057b722b987fc9fa38cb38711b366dce"
+  },
+  "raw_policy": "Original stdout/stderr binary streams and SQLite remain external SCRATCH as identified by gates; JSON keys are repository-relative. All new JSON evidence LF UTF-8.",
+  "retained_attempts": [
+    "evidence/regression-testing/p5t3-rendering1-gates.2026-10-20T08-43.json",
+    "evidence/regression-testing/p5t3-rendering2-gates.2026-10-20T08-44.json"
+  ],
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 339,
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "physical_lines": 36,
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+    },
+    {
+      "path": "tests/discovery_runtime/test_report_models.py",
+      "physical_lines": 375,
+      "sha256": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3"
+    },
+    {
+      "path": "tests/discovery_runtime/test_report_rendering.py",
+      "physical_lines": 117,
+      "sha256": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0"
+    }
+  ],
+  "status": "focused-rendering-subset-frozen-review-pending"
+}

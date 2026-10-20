@@ -1,0 +1,114 @@
+{
+  "Timestamp": "2026-10-20T08-44",
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "330763c500f17f949b7521f0553a62031c29ebfa54212ddb0e351acccb55c83a",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "330763c500f17f949b7521f0553a62031c29ebfa54212ddb0e351acccb55c83a",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "coverage": null,
+  "harness_sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba",
+  "label": "rendering2",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3531602000002749,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-format-2026-10-20T08-44.stderr.bin",
+          "readable": "All done! \\u2728 \\U0001f370 \\u2728\r\n5 files would be left unchanged.\r\n",
+          "sha256": "e596d811ad77d1aca6625607cb038c0a1ea03728cc9f64d784a99381c9168af0"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-format-2026-10-20T08-44.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1069312000181526,
+      "stage": "lint",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-lint-2026-10-20T08-44.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-lint-2026-10-20T08-44.stdout.bin",
+          "readable": "All checks passed!\n",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.8542798999988008,
+      "stage": "types",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-types-2026-10-20T08-44.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering2-types-2026-10-20T08-44.stdout.bin",
+          "readable": "WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:12:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:12:24 - error: Type of \"given\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:12:31 - error: Type of \"settings\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:13:6 - error: Import \"hypothesis\" could not be resolved (reportMissingImports)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:13:38 - error: Type of \"st\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:69:33 - error: \"render_pretty_json\" is not exported from module \"drm_copilot_discovery.report_rendering\" (reportPrivateImportUsage)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:92:2 - error: Untyped function decorator obscures type of function; ignoring decorator (reportUntypedFunctionDecorator)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:92:8 - error: Type of \"text\" is unknown (reportUnknownMemberType)\n  WORKSPACE\\tests\\discovery_runtime\\test_report_rendering.py:92:25 - error: Type of \"characters\" is unknown (reportUnknownMemberType)\n9 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+          "sha256": "583184456503eb2bc9c807ee3afb5431ff7e60b286453833fce316025ec5cbd4"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+    "tests/discovery_runtime/test_report_rendering.py",
+    "tests/discovery_runtime/test_report_models.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py"
+  ],
+  "status": "failed"
+}

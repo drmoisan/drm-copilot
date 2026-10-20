@@ -1,0 +1,9 @@
+{
+  "Timestamp": "2026-10-20T08-41",
+  "path": "tests/discovery_runtime/test_report_models.py",
+  "sha256": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2",
+  "physical_lines": 375,
+  "preserved_original": "SCRATCH/issue-980-p5t3-report-models-test-prior.py",
+  "scope": "Approved single monkeypatch import/use-site relocation; preserve all assertions/other behavior",
+  "proof": "Reuse shared p5t3 baseline accepted report_models test coverage"
+}

@@ -8,7 +8,7 @@ from dataclasses import FrozenInstanceError
 from typing import TYPE_CHECKING, cast
 
 import pytest
-from drm_copilot_discovery import report_models
+from drm_copilot_discovery import report_models, report_rendering
 from drm_copilot_discovery.models import (
     JsonObject,
     JsonValue,
@@ -101,7 +101,7 @@ def test_markdown_has_independent_prospective_render_budget(
         """Reject any attempted render of data (object); never return or perform I/O."""
         raise AssertionError("Oversized rendering must be rejected before encoding")
 
-    monkeypatch.setattr(report_models, "render_pretty_json", forbidden)
+    monkeypatch.setattr(report_rendering, "render_pretty_json", forbidden)
 
     with pytest.raises(ReportLimitError, match="^REPORT_LIMIT:"):
         report.to_markdown()

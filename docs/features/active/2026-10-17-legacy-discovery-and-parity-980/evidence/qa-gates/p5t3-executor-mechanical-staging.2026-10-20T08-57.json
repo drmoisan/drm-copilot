@@ -1,0 +1,459 @@
+{
+  "Timestamp": "2026-10-20T08:57:24.508899+00:00",
+  "status": "EXACT_MECHANICAL_CHECKED_WIP_UNION_NOT_STAGED",
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-ready.2026-10-20T08-57.json",
+    "sha256": "a4c3b85ab76d478072d81bdbed7c098a41acba9f568ad9fcc7a4365afda3345f"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-staging.2026-10-20T08-52.json",
+    "sha256": "dc83c5f1bcacefb4d88d8f125f1dd9f28b07d01415828a68793fd56d5576657d"
+  },
+  "owned_source_only": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+    "tests/discovery_runtime/test_parity_report_projection.py",
+    "tests/discovery_runtime/test_agent_output.py"
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-observer-baseline-supplement.2026-10-20T08-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-payload.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-ready.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-ready.2026-10-20T08-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-consolidation-format.2026-10-20T08-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-consolidation-format.2026-10-20T08-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-freeze.2026-10-20T08-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-import-sort.2026-10-20T08-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-import-sort.2026-10-20T08-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-lossless-archive.2026-10-20T08-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-format.2026-10-20T08-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-format.2026-10-20T08-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-lint.2026-10-20T08-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-lint.2026-10-20T08-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-format.2026-10-20T08-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-format.2026-10-20T08-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-lint.2026-10-20T08-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-lint.2026-10-20T08-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-types.2026-10-20T08-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-types.2026-10-20T08-46.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-format.2026-10-20T08-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-format.2026-10-20T08-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-lint.2026-10-20T08-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-lint.2026-10-20T08-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-tests.2026-10-20T08-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-tests.2026-10-20T08-50.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-types.2026-10-20T08-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-types.2026-10-20T08-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-source-map.2026-10-20T08-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-source-map.2026-10-20T08-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-staging.2026-10-20T08-52.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+    "tests/discovery_runtime/test_agent_output.py",
+    "tests/discovery_runtime/test_parity_report_projection.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-staging.2026-10-20T08-57.json"
+  ],
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-observer-baseline-supplement.2026-10-20T08-39.json",
+      "working_sha256": "2ae4a79d5ddd6d905f096335c80cfa36d4c795cc8878e4a2bd29e5378cedf3c8",
+      "expected_Git_LF_sha256": "2ae4a79d5ddd6d905f096335c80cfa36d4c795cc8878e4a2bd29e5378cedf3c8",
+      "working_bytes": 25596,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+      "working_sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d",
+      "expected_Git_LF_sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d",
+      "working_bytes": 94246,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-payload.2026-10-20T08-57.json",
+      "working_sha256": "cf2aff7a8ad30358772149015c94b13257cc6bf93717cda0577ed5b71ec76582",
+      "expected_Git_LF_sha256": "cf2aff7a8ad30358772149015c94b13257cc6bf93717cda0577ed5b71ec76582",
+      "working_bytes": 68367,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-ready.2026-10-20T08-57.json",
+      "working_sha256": "a4c3b85ab76d478072d81bdbed7c098a41acba9f568ad9fcc7a4365afda3345f",
+      "expected_Git_LF_sha256": "a4c3b85ab76d478072d81bdbed7c098a41acba9f568ad9fcc7a4365afda3345f",
+      "working_bytes": 7166,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-mechanical-ready.2026-10-20T08-57.md",
+      "working_sha256": "71cef8e5169bd21308ec3fd1f39a386fa412c2e53ed6c590c9ac95dc5628b8a7",
+      "expected_Git_LF_sha256": "71cef8e5169bd21308ec3fd1f39a386fa412c2e53ed6c590c9ac95dc5628b8a7",
+      "working_bytes": 2147,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-consolidation-format.2026-10-20T08-40.json",
+      "working_sha256": "37f38ce10f8b942632e8f252492f3ca202f5f869805f55b03012395a7a327e97",
+      "expected_Git_LF_sha256": "37f38ce10f8b942632e8f252492f3ca202f5f869805f55b03012395a7a327e97",
+      "working_bytes": 8110,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-consolidation-format.2026-10-20T08-40.md",
+      "working_sha256": "5786ba52765a47f6b642d43969f5b01bb33d982798d2276955f1111de070b296",
+      "expected_Git_LF_sha256": "5786ba52765a47f6b642d43969f5b01bb33d982798d2276955f1111de070b296",
+      "working_bytes": 774,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-freeze.2026-10-20T08-52.json",
+      "working_sha256": "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4",
+      "expected_Git_LF_sha256": "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4",
+      "working_bytes": 67881,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-import-sort.2026-10-20T08-45.json",
+      "working_sha256": "08be5ef968578c316afe53695344eed6aaed8c7a7b534e4d49d9e26e5923db60",
+      "expected_Git_LF_sha256": "08be5ef968578c316afe53695344eed6aaed8c7a7b534e4d49d9e26e5923db60",
+      "working_bytes": 7938,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-import-sort.2026-10-20T08-45.md",
+      "working_sha256": "8c0820809751b043a089b97f554ec522eaa55301ada76a5eb6c6b14eaaea195a",
+      "expected_Git_LF_sha256": "8c0820809751b043a089b97f554ec522eaa55301ada76a5eb6c6b14eaaea195a",
+      "working_bytes": 424,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-lossless-archive.2026-10-20T08-52.json",
+      "working_sha256": "5a966a36b1345d82a67e428ef1622958e0f7ffdde41c9882c4b8cdad36f19d6c",
+      "expected_Git_LF_sha256": "5a966a36b1345d82a67e428ef1622958e0f7ffdde41c9882c4b8cdad36f19d6c",
+      "working_bytes": 256547,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-format.2026-10-20T08-45.json",
+      "working_sha256": "c0ea5af7ec8b0427f82e99402d35c59455636f4022309537e719794d5782d568",
+      "expected_Git_LF_sha256": "c0ea5af7ec8b0427f82e99402d35c59455636f4022309537e719794d5782d568",
+      "working_bytes": 8011,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-format.2026-10-20T08-45.md",
+      "working_sha256": "f4205c23a6ee3ea0215a3a9b92c2e73dcecb0b9f32d744e69b6c6fe4d21a3927",
+      "expected_Git_LF_sha256": "f4205c23a6ee3ea0215a3a9b92c2e73dcecb0b9f32d744e69b6c6fe4d21a3927",
+      "working_bytes": 491,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-lint.2026-10-20T08-45.json",
+      "working_sha256": "13ea93063b04d9b21e9f6fb54f43b93f376891e8f276aa1affd8f49e04149bff",
+      "expected_Git_LF_sha256": "13ea93063b04d9b21e9f6fb54f43b93f376891e8f276aa1affd8f49e04149bff",
+      "working_bytes": 10116,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass1-lint.2026-10-20T08-45.md",
+      "working_sha256": "68f9f07acc598f43f5d3d05e598e152472aaafc0548999e382a41c97936849ef",
+      "expected_Git_LF_sha256": "68f9f07acc598f43f5d3d05e598e152472aaafc0548999e382a41c97936849ef",
+      "working_bytes": 2548,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-format.2026-10-20T08-46.json",
+      "working_sha256": "1069dee8e4c6fedba3db2d81bbe8e6b6effd036e87e71ff9f3bb970ce60400f6",
+      "expected_Git_LF_sha256": "1069dee8e4c6fedba3db2d81bbe8e6b6effd036e87e71ff9f3bb970ce60400f6",
+      "working_bytes": 8011,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-format.2026-10-20T08-46.md",
+      "working_sha256": "ffcbe08aa75c63467e9007cc39635d51334c8ccacf0564efcc42194c89581d26",
+      "expected_Git_LF_sha256": "ffcbe08aa75c63467e9007cc39635d51334c8ccacf0564efcc42194c89581d26",
+      "working_bytes": 491,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-lint.2026-10-20T08-46.json",
+      "working_sha256": "1abb7dbc0cf8d7691043d354ee13bff3f11c0be9331d5f9e2adaecc38c389def",
+      "expected_Git_LF_sha256": "1abb7dbc0cf8d7691043d354ee13bff3f11c0be9331d5f9e2adaecc38c389def",
+      "working_bytes": 7944,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-lint.2026-10-20T08-46.md",
+      "working_sha256": "5085224c56fa0624c30f0f395aa1c39bcfdc4874518bcd2c00b84b8a40047b63",
+      "expected_Git_LF_sha256": "5085224c56fa0624c30f0f395aa1c39bcfdc4874518bcd2c00b84b8a40047b63",
+      "working_bytes": 446,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-types.2026-10-20T08-46.json",
+      "working_sha256": "712741d14af21ed16a1a518d7d0498eeeddeda8924d074edc90266949dfc857f",
+      "expected_Git_LF_sha256": "712741d14af21ed16a1a518d7d0498eeeddeda8924d074edc90266949dfc857f",
+      "working_bytes": 8835,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass2-types.2026-10-20T08-46.md",
+      "working_sha256": "fb4ade98e884071a35c793368758bdf06c05f846fe0754f47b95f03f7d45d580",
+      "expected_Git_LF_sha256": "fb4ade98e884071a35c793368758bdf06c05f846fe0754f47b95f03f7d45d580",
+      "working_bytes": 1288,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-format.2026-10-20T08-48.json",
+      "working_sha256": "ce94111c4ed4aeff99d4e56763f1fc014b74aa4a875aa6b7ebc9a3ff860f63e2",
+      "expected_Git_LF_sha256": "ce94111c4ed4aeff99d4e56763f1fc014b74aa4a875aa6b7ebc9a3ff860f63e2",
+      "working_bytes": 8011,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-format.2026-10-20T08-48.md",
+      "working_sha256": "8b0f15e720bcc4a1054c4aa5af51afdb58fb89911f1168926c5c4f1e34b64773",
+      "expected_Git_LF_sha256": "8b0f15e720bcc4a1054c4aa5af51afdb58fb89911f1168926c5c4f1e34b64773",
+      "working_bytes": 491,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-lint.2026-10-20T08-48.json",
+      "working_sha256": "c7fbdaf5fc9187135f0c22a7bad336e81bcf4b1e4d0aa34f4127659cb4b672d7",
+      "expected_Git_LF_sha256": "c7fbdaf5fc9187135f0c22a7bad336e81bcf4b1e4d0aa34f4127659cb4b672d7",
+      "working_bytes": 7944,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-lint.2026-10-20T08-48.md",
+      "working_sha256": "1605916a39100463b6be2c576169965607059d7c4d8907c22dc4c8d8955eec18",
+      "expected_Git_LF_sha256": "1605916a39100463b6be2c576169965607059d7c4d8907c22dc4c8d8955eec18",
+      "working_bytes": 446,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-tests.2026-10-20T08-50.json",
+      "working_sha256": "c762b0fdbe861fd71a11670dafef357ea4d1210fd008f2fc726015b0f2863498",
+      "expected_Git_LF_sha256": "c762b0fdbe861fd71a11670dafef357ea4d1210fd008f2fc726015b0f2863498",
+      "working_bytes": 11185,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-tests.2026-10-20T08-50.md",
+      "working_sha256": "2ab1b12e562e8c0c50453ae04a853b99663d9294737584a881d7cdf17a1a9438",
+      "expected_Git_LF_sha256": "2ab1b12e562e8c0c50453ae04a853b99663d9294737584a881d7cdf17a1a9438",
+      "working_bytes": 3589,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-types.2026-10-20T08-48.json",
+      "working_sha256": "ec8395a7895a93e8b95fa53dd1fd8ab1977145f41795d9c22e5c266fc5d2efa5",
+      "expected_Git_LF_sha256": "ec8395a7895a93e8b95fa53dd1fd8ab1977145f41795d9c22e5c266fc5d2efa5",
+      "working_bytes": 8127,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-pass3-types.2026-10-20T08-48.md",
+      "working_sha256": "6d60096b24f6f41bd1a770aed133e5c1bb2a54b64e1ea55fa839e660ba449fca",
+      "expected_Git_LF_sha256": "6d60096b24f6f41bd1a770aed133e5c1bb2a54b64e1ea55fa839e660ba449fca",
+      "working_bytes": 617,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-source-map.2026-10-20T08-42.json",
+      "working_sha256": "96483f3dd0c6f587277732a859bc83a783ec916b8322c1f3fba2f518de82d64a",
+      "expected_Git_LF_sha256": "96483f3dd0c6f587277732a859bc83a783ec916b8322c1f3fba2f518de82d64a",
+      "working_bytes": 96516,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-source-map.2026-10-20T08-48.json",
+      "working_sha256": "f8e84c3d478d025f6b756875432f50066e8f1979f4f36077c45de0585c44bfbd",
+      "expected_Git_LF_sha256": "f8e84c3d478d025f6b756875432f50066e8f1979f4f36077c45de0585c44bfbd",
+      "working_bytes": 96872,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-staging.2026-10-20T08-52.json",
+      "working_sha256": "dc83c5f1bcacefb4d88d8f125f1dd9f28b07d01415828a68793fd56d5576657d",
+      "expected_Git_LF_sha256": "dc83c5f1bcacefb4d88d8f125f1dd9f28b07d01415828a68793fd56d5576657d",
+      "working_bytes": 6954,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "working_sha256": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+      "expected_Git_LF_sha256": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+      "working_bytes": 9326,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+      "working_sha256": "517cabe0e82456db27f7a7e637add28d4037fa848e65bfa9a20d63bd6e2ff06b",
+      "expected_Git_LF_sha256": "517cabe0e82456db27f7a7e637add28d4037fa848e65bfa9a20d63bd6e2ff06b",
+      "working_bytes": 11887,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_agent_output.py",
+      "working_sha256": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+      "expected_Git_LF_sha256": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+      "working_bytes": 18330,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_report_projection.py",
+      "working_sha256": "4d53a1d6fb0451bfce590301e0431b332f153a21dae925e035ec5c5b7787ce97",
+      "expected_Git_LF_sha256": "4d53a1d6fb0451bfce590301e0431b332f153a21dae925e035ec5c5b7787ce97",
+      "working_bytes": 12007,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "already_committed_exact_Git_bytes": false
+    }
+  ],
+  "self_identity": "This manifest lists itself; its SHA is returned externally to avoid a recursive self-hash.",
+  "normalization": "Only Git text=auto/eol=lf CRLF-to-LF representation is anticipated; original working bytes/hashes are separate.",
+  "scope": "No disjoint rendering, legacy adapter or completion semantic source files are added. Shared owner baseline references are included exactly.",
+  "task_acceptance": false
+}

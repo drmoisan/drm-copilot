@@ -1,0 +1,886 @@
+{
+  "Command": "Bounded source/AST and Git binding review; retained ordered receipt/raw-stream/coverage reconciliation (no test replay)",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T08-54",
+  "accepted_head": "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+  "authority": {
+    "actual_model": "gpt-6-astra",
+    "actual_reasoning_effort": "high",
+    "agent_id": "01a1587f-5823-7210-9d39-169420f2da62",
+    "agent_type": "atomic-executor-c3-elevated",
+    "attestation_key": "17a9c35c5720e245acb9e7e26ea514e403ed5aae4ba44629f4ea7a2e7c577065",
+    "launch_authority_valid": true,
+    "profile_path": ".codex/agents/atomic-executor-c3-elevated.toml",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "provenance_valid": true,
+    "recorded_at": "2026-10-20T08:48:36.9625147+00:00",
+    "routing_valid": true
+  },
+  "authority_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+  "checklist": {
+    "accepted_AC": "17/66",
+    "accepted_tasks": "43/84",
+    "current": "P5-T3 remains unchecked",
+    "next": [
+      "P5-T3",
+      "P5-T4",
+      "P5-T5",
+      "P6-T1",
+      "P6-T2"
+    ]
+  },
+  "coverage": {
+    "modules": [
+      {
+        "excluded_lines": [],
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "summary": {
+          "covered_branches": 64,
+          "covered_lines": 138,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 64,
+          "num_partial_branches": 0,
+          "num_statements": 138,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      },
+      {
+        "excluded_lines": [
+          11,
+          12
+        ],
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "summary": {
+          "covered_branches": 4,
+          "covered_lines": 17,
+          "excluded_lines": 2,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "num_statements": 17,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        }
+      }
+    ],
+    "new_changed_callables": [
+      "DiscoveryReport.to_markdown: 2/2 executable statements",
+      "render_report_markdown: 11/11 executable statements; 4/4 branches"
+    ],
+    "predecessor": "P5-T2 current model raw 111/142 statements and45/64 branches was supplemented by retained P5-T1 models proof to142/142 and64/64. This slice directly measures138/138 and64/64 plus new renderer17/17 and4/4; changed callable bodies100%; no uncovered statements/arcs remain, no loss of changed behavior.",
+    "predecessor_proof": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-handoff.2026-10-20T08-12.json",
+        "sha256": "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-current-coverage.2026-10-20T08-12.json",
+        "sha256": "5db392065b039ab8247d93211d6696419adcdc9364fae62ef968b0b8d8e16b51"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-ranges.2026-10-20T08-12.json",
+        "sha256": "b99e911f9862e40f981166df38233312c8c4ed14ab9a4ac87258f84ad0d86616"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-handoff.2026-10-20T05-24.json",
+        "sha256": "3e0f40187f3ce06c378089a963df24a2ab4dfd96a9b9e052dd89536fd8fe37a4"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-combined-coverage.2026-10-20T05-24.json",
+        "sha256": "f1dceba57a661ed4e03244bbc7c897ae07d837bc1dbab22d4bc6597f749934b3"
+      }
+    ],
+    "qualification": "Freeze AST interval counts include declaration execution; named coverage.py ranges above are callable-body denominators. End lines come from AST, because coverage.py entries supply start_line only. TYPE_CHECKING declarations at renderer lines 11-12 are excluded; no runtime production file excluded.",
+    "qualified_ranges": [
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 30,
+        "excluded_lines": [],
+        "kind": "classes",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportLimitError",
+        "start": 21
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 30,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportLimitError.__init__",
+        "start": 28
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 50,
+          "covered_lines": 69,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 50,
+          "num_partial_branches": 0,
+          "num_statements": 69,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 172,
+        "excluded_lines": [],
+        "kind": "classes",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget",
+        "start": 33
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 8,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 8,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 61,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget.__init__",
+        "start": 44
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 71,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget.work",
+        "start": 63
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 80,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget.spend",
+        "start": 73
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 12,
+          "covered_lines": 14,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 12,
+          "num_partial_branches": 0,
+          "num_statements": 14,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 105,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget.text",
+        "start": 82
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 32,
+          "covered_lines": 41,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 32,
+          "num_partial_branches": 0,
+          "num_statements": 41,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 172,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ReportBudget.check",
+        "start": 107
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 4,
+          "covered_lines": 7,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "num_statements": 7,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 193,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "_freeze",
+        "start": 175
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 4,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 4,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 205,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "bounded_object",
+        "start": 196
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 233,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "ratio",
+        "start": 208
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 5,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 5,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 277,
+        "excluded_lines": [],
+        "kind": "classes",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "DiscoveryReport",
+        "start": 237
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 257,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "DiscoveryReport.__post_init__",
+        "start": 250
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 261,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "DiscoveryReport.to_dict",
+        "start": 259
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 1,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 1,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 265,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "DiscoveryReport.to_json",
+        "start": 263
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 277,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "DiscoveryReport.to_markdown",
+        "start": 267
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 2,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 2,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 288,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "_legacy_version",
+        "start": 280
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 6,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 6,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 302,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "parse_coverage_ledger",
+        "start": 291
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 2,
+          "covered_lines": 7,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "num_statements": 7,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 325,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "build_coverage_rows",
+        "start": 305
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 0,
+          "covered_lines": 3,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "num_statements": 3,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 339,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "qualified_name": "render_coverage_report",
+        "start": 328
+      },
+      {
+        "coverage_named_summary": {
+          "covered_branches": 4,
+          "covered_lines": 11,
+          "excluded_lines": 0,
+          "missing_branches": 0,
+          "missing_lines": 0,
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "num_statements": 11,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100",
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100"
+        },
+        "end": 36,
+        "excluded_lines": [],
+        "kind": "functions",
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "qualified_name": "render_report_markdown",
+        "start": 15
+      }
+    ],
+    "raw": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering3-coverage.2026-10-20T08-44.json",
+      "physical_lines": 1,
+      "sha256": "caab3863e8384c2f4b4bcb410be11e17057b722b987fc9fa38cb38711b366dce"
+    },
+    "repository_wide_claim": false
+  },
+  "dependency_bindings": [
+    {
+      "accepted_blob": "e0a034cc16796f0b956e2172ef826f93423611bc",
+      "expected_git_blob": "e0a034cc16796f0b956e2172ef826f93423611bc",
+      "in_rendering_commit": false,
+      "lf_sha256": "344b549da438c0c73fa6fe89eefd43943bc688e2c023c8f8e1bab9caedc8c767",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "physical_lines": 39,
+      "working_sha256": "344b549da438c0c73fa6fe89eefd43943bc688e2c023c8f8e1bab9caedc8c767"
+    },
+    {
+      "accepted_blob": "7f095e147f9e2dd2260217baae4b5614b20324af",
+      "expected_git_blob": "7f095e147f9e2dd2260217baae4b5614b20324af",
+      "in_rendering_commit": false,
+      "lf_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "physical_lines": 382,
+      "working_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647"
+    },
+    {
+      "accepted_blob": "914d66577862386944012a938cffccd3f3c73651",
+      "expected_git_blob": "914d66577862386944012a938cffccd3f3c73651",
+      "in_rendering_commit": false,
+      "lf_sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "physical_lines": 475,
+      "working_sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512"
+    },
+    {
+      "accepted_blob": "1483f8f63cb46d078d9fb1780faa3525f53246a8",
+      "expected_git_blob": "1483f8f63cb46d078d9fb1780faa3525f53246a8",
+      "in_rendering_commit": false,
+      "lf_sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "physical_lines": 158,
+      "working_sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a"
+    },
+    {
+      "accepted_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1",
+      "expected_git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1",
+      "in_rendering_commit": false,
+      "lf_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "physical_lines": 156,
+      "working_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "accepted_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "expected_git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "in_rendering_commit": false,
+      "lf_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "physical_lines": 170,
+      "working_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "accepted_blob": "8de39ffb5f40f0f8f77e6aebbe8ce69e4d2f1502",
+      "expected_git_blob": "8de39ffb5f40f0f8f77e6aebbe8ce69e4d2f1502",
+      "in_rendering_commit": false,
+      "lf_sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "physical_lines": 418,
+      "working_sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "accepted_blob": "e32df068248da1397f023e7e5b563d471f2fb862",
+      "expected_git_blob": "e32df068248da1397f023e7e5b563d471f2fb862",
+      "in_rendering_commit": false,
+      "lf_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "physical_lines": 374,
+      "working_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1"
+    },
+    {
+      "accepted_blob": "ff3a5faf89785b828cdcea695d7739b7cd3b54fc",
+      "expected_git_blob": "ff3a5faf89785b828cdcea695d7739b7cd3b54fc",
+      "in_rendering_commit": false,
+      "lf_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "physical_lines": 382,
+      "working_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    },
+    {
+      "accepted_blob": "c6f4c0611e63170e88fc4067528f06351c6dcfa7",
+      "expected_git_blob": "c6f4c0611e63170e88fc4067528f06351c6dcfa7",
+      "in_rendering_commit": false,
+      "lf_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "physical_lines": 102,
+      "working_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08"
+    },
+    {
+      "expected_git_blob": "908612c6aad30ea9e4b5cb8800d2eb33b0930a3f",
+      "in_rendering_commit": true,
+      "lf_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 339,
+      "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "expected_git_blob": "be8fc11abcf333e07bdc2a656e88bf15301cbfcb",
+      "in_rendering_commit": true,
+      "lf_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "physical_lines": 36,
+      "working_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+    },
+    {
+      "accepted_blob": "65e1419a4d75657591af50a5b9d286339a1a7839",
+      "expected_git_blob": "65e1419a4d75657591af50a5b9d286339a1a7839",
+      "in_rendering_commit": false,
+      "lf_sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "physical_lines": 215,
+      "working_sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086"
+    },
+    {
+      "accepted_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409",
+      "expected_git_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409",
+      "in_rendering_commit": false,
+      "lf_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "physical_lines": 335,
+      "working_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b"
+    }
+  ],
+  "findings": [],
+  "gate_reconciliation": {
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "normalization": {
+      "canonical_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering2-gates.2026-10-20T08-44.json",
+      "change": "Only readable workspace-prefix substitution became case-insensitive. Raw stdout/stderr references/hashes, command, before/after hashes, exit codes, timings and diagnostics unchanged.",
+      "original": "SCRATCH/issue-980-p5t3-rendering2-gates-original.2026-10-20T08-44.json",
+      "original_sha256": "4a458ddc44725b366808565205aeeac264ae8bd0c7afbcfc7f2b9e2bc1504c58",
+      "published_sha256": "8cb8e341dd0bfb75680cb5e4d409f1899cf87ca80334e81e1a0355f74ee02fe4"
+    },
+    "normalization_verified": "Original bytes/hash and all gate fields identical after only case-insensitive WORKSPACE substitution in readable streams. Raw streams retained unchanged.",
+    "passed_cases": 105,
+    "raw_streams_verified": 16,
+    "replayed_cases": 0,
+    "retained_attempts": [
+      {
+        "attempt": "rendering1",
+        "stages": [
+          {
+            "format": 1
+          }
+        ]
+      },
+      {
+        "attempt": "rendering2",
+        "stages": [
+          {
+            "format": 0
+          },
+          {
+            "lint": 0
+          },
+          {
+            "types": 1
+          }
+        ]
+      }
+    ],
+    "successful_order": [
+      "format",
+      "lint",
+      "types",
+      "tests"
+    ]
+  },
+  "limits": [
+    "Rendering subset only; task checkoff and AC acceptance pending.",
+    "Full-task composition, prospective report publication, native and isolation gates remain coordinator-owned.",
+    "Legacy adapter08:45 unchanged statement is historical; later independent edits excluded.",
+    "No production/test/plan/checkpoint/Git/staging modifications by reviewer."
+  ],
+  "references": [
+    {
+      "expected_git_blob": "4ca27d4ab6100827fb2343e660c2e22e88955981",
+      "lf_sha256": "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering-freeze.2026-10-20T08-45.json",
+      "physical_lines": 253,
+      "working_sha256": "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2"
+    },
+    {
+      "expected_git_blob": "ba7178ea59c9adbf217d1e377005807f243d9671",
+      "lf_sha256": "a553aac61853ba7fb758d65dd048c5c95c3b013194e4425ff84dfec1387ad89e",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering-staging.2026-10-20T08-48.json",
+      "physical_lines": 61,
+      "working_sha256": "a553aac61853ba7fb758d65dd048c5c95c3b013194e4425ff84dfec1387ad89e"
+    },
+    {
+      "expected_git_blob": "f188e7652fb01167924d33ef6799dc9449100fb0",
+      "lf_sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+      "physical_lines": 127,
+      "working_sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d"
+    },
+    {
+      "expected_git_blob": "c5f96fe58aa22b674eda1964a4292ad653145f3d",
+      "lf_sha256": "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-interface-contract.2026-10-20T08-23.json",
+      "physical_lines": 130,
+      "working_sha256": "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61"
+    }
+  ],
+  "reviewer_diagnostics": [
+    {
+      "diagnostic": "KeyError: 'end_line'",
+      "exit_code": 1,
+      "resolution": "Read actual coverage.py schema; use qualified names and AST end_lineno. No coverage file modification."
+    },
+    {
+      "diagnostic": "AssertionError on outside-scope legacy adapter unchanged comparison after successful six-module closure check",
+      "exit_code": 1,
+      "resolution": "Owner/coordinator confirmed adapter advanced concurrently after08:45 freeze. Do not assert current unchanged adapter; not a rendering dependency and excluded from review/staging."
+    }
+  ],
+  "route": "rendering_review_p5t3_20261020",
+  "source_bindings": [
+    {
+      "expected_git_blob": "908612c6aad30ea9e4b5cb8800d2eb33b0930a3f",
+      "lf_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "physical_lines": 339,
+      "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "expected_git_blob": "be8fc11abcf333e07bdc2a656e88bf15301cbfcb",
+      "lf_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "physical_lines": 36,
+      "working_sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+    },
+    {
+      "expected_git_blob": "e9b8b89bb01e040f6e4edde7d30a1d894f7bdebc",
+      "lf_sha256": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+      "path": "tests/discovery_runtime/test_report_models.py",
+      "physical_lines": 375,
+      "working_sha256": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3"
+    },
+    {
+      "expected_git_blob": "66b4950dcc17a2006ab4a1003fa9db53bfd362e4",
+      "lf_sha256": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0",
+      "path": "tests/discovery_runtime/test_report_rendering.py",
+      "physical_lines": 117,
+      "working_sha256": "547573ffd847b5629d73b43c2b3d5bb1fd21868a029b0cc9e93e5cdfd8e249a0"
+    }
+  ],
+  "source_review": {
+    "authority": "No validation, report producer, claim assessment, path resolution, I/O, host authorization or readiness calculation introduced. Lazy wrapper import avoids initialization-cycle failure.",
+    "budget": "ReportBudget reserves JSON LF and ASCII wrapper before traversing fields, then renderer copies and encodes. Existing exact serializer-cost matrix and four new Unicode/control/fence boundary cases assert exact encoded capacity and one-byte-under pre-encoding failure via count=1 observer.",
+    "byte_compatibility": "Coverage/parity/fallback heading, JSON sort_keys/indent/ASCII escaping, LF suffix, and independent prospective budget remain identical. to_plain_value(document) equals the prior to_dict wrapper body. Only completion receives its new heading.",
+    "dependency_closure": "14 transitive package imports including package __init__; 12 outside-slice modules match committed predecessor Git blobs. Pending assessment, producer and adapter work not required by this commit.",
+    "existing_model_ast": "Compared frozen baseline and working AST: only DiscoveryReport.to_markdown changed; all other declarations/bodies identical.",
+    "observer_relocation": "Compared exact accepted Git text with only two permitted replacements: import report_rendering and patch report_rendering.render_pretty_json. All test assertions and bodies otherwise identical.",
+    "policy": "Fully annotated public signature; purpose/parameters/returns/errors/effects docstrings; heading decision intent comment; no new dependency/suppression or test filesystem/network/process/timing behavior; maximum scoped file 375 lines."
+  },
+  "status": "READY_FOR_CHECKED_RENDERING_COMMIT",
+  "task": "P5-T3",
+  "task_accepted": false
+}

@@ -7,7 +7,7 @@ from functools import partial
 from typing import TYPE_CHECKING, cast
 
 import pytest
-from drm_copilot_discovery import validation
+from drm_copilot_discovery import validation, validation_operation
 from drm_copilot_discovery.findings import Finding
 from drm_copilot_discovery.models import to_plain_value
 from drm_copilot_discovery.parity_report import (
@@ -246,7 +246,9 @@ def test_multiple_derived_reports_reuse_one_complete_assessment(
         # Observe real assessments; do not replace their proof or graph behavior.
         for name in (*counts, "parity_summary"):
             scoped.setattr(
-                validation, name, partial(counted, name, getattr(validation, name))
+                validation_operation,
+                name,
+                partial(counted, name, getattr(validation_operation, name)),
             )
         result = validate_snapshot(snapshot, mode="parity-complete")
     assert result.ok and result.findings == ()
