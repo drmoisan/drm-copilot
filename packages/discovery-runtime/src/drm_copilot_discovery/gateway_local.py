@@ -17,7 +17,8 @@ from drm_copilot_discovery.build_identity import load_build_identity
 from drm_copilot_discovery.catalog import load_catalog
 from drm_copilot_discovery.init_io import InitializationIO
 from drm_copilot_discovery.mutation_io import GuardedMutationWriter, capture_workspace
-from drm_copilot_discovery.path_policy import PathPolicy
+from drm_copilot_discovery.path_models import PathPolicyError
+from drm_copilot_discovery.path_policy import PathPolicy, workspace_identity
 from drm_copilot_discovery.report_models import ReportBudget
 from drm_copilot_discovery.service_contracts import ServiceAuthority
 from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection
@@ -95,6 +96,19 @@ class LocalServiceIO:
         """Return verified installed identity; propagate typed failure unchanged."""
         return self._identity()
 
+    def _matches_workspace(self, path: str) -> bool:
+        """Compare path (str) to the bound root with strict platform identity.
+
+        Return False for an invalid or different root; callers deny authority
+        with PermissionError. Parsing is lexical and performs no I/O.
+        """
+        try:
+            return workspace_identity(path) == workspace_identity(
+                self.initialization.workspace_root
+            )
+        except PathPolicyError:
+            return False
+
     def authorize(
         self, request: ServiceRequest, *, baseline: CapturedWorkspace | None
     ) -> ServiceAuthority:
@@ -107,18 +121,19 @@ class LocalServiceIO:
 
         request (ServiceRequest): parsed operation input; no authority is inferred from
         it. baseline (CapturedWorkspace | None): captured workspace, or None before
-        capture. Returns ServiceAuthority; invalid identity raises PermissionError and
-        path failures propagate. Reads metadata only for scoped selection.
+        capture. Returns ServiceAuthority; invalid or different root identity raises
+        PermissionError. Scoped-selection path failures propagate; reads metadata only
+        for scoped selection.
         """
         if (
             request.invocation_ref is not None
             or request.authorization_ref is not None
             or request.mode == "agent-output"
             or request.operation in ("prepare-agent", "finalize-agent")
-            or request.workspace_root not in (".", self.initialization.workspace_root)
+            or not self._matches_workspace(request.workspace_root)
             or (
                 baseline is not None
-                and baseline.workspace_root != self.initialization.workspace_root
+                and not self._matches_workspace(baseline.workspace_root)
             )
         ):
             raise PermissionError("Request has no local-user authority")
@@ -157,11 +172,11 @@ class LocalServiceIO:
         baseline (CapturedWorkspace): required accepted capture for this same-root
         guarded writer.
         authority (ServiceAuthority): authenticated local identity and exact grants.
-        Returns GuardedMutationWriter; invalid identity raises PermissionError. No
-        publication occurs until the writer is invoked.
+        Returns GuardedMutationWriter; invalid or different root identity raises
+        PermissionError. No publication occurs until the writer is invoked.
         """
         if (
-            baseline.workspace_root != self.initialization.workspace_root
+            not self._matches_workspace(baseline.workspace_root)
             or authority.principal != self._authority.principal
             or authority.author_or_agent != self._authority.author_or_agent
             or authority.invocation is not None

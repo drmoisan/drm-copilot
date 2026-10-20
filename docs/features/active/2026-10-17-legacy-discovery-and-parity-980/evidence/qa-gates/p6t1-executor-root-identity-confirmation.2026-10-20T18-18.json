@@ -1,0 +1,561 @@
+{
+  "task": "P6-T1",
+  "finding": "NIO1",
+  "status": "READY_FOR_CHECKED_REPAIR_PACKAGE_COMMIT",
+  "timestamp_utc": "2026-10-20T18:18:29Z",
+  "route": "atomic_execution_p6t1_native_root_identity_confirmation_20261020",
+  "head": "c2d7926c02a19ad02689f0111b353807221b8d36",
+  "comparison_base": "c2d7926c02a19ad02689f0111b353807221b8d36",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052,
+      "old_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "lines": 497
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "bytes": 17604,
+      "old_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "lines": 403
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "bytes": 17390,
+      "old_sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+      "lines": 425
+    }
+  ],
+  "source_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-root-identity-source-confirmation.2026-10-20T18-09.json",
+    "sha256": "2807702edfb6d7c620e3ef5883ca182d77e9d8e375d88fb4dbea9665e3db7671",
+    "bytes": 4726
+  },
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-nio1-freeze.2026-10-20T18-12.json",
+    "sha256": "34dbbbe3defe71a31770cbce6331f8733ff5a0e11dc0d38ae9f91a67d3858faa",
+    "bytes": 33715
+  },
+  "proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+    "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba",
+    "bytes": 128460
+  },
+  "reconciliation": {
+    "ordered_owner_gates": "PASS: Black, Ruff, scoped Pyright, 57 new tests, 32 retained tests.",
+    "distinct_passed_nodes": 89,
+    "new_nodes": 57,
+    "retained_nodes": 32,
+    "receipt_stream_pairs_decoded_and_readable_matched": 11,
+    "exact_archive_streams_decoded": 9,
+    "original_source_streams_decoded": 3,
+    "preservation": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+        "old_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+        "new_sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+        "unchanged_function_asts": 11,
+        "changed_existing_functions": [],
+        "added_functions": [
+          "workspace_identity"
+        ]
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "old_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+        "new_sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+        "unchanged_function_asts": 11,
+        "changed_existing_functions": [
+          "LocalServiceIO.authorize",
+          "LocalServiceIO.writer"
+        ],
+        "added_functions": [
+          "LocalServiceIO._matches_workspace"
+        ]
+      },
+      "tests/discovery_runtime/test_gateway_boundaries.py": {
+        "old_sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+        "new_sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+        "unchanged_function_asts": 14,
+        "changed_existing_functions": [],
+        "added_functions": [
+          "test_local_root_identity_accepts_equivalent_spelling",
+          "test_local_root_identity_rejects_nonmatching_roots",
+          "test_workspace_identity_rejects_an_invalid_trusted_root"
+        ]
+      }
+    },
+    "fresh_named_executable_body_coverage": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:workspace_identity": {
+        "covered_lines": 4,
+        "statements": 4,
+        "covered_branches": 2,
+        "branches": 2,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO._matches_workspace": {
+        "covered_lines": 4,
+        "statements": 4,
+        "covered_branches": 0,
+        "branches": 0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.authorize": {
+        "covered_lines": 13,
+        "statements": 14,
+        "covered_branches": 7,
+        "branches": 8,
+        "missing_lines": [
+          145
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ]
+        ]
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.writer": {
+        "covered_lines": 3,
+        "statements": 3,
+        "covered_branches": 2,
+        "branches": 2,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    "file_coverage": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+        "fresh": {
+          "covered_lines": 134,
+          "statements": 161,
+          "covered_branches": 61,
+          "branches": 86,
+          "missing_lines": [
+            178,
+            229,
+            235,
+            247,
+            257,
+            258,
+            264,
+            268,
+            274,
+            281,
+            288,
+            302,
+            321,
+            336,
+            343,
+            350,
+            366,
+            392,
+            400,
+            409,
+            441,
+            451,
+            458,
+            467,
+            474,
+            487,
+            492
+          ],
+          "missing_branches": [
+            [
+              177,
+              178
+            ],
+            [
+              226,
+              229
+            ],
+            [
+              234,
+              235
+            ],
+            [
+              245,
+              247
+            ],
+            [
+              263,
+              264
+            ],
+            [
+              267,
+              268
+            ],
+            [
+              273,
+              274
+            ],
+            [
+              280,
+              281
+            ],
+            [
+              287,
+              288
+            ],
+            [
+              301,
+              302
+            ],
+            [
+              320,
+              321
+            ],
+            [
+              332,
+              336
+            ],
+            [
+              342,
+              343
+            ],
+            [
+              349,
+              350
+            ],
+            [
+              365,
+              366
+            ],
+            [
+              391,
+              392
+            ],
+            [
+              399,
+              400
+            ],
+            [
+              408,
+              409
+            ],
+            [
+              440,
+              441
+            ],
+            [
+              450,
+              451
+            ],
+            [
+              456,
+              458
+            ],
+            [
+              466,
+              467
+            ],
+            [
+              473,
+              474
+            ],
+            [
+              486,
+              487
+            ],
+            [
+              491,
+              492
+            ]
+          ]
+        },
+        "qualified_with_retained_unchanged_proof": {
+          "covered_lines": 161,
+          "statements": 161,
+          "covered_branches": 86,
+          "branches": 86,
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "fresh": {
+          "covered_lines": 85,
+          "statements": 131,
+          "covered_branches": 19,
+          "branches": 38,
+          "missing_lines": [
+            145,
+            269,
+            270,
+            278,
+            280,
+            285,
+            293,
+            301,
+            303,
+            311,
+            312,
+            313,
+            314,
+            315,
+            316,
+            318,
+            319,
+            321,
+            322,
+            323,
+            324,
+            325,
+            326,
+            327,
+            328,
+            329,
+            330,
+            332,
+            333,
+            334,
+            335,
+            336,
+            337,
+            338,
+            339,
+            340,
+            341,
+            375,
+            376,
+            377,
+            378,
+            379,
+            380,
+            385,
+            392,
+            398
+          ],
+          "missing_branches": [
+            [
+              144,
+              145
+            ],
+            [
+              270,
+              278
+            ],
+            [
+              270,
+              280
+            ],
+            [
+              313,
+              -303
+            ],
+            [
+              313,
+              314
+            ],
+            [
+              323,
+              324
+            ],
+            [
+              323,
+              325
+            ],
+            [
+              326,
+              327
+            ],
+            [
+              326,
+              328
+            ],
+            [
+              334,
+              335
+            ],
+            [
+              334,
+              337
+            ],
+            [
+              337,
+              338
+            ],
+            [
+              337,
+              339
+            ],
+            [
+              339,
+              340
+            ],
+            [
+              339,
+              341
+            ],
+            [
+              376,
+              377
+            ],
+            [
+              376,
+              378
+            ],
+            [
+              378,
+              379
+            ],
+            [
+              378,
+              380
+            ]
+          ]
+        },
+        "qualified_with_retained_unchanged_proof": {
+          "covered_lines": 130,
+          "statements": 131,
+          "covered_branches": 37,
+          "branches": 38,
+          "missing_lines": [
+            145
+          ],
+          "missing_branches": [
+            [
+              144,
+              145
+            ]
+          ]
+        }
+      }
+    },
+    "raw_counters_augmented": false,
+    "unchanged_body_mappings": "Exact original/current AST and body-source correspondence verified; accepted historical coverage facts reused.",
+    "protected_current_bindings_verified": 24,
+    "new_test_contract": "Equivalent drive/UNC/POSIX roots; 17 invalid/different identities at all three guards; three invalid trusted roots. Real in-memory ports assert no writes, revocations or broadened authority."
+  },
+  "findings": [],
+  "open_probes": [],
+  "qualifications": [
+    "Current raw file proof remains 134/161 lines and 61/86 branches for path_policy; 85/131 and 19/38 for gateway_local. Historical unchanged-body evidence is separate.",
+    "Authorize retains the accepted missing line/arc: old 130 and 129->130 map to current 145 and 144->145. All four new/changed named bodies satisfy the line floor.",
+    "The unchanged docstring-only callback has zero executable body; the original evidence-reader diagnostic and correction are preserved.",
+    "NR1 harness-format and NIO1 production SERVICE_IO failures remain distinct. Original requests, failures and archives are not rewritten.",
+    "The focused tests preceded package regeneration. The old build-manifest bytes remain archived; the six explicitly authorized completed package outputs now accompany the repair. No native attempt is included.",
+    "Windows spelling claims cover the lexical helper and three local guards. No additional upstream or cross-platform native capability is claimed."
+  ],
+  "retained_accepted_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-audit.2026-10-18T23-34.json",
+      "sha256": "fc58c2fdb18bce715d1635b59668d8d80fc037a5e7598f9c4b4b1b68bf657340",
+      "bytes": 58930
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+      "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc",
+      "bytes": 87689
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1",
+      "bytes": 19332
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-archive.2026-10-20T16-39.json",
+      "sha256": "bbe502a3a661da66a13cd2d4d2158cd316b24ba332212f2f46cb1cec0400b089",
+      "bytes": 51117
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gateway-collection.2026-10-20T17-14.json",
+      "sha256": "f77d042c635596d52da3ad861f86378bbeea756b6d661bee1ec5a86945be87fa",
+      "bytes": 31915
+    }
+  ],
+  "preserved_native_references_outside_repair_union": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nr1.2026-10-20T17-43.json",
+      "sha256": "f08ddaa5bd9477514e3e83def4c213093b7993e431d61ab75d6df2b4e2f1c478",
+      "bytes": 24753
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nr1-raw.2026-10-20T17-43.json",
+      "sha256": "70b35b8e993409bf8d41f35ec19331d872f2ce8db0c5ee178c68d8cc38f3e543",
+      "bytes": 45911
+    }
+  ],
+  "native_reference_staging": "Coordinator-owned native evidence remains outside the repair plus six-output package union, as instructed.",
+  "completed_package_binding": {
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-handoff.2026-10-20T18-14.json",
+      "sha256": "0bb7a6b6dc31f34e420821e8c5b19d2b94fdf07724aa1dd7d9a149d0060af482",
+      "bytes": 36927
+    },
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-raw-archive.2026-10-20T18-14.json",
+      "sha256": "317a96593b66388c5eebc04890133054c1070227103cebdb32ec94f4f95ee2e3",
+      "bytes": 24287
+    },
+    "outputs": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-handoff.2026-10-20T18-14.json",
+        "sha256": "0bb7a6b6dc31f34e420821e8c5b19d2b94fdf07724aa1dd7d9a149d0060af482",
+        "bytes": 36927
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-raw-archive.2026-10-20T18-14.json",
+        "sha256": "317a96593b66388c5eebc04890133054c1070227103cebdb32ec94f4f95ee2e3",
+        "bytes": 24287
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-build.2026-10-20T18-14.json",
+        "sha256": "915253f1ca52b4ffecb9924fe90ce8dc79b364fe400e8541deb03b91eb51ae50",
+        "bytes": 75186
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-check.2026-10-20T18-14.json",
+        "sha256": "d70553cca5a167db5e6d39e998964155abdaf476ca83f4d1b5fd3a930612c0e6",
+        "bytes": 74951
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-install.2026-10-20T18-14.json",
+        "sha256": "4a8335c90f93a5566ec2b7954a76a5e71a6b64fc7dc972dceee3a07a2a3a009b",
+        "bytes": 65592
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+        "sha256": "2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66",
+        "bytes": 22217
+      }
+    ],
+    "source_input_count": 211,
+    "source_inputs_unchanged": true,
+    "verified_payload_members": 168,
+    "build_sha256": "2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66",
+    "policy_sha256": "ee929567bb66b0f58cb4e58cdb0bd327926c4d055aec0030b644ab6fd3078b42",
+    "wheel_sha256": "115ad5d263908c4ee1d52ae3719c35d76ead7485fe0a6f942ea76a2a7f5ed4d9",
+    "prior_manifest_preserved": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "sha256": "c05c22a870a0ae74431ee32f84a89bfddda39230310265dbb0b563e44290978a",
+      "bytes": 22217
+    },
+    "proof_scope": "Exact completed receipt/source/manifest/raw identity binding only; no reviewer rebuild, installation or native execution."
+  },
+  "reviewer_execution": "Read-only AST, hash, archived-stream and coverage reconciliation only; no test, service, package or native execution.",
+  "pending": [
+    "Checked repair/package commit and push",
+    "Installed native and combined P6-T1 acceptance proof"
+  ],
+  "task_checked_off": false,
+  "plan_tasks": {
+    "completed": 46,
+    "total": 84
+  },
+  "source_acs": {
+    "completed": 23,
+    "total": 66
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-root-identity-staging.2026-10-20T18-18.json"
+}

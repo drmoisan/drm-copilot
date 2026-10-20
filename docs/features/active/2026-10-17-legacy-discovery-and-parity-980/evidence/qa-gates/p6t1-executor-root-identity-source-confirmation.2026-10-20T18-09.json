@@ -1,0 +1,104 @@
+{
+  "task": "P6-T1",
+  "finding": "NIO1",
+  "status": "SOURCE_CONFIRMED_FOCUSED_PROOF_PENDING",
+  "timestamp_utc": "2026-10-20T18:09:17Z",
+  "route": "atomic_execution_p6t1_native_root_identity_confirmation_20261020",
+  "phase": "S5_P6T1_native_root_identity_confirmation",
+  "head": "c2d7926c02a19ad02689f0111b353807221b8d36",
+  "comparison_base": "c2d7926c02a19ad02689f0111b353807221b8d36",
+  "production_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052,
+      "lines": 497,
+      "git_lf_sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "baseline_git_blob_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "bytes": 17604,
+      "lines": 403,
+      "git_lf_sha256": "855dd59283685da245babe34987a6e7a173b612860ab3004bb1ead75e202ad87",
+      "baseline_git_blob_sha256": "6a7a15e69d22c53fd32820f4f99ba7a3ffc65be5bbab8f6afdb3553e1a0e767a"
+    }
+  ],
+  "ast_comparisons": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "unchanged_existing_function_asts": 11,
+      "changed_existing_functions": [],
+      "added_functions": [
+        "workspace_identity"
+      ],
+      "comparison": "Python AST including docstrings; source locations excluded."
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "unchanged_existing_function_asts": 11,
+      "changed_existing_functions": [
+        "LocalServiceIO.authorize",
+        "LocalServiceIO.writer"
+      ],
+      "added_functions": [
+        "LocalServiceIO._matches_workspace"
+      ],
+      "comparison": "Python AST including docstrings; source locations excluded."
+    }
+  },
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-init-io-cause.2026-10-20T17-52.json",
+      "sha256": "604c44f5862bdb4e3e1d46dfb7f44a58e93d781a350363bbf37f8fb897dc3fe9",
+      "bytes": 11002
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-native-request-finding.2026-10-20T17-38.json",
+      "sha256": "bf4afb5502ae86e8cff4a623237b1c6d19925b75286d633bba2033787920eef5",
+      "bytes": 15400
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation.2026-10-20T16-48.json",
+      "sha256": "4ed0410876eb30448e35e5489515a9b0fb99b3e288daefcc26aeef972bf3dd78",
+      "bytes": 10863
+    }
+  ],
+  "confirmed": [
+    "workspace_identity reuses the unchanged strict _absolute parser and additionally rejects POSIX backslash aliases.",
+    "The helper and all three local guards compare supported drive/UNC Windows spellings through PureWindowsPath; POSIX identity remains case-sensitive.",
+    "Invalid or different identities are denied. Request authorization, optional authorization baseline and required writer baseline use the same helper.",
+    "All other principal, host, invocation, grant and writer safeguards remain unchanged.",
+    "Only a fixed number of linear lexical scans/copies of bounded caller strings is added; no filesystem resolution, I/O or population traversal is introduced.",
+    "New and changed intent contracts satisfy the existing function documentation rule; both production files remain within 500 lines."
+  ],
+  "qualifications": [
+    "Claims cover the helper and the three LocalServiceIO guards, not additional upstream service or cross-platform native capability.",
+    "Working byte identities and Git LF-normalized identities are recorded separately.",
+    "NR1 was the earlier native harness format error; NIO1 is the later production local-root identity defect. Both original failure receipts remain unchanged."
+  ],
+  "new_findings": [],
+  "open_source_probes": [],
+  "reviewer_behavior_executed": false,
+  "pending": [
+    "Owner's frozen focused tests, retained local/path tests and exact named-body coverage.",
+    "Final three-file repair/evidence staging union.",
+    "Package rebuild and installed native verification under the coordinator's later release."
+  ],
+  "ready_for_package": false,
+  "task_checked_off": false,
+  "plan_tasks": {
+    "completed": 46,
+    "total": 84
+  },
+  "source_acs": {
+    "completed": 23,
+    "total": 66
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

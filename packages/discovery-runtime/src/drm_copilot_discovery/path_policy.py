@@ -113,6 +113,20 @@ def _absolute(path: str) -> PurePath:
     return result
 
 
+def workspace_identity(path: str) -> PurePath:
+    """Return the lexical identity of absolute path (str), without I/O.
+
+    Reuse strict drive/UNC Windows or case-sensitive POSIX identity. POSIX
+    backslash aliases are unsupported; invalid paths raise PathPolicyError.
+    """
+    identity = _absolute(path)
+    if isinstance(identity, PurePosixPath) and "\\" in path:
+        raise PathPolicyError(
+            "PATH_ABSOLUTE", path, "Use a canonical POSIX workspace path."
+        )
+    return identity
+
+
 def _overlaps(left: str, right: str) -> bool:
     """Treat equality and either component-prefix direction as an overlap."""
     return path_contains(left, right) or path_contains(right, left)
