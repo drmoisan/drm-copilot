@@ -1,0 +1,52 @@
+"""Add the explicit checked release to the already frozen final candidate."""
+
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+
+def main():
+    """Preserve the disabled candidate and bind only the newly released fields."""
+    scratch = Path(__file__).resolve().parent
+    qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+    disabled = qa / "p5t4-final-candidate-disabled.2026-10-20T11-36.json"
+    raw = disabled.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == "ea11b094a6bc3ff8397f28fed2477960f77f59643939100c2cc1dd339183b007"
+    candidate = json.loads(raw)
+    review = qa / "p5t4-executor-repair-confirmation.2026-10-20T11-36.json"
+    review_sha = hashlib.sha256(review.read_bytes()).hexdigest()
+    assert review_sha == "8086643347c934cd9797d8ce3335f23c830bcb8b6b6e69478e8c32ef9b46ea75"
+    # The release checks existing bindings without creating another source inventory.
+    for path, digest in candidate["bindings"].items():
+        assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest, path
+    for name, record in candidate["harnesses"].items():
+        assert hashlib.sha256((scratch / name).read_bytes()).hexdigest() == record["sha256"], name
+    candidate.update(
+        execution_released=True,
+        final_review_closed=True,
+        candidate_commit="7425d43598b9f75a8052d351eadffb5fea64791d",
+        authority_route="inventory_analyzers_p5t4_final_run_20261020",
+    )
+    candidate["retained_proof"]["final_review"] = {"path": review.as_posix(), "sha256": review_sha}
+    candidate["disabled_candidate"] = {"path": disabled.as_posix(), "sha256": hashlib.sha256(raw).hexdigest()}
+    candidate["limitations"][0] = "Task verification is released; independent final acceptance remains pending."
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate["released_at"] = stamp
+    output = qa / ("p5t4-final-candidate-released." + stamp + ".json")
+    assert not output.exists(), output
+    output.write_text(json.dumps(candidate, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    local = scratch / "candidate-released.json"
+    assert not local.exists()
+    local.write_bytes(output.read_bytes())
+    snapshot = qa / ("p5t4-final-release-harness." + stamp + ".txt")
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({"released_candidate": output.as_posix(),
+                      "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+                      "local_candidate": "SCRATCH/candidate-released.json",
+                      "node_count": candidate["node_count"], "execution_released": True}, indent=2))
+
+
+if __name__ == "__main__":
+    main()
