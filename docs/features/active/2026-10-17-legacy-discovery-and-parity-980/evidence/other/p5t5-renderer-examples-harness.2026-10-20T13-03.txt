@@ -1,0 +1,140 @@
+"""Generate synthetic renderer examples from accepted captured-memory fixtures."""
+import base64
+import gzip
+import hashlib
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+sys.path.insert(0, str(Path.cwd()))
+from drm_copilot_discovery.acceptance_generation import generate_acceptance
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.gherkin import render_acceptance
+from drm_copilot_discovery.schema_validation import validate_document
+from tests.discovery_runtime.test_acceptance_decisions import policy_snapshot
+from tests.discovery_runtime.test_acceptance_generation import generation_snapshot
+
+sys.stdout.reconfigure(encoding="utf-8")
+ROOT = Path.cwd()
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+EXAMPLES = ROOT / "examples/discovery/v2/acceptance"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+assert not EXAMPLES.exists(), "Example prefix must retain its recorded absence"
+REG = FEATURE / "evidence/regression-testing"
+proof_path = sorted(REG.glob("p5t5-renderer-repair2-tests.20*.json"))[-1]
+proof = json.loads(proof_path.read_text(encoding="utf-8"))
+assert proof["clean"] and len(proof["executed_nodes"]) == 77
+dependencies = {path: value for path, value in proof["after"].items()
+                if not path.startswith("<SCRATCH>")}
+
+
+def sha(raw):
+    """Return the exact immutable stream identity."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def assert_bindings():
+    """Require all tested source, tests and borrowed streams to remain unchanged."""
+    assert all(sha((ROOT / path).read_bytes()) == value
+               for path, value in dependencies.items())
+
+
+assert_bindings()
+catalog = load_catalog()
+cases = [
+    ("observed-source", generation_snapshot(catalog), "legacy-characterization",
+     "generation_snapshot(catalog)", 1, 0),
+    ("approved-target", policy_snapshot(catalog), "target-acceptance",
+     "policy_snapshot(catalog, status='approved')", 2, 0),
+    ("pending-target", policy_snapshot(catalog, status="proposed"), "target-acceptance",
+     "policy_snapshot(catalog, status='proposed')", 1, 1),
+]
+streams = {"example-harness.py": Path(__file__).read_bytes()}
+results = []
+output_paths = []
+for name, snapshot, kind, factory, ready_count, pending_count in cases:
+    result = generate_acceptance(snapshot, kind=kind)
+    assert len(result.ready) == ready_count, (name, result.findings)
+    pending = [item for item in result.specifications if item.document["readiness"] == "pending"]
+    assert len(pending) == pending_count
+    documents = []
+    for item in result.specifications:
+        raw = item.to_json().encode("utf-8")
+        validation = validate_document(raw, expected_kind="acceptance-specification",
+                                       expected_version="2.0.0", catalog=catalog)
+        assert validation.ok, validation.findings
+        documents.append({"scenario_id": item.document["scenario_id"],
+                          "criterion_id": item.identity.criterion_id,
+                          "readiness": item.document["readiness"], "sha256": sha(raw)})
+        streams[f"{name}/generated/{item.document['scenario_id']}.json"] = raw
+    bundle = render_acceptance(result)
+    expected_paths = {"acceptance.md"} | {
+        f"{item.identity.kind}/{item.document['scenario_id']}.feature"
+        for item in result.ready
+    }
+    assert {item.path for item in bundle.files} == expected_paths
+    files = []
+    for item in bundle.files:
+        target = EXAMPLES / name / item.path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(item.content)
+        assert target.read_bytes() == item.content
+        row = {"path": target.relative_to(ROOT).as_posix(),
+               "sha256": sha(item.content), "bytes": len(item.content)}
+        files.append(row)
+        output_paths.append(row["path"])
+    captured = []
+    for item in snapshot.manifest.files:
+        streams[f"{name}/captured/{item.path}"] = item.content
+        captured.append({"path": item.path, "category": item.category,
+                         "sha256": sha(item.content), "bytes": len(item.content)})
+    results.append({"name": name, "accepted_factory": factory, "kind": kind,
+                    "ready": ready_count, "pending": pending_count,
+                    "files": files, "specifications": documents,
+                    "captured_originals": captured,
+                    "findings": [item.to_dict() for item in result.findings]})
+    print(json.dumps({"example": name, "files": len(files), "ready": ready_count,
+                      "pending": pending_count}), flush=True)
+readme = EXAMPLES / "README.md"
+readme.write_text(
+    "# Synthetic acceptance rendering examples\n\n"
+    "These files are exact `render_acceptance` output from schema-valid, captured "
+    "in-memory fixtures. They demonstrate data rendering and do not represent "
+    "executed acceptance tests, production observations, or publication authority.\n\n"
+    "- `observed-source/` uses a declared synthetic source observation.\n"
+    "- `approved-target/` retains the observed criterion and a separately approved "
+    "target criterion, including their original references and ownership.\n"
+    "- `pending-target/` keeps the unresolved target criterion in `acceptance.md`; "
+    "only the independently ready observed criterion has a `.feature` file.\n\n"
+    "Every authored step is a single JSON string literal. No implementation step "
+    "definitions are supplied. The canonical P5-T5 example receipt records input "
+    "and output hashes and exact retained input bytes.\n",
+    encoding="utf-8", newline="\n",
+)
+output_paths.append(readme.relative_to(ROOT).as_posix())
+archive = {
+    name: {"encoding": "gzip-base64", "sha256": sha(raw), "bytes": len(raw),
+           "data": base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")}
+    for name, raw in streams.items()
+}
+assert all(gzip.decompress(base64.b64decode(row["data"])) == streams[name]
+           for name, row in archive.items())
+archive_path = FEATURE / "evidence/other" / f"p5t5-renderer-examples-originals.{STAMP}.json"
+archive_path.write_text(json.dumps(archive, indent=2) + "\n", encoding="utf-8", newline="\n")
+assert_bindings()
+receipt = {
+    "task": "P5-T5", "created_utc": datetime.now(timezone.utc).isoformat(),
+    "status": "PASS", "scope": "Synthetic examples, no unit-suite replay or runtime execution.",
+    "tested_binding": {"path": proof_path.relative_to(ROOT).as_posix(), "sha256": sha(proof_path.read_bytes())},
+    "dependencies": dependencies, "cases": results,
+    "originals": {"path": archive_path.relative_to(ROOT).as_posix(), "sha256": sha(archive_path.read_bytes())},
+    "output_byte_verification": "Every saved rendered file was reread and matched the exact public renderer bytes.",
+    "stage_paths": output_paths,
+}
+receipt_path = FEATURE / "evidence/other" / f"p5t5-renderer-examples.{STAMP}.json"
+receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+harness_path = receipt_path.with_name(f"p5t5-renderer-examples-harness.{STAMP}.txt")
+harness_path.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"path": receipt_path.relative_to(ROOT).as_posix(), "sha256": sha(receipt_path.read_bytes()),
+                  "example_paths": output_paths}))

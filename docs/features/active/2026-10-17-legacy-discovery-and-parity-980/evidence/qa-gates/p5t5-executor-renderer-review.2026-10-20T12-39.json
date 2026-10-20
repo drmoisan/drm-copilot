@@ -1,0 +1,350 @@
+{
+  "Timestamp": "2026-10-20T12-39",
+  "Command": "Bounded frozen-source/contract review; poetry run python SCRATCH/issue-980-p5t5-carrier-probe.py",
+  "EXIT_CODE": 0,
+  "task": "P5-T5",
+  "status": "COMPLETE_FINDINGS_REPAIR_REQUIRED",
+  "whole_task_accepted": false,
+  "route": "atomic_execution_p5t5_renderer_review_20261020",
+  "native_authority_verified": true,
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "owned_scope": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "sha256": "5c2cc975a3aceebf7c6710150e4520dc4f2a6953fe1cd34148d6eb582ce8d713",
+      "physical_lines": 453
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "sha256": "6e0b1094b44cf0674474a3923f7ae6db05f03170d4ff6c9378997a81c21fbd31",
+      "physical_lines": 391
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "sha256": "49e7456a7d69b9de6088bd17eee3211d2179ff213d762c1499fa1f2be44fadd8",
+      "physical_lines": 170
+    }
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate.2026-10-20T12-30.json",
+    "sha256": "7dafe0d5590cebfb4fac47892c2068f054fbe716e39d3e9bf4cd1135cef7ac40",
+    "bytes": 5866
+  },
+  "owner_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate-originals.2026-10-20T12-30.json",
+    "sha256": "5ca428688a261d6e95b96076e2fd5eaad6a0bae3e34ed9527f841fdfb9f52616",
+    "bytes": 37577
+  },
+  "approved_contract": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json",
+    "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef",
+    "bytes": 10602
+  },
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+    "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+    "bytes": 29911
+  },
+  "retained_generation_acceptance": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json",
+    "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6",
+    "bytes": 9032
+  },
+  "proof": {
+    "owner_result": {
+      "passed": 60,
+      "failed": 2,
+      "collected": 62,
+      "elapsed_seconds": 29.071616,
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-focused4-tests.2026-10-20T12-27.json",
+      "sha256": "85fab19ea54306fbbddbc1d384c84e1ba2c58822548fecc8eadab389f74c88e1"
+    },
+    "raw_coverage": {
+      "covered_lines": 205,
+      "num_statements": 215,
+      "percent_covered": 93.61022364217253,
+      "percent_covered_display": "94",
+      "missing_lines": 10,
+      "excluded_lines": 0,
+      "percent_statements_covered": 95.34883720930233,
+      "percent_statements_covered_display": "95",
+      "num_branches": 98,
+      "num_partial_branches": 10,
+      "covered_branches": 88,
+      "missing_branches": 10,
+      "percent_branches_covered": 89.79591836734694,
+      "percent_branches_covered_display": "90"
+    },
+    "measured_ranges": 16,
+    "bounded_probe": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-probe.2026-10-20T12-39.json",
+      "sha256": "55c9ed859bd699539354f06589f71211b15f8ccfa666ca0fa814d51abb3729cb",
+      "bytes": 29332
+    },
+    "suite_replay": false
+  },
+  "cleared_properties": [
+    "Only canonical generation.ready instances emit executable files; pending and withheld documents remain distinct, complete Markdown records.",
+    "Fixed kind/scenario filenames, ordinal bundle ordering and portable alias/ancestor collision rejection preserve identity and output confinement.",
+    "Exact generated tags are preserved without mobile/offline inference; quoted ASCII JSON keeps all authored steps/comments single-line and reversible.",
+    "Complete original owner/identity/digest/specification/finding data uses fixed JSON Markdown blocks, without authored links, HTML or executable step definitions.",
+    "Aggregate membership is ID-based; immutable members are traversed directly; measured JSON escapes and key-sort/path-comparison work are reserved before their protected operations, subject to RR1/RR2.",
+    "Production/test files are within 500 lines and tests use pure in-memory fixtures; no I/O, publication, graph revalidation or readiness promotion is introduced."
+  ],
+  "findings": [
+    {
+      "id": "RR1",
+      "category": "source-resource-contract",
+      "severity": "blocking",
+      "locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 43
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 99
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 107
+        }
+      ],
+      "problem": "Public file and bundle ceilings count path characters instead of UTF-8 bytes. Bundle construction also deducts ReportBudget's JSON trailing-LF byte even though these are raw files.",
+      "evidence": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-probe.2026-10-20T12-39.json",
+        "sha256": "55c9ed859bd699539354f06589f71211b15f8ccfa666ca0fa814d51abb3729cb",
+        "bytes": 29332
+      },
+      "observed": "At ceiling 4, path '\u00e9\u00e9' plus one content byte (5 actual UTF-8 bytes) is accepted by both carriers; ASCII path 'abc' plus one byte (exactly 4) is rejected only by the bundle.",
+      "required_delta": "Count Unicode scalar UTF-8 path bytes prospectively without an unreserved encoded copy; use the exact raw path/content budget without an invented LF. Retain portable path validation and immutable carriers. Add small positive/exact/one-byte-short ASCII and multibyte file/aggregate controls.",
+      "scope_limit": "Generated kind/scenario filenames are ASCII; this finding concerns the public carrier hard-cap contract, not a new ready-membership or path-authority defect."
+    },
+    {
+      "id": "RR2",
+      "category": "source-prospective-allocation",
+      "severity": "blocking",
+      "locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 200
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 226
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 343
+        }
+      ],
+      "problem": "The indentation/separator plus potentially long tag is concatenated before output.fixed reserves its bytes. Earlier tag syntax/work validation is not the remaining aggregate output-byte reservation. JSON work is charged at 20 units per input character, but a supplementary scalar becomes 12 escaped ASCII bytes; subsequent joining and encoding alone traverse at least 24 output characters per scalar. The input-character charge therefore does not cover the declared character-traversal work for serialization and retained-output copies.",
+      "evidence_basis": "Direct frozen-source evaluation order and the declared work unit in _Output, consistent with the approved contract's preallocation bounds. Both observations were reported by the owner and confirmed in the same bounded review. No additional behavioral or timing run.",
+      "required_delta": "Reserve the fixed prefix and existing tag separately before later measured chunk joining. In json(), additionally reserve a conservative fixed multiple of the measured escaped-byte delta before _plain/json.dumps, accounting for the subsequent output copies/joins/encoding. Preserve exact tag spelling/order and accepted model/generator semantics. Include bounded positive/shortage controls showing reservation before tag copying or encoder invocation, without elapsed-time assertions."
+    },
+    {
+      "id": "RT1",
+      "category": "test-fixtures",
+      "severity": "blocking",
+      "locations": [
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 347
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_tags.py",
+          "line": 135
+        }
+      ],
+      "problem": "The byte fixture exhausts AcceptanceGeneration before renderer observation; the decision fixture selects a source criterion positionally instead of the intended target criterion.",
+      "evidence": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-focused4-tests.2026-10-20T12-27.json",
+        "sha256": "85fab19ea54306fbbddbc1d384c84e1ba2c58822548fecc8eadab389f74c88e1",
+        "bytes": 21475
+      },
+      "required_delta": "Keep the 2,000-emoji payload and encoder assertions; choose a limit allowing accepted carrier construction but rejecting the renderer's ASCII expansion. Select the ready item and Markdown trace by explicit target-criterion identity; preserve nonempty decision refs and original owner equality."
+    },
+    {
+      "id": "RC1",
+      "category": "coverage",
+      "severity": "blocking",
+      "locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 133
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 161
+        }
+      ],
+      "problem": "_Output is 56/64 statements (87.5%) and _Output.measure is 42/50 (84%), below the required new class/method threshold.",
+      "evidence": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate.2026-10-20T12-30.json",
+        "sha256": "7dafe0d5590cebfb4fac47892c2068f054fbe716e39d3e9bf4cd1135cef7ac40",
+        "bytes": 5866
+      },
+      "required_delta": "Add the minimum meaningful renderer-owned structural/escaping resource boundary controls needed for >=90% in every measured range and changed-line no-loss. Preserve all 62 original nodes/assertions. Do not replay accepted model tests or claim unreachable guards covered.",
+      "original_missing_lines": [
+        170,
+        177,
+        187,
+        194,
+        206,
+        215,
+        219,
+        224
+      ]
+    },
+    {
+      "id": "PC1",
+      "category": "intent-contract-policy",
+      "severity": "blocking",
+      "rule": ".agents/skills/self-explanatory-code-commenting/SKILL.md mandatory typed parameter/return/effect contracts and immediate comprehension intent comments.",
+      "docstring_locations": [
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 52,
+          "name": "_paths",
+          "required_delta": "State the budget parameter's ReportBudget type."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 251,
+          "name": "_fields",
+          "required_delta": "State the output parameter's _Output type."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 283,
+          "name": "_trace",
+          "required_delta": "State item (AcceptanceSpecification) and output (_Output) parameter types."
+        },
+        {
+          "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+          "line": 318,
+          "name": "_feature",
+          "required_delta": "Document values and trace (dict[str, object]) and output (_Output); use the actual values parameter name."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 59,
+          "name": "file_text",
+          "required_delta": "State bundle (AcceptanceRenderBundle)."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 82,
+          "name": "test_public_captured_generation_renders_exact_trace_and_steps",
+          "required_delta": "State snapshot_catalog (SchemaCatalog), imported (bool), and return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 154,
+          "name": "test_authored_statements_stay_one_reversible_json_literal",
+          "required_delta": "State return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 183,
+          "name": "test_empty_given_has_no_synthetic_step",
+          "required_delta": "State return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 191,
+          "name": "test_ready_pending_withheld_and_actions_remain_distinct",
+          "required_delta": "State return None and local-only/no-I/O effects."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 222,
+          "name": "test_empty_and_blocked_generations_emit_markdown_only",
+          "required_delta": "State return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 248,
+          "name": "test_malformed_structural_candidates_are_not_executable",
+          "required_delta": "State fields (dict[str, object])."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 264,
+          "name": "test_only_exact_generation_carriers_are_accepted",
+          "required_delta": "State value (object) and return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 270,
+          "name": "test_public_carriers_are_immutable_sorted_and_encoding_checked",
+          "required_delta": "State return None and local-only/no-I/O effects."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 295,
+          "name": "test_portable_output_collisions_are_rejected",
+          "required_delta": "State return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 304,
+          "name": "test_unsafe_file_paths_are_rejected",
+          "required_delta": "State path (str) and return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 331,
+          "name": "test_escape_and_text_work_are_reserved_before_serialization",
+          "required_delta": "State monkeypatch (pytest.MonkeyPatch) and kind (str)."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 351,
+          "name": "counted",
+          "required_delta": "State value (object) and options (object keyword values)."
+        },
+        {
+          "path": "tests/discovery_runtime/test_gherkin.py",
+          "line": 381,
+          "name": "test_json_trace_preserves_scalar_types_and_nested_sequences",
+          "required_delta": "State return None and local-only/no-I/O effects."
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_tags.py",
+          "line": 81,
+          "name": "test_unsafe_ambiguous_or_unsorted_tags_fail_closed",
+          "required_delta": "State tags (object) and return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_tags.py",
+          "line": 88,
+          "name": "test_shared_tags_across_distinct_scenarios_are_not_collisions",
+          "required_delta": "State return None."
+        },
+        {
+          "path": "tests/discovery_runtime/test_acceptance_tags.py",
+          "line": 99,
+          "name": "test_distinct_punctuation_is_preserved_in_tags_and_identity",
+          "required_delta": "State return None and local-only/no-I/O effects."
+        }
+      ],
+      "comment_location": {
+        "path": "tests/discovery_runtime/test_acceptance_tags.py",
+        "line": 158,
+        "required_delta": "Place the artifact-filtering intent comment immediately above the generator expression or extract the filtered tuple with its adjacent comment."
+      },
+      "required_delta": "Expand only the enumerated contracts/comment; preserve executable AST, assertions and parametrization except the expressly listed behavior/fixture/coverage repairs. Maintain <=500 physical lines per source/test file."
+    }
+  ],
+  "open_probes": [],
+  "scope_exclusions": [
+    "Accepted generator/model source and suites",
+    "Separately assigned Set E review",
+    "Task/AC checkoff",
+    "CLI/host/publication delivery"
+  ],
+  "evidence_qualifications": [
+    "Owner's first full population is 60 passed and two fixture failures, not a clean gate; all 62 nodes executed.",
+    "Original raw coverage has no terminal LF and remains losslessly archived; the readable view does not replace its identity.",
+    "An initial read-only authority inspection requested .md; the actual .toml profile was then read and matched the exact authority hash. No authority or source file changed."
+  ],
+  "next_transition": "Coordinator may release the one finite repair set; final source/test freeze, per-unit gates and Set E consolidation remain pending."
+}

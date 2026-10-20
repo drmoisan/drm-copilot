@@ -1,0 +1,21 @@
+{
+  "Timestamp": "2026-10-20T12-39",
+  "task": "P5-T5",
+  "status": "PREPARATION_METADATA_CHECK_FAILED",
+  "exit_code": 1,
+  "gate_or_suite_executed": false,
+  "source_or_test_changed": false,
+  "diagnostic": "AssertionError: final_static.py",
+  "cause": "Copied predecessor hash contained one incorrect hexadecimal digit. The canonical P5-T4 prepared template and unchanged scratch script agree on the correct hash.",
+  "incorrect_sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6d14bbc3041c6d357e0",
+  "authoritative_sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0",
+  "rejected_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation-rejected-harness.2026-10-20T12-39.txt",
+    "sha256": "78c502e575342a23b8f9fdb9f6c9699a4542f7c07d137a454bfd914f20f62283"
+  },
+  "authoritative_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-template.2026-10-20T10-58.json",
+  "partial_snapshots_retained": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_gates.2026-10-20T12-38.txt docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_static.2026-10-20T12-38.txt"
+  ],
+  "stream_qualification": "Diagnostic is from the tool-rendered metadata invocation; no raw subprocess stream or completed gate is claimed."
+}

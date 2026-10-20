@@ -1,0 +1,257 @@
+{
+  "task": "P5-T5",
+  "status": "FROZEN_PRE_REPAIR_REVIEW_ONLY",
+  "created_utc": "2026-10-20T12:30:05.972724+00:00",
+  "owned": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "sha256": "5c2cc975a3aceebf7c6710150e4520dc4f2a6953fe1cd34148d6eb582ce8d713",
+      "physical_lines": 453
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "sha256": "6e0b1094b44cf0674474a3923f7ae6db05f03170d4ff6c9378997a81c21fbd31",
+      "physical_lines": 391
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "sha256": "49e7456a7d69b9de6088bd17eee3211d2179ff213d762c1499fa1f2be44fadd8",
+      "physical_lines": 170
+    }
+  },
+  "behavior": {
+    "passed": 60,
+    "failed": 2,
+    "collected": 62,
+    "elapsed_seconds": 29.071616,
+    "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-focused4-tests.2026-10-20T12-27.json",
+    "sha256": "85fab19ea54306fbbddbc1d384c84e1ba2c58822548fecc8eadab389f74c88e1"
+  },
+  "raw_coverage": {
+    "covered_lines": 205,
+    "num_statements": 215,
+    "percent_covered": 93.61022364217253,
+    "percent_covered_display": "94",
+    "missing_lines": 10,
+    "excluded_lines": 0,
+    "percent_statements_covered": 95.34883720930233,
+    "percent_statements_covered_display": "95",
+    "num_branches": 98,
+    "num_partial_branches": 10,
+    "covered_branches": 88,
+    "missing_branches": 10,
+    "percent_branches_covered": 89.79591836734694,
+    "percent_branches_covered_display": "90"
+  },
+  "ranges": [
+    {
+      "name": "AcceptanceRenderedFile",
+      "start": 25,
+      "end": 49,
+      "statements": 13,
+      "covered": 13,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "AcceptanceRenderedFile.__post_init__",
+      "start": 36,
+      "end": 49,
+      "statements": 10,
+      "covered": 10,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_paths",
+      "start": 52,
+      "end": 75,
+      "statements": 15,
+      "covered": 15,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "AcceptanceRenderBundle",
+      "start": 79,
+      "end": 113,
+      "statements": 16,
+      "covered": 16,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "AcceptanceRenderBundle.__post_init__",
+      "start": 90,
+      "end": 113,
+      "statements": 14,
+      "covered": 14,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_plain",
+      "start": 116,
+      "end": 130,
+      "statements": 8,
+      "covered": 8,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_Output",
+      "start": 133,
+      "end": 248,
+      "statements": 64,
+      "covered": 56,
+      "missing": [
+        170,
+        177,
+        187,
+        194,
+        206,
+        215,
+        219,
+        224
+      ],
+      "percent": 87.5
+    },
+    {
+      "name": "_Output.__init__",
+      "start": 142,
+      "end": 149,
+      "statements": 3,
+      "covered": 3,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_Output.fixed",
+      "start": 151,
+      "end": 159,
+      "statements": 4,
+      "covered": 4,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_Output.measure",
+      "start": 161,
+      "end": 224,
+      "statements": 50,
+      "covered": 42,
+      "missing": [
+        170,
+        177,
+        187,
+        194,
+        206,
+        215,
+        219,
+        224
+      ],
+      "percent": 84.0
+    },
+    {
+      "name": "_Output.json",
+      "start": 226,
+      "end": 239,
+      "statements": 3,
+      "covered": 3,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_Output.block",
+      "start": 241,
+      "end": 248,
+      "statements": 3,
+      "covered": 3,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_fields",
+      "start": 251,
+      "end": 280,
+      "statements": 23,
+      "covered": 23,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "_trace",
+      "start": 283,
+      "end": 315,
+      "statements": 10,
+      "covered": 9,
+      "missing": [
+        305
+      ],
+      "percent": 90.0
+    },
+    {
+      "name": "_feature",
+      "start": 318,
+      "end": 360,
+      "statements": 20,
+      "covered": 20,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "name": "render_acceptance",
+      "start": 363,
+      "end": 453,
+      "statements": 31,
+      "covered": 30,
+      "missing": [
+        381
+      ],
+      "percent": 96.7741935483871
+    }
+  ],
+  "fixture_findings": [
+    "Byte-bound fixture rejects in AcceptanceGeneration before renderer invocation.",
+    "Decision trace must select target-criterion instead of the first/source criterion."
+  ],
+  "coverage_gaps": [
+    {
+      "name": "_Output",
+      "start": 133,
+      "end": 248,
+      "statements": 64,
+      "covered": 56,
+      "missing": [
+        170,
+        177,
+        187,
+        194,
+        206,
+        215,
+        219,
+        224
+      ],
+      "percent": 87.5
+    },
+    {
+      "name": "_Output.measure",
+      "start": 161,
+      "end": 224,
+      "statements": 50,
+      "covered": 42,
+      "missing": [
+        170,
+        177,
+        187,
+        194,
+        206,
+        215,
+        219,
+        224
+      ],
+      "percent": 84.0
+    }
+  ],
+  "presentation": "Exact coverage JSON lacks terminal LF; it remains unchanged in the lossless archive. Authored readable evidence is UTF-8/LF.",
+  "archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate-originals.2026-10-20T12-30.json",
+  "archive_sha256": "5ca428688a261d6e95b96076e2fd5eaad6a0bae3e34ed9527f841fdfb9f52616",
+  "effects": "Evidence-only preservation; no source/test edits, behavioral execution, Git or checkpoint mutation."
+}

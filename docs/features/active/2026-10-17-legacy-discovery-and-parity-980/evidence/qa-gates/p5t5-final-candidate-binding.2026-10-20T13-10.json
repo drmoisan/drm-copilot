@@ -1,0 +1,142 @@
+{
+  "Command": "poetry run python SCRATCH/p5t5_bind_final.py",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T13-10",
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p5t5_final_binding_20261020",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P5T5_final_binding",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-candidate-disabled.2026-10-20T13-10.json",
+    "sha256": "6d0b598b2bbdceff9393d0a3a5da98886a61032e9bfbae109bc097885d849ceb"
+  },
+  "changed_code_test_paths": 7,
+  "composition_nodes": [
+    "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[False]",
+    "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[True]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown"
+  ],
+  "contract_nodes": 4,
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair-audit.2026-10-20T13-01.json",
+    "sha256": "ebe73fc77b859bf6304bb804407f05f0ee411862aff407eaff2c1afd12d7945f"
+  },
+  "coverage_view": {
+    "compressed_sha256": "1cb015fb77a47747473f3d8a272737c91daaa51b62c7e1a73fd4e76b7fbb15e7",
+    "member": "<SCRATCH>/p5t5-renderer-repair2-coverage.json",
+    "qualification": "The owner archive retains exact raw JSON. This LF UTF-8 reader view has identical parsed counters, coordinates, filenames and named ranges.",
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze-originals.2026-10-20T13-07.json",
+      "sha256": "0504bd8ab5f9d641b0f97db29fe0b60fc9372955b16a52089486f4cf7c2cd29e"
+    },
+    "raw_bytes": 66562,
+    "raw_crlf_count": 0,
+    "raw_sha256": "9a3285ddbcf80872dc8d6b0b5df5e9a0070a40d9fe20bb1ff8913213b9e5cb4a",
+    "raw_terminal_lf": false,
+    "reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-focused-coverage-view.2026-10-20T13-10.json",
+      "sha256": "e195ce558c201ade25f531ceb3f9c8bc173ea11b848f619e18d9603290aba339"
+    }
+  },
+  "examples": {
+    "bound_paths": [
+      "examples/discovery/v2/acceptance/observed-source/acceptance.md",
+      "examples/discovery/v2/acceptance/observed-source/legacy-characterization/scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d.feature",
+      "examples/discovery/v2/acceptance/approved-target/acceptance.md",
+      "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+      "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2.feature",
+      "examples/discovery/v2/acceptance/pending-target/acceptance.md",
+      "examples/discovery/v2/acceptance/pending-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+      "examples/discovery/v2/acceptance/README.md"
+    ],
+    "originals": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples-originals.2026-10-20T13-03.json",
+      "sha256": "3421aee8da364eed44fb0de52417abea9115320c6ae68533fe9a968c3394cf54"
+    },
+    "outputs": 7,
+    "provenance": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples.2026-10-20T13-03.json",
+      "sha256": "ff326f25b72302405bc69ae5e78b1152f102a93b0085f9b8308888a476a11e14"
+    },
+    "readme": 1
+  },
+  "executed_binding_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-bind-harness.2026-10-20T13-10.txt",
+    "sha256": "ee5eb8c8886703010043c89b43f7848727e1f1e455edcdfb78b582c7a1898537"
+  },
+  "execution_released": false,
+  "gate_execution": false,
+  "metadata_read_qualification": "Read-only PowerShell shape probes initially requested absent paths/members keys; actual owner keys are working_bindings and an identifier-keyed archive. Those tool diagnostics did not execute gates or write candidate evidence.",
+  "node_count": 118,
+  "prior_preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation-split.2026-10-20T12-42.json",
+    "sha256": "fb747846db1eea2ffb258f7849dcdeeec99cb3be707830ac7177d4ae81e0a33c"
+  },
+  "production_modules": 3,
+  "remaining_release_fields": [
+    "Independent candidate-ready receipt/hash",
+    "Checked candidate commit/push",
+    "execution_released=true",
+    "final_review_closed=true"
+  ],
+  "renderer_cases": 77,
+  "runtime_harnesses_unchanged": {
+    "p5t5_final_coverage.py": {
+      "accepted_predecessor_sha256": "0d9e869bf7450535a39d46aa8f218e3c7f5cde0a2dbd1896923bd2efd01db071",
+      "physical_lines": 210,
+      "runtime_path": "SCRATCH/p5t5_final_coverage.py",
+      "sha256": "a8f163389dfaad6acd39d0cbdce954f07a89fd03f3070f793f81fad2c3e4e477",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_coverage.2026-10-20T12-41.txt"
+    },
+    "p5t5_final_gates.py": {
+      "accepted_predecessor_sha256": "49b82d61d9ca580163da854164d9e10c456998e6a7334157eaa15b0aef85577e",
+      "physical_lines": 273,
+      "runtime_path": "SCRATCH/p5t5_final_gates.py",
+      "sha256": "dc92ab67e5cdc6abc0f9548fc53f5eaf8660b0a22b9d243a9ca630cfc82ba8f6",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_gates.2026-10-20T12-41.txt"
+    },
+    "p5t5_final_static.py": {
+      "accepted_predecessor_sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0",
+      "physical_lines": 145,
+      "runtime_path": "SCRATCH/p5t5_final_static.py",
+      "sha256": "dd52c76c58063d0caea6e71c42b82c92357ed7784e77f3f5c7d826167638b964",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_static.2026-10-20T12-41.txt"
+    },
+    "p5t5_prepare_final.py": {
+      "physical_lines": 252,
+      "runtime_path": "SCRATCH/p5t5_prepare_final.py",
+      "sha256": "a498ceb54fc609d72a9085b8cc00e4237ec155734abdd7d9630b390918d34ea4",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_prepare_final.2026-10-20T12-41.txt"
+    }
+  },
+  "set_e_cases": 41,
+  "source_or_test_edits": false,
+  "source_owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze.2026-10-20T13-07.json",
+    "sha256": "d6fbe1f305a6f4d46771497147cfc3a3f8630b361f3f653d87068bafdaf3047b"
+  },
+  "source_owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-staging.2026-10-20T13-07.json",
+    "sha256": "ae8f17ea0152622a260740d52f53dd555da3df024dd327a876088eec8cbcdab9"
+  },
+  "status": "PREPARED_AWAITING_REVIEW_COMMIT_RELEASE",
+  "task": "P5-T5",
+  "test_modules": 5,
+  "timeout": {
+    "basis": "29.513151-second renderer plus 50.64792280000984-second Set E focused runs; finite verification-process bound, not a host-hook limit.",
+    "progress_seconds": 20,
+    "seconds": 300
+  }
+}

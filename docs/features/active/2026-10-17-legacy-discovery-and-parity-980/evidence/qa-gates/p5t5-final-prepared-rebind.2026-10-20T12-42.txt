@@ -1,0 +1,96 @@
+"""Add only the approved renderer split paths to the disabled P5-T5 preparation."""
+
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+
+QA = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+RUNTIME = "packages/discovery-runtime/src/drm_copilot_discovery/"
+TESTS = "tests/discovery_runtime/"
+
+
+def sha(data):
+    """Return an exact-byte identity without newline normalization."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def write(path, value):
+    """Retain immutable LF UTF-8 metadata without replacing earlier attempts."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def main():
+    """Update path lists only; preserve the execution lock and unbound renderer hashes."""
+    previous_path = QA / "p5t5-final-preparation.2026-10-20T12-41.json"
+    previous_sha = "d02f891b238299e5c06237ce936fa79cbcf3ee1a0a9068ceabbce8d0d3e30ba6"
+    assert sha(previous_path.read_bytes()) == previous_sha
+    previous = json.loads(previous_path.read_bytes())
+    template_ref = previous["template"]
+    assert sha(Path(template_ref["path"]).read_bytes()) == template_ref["sha256"]
+    template = json.loads(Path(template_ref["path"]).read_bytes())
+    assert template["execution_released"] is False and template["final_review_closed"] is False
+    helper = RUNTIME + "acceptance_render_text.py"
+    limits_test = TESTS + "test_acceptance_render_limits.py"
+    template["files"].insert(1, helper)
+    template["files"].insert(4, limits_test)
+    template["production"].insert(1, helper)
+    template["coverage_targets"].insert(1, "drm_copilot_discovery.acceptance_render_text")
+    assert helper not in template["bindings"] and limits_test not in template["bindings"]
+    template["limitations"][-1] = "Renderer/helper repair, exact final nodes and fixture hashes remain unbound."
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    new_template = write(QA / ("p5t5-final-split-template." + stamp + ".json"), template)
+    script = Path(__file__).read_bytes()
+    snapshot = QA / ("p5t5-final-prepared-rebind." + stamp + ".txt")
+    assert not snapshot.exists() and b"\r" not in script and len(script.splitlines()) <= 500
+    snapshot.write_bytes(script)
+    receipt = {
+        "Timestamp": stamp, "task": "P5-T5", "status": "PREPARATION_READY_EXECUTION_DISABLED",
+        "Command": "poetry run python SCRATCH/p5t5_rebind_preparation.py", "EXIT_CODE": 0,
+        "previous_preparation": {"path": previous_path.as_posix(), "sha256": previous_sha},
+        "template": new_template, "execution_released": False, "native_execution_released": False,
+        "source_or_test_changed": False, "gates_or_suites_executed": False,
+        "scope_delta": {"new_production": helper, "new_test": limits_test,
+                        "purpose": "Approved _Output/_plain extraction and prospective UTF-8 path accounting; "
+                                   "required RR1/RR2/RC1 controls. No additional capability or public API."},
+        "final_scope": {"changed_python": template["files"], "measured_production": template["production"],
+                        "coverage_targets": template["coverage_targets"]},
+        "population": "Original 62 renderer identities and 41 Set E identities are retained; only required "
+                      "repair controls may be added. The repaired freeze supplies exact final IDs/count.",
+        "unchanged": "Three execution readers, order, four contracts, disabled release, baseline qualification, "
+                     "raw/readable conventions and accepted P5-T4 proof are unchanged.",
+        "missing_release_bindings": previous["missing_release_bindings"],
+        "harness": {"runtime_path": "SCRATCH/p5t5_rebind_preparation.py", "sha256": sha(script),
+                    "snapshot": snapshot.as_posix()},
+    }
+    receipt_ref = write(QA / ("p5t5-final-preparation-split." + stamp + ".json"), receipt)
+    markdown = QA / ("p5t5-final-preparation-split." + stamp + ".md")
+    assert not markdown.exists()
+    markdown.write_text(
+        "# P5-T5 prepared scope update\n\n"
+        f"Timestamp: {stamp}\nCommand: poetry run python SCRATCH/p5t5_rebind_preparation.py\nEXIT_CODE: 0\n"
+        "Output Summary: PREPARATION_READY; execution remains disabled. Seven changed Python paths and "
+        "three measured production modules, including unchanged legacy production.\n\n"
+        "The approved acceptance_render_text.py and test_acceptance_render_limits.py split is included "
+        "in the disabled template. Execution readers, four contracts and all retained proof are unchanged. "
+        "No moving renderer hashes or final node count have been assigned.\n\n"
+        "The repaired freeze, independent confirmation, checked commit/push and explicit release remain required.\n",
+        encoding="utf-8", newline="\n")
+    prior_staging = QA / "p5t5-final-preparation-staging.2026-10-20T12-41.json"
+    assert sha(prior_staging.read_bytes()) == "f2fd3b3231a01c49d67b069f41e1caa2b7318f67fdcb38a3d8ffa98dafc6421a"
+    staging = json.loads(prior_staging.read_bytes())["paths"]
+    staging.extend((new_template, receipt_ref, {"path": snapshot.as_posix(), "sha256": sha(script)},
+                    {"path": markdown.as_posix(), "sha256": sha(markdown.read_bytes())},
+                    {"path": prior_staging.as_posix(), "sha256": sha(prior_staging.read_bytes())}))
+    staging_ref = write(QA / ("p5t5-final-preparation-split-staging." + stamp + ".json"),
+                        {"Timestamp": stamp, "preparation": receipt_ref, "paths": staging})
+    print(json.dumps({"preparation": receipt_ref, "staging": staging_ref,
+                      "template": new_template, "execution_released": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()
