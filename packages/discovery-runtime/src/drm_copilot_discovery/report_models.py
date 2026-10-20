@@ -267,21 +267,14 @@ class DiscoveryReport:
     def to_markdown(self) -> str:
         """Return an exact JSON-backed Markdown view; no I/O or independent counts.
 
-        The fixed fence encloses pretty JSON, so embedded Markdown and escaped
-        newlines cannot close it. Raises ReportLimitError before rendering if
-        whitespace or ASCII escaping would exceed the independent output budget.
+        This thin wrapper delegates the immutable document and ParseLimits to
+        the shared renderer. Raises ReportLimitError before encoding when the
+        Markdown view exceeds its independent budget; no caller mutation occurs.
         """
-        # Closed artifact kinds select headings without inserting authored text.
-        heading = (
-            "parity"
-            if self.document.get("artifact_kind") == "parity-report"
-            else "coverage"
-        )
-        prefix, suffix = f"# Discovery {heading} report\n\n```json\n", "```\n"
-        budget = ReportBudget(self.limits, pretty=True)
-        budget.spend(len(prefix) + len(suffix))
-        budget.check(self.document)
-        return prefix + render_pretty_json(self.to_dict()) + suffix
+        # Lazy binding keeps report budgets independent of their formatting client.
+        from drm_copilot_discovery.report_rendering import render_report_markdown
+
+        return render_report_markdown(self.document, limits=self.limits)
 
 
 def _legacy_version(value: object) -> None:

@@ -7,7 +7,7 @@ from functools import partial
 from typing import TYPE_CHECKING, cast
 
 import pytest
-from drm_copilot_discovery import validation
+from drm_copilot_discovery import validation_operation
 from drm_copilot_discovery.agent_output import (
     required_output_digest,
     validate_agent_output,
@@ -160,7 +160,9 @@ def test_valid_failed_review_can_finish_without_authorizing_planning(
         # Every shared complete family must run once despite two report modes.
         for name in counts:
             scoped.setattr(
-                validation, name, partial(counted, getattr(validation, name), name)
+                validation_operation,
+                name,
+                partial(counted, getattr(validation_operation, name), name),
             )
         result = validate_snapshot(snapshot, mode="agent-output", invocation=invocation)
     assert set(counts.values()) == {1}

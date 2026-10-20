@@ -1,0 +1,59 @@
+{
+  "Timestamp": "2026-10-20T08-43",
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "c23b083c74d6d13f08d6d044f7572e7d9803401d277821f5808627de59ade222",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "tests/discovery_runtime/test_report_models.py": "84b47a419381a3be45484a81ba8b495e12872890425b50f08eb373e8585daaf3",
+    "tests/discovery_runtime/test_report_rendering.py": "c23b083c74d6d13f08d6d044f7572e7d9803401d277821f5808627de59ade222",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2"
+  },
+  "coverage": null,
+  "harness_sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba",
+  "label": "rendering1",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/discovery_runtime/test_report_models.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.6434644999972079,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-rendering1-format-2026-10-20T08-43.stderr.bin",
+          "readable": "would reformat tests\\discovery_runtime\\test_report_rendering.py\r\n\r\nOh no! \\U0001f4a5 \\U0001f494 \\U0001f4a5\r\n1 file would be reformatted, 4 files would be left unchanged.\r\n",
+          "sha256": "40c9e6bb083982dcbf799e922f8d44295735c8be484dc21fbfcdd0f947ccea01"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-rendering1-format-2026-10-20T08-43.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+    "tests/discovery_runtime/test_report_rendering.py",
+    "tests/discovery_runtime/test_report_models.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py"
+  ],
+  "status": "failed"
+}

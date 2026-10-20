@@ -1,0 +1,130 @@
+{
+  "Timestamp": "2026-10-20T08-23",
+  "basis": {
+    "approved_prerequisites": "execution_progress.p5t3_preparation.approved_prerequisites",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-preparation-delta.2026-10-20T06-55.json",
+    "sha256": "acd2a9745819fa65e35dea94ecebddb47d9c82928bf27bd58e142093a2d5ec9f"
+  },
+  "call_direction": [
+    "Public producer lazily calls validation.report_projection(kind=\"completion-report\"); it never assesses independently.",
+    "The operation evaluates the requested mode once, merges its trusted non-error input findings using the existing bounded collector, and calls completion_summary. That helper only projects the supplied tuple; it never calls validate_snapshot, report_projection, another producer or rule family.",
+    "Malformed input goes directly from actual validate_inputs findings to the same pure summary with structural_valid=false; no semantic operation is constructed.",
+    "completion_preflight reuses the accepted coverage_preflight captured-input resource bound, as parity_preflight already does. Budgeting is not coverage evaluation.",
+    "DiscoveryReport remains the bounded immutable carrier. report_rendering imports no validation/completion producer; it only formats the supplied JsonObject under ReportBudget."
+  ],
+  "envelope": {
+    "artifact_kind": "completion-report",
+    "completion": {
+      "assessment_state": "available | unavailable; structural_valid alone selects this label, not semantic success",
+      "blocking_findings": "ascending zero-based indices of error findings in envelope.findings",
+      "findings_complete": "false iff FINDINGS_LIMIT is present, otherwise true",
+      "mode_label": "closed map: structural -> Structural validation; discovery-complete -> Discovery completion; parity-complete -> Parity completion; planning -> Planning prerequisite",
+      "next_actions": "array of {action: str, finding_indices: list[int]}; one row per exact next_action string, sorted by action, with sorted unique indices",
+      "planning_prerequisite": "profile.completion_gates.planning_prerequisite only for available planning assessment; otherwise null",
+      "retained_finding_counts": "object with error, warning, info nonnegative integers counting only the retained tuple, including truncation marker",
+      "warning_findings": "ascending zero-based indices of warning findings in envelope.findings"
+    },
+    "counts": "sorted dict[str,int] of existing non-control/non-report artifact kinds when structural_valid; null when malformed/unavailable (never invented zero)",
+    "findings": "existing bounded, deduplicated, finding_key-ordered list of full Finding.to_dict objects, including trusted input warnings and FINDINGS_LIMIT",
+    "id": "caller identifier, default completion",
+    "input_sha256": "report_input_digest(snapshot)",
+    "mode": "one exact root mode: structural | discovery-complete | parity-complete | planning",
+    "schema_version": "2.0.0",
+    "validation_result": "fail iff retained selected-mode findings contain an error; malformed core always fail"
+  },
+  "finding_and_mode_rules": [
+    "Top-level findings is the single complete retained diagnostic source; index lists and actions do not duplicate/rewrite Finding payloads or infer new rules. Group action text by exact string, without trimming/casefolding that could merge different instructions. Indices retain all original codes, paths, pointers, related identities and severities.",
+    "No selected finding may disappear merely because an action is duplicated. Bound input work, grouping and retained output before allocation with ReportBudget; output exhaustion raises ReportLimitError, never a partial successful envelope. Truncated input remains fail through FINDINGS_LIMIT and findings_complete=false.",
+    "Stale/conflicting reference, incomplete artifact and pending scenario diagnostics come from existing selected-mode rules. Preserve unknown codes. No secondary code-to-readiness classifier is introduced.",
+    "A structural pass is labeled structural only. Planning resolves the existing configured prerequisite through evaluate; none still includes base safety checks. Do not evaluate unrelated completion modes merely to fill presentation fields.",
+    "Reject agent-output and unsupported modes at all public completion producer/planning boundaries. Completion does not issue output_valid, required-output grants or a host gate receipt.",
+    "No readiness field is emitted. True empty validated populations use existing empty counts/zero retained findings; unavailable artifact counts are null. Original diagnostic counts remain known even when semantic assessment is unavailable.",
+    "Completion warning preservation uses operation.input_findings only in completion projection; existing coverage/parity projection bytes remain unchanged where unaffected. Public validate_snapshot retains its existing aggregate input findings.",
+    "Derived report mismatch checks remain outside canonical core projection to avoid self-reference. Stale generated views can still block validate_snapshot/prospective publication; completion generation does not suppress or rewrite that gate."
+  ],
+  "implementation_released": false,
+  "legacy_adapter": [
+    "Retain the existing two-input CLI flags, validator injection seams, stdout/optional legacy output route, aggregate validation error behavior and exception propagation. This is explicitly legacy artifact compatibility, not a v2 graph-mode CLI (P6 owns service/CLI authority).",
+    "Runtime legacy_summary reuses accepted bounded coverage_report.build_coverage_rows and parity_report.build_parity_rows. Explicit v1 uses actual unit/row shapes; unversioned data remains compatibility-only; explicit v2 input is rejected at these helpers.",
+    "Legacy summary shape is coverage_ledger:{present:true,entry_count:len(coverage_rows)}, parity_matrix:{present:true,entry_count:len(parity_rows)}, validation_scope:\"legacy-artifact-compatibility-only\". Omit readiness, v2 schema_version, completion-report artifact_kind and completion gate status. The label does not assert injected validators performed real schema validation.",
+    "Legacy render_completion_report performs bounded deterministic pretty JSON only. The seven existing completion callers change authority assertions accordingly; four io tests retain legacy-only semantics. New v2 mode/publication tests call the runtime snapshot API."
+  ],
+  "malformed_core": [
+    "Retain original ordered input findings and next actions, validation_result=fail, counts=null, assessment_state=unavailable and planning_prerequisite=null. No semantic validator traversal or fabricated population/completion result.",
+    "This read-only diagnostic is renderable but cannot make malformed input valid, publish through structural mutation validation or authorize planning. SnapshotValidation still binds full snapshot.sha256; report envelope binds semantic report_input_digest."
+  ],
+  "owners": [
+    {
+      "name": "assessment_integration",
+      "owns": "Mechanical extraction, trusted warnings, mode dispatch and malformed diagnostic/recomputation equality; exact existing observer patch relocation.",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+        "tests/discovery_runtime/test_completion_projection.py",
+        "tests/discovery_runtime/test_parity_report_projection.py"
+      ]
+    },
+    {
+      "name": "completion_projection_and_planning",
+      "owns": "Pure summary/action grouping, preflight, public producer, exact report-only plan helper and bounded legacy pure helpers. Uses existing commit path in isolated in-memory tests.",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+        "tests/discovery_runtime/test_completion_report.py"
+      ]
+    },
+    {
+      "name": "rendering_and_legacy_adapter",
+      "owns": "Shared byte-preserving Markdown extraction/completion heading, thin compatibility CLI and dependent old callers.",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ]
+    }
+  ],
+  "performed": "Read existing preparation/approved prerequisite and shared model signatures; write only this contract artifact. No source/test edits, suites, new research, staging, Git or checkpoint changes.",
+  "proof_contract": [
+    "Three ownership lists are nonoverlapping. No worker changes another list or a predecessor helper without coordinator authorization. No source/test/script may exceed500 physical lines; obtain a cohesive split before exceeding it.",
+    "Retain exact unchanged-body proofs and accepted P5-T1/final accepted P5-T2 contracts. Keep mechanical relocation evidence separate from semantic warning/completion changes. No blanket predecessor rerun.",
+    "Focused new cases cover all four selected modes, agent-output rejection, warning-only pass, malformed diagnostics, truncation/error status, duplicate actions with retained target context, stale/conflicting/incomplete/pending findings, both views, safe replacement and forbidden authored writes.",
+    "Preserve Set D population from the prior delta (45 function definitions, not claimed executed case count), coverage/parity byte contracts and once-only assessment/carrier identity assertions. Native harness reuse requires a separate explicit release after static gates."
+  ],
+  "remaining_gate": "Accepted/pushed/remote-verified P5-T2 and coordinator implementation release; this artifact alone grants no execution authority.",
+  "rendering": [
+    "DiscoveryReport.to_json remains the existing canonical LF JSON. Markdown embeds the same detached fields and uses the fixed heading # Discovery completion report plus the existing JSON fence layout.",
+    "Shared Markdown extraction preserves exact coverage/parity heading/escaping/budget/newline bytes and existing fallback behavior for other already-supported kinds. Only completion receives its explicit new heading.",
+    "Neither renderer evaluates rules, changes status, adds findings or counts, resolves paths or performs I/O."
+  ],
+  "report_only_planning": [
+    "plan_completion_report accepts captured baseline and explicit caller-authenticated root grants; it does not mint grants, accept caller-rendered bytes or take analyst invocation context.",
+    "Rebuild one authoritative report from baseline.snapshot, then derive JSON and Markdown bytes. Require precisely the two matching kind/id/path grants for configured reports/completion-report.json and .md. Derive prior expected_sha256 from captured files, or null for absence. Call existing plan_mutation with those changes and no invocation.",
+    "Caller uses existing commit_mutation(plan, writer=trusted_writer, dry_run=...) unchanged. No direct write_report or new I/O adapter. Preserve exact identity/CAS, fresh capture, dry-run/no-write, identical-byte skipping and operational failure semantics.",
+    "An honest selected-mode failure report can publish only if the prospective graph is structurally valid. Malformed input and wrong/stale/grantless requests remain rejected. Never write authored source/evidence/contracts or treat the invalidation callback as new authority."
+  ],
+  "scope": "Unchanged P5-T3 plan; approved cohesive extraction, existing shared report models and root mutation APIs. No new validator, report schema or native authority.",
+  "sequence": [
+    "First mechanically move _Validation and its bounded _findings helper from validation.py to validation_operation.py. Preserve bodies, mode caching, source-completion reuse and complete_parity/complete_dimensions; retain public validation.py entrypoints and ValidationMode/SnapshotValidation types. Freeze mapped AST/body coverage proof before semantic edits.",
+    "Update only the existing once-only observer use-site in test_parity_report_projection.py. Keep observers of validation._schema_findings and public report_projection at their existing module.",
+    "Then add trusted input_findings storage and completion dispatch, shared pure summary projection and malformed-core completion diagnostics. Both validate_snapshot report recomputation and report_projection generation pass their actual validate_inputs result to the same operation; never accept caller-authored validation results.",
+    "Freeze the shared shape/signatures below before disjoint producer and rendering/adapter changes. Final composition gates bind the accepted P5-T2 candidate and all resulting bytes."
+  ],
+  "signatures": {
+    "completion_preflight": "completion_preflight(snapshot: DiscoverySnapshot) -> None",
+    "internal_operation": "_Validation(snapshot: DiscoverySnapshot, *, input_findings: tuple[Finding, ...] = ()) after the mechanical move; evaluate(mode: str) and report(kind/identifier/mode) retain existing contracts.",
+    "legacy_json": "render_completion_report(summary: dict[str, object]) -> str",
+    "legacy_summary": "build_completion_summary(coverage_artifact: dict[str, object], parity_artifact: dict[str, object]) -> dict[str, object]",
+    "planning": "plan_completion_report(baseline: CapturedWorkspace, *, mode: ValidationMode, grants: tuple[WriteGrant, ...], identifier: str = \"completion\") -> MutationPlan",
+    "producer": "build_completion_report(snapshot: DiscoverySnapshot, *, mode: ValidationMode, identifier: str = \"completion\") -> DiscoveryReport",
+    "shared_markdown": "render_report_markdown(document: JsonObject, *, limits: ParseLimits) -> str in report_rendering.py; DiscoveryReport.to_markdown delegates to it.",
+    "summary": "completion_summary(snapshot: DiscoverySnapshot, *, mode: ValidationMode, findings: tuple[Finding, ...], structural_valid: bool) -> JsonObject",
+    "unchanged_projection": "report_projection(snapshot: DiscoverySnapshot, *, kind: str, identifier: str, mode: ValidationMode) -> dict[str, object]",
+    "unchanged_validation": "validate_snapshot(snapshot: DiscoverySnapshot | None, *, mode: ValidationMode, invocation: InvocationContext | None = None) -> SnapshotValidation"
+  },
+  "state": "CONTRACT_READY",
+  "task": "P5-T3",
+  "task_accepted": false,
+  "unresolved_requirement_conflicts": []
+}
