@@ -1,0 +1,708 @@
+{
+  "Timestamp": "2026-10-20T17-00",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-normalize-views.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Exactly 43 readable Markdown views normalized after lossless archival; bounded whitespace checks pass and protected source/raw evidence is unchanged.",
+  "route": "gateway_doctor_p6t1_evidence_normalization_20261020",
+  "original_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-preservation-staging.2026-10-20T16-48.json",
+    "sha256": "04d5cbbbe2ceebd52596601c1362f28884ececd71dad72c2c7cf8f60083592b9"
+  },
+  "original_manifest_stage_path_count": 318,
+  "source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+    "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1"
+  },
+  "unchanged_source_test_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+    "tests/discovery_runtime/test_gateway.py": "3aa18d3bebef593ff3942a8d0154194e7bec045ab8b49aba26c41e296fdb77b5",
+    "tests/discovery_runtime/test_gateway_local.py": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+    "tests/discovery_runtime/test_doctor.py": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+    "tests/discovery_runtime/gateway_test_support.py": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3"
+  },
+  "unchanged_raw_sidecar_hashes": {
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.raw.json": "47e0b9fd5ce499411271f1efe8a73122c4a656eeb34f51da6856fdac428e6b93",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.raw.json": "d9b067b52b7cbd79492aea938d755812c1a57372949f7ee6f84ff1dbd993cca0",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.raw.json": "77effb3bba8ba531cebd4afea386a218c193211b38fe4b37f90701d5c0677281",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.raw.json": "f4b8f63fa5a9e74e449a11fd2902ad916ad5bae041a155cda58228c4fd0beca8",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.raw.json": "e0e01d52e53e5a38c3ec45fd54806906eb0ca17d1591636b204428c2b9a0dc8b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.raw.json": "8eace15f2c6dd71a6cd21ccf4004fa395ee25fabd02b6a63c89a511bbfc74ff7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.raw.json": "cc5098e9d047f065a31cdb683e39356364ada275daaa1ba70e423c4df23c77dd",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.raw.json": "cc5098e9d047f065a31cdb683e39356364ada275daaa1ba70e423c4df23c77dd",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.raw.json": "12146cf8ca6210d9ff0f40ba7645402625224ae14ab3e9f613b09f424daf7e7b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.raw.json": "6b835339adc426d4519f21680384ab2f135d069977c53e1a673831d3af2e56dc",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.raw.json": "c6d70a2e4111c1e645448c46aa784b03c48d9ce9d43a5df947c4707c31ee36de",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.raw.json": "3011215aef3321ae2f8ffceb1a12500a58411cf6cf0cf15b6ae94b8799e30a90",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.raw.json": "2df2e1f6d75d7477d19beb5697cc405df1fc6d068c47fb197e0433f87265c0b1",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.raw.json": "f67e5d9539b649a8ead3e1ea2e6c2180f8ebee2f923f1fa7171d9548e3b46fb6",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.raw.json": "fbe00126a3dc2a14b4f04f7679dd760908813a62d42da7b4c872dc043f97e3f2",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.raw.json": "ab47222605a583047c5d06b89faa3c53cf33986894db75f8edce9ee47d80c518",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.raw.json": "15f958151fce43a99a1ba470215f2e1faefe4234f63f1f65104b2b0d48c673ef",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.raw.json": "a7d992c4989535ca07d40dd1a415f7040ba1e06fd781b4ce0156fc161b0f1608",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.raw.json": "0e5f8c2425b4064379d7449be6f29202a0c25835b0f00d48c1276ba89ba4d439",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.raw.json": "5feffe51bf55a94943c4b8d7cd13d1a905c00d27ee0af216eecb49ac9e20e366",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.raw.json": "1a6baa81d2c60cb72b5ce2e60a9f90db21a51b8e0e2491acc9afb0ca8f41ee62",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.raw.json": "b5e5b49de0ad387f15d6fecb878bdb3825e72a768bd490109f33832f780945d4",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.raw.json": "0d982d315105e48015f75009ea536595104dd2981acdbec93b50b91e96a675ff",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.raw.json": "9bc35748e18cd6a4f2b04863323e054e9d40767199888ce50654c2a0a6af62bd",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.raw.json": "0e6128c88aea01da05ced3ffc89ca7af6ab36f7f6534d15f298c109b83cffa1c",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.raw.json": "823d36f5615f6dc3b7e203b3fc5953cced59af426ff4eeddebb63c8ccd921012",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.raw.json": "58547e7e983e0cff39b5cf7596c5a29aeed89549228a07d8960ee6a6fbc110e5",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.raw.json": "81f773b872bd52e0b00de0b26876514595749053b92b0f1622a30d13de9ecc5e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.raw.json": "db588e3108d437893a4b5342265d5a868c7439cce30f4a3670fdd3ccb7d78c22",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.raw.json": "f1f7cdfbc5897b51a2ee843bc974f124dd1fbe1884cf746542f2a1555fabbdf6",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.raw.json": "1b1968b1f57a228d73075fddd98e3c251021a4c2a034aef95dc7ebd01d73953c",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.raw.json": "b6d73c709f57bf67aa00256879edba3d5dc725dffb2f7a02c61beb14db4516f4",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.raw.json": "691215d6350eb9c2f3f710edae1550528217e1c8f929f7efa45dfee2c609deb2",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.raw.json": "82f071533c0391337e968010fb5b53a70599d0137499152edb09edd4dad75fbf",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.raw.json": "5e71a218a37c512336f05ccdc50d35ec8b580cf27c310b11650506dd3fcf2b1e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.raw.json": "6e8c3d619c7c5b0f4c0af74764d8a157d9614b44517f16791d839b3a080028ff",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.raw.json": "468f2198cbca3abfec39ef742f3e9dda570bc6be9017c86d5e51b087cb42815f",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.raw.json": "27cb1c812529372ac167072502fb6c26382d8d0360e4e58226eec1f36896c996",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.raw.json": "0dc9abf4d60e94670d3dc1f9daeee306c5fd6526bc1bac3d1b026dffd3358337",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.raw.json": "40da3cbd370a5933020f20e2092a0c9a588681182f0607ffcb6cf5b0febd9aca",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.raw.json": "9fd82c5b6586aaca2a9a33147399e5cf3cf9b1f6193f746a24dadccb59792a34",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.raw.json": "89add53248f865df507f3c8147439bb5647dd573e1db19ff0677093c8703ce0d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.raw.json": "510b6a8e983ddd09044e24ca7b39c2c06e1d8f3cf63b03a4b4b12c785d06a99d"
+  },
+  "original_diagnostic": {
+    "path": "artifacts/p6t1-preservation-whitespace.raw.txt",
+    "sha256": "b8efa72062d51babdd4b4cab728236505e9b0c54e3b3b5d51a6c12a52739c1c1"
+  },
+  "original_markdown_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json",
+    "sha256": "8c92fae965783f63ccc81c2b07fe04a2351ea50ab343636bf6fdfb7e26ba88f1"
+  },
+  "transform": [
+    "Decode as UTF-8 only to validate encoding; operate on bytes without changing any non-whitespace byte.",
+    "Python re.sub(rb'\\r+\\n|\\r', b'\\n', original): CRCRLF/CRLF/lone CR become LF.",
+    "Python re.sub(rb'[ \\t]+(?=\\n|$)', b'', result): remove only terminal horizontal padding.",
+    "Write exact normalized bytes without platform newline conversion."
+  ],
+  "reconstruction": "Each original is gzip-decompress(base64-decode(archive.entries[path].data)); its exact SHA/byte length are retained. Applying the documented transform reconstructs the current view and current hash.",
+  "claim_preservation": "No timestamps, command text, exit status, test claims or non-whitespace output content were rewritten. Original raw JSON/output archives and historical freeze/inventory manifests retain their original hashes.",
+  "read_only_equivalent_check": {
+    "scope": "The 43 normalized byte streams; no Git command or index mutation.",
+    "categories": "No CR bytes, trailing SP/TAB, space-before-tab in indentation, or blank line at EOF.",
+    "all_zero": true
+  },
+  "modified_paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.md",
+      "original_sha256": "c3e22bf0b396fe0af514aaca3893d0a8e917a0e1b8749c77d29ee4ff6fce2208",
+      "original_bytes": 661,
+      "current_sha256": "b943f1629c894a15f1259278d502d18e830478ddccb486de44bba84792a28bf6",
+      "current_bytes": 649,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.md",
+      "original_sha256": "6c3d01332e0ba8f3c28ae82264c31018d940432846a1532ec6b08d87734160da",
+      "original_bytes": 2465,
+      "current_sha256": "23bb203f602259e673b2e8561ee1b0f53f87d9ddf177ce39bd79231f65e12a1e",
+      "current_bytes": 2405,
+      "original_cr_bytes": 60,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.md",
+      "original_sha256": "5d43c7b68eed599de9c7e54fffbd189d488f12599035e2888b5dae92d6433213",
+      "original_bytes": 793,
+      "current_sha256": "ba94979586487e2a593b4bafb6e81d4b149739723ade5a0fbef3158d587e9971",
+      "current_bytes": 778,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-black.2026-10-20T16-07.md",
+      "original_sha256": "f2fd63f02cc238c5a845aed15091bbf2a70b8741e53d676a57432e5ac6559ecb",
+      "original_bytes": 306,
+      "current_sha256": "d142ca264604a1beee4466e3210494b289988978df1c2a450b87f3438ff5efd4",
+      "current_bytes": 294,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-doctor-repair-types.2026-10-20T16-07.md",
+      "original_sha256": "f4218cb09f946d4bd52d9ae4ae8b1a4544835f0d88cb5d0abb0804b95dedfd62",
+      "original_bytes": 439,
+      "current_sha256": "f43c6e774a979b3abc310fa5265c47bb1d4ebbdfd12bcc2fb1a2926cad0107bb",
+      "current_bytes": 424,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-first-black.2026-10-20T14-54.md",
+      "original_sha256": "c1c81c486f1850e68bec5d54c6edf36456bf7afb810ff3d886ed0f1f7df8a8d2",
+      "original_bytes": 893,
+      "current_sha256": "1963e6d442c3e79e4e17fe35868b2814cba1965bcb50227642f630f0a350b5a3",
+      "current_bytes": 869,
+      "original_cr_bytes": 24,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop1-black.2026-10-20T14-55.md",
+      "original_sha256": "a3697241a8bfad5289d92fdd36a86622a5fcd4ecd371d40b153a42fcc25c5747",
+      "original_bytes": 558,
+      "current_sha256": "ba61533a267bb7c48aeb0a701c1c08f59934d11aa87c3c63583e5b9e836e6722",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-black.2026-10-20T14-55.md",
+      "original_sha256": "5cb5940178f79167c2b619971b34462a93291425107ec860c1b64c81e0cc0cba",
+      "original_bytes": 558,
+      "current_sha256": "f2f6dab3060c41c30bd2f29dbe1099cf57816a3d962c07bb98ca3d67f5adfbb2",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop2-types.2026-10-20T14-55.md",
+      "original_sha256": "343365b5fefb00be2b78b478c699b3b39f34f3c9a2f06614a4f60c17a9600333",
+      "original_bytes": 5359,
+      "current_sha256": "09f3b631e1fcee2f0de07d5ad5a198a852ec9ec6c04291490cbc5a3dbb35f0ed",
+      "current_bytes": 5304,
+      "original_cr_bytes": 55,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black-format.2026-10-20T15-02.md",
+      "original_sha256": "f187dcabf383697d1631966ce9ee3dbfbbaf615ace51c02fa3210f39af59f78d",
+      "original_bytes": 686,
+      "current_sha256": "b35c8d42b09b09d60a26781f03888c4e289d9f720dbadf3a4293f42faa876c42",
+      "current_bytes": 668,
+      "original_cr_bytes": 18,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-black.2026-10-20T15-03.md",
+      "original_sha256": "51a3b54774c30d889f5fed462e04e69dd12c5269a04f2504563851209a57e699",
+      "original_bytes": 558,
+      "current_sha256": "c7c30d880f1757fb8e4d1af76769768e57cae7f4d0a1aa00289d65adc973baee",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.md",
+      "original_sha256": "42d10c5a762f2b27bbe3af848e98e2ad8a5a64c6f4d959f051384981c0f9a098",
+      "original_bytes": 31931,
+      "current_sha256": "13eeafa06e8e9b446fefe32a16449e312e58e00f4e30ebaa2a1279b35206cd40",
+      "current_bytes": 30743,
+      "original_cr_bytes": 1120,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop3-types.2026-10-20T15-03.md",
+      "original_sha256": "2c7bd57136eef0aed77f479584cb8778692ad367094da0361025a456a902b781",
+      "original_bytes": 690,
+      "current_sha256": "b5979483d21f8266139fd508e7a6665e91d1ced992d38e737476e74d2fbed8a9",
+      "current_bytes": 675,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black-format.2026-10-20T15-16.md",
+      "original_sha256": "7dd8baff4e8ad45db7ba135f20686739c04db7c1da3d72f2e210a0d6a71df4fe",
+      "original_bytes": 899,
+      "current_sha256": "f5b33c5e7a7d900c698520406c48ef22c09cd45931ca16d363fe95dcb33157c7",
+      "current_bytes": 875,
+      "original_cr_bytes": 24,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop4-black.2026-10-20T15-16.md",
+      "original_sha256": "ece026357b8b45c51d30388d99db0001b453809d645955763fbd69496ef70f49",
+      "original_bytes": 558,
+      "current_sha256": "86c4bc2e05f68e60b4484d1c03a834ab031abf3258d0542dd1ef2fd9759bd1d0",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-black.2026-10-20T15-17.md",
+      "original_sha256": "4a01d1c9d9383d6c19571459cfc2fab5f9a96989de2953bc5cb441669ba9d11a",
+      "original_bytes": 558,
+      "current_sha256": "d9860ad0609f2c7d14edadb12370611a95885db7d7ca8a7f3bd8ad63342d2056",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop5-types.2026-10-20T15-17.md",
+      "original_sha256": "7da92f78b8d69e30bef6bc585295b948574a888acbf617a71c52c4cb7cdf6234",
+      "original_bytes": 690,
+      "current_sha256": "98e229fcdba99d141f02a4c30aedeb8d93fac552c23d59896e0111168150e4f1",
+      "current_bytes": 675,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-black.2026-10-20T15-23.md",
+      "original_sha256": "086c57d33a0b3e1ae6839298b429f2b7beea6b8dab9c708224a86f5b022bcf15",
+      "original_bytes": 558,
+      "current_sha256": "3674674cfa284036f4b3b9f60cccd2413b152f1c3e4356d566137795d5fa160b",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop6-types.2026-10-20T15-23.md",
+      "original_sha256": "45af11faefb100894ba7331c3b0c6f3ce5c22eb555d3056450c66d56241994fe",
+      "original_bytes": 690,
+      "current_sha256": "b993a713042f08bc5748918b7ddb8605dbae1e84040301953ed513a72d4e0989",
+      "current_bytes": 675,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop7-black-format.2026-10-20T15-28.md",
+      "original_sha256": "098508a6486b223681b5c426d4d7123c8debbeb0b14b4b12cb6126eab46b22e6",
+      "original_bytes": 625,
+      "current_sha256": "4bb1cb26fe290f70c60267345b2053399b547ba862c6fa18e6110590fe0882ca",
+      "current_bytes": 609,
+      "original_cr_bytes": 16,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.md",
+      "original_sha256": "7c98c5fffa3366f851cd0d8e31fc056951004043e901e2c66b520e35ec8f5425",
+      "original_bytes": 558,
+      "current_sha256": "bfa0eb790cf043132f8acadf7c0ed538dfd1119a96c6ebefdfef2720e03da311",
+      "current_bytes": 546,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.md",
+      "original_sha256": "09d7ff97c994d97db44d0e1df4b0ebb646b2f6405f49bae0450ca523ae351fa1",
+      "original_bytes": 2320,
+      "current_sha256": "d0f6f479f69895584a34bce9f901f0bef2da3e98ea15a1f1d8ef51ce630bf368",
+      "current_bytes": 2262,
+      "original_cr_bytes": 58,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.md",
+      "original_sha256": "9caed1e7eefe3e2aed99d22f3158398406a70e41c604b5e7751fd0815894b477",
+      "original_bytes": 690,
+      "current_sha256": "ee1b1147f8f1f5c196e85126b4b621b556e94b18b6534c91befd304fbf19d9aa",
+      "current_bytes": 675,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair1-black.2026-10-20T16-11.md",
+      "original_sha256": "286ff96c3c67d547de0835a1b8973f5f7a38e052775245b9bb6010ec5ddb56ea",
+      "original_bytes": 845,
+      "current_sha256": "8e17ce28fdb48be7dd2fc688ece7de257c878ac33d9de81b733b614755dfb016",
+      "current_bytes": 825,
+      "original_cr_bytes": 20,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair2-black.2026-10-20T16-11.md",
+      "original_sha256": "2cf6eeafcf0d0b3341c308f0645d0495a5cf49088be1314a0d2259bf2a4836dc",
+      "original_bytes": 659,
+      "current_sha256": "252d76227f48d260fcbee46d23933da1361cc56e8d5a41f4363ca5f2656fa4c8",
+      "current_bytes": 647,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-black.2026-10-20T16-13.md",
+      "original_sha256": "c42294447b226c71788840a13d5339c65fe4ec346f3aad00e40c97972b6f07fb",
+      "original_bytes": 659,
+      "current_sha256": "77b9f254df7592e44b683780b1557ad2a705733cf694e41dfd17610da74340e8",
+      "current_bytes": 647,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair3-types.2026-10-20T16-13.md",
+      "original_sha256": "928b6cf6945630b5a2d1e4b8795d93e758a834cab9fd0d4dedc1cf04c89dc72f",
+      "original_bytes": 1868,
+      "current_sha256": "f4060b30bd269fc1b57184acb4cb618d391b26345df11ddddab41bf4358efc3b",
+      "current_bytes": 1843,
+      "original_cr_bytes": 25,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-black.2026-10-20T16-14.md",
+      "original_sha256": "34afd9467d4a92ab16d38dc8ddcd2fa4b673679c2de83e968e6bfa671e7d2d04",
+      "original_bytes": 758,
+      "current_sha256": "947631f82029b17efa2348a92995f32664199e2bd591669d1bae4d89d4361582",
+      "current_bytes": 742,
+      "original_cr_bytes": 16,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair4-format.2026-10-20T16-14.md",
+      "original_sha256": "696a42b3c3d80b4ead88b9983ffadc0fb7e3774b30406be656adcf31f29b4a65",
+      "original_bytes": 337,
+      "current_sha256": "ea4cc09405e2773d8e9edf60c1613277ac582cd52cc5f3d998846f989fad3107",
+      "current_bytes": 321,
+      "original_cr_bytes": 16,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-black.2026-10-20T16-14.md",
+      "original_sha256": "88e712de05d093a3d5350da26d19f4d21db956c87042be95133cb500d0df1951",
+      "original_bytes": 659,
+      "current_sha256": "c7aab8f7641b078fef713a4b00a540ca7f69673509f630fb4faaf1f1213e7ba0",
+      "current_bytes": 647,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-prechecks.2026-10-20T16-14.md",
+      "original_sha256": "8aac31ecb2235e5807703bf410ab8f8bd189abf7c1cca7ddd08ef730f667ab87",
+      "original_bytes": 8221,
+      "current_sha256": "5f6f39ed37880ca776ac3ad4ed8c67c4fca2b3c1057231d6de8571cc5c11a8ec",
+      "current_bytes": 7834,
+      "original_cr_bytes": 330,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-probes.2026-10-20T16-14.md",
+      "original_sha256": "70cbd760679014ba865387bb1a9320fa1aa5cec08f01329dc611d2694cc6cf46",
+      "original_bytes": 5139,
+      "current_sha256": "ec41cbc6661736c0b4b005006a95d9e93db1babaa4e854e414b818b0bad01107",
+      "current_bytes": 4933,
+      "original_cr_bytes": 206,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair5-types.2026-10-20T16-14.md",
+      "original_sha256": "fac2c4c2ddde62538bd1151b25a608d8222a7537ebbb5d3bfc13788170b962d5",
+      "original_bytes": 791,
+      "current_sha256": "60d233d27a361820faa1af2199fc9b83d86249568a71219105ddf18817c0d8ae",
+      "current_bytes": 776,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-black.2026-10-20T16-19.md",
+      "original_sha256": "aa1a725b4e2e406a2497b68f4913f9386f58c5702da35caa15dabeebbb61c28f",
+      "original_bytes": 659,
+      "current_sha256": "34932f079c65ea6279799e74225091a5f33dace7f58617540b7848d26c3278fa",
+      "current_bytes": 647,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-prechecks.2026-10-20T16-19.md",
+      "original_sha256": "d7ccf969c72ed98f70e6050d7d4882f2f61f8b6b9133d2c2e8d8c8852174134a",
+      "original_bytes": 4716,
+      "current_sha256": "24c4c6c8b8680ddea273499f2e49af7dc4e48cb2c3da2402177c8127b87fa716",
+      "current_bytes": 4489,
+      "original_cr_bytes": 194,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-probes.2026-10-20T16-19.md",
+      "original_sha256": "52f4d6c6f4271fc7dd50069815a9e277b2d4750992cdcfc8b3d22facd03a2713",
+      "original_bytes": 5139,
+      "current_sha256": "c663d150eeafa3dec4ea8ba4b161bfd303d6be5a3985f5d6a8ed536c164b9337",
+      "current_bytes": 4933,
+      "original_cr_bytes": 206,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair6-types.2026-10-20T16-19.md",
+      "original_sha256": "b55c0b2eb6f671c1b7033dee4604ccf658f887fdfffd89132c1f31d6a918db2c",
+      "original_bytes": 791,
+      "current_sha256": "d0fb97a193cfe16353aeb1e85a61c3df223bf9a76c9fd4f20175022ed2a226ad",
+      "current_bytes": 776,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-black.2026-10-20T16-19.md",
+      "original_sha256": "2dcc14a10d058a56484dd0b4e6477916f9ec87b7d032f06a36b89080c30bac77",
+      "original_bytes": 659,
+      "current_sha256": "bfd54d61970ad3312e82994af0b920d6ac5b48489eb2560fa4364e27e85b7ad6",
+      "current_bytes": 647,
+      "original_cr_bytes": 12,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-prechecks.2026-10-20T16-20.md",
+      "original_sha256": "1cb9e87c3d781f9998272e895883938f6cbe9783d2a5790d6b04f8a4df03ad67",
+      "original_bytes": 659,
+      "current_sha256": "e02765f5178d6065dae9262ce8d1bcf44312967a68d105b90697e377b9e681b7",
+      "current_bytes": 631,
+      "original_cr_bytes": 28,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.md",
+      "original_sha256": "89b46eb25c36ea919b1addbf3354349906f99d5ea5f50d99a3ff99a97cd99b6c",
+      "original_bytes": 5139,
+      "current_sha256": "1a67e1908fc24da81d4dd558433e9950729103379f4578e475c798989a04676d",
+      "current_bytes": 4933,
+      "original_cr_bytes": 206,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-tests.2026-10-20T16-22.md",
+      "original_sha256": "8b4a1093991a04c2351eb79de83f15401ce6c8a10e700fff26ef4f3d7c182a21",
+      "original_bytes": 2459,
+      "current_sha256": "e28d5921d8d39bc7deb1226becd99b25d7c8428c4b5a3a1a7c757ff8ffdb696a",
+      "current_bytes": 2399,
+      "original_cr_bytes": 60,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-types.2026-10-20T16-20.md",
+      "original_sha256": "435095f5701bd20d9f1339f80d3898cb3e4b36e8f67a966e3ddaea21577b264a",
+      "original_bytes": 791,
+      "current_sha256": "be010a833f649ee1c05c5c3d31082da9c6fc6a84205b8d28ad51018bb3ed9ffc",
+      "current_bytes": 776,
+      "original_cr_bytes": 15,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.md",
+      "original_sha256": "e2409e2d647cc15daa52bc2be0eac3ae541c2c839e9430c0a28cde2198e30be9",
+      "original_bytes": 1052,
+      "current_sha256": "bb0b40dc2d32e8b7eb3fe84657f0c4e4aba7470e7ace81e463e92035b86978a9",
+      "current_bytes": 1016,
+      "original_cr_bytes": 36,
+      "whitespace_check": {
+        "carriage_return_bytes": 0,
+        "trailing_horizontal_whitespace_lines": 0,
+        "space_before_tab_in_indent_lines": 0,
+        "blank_line_at_end": 0
+      }
+    }
+  ],
+  "new_artifacts_except_self": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-readable-originals.2026-10-20T17-00.json",
+      "sha256": "8c92fae965783f63ccc81c2b07fe04a2351ea50ab343636bf6fdfb7e26ba88f1"
+    }
+  ],
+  "manifest_includes_itself": false,
+  "self_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-readable-normalization.2026-10-20T17-00.json",
+    "qualification": "This qualification is an additional staged path; its SHA is emitted after writing and supplied to the independent reviewer. Neither new manifest embeds its own hash."
+  },
+  "scope_limits": "Evidence presentation only; no source/test/raw-output/index/checkpoint changes, test execution, expanded review or task acceptance."
+}

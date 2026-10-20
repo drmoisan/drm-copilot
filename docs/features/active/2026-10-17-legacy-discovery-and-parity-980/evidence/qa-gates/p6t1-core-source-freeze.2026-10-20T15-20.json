@@ -1,0 +1,59 @@
+{
+  "task": "P6-T1",
+  "status": "SOURCE_FROZEN_FOR_BOUNDED_REVIEW",
+  "written_utc": "2026-10-20T15:20:08.404538+00:00",
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "948ad510bf5a36337db3d23e5b78af76b100acfdcc0d58779dd1b49066710238",
+      "lines": 294
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "sha256": "4a947f198db4fd20683f9713c165a5537225a197e992a9841969290dc2dfee74",
+      "lines": 472
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "lines": 278
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "lines": 217
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+      "lines": 246
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "lines": 337
+    }
+  ],
+  "static_receipts": [
+    {
+      "path": "evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+      "sha256": "dd2e43675c1229259e945ea74a9549a4584bbe141a26230b3d5b5bf55335e049"
+    },
+    {
+      "path": "evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+      "sha256": "4c8b64719158414b7e60777a9f4a5dc5d12d014be08e438983c70dd7b94904e7"
+    },
+    {
+      "path": "evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+      "sha256": "ee4d394410c914f7fbe15ac54de372d2be77582b912fc57bf8d34bb9a0d18003"
+    }
+  ],
+  "baseline": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+  "contract": "evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+  "tests": "Moving tests excluded; no behavior claimed. Repaired shared source binding remains a prerequisite.",
+  "qualifications": [
+    "Authenticated local-user exact grants derived only from bounded existing changes; nonempty grants must match.",
+    "Pure index/proposal view excludes REPORT_KINDS only; publication uses complete original capture.",
+    "Actual bootstrap directory effects are explicit counters/findings; only real file digests become artifact rows."
+  ]
+}

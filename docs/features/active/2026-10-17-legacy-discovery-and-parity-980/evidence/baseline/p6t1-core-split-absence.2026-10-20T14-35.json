@@ -1,0 +1,16 @@
+{
+  "Timestamp": "2026-10-20T14-35",
+  "status": "ABSENCE_CONFIRMED_BEFORE_CREATION",
+  "route": "inventory_analyzers_p6t1_core_service_20261020 / S5_P6T1_core_service",
+  "baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+  },
+  "approved_new_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "tests/discovery_runtime/test_service_publication.py"
+  ],
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "qualification": "Only the approved three-path absence supplement. Existing service/operations/test_service baseline is reused. Gateway/doctor transferred; no writes by this owner."
+}

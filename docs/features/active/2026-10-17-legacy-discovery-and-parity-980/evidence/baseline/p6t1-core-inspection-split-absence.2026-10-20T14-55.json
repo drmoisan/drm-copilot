@@ -1,0 +1,16 @@
+{
+  "Timestamp": "2026-10-20T14-55",
+  "task": "P6-T1",
+  "scope": "Approved cohesive split only; no semantic expansion",
+  "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+  "absent": true,
+  "trigger": {
+    "source": "R/service.py",
+    "sha256": "996e195b941e3ae84ba8b00c09cdcf1b6d7b4d835945074678b450cc24430fbb",
+    "formatted_lines": 516
+  },
+  "shared_baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+  }
+}

@@ -1,0 +1,1010 @@
+{
+  "task": "P6-T1",
+  "Timestamp": "2026-10-20T16-34",
+  "Command": "Bind existing frozen core WIP files and retained evidence only",
+  "EXIT_CODE": 0,
+  "status": "preservation-only; core verification and full coverage pending",
+  "source_test_count": 9,
+  "source_test_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/discovery_runtime/test_service_publication.py": "bf5b712119e569acb8b90c329a7f0e62bdc7f7449bcfeb9e0ba74963bc7928d0",
+    "tests/discovery_runtime/test_service_boundaries.py": "380bb0bef28e759aac7929a61a5467ce1bda51e9cbc5cb5ff7e6990d183c4c89"
+  },
+  "timeout": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+    "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653",
+    "bytes": 47888
+  },
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-timeout-diagnosis.2026-10-20T16-34.json",
+    "sha256": "15bbbff7bfad0bc219fb7e05aa1e21bf49bc5f20bdce80000c426c57e3f3de3a",
+    "bytes": 11564
+  },
+  "review_reference": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+    "sha256": "0691f8816124bb027470a9235dc814bfd8c682d60cd1f56a4962108ade0bb368",
+    "bytes": 8862
+  },
+  "original_source_probe_reference": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-probe.2026-10-20T15-39.json",
+    "sha256": "e6edb4e40f1018ffd47171799d8c29a0e11d42f9a1299a9a2e0aa2026e9977de",
+    "bytes": 43248
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-bootstrap-split-absence.2026-10-20T15-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-boundary-test-split-absence.2026-10-20T15-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-inspection-split-absence.2026-10-20T14-55.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-split-absence.2026-10-20T14-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-original-tests-reconstructed.2026-10-20T16-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-source-freeze.2026-10-20T15-20.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-timeout-diagnosis.2026-10-20T16-34.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff-raw.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff-raw.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff-raw.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff-raw.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff-raw.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black-raw.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks-raw.2026-10-20T15-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff-raw.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests-raw.2026-10-20T15-54.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff-raw.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks-raw.2026-10-20T16-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff-raw.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck-raw.2026-10-20T16-11.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection-raw.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff-raw.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests-raw.2026-10-20T16-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-originals.2026-10-20T16-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+    "tests/discovery_runtime/test_service.py",
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "tests/discovery_runtime/test_service_publication.py"
+  ],
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-bootstrap-split-absence.2026-10-20T15-06.json",
+      "sha256": "554860df8dde6311953117a4339eeefa5865fb01bcfa35f458d2193d90c7c542",
+      "bytes": 829
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-boundary-test-split-absence.2026-10-20T15-18.json",
+      "sha256": "cc2fdbe370b9c85eca2a78155ffbb1a3c8ac9154c3cb0944b9d107b4f00d1439",
+      "bytes": 470
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-inspection-split-absence.2026-10-20T14-55.json",
+      "sha256": "d0af236b851167295baf9d6b161721633efde6b01468043d4795191459a49bb6",
+      "bytes": 573
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-core-split-absence.2026-10-20T14-35.json",
+      "sha256": "3f2baf9985c6a161ad732f1eae317517103fefa23304d0141459124fa452dd30",
+      "bytes": 871
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575",
+      "bytes": 34097
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.md",
+      "sha256": "fdc8ce7f9b45acf8fc0df0c193908001b09587b9f1130d3a5d503f7b7189677a",
+      "bytes": 6016
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-original-tests-reconstructed.2026-10-20T16-02.json",
+      "sha256": "16956928b5d15f378318768d05d908f89dfc25ddba4639198c8ac3b31bf2c0ef",
+      "bytes": 21902
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-source-freeze.2026-10-20T15-20.json",
+      "sha256": "2daa4d244d233ef48280461dd1bbf8821ce252e3fa61c524cd58a3d65bd78985",
+      "bytes": 2632
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-timeout-diagnosis.2026-10-20T16-34.json",
+      "sha256": "15bbbff7bfad0bc219fb7e05aa1e21bf49bc5f20bdce80000c426c57e3f3de3a",
+      "bytes": 11564
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black-raw.2026-10-20T15-31.json",
+      "sha256": "c0bb7b583ac4f1e9fa85039fffee68089577990a1c410b9901c3a7cd563011dd",
+      "bytes": 4690
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.json",
+      "sha256": "280852bef695e5920692caaed11d32a84ea788136b7fa2cc6705b6c87ed3aaf4",
+      "bytes": 13223
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-boundary-tests-format-black.2026-10-20T15-31.md",
+      "sha256": "daf693aabb8753afa27617d33e6c0f0885b6892382e9156263695614694d4e93",
+      "bytes": 921
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix-raw.2026-10-20T15-13.json",
+      "sha256": "4b8235eb77cc5919a825103f8f5b5df184a5d533a5dd986d23c006679357773c",
+      "bytes": 4698
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.json",
+      "sha256": "2104501370bdcf1e598113a98123b2f52943042ddb31f831a1c3792a2650929b",
+      "bytes": 12334
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction-lintfix-ruff-fix.2026-10-20T15-13.md",
+      "sha256": "fb72400f532a4014c3a386c3e64403554485a6238970f0236cb132032104f387",
+      "bytes": 1028
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black-raw.2026-10-20T15-15.json",
+      "sha256": "05f16c8d612bb64969765d2bb4b6fd52990a839d03879228a7dcc0da2529dd04",
+      "bytes": 4646
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.json",
+      "sha256": "90f858e2231cc819cd372de6ca847f25ddb90e6cd82cc3d2f1466425b0578f51",
+      "bytes": 12107
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction2-format-black.2026-10-20T15-15.md",
+      "sha256": "52d8c60ff65bbd0fe86f3c0b6dfc6af412d91818ca91cf68a0e5b5ec0dac7c96",
+      "bytes": 826
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black-raw.2026-10-20T15-19.json",
+      "sha256": "e9fac7c1f06a1af80de6c21c28cb6e93a18b557ca1baea34a7737c34c836b285",
+      "bytes": 4654
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.json",
+      "sha256": "a364d18119c802f1e28fde46ae6bd785b2fc05714b781f1cd084da7106255813",
+      "bytes": 12117
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-correction3-format-black.2026-10-20T15-19.md",
+      "sha256": "7639f234c239f3c5b085fc038ca7fe6f9e6f5441b2b0fc6841318a308a36c36d",
+      "bytes": 837
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black-raw.2026-10-20T15-13.json",
+      "sha256": "f837ee760088209ad77785686cd2405b9fed0eb2bd60bb9cdd89ff93b7be0a97",
+      "bytes": 4517
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.json",
+      "sha256": "38f84f539fda1ea576452ed29dfe28e0739299e0f297066bf6944918e01fa98d",
+      "bytes": 12023
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-black.2026-10-20T15-13.md",
+      "sha256": "8d6b892e148b7abefcdc411dc10a0ce7f504b44888c89b19aa6fbddfcba42619",
+      "bytes": 729
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff-raw.2026-10-20T15-13.json",
+      "sha256": "495ef825a0deb4eee6181e2ae8b5c2fc407204e6b573702301a7eac481e82635",
+      "bytes": 8324
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.json",
+      "sha256": "ead8490c3bfe312f527e804bbdd9b2fc545519219d46d81ef296770cb7c26d90",
+      "bytes": 23640
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused1-static-ruff.2026-10-20T15-13.md",
+      "sha256": "be2ba66ce7c2b80579ea52d27d0153c00ec2413e99a5602684d69ce2c24a9011",
+      "bytes": 11932
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black-raw.2026-10-20T15-14.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.json",
+      "sha256": "7de57f0c20b91b862d3869b91ffb57b5b2dd677fd44252be266378ec1633284c",
+      "bytes": 12024
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-black.2026-10-20T15-14.md",
+      "sha256": "f56250733172b59a6413803bd196cb9e17dca9e88dba0dd2831337a994f5510d",
+      "bytes": 729
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright-raw.2026-10-20T15-14.json",
+      "sha256": "5bc20d4e648ccade49c2ffd3c5e16a0bdf9d528f200f12d9b7cb96cd56652e73",
+      "bytes": 5851
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.json",
+      "sha256": "cf4b58bcd5131a07bc27bfc35493611bcdddd0004ab327b0230ddf263ebce15b",
+      "bytes": 18168
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-pyright.2026-10-20T15-14.md",
+      "sha256": "069f5f2d8e7ef5a346ebe092b0669f1cac16c2d754bd4b184c97bd0035a3ee4d",
+      "bytes": 5923
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff-raw.2026-10-20T15-14.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.json",
+      "sha256": "2ef05b142946c882f1e84aeedb755d2a429b39ebe8ad3d387e3969709dc3c779",
+      "bytes": 11967
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused2-static-ruff.2026-10-20T15-14.md",
+      "sha256": "11433400ac0869ab68d3c7cf6fdb1712eb4ae8c043235846cfdfc911c7a64483",
+      "bytes": 688
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black-raw.2026-10-20T15-15.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.json",
+      "sha256": "65b74fa3c3bd88bb2ec235994be91bbf1c638fba2ee9de92bc91d4974682632e",
+      "bytes": 12024
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-black.2026-10-20T15-15.md",
+      "sha256": "34e9e1a0562b5e14623d1e647416ece00d0d5168ce9a21c30781d43454e4bb0b",
+      "bytes": 729
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright-raw.2026-10-20T15-15.json",
+      "sha256": "30ebf9435e5bd56276143596f65df581b57e760ca9ed2c017eedd3135ac69893",
+      "bytes": 4938
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.json",
+      "sha256": "15e3134114e6db3ce8ded83303b0999096e27358e34b7fb8757c84ad43915193",
+      "bytes": 12713
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-pyright.2026-10-20T15-15.md",
+      "sha256": "60d5eb054daebb1b3f4d1ba2b8835637db2b0746f3a5b748fb4e692d2756b901",
+      "bytes": 1360
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff-raw.2026-10-20T15-15.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.json",
+      "sha256": "d9bf52f42c1effc3a1d870412084d8b3565ec7f5e50a37b18f61e4a77db0b523",
+      "bytes": 11967
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused3-static-ruff.2026-10-20T15-15.md",
+      "sha256": "a7e895dced2936ddecf62755530a99e2f265f795c29aa5559e0cf1b5006b3f4b",
+      "bytes": 688
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black-raw.2026-10-20T15-16.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.json",
+      "sha256": "d863f0f0ff689697c27b1bdfcba62aac30ff5fab9240c111c856090027c2286f",
+      "bytes": 12024
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-black.2026-10-20T15-16.md",
+      "sha256": "0f5da0038e66ee97d37f40445df968889396c9c011d9ea3d710ed2989c287810",
+      "bytes": 729
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright-raw.2026-10-20T15-16.json",
+      "sha256": "f25ce98166bceb2ca8097b9779a582f80358b6268a6c382fcdf2d5c641ff0150",
+      "bytes": 4690
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.json",
+      "sha256": "b438af3d680ea9626323ee7c2e6ba701cb0c5b78f2cafc029e24f5bf438930c1",
+      "bytes": 12136
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-pyright.2026-10-20T15-16.md",
+      "sha256": "afc971a8047fe27d71b85605822a34b5969348f3020d3cf38a5918c1221d8ded",
+      "bytes": 859
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff-raw.2026-10-20T15-16.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.json",
+      "sha256": "a344b9550cebbf369a742499d75e357d7836003ab6a8a698dab07cf1c6d2f32c",
+      "bytes": 11967
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused4-static-ruff.2026-10-20T15-16.md",
+      "sha256": "723993d75d57de8fde92a6b36e186b5bb041ef5c0a6923e08c5b137a936145d1",
+      "bytes": 688
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black-raw.2026-10-20T15-19.json",
+      "sha256": "3510ea08da7adce8529c0562572e6ef8c0ffdda56a24747ef6af4ee2c885cc41",
+      "bytes": 4553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.json",
+      "sha256": "dd2e43675c1229259e945ea74a9549a4584bbe141a26230b3d5b5bf55335e049",
+      "bytes": 12024
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-black.2026-10-20T15-19.md",
+      "sha256": "770910c17daff1bd3831f69d91e032b7376caa1c40826f3ac76d8b0ce4d4fdf5",
+      "bytes": 729
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright-raw.2026-10-20T15-19.json",
+      "sha256": "f25ce98166bceb2ca8097b9779a582f80358b6268a6c382fcdf2d5c641ff0150",
+      "bytes": 4690
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.json",
+      "sha256": "4c8b64719158414b7e60777a9f4a5dc5d12d014be08e438983c70dd7b94904e7",
+      "bytes": 12136
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-pyright.2026-10-20T15-19.md",
+      "sha256": "2bbb39f5ee8d3ff9ec61ba6ac2463d9bda4f9b7e2872647342b9cddc9f88e640",
+      "bytes": 859
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff-raw.2026-10-20T15-19.json",
+      "sha256": "a18895c28367b6eff53f24d9a31d14784d224813918923a8a3a05f02a5717e2d",
+      "bytes": 4501
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.json",
+      "sha256": "ee4d394410c914f7fbe15ac54de372d2be77582b912fc57bf8d34bb9a0d18003",
+      "bytes": 11967
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused5-static-ruff.2026-10-20T15-19.md",
+      "sha256": "f46ce5b39da590e238b802e2438509357d485ed90ee42fdfc25a5612dc5e62f7",
+      "bytes": 688
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black-raw.2026-10-20T15-31.json",
+      "sha256": "46612ec9a5210c6dc9c0e1faae1daf36514d12799f797fa4b144bfe1891ec280",
+      "bytes": 4601
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.json",
+      "sha256": "38167f06cbc3d8dc3179e37d5bca9bc78f372ca6cc5402dc993248673bd769ec",
+      "bytes": 13098
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-black.2026-10-20T15-31.md",
+      "sha256": "ca80028ab2ae1d8cb0dc51ed23d468fd0f06a4cf4421ad1898377d970c5f509c",
+      "bytes": 784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright-raw.2026-10-20T15-31.json",
+      "sha256": "9645e912b3c9c6a7ca713427262b9910d9e281d6e8c58ee6ff1b9b561fa9657e",
+      "bytes": 5383
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.json",
+      "sha256": "f0f6981588e649235f7217da1f6ada0a3859062187fe353a2ba3aa8abff500df",
+      "bytes": 15248
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-pyright.2026-10-20T15-31.md",
+      "sha256": "f9420082951788ea7dc5a13162d350694d600e02693f7289506f0d6c50d23204",
+      "bytes": 2789
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff-raw.2026-10-20T15-31.json",
+      "sha256": "4a4dc5ebb553d812aca58d5b6ca08a9f8455c4c3a7b184461af52d4b62afab68",
+      "bytes": 4549
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.json",
+      "sha256": "84452063ec379e348914bea78aedf42dacb7c937ea6132d7ec63df8ffde1770e",
+      "bytes": 13040
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-focused6-static-ruff.2026-10-20T15-31.md",
+      "sha256": "90fe1046026ee542f94152f660c3b369f7a0860337a259156f036fca791353c9",
+      "bytes": 743
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black-raw.2026-10-20T15-13.json",
+      "sha256": "cbff265a3a7edb9c551192bb1cf6966c6da3d49ff51570202e882fada8cb81b7",
+      "bytes": 4674
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.json",
+      "sha256": "90d605bdb2bbb1ae3062b523c7768355b68a4d92c687c01bb4d4bfcfd2e37868",
+      "bytes": 12649
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-initial-format-black.2026-10-20T15-13.md",
+      "sha256": "1704a9292dc955bbc9d5cd92661eb24f68e39b5d5992c3fd9dbbd0676f9fb447",
+      "bytes": 1341
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black-raw.2026-10-20T15-52.json",
+      "sha256": "28ad4499f8c78b3dd4c0754ec639986d9ef741e90e62e55d85bc568b39854f59",
+      "bytes": 5226
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.json",
+      "sha256": "d80f0ec1b42fd32e16359626d26e66caf80f25fed61569adf8d7d07d6228f35c",
+      "bytes": 13383
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-format-black.2026-10-20T15-52.md",
+      "sha256": "16453655f4f0fa2c18c47386c7c1d8ea047f054b67da8d938301b9c21f3a4e8a",
+      "bytes": 1076
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix-raw.2026-10-20T15-52.json",
+      "sha256": "ed2847a03a387ef78e0e33075375af5f45c0b6ebd0ec648af25b59445a66f442",
+      "bytes": 5166
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.json",
+      "sha256": "29d4c4e8860d4f04c4f0447eee3acae534de431333f0a609bfdeb3668339fca1",
+      "bytes": 13197
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair1-lintfix-ruff-fix.2026-10-20T15-52.md",
+      "sha256": "2c58d345a9ac19d4ff179e51f72eaeb7e0033e67449d70f194bbbcc004319aa9",
+      "bytes": 893
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black-raw.2026-10-20T15-52.json",
+      "sha256": "b53c3bef4879da78fa958b16391abe78718f07b308fefd2aa85156c9e05808db",
+      "bytes": 5081
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.json",
+      "sha256": "267d73ad86f7ca8c1159bb9284534b500150b77762417ba4d99abbf11813558e",
+      "bytes": 13090
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-black.2026-10-20T15-52.md",
+      "sha256": "22c037d3e1311547d6851beca044ea3ed6ca4bcbf0c867cbbce131dc1e6f776a",
+      "bytes": 784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage-raw.2026-10-20T15-57.json",
+      "sha256": "2e51aa9e4de41eb93bbd7f5db381ac0531f269f67c94d98c8daf346717acaeb8",
+      "bytes": 1361
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.json",
+      "sha256": "4d91f1428c68421bbc9df0b48d67522ac340398221ec172c4f28b166b232b5c9",
+      "bytes": 12540
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-coverage.2026-10-20T15-57.md",
+      "sha256": "1c1c8668e86325863c72f9694c7f6fb7cc55014d9a2126a2038b3ddc679ef04a",
+      "bytes": 286
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks-raw.2026-10-20T15-53.json",
+      "sha256": "73e847c2327e513a7d51b702ad290e405a89c071f2e67abbbbd60e1c9905eb2c",
+      "bytes": 5771
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.json",
+      "sha256": "05f17461e1e3996420e7db6f3bde115cf1008aa6a88cdb56daca00a9da6f1fce",
+      "bytes": 16571
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-prechecks.2026-10-20T15-53.md",
+      "sha256": "99548d06657a8c980e113ea4e64348e03c008ac40017e7f3905a5347b726d761",
+      "bytes": 2769
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1-raw.2026-10-20T15-52.json",
+      "sha256": "08aecee2d4e251661752260efdaf677246ee1a6f15f551d9a419cf4011dcfc87",
+      "bytes": 9941
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.json",
+      "sha256": "ef01554ddc57ac8e53eb86614aa38e798ee856c26af4d11c3ae0fce9a122a9f7",
+      "bytes": 16872
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe1.2026-10-20T15-52.md",
+      "sha256": "59424cfcd9d32139caf397a30928c5f42e7af594b18335557806e56be52cc4d7",
+      "bytes": 4376
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2-raw.2026-10-20T15-52.json",
+      "sha256": "a047dea7aab10fe81666c4aa49d3415098e584b8721b6bb65d3dc335d76389b9",
+      "bytes": 9629
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.json",
+      "sha256": "59999a625afcbd14583e7273f1bc5261bb932e65df5e8538fe998e95fadae181",
+      "bytes": 16267
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-probe2.2026-10-20T15-52.md",
+      "sha256": "dc6d0ad8b6b3f6a691cc3ba37ebb413c1a322195d360a914ff590cd72a55ba4a",
+      "bytes": 3850
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright-raw.2026-10-20T15-52.json",
+      "sha256": "b2070cf2c7d71e94da29fc34430c590b5e68aa4645c62c2db77cee721b4328a1",
+      "bytes": 5218
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.json",
+      "sha256": "49a0b0e3920d5873c1ad757e2d98833db5960a12e4d0912db8a7c8d4e6fa112a",
+      "bytes": 13202
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-pyright.2026-10-20T15-52.md",
+      "sha256": "66585f66b7132bd5cf235bfd1abd34cb4895e56cdd7ddf757dd4221e7446e915",
+      "bytes": 914
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff-raw.2026-10-20T15-52.json",
+      "sha256": "f94f9b0d654cc2fd3ed4566c56d75a4434e4dc7305751044436dc242bc8fb082",
+      "bytes": 5029
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.json",
+      "sha256": "f4e6643dec61e2f2be9248eb62e654740d254623dae6469671319121adc06ed5",
+      "bytes": 13033
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-ruff.2026-10-20T15-52.md",
+      "sha256": "e3e0bf7886dd5e87782c8cb9791e41d17d333af0ec85670751b1d04e7aa6bc44",
+      "bytes": 743
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests-raw.2026-10-20T15-54.json",
+      "sha256": "ba58878c53b21fd6d0c7a7bb1ec4d756d6cf74c75fee1b3b3f93f9faad8622f0",
+      "bytes": 7318
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.json",
+      "sha256": "6d0b56b922545e0d225d28beca4e88c280a9db1ea01d5c62f829483f7114f9de",
+      "bytes": 30424
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair2-tests.2026-10-20T15-54.md",
+      "sha256": "495a274f44b7fb9efad0211568a9d8072795767db342b5b6f53d5f5f5f4e66da",
+      "bytes": 15497
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black-raw.2026-10-20T15-57.json",
+      "sha256": "34073c2e3ad98b5dd92f34f1f1afbe6ecee119f7d2a506e69896407e01470f4a",
+      "bytes": 5257
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.json",
+      "sha256": "b3ea6643222d6670d1bd5737584285d6538d0ef5d312609e302c04a229ba661f",
+      "bytes": 13097
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-black.2026-10-20T15-57.md",
+      "sha256": "c8fedd268b08f7e193d525103acb158abd085203b9ce2b541a5dfb4919641cc1",
+      "bytes": 784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright-raw.2026-10-20T15-57.json",
+      "sha256": "3ab123e272984b01b9c40f718efc314e50935ca6475ed8668e70a10cf908d746",
+      "bytes": 5394
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.json",
+      "sha256": "06d8f5d20f2c1dda4f41fdd6385d9be765a914e804edd037e817a383bbcae1bc",
+      "bytes": 13209
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-pyright.2026-10-20T15-57.md",
+      "sha256": "9cb4c9670d5c5e6c738e5bff6d0047abaa3024a1b5585fd3b908e712c056615b",
+      "bytes": 914
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff-raw.2026-10-20T15-57.json",
+      "sha256": "a26a36ab97f538746bdbbc6dc317a792a892ffd2d8fbc46596fbf1a1fff48eca",
+      "bytes": 5205
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.json",
+      "sha256": "4bb78a3052f3885406fe3510c2b80846c293852d96e0c25aec07ab74ba63e8a7",
+      "bytes": 13040
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair3-static-ruff.2026-10-20T15-57.md",
+      "sha256": "1cdaa8d96f35a9e90aefcf8b9022bb0e8e10c748ce093a1043798e5a2a2fda0a",
+      "bytes": 743
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black-raw.2026-10-20T16-07.json",
+      "sha256": "34073c2e3ad98b5dd92f34f1f1afbe6ecee119f7d2a506e69896407e01470f4a",
+      "bytes": 5257
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.json",
+      "sha256": "9ae4e1e853dfac0219dc31c3488338e78eec380c3a5104644ef7337c0175ec43",
+      "bytes": 13090
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-black.2026-10-20T16-07.md",
+      "sha256": "9bea6338d45e1edeb9b169b82b9559a70ac431bb410dde5166e2988eb33f4473",
+      "bytes": 784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks-raw.2026-10-20T16-09.json",
+      "sha256": "06a6973d84376f2b0ad2d484e57cb446ccf86eb2a7abc91a518d456ffc8a097e",
+      "bytes": 6735
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.json",
+      "sha256": "077abae4e12d5040000a964fa4a6737f23d77e3e7331156b2260826a96c05c21",
+      "bytes": 19798
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-prechecks.2026-10-20T16-09.md",
+      "sha256": "10182efc5db285747e5ce015e33f51800128223441bc044a22aac257d62086bd",
+      "bytes": 5436
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1-raw.2026-10-20T16-07.json",
+      "sha256": "9935f3e8109de4c1b86601271c1ab7151b4560d681fe665eb76c85e54dd15060",
+      "bytes": 10113
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.json",
+      "sha256": "5451917e626d52cac5285adc4cda2a6726430d63e15ef1655bd2984b24300e0c",
+      "bytes": 16872
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe1.2026-10-20T16-07.md",
+      "sha256": "c71b50da5ab7c3d3d9497ab00767ecd29f8adf1a6926f835c2f9caa150ec754e",
+      "bytes": 4376
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2-raw.2026-10-20T16-07.json",
+      "sha256": "7ef5c8f86dc5e54be00ba44c65a8df17cd5acbfc37259486cae81578d0b1c819",
+      "bytes": 9805
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.json",
+      "sha256": "7b477a725b5cf6141f5c8162590af9c7c6c580fa7ec04bbfe4b04f31ebd40107",
+      "bytes": 16268
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-probe2.2026-10-20T16-07.md",
+      "sha256": "9cdfaedffcddc27cdb7f4131124614d9597b7271bbf905937c4eb21934b8c934",
+      "bytes": 3850
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright-raw.2026-10-20T16-07.json",
+      "sha256": "3ab123e272984b01b9c40f718efc314e50935ca6475ed8668e70a10cf908d746",
+      "bytes": 5394
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.json",
+      "sha256": "1ecaf78b36bd1d777178d129eee0599515df795e0568eb682658d5b2c587eddf",
+      "bytes": 13202
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-pyright.2026-10-20T16-07.md",
+      "sha256": "a99a443adbaee5634a95737268abcc0cb86215d472c10aceb6c6693dfe276cd6",
+      "bytes": 914
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff-raw.2026-10-20T16-07.json",
+      "sha256": "a26a36ab97f538746bdbbc6dc317a792a892ffd2d8fbc46596fbf1a1fff48eca",
+      "bytes": 5205
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.json",
+      "sha256": "5f139301420418557efd4b7848832c4654160ea3f64882f87162a5c921b38886",
+      "bytes": 13032
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair4-ruff.2026-10-20T16-07.md",
+      "sha256": "2343c6012bff38a260652317d8bc1ade109b22753c439a14293c833ed16d1dea",
+      "bytes": 743
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black-raw.2026-10-20T16-10.json",
+      "sha256": "7a8e56599fd6456109d151d7935b321535c593191e6aaf67f486e2e510aa8c4b",
+      "bytes": 5357
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.json",
+      "sha256": "8abfbc64bcddb98ab5fdd02407bb9915c06ab3a81ddfe6e3918af3304c5e35de",
+      "bytes": 13089
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-black.2026-10-20T16-10.md",
+      "sha256": "075e8830838e646cd17699c7029d53903b9ed312dea909ceade67c2bf7783adb",
+      "bytes": 784
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck-raw.2026-10-20T16-11.json",
+      "sha256": "2ff34e844b89674809a7d559ed9d6e0a473188db8bac11938262f3aacc33bde7",
+      "bytes": 5690
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.json",
+      "sha256": "87de01da7084ebd96b50ae6a757cc0b4c630b6eefbe0ef976166a5bf77935d8c",
+      "bytes": 13179
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-precheck.2026-10-20T16-11.md",
+      "sha256": "1930684ae23cf0811ad6bbd6d803bbaac12354c784465b9458620ea24896dc00",
+      "bytes": 777
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright-raw.2026-10-20T16-10.json",
+      "sha256": "09e73d3a571125643e5a5239bf7627ada651158189e74a0bb49d51f56007ea10",
+      "bytes": 5494
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.json",
+      "sha256": "b655742c87f88a848ca4d8ffa311d3fded45e97380c4ae0ec67e021a4ee3bfb2",
+      "bytes": 13201
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-pyright.2026-10-20T16-10.md",
+      "sha256": "7772e47694ccef3bedd6b272f3e93f2cad77e0cb60f942c88a4864aaba5ffc5d",
+      "bytes": 914
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection-raw.2026-10-20T16-27.json",
+      "sha256": "54ab78e29659bdc6b28031f255681846098a49d818240c21c9f7df7fb3593d5f",
+      "bytes": 5556
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.json",
+      "sha256": "6ccd937d0e015cce9dbf4c6c1990919fdd63dc4db88191605cb014f327b858b4",
+      "bytes": 28977
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-retain-collection.2026-10-20T16-27.md",
+      "sha256": "c19a37f94cab81fb27b2b33a2194670f56551d843e891ba853a5676a399f2bbb",
+      "bytes": 15972
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff-raw.2026-10-20T16-10.json",
+      "sha256": "b21fc4180eceb347159066e65933179dadea7d7871606aa4e73f7279b9f976d6",
+      "bytes": 5305
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.json",
+      "sha256": "a694f30d3f60bccc9dc9303f566231198df792868ac79b9b6f340bac811d9fe0",
+      "bytes": 13033
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-ruff.2026-10-20T16-10.md",
+      "sha256": "eab05fdf2fe017a699b1069c7c6ac4933efc8b5f1e62c61108883a398cd96ce3",
+      "bytes": 743
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests-raw.2026-10-20T16-26.json",
+      "sha256": "83e75c67ed7c2198e1ad7e99c04d5f3dfb08b3789592701c746262504256ea65",
+      "bytes": 6719
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.json",
+      "sha256": "db6184162247ad392b2aaf6c2fa32a865c3b1bba4a69140efb1e22bd6726f314",
+      "bytes": 23199
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-repair5-tests.2026-10-20T16-26.md",
+      "sha256": "c0f6d8865a4ba4b3478ea3f83d530bc0de2c7132250d5d9052a2e3fb06d8a497",
+      "bytes": 6075
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-originals.2026-10-20T16-27.json",
+      "sha256": "be0e6f69d6e1f05f6f37f93f371fbb107da582a7ebe9702758327776eb6817ee",
+      "bytes": 63118
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653",
+      "bytes": 47888
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "bytes": 20995
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "bytes": 12628
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "bytes": 14164
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "bytes": 11194
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+      "bytes": 10379
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "bytes": 8966
+    },
+    {
+      "path": "tests/discovery_runtime/test_service.py",
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "bytes": 19962
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "sha256": "380bb0bef28e759aac7929a61a5467ce1bda51e9cbc5cb5ff7e6990d183c4c89",
+      "bytes": 20119
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "bf5b712119e569acb8b90c329a7f0e62bdc7f7449bcfeb9e0ba74963bc7928d0",
+      "bytes": 17541
+    }
+  ],
+  "qualification": "No staging or commit occurred. The manifest itself is an additional closure path. Existing raw/readable streams are retained without rewrite. The reviewer owns its referenced artifacts and unions them separately."
+}

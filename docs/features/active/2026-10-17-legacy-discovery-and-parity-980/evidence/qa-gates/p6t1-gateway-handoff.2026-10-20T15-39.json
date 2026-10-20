@@ -1,0 +1,168 @@
+{
+  "Timestamp": "2026-10-20T15-39",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-handoff.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Six-file scoped subset: clean ordered gates, 86/86 tests and 86/86 reverse-order tests; pending independent review and coordinator integration.",
+  "status": "FOCUSED_SCOPE_CHECKED_PENDING_INDEPENDENT_REVIEW",
+  "plan": "plan.2026-10-17T22-38.md",
+  "task": "P6-T1 gateway/doctor slice",
+  "baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1",
+    "qualification": "Owned paths were absent; predecessor per-file coverage is not applicable. No baseline replay."
+  },
+  "baseline_qualification": "The one approved shared baseline retains historical accepted proof; it did not execute a fresh behavioral baseline. All six owned paths are new, with the two approved split-path absences recorded separately. No predecessor suite was replayed.",
+  "split": "evidence/other/p6t1-gateway-split.2026-10-20T14-46.json",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "41ff97e3d4ff0469f14d6077862d57a6aa57fee01d214efa0b2e196ba775015e",
+      "physical_lines": 301,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "f9c4fe395d8c22cd8dd0540c8d218a9f2a940607c20c881923f290f7217888f1",
+      "physical_lines": 319,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "310a9171c942802530ae3f7d224826b897e95a599367f48b17ed1e01748f22e2",
+      "physical_lines": 213,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "c2300b8288df099381ced7f9921ee59300c311e7aec019c3c0a183204314b5c2",
+      "physical_lines": 496,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "49114bf39862874dd1557ff5dcf4e35fa462c519b5ba2b3b3712b6202aefbb7c",
+      "physical_lines": 483,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    },
+    {
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "sha256": "56af82ec9550549a5f3d424138016deb1772743a19c7f35f31eca903a2ca8846",
+      "physical_lines": 343,
+      "diff_form": "New file; complete replacement available at the bound workspace path"
+    }
+  ],
+  "proofs_in_execution_order": [
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-loop8-black.2026-10-20T15-29.raw.json",
+      "sha256": "1a6baa81d2c60cb72b5ce2e60a9f90db21a51b8e0e2491acc9afb0ca8f41ee62",
+      "exit_code": 0,
+      "command": ".venv/Scripts/python.exe -m black --check packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py",
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-loop8-ruff.2026-10-20T15-29.raw.json",
+      "sha256": "624885d3f96676caa28a66f02adfd55373116e6145b8613bf69ed97f8df4e2ba",
+      "exit_code": 0,
+      "command": ".venv/Scripts/python.exe -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py",
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-loop8-types.2026-10-20T15-29.raw.json",
+      "sha256": "0d982d315105e48015f75009ea536595104dd2981acdbec93b50b91e96a675ff",
+      "exit_code": 0,
+      "command": ".venv/Scripts/python.exe -m pyright packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py",
+      "passed": null
+    },
+    {
+      "path": "evidence/qa-gates/p6t1-gateway-loop8-tests.2026-10-20T15-32.raw.json",
+      "sha256": "b5e5b49de0ad387f15d6fecb878bdb3825e72a768bd490109f33832f780945d4",
+      "exit_code": 0,
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py --cov=drm_copilot_discovery.gateway --cov=drm_copilot_discovery.gateway_local --cov=drm_copilot_discovery.doctor --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\issue-980-p6t1-gateway-loop8-coverage.json",
+      "passed": 86
+    },
+    {
+      "path": "evidence/regression-testing/p6t1-gateway-reverse.2026-10-20T15-37.raw.json",
+      "sha256": "510b6a8e983ddd09044e24ca7b39c2c06e1d8f3cf63b03a4b4b12c785d06a99d",
+      "exit_code": 0,
+      "command": ".venv/Scripts/python.exe -m pytest -o addopts= tests/discovery_runtime/test_doctor.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_gateway.py",
+      "passed": 86
+    }
+  ],
+  "freeze": {
+    "path": "evidence/regression-testing/p6t1-gateway-freeze.2026-10-20T15-35.json",
+    "sha256": "939ef244f98bbd91ad6f9cfb4e679c2c08784a7e25ca90cb726d4ff21ff22184"
+  },
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py": {
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "minimum_named_body_line_percent": 100.0,
+      "named_bodies_with_statements": 7,
+      "predecessor": "Absent; no prior executable lines",
+      "changed_line_loss": "Not applicable for new files; complete final file measured"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": {
+      "line_percent": 100.0,
+      "branch_percent": 100.0,
+      "minimum_named_body_line_percent": 100.0,
+      "named_bodies_with_statements": 6,
+      "predecessor": "Absent; no prior executable lines",
+      "changed_line_loss": "Not applicable for new files; complete final file measured"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "line_percent": 99.07407407407408,
+      "branch_percent": 96.875,
+      "minimum_named_body_line_percent": 92.85714285714286,
+      "named_bodies_with_statements": 11,
+      "predecessor": "Absent; no prior executable lines",
+      "changed_line_loss": "Not applicable for new files; complete final file measured"
+    }
+  },
+  "scoped_deltas": {
+    "black": "0 changes in the final check",
+    "ruff": "0 findings",
+    "pyright": "0 errors, warnings or information",
+    "tests": "0 failures, 86 passed",
+    "reverse_module_order": "0 failures, 86 passed",
+    "new_body_coverage": "Every named executable body is at least 90% line-covered",
+    "per_file_predecessor_coverage_delta": "N/A: all six owned paths were absent",
+    "repository_wide_coverage_delta": "Pending coordinator full-repository gate; not claimed by this scoped proof"
+  },
+  "reverse_order": [
+    "tests/discovery_runtime/test_doctor.py",
+    "tests/discovery_runtime/test_gateway_local.py",
+    "tests/discovery_runtime/test_gateway.py"
+  ],
+  "implementation": [
+    "Bounded binary JSON transport reuses the accepted parser, strict shared result serializer, fixed installed service import and matching exit codes.",
+    "Only typed pre-execution provider/catalog failures admit a fixed bounded emergency envelope; unexpected executor or result-validation failures refuse replacement JSON and emit fixed stderr.",
+    "Trusted outer root and the same repository reader bind initialization, execution, writer recapture and inventory source pinning.",
+    "LocalServiceIO composes accepted activation, initialization, metadata and writer primitives; it authenticates explicit local-user and rejects host markers/native invocation/prepare/finalize.",
+    "Doctor captures actual bounded profile/locator bytes or absence, preserves accepted selection semantics, verifies freshness and reports native capability unavailable without a receipt or write."
+  ],
+  "public_boundaries": [
+    "gateway.run_gateway(*, stdin, stdout, stderr, create_io, repository_reader, clock, analyzer_registry, limits=None, execute_request=_execute) -> int",
+    "gateway.main(argv=None, *, stdin=None, stdout=None, stderr=None) -> int",
+    "gateway_local.LocalServiceIO implements ServiceIO using accepted local primitives and the verified installed runtime provider.",
+    "doctor.inspect_doctor(*, io: ServiceIO, request: ServiceRequest, runtime: RuntimeIdentity) -> DiscoveryResult",
+    "Core service.execute and build_identity.load_build_identity signatures are unchanged."
+  ],
+  "retained_failed_proof": [
+    "evidence/qa-gates/p6t1-gateway-loop3-tests.2026-10-20T15-06.raw.json",
+    "evidence/qa-gates/p6t1-gateway-loop3-inputs.2026-10-20T15-21.json",
+    "Earlier formatter/linter/type diagnostics remain retained under evidence/qa-gates/p6t1-gateway-*."
+  ],
+  "limitations_and_remaining_gates": [
+    "Focused in-memory transport, local-adapter and doctor tests only.",
+    "Service execution is injected; integrated service proof remains separate.",
+    "Runtime identities in unit tests are synthetic fixtures; installed package process proof remains separate.",
+    "Package manifest generation is reserved to the coordinator after all source freezes.",
+    "The P6 trusted local-user factory has an explicitly empty authority invalidation callback.",
+    "Host markers, native invocation context and prepare/finalize paths are rejected; no native grant or receipt is issued.",
+    "P8 must wire real native revocation before capability issuance or acceptance; final feature validation remains pending.",
+    "Repository-wide regression/coverage and acceptance decisions remain with the coordinator.",
+    "Independent source review and progress-commit acceptance remain with the coordinator.",
+    "CLI registration is P6-T2; compatibility migration is P6-T3.",
+    "Production/test files are held at their checked hashes; no test population or scope was expanded after loop8."
+  ]
+}
