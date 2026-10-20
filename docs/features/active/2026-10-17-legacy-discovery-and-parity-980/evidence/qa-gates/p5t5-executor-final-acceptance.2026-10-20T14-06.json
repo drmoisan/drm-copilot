@@ -1,0 +1,200 @@
+{
+  "Timestamp": "2026-10-20T14-06",
+  "Command": "poetry run python SCRATCH/issue-980-p5t5-publish-acceptance.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "P5-T5 ACCEPTED; 46/84 tasks and 23/66 criteria in each authoritative source.",
+  "task": "P5-T5",
+  "status": "ACCEPTED",
+  "handoff_signal": "READY_FOR_ACCEPTANCE_COMMIT",
+  "route": "atomic_execution_p5t5_final_acceptance_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority_rechecked": true,
+  "candidate_commit": "556ccb4bf74a233f7d9dc8214e0cb43d8d83d78e",
+  "final_handoff": {
+    "bytes": 31219,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-handoff.2026-10-20T13-57.json",
+    "sha256": "33b0cd256588d68b0c280eb6eb2bc6d7a2b6ca8b3e7e0a8cdd80dacfa15518cf"
+  },
+  "final_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-closure.2026-10-20T13-59.json",
+    "sha256": "88ca79844925d5e857661a7595a22641ce4c6ba9ec011f58e7ba7e27722f4b2c"
+  },
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-final-reconciliation.2026-10-20T14-06.json",
+    "sha256": "59e44cabf3da8c3f05ba4bb2fb32b5a928e04ec0f138426863320de4d47e7730",
+    "bytes": 412167
+  },
+  "phase5_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-phase5-interface-handoff.2026-10-20T14-06.md",
+    "sha256": "221b24dfc5bc650c5d4ffd0c29598f1b855bd13eeb23742f46736639334055cb",
+    "bytes": 1820
+  },
+  "retained_reviews": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-ready.2026-10-20T13-17.json",
+      "sha256": "e362a02d712308c915e8b8844a207fa3e46ec3b1cbc3bed397102ddc9fe220ac",
+      "bytes": 5548
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-set-e-review.2026-10-20T12-29.json",
+      "sha256": "2b0b489a9806b6c1d6d2124b5e31a9d424a35d5b8fc84c9425d4f693bc42b547",
+      "bytes": 8407
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-rc2-ready.2026-10-20T13-51.json",
+      "sha256": "8eac8d35161b53f246f5d78e1818b9147e6ab88e96b5ac47eccb430a45bef7ca",
+      "bytes": 4720
+    }
+  ],
+  "verification": {
+    "python": "Black, Ruff, whole-repository Pyright, scoped static policy, reversed task tests, named-body coverage, then four contracts passed.",
+    "task_nodes": 119,
+    "test_seconds": 78.183,
+    "contracts": 4,
+    "coverage_modules": 3,
+    "coverage_ranges": 42,
+    "coverage_totals": {
+      "covered_lines": 423,
+      "num_statements": 428,
+      "covered_branches": 145,
+      "num_branches": 150
+    },
+    "trace_named_body": "9/9 statements and 4/4 branches in this final execution",
+    "raw_counters_augmented": false,
+    "qualified_prior_proof_count": 0,
+    "no_lost_focused_lines_or_arcs": true,
+    "new_review_or_behavioral_runs": false
+  },
+  "task_mapping": {
+    "identity": "P5-T5",
+    "evidence": "Retained renderer/Set E/RC2 review; exact final 119-node population; accepted generated examples; current three-module/42-range proof.",
+    "acceptance": "Repeated rendering is byte-stable; ready-only Gherkin, pending Markdown, configured tags and exact trace remain proven; no implementation code or step definitions."
+  },
+  "ac_mapping": {
+    "AC-49": {
+      "text": "Platform-mode tags are supported.",
+      "evidence": [
+        "tests/discovery_runtime/test_acceptance_tags.py::test_distinct_punctuation_is_preserved_in_tags_and_identity",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_shared_tags_across_distinct_scenarios_are_not_collisions",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-True]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[custom-True]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[mobile-False]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-False]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[online-False]"
+      ],
+      "conclusion": "Configured client/platform/mode tags survive exact rendering with deterministic identity and collision controls."
+    },
+    "AC-50": {
+      "text": "Offline/mobile tags are supported when configured.",
+      "evidence": [
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-True]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[mobile-False]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-False]",
+        "tests/discovery_runtime/test_acceptance_tags.py::test_empty_tag_tuple_does_not_create_an_inferred_tag"
+      ],
+      "conclusion": "Configured offline/mobile tags are preserved; omitted tags and applicability are not inferred."
+    }
+  },
+  "document_changes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "before_sha256": "b28b688894450ee269605de6f50d2df2ae02f161a81e1b49457be733e559eeab",
+      "after_sha256": "af8e7eac89a20d084d954a9fdc3bd6d2296a97f2b5f1af2c2cfc06b5aff69b85",
+      "after_git_lf_sha256": "65522556ced195a46e8f5f33c4f0c6897372ab443cdb967a08a5c485c1774c3d",
+      "newly_checked": [
+        "P5-T5"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "before_sha256": "0547f417f7f4e673828c0ac021c333a81a66cc82f4c799dec142faf3c840fe90",
+      "after_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+      "after_git_lf_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+      "newly_checked": [
+        "AC-49",
+        "AC-50"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "before_sha256": "c2926539c8451e7fa3969e061988b0a0188eb5fd9e4105027816b8fcf39ebffa",
+      "after_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+      "after_git_lf_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+      "newly_checked": [
+        "AC-49",
+        "AC-50"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    }
+  ],
+  "counts": {
+    "tasks": {
+      "checked": 46,
+      "total": 84,
+      "remaining": 38
+    },
+    "source_acs": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+        "checked": 23,
+        "total": 66,
+        "remaining": 43,
+        "newly_checked": [
+          "AC-49",
+          "AC-50"
+        ]
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+        "checked": 23,
+        "total": 66,
+        "remaining": 43,
+        "newly_checked": [
+          "AC-49",
+          "AC-50"
+        ]
+      }
+    }
+  },
+  "qualifications": [
+    "Final unchanged-reader named-body coverage supersedes the earlier declaration-inclusive range interpretation for _trace. Declaration line 157 does not establish runtime body execution. Original raw statistics, first-run failure and narrow guard proof remain separately retained.",
+    "Three generated Markdown outputs retain their exact renderer-produced terminal blank lines. The owner provenance and source-byte bindings are authoritative; examples are not normalized.",
+    "Original command bytes and coverage databases/JSON remain separate from UTF-8 readable views with verified OBSERVED_PATH_ALIASES and CR/LF normalization.",
+    "The retained relative-path closure invocation diagnostic affected metadata publication only. Final runner, sources, tests and coverage reader are unchanged.",
+    "Final proof is scoped to P5-T5; no new repository-wide coverage, publication, step-definition, CLI or installed-host claim."
+  ],
+  "findings": [],
+  "open_probes": [],
+  "next_five": [
+    {
+      "id": "P6-T1",
+      "title": "Expose the versioned Python service and fixed gateway."
+    },
+    {
+      "id": "P6-T2",
+      "title": "Register every required noninteractive console command."
+    },
+    {
+      "id": "P6-T3",
+      "title": "Finish safe legacy entry-point compatibility and remove checkout coupling."
+    },
+    {
+      "id": "P7-T1",
+      "title": "Author the four constrained specialist contracts canonically."
+    },
+    {
+      "id": "P7-T2",
+      "title": "Author nine invoked workflows and reduce seven legacy skills to aliases."
+    }
+  ],
+  "limitations": [
+    "Pure generated specifications/rendered bundles only",
+    "No publication or installed-host authority",
+    "No step definitions or target implementation",
+    "P6-T3 legacy adapter migration remains deferred",
+    "Repository-wide coverage and full-feature CI remain later gates"
+  ]
+}

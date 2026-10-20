@@ -1,0 +1,88 @@
+{
+  "Command": "poetry run python SCRATCH/p5t5_bind_retry.py",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T13-47",
+  "added_node": "tests/discovery_runtime/test_acceptance_render_limits.py::test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle",
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p5t5_final_repair_gates_20261020",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P5T5_final_repair_gates",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-candidate-disabled.2026-10-20T13-47.json",
+    "sha256": "7bc11d13d04864528768d69554785518e6cea41e16c1d8f1e5552d583350adfb"
+  },
+  "changed_binding": {
+    "new": "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125",
+    "old": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+    "path": "tests/discovery_runtime/test_acceptance_render_limits.py"
+  },
+  "contracts": 4,
+  "executed_binding_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-retry-binding-harness.2026-10-20T13-47.txt",
+    "sha256": "69a6bb3ff632f4fbdb8da4316b9af210f01740b1d6b5fd0b5c84c21137de0ea1"
+  },
+  "execution_released": false,
+  "first_run_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-first-run-closure.2026-10-20T13-46.json",
+    "sha256": "4853c307b101f85b596585429d24b95646b0f9e230a13ed7f85b2f086d90b743"
+  },
+  "gate_execution": false,
+  "harnesses_unchanged": {
+    "p5t5_final_coverage.py": {
+      "accepted_predecessor_sha256": "0d9e869bf7450535a39d46aa8f218e3c7f5cde0a2dbd1896923bd2efd01db071",
+      "physical_lines": 210,
+      "runtime_path": "SCRATCH/p5t5_final_coverage.py",
+      "sha256": "a8f163389dfaad6acd39d0cbdce954f07a89fd03f3070f793f81fad2c3e4e477",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_coverage.2026-10-20T12-41.txt"
+    },
+    "p5t5_final_gates.py": {
+      "accepted_predecessor_sha256": "49b82d61d9ca580163da854164d9e10c456998e6a7334157eaa15b0aef85577e",
+      "physical_lines": 273,
+      "runtime_path": "SCRATCH/p5t5_final_gates.py",
+      "sha256": "dc92ab67e5cdc6abc0f9548fc53f5eaf8660b0a22b9d243a9ca630cfc82ba8f6",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_gates.2026-10-20T12-41.txt"
+    },
+    "p5t5_final_static.py": {
+      "accepted_predecessor_sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0",
+      "physical_lines": 145,
+      "runtime_path": "SCRATCH/p5t5_final_static.py",
+      "sha256": "dd52c76c58063d0caea6e71c42b82c92357ed7784e77f3f5c7d826167638b964",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_static.2026-10-20T12-41.txt"
+    },
+    "p5t5_prepare_final.py": {
+      "physical_lines": 252,
+      "runtime_path": "SCRATCH/p5t5_prepare_final.py",
+      "sha256": "a498ceb54fc609d72a9085b8cc00e4237ec155734abdd7d9630b390918d34ea4",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_prepare_final.2026-10-20T12-41.txt"
+    }
+  },
+  "node_count": 119,
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-candidate-released.2026-10-20T13-22.json",
+    "sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84"
+  },
+  "qualification": "Only the frozen test hash and one node differ in the existing candidate scope. All source, example, dependency, reader, coverage-floor and timeout identities are retained. No collection, test, static gate, source inspection or Git operation was performed.",
+  "remaining": [
+    "Checked repair commit/push",
+    "Explicit execution release and final-review binding"
+  ],
+  "repair_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-freeze.2026-10-20T13-44.json",
+    "sha256": "5d4e2d0667a083ff1f4afa69c92486798a25b34f9997308c774a5daf7b4a79b9"
+  },
+  "retained_node_count": 118,
+  "source_test_edits": false,
+  "state": "PREPARED_AWAITING_CHECKED_COMMIT_RELEASE",
+  "task": "P5-T5"
+}

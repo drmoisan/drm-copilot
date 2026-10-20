@@ -320,7 +320,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover kind/feature/criterion/client/mode-derived identities, immutable source refs, approved scoped decisions, supersession, known legacy characterization, target requirements, unresolved/proposed/rejected expectations, and permutation/content-change properties.
   - Acceptance: Confirmed requirements yield linked ready specifications; unknown or contradictory expectations remain pending with no invented expected result, and generation never modifies implementation AC files.
 
-- [ ] [P5-T5] Render traceable Markdown and executable-ready Gherkin only.
+- [x] [P5-T5] Render traceable Markdown and executable-ready Gherkin only.
   - Files and behavior: Create R/gherkin.py, PT/test_{gherkin,acceptance_tags}.py, and E2/acceptance/ synthetic examples; update Set E projection/generation assertions while retaining safe public adapters.
   - Tests and proof: Assert feature/scenario/client/platform/mode tags, configured offline/mobile tags, escaping/collision detection, sorted output, source/evidence/decision traceability, companion pending Markdown, and no pending executable scenarios.
   - Acceptance: Repeated generation is byte-stable; .feature output includes only ready scenarios and no implementation-specific test code or step definitions.

@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "candidate": "SCRATCH\\candidate-retry-released.json",
+  "candidate_sha256": "1be8286990a30757fc032bbcda1cc1984a237f1eb732eb92ae6acf7bf979b32d",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m pyright",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:56:00.650307+00:00",
+  "label": "types",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-types-135544-raw.2026-10-20T13-56.json",
+    "sha256": "7e670b92c735d64143b972709b9a31979aeee1cab7b34506d590b7ddf464a05c"
+  },
+  "seconds": 14.044,
+  "stage": 3,
+  "started_at": "2026-10-20T13:55:46.606624+00:00",
+  "stderr": "",
+  "stdout": "WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\n\n0 errors, 0 warnings, 0 informations\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-56"
+}

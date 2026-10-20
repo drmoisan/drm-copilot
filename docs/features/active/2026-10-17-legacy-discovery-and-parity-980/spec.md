@@ -765,8 +765,8 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 **Acceptance scenarios**
 
 - [x] Confirmed contracts generate linked acceptance scenarios.
-- [ ] Platform-mode tags are supported.
-- [ ] Offline/mobile tags are supported when configured.
+- [x] Platform-mode tags are supported.
+- [x] Offline/mobile tags are supported when configured.
 - [x] Unresolved behavior does not become a false expected result.
 - [x] Scenarios preserve contract and decision traceability.
 

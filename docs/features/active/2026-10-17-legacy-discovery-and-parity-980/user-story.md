@@ -100,8 +100,8 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [ ] Generated outputs contain no unsupported references.
 ### Acceptance scenarios
 - [x] Confirmed contracts generate linked acceptance scenarios.
-- [ ] Platform-mode tags are supported.
-- [ ] Offline/mobile tags are supported when configured.
+- [x] Platform-mode tags are supported.
+- [x] Offline/mobile tags are supported when configured.
 - [x] Unresolved behavior does not become a false expected result.
 - [x] Scenarios preserve contract and decision traceability.
 ### Documentation
