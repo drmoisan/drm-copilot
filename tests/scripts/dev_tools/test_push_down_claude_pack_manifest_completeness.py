@@ -15,12 +15,12 @@ Purpose:
 Scope note:
     Three bundled files (`.claude/agents/pr-author.md`,
     `.claude/hooks/enforce-completion-helpers.ps1`,
-    `.claude/hooks/validate-pr-author-output.ps1`) were already absent from
-    every pack manifest before issue #279 and are unrelated to this feature
-    (issue #372). They are tracked as pre-existing, out-of-scope exceptions
-    below, reusing the identical exception set as the TypeScript twin, so
-    this test can assert real completeness without silently absorbing an
-    unrelated production fix into this change.
+    `.claude/hooks/validate-pr-author-output.ps1`) were formerly absent from
+    every pack manifest and were tracked here as pre-existing exceptions
+    (issues #279 and #372). Issue #984 listed all three in the Claude
+    `core.json`, because a core hook dot-sources the helper and core files
+    reference the pr-author agent and hook, so the exception set is now empty
+    and must stay empty, matching the TypeScript twin.
 """
 
 from __future__ import annotations
@@ -47,15 +47,10 @@ MANIFEST_DIR = (
     / "pack-manifests"
 )
 
-# Pre-existing, unrelated manifest gaps out of scope for issue #279, identical to
-# the exception set in the TypeScript twin `claude-pack-manifest-completeness.test.ts`.
-PRE_EXISTING_UNRELATED_EXCEPTIONS: frozenset[str] = frozenset(
-    {
-        ".claude/agents/pr-author.md",
-        ".claude/hooks/enforce-completion-helpers.ps1",
-        ".claude/hooks/validate-pr-author-output.ps1",
-    }
-)
+# Issue #984 registered the three previously excepted files in `core.json`, so
+# no bundled file remains a pre-existing exception. The set is identical to the
+# one in the TypeScript twin `claude-pack-manifest-completeness.test.ts`.
+PRE_EXISTING_UNRELATED_EXCEPTIONS: frozenset[str] = frozenset()
 
 
 def enumerate_bundled_claude_relative_paths() -> list[str]:
@@ -140,8 +135,8 @@ def test_bundled_claude_files_are_listed_in_some_pack_manifest() -> None:
     """Require every bundled `.claude` agent/skill/hook to appear in a manifest.
 
     Compares the real on-disk bundle against the real manifest union,
-    excluding the three documented pre-existing exceptions, and asserts no
-    other bundled file is silently dropped from every pack manifest.
+    excluding the documented pre-existing exceptions (none since issue #984),
+    and asserts no bundled file is silently dropped from every pack manifest.
     """
 
     on_disk_paths = enumerate_bundled_claude_relative_paths()
@@ -159,19 +154,12 @@ def test_bundled_claude_files_are_listed_in_some_pack_manifest() -> None:
     ), f"Bundled .claude files missing from every manifest: {missing}"
 
 
-def test_documented_exceptions_remain_absent_from_every_manifest() -> None:
-    """Assert the documented pre-existing exceptions still describe reality.
+def test_pre_existing_exception_set_is_empty() -> None:
+    """Keep the pre-existing exception set empty (issue #984).
 
-    Guards against the exception list silently growing stale: if a documented
-    exception is later added to a manifest, this test should be updated to
-    remove it from `PRE_EXISTING_UNRELATED_EXCEPTIONS` rather than leaving a
-    stale, overly permissive exception in place.
+    A bundled file absent from every manifest is dropped from a pack-scoped
+    push-down; issue #984 showed that a recorded exception can hide a file a
+    core hook needs. A new gap is fixed in a manifest, not added here.
     """
 
-    manifest_union = union_of_manifest_paths()
-
-    for exception_path in sorted(PRE_EXISTING_UNRELATED_EXCEPTIONS):
-        assert exception_path not in manifest_union, (
-            f"Documented exception {exception_path} is now present in a "
-            "manifest; remove it from PRE_EXISTING_UNRELATED_EXCEPTIONS."
-        )
+    assert sorted(PRE_EXISTING_UNRELATED_EXCEPTIONS) == []

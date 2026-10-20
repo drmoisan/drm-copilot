@@ -9,7 +9,9 @@
 
     Get-HookImportFailureExemption returns the D2 and D3 design entries and one Handler entry per
     surface for every handler whose fail-closed proof recorded FAIL-CLOSED (W-EXEMPT in
-    exemption-decisions.md). Get-HookScopedImportFailureHandler detects scoped import-failure
+    exemption-decisions.md). Each handler row carries its guarded leaf as the last tuple element
+    (issue #984): H1 to H6 guard feature-folder-resolution.ps1, and H9 to H12 guard the
+    evaluation-only dependency of a path-scoped Write/Edit hook. Get-HookScopedImportFailureHandler detects scoped import-failure
     handlers in script text, and Get-HookExemptionFinding reports a missing handler site, an
     unlisted handler, or a missing deny code. Every reader is an injectable script block, so the
     fixtures are in-memory here-strings and no file is written.
@@ -34,23 +36,35 @@ function Get-HookImportFailureExemption {
     }
     $handlers = @(
         @('H1', '#565', 'claude', '.claude/hooks/enforce-feature-folder-order.ps1', 'FeatureFolderOrderResolutionImportFailure', '.claude/hooks/enforce-feature-folder-order.ps1', '.claude/hooks/enforce-feature-folder-order.ps1', '$script:FeatureFolderOrderResolutionImportFailure', 'FEATURE_FOLDER_ORDER_BLOCKED:',
-            'H1 (#565): enforce-feature-folder-order.ps1 denies every plan write with FEATURE_FOLDER_ORDER_BLOCKED: when feature-folder-resolution.ps1 fails to load; non-plan writes never call the resolver; fail-closed proof recorded.'),
+            'H1 (#565): enforce-feature-folder-order.ps1 denies every plan write with FEATURE_FOLDER_ORDER_BLOCKED: when feature-folder-resolution.ps1 fails to load; non-plan writes never call the resolver; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H2', '#565', 'claude', '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', 'OrchestrationFeatureFolderResolutionImportFailure', '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', '$script:OrchestrationFeatureFolderResolutionImportFailure', 'feature-folder-resolution-import',
-            'H2 (#565): the preimplementation-gate modes sibling fails every epic and parallel readiness predicate with feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load, and the gate denies; fail-closed proof recorded.'),
+            'H2 (#565): the preimplementation-gate modes sibling fails every epic and parallel readiness predicate with feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load, and the gate denies; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H2', '#565', 'codex', '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', 'OrchestrationFeatureFolderResolutionImportFailure', '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1', '$script:OrchestrationFeatureFolderResolutionImportFailure', 'feature-folder-resolution-import',
-            'H2 (#565): the preimplementation-gate modes sibling fails every epic and parallel readiness predicate with feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load, and the gate denies; fail-closed proof recorded.'),
+            'H2 (#565): the preimplementation-gate modes sibling fails every epic and parallel readiness predicate with feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load, and the gate denies; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H3', '#565', 'claude', '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1', 'PrdFeatureFolderResolutionImportFailure', '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1', '.claude/hooks/enforce-prd-feature-before-planner.ps1', '-not $workMode', 'PRD_FEATURE_BLOCKED:',
-            'H3 (#565): Resolve-PrdFeatureWorkMode returns null when feature-folder-resolution.ps1 fails to load, and the planner gate denies with PRD_FEATURE_BLOCKED:; fail-closed proof recorded.'),
+            'H3 (#565): Resolve-PrdFeatureWorkMode returns null when feature-folder-resolution.ps1 fails to load, and the planner gate denies with PRD_FEATURE_BLOCKED:; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H4', '#565', 'claude', '.claude/hooks/enforce-epic-wave-barrier.ps1', 'EpicWaveBarrierResolutionImportFailure', '.claude/hooks/enforce-epic-wave-barrier.ps1', '.claude/hooks/enforce-epic-wave-barrier.ps1', '$script:EpicWaveBarrierResolutionImportFailure', 'EPIC_WAVE_BARRIER_BLOCKED:',
-            'H4 (#565): enforce-epic-wave-barrier.ps1 denies with EPIC_WAVE_BARRIER_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.'),
+            'H4 (#565): enforce-epic-wave-barrier.ps1 denies with EPIC_WAVE_BARRIER_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H5', '#565', 'claude', '.claude/hooks/enforce-parallel-drift-gate.ps1', 'ParallelDriftGateResolutionImportFailure', '.claude/hooks/enforce-parallel-drift-gate.ps1', '.claude/hooks/enforce-parallel-drift-gate.ps1', '$script:ParallelDriftGateResolutionImportFailure', 'PARALLEL_DRIFT_GATE_BLOCKED:',
-            'H5 (#565): enforce-parallel-drift-gate.ps1 denies with PARALLEL_DRIFT_GATE_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.'),
+            'H5 (#565): enforce-parallel-drift-gate.ps1 denies with PARALLEL_DRIFT_GATE_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H6', '#565', 'claude', '.claude/hooks/enforce-parallel-cohort-barrier.ps1', 'ParallelCohortBarrierResolutionImportFailure', '.claude/hooks/enforce-parallel-cohort-barrier.ps1', '.claude/hooks/enforce-parallel-cohort-barrier.ps1', '$script:ParallelCohortBarrierResolutionImportFailure', 'PARALLEL_COHORT_BARRIER_BLOCKED:',
-            'H6 (#565): enforce-parallel-cohort-barrier.ps1 denies with PARALLEL_COHORT_BARRIER_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.')
+            'H6 (#565): enforce-parallel-cohort-barrier.ps1 denies with PARALLEL_COHORT_BARRIER_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
+        @('H9', '#984', 'claude', '.claude/hooks/enforce-completion-consistency.ps1', 'CompletionHelpersImportFailure', '.claude/hooks/enforce-completion-consistency.ps1', '.claude/hooks/enforce-completion-consistency.ps1', '$script:CompletionHelpersImportFailure', 'COMPLETION_CONSISTENCY_BLOCKED:',
+            'H9 (#984, H1 #565): enforce-completion-consistency.ps1 denies every checkpoint write with COMPLETION_CONSISTENCY_BLOCKED: when enforce-completion-helpers.ps1 fails to load; other paths never call the helpers; fail-closed proof recorded.', 'enforce-completion-helpers.ps1'),
+        @('H10', '#984', 'claude', '.claude/hooks/enforce-discovery-artifact-gate.ps1', 'DiscoveryValidationImportFailure', '.claude/hooks/enforce-discovery-artifact-gate.ps1', '.claude/hooks/enforce-discovery-artifact-gate.ps1', '$script:DiscoveryValidationImportFailure', 'DISCOVERY_ARTIFACT_GATE_BLOCKED:',
+            'H10 (#984, H1 #565): enforce-discovery-artifact-gate.ps1 denies every Write of a discovery artifact type with DISCOVERY_ARTIFACT_GATE_BLOCKED: when DiscoveryValidation.psm1 fails to load; other paths and Edit calls never call the validator; fail-closed proof recorded.', 'DiscoveryValidation.psm1'),
+        @('H11', '#984', 'claude', '.claude/hooks/enforce-python-batch-budget.ps1', 'PythonBatchBudgetRouteImportFailure', '.claude/hooks/enforce-python-batch-budget.ps1', '.claude/hooks/enforce-python-batch-budget.ps1', '$script:PythonBatchBudgetRouteImportFailure', 'PYTHON_LARGE_PATH_REQUIRED:',
+            'H11 (#984, H1 #565): enforce-python-batch-budget.ps1 denies every .py path with PYTHON_LARGE_PATH_REQUIRED: when enforce-batch-budget-route.ps1 fails to load; other paths never call the route helper; fail-closed proof recorded.', 'enforce-batch-budget-route.ps1'),
+        @('H12', '#984', 'claude', '.claude/hooks/enforce-powershell-batch-budget.ps1', 'PowerShellBatchBudgetRouteImportFailure', '.claude/hooks/enforce-powershell-batch-budget.ps1', '.claude/hooks/enforce-powershell-batch-budget.ps1', '$script:PowerShellBatchBudgetRouteImportFailure', 'POWERSHELL_LARGE_PATH_REQUIRED:',
+            'H12 (#984, H1 #565): enforce-powershell-batch-budget.ps1 denies every .ps1, .psm1, or .psd1 path with POWERSHELL_LARGE_PATH_REQUIRED: when enforce-batch-budget-route.ps1 fails to load; other paths never call the route helper; fail-closed proof recorded.', 'enforce-batch-budget-route.ps1'),
+        @('H11', '#984', 'codex', '.codex/hooks/enforce-python-batch-budget.ps1', 'PythonBatchBudgetRouteImportFailure', '.codex/hooks/enforce-python-batch-budget.ps1', '.codex/hooks/enforce-python-batch-budget.ps1', '$script:PythonBatchBudgetRouteImportFailure', 'PYTHON_LARGE_PATH_REQUIRED:',
+            'H11 (#984, H1 #565): the Codex enforce-python-batch-budget.ps1 denies every .py path with PYTHON_LARGE_PATH_REQUIRED: when enforce-batch-budget-route.ps1 fails to load; other paths never call the route helper; fail-closed proof recorded.', 'enforce-batch-budget-route.ps1'),
+        @('H12', '#984', 'codex', '.codex/hooks/enforce-powershell-batch-budget.ps1', 'PowerShellBatchBudgetRouteImportFailure', '.codex/hooks/enforce-powershell-batch-budget.ps1', '.codex/hooks/enforce-powershell-batch-budget.ps1', '$script:PowerShellBatchBudgetRouteImportFailure', 'POWERSHELL_LARGE_PATH_REQUIRED:',
+            'H12 (#984, H1 #565): the Codex enforce-powershell-batch-budget.ps1 denies every .ps1, .psm1, or .psd1 path with POWERSHELL_LARGE_PATH_REQUIRED: when enforce-batch-budget-route.ps1 fails to load; other paths never call the route helper; fail-closed proof recorded.', 'enforce-batch-budget-route.ps1')
     )
     foreach ($h in $handlers) {
         [pscustomobject]@{
-            Id = $h[0]; Kind = 'Handler'; Issue = $h[1]; Surface = $h[2]; HandlerFile = $h[3]; Variable = $h[4]; Leaf = @('feature-folder-resolution.ps1')
+            Id = $h[0]; Kind = 'Handler'; Issue = $h[1]; Surface = $h[2]; HandlerFile = $h[3]; Variable = $h[4]; Leaf = @($h[10])
             ConsumerFile = $h[5]; DenyPathFile = $h[6]; DenyPathCondition = $h[7]; DenyCode = $h[8]; Justification = $h[9]
         }
     }

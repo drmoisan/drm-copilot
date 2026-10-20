@@ -71,10 +71,10 @@ Root cause (verified):
 
 ## Acceptance Criteria
 
-- [ ] `core.json` includes `.claude/hooks/enforce-completion-helpers.ps1`, and a fresh push-down into a clean target puts the file in place.
-- [ ] A manifest completeness test fails if any manifested hook depends on a sibling or lib file that is missing from the manifest.
-- [ ] With the helper deliberately removed, an `Edit` of a path other than the checkpoint is allowed, and an `Edit` of `artifacts/orchestration/orchestrator-state.json` is still denied with `COMPLETION_CONSISTENCY_BLOCKED`.
-- [ ] Release notes for the next harness version tell downstream repositories that received 1.1.19 to re-run push-down.
+- [x] `core.json` includes `.claude/hooks/enforce-completion-helpers.ps1`, and a fresh push-down into a clean target puts the file in place.
+- [x] A manifest completeness test fails if any manifested hook depends on a sibling or lib file that is missing from the manifest.
+- [x] With the helper deliberately removed, an `Edit` of a path other than the checkpoint is allowed, and an `Edit` of `artifacts/orchestration/orchestrator-state.json` is still denied with `COMPLETION_CONSISTENCY_BLOCKED`.
+- [x] Release notes for the next harness version tell downstream repositories that received 1.1.19 to re-run push-down.
 
 ## Next Step
 

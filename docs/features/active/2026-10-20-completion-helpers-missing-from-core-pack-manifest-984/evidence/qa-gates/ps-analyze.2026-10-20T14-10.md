@@ -1,0 +1,8 @@
+# QA Gate: PowerShell Analyzer (Issue #984)
+
+Timestamp: 2026-10-20T14-10
+Command: sh SCRATCH/issue-984-ps.sh issue-984-ps-check.ps1 -Mode analyze -ListFile SCRATCH/issue-984-p6-ps-files.txt (Invoke-ScriptAnalyzer with scripts/powershell/PoshQC/settings/pssa.settings.psd1, direct run)
+EXIT_CODE: 0
+Output Summary: 0 findings across the 11 files (TOTAL: 0). Loop pass 2.
+
+Files analyzed: `.claude/hooks/enforce-completion-consistency.ps1`, `.claude/hooks/enforce-discovery-artifact-gate.ps1`, `.claude/hooks/enforce-python-batch-budget.ps1`, `.claude/hooks/enforce-powershell-batch-budget.ps1`, `.codex/hooks/enforce-python-batch-budget.ps1`, `.codex/hooks/enforce-powershell-batch-budget.ps1`, `tests/scripts/claude-runtime/HookImportFailureExemptions.Helpers.ps1`, and the four new suites

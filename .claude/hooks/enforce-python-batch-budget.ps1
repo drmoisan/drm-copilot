@@ -61,7 +61,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
+$script:PythonBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PythonBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
 
 function Test-PythonBatchBudgetPathInRoot {
     <#
@@ -374,6 +374,7 @@ function Invoke-PythonBatchBudgetHook {
     if ($normalized -notmatch '\.py$') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:PythonBatchBudgetRouteImportFailure) { return Get-PythonBatchBudgetBlockDecision -Reason "PYTHON_LARGE_PATH_REQUIRED: the route helper '$($script:PythonBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.claude/state'
 
