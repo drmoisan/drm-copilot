@@ -1,0 +1,141 @@
+{
+  "task": "P6-T1",
+  "Timestamp": "2026-10-20T16-34",
+  "Command": ".venv/Scripts/python.exe <SCRATCH>/p6t1-core-preservation.py",
+  "EXIT_CODE": 0,
+  "status": "read-only diagnosis; unaccepted WIP; no continuation executed",
+  "timeout_retention": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+    "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653",
+    "bytes": 47888
+  },
+  "current_source_test_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-originals.2026-10-20T16-27.json",
+    "sha256": "be0e6f69d6e1f05f6f37f93f371fbb107da582a7ebe9702758327776eb6817ee",
+    "bytes": 63118
+  },
+  "source_test_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/discovery_runtime/test_service_publication.py": "bf5b712119e569acb8b90c329a7f0e62bdc7f7449bcfeb9e0ba74963bc7928d0",
+    "tests/discovery_runtime/test_service_boundaries.py": "380bb0bef28e759aac7929a61a5467ce1bda51e9cbc5cb5ff7e6990d183c4c89"
+  },
+  "fixture_comparison": {
+    "locations": [
+      "tests/discovery_runtime/test_service.py:163",
+      "tests/discovery_runtime/test_service.py:186",
+      "tests/discovery_runtime/test_service_publication.py:122"
+    ],
+    "same_population": true,
+    "description": "Both parameters use a fresh function-scoped MemoryService seeded from the same immutable initialization plan. The configured combined-role profile has one browser/web/online client, repository-only analyzer consent and application/verification/proposals roots. Neither case seeds source files or feature contracts. Earlier parameter writes cannot enter the next parameter's independent memory state.",
+    "request": {
+      "mode": "discovery-complete",
+      "write": true,
+      "format": "both"
+    },
+    "difference": "Only the requested report kind differs."
+  },
+  "call_path": [
+    {
+      "location": "service_reports.py:53",
+      "observation": "One report_projection call derives both output views."
+    },
+    {
+      "location": "operations.py:333",
+      "observation": "One plan_mutation call validates the two-file prospective graph; mutation_plan.py:407 calls structural validate_snapshot."
+    },
+    {
+      "location": "mutation_io.py:303",
+      "observation": "commit_mutation reconstructs plan_mutation and thus performs a second independent prospective structural validation."
+    },
+    {
+      "location": "mutation_io.py:380",
+      "observation": "Successful writes end with independent structural postcondition validation. These are static call sites, not measured call counts."
+    },
+    {
+      "location": "validation.py:138",
+      "observation": "Each report-present validation recomputes the structured report from authored inputs. The Markdown peer does not add a second identity-bearing report artifact."
+    },
+    {
+      "location": "validation_operation.py:233",
+      "observation": "Both reports evaluate discovery-complete as requested. Coverage then reuses that mode. Parity additionally evaluates parity-complete."
+    },
+    {
+      "location": "validation_operation.py:155",
+      "observation": "The common complete coverage/dimensions/acceptance result is cached within one assessment. The parity mode separately runs target-aware completion and complete parity validation."
+    }
+  ],
+  "diagnostic_conclusion": "No unexpected fixture-population expansion or service-level recursive assessment was identified. Accepted planning, commit reconstruction and postcondition validation repeat report recomputation across distinct assessment instances. The interrupted inner operation is unobservable from retained stdout; CPU activity does not identify it.",
+  "timing_qualification": "The runner emitted 20-second progress observations to the tool transcript, not per-node durations. The following bounds are arithmetic intervals from those retained conversation observations, not newly timed executions.",
+  "observed_progress": [
+    {
+      "elapsed_seconds": 340.757,
+      "completed_nodes": 34
+    },
+    {
+      "elapsed_seconds": 360.795,
+      "completed_nodes": 35
+    },
+    {
+      "elapsed_seconds": 521.19,
+      "completed_nodes": 35
+    },
+    {
+      "elapsed_seconds": 541.245,
+      "completed_nodes": 36
+    },
+    {
+      "elapsed_seconds": 561.289,
+      "completed_nodes": 37
+    },
+    {
+      "elapsed_seconds": 581.337,
+      "completed_nodes": 39
+    },
+    {
+      "elapsed_seconds": 741.691,
+      "completed_nodes": 39
+    },
+    {
+      "elapsed_seconds": 761.726,
+      "completed_nodes": 40
+    },
+    {
+      "elapsed_seconds": 881.955,
+      "completed_nodes": 40
+    }
+  ],
+  "case_duration_intervals_seconds": {
+    "new_contract_actual_publication_completed": [
+      160.395,
+      200.488
+    ],
+    "coverage_report_publication_completed": [
+      160.354,
+      200.437
+    ],
+    "parity_report_active_before_interruption": [
+      138.46482,
+      158.49982
+    ]
+  },
+  "whole_batch_seconds": 900.19082,
+  "timing_conclusion": "The timeout does not establish that parity exceeded the duration of the completed coverage case. No exact per-case duration was recorded.",
+  "pending": [
+    "69 retained continuation nodes, including the interrupted case",
+    "Current complete six-module named-body coverage",
+    "Combined final core/gateway reversed-module isolation",
+    "Independent complete core task acceptance"
+  ],
+  "executed_harness": {
+    "encoding": "gzip-base64",
+    "sha256": "cd00db7105aa74f0513f10b4d285d3d78c75938d280cf17cb195387d8946afef",
+    "bytes": 10438,
+    "data": "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"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "task": "P6-T1",
+  "observed_at": "2026-10-20T15:18:37.945027+00:00",
+  "path": "tests/discovery_runtime/test_service_boundaries.py",
+  "absent": true,
+  "shared_baseline": {
+    "path": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+    "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+  },
+  "scope": "Existing error/resource/authority and interrupted-effect controls; memory fixtures only. No production expansion."
+}

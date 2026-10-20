@@ -1,0 +1,23 @@
+{
+  "Timestamp": "2026-10-20T14-54",
+  "Command": ".venv/Scripts/python.exe -m black packages/discovery-runtime/src/drm_copilot_discovery/gateway.py packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py packages/discovery-runtime/src/drm_copilot_discovery/doctor.py tests/discovery_runtime/test_gateway.py tests/discovery_runtime/test_gateway_local.py tests/discovery_runtime/test_doctor.py",
+  "EXIT_CODE": 0,
+  "qualification": "Exact raw UTF-8 streams; base64 retains original path and newline bytes.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "streams": {
+    "stdout": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "base64": "cmVmb3JtYXR0ZWQgcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxnYXRld2F5LnB5DQpyZWZvcm1hdHRlZCBwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XGdhdGV3YXlfbG9jYWwucHkNCnJlZm9ybWF0dGVkIHRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfZG9jdG9yLnB5DQpyZWZvcm1hdHRlZCB0ZXN0c1xkaXNjb3ZlcnlfcnVudGltZVx0ZXN0X2dhdGV3YXkucHkNCnJlZm9ybWF0dGVkIHRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfZ2F0ZXdheV9sb2NhbC5weQ0KDQpBbGwgZG9uZSEg4pyoIPCfjbAg4pyoDQo1IGZpbGVzIHJlZm9ybWF0dGVkLCAxIGZpbGUgbGVmdCB1bmNoYW5nZWQuDQo=",
+      "sha256": "19818adaf32cd6ecf3086b617a88941126a1d61f8117c0e0e7eacef692c8903e",
+      "bytes": 395
+    }
+  }
+}

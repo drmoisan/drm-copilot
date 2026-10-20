@@ -1,0 +1,135 @@
+{
+  "Timestamp": "2026-10-20T16-32",
+  "Command": "poetry run python SCRATCH/issue-980-p6t1-gateway-gp1-residue.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Five finite GP1 documentation corrections remain; GW1/GW2/GW3 functional confirmation is retained. No new behavioral investigation or test execution.",
+  "status": "GP1_TEXT_CORRECTIONS_REQUIRED",
+  "task": "P6-T1",
+  "authority": "atomic_execution_p6t1_gateway_repair_confirmation_20261020",
+  "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+  "rule": "Keep docstrings accurate and contract-oriented; parameter meanings/constraints, actual returns and contract exceptions must match behavior.",
+  "scope_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "70317b21203fb11dd640fa2036b8b13521516f8ce8c8f7412b4d177e2b9207db",
+      "bytes": 15032
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "15d1ffba846eb418b8046cad1d2455c725167da2985f4c7e80f6fb44185564e1",
+      "bytes": 16934
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+      "bytes": 12590
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "7cb784279aac1e0d0aa6f7b6f38e7a0e50df1a3eb010e064851fe5ea361135fd",
+      "bytes": 17049
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "54399f29e71f00b20fac8b9c4036126c91bced0c12e8c1239dac5792fa72e6b7",
+      "bytes": 12772
+    }
+  ],
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+      "sha256": "8b091fecd4f8fd0f2a832705577f3310671d4a26f6664cf18378b191143c9d5c",
+      "bytes": 75013
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+      "sha256": "6dd9f01571209147eda24121bf55c7160ce4cf26bf35b16edd70919a2883f199",
+      "bytes": 40134
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.json",
+      "sha256": "f68c7e17a2084f1c2ebfdcc192efeb3cc6b46d60cfb53ab11935e8e9ce7af110",
+      "bytes": 20217
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-archive.2026-10-20T16-23.json",
+      "sha256": "9a74510a5c7223b8a2b26776d88c6df722ded75e6452522810f7119a1e427154",
+      "bytes": 109083
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-repair7-probes.2026-10-20T16-20.raw.json",
+      "sha256": "40da3cbd370a5933020f20e2092a0c9a588681182f0607ffcb6cf5b0febd9aca",
+      "bytes": 12241
+    }
+  ],
+  "findings": [
+    {
+      "id": "GP1-R1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "definition": "_failure",
+      "line": 94,
+      "docstring": "Return a fixed empty failure; retain only recognized enums from value.\n\ncode and exit_code are trusted boundary choices. Unknown context necessarily uses\nexit 2. No source text, substitute identity, effects or receipt survives.\n\ncode (str): selected fixed failure or simulated process status. exit_code\n(Literal[2, 3]): selected supported outcome code. value (JsonObject | None):\noptional decoded context or context-exit exception. Returns DiscoveryResult with\nnull runtime/manifest and no effects; invalid trusted values raise ValueError.",
+      "issue": "The code parameter describes a simulated process status; value: JsonObject | None describes a context-exit exception.",
+      "required_text_correction": "Describe code as the fixed gateway failure code and value as optional parsed JSON context. Neither parameter carries a process status or exception.",
+      "scope": "docstring only; preserve executable AST, assertions, decorators, signatures and parameter population"
+    },
+    {
+      "id": "GP1-R2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "definition": "LocalServiceIO.writer",
+      "line": 148,
+      "docstring": "Return a same-root guarded recapturing writer without publishing bytes.\n\nBaseline and authority are trusted core values. Reject foreign identity with\nPermissionError. Fresh captures retain this reader; accepted mutation validation\nremains responsible for exact grants and complete CAS.\n\nbaseline (CapturedWorkspace): captured workspace, or None before capture.\nauthority (ServiceAuthority): authenticated local identity and exact grants.\nReturns GuardedMutationWriter; invalid identity raises PermissionError. No\npublication occurs until the writer is invoked.",
+      "issue": "The required CapturedWorkspace baseline is described as possibly None.",
+      "required_text_correction": "Describe the required accepted capture used for the same-root guarded writer; remove the absent-baseline alternative.",
+      "scope": "docstring only; preserve executable AST, assertions, decorators, signatures and parameter population"
+    },
+    {
+      "id": "GP1-R3",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "definition": "LocalServiceIO._recapture",
+      "line": 175,
+      "docstring": "Reload the same profile and repository through the bound trusted reader.\n\nbaseline (CapturedWorkspace): captured workspace, or None before capture.\nReturns CapturedWorkspace; I/O, path and budget failures propagate. Reads the\nexact bound workspace and repository.",
+      "issue": "The required CapturedWorkspace baseline is described as possibly None.",
+      "required_text_correction": "Describe the required prior capture whose profile and repository are reloaded; remove the absent-baseline alternative.",
+      "scope": "docstring only; preserve executable AST, assertions, decorators, signatures and parameter population"
+    },
+    {
+      "id": "GP1-R4",
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "definition": "MemoryProcess.__exit__",
+      "line": 231,
+      "docstring": "Model deterministic context closure; no external resources exist. kind\n(type[BaseException] | None): context-exit exception type, if any. value\n(BaseException | None): optional decoded context or context-exit exception.\ntraceback (TracebackType | None): context-exit traceback, if any. Returns None;\nmemory-only effects; AssertionError on mismatch.",
+      "issue": "The BaseException | None value is described as optional decoded context.",
+      "required_text_correction": "Describe value solely as the context-exit exception instance, or None when no exception occurred.",
+      "scope": "docstring only; preserve executable AST, assertions, decorators, signatures and parameter population"
+    },
+    {
+      "id": "GP1-R5",
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "definition": "test_unexpected_executor_failure_cannot_claim_empty_effects.refuse",
+      "line": 434,
+      "docstring": "Fail after invocation without disclosing the simulated internal error. args\n(object): captured positional test arguments. ports (object): captured keyword\ncollaborators. Returns DiscoveryResult; memory-only effects; AssertionError on\nmismatch.",
+      "issue": "The test double claims to return DiscoveryResult and raise AssertionError, but unconditionally raises ValueError.",
+      "required_text_correction": "State that the test double does not return and deliberately raises ValueError after invocation; preserve its declared signature and executable body.",
+      "scope": "docstring only; preserve executable AST, assertions, decorators, signatures and parameter population"
+    }
+  ],
+  "functional_result": {
+    "GW1": "Confirmed: post-executor serialization failure returns exit 3 with fixed stderr and no replacement JSON.",
+    "GW2": "Confirmed: deadline is armed before pipe reading and cleanup is observed by the retained deterministic manual-timer probe. This is not a native elapsed-time test.",
+    "GW3": "Confirmed: doctor path work is reserved before SnapshotIO path processing; the retained tight-budget probe rejects with no text measurement or workspace byte read.",
+    "focused_proof": "Retain the exact 98 passing cases, including 86 original and 12 new cases, from the frozen owner receipt."
+  },
+  "dependency_boundary": {
+    "status": "DEPENDENT_WIP_NOT_TASK_ACCEPTANCE",
+    "reason": "The fixed lazy gateway executor imports service.execute; the six core service modules are not in the current committed HEAD.",
+    "combined_preservation": "The coordinator authorized preservation of six frozen core modules and three tests as explicitly unaccepted WIP, with their timeout/source/test archives. Their partial test result is not acceptance.",
+    "core_result": "40 of 109 passed; one operational interruption and 68 unexecuted; no assertion failure and no saved coverage."
+  },
+  "open_behavioral_probes": [],
+  "remaining": [
+    "Apply only these five text corrections and bind executable AST identity to the frozen 98-case candidate.",
+    "Finish the existing evidence/path union; combined reverse isolation and whole-task final gates remain pending."
+  ],
+  "mutations": "Only this new review evidence and staging metadata; no production, test, Git, checkpoint or checkoff changes."
+}

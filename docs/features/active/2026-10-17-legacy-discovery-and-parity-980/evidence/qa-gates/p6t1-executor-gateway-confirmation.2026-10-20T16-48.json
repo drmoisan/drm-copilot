@@ -1,0 +1,253 @@
+{
+  "Timestamp": "2026-10-20T16:48:23.455980+00:00",
+  "Command": "Bounded independent GW1/GW2/GW3/GP1 confirmation and combined preservation closure",
+  "EXIT_CODE": 0,
+  "task": "P6-T1",
+  "status": "READY_FOR_COMBINED_PRESERVATION_COMMIT",
+  "task_accepted": false,
+  "reviewer": "/root/legacy_discovery_orchestrator/atomic_execution",
+  "route": "atomic_execution_p6t1_gateway_repair_confirmation_20261020",
+  "phase": "S5_P6T1_gateway_repair_confirmation",
+  "head": "5ce0a9edc840d1e5f2b7cf0c95baeaaf90602874",
+  "findings": [],
+  "open_probes": [],
+  "closed_findings": [
+    "GW1",
+    "GW2",
+    "GW3",
+    "GP1"
+  ],
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-review.2026-10-20T15-52.json",
+      "sha256": "8b091fecd4f8fd0f2a832705577f3310671d4a26f6664cf18378b191143c9d5c",
+      "bytes": 75013
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-probe.2026-10-20T15-52.json",
+      "sha256": "6dd9f01571209147eda24121bf55c7160ce4cf26bf35b16edd70919a2883f199",
+      "bytes": 40134
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.json",
+      "sha256": "3307257a35f936e3be5501ff116552734b060cd99ba283ad14eb45fbad3ecde7",
+      "bytes": 9642
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-repair-freeze.2026-10-20T16-23.json",
+      "sha256": "f68c7e17a2084f1c2ebfdcc192efeb3cc6b46d60cfb53ab11935e8e9ce7af110",
+      "bytes": 20217
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-contract-ast.2026-10-20T16-36.json",
+      "sha256": "290173c30dafcab935d1d3ca72ed361b5b4a23b0cd6ed79583a40cf2ee6bc8e6",
+      "bytes": 30824
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1",
+      "bytes": 19332
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-evidence-inventory.2026-10-20T16-39.json",
+      "sha256": "9f540ff85014b2d3b92e1691fd3d2df1974d79bc0e2d5db1b9e1bbc81be4e8f4",
+      "bytes": 28955
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-core-preservation-staging.2026-10-20T16-34.json",
+      "sha256": "b4ee7a3c5deaee558d0f5d01e74f9691a38d520ff1faf4e9445eb7e459da8bb0",
+      "bytes": 70529
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+      "sha256": "0691f8816124bb027470a9235dc814bfd8c682d60cd1f56a4962108ade0bb368",
+      "bytes": 8862
+    }
+  ],
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-confirmation-reader.2026-10-20T16-48.json",
+    "sha256": "c5614fd48d8657c18d46016eb9e663572cc0cb7c70d88db123292e833f6399d0",
+    "bytes": 38808
+  },
+  "gateway": {
+    "scope": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+        "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+        "bytes": 14986
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+        "sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+        "bytes": 16991
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+        "sha256": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+        "bytes": 12590
+      },
+      {
+        "path": "tests/discovery_runtime/test_gateway.py",
+        "sha256": "3aa18d3bebef593ff3942a8d0154194e7bec045ab8b49aba26c41e296fdb77b5",
+        "bytes": 17118
+      },
+      {
+        "path": "tests/discovery_runtime/test_gateway_local.py",
+        "sha256": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+        "bytes": 20246
+      },
+      {
+        "path": "tests/discovery_runtime/test_doctor.py",
+        "sha256": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+        "bytes": 17639
+      },
+      {
+        "path": "tests/discovery_runtime/gateway_test_support.py",
+        "sha256": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+        "bytes": 12799
+      },
+      {
+        "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+        "sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+        "bytes": 11812
+      }
+    ],
+    "functional_confirmation": [
+      "Post-executor emission failure returns exit 3 with fixed stderr and no fabricated empty-effect JSON.",
+      "The fixed deadline starts before blocking pipe reads and is cancelled/joined during cleanup; process kill/wait cleanup remains bound.",
+      "Doctor reserves actual path and capture work before lookup, hashing and I/O; retained counted rejection observes no text measurement or byte read."
+    ],
+    "contracts": {
+      "authorized_docstrings_corrected": 5,
+      "all_eight_executable_asts_unchanged": true,
+      "original_test_functions": 35,
+      "original_assertions": 112,
+      "original_parametrization_unchanged": true,
+      "approved_fixture_decorator": "pytest.mark.usefixtures('fixed_deadline')",
+      "original_intent_targets_confirmed": 8
+    },
+    "ordered_proof": {
+      "format": "PASS",
+      "lint": "PASS",
+      "types": "PASS",
+      "tests": {
+        "passed": 98,
+        "seconds": 155.84,
+        "original": 86,
+        "new": 12
+      },
+      "prior_repair_run": {
+        "passed": 98,
+        "seconds": 153.03
+      },
+      "proofs": [
+        {
+          "path": "evidence/qa-gates/p6t1-gateway-contract1-black.2026-10-20T16-36.raw.json",
+          "sha256": "47e0b9fd5ce499411271f1efe8a73122c4a656eeb34f51da6856fdac428e6b93",
+          "passed": null
+        },
+        {
+          "path": "evidence/qa-gates/p6t1-gateway-contract1-ruff.2026-10-20T16-36.raw.json",
+          "sha256": "b79968bbc9fbbcb6ae1f78b843840e19af8e8328f886ec7b52c1befc3ec03397",
+          "passed": null
+        },
+        {
+          "path": "evidence/qa-gates/p6t1-gateway-contract1-types.2026-10-20T16-36.raw.json",
+          "sha256": "77effb3bba8ba531cebd4afea386a218c193211b38fe4b37f90701d5c0677281",
+          "passed": null
+        },
+        {
+          "path": "evidence/qa-gates/p6t1-gateway-contract1-tests.2026-10-20T16-39.raw.json",
+          "sha256": "d9b067b52b7cbd79492aea938d755812c1a57372949f7ee6f84ff1dbd993cca0",
+          "passed": 98
+        }
+      ],
+      "source_and_dependency_hashes_unchanged": true,
+      "reviewer_behavior_runs": 0
+    },
+    "coverage": {
+      "modules": 3,
+      "named_body_ranges": 28,
+      "statements": {
+        "covered": 353,
+        "total": 354
+      },
+      "branches": {
+        "covered": 93,
+        "total": 94
+      },
+      "minimum_named_body_line_percent": 92.85714285714286,
+      "prior_counts_unchanged": true,
+      "changed_line_or_prior_covered_line_loss": false,
+      "raw_counters_augmented": false,
+      "raw": {
+        "sha256": "ca1be5f6f8058ff0bef5a7191aa11cea3bb92e553777cfaea88b1bb8f1eec1e3",
+        "bytes": 32370,
+        "terminal_lf": false,
+        "counters_augmented": false,
+        "same_named_body_counts": true
+      },
+      "remaining_guard": "gateway_local.LocalServiceIO.authorize line 130 and arc 129->130; retained unchanged guard, within measured floor."
+    }
+  },
+  "dependency_boundary": {
+    "gateway_independently_runnable_against_head": false,
+    "reason": "The gateway's lazy service dispatch imports six core production modules absent from HEAD.",
+    "combined_preservation_authorized": true,
+    "core_status": "UNACCEPTED_WIP",
+    "core_source_test_paths": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "tests/discovery_runtime/test_service.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service_boundaries.py"
+    ],
+    "retained_core_proof": {
+      "collected": 109,
+      "passed": 40,
+      "interrupted": 1,
+      "unexecuted": 68,
+      "remaining": 69,
+      "assertion_failures": 0,
+      "operational_limit_seconds": 900,
+      "saved_coverage": false
+    },
+    "qualification": "The six core modules and three tests are preserved recoverably with the existing 161-path evidence closure. This does not accept core behavior, coverage or task completion. The active continuation is outside this checkpoint."
+  },
+  "evidence_qualifications": [
+    "Owner raw streams and sources retain their exact hashes; readable views retain documented path/UTF-8 normalization separately.",
+    "Coverage JSON without terminal LF remains exact archived raw data.",
+    "Original and adapted probes are separately bound. The adaptation changes only stale source-hash guards, manual Timer observations and repair assertions.",
+    "Manual Timer/call-order proof is not native elapsed-time or installed-host proof.",
+    "The 35-function/112-assertion preservation and 98-case count do not invent verbose executed node identities absent from the retained output.",
+    "Original failed receipts and reader diagnostics remain in the preservation union."
+  ],
+  "pending": [
+    "Core remaining-node behavior and full named-body coverage.",
+    "Combined final reverse/isolation and full service integration/native verification.",
+    "P6-T1 acceptance and checkoff.",
+    "P8 host authority and real revocation; P6 rejects host markers, grants/receipts and prepare/finalize."
+  ],
+  "counts": {
+    "tasks": {
+      "accepted": 46,
+      "total": 84
+    },
+    "source_acs": {
+      "accepted": 23,
+      "total": 66
+    }
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-preservation-staging.2026-10-20T16-48.json"
+}

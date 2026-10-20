@@ -1,0 +1,24 @@
+{
+  "Timestamp": "2026-10-20T16-32",
+  "Command": "poetry run python SCRATCH/issue-980-p6t1-gateway-gp1-residue.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Three new evidence paths only; this manifest includes itself, with its exact self hash reported externally.",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue-staging.2026-10-20T16-32.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.json",
+      "sha256": "3307257a35f936e3be5501ff116552734b060cd99ba283ad14eb45fbad3ecde7",
+      "bytes": 9642
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-gateway-gp1-residue.2026-10-20T16-32.md",
+      "sha256": "cd133a0fa359c0fb06640cf27973927f7dd2b29cfa93ac44ce74841ae89e3d4f",
+      "bytes": 2586
+    }
+  ],
+  "self_binding": "Included in stage_paths; SHA-256 and bytes reported by the authoring command to avoid self-reference."
+}

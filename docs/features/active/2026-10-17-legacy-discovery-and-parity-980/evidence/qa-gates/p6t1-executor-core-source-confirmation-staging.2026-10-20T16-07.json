@@ -1,0 +1,29 @@
+{
+  "task": "P6-T1",
+  "status": "SOURCE_CONFIRMATION_EVIDENCE_ONLY_NOT_CHECKED_WIP",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-confirmation-reader.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation-staging.2026-10-20T16-07.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-confirmation-reader.2026-10-20T16-07.json",
+      "sha256": "37d8458d220295a3516c69cd8de375f3ebf72745d6122c990caf014e1bd0349a",
+      "bytes": 9327
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.json",
+      "sha256": "0691f8816124bb027470a9235dc814bfd8c682d60cd1f56a4962108ade0bb368",
+      "bytes": 8862
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-core-source-confirmation.2026-10-20T16-07.md",
+      "sha256": "cb757c9a1865bcfda606f7fdcf91cc5d2918e882a40b2cc72e6cfef9a94b3a7c",
+      "bytes": 1559
+    }
+  ],
+  "self_treatment": "Included in stage_paths; its hash is returned externally, not recursively embedded.",
+  "scope_qualification": "Only four new reviewer evidence files. Not the final owner/candidate staging union."
+}

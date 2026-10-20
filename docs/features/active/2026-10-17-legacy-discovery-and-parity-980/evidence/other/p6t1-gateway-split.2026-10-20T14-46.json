@@ -1,0 +1,26 @@
+{
+  "Timestamp": "2026-10-20T14-46",
+  "Command": "Read-only size and proposed-path absence verification",
+  "EXIT_CODE": 0,
+  "Output Summary": "Gateway is 483 physical lines; approved local adapter/test split paths were absent before creation.",
+  "baseline": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+  "gateway_lines": 483,
+  "paths": [
+    {
+      "exists": false,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py"
+    },
+    {
+      "exists": false,
+      "path": "tests/discovery_runtime/test_gateway_local.py"
+    }
+  ],
+  "dependencies": [
+    "InitializationIO",
+    "ActivationStore",
+    "GuardedMutationWriter",
+    "LocalGitReader",
+    "load_build_identity"
+  ],
+  "authority": "Coordinator-approved cohesive split; parent owns lifecycle, build generation and acceptance."
+}
