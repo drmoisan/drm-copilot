@@ -1,0 +1,119 @@
+{
+  "stage": "types",
+  "label": "p5t2-adapter-pass1-types",
+  "started": "2026-10-20T05:49:37.532655+00:00",
+  "finished": "2026-10-20T05:49:39.465320+00:00",
+  "duration_seconds": 1.933,
+  "command": "poetry run pyright scripts/dev_tools/discovery/parity_report.py tests/scripts/dev_tools/discovery/test_parity_report.py",
+  "exit_code": 1,
+  "source_before": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "cdcc918cc2dc2959610fed2f7ecccf22a3d2a2b28b3cd198d34d9468d0e9b3df",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "72f497f7160bbb2b59cf1798f2a23ac613c9efd41ec990a8ddc614ccc6b9bbff",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "8c04ec943c302f8ea38db3262fbe0459c8f3d7e47e6c57720a00e84947e9142f",
+      "physical_lines": 248
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "cdcc918cc2dc2959610fed2f7ecccf22a3d2a2b28b3cd198d34d9468d0e9b3df",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "72f497f7160bbb2b59cf1798f2a23ac613c9efd41ec990a8ddc614ccc6b9bbff",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "8c04ec943c302f8ea38db3262fbe0459c8f3d7e47e6c57720a00e84947e9142f",
+      "physical_lines": 248
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-pass1-types-054939.stdout.bin",
+      "raw_sha256": "3333dbe4655708d285331bb3ff83ec3d5bb29b73f62b776aaf0a9e2ad5a98ac3",
+      "raw_bytes": 5653,
+      "presentation": ".\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:50:53 - error: Argument of type \"dict[str, list[dict[str, str]]]\" cannot be assigned to parameter \"artifact\" of type \"dict[str, object]\" in function \"build_parity_rows\"\n  \u00a0\u00a0\"dict[str, list[dict[str, str]]]\" is not assignable to \"dict[str, object]\"\n  \u00a0\u00a0\u00a0\u00a0Type parameter \"_VT@dict\" is invariant, but \"list[dict[str, str]]\" is not the same as \"object\"\n  \u00a0\u00a0\u00a0\u00a0Consider switching from \"dict\" to \"Mapping\" which is covariant in the value type (reportArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:230:62 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> str\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:230:69 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:232:40 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown, value: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:232:47 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:232:53 - error: Type of parameter \"value\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:232:74 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"object\" in function \"append\"\n  \u00a0\u00a0Argument type is \"tuple[Unknown, Unknown]\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:257:62 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:257:69 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:272:62 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:272:69 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:273:56 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown, value: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:273:63 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:273:69 - error: Type of parameter \"value\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:311:62 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:311:69 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:313:40 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown, text: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:313:47 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:313:53 - error: Type of parameter \"text\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_parity_report.py:313:73 - error: Argument type is unknown\n  \u00a0\u00a0Argument corresponds to parameter \"object\" in function \"append\" (reportUnknownArgumentType)\n20 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-adapter-pass1-types-054939.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}

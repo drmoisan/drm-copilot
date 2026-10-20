@@ -1,0 +1,40 @@
+{
+  "status": "LIST_ONLY_NOT_STAGED",
+  "owned_source_only": [
+    "scripts/dev_tools/discovery/parity_report.py",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py"
+  ],
+  "files": {
+    "scripts/dev_tools/discovery/parity_report.py": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-format.2026-10-20T05-44.json": "7ae7fd42b0a4c956fb25b308df9af6bbe096066ae0dcf48c9c520fd2c07b6328",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-format.2026-10-20T05-44.md": "7b2ee7543d4e885531f6b4a1cd04c99f720e48501facda157debb89ceba8b8dc",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-lint.2026-10-20T05-44.json": "1cda004958e8ebe634417d627858bd740f6b483dab1249135f7bd5462fbc1ca5",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-lint.2026-10-20T05-44.md": "7478e61e2bff08c1c85ff3fcc5b6387fc987a10a39f49ab7c9b2b67b89f8d013",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-tests.2026-10-20T05-44.json": "3bd36caf6a9ead344c516eb40ea5f80b275d4cadf7b43bdb64792ea6a3a35b3b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-tests.2026-10-20T05-44.md": "72f519a8d780f4d853028ec5329abf24b099aabfdcfebe9a18951b1fa6935cff",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-types.2026-10-20T05-44.json": "5fa93e1f18655c4a5ea5672aa7d3be013f52e5ff0063508c6a6f5b0f46355fee",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-baseline-types.2026-10-20T05-44.md": "e0655642b37297109ee98708d11158f46c617cc4ddb71c88250c7eb4098407e2",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-adapter-integration-baseline.2026-10-20T05-44.json": "c1e1e92d275d9cefd01e50ffa02b7458ef39ade4381317f3c20018a18295b83f",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-draft-format.2026-10-20T05-46.json": "cbfdb3bffde0acbb1d2a494228c6043948b3ef8376e67f9c71843f35d23c4f06",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-draft-format.2026-10-20T05-46.md": "80f2b17c32d3d4e6aed0c8586192b2e93abac6cf127eb0f1266bef050c8e9801",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-freeze.2026-10-20T05-51.json": "656c6a446a2d26fff8222010cf6f15494525a9f71d8eccd5cc4b95f9af9d103b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-lossless-archive.2026-10-20T05-51.json": "88fc1e00a7c8fd72bbf804b9b1a490614e8d01db42d19ce875ef9d47a319cd7a",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-format.2026-10-20T05-49.json": "dcc41ec07f7e31a273040247c4b650cb74a0e7bc026fbd76c3d64ccc76ae8b29",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-format.2026-10-20T05-49.md": "aed67952d955157dfc6e1be81d55b7ecd8230c7099f638dd26256ef43449f448",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-lint.2026-10-20T05-49.json": "b57fb6e941914a3824a3658c852e093cfe0efcebd8d9e3c73cc381b43a9b1e6e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-lint.2026-10-20T05-49.md": "9d4cb0a658a6edaed2b81f395d833e565834cf32a993af2d57327b2ad67a0114",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-types.2026-10-20T05-49.json": "9cc420bd72f05b889569c229b3bf342fc1126f11b3ebfa918efefe6e2d738bca",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass1-types.2026-10-20T05-49.md": "4ee7c45aa1d8bcfcf7a9a807902de66be92b2dd073add4332a84a388fe96236a",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass2-format.2026-10-20T05-50.json": "bb055dd8f5c780ff16dc578c8dc4da2000a6ffa2cb62baa31fac775c2a258b40",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass2-format.2026-10-20T05-50.md": "c13c0e371e14a23f14be67c64a05dd8a05ab941681d6719b1dd7821995aeed57",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-format.2026-10-20T05-50.json": "e9484d273bfa5f8156c6d4c18e2564c8706a322f274a77d5bcbfe6cd0287e326",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-format.2026-10-20T05-50.md": "b4610ccc527aac8a84c8e65d100227d8ee10cb7bed833ac97419c736da8560d2",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-lint.2026-10-20T05-50.json": "d52773ccc494d29d0a9d9dcc02f995407266028b5b000c6741274c876fbc8be0",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-lint.2026-10-20T05-50.md": "4c2d9d828c8eac6ff244587174034f3a387036622c8b3847d69a977c0b631c18",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-tests.2026-10-20T05-50.json": "1ce4add262ac80615e33f5d114080acf16f9250a8d2a9856deb5fc727deb6e86",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-tests.2026-10-20T05-50.md": "36a0c9b5656d4126462bb3694e068cbacf5f210c7214ff7c956f535dcd34b5ce",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-types.2026-10-20T05-50.json": "888b092c083140df4588b16b791482911e47d9e21e31515d74c387e958db5d89",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-pass3-types.2026-10-20T05-50.md": "11a6c294c89e4db385768539354e0be2c472587841b5df6bc3da3de0012421e5"
+  }
+}

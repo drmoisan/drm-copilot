@@ -1,0 +1,65 @@
+{
+  "baseline": "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json",
+  "carrier_module": "drm_copilot_discovery.parity_models",
+  "dimension_fields": {
+    "applicability": "str | None",
+    "consistent": "bool",
+    "disposition_valid": "bool",
+    "name": "str",
+    "pointer": "str",
+    "proof_valid": "bool | None",
+    "required": "bool",
+    "valid": "bool",
+    "verification": "str | None"
+  },
+  "entry_fields": {
+    "approval_valid": "bool | None",
+    "authored_state": "str | None",
+    "client_id": "str | None",
+    "complete": "bool",
+    "dimensions": "tuple[ParityDimensionOutcome, ...]",
+    "duplicate": "bool",
+    "evidence_valid": "bool | None",
+    "implementation_valid": "bool | None",
+    "matrix": "ArtifactRecord",
+    "pointer": "str",
+    "required": "bool | None",
+    "source": "ArtifactRecord | None",
+    "target": "RepositoryIdentity | None",
+    "valid": "bool",
+    "verification_valid": "bool | None"
+  },
+  "envelope_keys": [
+    "parity",
+    "parity_result",
+    "parity_findings"
+  ],
+  "parity_validation": "ParityValidation(findings: tuple[Finding, ...], entries: tuple[ParityEntryOutcome, ...] = ())",
+  "producer_module": "drm_copilot_discovery.parity_report",
+  "public": [
+    "parity_preflight(snapshot: DiscoverySnapshot) -> None",
+    "unavailable_parity_summary() -> JsonObject",
+    "parity_summary(snapshot: DiscoverySnapshot, *, index: ReferenceIndex, evidence: EvidenceValidation, claims: ClaimValidation, decisions: DecisionValidation, dimensions: DimensionValidation, parity: ParityValidation, findings: tuple[Finding, ...]) -> JsonObject",
+    "build_parity_report(snapshot: DiscoverySnapshot, *, identifier: str = 'parity', mode: ValidationMode = 'parity-complete') -> DiscoveryReport",
+    "parse_parity_matrix(text: str) -> dict[str, object]",
+    "build_parity_rows(artifact: dict[str, object]) -> tuple[list[dict[str, object]], dict[str, object]]",
+    "render_parity_report(rows: list[dict[str, object]], summary: dict[str, object]) -> str"
+  ],
+  "public_reexport": "drm_copilot_discovery.parity_rules.ParityValidation",
+  "semantics": [
+    "Retain branch decisions and TargetProof results; never infer validity from missing truncated diagnostics.",
+    "Invalidate all duplicate resolved source/client entries; authored state remains independent from valid and complete.",
+    "Complete requires a valid completed state and actual contextual target proof/current required approval, or valid approved retirement.",
+    "Use complete parity outcomes/dimensions/findings from the same validator operation; no separate assessment or recursion.",
+    "CoveragePopulation defines source-selection availability. Unavailable counts are null; confirmed-empty counts are zero and percentage is null.",
+    "Count source-feature identity, feature/client obligation, authored row and dimension obligation as distinct named units.",
+    "Absent undeclared optional dimensions are not-required, never passed. Present false claims remain invalid.",
+    "Current proposed/blocked decisions remain unresolved; historical rejected/superseded proposals are not active requirements.",
+    "Report output uses a fixed parity heading; coverage heading and bytes remain unchanged.",
+    "Explicit v1 family retains rows/feature_id/parity_status/verification; unversioned entries/id is compatibility-only; explicit v2 rejects in legacy helpers.",
+    "Invalid core parity reports retain a fail/unavailable diagnostic envelope; invalid-core publication still fails."
+  ],
+  "state": "INTERFACE_FROZEN_IMPLEMENTATION_IN_PROGRESS",
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T05:50:36.482836+00:00"
+}
