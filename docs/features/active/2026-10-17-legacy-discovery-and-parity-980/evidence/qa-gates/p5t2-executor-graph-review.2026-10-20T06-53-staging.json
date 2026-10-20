@@ -1,0 +1,28 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:53:35.642463+00:00",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-payload.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-staging.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.json",
+      "sha256": "ae9391372e3b1a08c76754c17ba37609be7bac7787aae91b8df588cdddacb74c",
+      "bytes": 12086
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.md",
+      "sha256": "23681c75b0ba82749c91a10f182b991b5c828fc5d199335a6951ff53ea2eddee",
+      "bytes": 1557
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-payload.json",
+      "sha256": "087be712f28153008c1828b0da68cbd5ab920646c1a2c8117f19e30844fbebe8",
+      "bytes": 90856
+    }
+  ],
+  "qualification": "Only this immutable review's four new evidence paths. Exact source/probe bytes are embedded; no owner artifact/source/test, checkpoint, Git or checkbox changed. Self hash returned separately."
+}

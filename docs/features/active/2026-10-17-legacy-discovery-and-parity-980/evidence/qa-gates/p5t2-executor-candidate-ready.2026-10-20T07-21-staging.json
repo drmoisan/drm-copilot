@@ -1,0 +1,2941 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T07:21:27.007282+00:00",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "owner_closures": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-final-staging.2026-10-20T07-17.json",
+      "sha256": "848a0ae99fd3246a928a7dd288808d46ca5fef523cf707e5aba8994d510867a3",
+      "bytes": 26053
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-staging.2026-10-20T06-50.json",
+      "sha256": "b29041f9722a2598bdc0b69f98df206a8873a14738acbe64514e369c0ab890f6",
+      "bytes": 9036
+    }
+  ],
+  "original_review_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-staging.json",
+    "sha256": "a12b200668b8d902c600a9bd1f89ab8aba78d3a9675ee8bc79e7be10481708ab",
+    "bytes": 1703
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-graph-axis-split.2026-10-20T06-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-graph-test-split.2026-10-20T06-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-metrics-split.2026-10-20T06-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21-payload.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-payload.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-staging.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-graph-source-freeze.2026-10-20T06-41.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-projection-PC1-repair.2026-10-20T06-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-closure-harness.2026-10-20T07-17.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-14.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-evidence-qualification.2026-10-20T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-final-staging.2026-10-20T07-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-first-runner.py-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-focused-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-first-checker.py-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-harness-prepare-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-precheck-prepare-harness.2026-10-20T07-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-raw-archive.2026-10-20T07-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair1format-black.2026-10-20T07-01.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair1format-black.2026-10-20T07-01.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-black.2026-10-20T07-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-black.2026-10-20T07-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-ruff.2026-10-20T07-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-ruff.2026-10-20T07-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-black.2026-10-20T07-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-black.2026-10-20T07-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-pyright.2026-10-20T07-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-pyright.2026-10-20T07-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-ruff.2026-10-20T07-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-ruff.2026-10-20T07-02.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-black.2026-10-20T07-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-black.2026-10-20T07-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-pyright.2026-10-20T07-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-pyright.2026-10-20T07-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-ruff.2026-10-20T07-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-ruff.2026-10-20T07-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-tests.2026-10-20T07-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-tests.2026-10-20T07-03.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-black.2026-10-20T07-04.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-black.2026-10-20T07-04.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-counted-controls.2026-10-20T07-04.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-counted-controls.2026-10-20T07-04.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-pyright.2026-10-20T07-04.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-pyright.2026-10-20T07-04.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-ruff.2026-10-20T07-04.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-ruff.2026-10-20T07-04.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-black.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-black.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-pyright.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-pyright.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-ruff.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-ruff.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-black.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-black.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-counted-controls.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-counted-controls.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-coverage.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-coverage.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-pyright.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-pyright.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-ruff.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-ruff.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-tests.2026-10-20T07-07.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-tests.2026-10-20T07-07.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-staging.2026-10-20T07-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-approval-harness-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.py-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-probe-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-coverage.2026-10-20T06-56.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-approved-version.py-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-budget-version.py-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-initial.py-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused1-black.2026-10-20T06-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused1-black.2026-10-20T06-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-black.2026-10-20T06-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-black.2026-10-20T06-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-pyright.2026-10-20T06-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-pyright.2026-10-20T06-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-ruff.2026-10-20T06-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-ruff.2026-10-20T06-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-tests.2026-10-20T06-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-tests.2026-10-20T06-38.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-black.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-black.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-coverage.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-coverage.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-pyright.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-pyright.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-ruff.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-ruff.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused12format-black.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused12format-black.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-approval-controls.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-approval-controls.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-black.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-black.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-coverage.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-coverage.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-pyright.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-pyright.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-ruff.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-ruff.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-tests.2026-10-20T06-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-tests.2026-10-20T06-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-approval-controls.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-approval-controls.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-black.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-black.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-coverage.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-coverage.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-pyright.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-pyright.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-ruff.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-ruff.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-tests.2026-10-20T06-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-tests.2026-10-20T06-47.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-black.2026-10-20T06-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-black.2026-10-20T06-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-ruff.2026-10-20T06-22.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-ruff.2026-10-20T06-22.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-black.2026-10-20T06-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-black.2026-10-20T06-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-pyright.2026-10-20T06-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-pyright.2026-10-20T06-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-ruff.2026-10-20T06-23.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-ruff.2026-10-20T06-23.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-black.2026-10-20T06-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-black.2026-10-20T06-24.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-pyright.2026-10-20T06-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-pyright.2026-10-20T06-24.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-ruff.2026-10-20T06-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-ruff.2026-10-20T06-24.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-tests.2026-10-20T06-24.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-tests.2026-10-20T06-24.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused5-black.2026-10-20T06-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused5-black.2026-10-20T06-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-black.2026-10-20T06-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-black.2026-10-20T06-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused7format-black.2026-10-20T06-36.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused7format-black.2026-10-20T06-36.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-black.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-black.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-pyright.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-pyright.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-ruff.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-ruff.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-black.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-black.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-pyright.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-pyright.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-ruff.2026-10-20T06-37.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-ruff.2026-10-20T06-37.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-freeze-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-harness-update-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-mobile-harness-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-original-binding-check-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-raw-archive.2026-10-20T06-56.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-staging.2026-10-20T06-56.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-source-freeze-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-split-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-structure-probe-readable.2026-10-20T06-56.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-format.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-format.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-lint.2026-10-20T06-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-lint.2026-10-20T06-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-types.2026-10-20T06-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-types.2026-10-20T06-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-format.2026-10-20T06-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-format.2026-10-20T06-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-lint.2026-10-20T06-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-lint.2026-10-20T06-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-tests.2026-10-20T06-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-tests.2026-10-20T06-45.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-types.2026-10-20T06-40.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-types.2026-10-20T06-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft-format.2026-10-20T05-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft-format.2026-10-20T05-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-format.2026-10-20T05-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-format.2026-10-20T05-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-lint.2026-10-20T05-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-lint.2026-10-20T05-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-format.2026-10-20T05-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-format.2026-10-20T05-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-lint.2026-10-20T05-53.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-lint.2026-10-20T05-53.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-freeze.2026-10-20T06-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-lossless-archive.2026-10-20T06-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-staging.2026-10-20T06-50.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-format.2026-10-20T06-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-format.2026-10-20T06-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-lint.2026-10-20T06-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-lint.2026-10-20T06-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-tests.2026-10-20T06-49.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-tests.2026-10-20T06-49.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-types.2026-10-20T06-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-types.2026-10-20T06-48.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-pass2-lossless-archive.2026-10-20T06-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-pass2-result.2026-10-20T06-46.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-source-freeze.2026-10-20T06-20.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "tests/discovery_runtime/test_parity_axes.py",
+    "tests/discovery_runtime/test_parity_metrics.py",
+    "tests/discovery_runtime/test_parity_report.py",
+    "tests/discovery_runtime/test_parity_report_projection.py",
+    "tests/discovery_runtime/test_report_models.py",
+    "tests/discovery_runtime/test_validation_modes.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21-staging.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-graph-axis-split.2026-10-20T06-57.json",
+      "sha256": "430146efa9f02d864280eaa5b952a29d75782803f9aecd32a7c800026d18a65f",
+      "bytes": 678,
+      "expected_git_sha256": "430146efa9f02d864280eaa5b952a29d75782803f9aecd32a7c800026d18a65f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-graph-test-split.2026-10-20T06-15.json",
+      "sha256": "0557e84db8ff2dd381d13bef9426d373d13c28ab7095cfe9da5c1ca4f291f553",
+      "bytes": 491,
+      "expected_git_sha256": "0557e84db8ff2dd381d13bef9426d373d13c28ab7095cfe9da5c1ca4f291f553",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-metrics-split.2026-10-20T06-17.json",
+      "sha256": "6ea57584cdbbb428cf1dbee7ade40e11076d4046885435969e49e318a0edae7c",
+      "bytes": 636,
+      "expected_git_sha256": "6ea57584cdbbb428cf1dbee7ade40e11076d4046885435969e49e318a0edae7c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21-payload.json",
+      "sha256": "cb72b334b501f0ccad79eb15cbe4e5af571caf820235ade51af8da737d1cb37b",
+      "bytes": 99449,
+      "expected_git_sha256": "cb72b334b501f0ccad79eb15cbe4e5af571caf820235ade51af8da737d1cb37b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21.json",
+      "sha256": "defe2e6db240ef825c34b41db6ccf09afb2190cc187402ed1c947f1d3cf90827",
+      "bytes": 18599,
+      "expected_git_sha256": "defe2e6db240ef825c34b41db6ccf09afb2190cc187402ed1c947f1d3cf90827",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21.md",
+      "sha256": "f0c6804c1a76e28495227f7890655bed3307c561fbbccbb658412536be9844ca",
+      "bytes": 2061,
+      "expected_git_sha256": "f0c6804c1a76e28495227f7890655bed3307c561fbbccbb658412536be9844ca",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-payload.json",
+      "sha256": "087be712f28153008c1828b0da68cbd5ab920646c1a2c8117f19e30844fbebe8",
+      "bytes": 90856,
+      "expected_git_sha256": "087be712f28153008c1828b0da68cbd5ab920646c1a2c8117f19e30844fbebe8",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53-staging.json",
+      "sha256": "a12b200668b8d902c600a9bd1f89ab8aba78d3a9675ee8bc79e7be10481708ab",
+      "bytes": 1703,
+      "expected_git_sha256": "a12b200668b8d902c600a9bd1f89ab8aba78d3a9675ee8bc79e7be10481708ab",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.json",
+      "sha256": "ae9391372e3b1a08c76754c17ba37609be7bac7787aae91b8df588cdddacb74c",
+      "bytes": 12086,
+      "expected_git_sha256": "ae9391372e3b1a08c76754c17ba37609be7bac7787aae91b8df588cdddacb74c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.md",
+      "sha256": "23681c75b0ba82749c91a10f182b991b5c828fc5d199335a6951ff53ea2eddee",
+      "bytes": 1557,
+      "expected_git_sha256": "23681c75b0ba82749c91a10f182b991b5c828fc5d199335a6951ff53ea2eddee",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-graph-source-freeze.2026-10-20T06-41.json",
+      "sha256": "5641b33321e718bad62b41a0baf3fea10e97234a8bee6034c6b06116ef8c3fe9",
+      "bytes": 1455,
+      "expected_git_sha256": "5641b33321e718bad62b41a0baf3fea10e97234a8bee6034c6b06116ef8c3fe9",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-projection-PC1-repair.2026-10-20T06-31.json",
+      "sha256": "d54e3a30d59149f734247b9160ce0f008b361fb2136f10d272a665cce95ceb4c",
+      "bytes": 74877,
+      "expected_git_sha256": "d54e3a30d59149f734247b9160ce0f008b361fb2136f10d272a665cce95ceb4c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-closure-harness.2026-10-20T07-17.txt",
+      "sha256": "3cc46852d99918121a63d9a68870ca3151f1417a9a1396d41f8a635b676919d6",
+      "bytes": 3747,
+      "expected_git_sha256": "3cc46852d99918121a63d9a68870ca3151f1417a9a1396d41f8a635b676919d6",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-14.json",
+      "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892",
+      "bytes": 116133,
+      "expected_git_sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+      "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892",
+      "bytes": 116133,
+      "expected_git_sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-evidence-qualification.2026-10-20T07-17.json",
+      "sha256": "d2de9a88f518bb02b39392d963c02e684043bd28952e62e0b2a08a791dfea521",
+      "bytes": 2738,
+      "expected_git_sha256": "d2de9a88f518bb02b39392d963c02e684043bd28952e62e0b2a08a791dfea521",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-final-staging.2026-10-20T07-17.json",
+      "sha256": "848a0ae99fd3246a928a7dd288808d46ca5fef523cf707e5aba8994d510867a3",
+      "bytes": 26053,
+      "expected_git_sha256": "848a0ae99fd3246a928a7dd288808d46ca5fef523cf707e5aba8994d510867a3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-first-runner.py-harness.2026-10-20T07-15.txt",
+      "sha256": "1106ef1392646e19ee69c09815da7f07242ae2e721a9f5626eff5ded6ece6131",
+      "bytes": 5709,
+      "expected_git_sha256": "1106ef1392646e19ee69c09815da7f07242ae2e721a9f5626eff5ded6ece6131",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-focused-harness.2026-10-20T07-15.txt",
+      "sha256": "496a5b3def061a9f10f56963512904c75d9518628357b4026bde0c6e2f74ce0f",
+      "bytes": 5918,
+      "expected_git_sha256": "496a5b3def061a9f10f56963512904c75d9518628357b4026bde0c6e2f74ce0f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-first-checker.py-harness.2026-10-20T07-15.txt",
+      "sha256": "077412a401a5487464a40c917c67cfb120ac6469e197ded1653c47b5ac8fb2a5",
+      "bytes": 11894,
+      "expected_git_sha256": "077412a401a5487464a40c917c67cfb120ac6469e197ded1653c47b5ac8fb2a5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze-harness.2026-10-20T07-15.txt",
+      "sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036",
+      "bytes": 12070,
+      "expected_git_sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+      "sha256": "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb",
+      "bytes": 33861,
+      "expected_git_sha256": "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-harness-prepare-harness.2026-10-20T07-15.txt",
+      "sha256": "512484c2ee11debb95487d0fe080f53d2cf6a242d415f940dbb813218e230dfd",
+      "bytes": 904,
+      "expected_git_sha256": "512484c2ee11debb95487d0fe080f53d2cf6a242d415f940dbb813218e230dfd",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-precheck-prepare-harness.2026-10-20T07-15.txt",
+      "sha256": "8e334e5d8e74b57887ed8556211f8d93eaac3e6f0eb0dea8ea769cd9cdf04a48",
+      "bytes": 711,
+      "expected_git_sha256": "8e334e5d8e74b57887ed8556211f8d93eaac3e6f0eb0dea8ea769cd9cdf04a48",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-raw-archive.2026-10-20T07-15.json",
+      "sha256": "f6f9edf2ed5e33c322967a34be860b9dd2c6929c916d6d07e57398da80606725",
+      "bytes": 196467,
+      "expected_git_sha256": "f6f9edf2ed5e33c322967a34be860b9dd2c6929c916d6d07e57398da80606725",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair1format-black.2026-10-20T07-01.json",
+      "sha256": "71e98c889aba8389d50f9581502914e9c219ce081e63d448255c0d4d30d76565",
+      "bytes": 5351,
+      "expected_git_sha256": "71e98c889aba8389d50f9581502914e9c219ce081e63d448255c0d4d30d76565",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair1format-black.2026-10-20T07-01.md",
+      "sha256": "0020d7bc60dd758c16999800be0fa4c1d5a615608507e61e172a63b41f4ec402",
+      "bytes": 749,
+      "expected_git_sha256": "0020d7bc60dd758c16999800be0fa4c1d5a615608507e61e172a63b41f4ec402",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-black.2026-10-20T07-02.json",
+      "sha256": "696584554681de8094daaddfd3fc20f447f4c99bf3f7666c69489c3597f0aa88",
+      "bytes": 5218,
+      "expected_git_sha256": "696584554681de8094daaddfd3fc20f447f4c99bf3f7666c69489c3597f0aa88",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-black.2026-10-20T07-02.md",
+      "sha256": "9e23d26c87bb3fda65cecfe3a1515f73fc04c5a5e090273744f941ff645b016e",
+      "bytes": 613,
+      "expected_git_sha256": "9e23d26c87bb3fda65cecfe3a1515f73fc04c5a5e090273744f941ff645b016e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-ruff.2026-10-20T07-02.json",
+      "sha256": "568afbee67606828f5c7fa04c0992d4ecac6ef6fc874af904923e6f3e5d64c23",
+      "bytes": 6633,
+      "expected_git_sha256": "568afbee67606828f5c7fa04c0992d4ecac6ef6fc874af904923e6f3e5d64c23",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair2-ruff.2026-10-20T07-02.md",
+      "sha256": "89aca47fe0737f78f5d16368eeae79f761c95eb18283ae33b5de1965ddef82a3",
+      "bytes": 2004,
+      "expected_git_sha256": "89aca47fe0737f78f5d16368eeae79f761c95eb18283ae33b5de1965ddef82a3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-black.2026-10-20T07-02.json",
+      "sha256": "16cb6640ad802981c63e8262018d7e043910ba2b4d75708414b9c9e393377524",
+      "bytes": 5218,
+      "expected_git_sha256": "16cb6640ad802981c63e8262018d7e043910ba2b4d75708414b9c9e393377524",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-black.2026-10-20T07-02.md",
+      "sha256": "f6f737f1f611ebee3eff9e966626e8d6a3d4b3454a74d411160d95d1dce7582a",
+      "bytes": 613,
+      "expected_git_sha256": "f6f737f1f611ebee3eff9e966626e8d6a3d4b3454a74d411160d95d1dce7582a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-pyright.2026-10-20T07-02.json",
+      "sha256": "5285288a37cfe9069b760f8789fd2fac3bc76a0d8d996a4c94089e3032210a5a",
+      "bytes": 6146,
+      "expected_git_sha256": "5285288a37cfe9069b760f8789fd2fac3bc76a0d8d996a4c94089e3032210a5a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-pyright.2026-10-20T07-02.md",
+      "sha256": "99eb96a1cabe21cd89c9ed689193dfa617e19e579838f6c2ffb5c76df016c195",
+      "bytes": 1505,
+      "expected_git_sha256": "99eb96a1cabe21cd89c9ed689193dfa617e19e579838f6c2ffb5c76df016c195",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-ruff.2026-10-20T07-02.json",
+      "sha256": "da036d01da509f60de50b1966e2502a1138218af55c2912a6b44b8d839e5ae18",
+      "bytes": 5159,
+      "expected_git_sha256": "da036d01da509f60de50b1966e2502a1138218af55c2912a6b44b8d839e5ae18",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair3-ruff.2026-10-20T07-02.md",
+      "sha256": "baa5f0296947af6a76c7351d34359dd44baeae30a618d7287fb41cbc982c16ee",
+      "bytes": 560,
+      "expected_git_sha256": "baa5f0296947af6a76c7351d34359dd44baeae30a618d7287fb41cbc982c16ee",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-black.2026-10-20T07-03.json",
+      "sha256": "eb8f901c4bd6b019d8b60ae6ef3ede83baf6f89782a5d1054e1610ea20f2accc",
+      "bytes": 5218,
+      "expected_git_sha256": "eb8f901c4bd6b019d8b60ae6ef3ede83baf6f89782a5d1054e1610ea20f2accc",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-black.2026-10-20T07-03.md",
+      "sha256": "690675caca08feb30a310d70472a864cd759d6dd5ccf843e167f9ef651257be3",
+      "bytes": 613,
+      "expected_git_sha256": "690675caca08feb30a310d70472a864cd759d6dd5ccf843e167f9ef651257be3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-pyright.2026-10-20T07-03.json",
+      "sha256": "bcde65348d58bf61dcf53b865cbe9f8fc07bac18e066482481551a4726bc71b5",
+      "bytes": 5334,
+      "expected_git_sha256": "bcde65348d58bf61dcf53b865cbe9f8fc07bac18e066482481551a4726bc71b5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-pyright.2026-10-20T07-03.md",
+      "sha256": "e18954df7546a175b888f4c7ba3d8c1551a37852c3ef3d7dd26cc4dbabe42a66",
+      "bytes": 732,
+      "expected_git_sha256": "e18954df7546a175b888f4c7ba3d8c1551a37852c3ef3d7dd26cc4dbabe42a66",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-ruff.2026-10-20T07-03.json",
+      "sha256": "f2f7d1d155409ceb47c515c4e24340106294285cba98b4dc3fc397a1dc57f06d",
+      "bytes": 5158,
+      "expected_git_sha256": "f2f7d1d155409ceb47c515c4e24340106294285cba98b4dc3fc397a1dc57f06d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-ruff.2026-10-20T07-03.md",
+      "sha256": "b782c889f012c4bc75230ef6825efa5e0161a8e7a6c37ab7d05972c324898cfb",
+      "bytes": 560,
+      "expected_git_sha256": "b782c889f012c4bc75230ef6825efa5e0161a8e7a6c37ab7d05972c324898cfb",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-tests.2026-10-20T07-03.json",
+      "sha256": "018a4f7dce529195580a688839fff5b9bff2b69963bcca66d2df676d4f656de1",
+      "bytes": 19104,
+      "expected_git_sha256": "018a4f7dce529195580a688839fff5b9bff2b69963bcca66d2df676d4f656de1",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair4-tests.2026-10-20T07-03.md",
+      "sha256": "863f4bb300ff97b2957f49f94068eaf334aed81ed62b2c7934569340dd0010b1",
+      "bytes": 13568,
+      "expected_git_sha256": "863f4bb300ff97b2957f49f94068eaf334aed81ed62b2c7934569340dd0010b1",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-black.2026-10-20T07-04.json",
+      "sha256": "0e322cc29085ac168152af1114882ccdb4ddb296f9136e087a6dae70d463c595",
+      "bytes": 5218,
+      "expected_git_sha256": "0e322cc29085ac168152af1114882ccdb4ddb296f9136e087a6dae70d463c595",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-black.2026-10-20T07-04.md",
+      "sha256": "d117449de1bfa5893f5fa924f11459ba1fa69e65473f85b6ff7affe4dc306dc6",
+      "bytes": 613,
+      "expected_git_sha256": "d117449de1bfa5893f5fa924f11459ba1fa69e65473f85b6ff7affe4dc306dc6",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-counted-controls.2026-10-20T07-04.json",
+      "sha256": "e6caff798f6d5c8388dea2f4d8e6a4c1840d44a4496e1fbc93203d9ccd1e7558",
+      "bytes": 8540,
+      "expected_git_sha256": "e6caff798f6d5c8388dea2f4d8e6a4c1840d44a4496e1fbc93203d9ccd1e7558",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-counted-controls.2026-10-20T07-04.md",
+      "sha256": "f5e672dfa181756df3a5c179b147e3cd54ef00dea6473d5f8c09be9ffa08b47b",
+      "bytes": 3899,
+      "expected_git_sha256": "f5e672dfa181756df3a5c179b147e3cd54ef00dea6473d5f8c09be9ffa08b47b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-pyright.2026-10-20T07-04.json",
+      "sha256": "33e091a903f6724ba576f7269db259591dbae425aabde79386332518feda7a89",
+      "bytes": 5334,
+      "expected_git_sha256": "33e091a903f6724ba576f7269db259591dbae425aabde79386332518feda7a89",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-pyright.2026-10-20T07-04.md",
+      "sha256": "5b5d2e4a3b8596a7e35cafdabb20ef10ab0f6664d6332a5bc2a4cf1b08fa41e6",
+      "bytes": 732,
+      "expected_git_sha256": "5b5d2e4a3b8596a7e35cafdabb20ef10ab0f6664d6332a5bc2a4cf1b08fa41e6",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-ruff.2026-10-20T07-04.json",
+      "sha256": "e8a978ec6f188d052fa0d055bda19c1fcf67e30979eee98df42a72a818384d32",
+      "bytes": 5159,
+      "expected_git_sha256": "e8a978ec6f188d052fa0d055bda19c1fcf67e30979eee98df42a72a818384d32",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair5-ruff.2026-10-20T07-04.md",
+      "sha256": "c3abc23097a68aa6ee94dee6bce300425ac545a11531faca0dc17ac065c7fd67",
+      "bytes": 560,
+      "expected_git_sha256": "c3abc23097a68aa6ee94dee6bce300425ac545a11531faca0dc17ac065c7fd67",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-black.2026-10-20T07-07.json",
+      "sha256": "d2f11a6be5b659307203264615002fde913c42003d7e77a3a638db004e60fc53",
+      "bytes": 5218,
+      "expected_git_sha256": "d2f11a6be5b659307203264615002fde913c42003d7e77a3a638db004e60fc53",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-black.2026-10-20T07-07.md",
+      "sha256": "595a2e6390786cad1c0290a11f0f20327812f6408a9e5b326c35e43cd35e9474",
+      "bytes": 613,
+      "expected_git_sha256": "595a2e6390786cad1c0290a11f0f20327812f6408a9e5b326c35e43cd35e9474",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-pyright.2026-10-20T07-07.json",
+      "sha256": "5fb8d75be610d07947894e03795ca28c563ba8e24d197e385e72c781f5a3d1d4",
+      "bytes": 5684,
+      "expected_git_sha256": "5fb8d75be610d07947894e03795ca28c563ba8e24d197e385e72c781f5a3d1d4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-pyright.2026-10-20T07-07.md",
+      "sha256": "712c1b6be200320e907db8669864818566f33c2efc2932823b6f86c2d8b0c11a",
+      "bytes": 1066,
+      "expected_git_sha256": "712c1b6be200320e907db8669864818566f33c2efc2932823b6f86c2d8b0c11a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-ruff.2026-10-20T07-07.json",
+      "sha256": "55a69042e77cca01ebbd4d02296d47085b692a761347270932442d99dc91810d",
+      "bytes": 5159,
+      "expected_git_sha256": "55a69042e77cca01ebbd4d02296d47085b692a761347270932442d99dc91810d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair6-ruff.2026-10-20T07-07.md",
+      "sha256": "1c0936ef5bdb036ecca955dcd1f5c62cd3508e3f410faf2304ef0c46c932916e",
+      "bytes": 560,
+      "expected_git_sha256": "1c0936ef5bdb036ecca955dcd1f5c62cd3508e3f410faf2304ef0c46c932916e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-black.2026-10-20T07-07.json",
+      "sha256": "68e68d772d64df6f8bfa5c5b36fb5f4ad8c493eb630e5d6283e04cee1299b1cb",
+      "bytes": 5218,
+      "expected_git_sha256": "68e68d772d64df6f8bfa5c5b36fb5f4ad8c493eb630e5d6283e04cee1299b1cb",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-black.2026-10-20T07-07.md",
+      "sha256": "99874cafe74fe54e98985be246069410b723ddf5a740e0c24cb938119c52fc4a",
+      "bytes": 613,
+      "expected_git_sha256": "99874cafe74fe54e98985be246069410b723ddf5a740e0c24cb938119c52fc4a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-counted-controls.2026-10-20T07-07.json",
+      "sha256": "d16060992a48e47977eb449f736d381e874a4eec6b30e3450e428cb84f5a0c92",
+      "bytes": 5632,
+      "expected_git_sha256": "d16060992a48e47977eb449f736d381e874a4eec6b30e3450e428cb84f5a0c92",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-counted-controls.2026-10-20T07-07.md",
+      "sha256": "9450ec0beb21252e103f55956c117c8117fae838bcab1322c5f6abb76050256f",
+      "bytes": 1002,
+      "expected_git_sha256": "9450ec0beb21252e103f55956c117c8117fae838bcab1322c5f6abb76050256f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-coverage.2026-10-20T07-07.json",
+      "sha256": "fccd1e4217c55e8fa473a99585bcb5061e96c1af3232a1d58f36b9179655646b",
+      "bytes": 4868,
+      "expected_git_sha256": "fccd1e4217c55e8fa473a99585bcb5061e96c1af3232a1d58f36b9179655646b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-coverage.2026-10-20T07-07.md",
+      "sha256": "911b057629e05230af77175ea78554648bc3445a63207ad388202111b1cabda6",
+      "bytes": 286,
+      "expected_git_sha256": "911b057629e05230af77175ea78554648bc3445a63207ad388202111b1cabda6",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-pyright.2026-10-20T07-07.json",
+      "sha256": "4453bedf6ac070c8a21a84bf50f6baefe8b2e2316568ebea4b4251d8d2248115",
+      "bytes": 5334,
+      "expected_git_sha256": "4453bedf6ac070c8a21a84bf50f6baefe8b2e2316568ebea4b4251d8d2248115",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-pyright.2026-10-20T07-07.md",
+      "sha256": "84382c9d6b822c56c6674a5f3c3cfb7786af78d2b4d340e3447bd0e26f05d9d4",
+      "bytes": 732,
+      "expected_git_sha256": "84382c9d6b822c56c6674a5f3c3cfb7786af78d2b4d340e3447bd0e26f05d9d4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-ruff.2026-10-20T07-07.json",
+      "sha256": "43cffa1f296a990a3b56861813ffe9dc126011fe6bbefa934f2f9ea974a9f811",
+      "bytes": 5159,
+      "expected_git_sha256": "43cffa1f296a990a3b56861813ffe9dc126011fe6bbefa934f2f9ea974a9f811",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-ruff.2026-10-20T07-07.md",
+      "sha256": "29b622e626b9bb49753439ef2162f24cc86d09281953eaae8727b4bdc4b1849a",
+      "bytes": 560,
+      "expected_git_sha256": "29b622e626b9bb49753439ef2162f24cc86d09281953eaae8727b4bdc4b1849a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-tests.2026-10-20T07-07.json",
+      "sha256": "0d7a19956bd139d3f3d74630a3d16c129182a12b5fe95aaa711daf290f9a7d87",
+      "bytes": 14671,
+      "expected_git_sha256": "0d7a19956bd139d3f3d74630a3d16c129182a12b5fe95aaa711daf290f9a7d87",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-repair7-tests.2026-10-20T07-07.md",
+      "sha256": "079c1b2682f3d3ec6666890a7adda7a3187e896798cfbaedb45e0271bc19af33",
+      "bytes": 9149,
+      "expected_git_sha256": "079c1b2682f3d3ec6666890a7adda7a3187e896798cfbaedb45e0271bc19af33",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-staging.2026-10-20T07-15.json",
+      "sha256": "0988913389a542c3d046d1499bed277b5e9df24c56bcc745a9f7155094662937",
+      "bytes": 34302,
+      "expected_git_sha256": "0988913389a542c3d046d1499bed277b5e9df24c56bcc745a9f7155094662937",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-approval-harness-readable.2026-10-20T06-56.txt",
+      "sha256": "ad1f63d5cd8c7aecba74d0430a533bb06e9d06e020fec60ce1fdbfe83f181ab5",
+      "bytes": 657,
+      "expected_git_sha256": "ad1f63d5cd8c7aecba74d0430a533bb06e9d06e020fec60ce1fdbfe83f181ab5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.json",
+      "sha256": "2b41d8cf84e0d79f6b2165dfa326cd3ef2464fa99e8049098e7cccce40f62994",
+      "bytes": 2645,
+      "expected_git_sha256": "2b41d8cf84e0d79f6b2165dfa326cd3ef2464fa99e8049098e7cccce40f62994",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.md",
+      "sha256": "b3449756849071285b245c4d9065f6220f03b5277fed2ca15c7244030feed5d5",
+      "bytes": 1349,
+      "expected_git_sha256": "b3449756849071285b245c4d9065f6220f03b5277fed2ca15c7244030feed5d5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-original.py-readable.2026-10-20T06-56.txt",
+      "sha256": "bfa4216e92539dcaa078b68a2287a286190eced270ab9662d23f146e8ed7db51",
+      "bytes": 17642,
+      "expected_git_sha256": "bfa4216e92539dcaa078b68a2287a286190eced270ab9662d23f146e8ed7db51",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-conflict-probe-readable.2026-10-20T06-56.txt",
+      "sha256": "b450ce18ec60e218a83a0bd035fa5fcea699fce6ce5b5a6ac652d64dfb1f159a",
+      "bytes": 4263,
+      "expected_git_sha256": "b450ce18ec60e218a83a0bd035fa5fcea699fce6ce5b5a6ac652d64dfb1f159a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-coverage.2026-10-20T06-56.json",
+      "sha256": "7ae50142f1245db2d149ddc6804118ac0c9af09d0c221ed71e4cd6360f9e85c1",
+      "bytes": 115018,
+      "expected_git_sha256": "7ae50142f1245db2d149ddc6804118ac0c9af09d0c221ed71e4cd6360f9e85c1",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-approved-version.py-readable.2026-10-20T06-56.txt",
+      "sha256": "9a3576b82c60d7e2cfa845565f7100ae66e0b9b5cda86c0b589356998c1fb4e5",
+      "bytes": 5982,
+      "expected_git_sha256": "9a3576b82c60d7e2cfa845565f7100ae66e0b9b5cda86c0b589356998c1fb4e5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-budget-version.py-readable.2026-10-20T06-56.txt",
+      "sha256": "943fd511499a5f41a86ea528e50eb806c62b1298c307b600fdf295d05a996898",
+      "bytes": 5672,
+      "expected_git_sha256": "943fd511499a5f41a86ea528e50eb806c62b1298c307b600fdf295d05a996898",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-initial.py-readable.2026-10-20T06-56.txt",
+      "sha256": "0cab2c397ac566b1170a568d9fb752b2ab37c77fa7cfcb44e781a2e2a61fbf85",
+      "bytes": 5285,
+      "expected_git_sha256": "0cab2c397ac566b1170a568d9fb752b2ab37c77fa7cfcb44e781a2e2a61fbf85",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused-readable.2026-10-20T06-56.txt",
+      "sha256": "b221584e4b7b9d150349cc1259dab3c31a8f41bbe0c4564e861f57c0dfde78de",
+      "bytes": 6069,
+      "expected_git_sha256": "b221584e4b7b9d150349cc1259dab3c31a8f41bbe0c4564e861f57c0dfde78de",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused1-black.2026-10-20T06-22.json",
+      "sha256": "fc41bbc3e493feddbfb62e43f5ceae4eb4e0c0fb49857228fcde810c8adc81ca",
+      "bytes": 5352,
+      "expected_git_sha256": "fc41bbc3e493feddbfb62e43f5ceae4eb4e0c0fb49857228fcde810c8adc81ca",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused1-black.2026-10-20T06-22.md",
+      "sha256": "6b7d306c653067c67ae4ff6e6ffb15d9d26c3c39065c219251f696223e664639",
+      "bytes": 976,
+      "expected_git_sha256": "6b7d306c653067c67ae4ff6e6ffb15d9d26c3c39065c219251f696223e664639",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-black.2026-10-20T06-38.json",
+      "sha256": "2a8cdd25a6cf40a068b05e545815dca59cd029ee7e1e4e5212dbe5ae63fb6d17",
+      "bytes": 4927,
+      "expected_git_sha256": "2a8cdd25a6cf40a068b05e545815dca59cd029ee7e1e4e5212dbe5ae63fb6d17",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-black.2026-10-20T06-38.md",
+      "sha256": "c09d4c1c7b5d5532b86951b5dc9c2772b33a5b3d208fa237fed7b63edcc38f88",
+      "bytes": 569,
+      "expected_git_sha256": "c09d4c1c7b5d5532b86951b5dc9c2772b33a5b3d208fa237fed7b63edcc38f88",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-pyright.2026-10-20T06-38.json",
+      "sha256": "d9f7c6bfec4d9d0d4b215bdf06dee3b8aad50045a8683729c43f5195c7e434cf",
+      "bytes": 5043,
+      "expected_git_sha256": "d9f7c6bfec4d9d0d4b215bdf06dee3b8aad50045a8683729c43f5195c7e434cf",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-pyright.2026-10-20T06-38.md",
+      "sha256": "6b0763f9e65c17a0778cef9f376359c158f1e514fc84abb00b2595d863a4c909",
+      "bytes": 688,
+      "expected_git_sha256": "6b0763f9e65c17a0778cef9f376359c158f1e514fc84abb00b2595d863a4c909",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-ruff.2026-10-20T06-38.json",
+      "sha256": "192946cb108396d4d03d5f71b07ba34eac274a2cbc7eb581567a55e136549f9e",
+      "bytes": 4868,
+      "expected_git_sha256": "192946cb108396d4d03d5f71b07ba34eac274a2cbc7eb581567a55e136549f9e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-ruff.2026-10-20T06-38.md",
+      "sha256": "4f75b2c649a2d76ea7d46618a0ec165de391a77932e353b63666677d6286b333",
+      "bytes": 516,
+      "expected_git_sha256": "4f75b2c649a2d76ea7d46618a0ec165de391a77932e353b63666677d6286b333",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-tests.2026-10-20T06-38.json",
+      "sha256": "ec478993c9d9cd39a8845397f4072a6e950750ee11f555f80414708e7feaf297",
+      "bytes": 12298,
+      "expected_git_sha256": "ec478993c9d9cd39a8845397f4072a6e950750ee11f555f80414708e7feaf297",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused10-tests.2026-10-20T06-38.md",
+      "sha256": "ff07e8157229d62b4fca86e71c62efb0e196a24dd65c0241e522d0ff45066d2a",
+      "bytes": 7100,
+      "expected_git_sha256": "ff07e8157229d62b4fca86e71c62efb0e196a24dd65c0241e522d0ff45066d2a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-black.2026-10-20T06-39.json",
+      "sha256": "cb4eb378355c657e28d43db68fe24c642b8620de36db95ee8db7ee918201b062",
+      "bytes": 4927,
+      "expected_git_sha256": "cb4eb378355c657e28d43db68fe24c642b8620de36db95ee8db7ee918201b062",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-black.2026-10-20T06-39.md",
+      "sha256": "401c504100a9fdf5b2f31f73268ebf9fe157ae55566004031340abaa7e69dbe4",
+      "bytes": 569,
+      "expected_git_sha256": "401c504100a9fdf5b2f31f73268ebf9fe157ae55566004031340abaa7e69dbe4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-coverage.2026-10-20T06-39.json",
+      "sha256": "b02d8f3e9ff84cc665e171be3e974e4764c9ce9be75bc73fb908c850820545b8",
+      "bytes": 4626,
+      "expected_git_sha256": "b02d8f3e9ff84cc665e171be3e974e4764c9ce9be75bc73fb908c850820545b8",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-coverage.2026-10-20T06-39.md",
+      "sha256": "63dadabd779ba03adef9e22fd4abe79a8edd602234b9334d9b9c91e5affb8ccf",
+      "bytes": 284,
+      "expected_git_sha256": "63dadabd779ba03adef9e22fd4abe79a8edd602234b9334d9b9c91e5affb8ccf",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-pyright.2026-10-20T06-39.json",
+      "sha256": "4fdb772a9a4387dcbcc80511a5fac4e2eed49c31864e2b3b484937463a372502",
+      "bytes": 5043,
+      "expected_git_sha256": "4fdb772a9a4387dcbcc80511a5fac4e2eed49c31864e2b3b484937463a372502",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-pyright.2026-10-20T06-39.md",
+      "sha256": "083ecc6c00a61ca4724d08579b8188a6bacb0f37c5b023dc221f195c6ae7525c",
+      "bytes": 688,
+      "expected_git_sha256": "083ecc6c00a61ca4724d08579b8188a6bacb0f37c5b023dc221f195c6ae7525c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-ruff.2026-10-20T06-39.json",
+      "sha256": "e28c964364a215079bbbb37d62cc1fb06f897ed8963520c0e6ecfd527e29afb2",
+      "bytes": 4868,
+      "expected_git_sha256": "e28c964364a215079bbbb37d62cc1fb06f897ed8963520c0e6ecfd527e29afb2",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-ruff.2026-10-20T06-39.md",
+      "sha256": "7c8628637e81fed333bcef42312afd331db919156e039756dcdbdebae06d18d8",
+      "bytes": 516,
+      "expected_git_sha256": "7c8628637e81fed333bcef42312afd331db919156e039756dcdbdebae06d18d8",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.json",
+      "sha256": "96ba02ebb9c1c0df725336ee933de9cf0ee3c5cf4986471ec8f36b141764ee4f",
+      "bytes": 11295,
+      "expected_git_sha256": "96ba02ebb9c1c0df725336ee933de9cf0ee3c5cf4986471ec8f36b141764ee4f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.md",
+      "sha256": "ecebdcfce3401ae7c7097c425a9bc50e8934305adedb0b779a474b96d4cbb5e0",
+      "bytes": 6094,
+      "expected_git_sha256": "ecebdcfce3401ae7c7097c425a9bc50e8934305adedb0b779a474b96d4cbb5e0",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused12format-black.2026-10-20T06-42.json",
+      "sha256": "56c842e53bbc16bec9589cd6e6cf2106f7c80d4bbda3485aec6bcdb78562a4ba",
+      "bytes": 5000,
+      "expected_git_sha256": "56c842e53bbc16bec9589cd6e6cf2106f7c80d4bbda3485aec6bcdb78562a4ba",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused12format-black.2026-10-20T06-42.md",
+      "sha256": "828c5e4689d636152380059b07445016c95f9d26bfd742cedcdc4dcd2aeb4f34",
+      "bytes": 648,
+      "expected_git_sha256": "828c5e4689d636152380059b07445016c95f9d26bfd742cedcdc4dcd2aeb4f34",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-approval-controls.2026-10-20T06-42.json",
+      "sha256": "522a60167eec233f02cec96b49f74ca9bb30935654bd347caff067ffa736230d",
+      "bytes": 5444,
+      "expected_git_sha256": "522a60167eec233f02cec96b49f74ca9bb30935654bd347caff067ffa736230d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-approval-controls.2026-10-20T06-42.md",
+      "sha256": "2f1be0dd800c44b029230c3458b38812daf0dca23c897f2ac79c82cf3785e6bd",
+      "bytes": 1046,
+      "expected_git_sha256": "2f1be0dd800c44b029230c3458b38812daf0dca23c897f2ac79c82cf3785e6bd",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-black.2026-10-20T06-42.json",
+      "sha256": "c6a2538b22acb1db8790a46ba8a5fe0d2fcf6c0c5398b0fd76cda447285c1ee3",
+      "bytes": 4927,
+      "expected_git_sha256": "c6a2538b22acb1db8790a46ba8a5fe0d2fcf6c0c5398b0fd76cda447285c1ee3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-black.2026-10-20T06-42.md",
+      "sha256": "272c8f5180b6e3fd160d7bb0e80deb856b40516fda8234b814a5540359213acf",
+      "bytes": 569,
+      "expected_git_sha256": "272c8f5180b6e3fd160d7bb0e80deb856b40516fda8234b814a5540359213acf",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-coverage.2026-10-20T06-42.json",
+      "sha256": "8c2d16dff40b46bf2e87b05b64322aa4cd2370de927330931c688412293a22e5",
+      "bytes": 4625,
+      "expected_git_sha256": "8c2d16dff40b46bf2e87b05b64322aa4cd2370de927330931c688412293a22e5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-coverage.2026-10-20T06-42.md",
+      "sha256": "2dbe32f56c229944ba7b89a161e096dbc9116c8cea2a99de91771bff59ae81fe",
+      "bytes": 284,
+      "expected_git_sha256": "2dbe32f56c229944ba7b89a161e096dbc9116c8cea2a99de91771bff59ae81fe",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-pyright.2026-10-20T06-42.json",
+      "sha256": "beb00584245a2cf6254af838e208e8433dedf247eb0b61a0a4f01e478ba54e7f",
+      "bytes": 5043,
+      "expected_git_sha256": "beb00584245a2cf6254af838e208e8433dedf247eb0b61a0a4f01e478ba54e7f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-pyright.2026-10-20T06-42.md",
+      "sha256": "62327656c23b43cb9d705798cbe53fb6b38d3d659462fe4a2ac6f32f4c30d897",
+      "bytes": 688,
+      "expected_git_sha256": "62327656c23b43cb9d705798cbe53fb6b38d3d659462fe4a2ac6f32f4c30d897",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-ruff.2026-10-20T06-42.json",
+      "sha256": "479084b3dc834b612cc668c22805a98f5fbf3ace620ad06c24df07151f3fcf9b",
+      "bytes": 4868,
+      "expected_git_sha256": "479084b3dc834b612cc668c22805a98f5fbf3ace620ad06c24df07151f3fcf9b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-ruff.2026-10-20T06-42.md",
+      "sha256": "b1a8ba092d6723de3481e595300dbb3df7d02c6d34440efc193bc2eb56836e8f",
+      "bytes": 516,
+      "expected_git_sha256": "b1a8ba092d6723de3481e595300dbb3df7d02c6d34440efc193bc2eb56836e8f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-tests.2026-10-20T06-42.json",
+      "sha256": "dec049c75491dc979e59e7f4581897ecb8925deff58fa4c37d710e79840b10df",
+      "bytes": 11296,
+      "expected_git_sha256": "dec049c75491dc979e59e7f4581897ecb8925deff58fa4c37d710e79840b10df",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused13-tests.2026-10-20T06-42.md",
+      "sha256": "3fb27e03c52a97498b64c16623aa819a8f7599b515089bc8a59da82e89fd4296",
+      "bytes": 6094,
+      "expected_git_sha256": "3fb27e03c52a97498b64c16623aa819a8f7599b515089bc8a59da82e89fd4296",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-approval-controls.2026-10-20T06-47.json",
+      "sha256": "40acbf5fc4466ac663a7ff368b5038592e4d0dc6d0cf9ef9a48b3a9389945642",
+      "bytes": 5686,
+      "expected_git_sha256": "40acbf5fc4466ac663a7ff368b5038592e4d0dc6d0cf9ef9a48b3a9389945642",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-approval-controls.2026-10-20T06-47.md",
+      "sha256": "1ed2c154aededbd2c769dbed0c3f3630190700e9692653a6664b5976132e5c81",
+      "bytes": 1280,
+      "expected_git_sha256": "1ed2c154aededbd2c769dbed0c3f3630190700e9692653a6664b5976132e5c81",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-black.2026-10-20T06-47.json",
+      "sha256": "98011753806000ad069170be99e0a5304fd5c3baef71afe98cb2b4cd51ef4921",
+      "bytes": 4927,
+      "expected_git_sha256": "98011753806000ad069170be99e0a5304fd5c3baef71afe98cb2b4cd51ef4921",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-black.2026-10-20T06-47.md",
+      "sha256": "f1b92aade2b053e642d33184dc432324f7bd03d2215a50df5ff7be302652b727",
+      "bytes": 569,
+      "expected_git_sha256": "f1b92aade2b053e642d33184dc432324f7bd03d2215a50df5ff7be302652b727",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-coverage.2026-10-20T06-47.json",
+      "sha256": "4fb2adf5703a03f4c94897101c73cf9330b4fee03106df8ef4726b7716dcec03",
+      "bytes": 4626,
+      "expected_git_sha256": "4fb2adf5703a03f4c94897101c73cf9330b4fee03106df8ef4726b7716dcec03",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-coverage.2026-10-20T06-47.md",
+      "sha256": "ff0155cd006f846ec0e74c85b06997787a6d1e43245db91d81e9a482c9f0c02c",
+      "bytes": 284,
+      "expected_git_sha256": "ff0155cd006f846ec0e74c85b06997787a6d1e43245db91d81e9a482c9f0c02c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-pyright.2026-10-20T06-47.json",
+      "sha256": "0e86805978f081e468dd49c5ea9f27fa85168f097b5b0ed52b079806f566af35",
+      "bytes": 5043,
+      "expected_git_sha256": "0e86805978f081e468dd49c5ea9f27fa85168f097b5b0ed52b079806f566af35",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-pyright.2026-10-20T06-47.md",
+      "sha256": "4d0ba2bee45922bbb88c6dbdd8a0a5dc3c94b000893b5cfef3f4b738a1d74bf3",
+      "bytes": 688,
+      "expected_git_sha256": "4d0ba2bee45922bbb88c6dbdd8a0a5dc3c94b000893b5cfef3f4b738a1d74bf3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-ruff.2026-10-20T06-47.json",
+      "sha256": "3bd5cefcd9fd51ee7cf2c2a0846017ae0989b3abc617defe6b7660873df25d1d",
+      "bytes": 4868,
+      "expected_git_sha256": "3bd5cefcd9fd51ee7cf2c2a0846017ae0989b3abc617defe6b7660873df25d1d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-ruff.2026-10-20T06-47.md",
+      "sha256": "b0e8cc836e902554614a193749264ac80856170a035ace02fae3ddf1af8334d4",
+      "bytes": 516,
+      "expected_git_sha256": "b0e8cc836e902554614a193749264ac80856170a035ace02fae3ddf1af8334d4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-tests.2026-10-20T06-47.json",
+      "sha256": "89e1a20d2333d7542b12639b2acdb0700064bcbe4921b58681e38aad348474dc",
+      "bytes": 11296,
+      "expected_git_sha256": "89e1a20d2333d7542b12639b2acdb0700064bcbe4921b58681e38aad348474dc",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused14-tests.2026-10-20T06-47.md",
+      "sha256": "e46f2185076465ff6f5c495a5c448e38057969b2b28f373861d08ff51a5f6053",
+      "bytes": 6094,
+      "expected_git_sha256": "e46f2185076465ff6f5c495a5c448e38057969b2b28f373861d08ff51a5f6053",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-black.2026-10-20T06-22.json",
+      "sha256": "e582efc34f54034e3bc98377c3e66d5b0cf00f03c3aae17afcebd9bf01a75fff",
+      "bytes": 4929,
+      "expected_git_sha256": "e582efc34f54034e3bc98377c3e66d5b0cf00f03c3aae17afcebd9bf01a75fff",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-black.2026-10-20T06-22.md",
+      "sha256": "0ccc00ea54ed078609f4343f0949725790ebb4cd11d710bb93cf01faec07a36f",
+      "bytes": 569,
+      "expected_git_sha256": "0ccc00ea54ed078609f4343f0949725790ebb4cd11d710bb93cf01faec07a36f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-ruff.2026-10-20T06-22.json",
+      "sha256": "ffb1d0841bb5451be0c921e8b79bfdf15604f179db9a4071b6783196a5d91b70",
+      "bytes": 11259,
+      "expected_git_sha256": "ffb1d0841bb5451be0c921e8b79bfdf15604f179db9a4071b6783196a5d91b70",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused2-ruff.2026-10-20T06-22.md",
+      "sha256": "2174c2da8cbbf8161afb0d77ce5e2d9122df8f55e7db2a66f109a4503877ac9c",
+      "bytes": 6712,
+      "expected_git_sha256": "2174c2da8cbbf8161afb0d77ce5e2d9122df8f55e7db2a66f109a4503877ac9c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-black.2026-10-20T06-23.json",
+      "sha256": "1bfc1257a68498408ed17e30f85995be7acd4bd85e063aa83deaf15c7a7f7e6b",
+      "bytes": 4929,
+      "expected_git_sha256": "1bfc1257a68498408ed17e30f85995be7acd4bd85e063aa83deaf15c7a7f7e6b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-black.2026-10-20T06-23.md",
+      "sha256": "b467b6d9bc2109b76148a696f3b679fc36b9fa736e3bbac0cf98fc67e4fcd86e",
+      "bytes": 569,
+      "expected_git_sha256": "b467b6d9bc2109b76148a696f3b679fc36b9fa736e3bbac0cf98fc67e4fcd86e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-pyright.2026-10-20T06-23.json",
+      "sha256": "5be32ab27ee6fc999359f0572628e39834818538c07a67feb0de8eb536e6ede7",
+      "bytes": 8189,
+      "expected_git_sha256": "5be32ab27ee6fc999359f0572628e39834818538c07a67feb0de8eb536e6ede7",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-pyright.2026-10-20T06-23.md",
+      "sha256": "7330fdbc32c001b59690b3f8401a948885b5fc677934adf27e5b651431c29dae",
+      "bytes": 3565,
+      "expected_git_sha256": "7330fdbc32c001b59690b3f8401a948885b5fc677934adf27e5b651431c29dae",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-ruff.2026-10-20T06-23.json",
+      "sha256": "70cdd45c8594c5211273381f81ac16bceea51fc99a940bbb166eaabdb94a844d",
+      "bytes": 4866,
+      "expected_git_sha256": "70cdd45c8594c5211273381f81ac16bceea51fc99a940bbb166eaabdb94a844d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused3-ruff.2026-10-20T06-23.md",
+      "sha256": "1745278bd49f581951610488e218c3a1f076a067555f836e9de2f5a3108bdab1",
+      "bytes": 516,
+      "expected_git_sha256": "1745278bd49f581951610488e218c3a1f076a067555f836e9de2f5a3108bdab1",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-black.2026-10-20T06-24.json",
+      "sha256": "ab716fce9dbd94c8d1f105f754e90d65de2c278848f2def75ae3dc78afac145e",
+      "bytes": 4929,
+      "expected_git_sha256": "ab716fce9dbd94c8d1f105f754e90d65de2c278848f2def75ae3dc78afac145e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-black.2026-10-20T06-24.md",
+      "sha256": "bf44081817347cd71c69c3c10a049c362455ecfb58976952630267ece6cda56f",
+      "bytes": 569,
+      "expected_git_sha256": "bf44081817347cd71c69c3c10a049c362455ecfb58976952630267ece6cda56f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-pyright.2026-10-20T06-24.json",
+      "sha256": "14c4521ac078edd18c9fa8f09cf7ac1e39b999f07684751d9c65d665e797cc56",
+      "bytes": 5047,
+      "expected_git_sha256": "14c4521ac078edd18c9fa8f09cf7ac1e39b999f07684751d9c65d665e797cc56",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-pyright.2026-10-20T06-24.md",
+      "sha256": "d723acd84353a09be7304fee33b2cf46def893490ce843b6dcdc8a8c806e1ef7",
+      "bytes": 688,
+      "expected_git_sha256": "d723acd84353a09be7304fee33b2cf46def893490ce843b6dcdc8a8c806e1ef7",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-ruff.2026-10-20T06-24.json",
+      "sha256": "794730d22649702c86257de3c0413f9433ee46f738a29692f7e3afc549aac5ef",
+      "bytes": 4866,
+      "expected_git_sha256": "794730d22649702c86257de3c0413f9433ee46f738a29692f7e3afc549aac5ef",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-ruff.2026-10-20T06-24.md",
+      "sha256": "368646fcc543748cf03c6f6ab83c25bb023b174ceb03b607e3dfbfaa68936ae8",
+      "bytes": 516,
+      "expected_git_sha256": "368646fcc543748cf03c6f6ab83c25bb023b174ceb03b607e3dfbfaa68936ae8",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-tests.2026-10-20T06-24.json",
+      "sha256": "86c3c6633920911129a81a35d29860c0d891352148cc7537bde5da28b470beec",
+      "bytes": 46694,
+      "expected_git_sha256": "86c3c6633920911129a81a35d29860c0d891352148cc7537bde5da28b470beec",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused4-tests.2026-10-20T06-24.md",
+      "sha256": "db2e3f7ad62301652e608cf77b32640c0466a7c6db1669674354964c511aff7a",
+      "bytes": 39418,
+      "expected_git_sha256": "db2e3f7ad62301652e608cf77b32640c0466a7c6db1669674354964c511aff7a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused5-black.2026-10-20T06-26.json",
+      "sha256": "4c1898f5bb6e3225bb4c06d975d3cd1fcd8800e4ffadbbd24e6fe4db294ada97",
+      "bytes": 5035,
+      "expected_git_sha256": "4c1898f5bb6e3225bb4c06d975d3cd1fcd8800e4ffadbbd24e6fe4db294ada97",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused5-black.2026-10-20T06-26.md",
+      "sha256": "7d7b3c2af05a6181878d70bec35d4e66536005767c5ec3b85bf308fb53ba23ec",
+      "bytes": 683,
+      "expected_git_sha256": "7d7b3c2af05a6181878d70bec35d4e66536005767c5ec3b85bf308fb53ba23ec",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-black.2026-10-20T06-26.json",
+      "sha256": "1f27d9e5f6404091b72654c5fbb887890888c14f47ab62ba377904808dbfd46c",
+      "bytes": 4929,
+      "expected_git_sha256": "1f27d9e5f6404091b72654c5fbb887890888c14f47ab62ba377904808dbfd46c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-black.2026-10-20T06-26.md",
+      "sha256": "99aff193a86677a1d1f43620c22bc5260e75f549479ec562dd640a48040257ef",
+      "bytes": 569,
+      "expected_git_sha256": "99aff193a86677a1d1f43620c22bc5260e75f549479ec562dd640a48040257ef",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.json",
+      "sha256": "9a67850c92dca4073d353517fe980f63b2989d2b72cb94259b8bfd2f418aaee5",
+      "bytes": 5285,
+      "expected_git_sha256": "9a67850c92dca4073d353517fe980f63b2989d2b72cb94259b8bfd2f418aaee5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.md",
+      "sha256": "2c75d077c5b915e520b39ee73dc58ccf07844e9bd51b4bf08aa034eea1b6400f",
+      "bytes": 937,
+      "expected_git_sha256": "2c75d077c5b915e520b39ee73dc58ccf07844e9bd51b4bf08aa034eea1b6400f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused7format-black.2026-10-20T06-36.json",
+      "sha256": "8a443a6434c3f9796fed5d474df14ed2a02b033a6f5a975bca4cb8881ccbe05f",
+      "bytes": 4997,
+      "expected_git_sha256": "8a443a6434c3f9796fed5d474df14ed2a02b033a6f5a975bca4cb8881ccbe05f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused7format-black.2026-10-20T06-36.md",
+      "sha256": "b90549d9447f0b9a7f06fbd7ab9c4540d7ee4e9ffd34e40be75de2f48e0ce9bc",
+      "bytes": 648,
+      "expected_git_sha256": "b90549d9447f0b9a7f06fbd7ab9c4540d7ee4e9ffd34e40be75de2f48e0ce9bc",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-black.2026-10-20T06-37.json",
+      "sha256": "089def589ae282a37f51a3e76df13d82c5f9d46ef4569e78206cc802bbf9ca66",
+      "bytes": 4925,
+      "expected_git_sha256": "089def589ae282a37f51a3e76df13d82c5f9d46ef4569e78206cc802bbf9ca66",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-black.2026-10-20T06-37.md",
+      "sha256": "aeb704de2219f7d02179751d2aaa85feab47b8b0586535692b77a0fdd2f26885",
+      "bytes": 569,
+      "expected_git_sha256": "aeb704de2219f7d02179751d2aaa85feab47b8b0586535692b77a0fdd2f26885",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-pyright.2026-10-20T06-37.json",
+      "sha256": "a66197dfc1a32a9d9a7fd0abdf837201c5f8f29b79817a9c497d55ac02fed8ba",
+      "bytes": 5577,
+      "expected_git_sha256": "a66197dfc1a32a9d9a7fd0abdf837201c5f8f29b79817a9c497d55ac02fed8ba",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-pyright.2026-10-20T06-37.md",
+      "sha256": "1fb164da0a95966e53a2e317e876b4b981e91a6cef3a6e9f383a96bf9d612ebc",
+      "bytes": 1203,
+      "expected_git_sha256": "1fb164da0a95966e53a2e317e876b4b981e91a6cef3a6e9f383a96bf9d612ebc",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-ruff.2026-10-20T06-37.json",
+      "sha256": "38eae613f6ed70689820f084a944d6d077172bda81e6e10d88bfd97eb87c0afa",
+      "bytes": 4866,
+      "expected_git_sha256": "38eae613f6ed70689820f084a944d6d077172bda81e6e10d88bfd97eb87c0afa",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused8-ruff.2026-10-20T06-37.md",
+      "sha256": "1091016da29cf600399298fb42ccee7fc62b7e7069fa2cc3481af4f6e8f0a2bb",
+      "bytes": 516,
+      "expected_git_sha256": "1091016da29cf600399298fb42ccee7fc62b7e7069fa2cc3481af4f6e8f0a2bb",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-black.2026-10-20T06-37.json",
+      "sha256": "3d9057aa14456616463d63971a22422c0c67ec27f394f09a55ea2fbb1085cdb9",
+      "bytes": 4925,
+      "expected_git_sha256": "3d9057aa14456616463d63971a22422c0c67ec27f394f09a55ea2fbb1085cdb9",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-black.2026-10-20T06-37.md",
+      "sha256": "fb4de759449d7f923a007dbd9abfbac873c7bc5b0b65b427a61277a7d0f06962",
+      "bytes": 569,
+      "expected_git_sha256": "fb4de759449d7f923a007dbd9abfbac873c7bc5b0b65b427a61277a7d0f06962",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-pyright.2026-10-20T06-37.json",
+      "sha256": "9c902a1dd9d412d60a704e123b08e97027c88b485513e312bf0f6a78aff0e77b",
+      "bytes": 5299,
+      "expected_git_sha256": "9c902a1dd9d412d60a704e123b08e97027c88b485513e312bf0f6a78aff0e77b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-pyright.2026-10-20T06-37.md",
+      "sha256": "d60d263bb72c7e8fe88110173a4feb99148393de69b8130c7d776d9f0fd40c2a",
+      "bytes": 950,
+      "expected_git_sha256": "d60d263bb72c7e8fe88110173a4feb99148393de69b8130c7d776d9f0fd40c2a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-ruff.2026-10-20T06-37.json",
+      "sha256": "17436afb222684eca8728034869039f38450ba539f692155d161eab34e91bc99",
+      "bytes": 4866,
+      "expected_git_sha256": "17436afb222684eca8728034869039f38450ba539f692155d161eab34e91bc99",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused9-ruff.2026-10-20T06-37.md",
+      "sha256": "1091016da29cf600399298fb42ccee7fc62b7e7069fa2cc3481af4f6e8f0a2bb",
+      "bytes": 516,
+      "expected_git_sha256": "1091016da29cf600399298fb42ccee7fc62b7e7069fa2cc3481af4f6e8f0a2bb",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-freeze-readable.2026-10-20T06-56.txt",
+      "sha256": "178c23d25a4cf0492eb0cf570c3593c927ad9146a7cbe38850f985586fbb07e2",
+      "bytes": 9567,
+      "expected_git_sha256": "178c23d25a4cf0492eb0cf570c3593c927ad9146a7cbe38850f985586fbb07e2",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-harness-update-readable.2026-10-20T06-56.txt",
+      "sha256": "0928dba54a473d7ffc14dab3ccaa6c89bba7f9bbc8c411d3443107abf717639d",
+      "bytes": 1648,
+      "expected_git_sha256": "0928dba54a473d7ffc14dab3ccaa6c89bba7f9bbc8c411d3443107abf717639d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-mobile-harness-readable.2026-10-20T06-56.txt",
+      "sha256": "94284f5d161da47299af487f3e9a4407568e0493dafecf2cc0f6c5ad6744db0c",
+      "bytes": 498,
+      "expected_git_sha256": "94284f5d161da47299af487f3e9a4407568e0493dafecf2cc0f6c5ad6744db0c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-original-binding-check-readable.2026-10-20T06-56.txt",
+      "sha256": "22b0b291d3c67b43ab3bcc875c08cac22339ab746b4cd70a8b9d57eac7984351",
+      "bytes": 968,
+      "expected_git_sha256": "22b0b291d3c67b43ab3bcc875c08cac22339ab746b4cd70a8b9d57eac7984351",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+      "sha256": "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7",
+      "bytes": 28976,
+      "expected_git_sha256": "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-raw-archive.2026-10-20T06-56.json",
+      "sha256": "21cb737e1d61c42bae979a8e1ffbcf59326f1ac57762e493586c8ff16ef1296e",
+      "bytes": 366742,
+      "expected_git_sha256": "21cb737e1d61c42bae979a8e1ffbcf59326f1ac57762e493586c8ff16ef1296e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-staging.2026-10-20T06-56.json",
+      "sha256": "dcfb2aed26b8f25acd947fb8eb1294a7f056ed1ff132dee13152bde49b78f5e5",
+      "bytes": 16679,
+      "expected_git_sha256": "dcfb2aed26b8f25acd947fb8eb1294a7f056ed1ff132dee13152bde49b78f5e5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-source-freeze-readable.2026-10-20T06-56.txt",
+      "sha256": "41440435ca580a01fbd14a9caa3e8577d105049e5326dad7d125359dcc0034da",
+      "bytes": 1642,
+      "expected_git_sha256": "41440435ca580a01fbd14a9caa3e8577d105049e5326dad7d125359dcc0034da",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-split-readable.2026-10-20T06-56.txt",
+      "sha256": "fff1f65528e70f5e5a3f55fb423210727ef86e8f5961ae62a4b92cc323de8a95",
+      "bytes": 3248,
+      "expected_git_sha256": "fff1f65528e70f5e5a3f55fb423210727ef86e8f5961ae62a4b92cc323de8a95",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-structure-probe-readable.2026-10-20T06-56.txt",
+      "sha256": "c00e48e95d90ba0a7df78c05ed39b5aa13782777e6e500194881cc5a14d2fa4f",
+      "bytes": 938,
+      "expected_git_sha256": "c00e48e95d90ba0a7df78c05ed39b5aa13782777e6e500194881cc5a14d2fa4f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-format.2026-10-20T06-39.json",
+      "sha256": "e9d0808ee746e288a7a5806ae9740b6d228b4e4b521ab865f5bac7d1fa1afb7f",
+      "bytes": 7478,
+      "expected_git_sha256": "e9d0808ee746e288a7a5806ae9740b6d228b4e4b521ab865f5bac7d1fa1afb7f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-format.2026-10-20T06-39.md",
+      "sha256": "4b26c2b8ef7db2e229acc141214a7bca4dd06b4ecb29c8ffa4ddb77e8051143a",
+      "bytes": 422,
+      "expected_git_sha256": "4b26c2b8ef7db2e229acc141214a7bca4dd06b4ecb29c8ffa4ddb77e8051143a",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-lint.2026-10-20T06-39.json",
+      "sha256": "8b9d2f8bf2678fc37762ea8b5ba1cc85b118f1594faa61494fe26ebfa4e306fa",
+      "bytes": 7411,
+      "expected_git_sha256": "8b9d2f8bf2678fc37762ea8b5ba1cc85b118f1594faa61494fe26ebfa4e306fa",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-lint.2026-10-20T06-39.md",
+      "sha256": "e76c9bd20ffe43b656f289aef90c3cbabca188a0d8a3321841551a883057d0ee",
+      "bytes": 377,
+      "expected_git_sha256": "e76c9bd20ffe43b656f289aef90c3cbabca188a0d8a3321841551a883057d0ee",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-types.2026-10-20T06-40.json",
+      "sha256": "1e3417f27ff56f72bcd9b8f257fb0ce41779926a17a2e321d102f69bb741895d",
+      "bytes": 7860,
+      "expected_git_sha256": "1e3417f27ff56f72bcd9b8f257fb0ce41779926a17a2e321d102f69bb741895d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass1-types.2026-10-20T06-40.md",
+      "sha256": "7b5b7ea626238555238ef7943fd55c578fa13cf769c82ffd996b78ea3dd98d91",
+      "bytes": 802,
+      "expected_git_sha256": "7b5b7ea626238555238ef7943fd55c578fa13cf769c82ffd996b78ea3dd98d91",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-format.2026-10-20T06-40.json",
+      "sha256": "4f52098f2f94b7ed16bb25ca2a46aa5a62fa73f68b0d8a36fda7464c534a704e",
+      "bytes": 7478,
+      "expected_git_sha256": "4f52098f2f94b7ed16bb25ca2a46aa5a62fa73f68b0d8a36fda7464c534a704e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-format.2026-10-20T06-40.md",
+      "sha256": "10d73a848d4368233f4bbf9dc0e239f68f34d1f89a7825d16b69c54b180818ff",
+      "bytes": 422,
+      "expected_git_sha256": "10d73a848d4368233f4bbf9dc0e239f68f34d1f89a7825d16b69c54b180818ff",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-lint.2026-10-20T06-40.json",
+      "sha256": "49d8e33a9d1d2a5a7f35266c294fb4b7e6044efc3f97340b5e62014fee008941",
+      "bytes": 7411,
+      "expected_git_sha256": "49d8e33a9d1d2a5a7f35266c294fb4b7e6044efc3f97340b5e62014fee008941",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-lint.2026-10-20T06-40.md",
+      "sha256": "d8561508732cb972b87b8f1b20d0c8d79eddbf6a8a999edcb1e965640b2f98d4",
+      "bytes": 377,
+      "expected_git_sha256": "d8561508732cb972b87b8f1b20d0c8d79eddbf6a8a999edcb1e965640b2f98d4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-tests.2026-10-20T06-45.json",
+      "sha256": "644a9a3481de45ba3da83cf0b010067d008d3dd00a1e18465f84f3fca4c64c0c",
+      "bytes": 17467,
+      "expected_git_sha256": "644a9a3481de45ba3da83cf0b010067d008d3dd00a1e18465f84f3fca4c64c0c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-tests.2026-10-20T06-45.md",
+      "sha256": "5b6a69ced811d1a127921f5eb422a2ccd6cedc972a5e8a1afe03422a0425a4fe",
+      "bytes": 9963,
+      "expected_git_sha256": "5b6a69ced811d1a127921f5eb422a2ccd6cedc972a5e8a1afe03422a0425a4fe",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-types.2026-10-20T06-40.json",
+      "sha256": "e6122c45b294c1a715eed039cc4ad592787676c8ba195aff9c8389bf00d51040",
+      "bytes": 7594,
+      "expected_git_sha256": "e6122c45b294c1a715eed039cc4ad592787676c8ba195aff9c8389bf00d51040",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-PC1-pass2-types.2026-10-20T06-40.md",
+      "sha256": "95b5a98039a853c9099679e53b5acbf07a77c71ac1753de6cd9bb9efa94b3e3e",
+      "bytes": 548,
+      "expected_git_sha256": "95b5a98039a853c9099679e53b5acbf07a77c71ac1753de6cd9bb9efa94b3e3e",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft-format.2026-10-20T05-48.json",
+      "sha256": "5052876781d65bd18f60b4b76388ffc2b6a1e0ef322976cb300223319fa589ab",
+      "bytes": 5528,
+      "expected_git_sha256": "5052876781d65bd18f60b4b76388ffc2b6a1e0ef322976cb300223319fa589ab",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft-format.2026-10-20T05-48.md",
+      "sha256": "32a738d3b507d0835376d77eed8b74dff4c1a64061603ebd581718a34d4b21c4",
+      "bytes": 491,
+      "expected_git_sha256": "32a738d3b507d0835376d77eed8b74dff4c1a64061603ebd581718a34d4b21c4",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-format.2026-10-20T05-52.json",
+      "sha256": "3b39206389415f3238da19c6930be104f58fb08002ce2e81c5306d347a63e852",
+      "bytes": 6113,
+      "expected_git_sha256": "3b39206389415f3238da19c6930be104f58fb08002ce2e81c5306d347a63e852",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-format.2026-10-20T05-52.md",
+      "sha256": "6c81d54307568304e607dfcb98eef81a5a651e16598c922b57fde4339cb486b9",
+      "bytes": 492,
+      "expected_git_sha256": "6c81d54307568304e607dfcb98eef81a5a651e16598c922b57fde4339cb486b9",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-lint.2026-10-20T05-52.json",
+      "sha256": "9245149d746778d86f4bf2d4b955b77e553d537270af1fc118c22094ef813a03",
+      "bytes": 9034,
+      "expected_git_sha256": "9245149d746778d86f4bf2d4b955b77e553d537270af1fc118c22094ef813a03",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft2-lint.2026-10-20T05-52.md",
+      "sha256": "36d564c22ebc5bf12e4e29a4b693d9cb38d434abe86be5a62f7a4a3ae4285876",
+      "bytes": 3333,
+      "expected_git_sha256": "36d564c22ebc5bf12e4e29a4b693d9cb38d434abe86be5a62f7a4a3ae4285876",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-format.2026-10-20T05-53.json",
+      "sha256": "8282c0a9c8aaaee6d6728542854108b88e8d8b939778a3d75b5f44af21437733",
+      "bytes": 6031,
+      "expected_git_sha256": "8282c0a9c8aaaee6d6728542854108b88e8d8b939778a3d75b5f44af21437733",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-format.2026-10-20T05-53.md",
+      "sha256": "5eb380858152332b291a0a17e86591320c80c72bfab43fc1f4ff2e6f75cd669b",
+      "bytes": 419,
+      "expected_git_sha256": "5eb380858152332b291a0a17e86591320c80c72bfab43fc1f4ff2e6f75cd669b",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-lint.2026-10-20T05-53.json",
+      "sha256": "ff78a54a288747e7082bc0b6acb6127555a662dbb4df61c36cc9479376e25318",
+      "bytes": 6495,
+      "expected_git_sha256": "ff78a54a288747e7082bc0b6acb6127555a662dbb4df61c36cc9479376e25318",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-draft3-lint.2026-10-20T05-53.md",
+      "sha256": "bb842f9fb01b2e121a485d17e9c2f78388c5a3cd2ec68e19331766058017e186",
+      "bytes": 881,
+      "expected_git_sha256": "bb842f9fb01b2e121a485d17e9c2f78388c5a3cd2ec68e19331766058017e186",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-freeze.2026-10-20T06-50.json",
+      "sha256": "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d",
+      "bytes": 55116,
+      "expected_git_sha256": "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-lossless-archive.2026-10-20T06-50.json",
+      "sha256": "a3ffe64de0b9ba77b05f593ad6e34bd0c4f602c23a192d7dc3d0722ed88b6847",
+      "bytes": 314243,
+      "expected_git_sha256": "a3ffe64de0b9ba77b05f593ad6e34bd0c4f602c23a192d7dc3d0722ed88b6847",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-staging.2026-10-20T06-50.json",
+      "sha256": "b29041f9722a2598bdc0b69f98df206a8873a14738acbe64514e369c0ab890f6",
+      "bytes": 9036,
+      "expected_git_sha256": "b29041f9722a2598bdc0b69f98df206a8873a14738acbe64514e369c0ab890f6",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-format.2026-10-20T06-48.json",
+      "sha256": "ef5d8f0c7aaa96755290b0c298c8605ba1c64ee32263201975ecf9bb9f04975f",
+      "bytes": 7490,
+      "expected_git_sha256": "ef5d8f0c7aaa96755290b0c298c8605ba1c64ee32263201975ecf9bb9f04975f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-format.2026-10-20T06-48.md",
+      "sha256": "c24a3c5150e6ddd68358a558309735ea57e7782934f108a2573ccb80b265665c",
+      "bytes": 426,
+      "expected_git_sha256": "c24a3c5150e6ddd68358a558309735ea57e7782934f108a2573ccb80b265665c",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-lint.2026-10-20T06-48.json",
+      "sha256": "ea4dc1bb43e13381878c03d981ca8ca6bd43c812616e38d3d97dc8383d47e480",
+      "bytes": 7423,
+      "expected_git_sha256": "ea4dc1bb43e13381878c03d981ca8ca6bd43c812616e38d3d97dc8383d47e480",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-lint.2026-10-20T06-48.md",
+      "sha256": "23686d8fc739798b8184903766bb1a3d417d5f90be612e072e498501403baa74",
+      "bytes": 381,
+      "expected_git_sha256": "23686d8fc739798b8184903766bb1a3d417d5f90be612e072e498501403baa74",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-tests.2026-10-20T06-49.json",
+      "sha256": "f8bb1bb23091615fab004fc4a6fc1beb6b70a52fffd77a452a93c8d69cbf60e1",
+      "bytes": 9331,
+      "expected_git_sha256": "f8bb1bb23091615fab004fc4a6fc1beb6b70a52fffd77a452a93c8d69cbf60e1",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-tests.2026-10-20T06-49.md",
+      "sha256": "fbc72718e3bc86d6fba43c039c3ccd27e5c5a1cb9c88ef57a2d8d76737af4e68",
+      "bytes": 2216,
+      "expected_git_sha256": "fbc72718e3bc86d6fba43c039c3ccd27e5c5a1cb9c88ef57a2d8d76737af4e68",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-types.2026-10-20T06-48.json",
+      "sha256": "61b8106f67a56aff3b36c7bde4733df96205a620b9150282616affa5eb83cf53",
+      "bytes": 7606,
+      "expected_git_sha256": "61b8106f67a56aff3b36c7bde4733df96205a620b9150282616affa5eb83cf53",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-fixture-pass3-types.2026-10-20T06-48.md",
+      "sha256": "a9609dd9dae502b370310ef6879b764d31c5cb1404f3ffabc530c166ba67c1c3",
+      "bytes": 552,
+      "expected_git_sha256": "a9609dd9dae502b370310ef6879b764d31c5cb1404f3ffabc530c166ba67c1c3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-pass2-lossless-archive.2026-10-20T06-46.json",
+      "sha256": "baa89c616d21d5e7a0b3c0999bb56ddf0b26f1ca4271a1e0e8f8bbfe04c634fc",
+      "bytes": 350878,
+      "expected_git_sha256": "baa89c616d21d5e7a0b3c0999bb56ddf0b26f1ca4271a1e0e8f8bbfe04c634fc",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-pass2-result.2026-10-20T06-46.json",
+      "sha256": "d4f9ff28c477f3c69a6cea3aee518ec251a27b905f8fc5dc383a5006df49ad57",
+      "bytes": 54245,
+      "expected_git_sha256": "d4f9ff28c477f3c69a6cea3aee518ec251a27b905f8fc5dc383a5006df49ad57",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-source-freeze.2026-10-20T06-20.json",
+      "sha256": "149f5e543a465298fb201c1fb03a77a15297bdc1061702ebf0df554527451bd3",
+      "bytes": 69009,
+      "expected_git_sha256": "149f5e543a465298fb201c1fb03a77a15297bdc1061702ebf0df554527451bd3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+      "sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+      "bytes": 18617,
+      "expected_git_sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "bytes": 7219,
+      "expected_git_sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+      "bytes": 14576,
+      "expected_git_sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02",
+      "bytes": 20796,
+      "expected_git_sha256": "2768d0f17d70597906b1b03b17997b49b2363f9c1a1c2fcccadd05c0d4b74c3f",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "823e6961d16deb77550f2ec0068952eed864da66c8fd4ed7270de46618e76c82",
+      "normalization": "CRLF to LF under actual attributes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_axes.py",
+      "sha256": "b5c23d4f638efa2d215e1c1a0698145ebf9cc41d76b5d635ae5bda8fdc716ef5",
+      "bytes": 10353,
+      "expected_git_sha256": "b5c23d4f638efa2d215e1c1a0698145ebf9cc41d76b5d635ae5bda8fdc716ef5",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_metrics.py",
+      "sha256": "6590e14597260daab9cca0282af4744bb6ccfca5c8671e4cbf4edbe4a6a18c17",
+      "bytes": 18070,
+      "expected_git_sha256": "6590e14597260daab9cca0282af4744bb6ccfca5c8671e4cbf4edbe4a6a18c17",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_report.py",
+      "sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+      "bytes": 16430,
+      "expected_git_sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "676b0e6ba1589542a79e20c49f23298bb365531f948eec1ed47511d584e347d2",
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_report_projection.py",
+      "sha256": "d0d83b3a4bb0add6f87e8fb81b9185239441234d78279caf3b31f48ae8be8b7d",
+      "bytes": 11932,
+      "expected_git_sha256": "d0d83b3a4bb0add6f87e8fb81b9185239441234d78279caf3b31f48ae8be8b7d",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": null,
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_report_models.py",
+      "sha256": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2",
+      "bytes": 14299,
+      "expected_git_sha256": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+      "normalization": "working bytes equal expected Git bytes"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "bytes": 17875,
+      "expected_git_sha256": "287ba24a7b24dd06efc0e8bf3161d092a61e20ce5879b8dee3997ceb68acdeb3",
+      "attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "head_blob_sha256": "6af3bcef3568d10c6e0546500e1e809103ac83ffc7256681d6825c8bba27933f",
+      "normalization": "CRLF to LF under actual attributes"
+    }
+  ],
+  "retained_committed": [],
+  "qualification": "Exact candidate/evidence union only. Working and expected Git-normalized SHA256 are separate; coordinator must verify actual index bytes after staging. This manifest includes itself by path; its hash is returned separately. No Git writes, task checkoffs or final-gate outputs."
+}

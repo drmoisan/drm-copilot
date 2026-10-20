@@ -1,0 +1,381 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T07:21:26.663302+00:00",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "route": "atomic_execution_p5t2_repair_confirmation_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "owned_source_test_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+    "tests/discovery_runtime/test_parity_report.py": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+    "tests/discovery_runtime/test_parity_metrics.py": "6590e14597260daab9cca0282af4744bb6ccfca5c8671e4cbf4edbe4a6a18c17",
+    "tests/discovery_runtime/test_report_models.py": "85e78e857635f52318163aa5fa170f9ea4cc43fba65adb47dc7140fdc81523e2",
+    "tests/discovery_runtime/test_parity_axes.py": "b5c23d4f638efa2d215e1c1a0698145ebf9cc41d76b5d635ae5bda8fdc716ef5",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02",
+    "tests/discovery_runtime/test_parity_report_projection.py": "d0d83b3a4bb0add6f87e8fb81b9185239441234d78279caf3b31f48ae8be8b7d",
+    "tests/discovery_runtime/test_validation_modes.py": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4"
+  },
+  "graph_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+    "sha256": "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb"
+  },
+  "graph_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-final-staging.2026-10-20T07-17.json",
+    "sha256": "848a0ae99fd3246a928a7dd288808d46ca5fef523cf707e5aba8994d510867a3",
+    "bytes": 26053
+  },
+  "graph_presentation_qualification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-evidence-qualification.2026-10-20T07-17.json",
+    "sha256": "d2de9a88f518bb02b39392d963c02e684043bd28952e62e0b2a08a791dfea521",
+    "bytes": 2738
+  },
+  "integration_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-freeze.2026-10-20T06-50.json",
+    "sha256": "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d"
+  },
+  "integration_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-staging.2026-10-20T06-50.json",
+    "sha256": "b29041f9722a2598bdc0b69f98df206a8873a14738acbe64514e369c0ab890f6"
+  },
+  "original_graph_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-graph-review.2026-10-20T06-53.json",
+    "sha256": "ae9391372e3b1a08c76754c17ba37609be7bac7787aae91b8df588cdddacb74c",
+    "bytes": 12086
+  },
+  "retained_outcome_and_PC1_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-PC1-confirmation.2026-10-20T06-40.json",
+    "sha256": "8bc71ae26f2017f3a92601874afe0d19b922866ab47360b61a60eb45333c58a3",
+    "bytes": 7787
+  },
+  "retained_helper_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-helper-adapter-review.2026-10-20T06-06.json",
+    "sha256": "2219f081f9ab374cb39d51ac870b40991e84cfcc85981fbe709880e20a4c40e3",
+    "bytes": 4540
+  },
+  "graph": {
+    "findings_closed": [
+      "GR1",
+      "GR2"
+    ],
+    "confirmation": "Authored passed/failed/blocked/not_run count once only for consistent representations, independently of evidence-backed verified claims. Required mode names are indexed after prospective reservation; the original bounded probes close the repeated tuple scan.",
+    "cases": 58,
+    "retained_original_cases": 36,
+    "new_cases": 22,
+    "counted_prechecks": 3,
+    "gates": [
+      {
+        "stage": "black",
+        "exit_code": 0,
+        "elapsed_seconds": 1.765676
+      },
+      {
+        "stage": "ruff",
+        "exit_code": 0,
+        "elapsed_seconds": 1.148925
+      },
+      {
+        "stage": "pyright",
+        "exit_code": 0,
+        "elapsed_seconds": 2.397518
+      },
+      {
+        "stage": "counted-controls",
+        "exit_code": 0,
+        "elapsed_seconds": 3.015755
+      },
+      {
+        "stage": "tests",
+        "exit_code": 0,
+        "elapsed_seconds": 39.480526
+      },
+      {
+        "stage": "coverage",
+        "exit_code": 0,
+        "elapsed_seconds": 1.422003
+      }
+    ],
+    "coverage": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+        "current": {
+          "covered_lines": 151,
+          "num_statements": 151,
+          "percent_covered": 97.58454106280193,
+          "percent_covered_display": "98",
+          "missing_lines": 0,
+          "excluded_lines": 10,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 56,
+          "num_partial_branches": 5,
+          "covered_branches": 51,
+          "missing_branches": 5,
+          "percent_branches_covered": 91.07142857142857,
+          "percent_branches_covered_display": "91"
+        },
+        "ranges": 6,
+        "retained_ranges": 0
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+        "current": {
+          "covered_lines": 25,
+          "num_statements": 45,
+          "percent_covered": 47.16981132075472,
+          "percent_covered_display": "47",
+          "missing_lines": 20,
+          "excluded_lines": 10,
+          "percent_statements_covered": 55.55555555555556,
+          "percent_statements_covered_display": "56",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 8,
+          "percent_branches_covered": 0.0,
+          "percent_branches_covered_display": "0"
+        },
+        "ranges": 8,
+        "retained_ranges": 4
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+        "current": {
+          "covered_lines": 110,
+          "num_statements": 142,
+          "percent_covered": 74.75728155339806,
+          "percent_covered_display": "75",
+          "missing_lines": 32,
+          "excluded_lines": 0,
+          "percent_statements_covered": 77.46478873239437,
+          "percent_statements_covered_display": "77",
+          "num_branches": 64,
+          "num_partial_branches": 14,
+          "covered_branches": 44,
+          "missing_branches": 20,
+          "percent_branches_covered": 68.75,
+          "percent_branches_covered_display": "69"
+        },
+        "ranges": 20,
+        "retained_ranges": 10
+      }
+    },
+    "changed_axes": {
+      "covered_statements": 39,
+      "statements": 39,
+      "missing_branch_destinations": [],
+      "mapped_prior_covered_lines_lost": []
+    },
+    "probe": {
+      "timestamp_utc": "2026-10-20T07:15:21.426837+00:00",
+      "status": "GR1_GR2_ORIGINAL_BOUNDED_PROBES_PASS",
+      "source_hashes": {
+        "parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+        "parity_metrics.py": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+        "report_models.py": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+      },
+      "authored_status": [
+        {
+          "authored": "passed",
+          "counters": {
+            "passed": 1,
+            "failed": 0,
+            "blocked": 0,
+            "not_run": 0
+          },
+          "verified": 0
+        },
+        {
+          "authored": "failed",
+          "counters": {
+            "passed": 0,
+            "failed": 1,
+            "blocked": 0,
+            "not_run": 0
+          },
+          "verified": 0
+        },
+        {
+          "authored": "blocked",
+          "counters": {
+            "passed": 0,
+            "failed": 0,
+            "blocked": 1,
+            "not_run": 0
+          },
+          "verified": 0
+        },
+        {
+          "authored": "not-run",
+          "counters": {
+            "passed": 0,
+            "failed": 0,
+            "blocked": 0,
+            "not_run": 1
+          },
+          "verified": 0
+        }
+      ],
+      "custom_mode_work": [
+        {
+          "custom_modes": 8,
+          "attempts": [
+            {
+              "capacity": 15,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 0
+            },
+            {
+              "capacity": 24,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 8
+            },
+            {
+              "capacity": 49,
+              "rows": 11,
+              "charged_work": 49,
+              "comparisons": 0,
+              "hashes": 40
+            }
+          ]
+        },
+        {
+          "custom_modes": 32,
+          "attempts": [
+            {
+              "capacity": 63,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 0
+            },
+            {
+              "capacity": 96,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 32
+            },
+            {
+              "capacity": 169,
+              "rows": 35,
+              "charged_work": 169,
+              "comparisons": 0,
+              "hashes": 160
+            }
+          ]
+        },
+        {
+          "custom_modes": 64,
+          "attempts": [
+            {
+              "capacity": 127,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 0
+            },
+            {
+              "capacity": 192,
+              "rejected_without_output": true,
+              "comparisons": 0,
+              "hashes": 64
+            },
+            {
+              "capacity": 329,
+              "rows": 67,
+              "charged_work": 329,
+              "comparisons": 0,
+              "hashes": 320
+            }
+          ]
+        }
+      ],
+      "qualification": "Isolated actual axes method with original immutable-carrier inputs; duplicate consistent representations added as a direct control. Counted retained strings preserve values and ordinary text is restored only before the unchanged strict output check. Exact 8/32/64 populations, no wall-clock correctness assertion, no full graph suite or filesystem fixture."
+    },
+    "source_delta": "Only ParityProjection.axes changes executable production behavior. The public test-helper rename is the only retained-test AST difference; all original assertions/decorators/parameters remain.",
+    "decoded_new_raw_members": 109
+  },
+  "integration": {
+    "confirmation": "Public unavailable helper import; valid invocation baseline retained before prospective profile removal. Every original assertion and parameter remains, other test functions unchanged.",
+    "original_result": "24 passed and one fixture failure among 25; preserved, not relabeled as a clean run.",
+    "corrective_result": "Two cases passed after Black, Ruff and scoped Pyright: repaired missing-profile and existing completion fallthrough.",
+    "current_changed_callables": [
+      {
+        "symbol": "_Validation.__init__",
+        "lines": 17,
+        "branches": 0
+      },
+      {
+        "symbol": "_Validation.complete",
+        "lines": 16,
+        "branches": 4
+      },
+      {
+        "symbol": "_Validation.report",
+        "lines": 13,
+        "branches": 4
+      },
+      {
+        "symbol": "report_projection",
+        "lines": 15,
+        "branches": 12
+      }
+    ],
+    "coverage_qualification": "Combined actual stable-source 25-case and 2-case execution sets. Four changed callables fully measured; unchanged methods retain separate accepted proof. Raw coverage is not augmented; final 26-case candidate gate remains pending.",
+    "final_population_count": 26,
+    "final_population": [
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-False]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-True]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-False]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-True]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-False]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-True]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[missing-profile]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[loader]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[artifact]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_result]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_findings]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_multiple_derived_reports_reuse_one_complete_assessment",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_parity_preflight_rejects_excess_before_graph_work",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[automatic]",
+      "tests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[agent-output]",
+      "tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-False]",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-True]",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-False]",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-True]",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-False]",
+      "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-True]",
+      "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[missing-profile]",
+      "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[loader]",
+      "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[completion-report-initialized-root]"
+    ]
+  },
+  "qualifications": [
+    "Current raw coverage remains distinct from retained unchanged helper/renderer proof in the immutable pre-repair manifest. Definition/declaration lines follow the existing AST-range convention. Raw Windows path separators are normalized only in this reader.",
+    "The exact coverage.py JSON stream has no terminal newline; its hash and raw archive bytes are preserved. It is raw proof, not a generated readable receipt.",
+    "Decoded raw streams match hashes; presentation only replaces recorded workspace/scratch roots. Markdown then normalizes line endings and trailing whitespace as declared by the exact archived gate script.",
+    "Two local reader assumptions were corrected: binding objects were compared with hash strings, and ID/outcome records were treated as bare IDs. Both exact checker versions/diagnostics are preserved. Documented field shapes are now used; underlying hashes/results matched, and no behavioral rerun was required.",
+    "The owner retained its UTF-8/default-decoding checker failure and raw-coverage terminal-newline checker failure. Only readers/presentation qualifications changed; all candidate and passing raw bytes remain exact.",
+    "The original graph findings, failed counted instrumentation, original 36-case proof and integration 24/25 fixture failure remain immutable. This checkpoint does not relabel any failed run as a clean pass.",
+    "Committed helper44 and outcome91 proof is reused. No predecessor suite or full graph/integration suite was replayed by this confirmation.",
+    "Ten candidate source/test paths form the graph/integration checkpoint. Borrowed outcome/helper and source-report interfaces retain their existing bindings; no uncommitted implementation outside this union is required."
+  ],
+  "raw_reconciliation_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21-payload.json",
+    "sha256": "cb72b334b501f0ccad79eb15cbe4e5af571caf820235ade51af8da737d1cb37b",
+    "bytes": 99449
+  },
+  "findings": [],
+  "open_probes": [],
+  "final_task_gates_pending": true,
+  "native_expectations": "Sixteen prepared expectations remain unchanged; their execution is not claimed by this receipt.",
+  "task_accepted": false,
+  "plan_count": "42/84",
+  "source_AC_count": "17/66",
+  "next_five_pending_tasks": [
+    "P5-T2",
+    "P5-T3",
+    "P5-T4",
+    "P5-T5",
+    "P6-T1"
+  ]
+}

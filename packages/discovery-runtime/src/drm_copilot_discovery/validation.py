@@ -25,6 +25,11 @@ from drm_copilot_discovery.dimension_rules import validate_dimensions
 from drm_copilot_discovery.evidence_rules import validate_evidence
 from drm_copilot_discovery.findings import Finding, FindingCollector
 from drm_copilot_discovery.models import to_plain_value
+from drm_copilot_discovery.parity_report import (
+    parity_preflight,
+    parity_summary,
+    unavailable_parity_summary,
+)
 from drm_copilot_discovery.parity_rules import validate_parity
 from drm_copilot_discovery.references import index_references
 from drm_copilot_discovery.revision_rules import validate_revisions
@@ -47,6 +52,7 @@ if TYPE_CHECKING:
 
     from drm_copilot_discovery.agent_output import InvocationContext
     from drm_copilot_discovery.dimension_rules import DimensionValidation
+    from drm_copilot_discovery.parity_rules import ParityValidation
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
 
 ValidationMode: TypeAlias = Literal[
@@ -136,7 +142,7 @@ class _Validation:
             decisions=self.decisions,
             dimensions=self.dimensions,
         )
-        parity = validate_parity(
+        self.parity = validate_parity(
             snapshot,
             index=self.index,
             evidence=self.evidence,
@@ -157,7 +163,7 @@ class _Validation:
                     self.dimensions,
                     coverage,
                     acceptance,
-                    parity,
+                    self.parity,
                 )
                 for finding in result.findings
             ),
@@ -170,6 +176,8 @@ class _Validation:
         self._complete_source: (
             tuple[tuple[Finding, ...], DimensionValidation] | None
         ) = None
+        self.complete_parity: ParityValidation = self.parity
+        self.complete_dimensions = self.dimensions
 
     def evaluate(self, mode: str) -> tuple[Finding, ...]:
         """Return exact policy-mode findings while reusing lower-level assessments."""
@@ -193,7 +201,11 @@ class _Validation:
         return findings
 
     def complete(self, *, parity: bool) -> tuple[Finding, ...]:
-        """Apply source discovery before optional target parity completeness."""
+        """Return tuple[Finding, ...] after source and optional target completeness.
+
+        parity (bool) enables target checks. Retain complete_dimensions and
+        complete_parity for this operation's reports; perform no external effects.
+        """
         snapshot = self.snapshot
         # Both completion modes share source proof within this immutable operation.
         if self._complete_source is None:
@@ -242,6 +254,7 @@ class _Validation:
                 dimensions,
             )
         common, dimensions = self._complete_source
+        self.complete_dimensions = dimensions
         completion = validate_completion(
             snapshot,
             index=self.index,
@@ -253,23 +266,22 @@ class _Validation:
         )
         values = [*common, *completion.findings]
         if parity:
-            values.extend(
-                validate_parity(
-                    snapshot,
-                    complete=True,
-                    index=self.index,
-                    evidence=self.evidence,
-                    revisions=self.revisions,
-                    decisions=self.decisions,
-                    dimensions=dimensions,
-                ).findings
+            self.complete_parity = validate_parity(
+                snapshot,
+                complete=True,
+                index=self.index,
+                evidence=self.evidence,
+                revisions=self.revisions,
+                decisions=self.decisions,
+                dimensions=dimensions,
             )
+            values.extend(self.complete_parity.findings)
         return _findings(values, self.limit)
 
     def report(self, *, kind: str, identifier: str, mode: str) -> dict[str, object]:
         """Return fields for kind, identifier and mode (str) from shared assessments.
 
-        Coverage adds independently evaluated discovery results and population;
+        Coverage/parity add independently evaluated complete results and populations;
         requested-mode findings remain unchanged. Raises ValueError on invalid
         modes or resource limits. No I/O, publication or caller mutation occurs.
         """
@@ -290,12 +302,14 @@ class _Validation:
             "counts": dict(sorted(counts.items())),
             "findings": [item.to_dict() for item in findings],
         }
-        # Only coverage gains discovery-specific fields; other report envelopes
-        # retain their existing comparison contract and requested-mode semantics.
-        if kind == "coverage-report":
-            complete = self.evaluate("discovery-complete")
-            result["coverage"] = to_plain_value(
-                coverage_summary(
+        # Preserve requested-mode semantics alongside the selected report's full proof.
+        if kind in {"coverage-report", "parity-report"}:
+            coverage = kind == "coverage-report"
+            complete = self.evaluate(
+                "discovery-complete" if coverage else "parity-complete"
+            )
+            if coverage:
+                summary = coverage_summary(
                     self.snapshot,
                     index=self.index,
                     evidence=self.evidence,
@@ -303,12 +317,26 @@ class _Validation:
                     dimensions=self.dimensions,
                     findings=complete,
                 )
-            )
-            result["discovery_result"] = (
+            else:
+                # evaluate(parity-complete) populated both complete carriers above.
+                summary = parity_summary(
+                    self.snapshot,
+                    index=self.index,
+                    evidence=self.evidence,
+                    claims=self.claims,
+                    decisions=self.decisions,
+                    dimensions=self.complete_dimensions,
+                    parity=self.complete_parity,
+                    findings=complete,
+                )
+            result["coverage" if coverage else "parity"] = to_plain_value(summary)
+            result["discovery_result" if coverage else "parity_result"] = (
                 "fail" if any(item.severity == "error" for item in complete) else "pass"
             )
             # Preserve the exact complete assessment independently of the chosen mode.
-            result["completion_findings"] = [item.to_dict() for item in complete]
+            result["completion_findings" if coverage else "parity_findings"] = [
+                item.to_dict() for item in complete
+            ]
         return result
 
 
@@ -427,23 +455,26 @@ def report_projection(
 ) -> dict[str, object]:
     """Project snapshot (DiscoverySnapshot) for kind/identifier (str) and root mode.
 
-    Returns dict[str, object] without I/O or publication. Coverage reports retain
-    structural failures and unavailable counts; other kinds reject those inputs.
-    Raises ValueError for unsupported kind/mode, invalid non-coverage inputs or
+    Returns dict[str, object] without I/O or publication. Coverage/parity retain
+    structural failures and unavailable counts; completion rejects those inputs.
+    Raises ValueError for unsupported kind/mode, invalid completion inputs or
     resource excess. No caller mutation or injected validation authority exists.
     """
     if kind not in REPORT_KINDS or mode == "agent-output":
         raise ValueError("Reports require a supported report kind and root review mode")
-    # Reserve coverage work before structural validation or aggregate projection.
+    # Reserve report work before structural validation or aggregate projection.
     if kind == "coverage-report":
         coverage_preflight(snapshot)
+    elif kind == "parity-report":
+        parity_preflight(snapshot)
     failures = _schema_findings(snapshot)
     if any(item.severity == "error" for item in failures):
-        # Invalid core bytes cannot supply counts, yet coverage can truthfully
+        # Invalid core bytes cannot supply counts, yet diagnostic reports can
         # render the original blockers without running any semantic assessments.
-        if kind == "coverage-report":
+        if kind in {"coverage-report", "parity-report"}:
             if mode not in _MODES:
                 raise ValueError("Unsupported report or validation mode")
+            coverage = kind == "coverage-report"
             return {
                 "schema_version": "2.0.0",
                 "artifact_kind": kind,
@@ -453,9 +484,15 @@ def report_projection(
                 "validation_result": "fail",
                 "counts": {},
                 "findings": [item.to_dict() for item in failures],
-                "coverage": to_plain_value(unavailable_coverage_summary()),
-                "discovery_result": "fail",
-                "completion_findings": [item.to_dict() for item in failures],
+                "coverage" if coverage else "parity": to_plain_value(
+                    unavailable_coverage_summary()
+                    if coverage
+                    else unavailable_parity_summary()
+                ),
+                "discovery_result" if coverage else "parity_result": "fail",
+                "completion_findings" if coverage else "parity_findings": [
+                    item.to_dict() for item in failures
+                ],
             }
         raise ValueError("Report projection requires structurally parsed inputs")
     return _Validation(snapshot).report(kind=kind, identifier=identifier, mode=mode)

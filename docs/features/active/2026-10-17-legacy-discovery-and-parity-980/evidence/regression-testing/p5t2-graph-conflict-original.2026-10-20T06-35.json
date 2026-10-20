@@ -1,0 +1,29 @@
+{
+  "bound_original_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.json",
+  "classification": "isolated original-code control, not prior historical execution",
+  "current_sha256": "b2b5bda9f033f4f98f83589fc769a68764ea94f0a1bc5400826c3496900ab3bf",
+  "elapsed_seconds": 1.5795540999970399,
+  "exit_code": 1,
+  "harness_sha256": "482b958b54c19bc0bfcc7d1c8cfd1789959bd079a85eb861b62cc76beb1015af",
+  "node": "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0]",
+  "original_bytes": 17642,
+  "original_reconstruction": "Reverse only the comparison guard and its work charge; byte hash exactly matches the immutable focused6 receipt. Execute original axes in an isolated process, with the corrected test fixture; no repository source is replaced.",
+  "original_sha256": "bfa4216e92539dcaa078b68a2287a286190eced270ab9662d23f146e8ed7db51",
+  "raw": {
+    "stderr": {
+      "bytes": 0,
+      "scratch_relative": "p5t2-graph-conflict-original.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 1162,
+      "scratch_relative": "p5t2-graph-conflict-original.stdout",
+      "sha256": "03633a985c4b0e45ecf0901c5de3e28a924f0204d19edc412e681897513a6e71"
+    }
+  },
+  "source_unchanged": true,
+  "started_utc": "2026-10-20T06:34:59.631914+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- <WORKSPACE>\\.venv\\Scripts\\python.exe\r\nrootdir: <WORKSPACE>\r\nconfigfile: pyproject.toml\r\ncollecting ... collected 1 item\r\n\r\ntests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0] FAILED [100%]\r\n\r\n================================== FAILURES ===================================\r\n_ test_present_optional_or_contradictory_claims_remain_independent[changes0] __\r\ntests\\discovery_runtime\\test_parity_metrics.py:478: in test_present_optional_or_contradictory_claims_remain_independent\r\n    assert counts[\"conflicting\"] == 1 and counts[\"verified\"] == 0\r\nE   assert (0 == 1)\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0]\r\n============================== 1 failed in 1.24s ==============================\r\n",
+  "task": "P5-T2"
+}

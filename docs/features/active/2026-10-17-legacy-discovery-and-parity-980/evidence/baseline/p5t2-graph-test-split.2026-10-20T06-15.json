@@ -1,0 +1,10 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:15:00Z",
+  "baseline": "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json",
+  "baseline_sha256": "dd8ff586304e142d0894f38eb7364729821d3866c680d7981782b9e829c08d86",
+  "approved_new_path": "tests/discovery_runtime/test_parity_metrics.py",
+  "absent_before_creation": true,
+  "scope": "Keep new graph, metric and resource cases separate from unchanged true-v1 compatibility assertions.",
+  "production_scope_unchanged": true
+}

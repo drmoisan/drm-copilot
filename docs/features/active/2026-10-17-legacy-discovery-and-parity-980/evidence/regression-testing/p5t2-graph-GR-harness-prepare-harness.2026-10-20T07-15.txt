@@ -1,0 +1,22 @@
+"""Prepare a new immutable focused runner without changing prior executed bytes."""
+from pathlib import Path
+
+scratch = Path(__file__).parent
+original = (scratch / "p5t2-graph-focused.py").read_text()
+replacement = original.replace(
+    'for name in ("test_parity_report", "test_parity_metrics", "test_report_models")',
+    'for name in ("test_parity_report", "test_parity_metrics", "test_report_models", "test_parity_axes")',
+).replace(
+    '    TESTS[1],\n',
+    '    TESTS[3],\n    TESTS[1],\n',
+).replace(
+    'f"p5t2-graph-{ATTEMPT}"',
+    'f"p5t2-graph-GR-{ATTEMPT}"',
+)
+start = replacement.index('    ("approval-controls",')
+end = replacement.index('    ("tests",', start)
+replacement = replacement[:start] + replacement[end:]
+assert replacement != original
+destination = scratch / "p5t2-graph-GR-focused.py"
+destination.write_bytes((replacement.rstrip() + "\n").encode())
+print(destination.name)

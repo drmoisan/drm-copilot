@@ -1,0 +1,53 @@
+{
+  "behavioral_replay": false,
+  "checker_diagnostic": {
+    "bounded_diagnosis": {
+      "artifact": "coverage.py exact raw JSON",
+      "behavioral_replay": false,
+      "candidate_and_coverage_checks": "passed before presentation assertion",
+      "carriage_returns": false,
+      "production_test_changes": false,
+      "terminal_blank_lines": false,
+      "terminal_newline": false
+    },
+    "command": "poetry run python SCRATCH/p5t2-graph-GR-freeze.py",
+    "exit_code": 1,
+    "failure": "AssertionError at line 225: terminal newline assertion",
+    "harness_sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036",
+    "kind": "evidence-checker-failure"
+  },
+  "executed_failed_checker": {
+    "archive": {
+      "bytes": 196467,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-raw-archive.2026-10-20T07-15.json",
+      "sha256": "f6f9edf2ed5e33c322967a34be860b9dd2c6929c916d6d07e57398da80606725"
+    },
+    "member": "SCRATCH/p5t2-graph-GR-freeze.py",
+    "sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036"
+  },
+  "freeze": {
+    "bytes": 33861,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+    "sha256": "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb"
+  },
+  "harness": {
+    "bytes": 3747,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-closure-harness.2026-10-20T07-17.txt",
+    "sha256": "3cc46852d99918121a63d9a68870ca3151f1417a9a1396d41f8a635b676919d6"
+  },
+  "original_staging": {
+    "bytes": 34302,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-staging.2026-10-20T07-15.json",
+    "sha256": "0988913389a542c3d046d1499bed277b5e9df24c56bcc745a9f7155094662937"
+  },
+  "qualified_result": "Source, node, assertion, coverage, size and comment checks completed before the raw-newline assertion. This closes only that presentation assumption.",
+  "raw_coverage": {
+    "bytes": 116133,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-coverage.2026-10-20T07-15.json",
+    "sha256": "2b9c5ed8b6dc095e9a8d6f5469699975f8e3a5551e00c937a1da8d2486c1e892"
+  },
+  "raw_stream_exception": "Exact coverage.py JSON lacks a terminal newline; retain original bytes.",
+  "readable_presentation": "Stage JSON/Markdown are UTF-8, LF-only, without trailing whitespace or terminal blank lines.",
+  "source_test_changes": false,
+  "timestamp_utc": "2026-10-20T07:17:56.104216+00:00"
+}

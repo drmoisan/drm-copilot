@@ -1,0 +1,133 @@
+{
+  "stage": "lint",
+  "label": "p5t2-projection-draft2-lint",
+  "started": "2026-10-20T05:52:51.808238+00:00",
+  "finished": "2026-10-20T05:52:53.429840+00:00",
+  "duration_seconds": 1.622,
+  "command": "poetry run ruff check packages/discovery-runtime/src/drm_copilot_discovery/validation.py tests/discovery_runtime/test_parity_report_projection.py tests/discovery_runtime/test_validation_modes.py",
+  "exit_code": 1,
+  "source_before": {
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "physical_lines": 476
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "a0a687b693b5f34f10c9c33ebfeb82d8a472e23050e16e3513dc5d751554d7d3",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "01ae3b4a5e79a4af027eeb199c334872083cbce1744ae9968691cf2381f95e60",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "physical_lines": 476
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "a0a687b693b5f34f10c9c33ebfeb82d8a472e23050e16e3513dc5d751554d7d3",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "01ae3b4a5e79a4af027eeb199c334872083cbce1744ae9968691cf2381f95e60",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "d8d78f443c71917dec7eb8e5def1fd32f9e9f865231f0e0d661574b251040ce5",
+      "physical_lines": 75
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257",
+      "physical_lines": 485
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": null,
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-projection-draft2-lint-055253.stdout.bin",
+      "raw_sha256": "906df63bfd616f4148fd9bfeee830baeec647ff1af07ea9aed2af4b3932da500",
+      "raw_bytes": 2978,
+      "presentation": "S101 Use of `assert` detected\n   --> packages\\discovery-runtime\\src\\drm_copilot_discovery\\validation.py:315:17\n    |\n313 |                 )\n314 |             else:\n315 |                 assert (\n    |                 ^^^^^^\n316 |                     self.complete_parity is not None\n317 |                     and self._complete_source is not None\n    |\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests\\discovery_runtime\\test_parity_report_projection.py:3:1\n   |\n 1 |   \"\"\"Check parity report composition, recomputation and authority entirely in memory.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | from dataclasses import replace\n 6 | | from functools import partial\n 7 | | from typing import TYPE_CHECKING, cast\n 8 | |\n 9 | | import pytest\n10 | | from drm_copilot_discovery import validation\n11 | | from drm_copilot_discovery.findings import Finding\n12 | | from drm_copilot_discovery.models import to_plain_value\n13 | | from drm_copilot_discovery.parity_report import build_parity_report\n14 | | from drm_copilot_discovery.report_models import ReportLimitError\n15 | | from drm_copilot_discovery.validation import (\n16 | |     report_input_digest,\n17 | |     report_projection,\n18 | |     validate_snapshot,\n19 | | )\n20 | |\n21 | | from tests.discovery_runtime.test_snapshot_io import (\n22 | |     snapshot_catalog as snapshot_catalog,\n23 | | )\n24 | | from tests.discovery_runtime.test_coverage_scope import profile_with\n25 | | from tests.discovery_runtime.validation_test_support import (\n26 | |     ROOT,\n27 | |     captured,\n28 | |     document_record,\n29 | |     mode_profile,\n30 | |     no_scope_snapshot,\n31 | |     output_context,\n32 | |     replace_document,\n33 | | )\n34 | | from tests.schemas.discovery.v2_schema_test_support import as_object\n   | |____________________________________________________________________^\n35 |\n36 |   if TYPE_CHECKING:\n   |\nhelp: Organize imports\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_parity_report_projection.py:141:89\n    |\n139 |     snapshot_catalog: SchemaCatalog, field: str\n140 | ) -> None:\n141 |     \"\"\"For field (str), reject forged output despite an otherwise exact role manifest.\"\"\"\n    |                                                                                         ^\n142 |     baseline = no_scope_snapshot(snapshot_catalog)\n143 |     report = build_parity_report(baseline).to_dict()\n    |\n\nE501 Line too long (89 > 88)\n   --> tests\\discovery_runtime\\test_parity_report_projection.py:198:89\n    |\n196 |         name: str, target: Callable[..., object], *args: object, **kwargs: object\n197 |     ) -> object:\n198 |         \"\"\"Forward args/kwargs to target, counting complete name calls; return object.\"\"\"\n    |                                                                                         ^\n199 |         if name == \"parity_summary\":\n200 |             carriers.append(kwargs[\"parity\"])\n    |\n\nFound 4 errors.\n[*] 1 fixable with the `--fix` option.\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-projection-draft2-lint-055253.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}

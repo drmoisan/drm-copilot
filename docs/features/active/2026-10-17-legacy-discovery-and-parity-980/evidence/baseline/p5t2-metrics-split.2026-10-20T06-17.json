@@ -1,0 +1,10 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:17:00Z",
+  "baseline": "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json",
+  "baseline_sha256": "dd8ff586304e142d0894f38eb7364729821d3866c680d7981782b9e829c08d86",
+  "approved_new_path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+  "absent_before_creation": true,
+  "scope": "Internal projection and fixed reference helper only; public report exports and unchanged v1 helper bodies remain in parity_report.py.",
+  "reason": "Keep the concrete aggregation draft and required contract documentation below 500 formatted lines per module."
+}
