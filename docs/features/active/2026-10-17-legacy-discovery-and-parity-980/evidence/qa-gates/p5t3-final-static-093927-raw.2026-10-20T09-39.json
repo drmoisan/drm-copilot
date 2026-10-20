@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-static-093927.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg0KICBGaWxlICJDOlxVc2Vyc1xEYW5Nb2lzYW5cQXBwRGF0YVxMb2NhbFxUZW1wXGlzc3VlLTk4MC1wNXQzLWNvbXBsZXRpb25cZmluYWxfc3RhdGljLnB5IiwgbGluZSA5NSwgaW4gPG1vZHVsZT4NCiAgICBtYWluKCkNCiAgICB+fn5+Xl4NCiAgRmlsZSAiQzpcVXNlcnNcRGFuTW9pc2FuXEFwcERhdGFcTG9jYWxcVGVtcFxpc3N1ZS05ODAtcDV0My1jb21wbGV0aW9uXGZpbmFsX3N0YXRpYy5weSIsIGxpbmUgNjEsIGluIG1haW4NCiAgICBhc3NlcnQgYXN0LmdldF9kb2NzdHJpbmcobm9kZSksIChyZWxhdGl2ZSwgbm9kZS5uYW1lKQ0KICAgICAgICAgICB+fn5+fn5+fn5+fn5+fn5+fl5eXl5eXg0KQXNzZXJ0aW9uRXJyb3I6ICgndGVzdHMvc2NyaXB0cy9kZXZfdG9vbHMvZGlzY292ZXJ5L3Rlc3RfaW8ucHknLCAnZmFrZV9yZWFkX3RleHQnKQ0K",
+      "bytes": 459,
+      "path": "SCRATCH/p5t3-final-static-093927.stderr",
+      "sha256": "0aaf52ff00ffcb36445c209e804f2699cb7af2088b5576f81fbdcc84c4f6504f"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDQsICJsYWJlbCI6ICJzdGF0aWMiLCAic3RhdHVzIjogImZpbmlzaGVkIiwgImNvbXBsZXRlZCI6IDAsICJsYXN0X25vZGUiOiBudWxsLCAic3RhcnRlZF9hdCI6ICIyMDI2LTEwLTIwVDA5OjM5OjQzLjI1MjY3MSswMDowMCIsICJ0aW1lb3V0X3NlY29uZHMiOiAzMDAsICJwaWQiOiA3OTc5NiwgImVsYXBzZWRfc2Vjb25kcyI6IDEuMDE2LCAiZXhpdF9jb2RlIjogMX0K",
+      "bytes": 219,
+      "path": "SCRATCH/p5t3-final-static-093927.progress.json",
+      "sha256": "bb0265d12ab23cf6a6ff0fbec7d528532a7c699a5de2fa08eac5b78f5bee0214"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

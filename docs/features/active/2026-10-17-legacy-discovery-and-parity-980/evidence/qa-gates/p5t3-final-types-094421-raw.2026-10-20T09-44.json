@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "V0FSTklORzogdGhlcmUgaXMgYSBuZXcgcHlyaWdodCB2ZXJzaW9uIGF2YWlsYWJsZSAodjEuMS40MDkgLT4gdjEuMS40MTQpLg0KUGxlYXNlIGluc3RhbGwgdGhlIG5ldyB2ZXJzaW9uIG9yIHNldCBQWVJJR0hUX1BZVEhPTl9GT1JDRV9WRVJTSU9OIHRvIGBsYXRlc3RgDQoNCjAgZXJyb3JzLCAwIHdhcm5pbmdzLCAwIGluZm9ybWF0aW9ucwo=",
+      "bytes": 194,
+      "path": "SCRATCH/p5t3-final-types-094421.stdout",
+      "sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-types-094421.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDMsICJsYWJlbCI6ICJ0eXBlcyIsICJzdGF0dXMiOiAiZmluaXNoZWQiLCAiY29tcGxldGVkIjogMCwgImxhc3Rfbm9kZSI6IG51bGwsICJzdGFydGVkX2F0IjogIjIwMjYtMTAtMjBUMDk6NDQ6MjMuNDczOTIzKzAwOjAwIiwgInRpbWVvdXRfc2Vjb25kcyI6IDMwMCwgInBpZCI6IDM4MjA0LCAiZWxhcHNlZF9zZWNvbmRzIjogMTMuMDM5LCAiZXhpdF9jb2RlIjogMH0K",
+      "bytes": 219,
+      "path": "SCRATCH/p5t3-final-types-094421.progress.json",
+      "sha256": "9779cc6f899ca9e3b7619cb89d830f1dda41220229bf1694368f65c393cdb23d"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

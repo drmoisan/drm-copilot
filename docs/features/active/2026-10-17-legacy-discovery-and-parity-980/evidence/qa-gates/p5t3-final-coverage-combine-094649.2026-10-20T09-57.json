@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "7f98e8a0b6e26474397ca4d80466ad26b8d840a4d24c34432e83fec015925afd"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "7f98e8a0b6e26474397ca4d80466ad26b8d840a4d24c34432e83fec015925afd"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t3-final-candidate-native-repair.2026-10-20T09-46.json",
+  "candidate_sha256": "1a0da6fa3b283be26954f6c755db3056a1aacb869074bd2e05e51070cb5e0ef2",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\p5t3-final-094649-producer.coverage SCRATCH\\p5t3-final-094649-legacy.coverage SCRATCH\\p5t3-final-094649-semantic.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T09:57:12.222206+00:00",
+  "label": "coverage-combine",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-coverage-combine-094649-raw.2026-10-20T09-57.json",
+    "sha256": "5cb4c464dc859d6ea6dbdb189264370afa9cf57c6819823dd631e55cbecd7253"
+  },
+  "seconds": 1.016,
+  "stage": 6,
+  "started_at": "2026-10-20T09:57:11.206675+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t3-completion\\p5t3-final-094649-legacy.coverage\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t3-completion\\p5t3-final-094649-producer.coverage\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t3-completion\\p5t3-final-094649-semantic.coverage\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T09-57"
+}

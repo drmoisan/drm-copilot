@@ -1,0 +1,257 @@
+"""Reconcile the frozen P5-T3 receipts without executing product behavior."""
+import ast
+import base64
+import ctypes
+import difflib
+import hashlib
+import json
+import os
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+Q = F / "evidence/qa-gates"
+S = Path(__file__).parent
+sha = lambda raw: hashlib.sha256(raw).hexdigest()
+
+
+def ref(path):
+    return {"path": str(path).replace("\\", "/"), "sha256": sha(Path(path).read_bytes())}
+
+
+def bound(reference):
+    raw = Path(reference["path"]).read_bytes()
+    assert sha(raw) == reference["sha256"], reference["path"]
+    if "bytes" in reference:
+        assert len(raw) == reference["bytes"]
+    result = json.loads(raw)
+    for key in reference.get("selector", []):
+        result = result[key]
+    return result
+
+
+def fixed(name, digest):
+    return {"path": (Q / name).as_posix(), "sha256": digest}
+
+
+closure_ref = fixed("p5t3-final-closure.2026-10-20T09-57.json", "48e10bb1084fce341ce4764dd66bbd4aa2fbc3a5b14207dc9d281b6caa2acd6d")
+stage_ref = fixed("p5t3-final-staging.2026-10-20T09-57.json", "2157e2a8d88035c6615fc59e3df11ddb4cedd826be14e8ab6c6d8f774bf84eed")
+closure, stage = bound(closure_ref), bound(stage_ref)
+handoff, candidate = bound(closure["handoff"]), bound(closure["candidate"])
+assert closure["handoff"]["sha256"] == "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"
+commit = "a00b2b36a388088a9cd641defadfd8e8c0e8f64c"
+assert candidate["candidate_commit"] == closure["checked_commit"] == commit
+assert subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip() == commit
+assert bound(candidate["retained_proof"]["review"])["status"] == "READY_FOR_CHECKED_WIP_AND_FINAL_GATES"
+assert len(stage["stage_paths"]) == 97
+assert set(stage["stage_paths"]) == {r["path"] for r in stage["bindings"]} | {stage_ref["path"]}
+for record in stage["bindings"]:
+    raw = Path(record["path"]).read_bytes()
+    assert sha(raw) == record["sha256"] and len(raw) == record["bytes"], record["path"]
+
+actual = {}
+for path, digest in candidate["bindings"].items():
+    actual[path] = sha(Path(path).read_bytes())
+    assert actual[path] == digest, path
+harnesses = {}
+for name, record in candidate["harnesses"].items():
+    matches = [r for r in stage["bindings"] if r["sha256"] == record["sha256"]]
+    assert matches, name
+    harnesses[name] = matches[0]
+    actual["harness:" + name] = record["sha256"]
+binding = {"changed": [], "sha256": sha(json.dumps(actual, sort_keys=True).encode())}
+assert binding == handoff["bindings"]
+queries = [prefix + r["path"] for r in closure["source_test_git_bindings"] for prefix in (commit + ":", ":")]
+blobs = subprocess.run(["git", "cat-file", "--batch"], input=("\n".join(queries) + "\n").encode(), capture_output=True, check=True).stdout
+position = 0
+for record in closure["source_test_git_bindings"]:
+    assert sha(Path(record["path"]).read_bytes()) == record["working_sha256"]
+    for label in ("commit", "index"):
+        end = blobs.index(b"\n", position)
+        header = blobs[position:end].split()
+        assert header[1] == b"blob"
+        length = int(header[2])
+        position = end + 1
+        content = blobs[position:position + length]
+        position += length + 1
+        assert sha(content) == record[label + "_sha256"], (record["path"], label)
+assert position == len(blobs)
+
+
+def decode(reference):
+    result = {}
+    for row in bound(reference)["entries"]:
+        raw = base64.b64decode(row["base64"], validate=True)
+        assert len(raw) == row["bytes"] and sha(raw) == row["sha256"], row["path"]
+        assert row["path"] not in result
+        result[row["path"]] = raw
+    return result
+
+
+roots = [(Path.cwd(), "WORKSPACE"),
+         (Path(os.environ["TEMP"]) / "issue-980-p5t3-completion", "SCRATCH"),
+         (Path(os.environ["TEMP"]) / "codex-legacy-discovery" / "issue-980", "NATIVE_SCRATCH")]
+aliases = []
+for root, label in roots:
+    spellings = {str(root), root.as_posix()}
+    for name in ("GetLongPathNameW", "GetShortPathNameW"):
+        buffer = ctypes.create_unicode_buffer(32768)
+        size = getattr(ctypes.windll.kernel32, name)(str(root), buffer, len(buffer))
+        assert 0 < size < len(buffer) and root.samefile(buffer.value)
+        spellings.update((buffer.value, buffer.value.replace("\\", "/")))
+    aliases.extend((spelling, label) for spelling in spellings)
+
+
+def readable(raw):
+    text = raw.decode("utf-8")
+    for spelling, label in sorted(aliases, key=lambda x: len(x[0]), reverse=True):
+        text = re.sub(re.escape(spelling), lambda match: label, text, flags=re.I)
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+labels = ["format", "lint", "types", "static", "native", "producer", "legacy", "semantic", "coverage-combine", "coverage-json", "coverage-proof", "contracts"]
+assert [r["label"] for r in handoff["receipts"]] == labels
+raw_commands, receipts, all_nodes = {}, {}, []
+previous = None
+for row in handoff["receipts"]:
+    receipt = bound(row)
+    label = row["label"]
+    assert receipt["exit_code"] == 0 and not receipt["timed_out"]
+    assert receipt["candidate_sha256"] == closure["candidate"]["sha256"]
+    assert receipt["binding_before"] == receipt["binding_after"] == binding
+    assert receipt["seconds"] == row["seconds"] and receipt["stage"] == row["stage"]
+    start, finish = (datetime.fromisoformat(receipt[k]) for k in ("started_at", "finished_at"))
+    assert start <= finish and (previous is None or previous <= start)
+    previous = finish
+    decoded = decode(receipt["raw_archive"])
+    expected_entries = 4 if label == "format" else 3
+    assert len(decoded) == expected_entries and not (raw_commands.keys() & decoded.keys())
+    if label == "format":
+        assert "OBSERVED_PATH_ALIASES" in decoded
+    raw_commands.update(decoded)
+    stdout = next(raw for p, raw in decoded.items() if p.endswith(".stdout"))
+    stderr = next(raw for p, raw in decoded.items() if p.endswith(".stderr"))
+    assert readable(stdout) == receipt["stdout"], (label, "stdout")
+    assert readable(stderr) == receipt["stderr"], (label, "stderr")
+    nodes = re.findall(r"^(tests/.+?) (PASSED|FAILED|ERROR|SKIPPED)(?:\s|$)", stdout.decode("utf-8"), re.M)
+    assert len(nodes) == receipt["completed_nodes"] and all(status == "PASSED" for _, status in nodes)
+    if label in candidate["nodes"]:
+        expected = next(b["nodes"] for b in handoff["batches"] if b["label"] == label)
+        assert [n for n, _ in nodes] == expected == list(reversed(candidate["nodes"][label]))
+        all_nodes.extend(expected)
+    elif label == "contracts":
+        assert [n for n, _ in nodes] == handoff["contracts"] == candidate["contracts"]
+    receipts[label] = {"reference": row, "nodes": len(nodes), "stdout_sha256": sha(stdout), "stderr_sha256": sha(stderr)}
+assert len(all_nodes) == len(set(all_nodes)) == 108 and receipts["contracts"]["nodes"] == 4
+remaining = decode(closure["remaining_raw_archive"])
+assert len(remaining) == 16
+raw_all = raw_commands | remaining
+for row in handoff["raw_files"]:
+    raw = raw_all[row["path"]]
+    assert sha(raw) == row["sha256"] and len(raw) == row["bytes"], row["path"]
+for batch in handoff["batches"]:
+    assert sha(remaining[batch["coverage"]]) == batch["coverage_sha256"]
+native_raw = next(v for k, v in remaining.items() if k.endswith("native-result-restart.json"))
+native = json.loads(native_raw)
+assert json.loads(readable(native_raw)) == handoff["native"]
+assert native["state"] == "native-composition-passed" and len(native["checks"]) == 59
+assert all(r["passed"] is True for r in native["checks"])
+stdout = next(raw.decode("utf-8") for p, raw in raw_commands.items() if "native-" in p and p.endswith(".stdout"))
+assert re.findall(r"^PASS ([^\r\n]+)", stdout, re.M) == [r["label"] for r in native["checks"]]
+assert json.loads(remaining["FIXTURE_REPORT/completion-report.json"]) == native["report"]
+
+coverage = bound(handoff["coverage"]["current_coverage"])
+ranges = bound(handoff["coverage"]["coverage_ranges"])
+raw_combined = next(v for k, v in remaining.items() if k.endswith("combined-coverage.json"))
+assert sha(raw_combined) == ranges["raw_coverage_sha256"]
+raw_coverage = json.loads(raw_combined)
+raw_coverage["files"] = {p.replace("\\", "/"): v for p, v in raw_coverage["files"].items()}
+assert raw_coverage == coverage
+assert json.loads(next(v for k, v in remaining.items() if k.endswith("coverage-result.json"))) == handoff["coverage"]
+assert len(ranges["modules"]) == len(ranges["deltas"]) == 6 and len(ranges["ranges"]) == 42
+assert len(ranges["qualifications"]) == 23 == len(candidate["retained_units"]) + len(candidate["retained_segments"])
+retained = {(r["path"], r["name"]): r for r in candidate["retained_units"]}
+segments = {r["path"]: r for r in candidate["retained_segments"]}
+qualified_lines, qualified_arcs = {}, {}
+for qualification in ranges["qualifications"]:
+    path = qualification["path"]
+    assert qualification["raw_counters_augmented"] is False
+    if "name" in qualification:
+        prior = retained[(path, qualification["name"])]
+        assert qualification["coverage"] == prior["coverage"] and qualification["source_ref"] == prior["source_ref"]
+        bound(prior["accepted_prerequisite"])
+        bound(prior["coverage"])
+    else:
+        prior = segments[path]
+        assert qualification["proof"] == prior["proof"] and qualification["source_map"] == prior["source_map"]
+        assert qualification["current_source_sha256"] == candidate["bindings"][path]
+        proof = bound(prior["proof"])
+        bound(prior["review_confirmation"])
+        assert qualification["mapped_previously_executed_lines"] == proof["retained_prior_lines"]
+        assert qualification["mapped_previously_executed_branches"] == proof["retained_prior_arcs"]
+    qualified_lines.setdefault(path, set()).update(qualification["mapped_previously_executed_lines"])
+    qualified_arcs.setdefault(path, set()).update(map(tuple, qualification["mapped_previously_executed_branches"]))
+for delta in ranges["deltas"]:
+    current = coverage["files"][delta["path"]]
+    old_lines, old_arcs, refs = set(), set(), []
+    for proof in candidate["current_coverage_proofs"]:
+        if delta["path"] in proof["source_bindings"]:
+            assert proof["source_bindings"][delta["path"]] == candidate["bindings"][delta["path"]]
+            files = {p.replace("\\", "/"): v for p, v in bound(proof["coverage"])["files"].items()}
+            old_lines.update(files[delta["path"]]["executed_lines"])
+            old_arcs.update(map(tuple, files[delta["path"]]["executed_branches"]))
+            refs.append(proof["coverage"])
+    assert refs == delta["focused_proofs"]
+    assert not (old_lines - set(current["executed_lines"]))
+    assert not (old_arcs - set(map(tuple, current["executed_branches"])))
+    assert delta["lost_previously_executed_lines"] == delta["lost_previously_executed_branches"] == []
+for module in ranges["modules"]:
+    path = module["path"]
+    current = coverage["files"][path]
+    assert module["current_raw_summary"] == current["summary"]
+    assert not (set(current["missing_lines"]) - qualified_lines.get(path, set()))
+    assert not (set(map(tuple, current["missing_branches"])) - qualified_arcs.get(path, set()))
+    assert module["remaining_unproved_lines"] == module["remaining_unproved_branches"] == []
+    assert module["proof_covered_statements"] == module["proof_statement_total"]
+    assert module["proof_covered_branches"] == module["proof_branch_total"]
+for record in ranges["ranges"]:
+    current = coverage["files"][record["path"]]
+    lo, hi = record["start"], record["end"]
+    for kind in ("executed_lines", "missing_lines", "executed_branches", "missing_branches"):
+        expected = [x for x in current[kind] if lo <= (x[0] if isinstance(x, list) else x) <= hi]
+        assert record["current_raw_" + kind] == expected, (record["name"], kind)
+    named = current.get(record["kind"], {}).get(record["name"])
+    assert record["coverage_named_summary"] == (named["summary"] if named else None)
+    assert record["remaining_unproved_lines"] == record["remaining_unproved_branches"] == []
+
+before = {}
+for name in ("plan.2026-10-17T22-38.md", "spec.md", "user-story.md"):
+    path = F / name
+    raw = path.read_bytes()
+    (S / ("p5t3-before-" + name)).write_bytes(raw)
+    before[path.as_posix()] = {"sha256": sha(raw), "crlf": raw.count(b"\r\n"), "lf": raw.count(b"\n")}
+result = {
+    "status": "FINAL_RECEIPTS_RECONCILED_PASS",
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "closure": closure_ref, "owner_staging": stage_ref, "handoff": closure["handoff"],
+    "candidate": closure["candidate"], "checked_commit": commit,
+    "bindings_checked": len(candidate["bindings"]), "source_test_git_streams": len(closure["source_test_git_bindings"]),
+    "harnesses": harnesses, "receipts": receipts, "task_nodes": 108, "contracts": 4, "native_checks": 59,
+    "raw_command_streams": len(raw_commands), "raw_remaining_streams": len(remaining),
+    "coverage_raw_totals": {k: sum(m["current_raw_summary"][k] for m in ranges["modules"]) for k in ("covered_lines", "num_statements", "covered_branches", "num_branches")},
+    "coverage_qualified_totals": {k: sum(m[k] for m in ranges["modules"]) for k in ("proof_covered_statements", "proof_statement_total", "proof_covered_branches", "proof_branch_total")},
+    "coverage_modules": 6, "coverage_ranges": 42, "retained_qualifications": 23,
+    "coverage_unproved_points": [], "raw_counters_augmented": False,
+    "before_documents": before, "findings": [], "open_probes": [], "behavior_rerun": False,
+    "qualifications": [
+        "Exact base64 raw streams retain original bytes, newlines and operational paths; readable views replace observed same-file root aliases and CR/LF only.",
+        "Raw current coverage stays separate from accepted unchanged-body and reviewed statement/arc mappings.",
+        "Both original harness-only failures and their bounded corrections remain in the owner closure.",
+    ],
+}
+destination = S / "issue-980-p5t3-final-reconcile-result.json"
+assert not destination.exists()
+destination.write_bytes((json.dumps(result, indent=2) + "\n").encode())
+print(json.dumps({k: result[k] for k in ("status", "task_nodes", "contracts", "native_checks", "coverage_raw_totals", "coverage_qualified_totals")}))

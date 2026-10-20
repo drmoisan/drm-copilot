@@ -1,0 +1,198 @@
+{
+  "task": "P5-T3",
+  "status": "ACCEPTED",
+  "handoff_signal": "READY_FOR_ACCEPTANCE_COMMIT",
+  "timestamp_utc": "2026-10-20T10:13:28.800696+00:00",
+  "route": "atomic_execution_p5t3_acceptance_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority_rechecked": true,
+  "candidate_commit": "a00b2b36a388088a9cd641defadfd8e8c0e8f64c",
+  "Command": "python SCRATCH/issue-980-p5t3-final-reconcile.py",
+  "EXIT_CODE": 0,
+  "OutputSummary": "108 exact reversed task cases, 59 native assertions, four contracts and all frozen receipt/source bindings reconcile; no behavior rerun.",
+  "reconciliation_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-final-reconciliation.2026-10-20T10-13.json",
+    "sha256": "663ac285b660341639f3fb0f2dd33297b222abfdda0171276d7a59b8bf9585e9"
+  },
+  "raw_checker_attempts": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-final-reconciliation-raw.2026-10-20T10-13.json",
+    "sha256": "d693279a86e23c4c10844990ffbbd35fa426535e9f422b545b5a7086fd60325a"
+  },
+  "executed_checker": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-final-reconciliation-harness.2026-10-20T10-13.txt",
+    "sha256": "b781ca95d587a001c18ecbeb22e9b8657651ec39f78d3899c9aeff7f8cbb4d86"
+  },
+  "owner_handoff": {
+    "bytes": 46567,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+    "sha256": "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"
+  },
+  "owner_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-closure.2026-10-20T09-57.json",
+    "sha256": "48e10bb1084fce341ce4764dd66bbd4aa2fbc3a5b14207dc9d281b6caa2acd6d"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-staging.2026-10-20T09-57.json",
+    "sha256": "2157e2a8d88035c6615fc59e3df11ddb4cedd826be14e8ab6c6d8f774bf84eed"
+  },
+  "retained_candidate_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-candidate-ready.2026-10-20T09-31.json",
+    "sha256": "5865f935ac62cc008d30200983ec1efed38953d80e53d9286d06dd82f583815e"
+  },
+  "verification": {
+    "ordered_toolchain": [
+      "Black",
+      "Ruff",
+      "whole-repository Pyright",
+      "static policy/architecture",
+      "native Windows/Git composition",
+      "reversed task tests and coverage reconciliation",
+      "four affected contracts"
+    ],
+    "python_toolchain": "PASS",
+    "task_cases": {
+      "producer": 54,
+      "legacy": 31,
+      "semantic": 23,
+      "total": 108
+    },
+    "native_assertions": 59,
+    "contracts": 4,
+    "candidate_bindings": 33,
+    "source_test_working_index_commit_bindings": 16,
+    "coverage_modules": 6,
+    "coverage_ranges": 42,
+    "separate_retained_qualifications": 23,
+    "raw_coverage": {
+      "covered_lines": 450,
+      "num_statements": 490,
+      "covered_branches": 131,
+      "num_branches": 164
+    },
+    "qualified_coverage": {
+      "proof_covered_statements": 490,
+      "proof_statement_total": 490,
+      "proof_covered_branches": 164,
+      "proof_branch_total": 164
+    },
+    "unproved_points": [],
+    "raw_counters_augmented": false,
+    "behavior_rerun_during_acceptance": false
+  },
+  "task_acceptance_mapping": [
+    "Selected structural, discovery-complete, parity-complete and planning results retain original blockers/warnings, malformed/unavailable diagnostics and explicit mode/digest identity.",
+    "JSON and Markdown derive from one immutable completion result; next actions retain finding references and deduplicate without asserting host readiness.",
+    "Actual Windows/Git capture, grant validation, guarded creation/replacement, idempotence and recapture passed; authored evidence/contracts remain protected."
+  ],
+  "interface_handoff": [
+    "completion_report builds from the selected public validated projection; validation_operation owns the cached assessment and preserves coverage/parity/validation-report behavior.",
+    "Paired JSON/Markdown planning requires exact configured output grants and delegates prospective validation and writes to existing mutation authority.",
+    "Consumers receive explicit mode, pass/fail/unavailable state, current input digest, blockers, warnings and traceable next actions; no installed-host completion authority is created."
+  ],
+  "qualifications": [
+    "Exact base64 raw streams retain original bytes, newlines and operational paths; readable views replace observed same-file root aliases and CR/LF only.",
+    "Raw current coverage stays separate from accepted unchanged-body and reviewed statement/arc mappings.",
+    "Both original harness-only failures and their bounded corrections remain in the owner closure."
+  ],
+  "historical_failures": [
+    "Original semantic 17/20 run and SD1/ST1 reproduction/repairs remain in committed candidate evidence.",
+    "Final static failure concerned two exact accepted unchanged nested test fakes; the bounded harness qualification preserved their bytes.",
+    "Final native harness absent-path KeyError was corrected to manifest membership; original failure and corrected executable remain in the final closure."
+  ],
+  "document_changes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "before_sha256": "4b9d2e591dcd5a244637850e24e196d37f143107bfd9e7dede31b01a537f259e",
+      "after_sha256": "cbb266940feee4916642dbcf65ad25ea463456c5647eede77de5b63dff19368d",
+      "change": "P5-T3",
+      "only_checkbox_changed": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "before_sha256": "6cfbda32f4569ea599e2a337f39cb19dbe76a141eff9e18dc4866132e18e3743",
+      "after_sha256": "fa81cc5f18d407cdf764700bab3dd4348038abc5d27a98cacd237902a5448bfa",
+      "change": "AC-23",
+      "only_checkbox_changed": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "before_sha256": "9e4fee44ba97836140c1ad4a5edc40480bb719b288825b29db7d76e1e33d32b0",
+      "after_sha256": "26b9738375d200453de4ef52c4a2417297ab9ec7381447d32e2d46dc402c8ca3",
+      "change": "AC-23",
+      "only_checkbox_changed": true
+    }
+  ],
+  "plan_status": {
+    "checked": 44,
+    "total": 84
+  },
+  "source_ACs": {
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+      "checked": 18,
+      "total": 66,
+      "newly_checked": [
+        "AC-23"
+      ]
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+      "checked": 18,
+      "total": 66,
+      "newly_checked": [
+        "AC-23"
+      ]
+    }
+  },
+  "AC23_mapping": {
+    "criterion": "Markdown and JSON reports are generated.",
+    "work_mode": "full-feature",
+    "sources": [
+      "spec.md",
+      "user-story.md"
+    ],
+    "prior_report_acceptance": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-final-acceptance.2026-10-20T05-33.json",
+        "sha256": "a7623d3035628c7ff6f6203eee4551a25c84f2cdec31dc45381d313a103702d8"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-final-acceptance.2026-10-20T08-31.json",
+        "sha256": "d2db668e8a3b440a40792d9868414ee0ba5bfd94b9e8141047c49176931157ae"
+      }
+    ],
+    "current_completion_proof": {
+      "bytes": 46567,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+      "sha256": "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"
+    },
+    "basis": "Accepted coverage and parity paired views plus the current completion JSON/Markdown renderer and guarded native publication satisfy the whole report-generation criterion. CLI delivery, other acceptance criteria and host integration remain separate."
+  },
+  "limitations": [
+    "Later acceptance generation, service/CLI delivery, host-gate integration and final feature acceptance remain pending.",
+    "Actual local Windows/Git composition does not establish installed coding-agent-host or non-Windows operation.",
+    "Whole-run durations are batch observations, not individual API latency guarantees."
+  ],
+  "findings": [],
+  "open_probes": [],
+  "next_five_tasks": [
+    {
+      "id": "P5-T4",
+      "title": "Generate stable ready or pending acceptance records."
+    },
+    {
+      "id": "P5-T5",
+      "title": "Render traceable Markdown and executable-ready Gherkin only."
+    },
+    {
+      "id": "P6-T1",
+      "title": "Expose the versioned Python service and fixed gateway."
+    },
+    {
+      "id": "P6-T2",
+      "title": "Register every required noninteractive console command."
+    },
+    {
+      "id": "P6-T3",
+      "title": "Finish safe legacy entry-point compatibility and remove checkout coupling."
+    }
+  ]
+}

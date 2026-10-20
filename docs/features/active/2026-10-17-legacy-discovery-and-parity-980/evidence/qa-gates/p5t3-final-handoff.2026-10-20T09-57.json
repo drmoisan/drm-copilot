@@ -1,0 +1,915 @@
+{
+  "batches": [
+    {
+      "coverage": "SCRATCH/p5t3-final-094649-producer-coverage.json",
+      "coverage_sha256": "449936cfebfe5894c94dd28f549344d606e992b78d759522c7f11389b6e434dc",
+      "label": "producer",
+      "nodes": [
+        "tests/discovery_runtime/test_completion_planning.py::test_malformed_core_diagnostic_cannot_pass_prospective_mutation_validation",
+        "tests/discovery_runtime/test_completion_planning.py::test_paired_views_support_dry_run_replacement_and_exact_unchanged_skip",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_reserves_captured_file_comparisons_before_projection",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_requires_an_actual_captured_workspace",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[True]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[custom]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[agent-output]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[list]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[member]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[md]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[json]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[identifier]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[kind]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[duplicate]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[extra]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[one]",
+        "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[none]",
+        "tests/discovery_runtime/test_completion_planning.py::test_public_builder_delegates_one_exact_mode_and_identifier",
+        "tests/discovery_runtime/test_completion_report.py::test_empty_legacy_counts_remain_compatibility_only",
+        "tests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[artifact_kind-completion-report]",
+        "tests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[schema_version-2.0.0]",
+        "tests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[parity]",
+        "tests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[coverage]",
+        "tests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[True]",
+        "tests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[False]",
+        "tests/discovery_runtime/test_completion_report.py::test_grouping_reserves_work_before_visiting_supplied_findings",
+        "tests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[unicode]",
+        "tests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[ascii]",
+        "tests/discovery_runtime/test_completion_report.py::test_public_preflight_requires_a_captured_snapshot",
+        "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[validity]",
+        "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[member]",
+        "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[list]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[mode5]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[True]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[None]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[custom]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[]",
+        "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[agent-output]",
+        "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order2]",
+        "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order1]",
+        "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order0]",
+        "tests/discovery_runtime/test_completion_report.py::test_exact_actions_preserve_every_original_diagnostic_index",
+        "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[parity-complete]",
+        "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[discovery-complete]",
+        "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[none]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-planning-Planning prerequisite]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-parity-complete-Parity completion]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-discovery-complete-Discovery completion]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-structural-Structural validation]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-planning-Planning prerequisite]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-parity-complete-Parity completion]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-discovery-complete-Discovery completion]",
+        "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-structural-Structural validation]"
+      ]
+    },
+    {
+      "coverage": "SCRATCH/p5t3-final-094649-legacy-coverage.json",
+      "coverage_sha256": "025b735dbfb7ae437f596eb7b2b770d61a0848724d52df68444e05b027735dcf",
+      "label": "legacy",
+      "nodes": [
+        "tests/scripts/dev_tools/discovery/test_io.py::test_write_report_calls_write_text_with_exact_content",
+        "tests/scripts/dev_tools/discovery/test_io.py::test_read_artifact_text_returns_stubbed_text",
+        "tests/scripts/dev_tools/discovery/test_io.py::test_validate_or_raise_raises_with_errors",
+        "tests/scripts/dev_tools/discovery/test_io.py::test_validate_or_raise_passes_with_no_errors",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[write]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[validator]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[read]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments2]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments1]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments0]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_none_arguments_use_process_argument_seam",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_default_validator_bindings_preserve_both_diagnostics",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[secret-token is not JSON-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[secret-token is not JSON-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[[\"secret-token\"]-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[[\"secret-token\"]-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":\"secret-token\"}-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":\"secret-token\"}-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":NaN}-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":NaN}-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":[],\"entries\":[{\"id\":\"secret-token\"}]}-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":[],\"entries\":[{\"id\":\"secret-token\"}]}-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"schema_version\":2,\"entries\":[]}-parity]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"schema_version\":2,\"entries\":[]}-coverage]",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_writes_to_stdout_when_output_omitted",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_1_when_either_validator_fails",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_0_when_both_validators_pass",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_build_completion_summary_handles_missing_entries_key",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_1_on_coverage_validation_failure_and_skips_build",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_render_completion_report_is_deterministic",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py::test_build_completion_summary_reports_entry_counts_and_compatibility"
+      ]
+    },
+    {
+      "coverage": "SCRATCH/p5t3-final-094649-semantic-coverage.json",
+      "coverage_sha256": "6082aebef1d9d7ba82997c752a17e39059e91a04d1efbde6abf6e81a9b56a128",
+      "label": "semantic",
+      "nodes": [
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-initialized-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly",
+        "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[agent-output-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[agent-output-False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[automatic-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_rejects_unsupported_modes[automatic-False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_preflight_precedes_input_validation",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_preserves_bounded_warning_and_truncation_authority[101]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_preserves_bounded_warning_and_truncation_authority[100]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_recomputation_reuses_assessment_and_rejects_authored_override",
+        "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[loader]",
+        "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[malformed]",
+        "tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[missing-profile]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[planning-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[planning-False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[parity-complete-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[parity-complete-False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[discovery-complete-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[discovery-complete-False]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[structural-True]",
+        "tests/discovery_runtime/test_completion_projection.py::test_completion_uses_only_selected_mode_with_trusted_warnings[structural-False]"
+      ]
+    }
+  ],
+  "bindings": {
+    "changed": [],
+    "sha256": "7f98e8a0b6e26474397ca4d80466ad26b8d840a4d24c34432e83fec015925afd"
+  },
+  "candidate_sha256": "1a0da6fa3b283be26954f6c755db3056a1aacb869074bd2e05e51070cb5e0ef2",
+  "contracts": [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+  ],
+  "coverage": {
+    "coverage_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-coverage-ranges.2026-10-20T09-57.json",
+      "sha256": "c912f050d0e6dee0f9d26300e28da0cc64e46d28bc0b067f439ee8c623f5aa02"
+    },
+    "current_coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-current-coverage.2026-10-20T09-57.json",
+      "sha256": "942ac5ef39da1e341a20d2049f098477482b0480eac6a08766cbda21848b2f5e"
+    },
+    "current_raw_counters_augmented": false,
+    "module_count": 6,
+    "qualified_prior_proof_count": 23,
+    "range_count": 42
+  },
+  "finished_at": "2026-10-20T09:57:16.378749+00:00",
+  "limitations": [
+    "No final gate, task unit test, native publication or fixture mutation executed during preparation.",
+    "Native fixture can prove actual Windows/Git composition only; no installed coding-agent-host hooks or non-Windows claim.",
+    "No successor, CLI-delivery or feature-completion acceptance is implied."
+  ],
+  "native": {
+    "after": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+      "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+      "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+      "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+      "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+      "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+      "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+      "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+      "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+      "docs/migration/discovery/reports/completion-report.json": "98f7f7a3f4cfa09ea5827831eff461c217c79bbc26354feb191a918066eff119",
+      "docs/migration/discovery/reports/completion-report.md": "7614d7590c5fe5c43e19853872523c24a6e49a9190bb2fa662f6e40642cdf6a8",
+      "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+      "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+      "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    },
+    "checks": [
+      {
+        "label": "accepted-fixture-byte-identity",
+        "passed": true
+      },
+      {
+        "label": "checkout-identity",
+        "passed": true
+      },
+      {
+        "label": "captured-byte-identity",
+        "passed": true
+      },
+      {
+        "label": "semantic-input-identity",
+        "passed": true
+      },
+      {
+        "label": "actual-core-structural-pass",
+        "passed": true
+      },
+      {
+        "label": "completion-output-absence",
+        "passed": true
+      },
+      {
+        "label": "missing-grants-refused",
+        "passed": true
+      },
+      {
+        "label": "wrong-kind-refused",
+        "passed": true
+      },
+      {
+        "label": "authored-contract-grant-refused",
+        "passed": true
+      },
+      {
+        "label": "malformed-identity",
+        "passed": true
+      },
+      {
+        "label": "malformed-json",
+        "passed": true
+      },
+      {
+        "label": "malformed-heading",
+        "passed": true
+      },
+      {
+        "label": "malformed-markdown",
+        "passed": true
+      },
+      {
+        "label": "malformed-no-authority",
+        "passed": true
+      },
+      {
+        "label": "malformed-known-error",
+        "passed": true
+      },
+      {
+        "label": "malformed-unavailable",
+        "passed": true
+      },
+      {
+        "label": "malformed-input-findings-retained",
+        "passed": true
+      },
+      {
+        "label": "malformed-structural-refused",
+        "passed": true
+      },
+      {
+        "label": "malformed-publication-plan-refused",
+        "passed": true
+      },
+      {
+        "label": "malformed-plan-keeps-findings",
+        "passed": true
+      },
+      {
+        "label": "negative-controls-no-write",
+        "passed": true
+      },
+      {
+        "label": "structural-identity",
+        "passed": true
+      },
+      {
+        "label": "structural-json",
+        "passed": true
+      },
+      {
+        "label": "structural-heading",
+        "passed": true
+      },
+      {
+        "label": "structural-markdown",
+        "passed": true
+      },
+      {
+        "label": "structural-no-authority",
+        "passed": true
+      },
+      {
+        "label": "structural-explicit-mode",
+        "passed": true
+      },
+      {
+        "label": "structural-current-input-digest",
+        "passed": true
+      },
+      {
+        "label": "structural-independent-expectations",
+        "passed": true
+      },
+      {
+        "label": "planned-immutable-pair",
+        "passed": true
+      },
+      {
+        "label": "new-output-preconditions",
+        "passed": true
+      },
+      {
+        "label": "dry-run-planned",
+        "passed": true
+      },
+      {
+        "label": "dry-run-no-write",
+        "passed": true
+      },
+      {
+        "label": "structural-publication",
+        "passed": true
+      },
+      {
+        "label": "structural-pair-on-disk",
+        "passed": true
+      },
+      {
+        "label": "structural-invalidation-seam",
+        "passed": true
+      },
+      {
+        "label": "parity-complete-identity",
+        "passed": true
+      },
+      {
+        "label": "parity-complete-json",
+        "passed": true
+      },
+      {
+        "label": "parity-complete-heading",
+        "passed": true
+      },
+      {
+        "label": "parity-complete-markdown",
+        "passed": true
+      },
+      {
+        "label": "parity-complete-no-authority",
+        "passed": true
+      },
+      {
+        "label": "selected-failure-explicit",
+        "passed": true
+      },
+      {
+        "label": "independent-error-population",
+        "passed": true
+      },
+      {
+        "label": "failure-actions-and-indices",
+        "passed": true
+      },
+      {
+        "label": "replacement-immutable-pair",
+        "passed": true
+      },
+      {
+        "label": "replacement-cas-preconditions",
+        "passed": true
+      },
+      {
+        "label": "truthful-failure-published",
+        "passed": true
+      },
+      {
+        "label": "replacement-pair-on-disk",
+        "passed": true
+      },
+      {
+        "label": "semantic-digest-stable",
+        "passed": true
+      },
+      {
+        "label": "full-snapshot-changed",
+        "passed": true
+      },
+      {
+        "label": "source-pins-unchanged",
+        "passed": true
+      },
+      {
+        "label": "authored-identities-unchanged",
+        "passed": true
+      },
+      {
+        "label": "authoritative-recomputation",
+        "passed": true
+      },
+      {
+        "label": "published-structural-pass",
+        "passed": true
+      },
+      {
+        "label": "replacement-invalidation-seam",
+        "passed": true
+      },
+      {
+        "label": "idempotent-no-write",
+        "passed": true
+      },
+      {
+        "label": "stale-original-rejected",
+        "passed": true
+      },
+      {
+        "label": "only-completion-output-bytes-changed",
+        "passed": true
+      },
+      {
+        "label": "source-bindings-stable",
+        "passed": true
+      }
+    ],
+    "elapsed_seconds": 263.7761943000078,
+    "fixture": "SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83",
+    "fixture_receipt_sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355",
+    "initial_snapshot_sha256": "055dabb3fcc14142e7a43aed518c8950ebfb018a6ece78d9b10b8ec4595fdadc",
+    "input_sha256": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+    "operation_seconds": {
+      "capture-baseline": 3.0325636000197846,
+      "commit-idempotent": 25.85899980002432,
+      "derive-parity-complete": 2.9607788999855984,
+      "derive-structural": 2.9300779000041075,
+      "malformed-diagnostic": 2.557185000012396,
+      "malformed-overlay": 2.9888908000139054,
+      "plan-idempotent": 9.514107099996181,
+      "plan-replacement": 9.332416899997042,
+      "plan-structural": 9.28907940001227,
+      "publish-structural": 71.88793699999223,
+      "publish-truthful-failure": 71.72010459998273,
+      "recapture-replacement": 4.169176600000355,
+      "recapture-structural": 4.0252147000283,
+      "recompute-replacement": 2.948843400023179,
+      "stale-plan-dry-run": 10.45416700001806,
+      "structural-dry-run": 10.30718689999776,
+      "structural-validation": 2.912467399990419
+    },
+    "qualifications": [
+      "Actual Windows/Git fixture, capture, guarded creation/replacement and recapture; no consumer repository or network.",
+      "Malformed-core refusal uses an immutable in-memory loader overlay of the actual capture, not an authored disk mutation.",
+      "Expected mode/status/count/action values are fixed independently of generated actual values.",
+      "Authority invalidation is fixture instrumentation, not proof of installed host hooks or non-Windows execution."
+    ],
+    "report": {
+      "artifact_kind": "completion-report",
+      "completion": {
+        "assessment_state": "available",
+        "blocking_findings": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "findings_complete": true,
+        "mode_label": "Parity completion",
+        "next_actions": [
+          {
+            "action": "Correct the identity or supply the artifact, then validate again.",
+            "finding_indices": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "planning_prerequisite": null,
+        "retained_finding_counts": {
+          "error": 5,
+          "info": 0,
+          "warning": 0
+        },
+        "warning_findings": []
+      },
+      "counts": {
+        "coverage-ledger": 1,
+        "evidence-reference": 2,
+        "feature-contract": 1,
+        "inventory-snapshot": 1,
+        "parity-matrix": 1,
+        "scope": 1
+      },
+      "findings": [
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "ACCEPTANCE_CRITERIA",
+          "message": "Required features need explicit supported criteria.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/acceptance_criteria",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/observable_outputs",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_MISSING",
+          "message": "Required behavior needs an explicit classification.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/online",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/trigger",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "code": "PARITY_INCOMPLETE",
+          "message": "Required parity remains unassessed, partial, missing or conflicting.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        }
+      ],
+      "id": "completion",
+      "input_sha256": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+      "mode": "parity-complete",
+      "schema_version": "2.0.0",
+      "validation_result": "fail"
+    },
+    "state": "native-composition-passed",
+    "task": "P5-T3"
+  },
+  "node_count": 108,
+  "raw_files": [
+    {
+      "bytes": 1127,
+      "path": "OBSERVED_PATH_ALIASES",
+      "sha256": "8c18933e98f1eb3e51bac2e169567533c98139859b2a667c57abb2492ff1d145"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-format-094649.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 59,
+      "path": "SCRATCH/p5t3-final-format-094649.stderr",
+      "sha256": "24315bea89f680c399aecdf314732fa86f8f9b1e43b91a23310112252efd5bf6"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/p5t3-final-format-094649.progress.json",
+      "sha256": "f38f7fe7a903c9b328484eabee5069403063b0e8d87ae2abc050cb66c8f6b29e"
+    },
+    {
+      "bytes": 19,
+      "path": "SCRATCH/p5t3-final-lint-094649.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-lint-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 217,
+      "path": "SCRATCH/p5t3-final-lint-094649.progress.json",
+      "sha256": "16791354855721a95d3c29fa05a20ee897b3661f16f4f69305fe34dd9a76152f"
+    },
+    {
+      "bytes": 194,
+      "path": "SCRATCH/p5t3-final-types-094649.stdout",
+      "sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-types-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 218,
+      "path": "SCRATCH/p5t3-final-types-094649.progress.json",
+      "sha256": "3d4021706d9124f9a8462631ec50b2eb45cdb174d4f530ed0896ac47d39f7bb9"
+    },
+    {
+      "bytes": 10178,
+      "path": "SCRATCH/p5t3-final-static-094649.stdout",
+      "sha256": "04ae541fe21161233de7cf47a842eef7338d7c8ff33132a80ae5404fca634c91"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-static-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/p5t3-final-static-094649.progress.json",
+      "sha256": "2cf8d9dbaf219682847cc8f9745481e3d150fbb563cc09fb7cb1bb5e034c30a0"
+    },
+    {
+      "bytes": 1821,
+      "path": "SCRATCH/p5t3-final-native-094649.stdout",
+      "sha256": "d372ca8fd6911dc8bdfdf8c21b8c4ecad09d56647baa0ef62953659482d21089"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-native-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 221,
+      "path": "SCRATCH/p5t3-final-native-094649.progress.json",
+      "sha256": "9f7c22bd631faa12d3da81949d35fc6bf56fe72898748d33105e3e08038827f2"
+    },
+    {
+      "bytes": 9396,
+      "path": "SCRATCH/p5t3-final-producer-094649.stdout",
+      "sha256": "520b6836f34e569f7cefae4a098e1ae00fd6e4b69ca371fa52bbf7973759c1a2"
+    },
+    {
+      "bytes": 386,
+      "path": "SCRATCH/p5t3-final-producer-094649.stderr",
+      "sha256": "50cea79b70873dfca1c3954034f2ad0e4774af7ddecd8671e1ca1811ad3d3fd7"
+    },
+    {
+      "bytes": 388,
+      "path": "SCRATCH/p5t3-final-producer-094649.progress.json",
+      "sha256": "737e0bf7bd772b8bf4bf4bb48fd1ebbfc64a06ff09a33c8f15cb8a3fdbb951bb"
+    },
+    {
+      "bytes": 6285,
+      "path": "SCRATCH/p5t3-final-legacy-094649.stdout",
+      "sha256": "71ff4c890378daf24704da3fe2dee7fade8dae6463f69b59395f0d6563ee8135"
+    },
+    {
+      "bytes": 1135,
+      "path": "SCRATCH/p5t3-final-legacy-094649.stderr",
+      "sha256": "8429f4f66db5b0dc8e85d52b1e709271b8af2b4f8c0c3c03b062c112e898860c"
+    },
+    {
+      "bytes": 372,
+      "path": "SCRATCH/p5t3-final-legacy-094649.progress.json",
+      "sha256": "bd5e5c0e22dc740f03ea3bd2942496faaba7adfc78ed971ee5e5b66ccad56139"
+    },
+    {
+      "bytes": 5333,
+      "path": "SCRATCH/p5t3-final-semantic-094649.stdout",
+      "sha256": "509e96ee1b186f721345d195cecf77dc143c1ed5ca460007d30ef2083eb0d54a"
+    },
+    {
+      "bytes": 765,
+      "path": "SCRATCH/p5t3-final-semantic-094649.stderr",
+      "sha256": "afa58e10ea66b06f2224d99883285154c04b52dc3f2b8001c0a4078c94c7ba72"
+    },
+    {
+      "bytes": 380,
+      "path": "SCRATCH/p5t3-final-semantic-094649.progress.json",
+      "sha256": "8e692ddc762f572b2c6073f5b5cd93a127434104f18c529a8d26572911be7694"
+    },
+    {
+      "bytes": 328,
+      "path": "SCRATCH/p5t3-final-coverage-combine-094649.stdout",
+      "sha256": "e37cf237e09bcda14bed058b5d7b83a4bba6d5337cb1e07f97e05045d5daac7f"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-coverage-combine-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 229,
+      "path": "SCRATCH/p5t3-final-coverage-combine-094649.progress.json",
+      "sha256": "63e9f7dc0021f6c672fd49769e4142d1ee7ec5246a2ca6b4a2d595d54bd61443"
+    },
+    {
+      "bytes": 127,
+      "path": "SCRATCH/p5t3-final-coverage-json-094649.stdout",
+      "sha256": "3f4e4f51ef3e33542d83b6d391a5f5398c0e0703e9de540d5b3cfe14d30afa4c"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-coverage-json-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 226,
+      "path": "SCRATCH/p5t3-final-coverage-json-094649.progress.json",
+      "sha256": "2ca767ced1df812bbade5fab6c293aea67094fb2275e955cf3a6cb5454b4296a"
+    },
+    {
+      "bytes": 651,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.stdout",
+      "sha256": "cf931794eafb0d8b7796fde19b248a80f0c16e3a9259b9a4824ae3d7f2c803a0"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 227,
+      "path": "SCRATCH/p5t3-final-coverage-proof-094649.progress.json",
+      "sha256": "50a498e7ed2155b50d72c2f1268605b706478dc4fc08eed59ad150ac3c8f888b"
+    },
+    {
+      "bytes": 1015,
+      "path": "SCRATCH/p5t3-final-contracts-094649.stdout",
+      "sha256": "ddc35878d360d94e6394c9fcf00726c17cdd65dc4ed230a9acb912e4ef6df6ba"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-contracts-094649.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 362,
+      "path": "SCRATCH/p5t3-final-contracts-094649.progress.json",
+      "sha256": "f2e0bdc86d1ca77b1bcb6bcf0f379b76bb6ef60d51fe90b1099178b4adb32dac"
+    }
+  ],
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-format-094649.2026-10-20T09-46.json",
+      "seconds": 1.012,
+      "sha256": "b547093ead6eab1227866f4d67cb9589e4f075b5fba6870edaf5988c9997711a",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-lint-094649.2026-10-20T09-46.json",
+      "seconds": 1.012,
+      "sha256": "c47e0caecf6c822aad8bad008dd9138cf2556441cc465b38b93272a6ae725902",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-types-094649.2026-10-20T09-47.json",
+      "seconds": 13.04,
+      "sha256": "e3919955fa990744f046e63fa363a8a0c69003aac1567fe6196e9c488ae419b7",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "static",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-static-094649.2026-10-20T09-47.json",
+      "seconds": 2.017,
+      "sha256": "bf245f84fd2502a51de9b4d3c08e5471a6c90ea2eb10fff016038c8d0bcf349e",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-094649.2026-10-20T09-51.json",
+      "seconds": 264.573,
+      "sha256": "ae9e901ca45262fbdc2c77c1d7478d08864972ede10d54169c1b0e88d2a4017b",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "producer",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-producer-094649.2026-10-20T09-54.json",
+      "seconds": 159.347,
+      "sha256": "c8e3128a54f8e80a8d87bd6fd64a2acbc0d8f8eafc0675336cd7b97a89680085",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "legacy",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-legacy-094649.2026-10-20T09-54.json",
+      "seconds": 2.019,
+      "sha256": "79080da64bc9acff3cd3aa1e2b70589343aff7459918b88e5695a0ac9a22cb15",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "semantic",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-semantic-094649.2026-10-20T09-57.json",
+      "seconds": 178.39,
+      "sha256": "045a05faaea5739ce69aee58a13e4b7f4ed774231caad8d36c0686bc8b317495",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-combine",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-coverage-combine-094649.2026-10-20T09-57.json",
+      "seconds": 1.016,
+      "sha256": "cff14f1751c9fb647fdea93f6bdbe09d601c5ec0572eacce5e746fccc2143e71",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-json",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-coverage-json-094649.2026-10-20T09-57.json",
+      "seconds": 1.015,
+      "sha256": "24667cb8f12c3ea71b6238e7a4a3a530c9f095ed1c267d6426132932fe6e7bad",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-proof",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-coverage-proof-094649.2026-10-20T09-57.json",
+      "seconds": 2.047,
+      "sha256": "095a91489ceb4144519e46348f9402018435b1cb6a67ea00bba9e8fc4f72e79e",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-contracts-094649.2026-10-20T09-57.json",
+      "seconds": 1.016,
+      "sha256": "21b8379b8bf7c92cfd6c1a0e44a3d363af87d16918e79689de98344c6bcff169",
+      "stage": 7
+    }
+  ],
+  "retained_proof": {
+    "legacy": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+      "sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92"
+    },
+    "legacy_collection": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-legacy-collection.2026-10-20T09-28.json",
+      "sha256": "974409de19874ffdd01cce88ca7dccaac28c0bb8288889cefaeee4a002a2131f"
+    },
+    "mechanical": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-freeze.2026-10-20T08-52.json",
+      "sha256": "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4"
+    },
+    "original_preparation": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-preparation.2026-10-20T09-18.json",
+      "sha256": "2e4a75eca4ecb1ab0a0dbb008021d3981e5089ce4c9a1ee276f48d883858a219"
+    },
+    "producer": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+      "sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991"
+    },
+    "rendering": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering-freeze.2026-10-20T08-45.json",
+      "sha256": "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2"
+    },
+    "review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-candidate-ready.2026-10-20T09-31.json",
+      "sha256": "5865f935ac62cc008d30200983ec1efed38953d80e53d9286d06dd82f583815e"
+    },
+    "reviewed_union": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-composition-review.staging.2026-10-20T09-19.json",
+      "sha256": "ae7d384f9564071856de3b537e7fd1680cac6c52fc19e7b7ff9ea9d3c2b80662"
+    },
+    "semantic": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-freeze.2026-10-20T09-27.json",
+      "sha256": "29f00c84225e64d98a556b51d45615f5d58c004f1d9fe2d76f5688545d95355c"
+    }
+  },
+  "started_at": "2026-10-20T09:46:49.594114+00:00",
+  "status": "FINAL_GATES_PASSED_ACCEPTANCE_PENDING",
+  "task": "P5-T3",
+  "timestamp": "2026-10-20T09-57"
+}

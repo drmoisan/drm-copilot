@@ -1,0 +1,115 @@
+"""Collect only the frozen legacy node identities; do not execute test bodies."""
+
+import base64
+import ctypes
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+FREEZE = FEATURE / "evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json"
+EXPECTED = "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92"
+
+
+def sha(raw):
+    """Identify exact bytes without normalizing captured output."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def aliases():
+    """Reuse observed Windows long/short root spelling normalization."""
+    pairs = []
+    # Obtain actual aliases instead of inferring a short directory name.
+    for root, label in ((ROOT, "WORKSPACE"), (SCRATCH, "SCRATCH")):
+        spellings = {str(root), root.as_posix()}
+        for name in ("GetLongPathNameW", "GetShortPathNameW"):
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = getattr(ctypes.windll.kernel32, name)(str(root), buffer, len(buffer))
+            assert 0 < size < len(buffer)
+            spellings.update((buffer.value, buffer.value.replace("\\", "/")))
+        pairs.extend((value, label) for value in spellings)
+    return sorted(pairs, key=lambda pair: len(pair[0]), reverse=True)
+
+
+def main():
+    """Bind frozen inputs and retain the sole authorized collection result."""
+    frozen = FREEZE.read_bytes()
+    assert sha(frozen) == EXPECTED
+    document = json.loads(frozen)
+    bindings = {entry["path"]: entry["sha256"] for entry in document["scope"]}
+    bindings.update(document["dependencies"])
+    io_test = document["unchanged_io_test"]
+    bindings[io_test["path"]] = io_test["sha256"]
+    before = {path: sha(Path(path).read_bytes()) for path in bindings}
+    assert before == bindings
+    roots = aliases()
+    command = [sys.executable, "-m", "pytest", "--collect-only", "-q", "-o", "addopts=",
+               "-p", "no:cacheprovider", "--no-cov",
+               "tests/scripts/dev_tools/discovery/test_completion_report.py",
+               "tests/scripts/dev_tools/discovery/test_io.py"]
+    environment = dict(os.environ)
+    environment.update(PYTHONIOENCODING="utf-8", PYTHONUNBUFFERED="1", PYTHONDONTWRITEBYTECODE="1")
+    started = datetime.datetime.now(datetime.timezone.utc)
+    clock = time.monotonic()
+    try:
+        result = subprocess.run(command, capture_output=True, env=environment, timeout=60)
+    except subprocess.TimeoutExpired as error:
+        result = subprocess.CompletedProcess(command, 124, error.stdout or b"", error.stderr or b"")
+    elapsed = time.monotonic() - clock
+    after = {path: sha(Path(path).read_bytes()) for path in bindings}
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    stem = "p5t3-final-legacy-collection." + stamp
+    outputs = {"stdout": result.stdout, "stderr": result.stderr,
+               "observed-root-aliases": json.dumps(roots).encode("utf-8")}
+    raw = []
+    # Preserve every original stream before interpreting success or node counts.
+    for name, content in outputs.items():
+        target = SCRATCH / (stem + "." + name)
+        assert not target.exists(), target.name
+        target.write_bytes(content)
+        raw.append({"path": "SCRATCH/" + target.name, "sha256": sha(content), "bytes": len(content),
+                    "base64": base64.b64encode(content).decode("ascii")})
+    readable = {}
+    for name in ("stdout", "stderr"):
+        text = outputs[name].decode("utf-8")
+        for spelling, label in roots:
+            text = re.sub(re.escape(spelling), lambda match: label, text, flags=re.I)
+        readable[name] = text.replace("\r\n", "\n").replace("\r", "\n")
+    nodes = re.findall(r"^(tests/.+::.+)$", readable["stdout"], re.M)
+    archive = QA / (stem + "-raw.json")
+    assert not archive.exists()
+    archive.write_text(json.dumps({"raw_streams": raw}, indent=2, sort_keys=True) + "\n",
+                       encoding="utf-8", newline="\n")
+    source = Path(__file__).read_bytes()
+    snapshot = QA / (stem + "-harness.txt")
+    assert not snapshot.exists()
+    snapshot.write_bytes(source)
+    payload = {"task": "P5-T3", "Timestamp": stamp, "started_at": started.isoformat(),
+               "seconds": elapsed, "exit_code": result.returncode,
+               "command": ["python", *command[1:]], "node_count": len(nodes), "nodes": nodes,
+               "qualification": "Collection only; no test body or final gate executed. Prior 31-case behavior proof remains authoritative.",
+               "baseline": {"path": FREEZE.as_posix(), "sha256": EXPECTED},
+               "before": before, "after": after, **readable,
+               "raw_archive": {"path": archive.as_posix(), "sha256": sha(archive.read_bytes())},
+               "harness": {"path": snapshot.as_posix(), "sha256": sha(source)}}
+    receipt = QA / (stem + ".json")
+    assert not receipt.exists()
+    receipt.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n",
+                       encoding="utf-8", newline="\n")
+    print(json.dumps({"path": receipt.as_posix(), "sha256": sha(receipt.read_bytes()),
+                      "exit_code": result.returncode, "node_count": len(nodes), "seconds": elapsed}))
+    assert result.returncode == 0 and len(nodes) == len(set(nodes)) == 31
+    assert before == after
+
+
+if __name__ == "__main__":
+    main()

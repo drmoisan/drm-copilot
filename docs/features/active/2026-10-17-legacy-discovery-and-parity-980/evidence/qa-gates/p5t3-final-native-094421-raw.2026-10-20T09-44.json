@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "UEFTUyBhY2NlcHRlZC1maXh0dXJlLWJ5dGUtaWRlbnRpdHkNClBBU1MgY2hlY2tvdXQtaWRlbnRpdHkNClBBU1MgY2FwdHVyZWQtYnl0ZS1pZGVudGl0eQ0KUEFTUyBzZW1hbnRpYy1pbnB1dC1pZGVudGl0eQ0KUEFTUyBhY3R1YWwtY29yZS1zdHJ1Y3R1cmFsLXBhc3MNCg==",
+      "bytes": 154,
+      "path": "SCRATCH/p5t3-final-native-094421.stdout",
+      "sha256": "53be91e4d54c0d18ab8be5b2ee3ff8a10a3c4e53ff05e4cc7ecd98c2c2ca3317"
+    },
+    {
+      "base64": "VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg0KICBGaWxlICJDOlxVc2Vyc1xEQU5NT0l+MVxBcHBEYXRhXExvY2FsXFRlbXBcY29kZXgtbGVnYWN5LWRpc2NvdmVyeVxpc3N1ZS05ODBcaXNzdWUtOTgwLXA1dDMtbmF0aXZlLWNvbXBvc2l0aW9uLnB5IiwgbGluZSAyOTcsIGluIDxtb2R1bGU+DQogICAgbWFpbigpDQogICAgfn5+fl5eDQogIEZpbGUgIkM6XFVzZXJzXERBTk1PSX4xXEFwcERhdGFcTG9jYWxcVGVtcFxjb2RleC1sZWdhY3ktZGlzY292ZXJ5XGlzc3VlLTk4MFxpc3N1ZS05ODAtcDV0My1uYXRpdmUtY29tcG9zaXRpb24ucHkiLCBsaW5lIDE3MywgaW4gbWFpbg0KICAgIGNoZWNrKCJjb21wbGV0aW9uLW91dHB1dC1hYnNlbmNlIiwgYWxsKHNuYXBzaG90LmZpbGUocGF0aCkgaXMgTm9uZSBmb3IgcGF0aCBpbiBvdXRwdXRzKSkNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH5+fl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl4NCiAgRmlsZSAiQzpcVXNlcnNcREFOTU9JfjFcQXBwRGF0YVxMb2NhbFxUZW1wXGNvZGV4LWxlZ2FjeS1kaXNjb3ZlcnlcaXNzdWUtOTgwXGlzc3VlLTk4MC1wNXQzLW5hdGl2ZS1jb21wb3NpdGlvbi5weSIsIGxpbmUgMTczLCBpbiA8Z2VuZXhwcj4NCiAgICBjaGVjaygiY29tcGxldGlvbi1vdXRwdXQtYWJzZW5jZSIsIGFsbChzbmFwc2hvdC5maWxlKHBhdGgpIGlzIE5vbmUgZm9yIHBhdGggaW4gb3V0cHV0cykpDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fl5eXl5eXg0KICBGaWxlICJDOlxVc2Vyc1xEYW5Nb2lzYW5ccmVwb3NcZHJtLWNvcGlsb3Qtd3RcMjAyNi0xMC0xN1QyMi0zMFxwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XHNuYXBzaG90LnB5IiwgbGluZSAyNzAsIGluIGZpbGUNCiAgICByYWlzZSBLZXlFcnJvcihwYXRoKQ0KS2V5RXJyb3I6ICdkb2NzL21pZ3JhdGlvbi9kaXNjb3ZlcnkvcmVwb3J0cy9jb21wbGV0aW9uLXJlcG9ydC5qc29uJw0K",
+      "bytes": 1068,
+      "path": "SCRATCH/p5t3-final-native-094421.stderr",
+      "sha256": "9ec12b70a1f554aeec7eaf38dc71579a817e22a521cf58a19b8ffee8d66345fb"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDUsICJsYWJlbCI6ICJuYXRpdmUiLCAic3RhdHVzIjogImZpbmlzaGVkIiwgImNvbXBsZXRlZCI6IDAsICJsYXN0X25vZGUiOiBudWxsLCAic3RhcnRlZF9hdCI6ICIyMDI2LTEwLTIwVDA5OjQ0OjM4LjU3Mjc3OSswMDowMCIsICJ0aW1lb3V0X3NlY29uZHMiOiA2NjAsICJwaWQiOiA4NTI1NiwgImVsYXBzZWRfc2Vjb25kcyI6IDcuMDI5LCAiZXhpdF9jb2RlIjogMX0K",
+      "bytes": 219,
+      "path": "SCRATCH/p5t3-final-native-094421.progress.json",
+      "sha256": "be1e11e0ac9408a9b53918a58ee62a9bbabc7b6459e1854d231b03d02f4247ef"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}
