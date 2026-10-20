@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\issue-980-p5t1-final-architecture.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t1-final-candidate.2026-10-20T04-22.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T04:23:09.379117+00:00",
+  "label": "architecture",
+  "last_node": null,
+  "pid": 71796,
+  "raw": [
+    {
+      "bytes": 1340,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-architecture.stdout",
+      "sha256": "f125c2d979554b429422b121dc31c59714c3c8bafa5cdfa59a644b013e63001a"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-architecture.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 224,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-architecture.progress.json",
+      "sha256": "9c0669c8562fdadf4c0b2f48e10f24544a69ad8f235a4f9ab6d2fa93f831f801"
+    }
+  ],
+  "seconds": 1.01,
+  "stage": 4,
+  "started_at": "2026-10-20T04:23:08.369354+00:00",
+  "stderr": "",
+  "stdout": "{\r\n  \"checks\": [\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py\",\r\n      \"lines\": 430,\r\n      \"definitions\": 8,\r\n      \"loops\": 5\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py\",\r\n      \"lines\": 337,\r\n      \"definitions\": 9,\r\n      \"loops\": 9\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/validation.py\",\r\n      \"lines\": 461,\r\n      \"definitions\": 10,\r\n      \"loops\": 2\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_coverage_report.py\",\r\n      \"lines\": 477,\r\n      \"definitions\": 11,\r\n      \"loops\": 0\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_coverage_report_contract.py\",\r\n      \"lines\": 285,\r\n      \"definitions\": 10,\r\n      \"loops\": 0\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_validation_modes.py\",\r\n      \"lines\": 476,\r\n      \"definitions\": 14,\r\n      \"loops\": 2\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_agent_output.py\",\r\n      \"lines\": 492,\r\n      \"definitions\": 12,\r\n      \"loops\": 1\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_mutation_plan.py\",\r\n      \"lines\": 484,\r\n      \"definitions\": 20,\r\n      \"loops\": 1\r\n    }\r\n  ],\r\n  \"retained_helper_paths\": 5,\r\n  \"no_production_or_test_changes\": true\r\n}\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T04-23"
+}

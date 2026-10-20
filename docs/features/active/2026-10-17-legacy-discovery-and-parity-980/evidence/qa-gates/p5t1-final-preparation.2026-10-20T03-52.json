@@ -1,0 +1,384 @@
+{
+  "Command": "poetry run python SCRATCH/issue-980-p5t1-final-preparation.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Preparation only: no suites, source/test changes, or execution release.",
+  "Timestamp": "2026-10-20T03-52",
+  "accepted_baseline_commit": "2920686f68849957d91e2c94f525a32e466d1d8e",
+  "authority": {
+    "launch_authority_valid": true,
+    "native_attestation_sha256": "2d2ed086137673ee0e3d2644d29f055377f7d07b5b443e8bd8187d61a1a72423",
+    "provenance_valid": true,
+    "qualification": "Existing native attestation rechecked against the current profile and fresh route; no new SubagentStart event claimed.",
+    "route": {
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C4",
+      "delegation_id": "workspace_operations_p5t1_final_gate_preparation_20261020",
+      "deployment_agent": "python-typed-engineer-c4",
+      "execution_context": "standalone",
+      "logical_agent": "python-typed-engineer",
+      "model": "gpt-6-astra",
+      "model_reasoning_effort": "max",
+      "orchestration_complexity_ceiling": "C4",
+      "phase": "S5_P5T1_final_gate_preparation",
+      "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+      "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    },
+    "routing_valid": true
+  },
+  "baseline": {
+    "bytes": 18320,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f"
+  },
+  "case_counts": {
+    "callers": null,
+    "distinct_total": null,
+    "graph": null,
+    "reason": "Owners have not frozen complete verbose node populations; no provisional count is authority."
+  },
+  "checkpoint_plan_git_mutations": false,
+  "coverage_contract": {
+    "floors": "Each new/changed module/class/callable >=90% lines; every changed production module >=75% branches; no decrease against its applicable baseline; no uncovered changed executable line.",
+    "line_mapping": "Map accepted validation qualified units and changed executable lines to the final bytes. Preserve raw coverage rather than manufacturing a declaration-inclusive denominator.",
+    "overall_scope": "Retained helper114 proof plus final remaining graph/caller proof; no repository-wide coverage percentage or whole-feature completion claim.",
+    "range_convention": "Bind current AST qualified names/ranges separately from coverage.py named summaries. Raw AST ranges intersect module executable/missing lines and originating branch lines; do not equate them to named-unit summary denominators because declaration exclusions differ.",
+    "raw_range_qualification": {
+      "bytes": 20056,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-checker-qualification.2026-10-20T03-30.json",
+      "sha256": "6ecfe93f63c50e5d601c7ab85db923a8128bc79e761d1f173b8bd8986e2e6454"
+    },
+    "validation_baseline": {
+      "branches": "42/42",
+      "source": "Shared baseline references accepted P2-T9 proof.",
+      "statements": "133/133"
+    }
+  },
+  "evidence_contract": {
+    "before_after": "Check exact candidate, borrowed dependency, schema and retained proof hashes before and after every command.",
+    "failure": "Preserve a failed command/result; consolidate the concrete finding before any authorized correction and required full ordered restart.",
+    "harnesses": "Adapt accepted final runner/static/native conventions into new LF-only P5-T1 scratch scripts; snapshot exact executed bytes and never rewrite historical scripts.",
+    "raw": "Preserve separate stdout/stderr, exit codes, actual UTC command/write times, elapsed durations, exact node order, raw coverage/database and Git attributes/working/index qualifications.",
+    "reference_handoff": {
+      "bytes": 25992,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-handoff.2026-10-19T14-20.json",
+      "sha256": "5fb8315ae602489b3645e46277b5f0bb5a508632f15d606354598dc8b3cdbc0d"
+    },
+    "reference_runner": {
+      "bytes": 10732,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p4t9-final-gates-harness.2026-10-19T14-04.txt",
+      "sha256": "f462e7a5c0d981fb7bfc55b483b75f19e57e020a081c8aa672899c698cfe5096"
+    },
+    "rendered": "Canonical JSON/Markdown use portable paths, LF and one terminal newline; any necessary raw normalization gets original hash/length and a decode-verified lossless archive."
+  },
+  "execution_prerequisites": [
+    "Both producer modules repaired under their owner and bounded review confirmation completed.",
+    "Validation owner freezes current source and all three caller tests with exact passing nodes/coverage.",
+    "Graph owner freezes both test modules and exact passing nodes/coverage against the repaired source.",
+    "Eight-file final candidate, helper closure, borrowed fixtures/catalog/schema/config dependencies and executed harnesses are hash-bound.",
+    "Current source/test size and test-isolation checks satisfy the unchanged policy.",
+    "Coordinator explicitly releases the final ordered sequence; stage 7 additionally requires its fixture/harness binding."
+  ],
+  "execution_released": false,
+  "measured_modules": [
+    "drm_copilot_discovery.coverage_report",
+    "drm_copilot_discovery.coverage_population",
+    "drm_copilot_discovery.validation"
+  ],
+  "observed_not_frozen": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "physical_lines": 359,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "f1da578149f69f9353e2f286d108a4ba6f5cefc255210c31f2fe7cb1d773fadc"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "physical_lines": 272,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "physical_lines": 449,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_report.py",
+      "physical_lines": 450,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "1d7710a1cb4377786368a803ae87f5302ca48e0b7c7cb3feab78afbbd479840d"
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "physical_lines": 223,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "bbdb9c59fd746d31199af85cd05fd666a60883ff6e77e03e567ec7424dcd09e9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "physical_lines": 446,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "7a57c25da496d0b71f51aeb345518cc19d156a3d78425fbd4f14a619486aa1da"
+    },
+    {
+      "path": "tests/discovery_runtime/test_agent_output.py",
+      "physical_lines": 460,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "83b68a08fd75b923d5be27e1a8c486ec6b91a841b28b6f118be8cb434b1bb397"
+    },
+    {
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "physical_lines": 484,
+      "qualification": "Observed preparation bytes only; this is not a frozen execution candidate.",
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4"
+    }
+  ],
+  "ordered_stages": [
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "tests/discovery_runtime/test_coverage_report.py",
+        "tests/discovery_runtime/test_coverage_report_contract.py",
+        "tests/discovery_runtime/test_validation_modes.py",
+        "tests/discovery_runtime/test_agent_output.py",
+        "tests/discovery_runtime/test_mutation_plan.py"
+      ],
+      "name": "format",
+      "number": 1
+    },
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "tests/discovery_runtime/test_coverage_report.py",
+        "tests/discovery_runtime/test_coverage_report_contract.py",
+        "tests/discovery_runtime/test_validation_modes.py",
+        "tests/discovery_runtime/test_agent_output.py",
+        "tests/discovery_runtime/test_mutation_plan.py"
+      ],
+      "name": "lint",
+      "number": 2
+    },
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pyright"
+      ],
+      "name": "types",
+      "number": 3,
+      "scope": "Whole repository using the accepted Poetry environment."
+    },
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "SCRATCH/issue-980-p5t1-final-architecture.py"
+      ],
+      "checks": [
+        "All 13 task source/test paths <=500 physical lines; immutable helper evidence retained.",
+        "Only the eight remaining files are checked for new policy/intent/type-contract deltas.",
+        "Pure producers do not import repository tooling or introduce filesystem/process/network operations.",
+        "Five current tests use in-memory seams and no temporary-file/process fixtures.",
+        "No new dependencies, schema changes, policy changes or publication surface."
+      ],
+      "name": "architecture-size-isolation",
+      "number": 4,
+      "status": "Harness adaptation pending final candidate."
+    },
+    {
+      "batches": [
+        {
+          "argv": [
+            "poetry",
+            "run",
+            "python",
+            "-m",
+            "pytest",
+            "-o",
+            "addopts=",
+            "-p",
+            "no:cacheprovider",
+            "-v",
+            "tests/discovery_runtime/test_coverage_report_contract.py",
+            "tests/discovery_runtime/test_coverage_report.py",
+            "--cov=drm_copilot_discovery.coverage_report",
+            "--cov=drm_copilot_discovery.coverage_population",
+            "--cov=drm_copilot_discovery.validation",
+            "--cov-branch",
+            "--cov-report=term-missing",
+            "--cov-report=json:SCRATCH/issue-980-p5t1-final-graph-coverage.json"
+          ],
+          "name": "graph-reverse"
+        },
+        {
+          "argv": [
+            "poetry",
+            "run",
+            "python",
+            "-m",
+            "pytest",
+            "-o",
+            "addopts=",
+            "-p",
+            "no:cacheprovider",
+            "-v",
+            "tests/discovery_runtime/test_mutation_plan.py",
+            "tests/discovery_runtime/test_agent_output.py",
+            "tests/discovery_runtime/test_validation_modes.py",
+            "--cov=drm_copilot_discovery.coverage_report",
+            "--cov=drm_copilot_discovery.coverage_population",
+            "--cov=drm_copilot_discovery.validation",
+            "--cov-branch",
+            "--cov-report=term-missing",
+            "--cov-report=json:SCRATCH/issue-980-p5t1-final-callers-coverage.json"
+          ],
+          "name": "callers-reverse"
+        }
+      ],
+      "coverage_data": "Separate COVERAGE_FILE per isolated process; retain both raw streams/databases, then combine only these exact bound databases for final module and named-unit totals.",
+      "name": "affected-tests-and-coverage",
+      "node_contract": "Match exact deduplicated owner node sets, including parameter IDs with spaces, and record actual reversed module order. No extra collection/replay is needed for preparation.",
+      "number": 5
+    },
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-v",
+        "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+        "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+      ],
+      "case_count": 4,
+      "name": "affected-contracts",
+      "number": 6,
+      "reason": "Existing installed-package/type/coverage and T2-tier contracts apply to the new runtime modules. Report recomputation is covered in the five affected modules. No report schema was added, and no unrelated inventory/parser schema sweep is planned."
+    },
+    {
+      "argv": [
+        "poetry",
+        "run",
+        "python",
+        "SCRATCH/issue-980-p5t1-final-native.py"
+      ],
+      "assertions": [
+        "Actual capture_workspace/load_snapshot retains exactly the materialized profile, scope, inventory, ledger and checksummed confirmation evidence.",
+        "The complete configured confirmed-no-scope fixture validates structurally using the actual trusted catalog.",
+        "Public build_coverage_report keeps a justified no-scope result distinct from an unconfigured or uninventoried graph.",
+        "Empty supported populations expose zero named counts and null zero-denominator percentages, including repaired runtime fields and units.",
+        "Public generated document equals report_projection for the same kind, identifier and mode.",
+        "to_dict, parsed to_json, and the exact embedded JSON of to_markdown agree field for field.",
+        "Repeated generation over identical captured inputs is byte-deterministic.",
+        "Generation and validation preserve the immutable snapshot digest and retained input bytes.",
+        "A pre-existing generated report in a separately prepared fixture does not change the semantic report input digest or coverage counts.",
+        "A changed authored input alters semantic identity or yields its actual validation finding; prior report success cannot be retained.",
+        "An authored report with forged counts is rejected by recomputation with REPORT_RESULT rather than accepted as authority.",
+        "A configured uninventoried fixture keeps discovery failure and actionable blockers rather than reporting completion.",
+        "Malformed authored scope bytes yield unavailable coverage populations and retain original structural findings.",
+        "All fixture/source/Git bytes and status remain unchanged during the read-only operation interval; no report publication or mutation commit is attempted."
+      ],
+      "fixture_preconditions": [
+        "Derive the complete schema-valid seed from validation_test_support.no_scope_snapshot; replace the synthetic repository pin with an actual local fixture commit before preparing linked artifacts.",
+        "All fixture construction is outside the workspace in SCRATCH, before readonly before/after captures. No unit-test filesystem fixture is added.",
+        "Use existing accepted metadata/byte-reader and bounded LocalGitReader contracts; no private loader shortcut or permissive validator.",
+        "Prepare finite positive/derived-report/forged-report/missing-inventory/malformed-input variants before operations, then bind exact files and expected findings.",
+        "This is Windows/Git public composition only, not installed coding-agent host, non-Windows, or publication proof."
+      ],
+      "name": "bounded-native-composition",
+      "number": 7,
+      "status": "Operational fixture and executable harness await final producer semantics and release."
+    }
+  ],
+  "preparation_harness": {
+    "bytes": 17461,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-preparation-harness.2026-10-20T03-52.txt",
+    "sha256": "6b7c23111b30ca1ed2b653e756fe2aed0987fcfe006d736b84049f470954f57f"
+  },
+  "regression_binding": "Bind the owners' existing consolidated PR1 population, PR2 counted-work, PR3 runtime-measure and PR4 documentation repairs; this preparation authors no tests or expanded matrix.",
+  "remaining_files": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+    "tests/discovery_runtime/test_coverage_report.py",
+    "tests/discovery_runtime/test_coverage_report_contract.py",
+    "tests/discovery_runtime/test_validation_modes.py",
+    "tests/discovery_runtime/test_agent_output.py",
+    "tests/discovery_runtime/test_mutation_plan.py"
+  ],
+  "required_repair_ids": [
+    "P5-T1-PR1",
+    "P5-T1-PR2",
+    "P5-T1-PR3",
+    "P5-T1-PR4"
+  ],
+  "retained_helper_proof": {
+    "branches": "68/68",
+    "checked_commit": "493236fa88374eaee3fc6d12c038f40728c4c665",
+    "condition": "Reuse while exact helper/legacy bytes and their recorded local dependency closure remain valid.",
+    "confirmation": {
+      "bytes": 4838,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-repair-confirmation.2026-10-20T03-30.json",
+      "sha256": "fb25f0e49056abadb87213a488d54ada7643f24413e635c050f9d6a69f712977"
+    },
+    "coverage_closure": {
+      "bytes": 19063,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage-closure.2026-10-20T03-23.json",
+      "sha256": "2992a298ec22f2a08236db7c220195f67db005464dd31c8fb1e7715a24325ab4"
+    },
+    "current_hashes_match": true,
+    "freeze": {
+      "bytes": 31688,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json",
+      "sha256": "533d40493b030131e607b6dcbdd6b1b9b3d3f75bfe7a3c614dce64da29ffbfdf"
+    },
+    "replay_planned": false,
+    "source_test_paths": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "scripts/dev_tools/discovery/coverage_report.py",
+      "tests/discovery_runtime/test_report_models.py",
+      "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "tests/scripts/dev_tools/discovery/test_rendering.py"
+    ],
+    "statements": "179/179",
+    "tests": 114
+  },
+  "review_prerequisite": {
+    "bytes": 8891,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+    "sha256": "9edec6099eb52d7099db75e466bb9cc25e60f21ff0416920ea74266928967dd3"
+  },
+  "source_test_mutations": false,
+  "status": "PREPARED_AWAITING_REPAIRED_FROZEN_CANDIDATE",
+  "suite_execution": false,
+  "task": "P5-T1",
+  "task_accepted": false
+}

@@ -1,0 +1,119 @@
+{
+  "archive": {
+    "bytes": 127898,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-archive.2026-10-20T04-59.json",
+    "sha256": "21193e22db52e5799909bd95e13000d402e918b28ae8f82a88b6b7fadbe61dec"
+  },
+  "baseline": {
+    "bytes": 38794,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json",
+    "sha256": "d82d917a2db50d3b6bcf808a2fb2f7726b7f5598bf11310b161eeecf8c7fa5a8"
+  },
+  "coverage": {
+    "bytes": 32918,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-coverage.2026-10-20T04-59.json",
+    "sha256": "111c685214aa0e2003890dcbc1e76b940d2f6cd291a67d428df871afbacff2d7"
+  },
+  "delta": {
+    "bytes": 4404,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-delta.2026-10-20T04-59.json",
+    "sha256": "a61d3b1b5554df14cae5fc1bca97ea3161534db052c3e6bd777f6d81358cd09e"
+  },
+  "finding": {
+    "bytes": 4191,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-finding.2026-10-20T04-44.json",
+    "sha256": "e99b51c31f3ab10f6d1ae52daf70cd5065495d13bba2aef977e57a3ebc99ff98"
+  },
+  "harness": {
+    "bytes": 11719,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary-freeze-harness.2026-10-20T04-59.txt",
+    "sha256": "d46ec1340019d41daa75931a9f4e72384c2ecb7feded22b89301f395126d2b66"
+  },
+  "limitations": [
+    "Boundary3 retained seven passes and two test-helper failures after the generated report/digest equality controls passed. Only the authored-document assertion route changed to the public projection before the clean boundary4 restart.",
+    "Only configured-report documentation is excluded. Source/test categories, case-sensitive path segments, authored documentation elsewhere and loader/path/grant validation remain unchanged.",
+    "The original49 graph nodes remain present; nine regressions were added. The shared114 helper/legacy cases were not replayed.",
+    "Final owner will run the unchanged14 native assertions as the first regression precheck after fresh ordered static gates, before long caller replay. Task acceptance remains pending."
+  ],
+  "nodes": [
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_loaded_report_views_do_not_replace_authored_documentation_accounting[reports-]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_loaded_report_views_do_not_replace_authored_documentation_accounting[generated/views-nested/]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-documentation-False]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/nested/coverage-report.md-documentation-False]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports-other/coverage-report.md-documentation-True]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/Reports/coverage-report.md-documentation-True]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/coverage-report.md-documentation-True]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-source-True]",
+    "tests/discovery_runtime/test_coverage_report_contract.py::test_report_output_scope_preserves_path_segments_and_input_categories[docs/migration/discovery/reports/coverage-report.md-test-True]"
+  ],
+  "owned": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": {
+      "bytes": 16758,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "sha256": "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02"
+    },
+    "tests/discovery_runtime/test_coverage_report_contract.py": {
+      "bytes": 14736,
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "sha256": "31d1a668bf3b5d1f7254da11c7ff4b8158bafb5c4cc9c070f84810fbc3a6a0a7"
+    }
+  },
+  "physical_lines": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py": 433,
+    "tests/discovery_runtime/test_coverage_report_contract.py": 374
+  },
+  "stages": [
+    {
+      "bytes": 3983,
+      "duration_seconds": 1.767,
+      "harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format-harness.2026-10-20T04-53.txt",
+        "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-format.2026-10-20T04-53.json",
+      "sha256": "cec401b950923257b444e1e618395678bbe7e399483084ac8096690a7de64068",
+      "stage": "format",
+      "started_at": "2026-10-20T04:53:28.539526+00:00"
+    },
+    {
+      "bytes": 3926,
+      "duration_seconds": 1.172,
+      "harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint-harness.2026-10-20T04-53.txt",
+        "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-lint.2026-10-20T04-53.json",
+      "sha256": "308193a1f71d82ef10c179aedea11986121594ebaa55bc3247d013db9626d338",
+      "stage": "lint",
+      "started_at": "2026-10-20T04:53:37.114411+00:00"
+    },
+    {
+      "bytes": 4148,
+      "duration_seconds": 2.86,
+      "harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types-harness.2026-10-20T04-53.txt",
+        "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-types.2026-10-20T04-53.json",
+      "sha256": "266f76e44249693758c461b6f7af2871a8e0c01f690a481702e66bdb411322df",
+      "stage": "types",
+      "started_at": "2026-10-20T04:53:45.680147+00:00"
+    },
+    {
+      "bytes": 8625,
+      "duration_seconds": 73.564,
+      "harness": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests-harness.2026-10-20T04-55.txt",
+        "sha256": "ca98fbb47e30fb93cca11bf6c3341c0655577e5b3ee10cfa39f62828796073ad"
+      },
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-report-boundary4-tests.2026-10-20T04-55.json",
+      "sha256": "d8b9ab637bbdba9f14d20a9fc0a9e6c3f2582ff26ada61e1b3d1b5d8059d2157",
+      "stage": "tests",
+      "started_at": "2026-10-20T04:53:55.335024+00:00"
+    }
+  ],
+  "status": "FROZEN_NARROW_REPAIR_FOR_BOUNDED_CONFIRMATION",
+  "task": "P5-T1",
+  "test_count": 9,
+  "timestamp_utc": "2026-10-20T04:59:16.141148+00:00"
+}

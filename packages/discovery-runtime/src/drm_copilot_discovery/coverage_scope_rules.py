@@ -245,10 +245,15 @@ def _inventory(
         and selection.scope.artifact.repository.revision
         == snapshot.profile.repository.revision
     ):
+        # Generated report views are outputs; authored documentation remains input.
         expected = {
             file.path
             for file in snapshot.manifest.files
             if file.category in {"source", "test", "documentation"}
+            and not (
+                file.category == "documentation"
+                and within_roots(file.path, (snapshot.profile.artifacts["reports"],))
+            )
         }
         # Skipped paths need explicit inventory exclusion records.
         for path in snapshot.excluded_paths:

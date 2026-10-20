@@ -1,0 +1,66 @@
+{
+  "callers_seconds": 927.939,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+    "sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe"
+  },
+  "closing_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-held-harness.2026-10-20T04-45.txt",
+    "sha256": "85303ca5be0fb855b50473050a0e9271dda2f890798776dba3dfb1624a4a8576"
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-combined-coverage.2026-10-20T04-39.json",
+    "sha256": "9e27ea5958fbb24b49f8a4e81c4d667946b60688c550f50b624093277a99ed92"
+  },
+  "coverage_ranges": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-coverage-ranges.2026-10-20T04-39.json",
+    "sha256": "c17fec6f61dac0e7105978ef5c40ed6ae805fba67138294bd12be3c6301ceff2"
+  },
+  "feature_complete": false,
+  "native_failed_seconds": 21.048,
+  "native_failure_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-failed-originals.2026-10-20T04-41.json",
+    "sha256": "8e3e977bcacd63f6c92ca0bd674de4beae8c7461386578a1e4335bd5cefa32a8"
+  },
+  "next_transition": "Independent diagnosis confirmation, minimal owner repair and coordinator-selected restart. No source/test edit or additional gate run by this worker.",
+  "normalization": "Candidate binds actual working bytes and qualified Git LF bytes. Original stream bytes are recoverable from archives; readable outputs remain separate.",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-held-original-streams.2026-10-20T04-45.json",
+    "sha256": "a52bdd5146dde853741c470cc51c4b1fd1861357c0b9d1d08107af3d2edd2591"
+  },
+  "retained_helper": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json",
+    "sha256": "533d40493b030131e607b6dcbdd6b1b9b3d3f75bfe7a3c614dce64da29ffbfdf"
+  },
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-consolidated-candidate-review.2026-10-20T04-12.json",
+    "sha256": "bff0d6838743044beec6af16f10b28670383e4f8aa134f510a197c4f4330ea43"
+  },
+  "scope": {
+    "contracts": 4,
+    "fresh_caller_cases": 138,
+    "fresh_graph_cases": 49,
+    "native_failed": 9,
+    "native_not_executed": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "native_passed": 8,
+    "retained_helper_cases": 114
+  },
+  "source_owner_finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-native-finding.2026-10-20T04-44.json",
+    "sha256": "e99b51c31f3ab10f6d1ae52daf70cd5065495d13bba2aef977e57a3ebc99ff98"
+  },
+  "stages1_6": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-stages1-6.2026-10-20T04-39.json",
+    "sha256": "cd9b9f6e4f566f8f597a28407fa770ae00fe28a45d9f02ea952f5707987fd7f1"
+  },
+  "status": "final-native-stage-blocked",
+  "task": "P5-T1",
+  "task_accepted": false,
+  "timestamp": "2026-10-20T04-45"
+}

@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m pyright",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T04:23:08.326580+00:00",
+  "label": "types",
+  "last_node": null,
+  "pid": 82708,
+  "raw": [
+    {
+      "bytes": 194,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-types.stdout",
+      "sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-types.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-types.progress.json",
+      "sha256": "3469d5d94620f392fccc7b9a0763a1e1228fbc13863abd9313dc56be9acccf61"
+    }
+  ],
+  "seconds": 13.033,
+  "stage": 3,
+  "started_at": "2026-10-20T04:22:55.293591+00:00",
+  "stderr": "",
+  "stdout": "WARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n0 errors, 0 warnings, 0 informations\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T04-23"
+}

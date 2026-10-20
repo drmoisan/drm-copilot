@@ -1,0 +1,226 @@
+"""Run ordered P5-T1 gates with exact bindings and observable bounded processes."""
+import ast
+import datetime
+import difflib
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import threading
+import time
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+manifest_path = Path(sys.argv[1])
+manifest = json.loads(manifest_path.read_bytes())
+assert manifest["execution_released"]
+began = datetime.datetime.now(datetime.timezone.utc)
+run_id = began.strftime("%H%M%S")
+receipts, raw_files, batches = [], [], []
+
+
+def sha(data):
+    """Return exact-byte SHA-256."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def portable(text):
+    """Redact only actual workspace/scratch path spellings in readable copies."""
+    for path, label in ((root, "WORKSPACE"), (scratch, "SCRATCH")):
+        for spelling in (str(path), path.as_posix()):
+            text = re.sub(re.escape(spelling), lambda match: label, text, flags=re.I)
+    return text
+
+
+def write(path, value):
+    """Create canonical readable JSON without overwriting previous evidence."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def binding():
+    """Verify every candidate/dependency and exact executed harness stream."""
+    actual = {path: sha(Path(path).read_bytes()) for path in manifest["bindings"]}
+    assert actual == manifest["bindings"], "A candidate or dependency changed"
+    for name, reference in manifest["harnesses"].items():
+        assert sha((scratch / name).read_bytes()) == reference["sha256"]
+    return sha(json.dumps(actual, sort_keys=True).encode())
+
+
+def run(stage, label, arguments, *, module=True, timeout=300, environment=None):
+    """Stream one command to raw files and report actual status before gate checks."""
+    before = binding()
+    started = datetime.datetime.now(datetime.timezone.utc)
+    clock = time.monotonic()
+    command = [sys.executable, "-u", *(["-m"] if module else []), *map(str, arguments)]
+    env = dict(os.environ)
+    env.update(PYTHONIOENCODING="utf-8", PYTHONUNBUFFERED="1", PYTHONDONTWRITEBYTECODE="1")
+    env.update(environment or {})
+    stem = f"issue-980-p5t1-final-{run_id}-{label}"
+    stdout_path, stderr_path = scratch / (stem + ".stdout"), scratch / (stem + ".stderr")
+    progress_path = scratch / (stem + ".progress.json")
+    progress = {"label": label, "stage": stage, "completed": 0, "last_node": None,
+                "started_at": started.isoformat(), "timeout_seconds": timeout, "status": "running"}
+    lock = threading.Lock()
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, bufsize=0)
+    progress["pid"] = process.pid
+
+    def consume(stream, destination, capture_nodes):
+        """Preserve exact bytes while extracting completed verbose node records."""
+        with destination.open("wb") as target:
+            for line in iter(stream.readline, b""):
+                target.write(line)
+                target.flush()
+                if capture_nodes:
+                    match = re.match(r"^(tests/.+?) (PASSED|FAILED|ERROR|SKIPPED)(?:\s|$)", line.decode("utf-8", errors="replace"))
+                    if match:
+                        with lock:
+                            progress["completed"] += 1
+                            progress["last_node"] = match.group(1)
+                            progress["last_status"] = match.group(2)
+            stream.close()
+
+    threads = [threading.Thread(target=consume, args=(process.stdout, stdout_path, True)),
+               threading.Thread(target=consume, args=(process.stderr, stderr_path, False))]
+    for thread in threads:
+        thread.start()
+    timed_out = False
+    while process.poll() is None:
+        elapsed = time.monotonic() - clock
+        with lock:
+            progress["elapsed_seconds"] = round(elapsed, 3)
+            pending = progress_path.with_suffix(".tmp")
+            pending.write_text(json.dumps(progress) + "\n", encoding="utf-8", newline="\n")
+            pending.replace(progress_path)
+        if elapsed >= timeout:
+            timed_out = True
+            process.kill()
+            break
+        time.sleep(1)
+    process.wait()
+    for thread in threads:
+        thread.join()
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    progress.update(status="timeout" if timed_out else "finished", exit_code=process.returncode,
+                    elapsed_seconds=round(time.monotonic() - clock, 3))
+    progress_path.write_text(json.dumps(progress) + "\n", encoding="utf-8", newline="\n")
+    after = binding()
+    stdout, stderr = stdout_path.read_bytes(), stderr_path.read_bytes()
+    stamp = finished.strftime("%Y-%m-%dT%H-%M")
+    payload = {"stage": stage, "label": label, "timestamp": stamp,
+        "started_at": started.isoformat(), "finished_at": finished.isoformat(),
+        "seconds": round((finished - started).total_seconds(), 3),
+        "command": portable(subprocess.list2cmdline(command)), "exit_code": process.returncode,
+        "timed_out": timed_out, "timeout_seconds": timeout, "pid": process.pid,
+        "completed_nodes": progress["completed"], "last_node": progress["last_node"],
+        "candidate": manifest_path.as_posix(), "candidate_sha256": sha(manifest_path.read_bytes()),
+        "binding_before": before, "binding_after": after,
+        "stdout": portable(stdout.decode("utf-8", errors="replace")),
+        "stderr": portable(stderr.decode("utf-8", errors="replace")), "raw": []}
+    for path in (stdout_path, stderr_path, progress_path):
+        entry = {"path": "SCRATCH/" + path.name, "sha256": sha(path.read_bytes()), "bytes": path.stat().st_size}
+        payload["raw"].append(entry)
+        raw_files.append(entry)
+    path = qa / (f"p5t1-final-{label}-{run_id}." + stamp + ".json")
+    write(path, payload)
+    markdown = f'# P5-T1 final {label}\n\nTimestamp: {stamp}\nCommand: `{payload["command"]}`\nEXIT_CODE: {process.returncode}\nOutput Summary: Stage {stage}; elapsed {payload["seconds"]} seconds; completed nodes {progress["completed"]}; timeout={timed_out}.\n\n```text\n{payload["stdout"]}{payload["stderr"]}\n```\n'
+    path.with_suffix(".md").write_text("\n".join(line.rstrip() for line in markdown.splitlines()).rstrip() + "\n", encoding="utf-8", newline="\n")
+    receipts.append({"stage": stage, "label": label, "path": path.as_posix(), "sha256": sha(path.read_bytes()), "exit_code": process.returncode, "seconds": payload["seconds"]})
+    print(json.dumps({"stage": stage, "label": label, "exit_code": process.returncode, "seconds": payload["seconds"], "completed": progress["completed"], "receipt": path.as_posix()}), flush=True)
+    if timed_out or process.returncode:
+        print((payload["stdout"][-6000:] + payload["stderr"][-6000:]).encode("ascii", errors="backslashreplace").decode(), flush=True)
+        raise SystemExit(process.returncode or 1)
+    return payload
+
+
+binding()
+code = [entry["path"] for entry in manifest["files"]]
+run(1, "format", ["black", "--check", *code])
+run(2, "lint", ["ruff", "check", *code])
+run(3, "types", ["pyright"])
+run(4, "architecture", [scratch / "issue-980-p5t1-final-architecture.py", manifest_path], module=False)
+data_files = []
+for batch in ("graph", "callers"):
+    modules = list(reversed(manifest["forward_test_module_order"][batch]))
+    database = scratch / f"issue-980-p5t1-final-{run_id}-{batch}.coverage"
+    coverage_path = scratch / f"issue-980-p5t1-final-{run_id}-{batch}-coverage.raw.json"
+    result = run(5, batch + "-reverse", ["pytest", "-v", "-o", "addopts=", "-p", "no:cacheprovider", *modules,
+        *["--cov=" + target for target in manifest["coverage_targets"]], "--cov-branch",
+        "--cov-report=term-missing", "--cov-report=json:" + str(coverage_path)],
+        timeout=manifest["timeout_seconds"][batch], environment={"COVERAGE_FILE": str(database)})
+    nodes = re.findall(r"^(tests/.+?) PASSED(?:\s|$)", result["stdout"], re.M)
+    assert len(nodes) == len(set(nodes)) == manifest["node_counts"][batch], (batch, len(nodes))
+    assert set(nodes) == set(manifest["nodes"][batch]), (batch, "node population changed")
+    data_files.append(database)
+    raw_files.extend({"path": "SCRATCH/" + path.name, "sha256": sha(path.read_bytes()), "bytes": path.stat().st_size} for path in (database, coverage_path))
+    batches.append({"batch": batch, "nodes": nodes, "module_order": modules, "raw_coverage": "SCRATCH/" + coverage_path.name})
+combined_database = scratch / f"issue-980-p5t1-final-{run_id}-combined.coverage"
+combined_json = scratch / f"issue-980-p5t1-final-{run_id}-combined-coverage.raw.json"
+env = {"COVERAGE_FILE": str(combined_database)}
+run(5, "coverage-combine", ["coverage", "combine", "--keep", *data_files], environment=env)
+run(5, "coverage-json", ["coverage", "json", "-o", combined_json], environment=env)
+coverage = json.loads(combined_json.read_bytes())
+coverage["files"] = {path.replace("\\", "/"): value for path, value in coverage["files"].items()}
+assert set(coverage["files"]) == set(manifest["production"]), list(coverage["files"])
+range_results, regressions = [], []
+for path, data in coverage["files"].items():
+    assert data["summary"]["percent_statements_covered"] >= 90, (path, data["summary"])
+    assert data["summary"]["percent_branches_covered"] >= 75, path
+    if path.endswith("/validation.py"):
+        assert data["summary"]["percent_statements_covered"] == 100
+        assert data["summary"]["percent_branches_covered"] == 100
+        previous = subprocess.run(["git", "show", manifest["accepted_baseline"] + ":" + path], capture_output=True, check=True).stdout.decode().splitlines()
+        current = Path(path).read_text(encoding="utf-8").splitlines()
+        mapped, changed = {}, set()
+        for operation, a, b, c, d in difflib.SequenceMatcher(a=previous, b=current, autojunk=False).get_opcodes():
+            if operation == "equal":
+                mapped.update({old + 1: new + 1 for old, new in zip(range(a, b), range(c, d))})
+            else:
+                changed.update(range(c + 1, d + 1))
+        assert not changed & set(data["missing_lines"])
+        lost = [mapped[line] for line in manifest["validation_baseline"]["executed_lines"] if line in mapped and mapped[line] in data["missing_lines"]]
+        assert not lost, lost
+        regressions.append({"path": path, "previous_covered_lines": len(manifest["validation_baseline"]["executed_lines"]), "mapped_previous_lines": len(mapped), "lost_previously_covered": lost, "uncovered_changed_lines": sorted(changed & set(data["missing_lines"]))})
+    else:
+        old = next(value for name, value in manifest["graph_coverage"]["files"].items() if name.replace("\\", "/") == path)
+        assert set(old["executed_lines"]) <= set(data["executed_lines"])
+        assert set(map(tuple, old["executed_branches"])) <= set(map(tuple, data["executed_branches"]))
+        assert set(data["missing_lines"]) <= set(old["missing_lines"])
+        regressions.append({"path": path, "retained_known_missing_lines": data["missing_lines"], "retained_known_missing_branches": data["missing_branches"], "lost_previously_covered": []})
+    # Raw AST ranges and named coverage summaries have intentionally distinct denominators.
+    def visit(body, prefix=""):
+        for node in body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                name = prefix + node.name
+                family = "classes" if isinstance(node, ast.ClassDef) else "functions"
+                named = data.get(family, {}).get(name)
+                executed = [line for line in data["executed_lines"] if node.lineno <= line <= node.end_lineno]
+                missing = [line for line in data["missing_lines"] if node.lineno <= line <= node.end_lineno]
+                total = len(executed) + len(missing)
+                assert total == 0 or len(executed) / total >= .9, (path, name, "raw range")
+                if named and named["summary"]["num_statements"]:
+                    assert named["summary"]["percent_statements_covered"] >= 90, (path, name, "named summary")
+                range_results.append({"path": path, "name": name, "kind": family, "start": node.lineno, "end": node.end_lineno, "executed_statements": len(executed), "missing_statements": missing, "raw_statement_total": total, "coverage_named_summary": named["summary"] if named else None})
+                visit(node.body, name + ".")
+    visit(ast.parse(Path(path).read_bytes()).body)
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+coverage_evidence = qa / ("p5t1-final-combined-coverage." + stamp + ".json")
+write(coverage_evidence, coverage)
+ranges_path = qa / ("p5t1-final-coverage-ranges." + stamp + ".json")
+write(ranges_path, {"ranges": range_results, "regressions": regressions, "convention": manifest["coverage_convention"]})
+raw_files.extend({"path": "SCRATCH/" + path.name, "sha256": sha(path.read_bytes()), "bytes": path.stat().st_size} for path in (combined_database, combined_json))
+contracts = run(6, "contracts", ["pytest", "-v", "-o", "addopts=", "-p", "no:cacheprovider", "--no-cov", *manifest["contract_selection"]])
+contract_nodes = re.findall(r"^(tests/.+?) PASSED(?:\s|$)", contracts["stdout"], re.M)
+assert set(contract_nodes) == set(manifest["contract_selection"]) and len(contract_nodes) == 4
+finished = datetime.datetime.now(datetime.timezone.utc)
+stage_path = qa / ("p5t1-final-stages1-6." + finished.strftime("%Y-%m-%dT%H-%M") + ".json")
+write(stage_path, {"task": "P5-T1", "candidate": manifest_path.as_posix(), "candidate_sha256": sha(manifest_path.read_bytes()),
+    "started_at": began.isoformat(), "finished_at": finished.isoformat(), "receipts": receipts,
+    "batches": batches, "unit_count": 187, "contract_nodes": contract_nodes, "retained_helper_cases": 114,
+    "coverage": {"path": coverage_evidence.as_posix(), "sha256": sha(coverage_evidence.read_bytes())},
+    "ranges": {"path": ranges_path.as_posix(), "sha256": sha(ranges_path.read_bytes())},
+    "raw_files": raw_files, "binding_sha256": binding(), "native_pending": True})
+print(json.dumps({"stages1_6": stage_path.as_posix(), "unit_cases": 187, "contracts": 4, "range_count": len(range_results), "native_pending": True}), flush=True)

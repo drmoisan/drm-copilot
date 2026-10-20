@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py packages/discovery-runtime/src/drm_copilot_discovery/validation.py tests/discovery_runtime/test_coverage_report.py tests/discovery_runtime/test_coverage_report_contract.py tests/discovery_runtime/test_validation_modes.py tests/discovery_runtime/test_agent_output.py tests/discovery_runtime/test_mutation_plan.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T04:22:55.268480+00:00",
+  "label": "lint",
+  "last_node": null,
+  "pid": 56792,
+  "raw": [
+    {
+      "bytes": 19,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-lint.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-lint.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 217,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-lint.progress.json",
+      "sha256": "59d5295d0d9d65ee5e77fe010ead3533bc15a93dbb0b59adc36ef0e1979619c2"
+    }
+  ],
+  "seconds": 1.008,
+  "stage": 2,
+  "started_at": "2026-10-20T04:22:54.260958+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T04-22"
+}

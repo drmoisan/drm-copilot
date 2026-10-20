@@ -1,0 +1,94 @@
+"""Preserve completed final stages and the native failure while repair is routed."""
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+scratch = Path(__file__).resolve().parent
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+qa = feature / "evidence/qa-gates"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def ref(path):
+    """Bind exact existing bytes without normalizing them."""
+    return {"path": path.as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def write(path, value):
+    """Create portable LF evidence without replacing prior receipts."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+stages_path = qa / "p5t1-final-stages1-6.2026-10-20T04-39.json"
+stages = json.loads(stages_path.read_bytes())
+candidate_path = Path(stages["candidate"])
+candidate = json.loads(candidate_path.read_bytes())
+assert stages["unit_count"] == 187 and len(stages["contract_nodes"]) == 4
+assert all(row["exit_code"] == 0 for row in stages["receipts"])
+entries = []
+for record in stages["raw_files"]:
+    path = scratch / record["path"].removeprefix("SCRATCH/")
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == record["sha256"] and len(raw) == record["bytes"]
+    payload = base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(payload)) == raw
+    entries.append({**record, "encoding": "base64(gzip(original bytes)); mtime=0",
+                    "payload": payload, "decode_verified": True})
+for name in ("issue-980-p5t1-final-bind-before-node-correction.py",
+             "issue-980-p5t1-final-binding-note.py", Path(__file__).name):
+    raw = (scratch / name).read_bytes()
+    payload = base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(payload)) == raw
+    entries.append({"path": "SCRATCH/" + name, "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw), "encoding": "base64(gzip(original bytes)); mtime=0",
+        "payload": payload, "decode_verified": True})
+archive_path = qa / ("p5t1-final-held-original-streams." + stamp + ".json")
+write(archive_path, {"task": "P5-T1", "timestamp": stamp, "entries": entries,
+    "qualification": "Lossless original passing command streams, progress and raw coverage/databases. Native failed streams and frozen native harnesses are retained in the separately referenced failure archive. Readable copies replace only actual host-local path spellings."})
+finding_path = qa / "p5t1-final-native-finding.2026-10-20T04-44.json"
+finding = json.loads(finding_path.read_bytes())
+script_path = qa / ("p5t1-final-held-harness." + stamp + ".txt")
+script_path.write_bytes(Path(__file__).read_bytes())
+handoff_path = qa / ("p5t1-final-held-handoff." + stamp + ".json")
+write(handoff_path, {
+    "task": "P5-T1", "timestamp": stamp, "status": "final-native-stage-blocked",
+    "candidate": ref(candidate_path), "stages1_6": ref(stages_path),
+    "source_owner_finding": ref(finding_path), "raw_archive": ref(archive_path),
+    "native_failure_archive": finding["failure_archive"], "closing_harness": ref(script_path),
+    "coverage": stages["coverage"], "coverage_ranges": stages["ranges"],
+    "retained_helper": candidate["retained_helper"], "review": candidate["review"],
+    "scope": {"fresh_graph_cases": 49, "fresh_caller_cases": 138, "contracts": 4,
+              "retained_helper_cases": 114, "native_passed": 8, "native_failed": 9,
+              "native_not_executed": [10, 11, 12, 13, 14]},
+    "callers_seconds": 927.939, "native_failed_seconds": 21.048,
+    "normalization": "Candidate binds actual working bytes and qualified Git LF bytes. Original stream bytes are recoverable from archives; readable outputs remain separate.",
+    "next_transition": "Independent diagnosis confirmation, minimal owner repair and coordinator-selected restart. No source/test edit or additional gate run by this worker.",
+    "task_accepted": False, "feature_complete": False})
+handoff_path.with_suffix(".md").write_text(
+    f"# P5-T1 retained final-gate result\n\nTimestamp: {stamp}\n"
+    "Command: `poetry run python SCRATCH/issue-980-p5t1-final-held.py`\n"
+    "EXIT_CODE: 0\n"
+    "Output Summary: Passing stages 1–6 and failed native-stage evidence are preserved; task acceptance remains pending.\n\n"
+    "The 49 graph tests, 138 caller tests and four contracts passed. All 27 measured callable/class ranges passed. Validator coverage is 150/150 statements and 52/52 branches; report coverage is 111/111 and 26/26; population coverage is 113/115 and 46/50, retaining its two known statements and four branch gaps without loss. The accepted 114-case helper proof was reused.\n\n"
+    "The native composition passed eight assertions, then failed the previous-view equality assertion. Its semantic digest remains stable; generated Markdown incorrectly enters coverage scan-input accounting. Assertions 10–14 were not executed. The complete bounded finding is assigned to coordinator/reviewer routing, with no source/test/fixture edits here.\n\n"
+    "Exact original output/progress/coverage bytes are decode-verified in the lossless archive. Native failed streams are preserved separately. Candidate, review and helper proofs are referenced without repeating historical inventories. The caller duration of 927.939 seconds and native failed duration of 21.048 seconds are not host timeout limits.\n",
+    encoding="utf-8", newline="\n")
+untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard", "--", (feature / "evidence").as_posix()],
+                          capture_output=True, check=True).stdout.decode().splitlines()
+owned = sorted(path for path in untracked if Path(path).name.startswith("p5t1-final-"))
+for path in owned:
+    raw = Path(path).read_bytes()
+    assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path
+    assert all(line == line.rstrip() for line in raw.splitlines()), path
+    assert str(scratch).encode() not in raw and scratch.as_posix().encode() not in raw
+closure_path = qa / ("p5t1-final-held-staging-closure." + stamp + ".json")
+write(closure_path, {"timestamp": stamp, "handoff": ref(handoff_path),
+    "stage_paths": [*owned, closure_path.as_posix()], "bindings": [ref(Path(path)) for path in owned],
+    "qualification": "Preservation-only owned evidence; no acceptance checkoff. Parent owns staging and commits. Self path is included without recursive self-hash."})
+print(json.dumps({"handoff": ref(handoff_path), "closure": ref(closure_path),
+                  "stage_paths": len(owned) + 1, "archived_streams": len(entries)}, indent=2))

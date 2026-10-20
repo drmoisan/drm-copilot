@@ -1,0 +1,72 @@
+"""Archive one real P5-T1 check with raw streams and exact executed harness bytes."""
+import base64
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT=Path.cwd()
+SCRATCH=Path(__file__).parent
+FEATURE=Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+RUNTIME='packages/discovery-runtime/src/drm_copilot_discovery/'
+OWNED=[RUNTIME+'coverage_scope_rules.py',RUNTIME+'coverage_report.py',RUNTIME+'report_models.py',RUNTIME+'validation.py',
+    'tests/discovery_runtime/test_coverage_report.py',
+    'tests/discovery_runtime/test_validation_modes.py',
+    'tests/discovery_runtime/test_agent_output.py',
+    'tests/discovery_runtime/test_mutation_plan.py',
+    'tests/discovery_runtime/test_report_models.py',
+    'tests/discovery_runtime/test_coverage_report_contract.py',
+    RUNTIME+'coverage_population.py']
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+def hashes():
+    return {name:digest((ROOT/name).read_bytes()) for name in OWNED if (ROOT/name).exists()}
+
+def portable(text):
+    for path,label in ((str(ROOT),'WORKSPACE'),(str(SCRATCH),'SCRATCH'),(str(SCRATCH.resolve()),'SCRATCH')):
+        parts=re.split(r'[\\/]',path)
+        pattern=r'[\\/]'.join(re.escape(part) for part in parts)
+        text=re.sub(pattern,label,text,flags=re.I)
+    return '\n'.join(line.rstrip() for line in text.splitlines())
+
+label=sys.argv[1]
+argv=sys.argv[2:]
+if argv[0]=='--': argv=argv[1:]
+started=datetime.now(timezone.utc)
+before=hashes()
+env=dict(os.environ)
+env['COVERAGE_FILE']=str(SCRATCH/(label+'.coverage'))
+env['PYTHONIOENCODING']='utf-8'
+begin=time.perf_counter()
+process=subprocess.run(argv,cwd=ROOT,env=env,capture_output=True)
+elapsed=time.perf_counter()-begin
+after=hashes()
+stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+directory=FEATURE/'evidence/regression-testing'
+prefix=directory/f'p5t1-{label}.{stamp}'
+stdout_path=SCRATCH/(label+'.stdout')
+stderr_path=SCRATCH/(label+'.stderr')
+stdout_path.write_bytes(process.stdout)
+stderr_path.write_bytes(process.stderr)
+harness=directory/f'p5t1-{label}-harness.{stamp}.txt'
+harness.write_bytes(Path(__file__).read_bytes())
+payload={'task':'P5-T1','started_at':started.isoformat(),'timestamp_utc':datetime.now(timezone.utc).isoformat(),
+    'command':[portable(arg) for arg in argv],'exit_code':process.returncode,'duration_seconds':round(elapsed,3),
+    'source_before':before,'source_after':after,
+    'stdout':{'sha256':digest(process.stdout),'base64':base64.b64encode(process.stdout).decode()},
+    'stderr':{'sha256':digest(process.stderr),'base64':base64.b64encode(process.stderr).decode()},
+    'harness':{'path':harness.as_posix(),'sha256':digest(harness.read_bytes())}}
+Path(str(prefix)+'.json').write_text(json.dumps(payload,sort_keys=True,indent=2)+'\n',encoding='utf-8',newline='\n')
+rendered=portable(process.stdout.decode('utf-8',errors='replace')+'\n'+process.stderr.decode('utf-8',errors='replace'))
+markdown=f'# P5-T1 {label}\n\nTimestamp: {stamp}\n\nCommand: '+portable(subprocess.list2cmdline(argv))+f'\n\nEXIT_CODE: {process.returncode}\n\nOutput Summary: The exact completed command result is retained below; no inferred completion is claimed.\n\nDuration seconds: {elapsed:.3f}\n\n```text\n{rendered}\n```\n'
+Path(str(prefix)+'.md').write_text(markdown,encoding='utf-8',newline='\n')
+print(json.dumps({'receipt':str(prefix)+'.json','exit_code':process.returncode,'seconds':round(elapsed,3)}),flush=True)
+print(rendered.encode('ascii','backslashreplace').decode(),flush=True)
+sys.exit(process.returncode)

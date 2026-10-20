@@ -1,0 +1,119 @@
+"""Diagnose the failed previous-view assertion using existing untouched fixtures."""
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.coverage_report import build_coverage_report
+from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+from drm_copilot_discovery.mutation_io import capture_workspace
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from drm_copilot_discovery.repository_reader import LocalGitReader
+from drm_copilot_discovery.validation import report_input_digest
+
+scratch = Path(__file__).resolve().parent
+suite = scratch / "issue-980-p5t1-native-7b8dc52f660c4dd8b7ed61cfec84bb50"
+qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+clock = time.monotonic()
+catalog = load_catalog()
+profile_path = "docs/migration/discovery/domain-profile.yaml"
+profile = ProfileV2((suite / "base" / profile_path).read_bytes(), format="yaml", catalog=catalog)
+before = {path.relative_to(suite).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+          for path in sorted(suite.rglob("*")) if path.is_file()}
+
+
+def run_git(argv, *, output_limit):
+    """Use the already accepted bounded Git-reader contract without shell execution."""
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        data = process.stdout.read(output_limit + 1)
+        if len(data) > output_limit:
+            process.kill()
+            raise OSError("Bounded Git output exceeded")
+        if process.wait():
+            raise OSError("Bounded Git read failed")
+        return data
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+def differences(left, right, prefix=""):
+    """Report detached differences without treating them as fixes or validation."""
+    found = []
+    if isinstance(left, dict) and isinstance(right, dict):
+        for key in sorted(set(left) | set(right)):
+            found.extend(differences(left.get(key), right.get(key), prefix + "/" + key))
+    elif left != right:
+        found.append({"path": prefix, "base": left, "previous": right})
+    return found
+
+
+snapshots = {}
+for name in ("base", "previous"):
+    directory = suite / name
+    primitives = LocalMutationPrimitives(workspace_root=str(directory), lock_path=str(suite / (name + ".lock")))
+    repository = LocalGitReader(workspace_root=str(directory), repository_id=profile.repository.id, run=run_git)
+    snapshots[name] = capture_workspace(workspace_root=str(directory), profile_path=profile_path,
+        metadata=primitives.metadata, read_bytes=primitives.read_bytes, catalog=catalog, repository=repository).snapshot
+base, previous = snapshots["base"], snapshots["previous"]
+stored = json.loads((suite / "previous/docs/migration/discovery/reports/coverage-report.json").read_bytes())
+current = build_coverage_report(previous).to_dict()
+diagnosis = {
+    "timestamp": stamp, "task": "P5-T1", "scope": "Read-only diagnosis of existing native fixtures; no suite rerun.",
+    "base_digest": report_input_digest(base), "previous_digest": report_input_digest(previous),
+    "base_full_digest": base.sha256, "previous_full_digest": previous.sha256,
+    "stored_report_digest": stored["input_sha256"], "recomputed_report_digest": current["input_sha256"],
+    "report_differences": differences(stored, current),
+    "manifest_differences": differences(base.manifest.to_dict(), previous.manifest.to_dict()),
+    "base_excluded_paths": list(base.excluded_paths), "previous_excluded_paths": list(previous.excluded_paths),
+    "base_checkout": base.checkout.to_dict(), "previous_checkout": previous.checkout.to_dict(),
+    "repository_files": {name: [(item.path, item.sha256) for item in snapshot.repository_files]
+                         for name, snapshot in snapshots.items()},
+    "loaded_artifacts": {name: [{"path": item.path, "kind": item.expected_kind} for item in snapshot.artifacts]
+                         for name, snapshot in snapshots.items()},
+    "loader_findings": {name: [item.to_dict() for item in snapshot.findings] for name, snapshot in snapshots.items()},
+    "remaining_setup": {
+        "changed_scope": json.loads((suite / "changed" / profile.artifacts["scope"]).read_bytes()),
+        "forged_total": json.loads((suite / "forged/docs/migration/discovery/reports/coverage-report.json").read_bytes())["coverage"]["components"]["total"],
+        "invalid_scope": (suite / "invalid" / profile.artifacts["scope"]).read_text(),
+        "uninventoried_authored_paths": [path.relative_to(suite / "uninventoried").as_posix()
+            for path in (suite / "uninventoried/docs").rglob("*") if path.is_file()]},
+}
+after = {path.relative_to(suite).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+         for path in sorted(suite.rglob("*")) if path.is_file()}
+assert before == after
+diagnosis["fixture_bytes_preserved"] = True
+diagnosis["elapsed_seconds"] = time.monotonic() - clock
+failure_path = qa / "p5t1-final-native-043934.2026-10-20T04-39.json"
+failure = json.loads(failure_path.read_bytes())
+originals = []
+paths = [scratch / record["path"].removeprefix("SCRATCH/") for record in failure["raw"]]
+paths.extend(scratch / name for name in ("issue-980-p5t1-final-native.py", "issue-980-p5t1-final-native-gate.py"))
+for path in paths:
+    raw = path.read_bytes()
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    originals.append({"identifier": "SCRATCH/" + path.name, "sha256": hashlib.sha256(raw).hexdigest(),
+                      "bytes": len(raw), "encoding": "base64(gzip(original bytes)); mtime=0",
+                      "payload": encoded, "decode_verified": True})
+archive = qa / ("p5t1-final-native-failed-originals." + stamp + ".json")
+archive.write_text(json.dumps({"failure": {"path": failure_path.as_posix(), "sha256": hashlib.sha256(failure_path.read_bytes()).hexdigest()},
+                              "entries": originals}, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+diagnosis["failure_archive"] = {"path": archive.as_posix(), "sha256": hashlib.sha256(archive.read_bytes()).hexdigest()}
+path = qa / ("p5t1-final-native-diagnosis." + stamp + ".json")
+path.write_text(json.dumps(diagnosis, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+snapshot_path = qa / ("p5t1-final-native-diagnosis-harness." + stamp + ".txt")
+snapshot_path.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"path": path.as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                  "base_digest": diagnosis["base_digest"], "previous_digest": diagnosis["previous_digest"],
+                  "report_differences": diagnosis["report_differences"],
+                  "base_excluded": diagnosis["base_excluded_paths"], "previous_excluded": diagnosis["previous_excluded_paths"]}, indent=2))

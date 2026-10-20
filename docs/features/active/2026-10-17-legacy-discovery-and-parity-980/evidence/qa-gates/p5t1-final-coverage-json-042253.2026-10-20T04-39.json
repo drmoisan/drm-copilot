@@ -1,0 +1,38 @@
+{
+  "binding_after": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "binding_before": "1af11906ba0408a0bfadf15767cc3b1ceac7e12ab96b48a56ee01504e6e52a34",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-final-candidate.2026-10-20T04-22.json",
+  "candidate_sha256": "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage json -o SCRATCH\\issue-980-p5t1-final-042253-combined-coverage.raw.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T04:39:16.606427+00:00",
+  "label": "coverage-json",
+  "last_node": null,
+  "pid": 45924,
+  "raw": [
+    {
+      "bytes": 148,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-json.stdout",
+      "sha256": "4c2b3288f57f7f6b379ff6cf5692b1a3a5ae303ecad0665bd99df13a76c79f4b"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-json.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 226,
+      "path": "SCRATCH/issue-980-p5t1-final-042253-coverage-json.progress.json",
+      "sha256": "47f92ae214fe1bb6c3ab276d8d0eaf3b6c3836e033613f3ed4b3e042c11ff58e"
+    }
+  ],
+  "seconds": 1.009,
+  "stage": 5,
+  "started_at": "2026-10-20T04:39:15.597054+00:00",
+  "stderr": "",
+  "stdout": "Wrote JSON report to SCRATCH\\issue-980-p5t1-final-042253-combined-coverage.raw.json\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T04-39"
+}
