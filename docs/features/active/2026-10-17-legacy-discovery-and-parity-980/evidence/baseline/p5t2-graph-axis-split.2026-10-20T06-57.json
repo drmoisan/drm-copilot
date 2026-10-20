@@ -1,0 +1,11 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:57:36.1680552Z",
+  "path": "tests/discovery_runtime/test_parity_axes.py",
+  "existed_before_creation": false,
+  "owner": "workspace_operations",
+  "purpose": "GR1 authored status counters and GR2 bounded custom-mode membership regressions",
+  "existing_test_scope": "Preserve all 36 existing node IDs/assertions; public rename only for assessed_projection fixture helper",
+  "baseline": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+  "baseline_sha256": "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7"
+}

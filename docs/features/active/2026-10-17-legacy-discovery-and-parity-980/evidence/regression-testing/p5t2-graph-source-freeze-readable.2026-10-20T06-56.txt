@@ -1,0 +1,14 @@
+"""Freeze the unchanged parity projection sources for incremental review."""
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json
+root=Path.cwd(); feature=root/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+paths=['packages/discovery-runtime/src/drm_copilot_discovery/'+name+'.py' for name in ('parity_report','parity_metrics','report_models')]
+rows=[]
+for path in paths:
+ data=(root/path).read_bytes(); rows.append({'path':path,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'physical_lines':len(data.splitlines())})
+receipt={'task':'P5-T2','status':'source-only-frozen-for-review','timestamp_utc':datetime.now(timezone.utc).isoformat(),'sources':rows,'passing_focused_receipt':'evidence/regression-testing/p5t2-graph-focused11-tests.2026-10-20T06-39.json','passing_cases':36,'current_tests_status':'Production remains frozen; approved positive disposition assertions are being added to existing parameter cases, without a larger node population.','baseline':'evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json','helper_proof':'evidence/regression-testing/p5t2-helper-freeze.2026-10-20T06-00.json','original_conflict_control':'evidence/regression-testing/p5t2-graph-conflict-original.2026-10-20T06-35.json','acceptance':False}
+base=feature/'evidence/qa-gates'/f'p5t2-graph-source-freeze.{stamp}'
+path=Path(str(base)+'.json');path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(path.relative_to(root).as_posix(),hashlib.sha256(path.read_bytes()).hexdigest())

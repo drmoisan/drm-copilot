@@ -1,0 +1,13 @@
+"""Inspect the fixed projection sources without executing behavioral tests."""
+import ast,json
+from pathlib import Path
+paths=['packages/discovery-runtime/src/drm_copilot_discovery/'+n+'.py' for n in ('parity_report','parity_metrics','report_models')]+['tests/discovery_runtime/'+n+'.py' for n in ('test_parity_report','test_parity_metrics','test_report_models')]
+findings=[]
+for path in paths:
+ text=Path(path).read_text(); lines=text.splitlines(); tree=ast.parse(text)
+ if len(lines)>500: findings.append((path,'size',len(lines)))
+ for node in ast.walk(tree):
+  if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)) and not ast.get_docstring(node):findings.append((path,'docstring',node.lineno))
+  if isinstance(node,(ast.For,ast.AsyncFor,ast.While)) and not lines[node.lineno-2].lstrip().startswith('#'):findings.append((path,'loop-intent',node.lineno))
+ print(path,len(lines))
+print('findings',json.dumps(findings))

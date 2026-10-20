@@ -1,0 +1,163 @@
+{
+  "stage": "tests",
+  "label": "p5t2-projection-PC1-pass2-tests",
+  "started": "2026-10-20T06:41:04.800041+00:00",
+  "finished": "2026-10-20T06:45:54.292839+00:00",
+  "duration_seconds": 289.493,
+  "command": "poetry run pytest tests/discovery_runtime/test_parity_report_projection.py tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts -o addopts= -v --cov=drm_copilot_discovery.validation --cov-config=SCRATCH/coverage.ini --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/projection-coverage.json",
+  "exit_code": 1,
+  "source_before": {
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "physical_lines": 476
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02",
+      "physical_lines": 498
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "e65d5d9c1b414a17323deecfa66123b80c5ab30657ab93e4bb2be68d6763d736",
+      "physical_lines": 298
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "physical_lines": 173
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "sha256": "cd96d559f5562fef7ac6db69af3f1dbe0632e6ad6c3ec0955ce233401a74556d",
+      "physical_lines": 399
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": {
+      "sha256": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2",
+      "physical_lines": 303
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "physical_lines": 345
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "sha256": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+      "physical_lines": 473
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+      "physical_lines": 346
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "physical_lines": 476
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "physical_lines": 344
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02",
+      "physical_lines": 498
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "e65d5d9c1b414a17323deecfa66123b80c5ab30657ab93e4bb2be68d6763d736",
+      "physical_lines": 298
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "physical_lines": 173
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "sha256": "cd96d559f5562fef7ac6db69af3f1dbe0632e6ad6c3ec0955ce233401a74556d",
+      "physical_lines": 399
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": {
+      "sha256": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2",
+      "physical_lines": 303
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "physical_lines": 345
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "sha256": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+      "physical_lines": 473
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903",
+      "physical_lines": 346
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "tests/discovery_runtime/parity_test_support.py": {
+      "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67",
+      "physical_lines": 229
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-projection-PC1-pass2-tests-064554.stdout.bin",
+      "raw_sha256": "76ee548995052663ffd04ab6ee56a01ce84825540f6a7a7b01b5b48e7dd6b87d",
+      "raw_bytes": 9471,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 25 items\r\n\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-False] PASSED [  4%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-True] PASSED [  8%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-False] PASSED [ 12%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-True] PASSED [ 16%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-False] PASSED [ 20%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-True] PASSED [ 24%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[missing-profile] FAILED [ 28%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[loader] PASSED [ 32%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[artifact] PASSED [ 36%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity] PASSED [ 40%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_result] PASSED [ 44%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_findings] PASSED [ 48%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_multiple_derived_reports_reuse_one_complete_assessment PASSED [ 52%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_parity_preflight_rejects_excess_before_graph_work PASSED [ 56%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[automatic] PASSED [ 60%]\r\ntests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[agent-output] PASSED [ 64%]\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly PASSED [ 68%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-False] PASSED [ 72%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-True] PASSED [ 76%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-False] PASSED [ 80%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-True] PASSED [ 84%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-False] PASSED [ 88%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-True] PASSED [ 92%]\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[missing-profile] PASSED [ 96%]\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[loader] PASSED [100%]\r\n\r\n================================== FAILURES ===================================\r\n_ test_invalid_core_reports_unavailable_but_never_valid_output[missing-profile] _\r\n\r\nsnapshot_catalog = SchemaCatalog(documents=(('schemas/discovery/v1/coverage-ledger.schema.json', JsonObject(members=(('$defs', JsonObject...'issued_at', 'writer')), ('title', 'Discovery v2 protected validation receipt'), ('type', 'object'))))), extensions=())\r\nfault = 'missing-profile'\r\n\r\n    @pytest.mark.parametrize(\"fault\", [\"missing-profile\", \"loader\", \"artifact\"])\r\n    def test_invalid_core_reports_unavailable_but_never_valid_output(\r\n        snapshot_catalog: SchemaCatalog, fault: str\r\n    ) -> None:\r\n        \"\"\"Retain original diagnostics and reject invalid completion authority.\r\n    \r\n        snapshot_catalog (SchemaCatalog) validates fixtures; fault (str) selects the\r\n        captured-input defect. Return None; construct and inspect only memory values.\r\n        \"\"\"\r\n        snapshot = no_scope_snapshot(snapshot_catalog)\r\n        # Separate absent profile bytes, malformed artifacts and loader diagnostics.\r\n        if fault == \"missing-profile\":\r\n            snapshot = replace(\r\n                snapshot,\r\n                manifest=replace(\r\n                    snapshot.manifest,\r\n                    files=tuple(\r\n                        item\r\n                        for item in snapshot.manifest.files\r\n                        if item.path != snapshot.profile.artifacts[\"profile\"]\r\n                    ),\r\n                ),\r\n            )\r\n        elif fault == \"artifact\":\r\n            snapshot = replace_document(snapshot, snapshot.artifacts[0].path, {})\r\n        else:\r\n            snapshot = replace(\r\n                snapshot,\r\n                findings=(\r\n                    Finding(\r\n                        code=\"CAPTURE_ERROR\",\r\n                        message=\"Unavailable\",\r\n                        next_action=\"Recapture.\",\r\n                    ),\r\n                ),\r\n            )\r\n        expected = validate_snapshot(snapshot, mode=\"structural\")\r\n        report = build_parity_report(snapshot).to_dict()\r\n        assert report[\"validation_result\"] == report[\"parity_result\"] == \"fail\"\r\n        assert report[\"findings\"] == report[\"parity_findings\"]\r\n        assert report[\"findings\"] == [item.to_dict() for item in expected.findings]\r\n        assert report[\"counts\"] == {}\r\n        assert report[\"parity\"] == to_plain_value(unavailable_parity_summary())\r\n        assert report[\"input_sha256\"] == report_input_digest(snapshot)\r\n        assert not validate_snapshot(snapshot, mode=\"planning\").ok\r\n        output = document_record(\r\n            snapshot.profile, \"parity-report\", ROOT + \"reports/invalid.json\", report\r\n        )\r\n>       reviewed, invocation = output_context(\r\n            snapshot,\r\n            \"migration-coverage-reviewer\",\r\n            outputs=(output,),\r\n            review_mode=\"parity-complete\",\r\n        )\r\n\r\ntests\\discovery_runtime\\test_parity_report_projection.py:128: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\ntests\\discovery_runtime\\validation_test_support.py:218: in output_context\r\n    \"profile_sha256\": baseline.file(baseline.profile.artifacts[\"profile\"]).sha256,\r\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nself = DiscoverySnapshot(profile=ProfileV2(document=JsonObject(members=(('$schema', 'urn:drm-copilot:discovery:2.0.0:domain-p...aaaaaaaaaaaaaaaaaaaaaaaaaaaa'), origin_path=None)), repository_files=(), checkout=None, excluded_paths=(), findings=())\r\npath = 'docs/migration/discovery/domain-profile.yaml'\r\n\r\n    def file(self, path: str) -> SnapshotFile:\r\n        \"\"\"Return captured content by exact spelling, raising for uncaptured inputs.\"\"\"\r\n        # Match exact spelling; aliases cannot select another captured file.\r\n        for item in self.manifest.files:\r\n            if item.path == path:\r\n                return item\r\n>       raise KeyError(path)\r\nE       KeyError: 'docs/migration/discovery/domain-profile.yaml'\r\n\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\snapshot.py:270: KeyError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                 Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\validation.py     162      8     56      8    93%   193, 195, 306->340, 357, 382, 390-397, 423, 431\r\n----------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                  162      8     56      8    93%\r\nCoverage JSON written to file SCRATCH/projection-coverage.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[missing-profile]\r\n================== 1 failed, 24 passed in 287.44s (0:04:47) ===================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t2-projection-PC1-pass2-tests-064554.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}

@@ -348,3 +348,28 @@ def test_immutable_budget_and_copy_traverse_members_without_key_search(
     assert calls == []
     assert copied.members == value.members and copied is not value
     assert budget.nodes_left == budget.limits.expanded_nodes - (2 * count + 1)
+
+
+@pytest.mark.parametrize(
+    "kind,heading",
+    [
+        ("parity-report", "parity"),
+        ("coverage-report", "coverage"),
+        ("authored\n# misleading", "coverage"),
+    ],
+)
+def test_heading_uses_only_closed_artifact_kind(kind: str, heading: str) -> None:
+    """Render kind (str) with fixed heading (str); return None without I/O.
+
+    Unknown authored values cannot enter the heading. JSON and Markdown retain
+    identical fields, and the historical coverage heading remains unchanged.
+    """
+    report = DiscoveryReport(
+        document=bounded_object({"artifact_kind": kind}, limits=ParseLimits())
+    )
+    value = report.to_markdown()
+    assert value.startswith(f"# Discovery {heading} report\n\n```json\n")
+    assert (
+        json.loads(value.split("```json\n", 1)[1].rsplit("```", 1)[0])
+        == report.to_dict()
+    )

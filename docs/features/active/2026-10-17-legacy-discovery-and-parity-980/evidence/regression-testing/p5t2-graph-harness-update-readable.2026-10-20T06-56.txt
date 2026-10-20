@@ -1,0 +1,20 @@
+from pathlib import Path
+scratch=Path(__file__).parent
+path=scratch/'p5t2-graph-focused.py'
+raw=path.read_bytes()
+(scratch/'p5t2-graph-focused-initial.py.txt').write_bytes(raw)
+text=raw.decode('utf-8-sig').replace('\r\n','\n')
+text=text.replace('    TESTS[2] + "::test_heading_uses_only_closed_artifact_kind",','    TESTS[2] + "::test_heading_uses_only_closed_artifact_kind",\n    TESTS[0] + "::test_graph_work_rejects_before_retaining_entry_locations",\n    TESTS[0] + "::test_axis_output_budget_rejects_before_processing_remaining_rows",')
+text=text.replace('import os\n','import os\nimport re\n')
+text=text.replace('def hashes(paths: list[str])', '''def safe_text(value: str) -> str:
+    """Render paths case-insensitively while raw bytes remain separately preserved."""
+    for path, marker in ((str(SCRATCH), '<SCRATCH>'), (str(ROOT), '<WORKSPACE>')):
+        value = re.sub(re.escape(path), lambda match: marker, value, flags=re.I)
+    return value.replace('\\r\\n', '\\n').replace('\\r', '\\n')
+
+
+def hashes(paths: list[str])''')
+text=text.replace('output.replace(str(ROOT), "<WORKSPACE>").replace(str(SCRATCH), "<SCRATCH>")','safe_text(output)').replace('errors.replace(str(ROOT), "<WORKSPACE>").replace(str(SCRATCH), "<SCRATCH>")','safe_text(errors)')
+text=text.replace('rendered = rendered.replace(str(ROOT), "<WORKSPACE>").replace(str(SCRATCH), "<SCRATCH>")','rendered = safe_text(rendered)')
+text=text.replace('["poetry", "run", "black", "--check", *SOURCES, *TESTS]','["poetry", "run", "black", *([] if ATTEMPT.endswith("format") else ["--check"]), *SOURCES, *TESTS]')
+path.write_text(text.rstrip()+'\n',encoding='utf-8',newline='\n')

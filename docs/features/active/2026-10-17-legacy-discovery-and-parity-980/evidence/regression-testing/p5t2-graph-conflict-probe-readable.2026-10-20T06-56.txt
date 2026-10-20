@@ -1,0 +1,43 @@
+"""Run one existing conflict control against hash-reconstructed original bytes."""
+from __future__ import annotations
+import hashlib,json,os,subprocess,sys,time,types
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd()
+SCRATCH=Path(__file__).parent
+FEATURE=ROOT/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980'
+source='packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py'
+node='tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0]'
+if len(sys.argv)>1:
+    sys.path.insert(0,str(ROOT))
+    import pytest
+    from drm_copilot_discovery import parity_metrics
+    original=SCRATCH/'p5t2-graph-conflict-original.py.txt'
+    module=types.ModuleType('original_parity_metrics_probe')
+    exec(compile(original.read_bytes(),'<retained-original-parity-metrics>','exec'),module.__dict__)
+    parity_metrics.ParityProjection.axes=module.ParityProjection.axes
+    raise SystemExit(pytest.main(['-v','--tb=short','-o','addopts=','-p','no:cacheprovider',node]))
+raw=(ROOT/source).read_bytes()
+old=raw.decode().replace('self.population.budget.work(5 * len(parts))','self.population.budget.work(3 * len(parts))').replace('                    and len(verification) == 1\r\n                    and all(part.consistent for part in parts)\r\n','').replace('                    and len(verification) == 1\n                    and all(part.consistent for part in parts)\n','').encode()
+prior=FEATURE/'evidence/regression-testing/p5t2-graph-focused6-ruff.2026-10-20T06-26.json'
+expected=json.loads(prior.read_text())['before'][source]
+assert hashlib.sha256(old).hexdigest()==expected
+(SCRATCH/'p5t2-graph-conflict-original.py.txt').write_bytes(old)
+started=datetime.now(timezone.utc); clock=time.monotonic()
+env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',PYTEST_DISABLE_PLUGIN_AUTOLOAD='1')
+process=subprocess.run([sys.executable,str(Path(__file__)),'probe'],env=env,capture_output=True,timeout=120)
+elapsed=time.monotonic()-clock
+raws={}
+for label,data in [('stdout',process.stdout),('stderr',process.stderr)]:
+    name=f'p5t2-graph-conflict-original.{label}'
+    (SCRATCH/name).write_bytes(data)
+    raws[label]={'scratch_relative':name,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+text=process.stdout.decode('utf-8',errors='replace')+process.stderr.decode('utf-8',errors='replace')
+assert (ROOT/source).read_bytes()==raw
+receipt={'task':'P5-T2','classification':'isolated original-code control, not prior historical execution','started_utc':started.isoformat(),'elapsed_seconds':elapsed,'exit_code':process.returncode,'node':node,'original_sha256':expected,'original_bytes':len(old),'bound_original_receipt':prior.relative_to(ROOT).as_posix(),'current_sha256':hashlib.sha256(raw).hexdigest(),'source_unchanged':True,'original_reconstruction':'Reverse only the comparison guard and its work charge; byte hash exactly matches the immutable focused6 receipt. Execute original axes in an isolated process, with the corrected test fixture; no repository source is replaced.','raw':raws,'harness_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'stdout':process.stdout.decode('utf-8',errors='replace').replace(str(ROOT),'<WORKSPACE>'),'stderr':process.stderr.decode('utf-8',errors='replace').replace(str(ROOT),'<WORKSPACE>')}
+stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+base=FEATURE/'evidence/regression-testing'/f'p5t2-graph-conflict-original.{stamp}'
+Path(str(base)+'.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+Path(str(base)+'.md').write_text(f'# P5-T2 original verification conflict control\n\nTimestamp: {started.strftime("%Y-%m-%dT%H-%M")}\n\nCommand: `poetry run python <SCRATCH>/p5t2-graph-conflict-probe.py`\n\nEXIT_CODE: {process.returncode}\n\nOutput Summary: Isolated original-code control; source unchanged. Original bytes match the recorded pre-correction SHA.\n\n```text\n'+text.replace(str(ROOT),'<WORKSPACE>').replace('\r\n','\n').rstrip()+'\n```\n',encoding='utf-8',newline='\n')
+print(json.dumps({key:receipt[key] for key in ('exit_code','original_sha256','current_sha256','elapsed_seconds','source_unchanged')}))
+print(text[-4000:])

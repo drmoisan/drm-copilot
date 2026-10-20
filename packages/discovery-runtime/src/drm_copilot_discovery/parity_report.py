@@ -3,12 +3,110 @@
 from __future__ import annotations
 
 import re
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
+from drm_copilot_discovery.coverage_report import coverage_preflight
 from drm_copilot_discovery.models import JsonObject, ParseLimits, to_plain_value
+from drm_copilot_discovery.parity_metrics import ParityProjection
 from drm_copilot_discovery.parsing import parse_document
 from drm_copilot_discovery.rendering import render_pretty_json, sort_rows
-from drm_copilot_discovery.report_models import ReportBudget, bounded_object
+from drm_copilot_discovery.report_models import (
+    DiscoveryReport,
+    ReportBudget,
+    bounded_object,
+)
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.claim_rules import ClaimValidation
+    from drm_copilot_discovery.decision_rules import DecisionValidation
+    from drm_copilot_discovery.dimension_rules import DimensionValidation
+    from drm_copilot_discovery.evidence_rules import EvidenceValidation
+    from drm_copilot_discovery.findings import Finding
+    from drm_copilot_discovery.parity_models import ParityValidation
+    from drm_copilot_discovery.references import ReferenceIndex
+    from drm_copilot_discovery.snapshot import DiscoverySnapshot
+    from drm_copilot_discovery.validation import ValidationMode
+
+
+def parity_preflight(snapshot: DiscoverySnapshot) -> None:
+    """Bound captured snapshot before assessment; return None without I/O.
+
+    snapshot must be a DiscoverySnapshot. Reuses accepted semantic-input budgeting;
+    ValueError rejects invalid input and ReportLimitError rejects excess. Generated
+    reports remain excluded, and this check grants no validation authority.
+    """
+    coverage_preflight(snapshot)
+
+
+def unavailable_parity_summary() -> JsonObject:
+    """Return explicit unavailable metrics without inventing zero denominators.
+
+    The validator retains failure findings in its envelope. No inputs, effects,
+    exceptions or completion claims accompany this fixed immutable JsonObject.
+    """
+    return JsonObject(
+        (
+            ("population_state", "unavailable"),
+            ("source_features", None),
+            ("feature_client_obligations", None),
+            ("entries", None),
+            ("clients", None),
+            ("blockers", None),
+            ("unresolved_decisions", None),
+            ("metrics", None),
+        )
+    )
+
+
+def parity_summary(
+    snapshot: DiscoverySnapshot,
+    *,
+    index: ReferenceIndex,
+    evidence: EvidenceValidation,
+    claims: ClaimValidation,
+    decisions: DecisionValidation,
+    dimensions: DimensionValidation,
+    parity: ParityValidation,
+    findings: tuple[Finding, ...],
+) -> JsonObject:
+    """Project typed assessments of snapshot into an immutable parity JsonObject.
+
+    snapshot (DiscoverySnapshot), index (ReferenceIndex), evidence
+    (EvidenceValidation), claims (ClaimValidation), decisions (DecisionValidation),
+    dimensions (DimensionValidation) and parity (ParityValidation) are the
+    composer's accepted inputs. findings (tuple[Finding]) retains diagnostics.
+    No injected value grants authority. ValueError/ReportLimitError reject invalid
+    or excessive input. No I/O, source mutation, approval or publication occurs.
+    """
+    parity_preflight(snapshot)
+    return ParityProjection(
+        snapshot, index, evidence, claims, decisions, dimensions, parity, findings
+    ).project(unavailable_parity_summary())
+
+
+def build_parity_report(
+    snapshot: DiscoverySnapshot,
+    *,
+    identifier: str = "parity",
+    mode: ValidationMode = "parity-complete",
+) -> DiscoveryReport:
+    """Return authoritative parity views for captured snapshot and root mode.
+
+    snapshot (DiscoverySnapshot) holds captured inputs. identifier (str) names the
+    report; mode (ValidationMode) remains separate from parity completion.
+    Lazy composition avoids recursion. Raises ValueError or
+    ReportLimitError for invalid/excess input; no I/O or publication occurs.
+    """
+    from drm_copilot_discovery.validation import report_projection
+
+    parity_preflight(snapshot)
+    value = report_projection(
+        snapshot, kind="parity-report", identifier=identifier, mode=mode
+    )
+    return DiscoveryReport(
+        document=bounded_object(value, limits=snapshot.profile.limits.parse_limits()),
+        limits=snapshot.profile.limits.parse_limits(),
+    )
 
 
 def _legacy_version(value: object) -> bool:

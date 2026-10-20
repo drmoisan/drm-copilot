@@ -1,0 +1,70 @@
+"""Qualify raw-tool formatting without changing the completed candidate binding."""
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path.cwd()
+scratch = Path(__file__).parent
+out = root / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing"
+stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+freeze = out / "p5t2-graph-GR-freeze.2026-10-20T07-15.json"
+staging = out / "p5t2-graph-GR-staging.2026-10-20T07-15.json"
+document = json.loads(freeze.read_text(encoding="utf-8"))
+prior_stage = json.loads(staging.read_text(encoding="utf-8"))
+
+
+def reference(path):
+    """Return a relative artifact identity using its unchanged exact bytes."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(root).as_posix(),
+            "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+
+def save(path, value):
+    """Write one new readable JSON receipt with a single final LF."""
+    path.write_bytes((json.dumps(value, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+
+
+# Inspect only presentation of the already-bound stage receipts and raw coverage.
+for row in document["stage_receipts"]:
+    for extension in (".json", ".md"):
+        raw = (root / row["path"]).with_suffix(extension).read_bytes()
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n")
+        assert all(line == line.rstrip() for line in raw.decode("utf-8").splitlines())
+coverage = root / document["raw_coverage"]["path"]
+assert reference(coverage) == document["raw_coverage"]
+assert not coverage.read_bytes().endswith(b"\n")
+
+# Preserve this executed evidence-only payload without transforming its text.
+harness = out / f"p5t2-graph-GR-closure-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+qualification = out / f"p5t2-graph-GR-evidence-qualification.{stamp}.json"
+save(qualification, {
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "freeze": reference(freeze), "original_staging": reference(staging),
+    "raw_coverage": reference(coverage), "harness": reference(harness),
+    "raw_stream_exception": "Exact coverage.py JSON lacks a terminal newline; retain original bytes.",
+    "readable_presentation": "Stage JSON/Markdown are UTF-8, LF-only, without trailing whitespace or terminal blank lines.",
+    "checker_diagnostic": json.loads((scratch / "p5t2-graph-GR-freeze-second-checker-diagnostic.json").read_text(encoding="utf-8")),
+    "executed_failed_checker": {
+        "archive": document["new_raw_archive"],
+        "member": "SCRATCH/p5t2-graph-GR-freeze.py",
+        "sha256": "a6fb44861b62c9fc85773eeea1def0b2800c58f4af0c4ae43c11d51bfd365036",
+    },
+    "qualified_result": "Source, node, assertion, coverage, size and comment checks completed before the raw-newline assertion. This closes only that presentation assumption.",
+    "source_test_changes": False, "behavioral_replay": False,
+})
+closure = out / f"p5t2-graph-GR-final-staging.{stamp}.json"
+save(closure, {
+    "freeze": reference(freeze), "qualification": reference(qualification),
+    "stage_paths": sorted(set(prior_stage["stage_paths"] + [
+        qualification.relative_to(root).as_posix(),
+        harness.relative_to(root).as_posix(),
+        closure.relative_to(root).as_posix(),
+    ])),
+})
+print(json.dumps({"freeze": reference(freeze), "qualification": reference(qualification),
+                  "staging": reference(closure), "cases": document["case_count"],
+                  "ranges": sum(len(value["ranges"]) for value in document["per_unit_coverage"].values()),
+                  "raw_coverage_summaries": {path: value["raw_summary"] for path, value in document["per_unit_coverage"].items()}}))

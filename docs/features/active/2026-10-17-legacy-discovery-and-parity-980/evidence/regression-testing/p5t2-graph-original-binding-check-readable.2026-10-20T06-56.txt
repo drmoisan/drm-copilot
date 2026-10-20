@@ -1,0 +1,11 @@
+from pathlib import Path
+import hashlib,json
+root=Path.cwd()
+path='packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py'
+raw=(root/path).read_bytes()
+text=raw.decode().replace('self.population.budget.work(5 * len(parts))','self.population.budget.work(3 * len(parts))').replace('                    and len(verification) == 1\r\n                    and all(part.consistent for part in parts)\r\n','').replace('                    and len(verification) == 1\n                    and all(part.consistent for part in parts)\n','')
+old=text.encode()
+print('current',hashlib.sha256(raw).hexdigest(),'reconstructed',hashlib.sha256(old).hexdigest())
+for receipt in (root/'docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing').glob('p5t2-graph-focused*-*.json'):
+ data=json.loads(receipt.read_text())
+ print(receipt.name,data.get('before',{}).get(path),data.get('before',{}).get(path)==hashlib.sha256(old).hexdigest())

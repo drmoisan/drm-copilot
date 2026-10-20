@@ -271,7 +271,13 @@ class DiscoveryReport:
         newlines cannot close it. Raises ReportLimitError before rendering if
         whitespace or ASCII escaping would exceed the independent output budget.
         """
-        prefix, suffix = "# Discovery coverage report\n\n```json\n", "```\n"
+        # Closed artifact kinds select headings without inserting authored text.
+        heading = (
+            "parity"
+            if self.document.get("artifact_kind") == "parity-report"
+            else "coverage"
+        )
+        prefix, suffix = f"# Discovery {heading} report\n\n```json\n", "```\n"
         budget = ReportBudget(self.limits, pretty=True)
         budget.spend(len(prefix) + len(suffix))
         budget.check(self.document)
