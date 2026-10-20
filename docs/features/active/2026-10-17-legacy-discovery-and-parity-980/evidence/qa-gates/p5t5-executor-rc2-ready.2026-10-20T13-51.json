@@ -1,0 +1,100 @@
+{
+  "Timestamp": "2026-10-20T13-51",
+  "Command": "poetry run python SCRATCH/issue-980-p5t5-publish-guard-ready.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "RC2 confirmed; exact checked-WIP closure ready. Aggregate 119 and task acceptance remain pending.",
+  "task": "P5-T5",
+  "status": "READY_FOR_CHECKED_RC2_WIP",
+  "head": "8cfac33dc648ee7ec314cfb2efea169e6b2cd9a2",
+  "authority": {
+    "delegation_id": "atomic_execution_p5t5_guard_confirmation_20261020",
+    "phase": "S5_P5T5_guard_confirmation",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing": "Rechecked persisted exact route and profile; parent verified native authority."
+  },
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-body-coverage-finding.2026-10-20T13-36.json",
+    "sha256": "cd884905f8752271885dc59564d8debb691f84837ce0dac9d211e3cac2e638cb",
+    "bytes": 28290
+  },
+  "repair_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-freeze.2026-10-20T13-44.json",
+    "sha256": "5d4e2d0667a083ff1f4afa69c92486798a25b34f9997308c774a5daf7b4a79b9",
+    "bytes": 9273
+  },
+  "first_final_run_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-first-run-closure.2026-10-20T13-46.json",
+    "sha256": "4853c307b101f85b596585429d24b95646b0f9e230a13ed7f85b2f086d90b743",
+    "bytes": 27253
+  },
+  "owner_staging": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-staging.2026-10-20T13-44.json",
+      "sha256": "7319c9a5dc5e2b7d0dc5c52dc435c531d7b4681c3b0ff5f3210dca97033b91fe",
+      "bytes": 7380
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-first-run-staging.2026-10-20T13-46.json",
+      "sha256": "75e868f34fa35e14dc95828cff170fe07835cdeab0e91fecc75de5cde1d9e162",
+      "bytes": 12807
+    }
+  ],
+  "confirmation_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-rc2-confirmation-payload.2026-10-20T13-51.json",
+    "sha256": "9f44d738ae1e6138070ec7338d552b759b38829f74d2a091b51e6f7b70a593f0",
+    "bytes": 26232
+  },
+  "changed_test": {
+    "path": "tests/discovery_runtime/test_acceptance_render_limits.py",
+    "sha256": "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125",
+    "bytes": 10786
+  },
+  "confirmation": [
+    "One appended public-renderer test; the committed test bytes remain an exact prefix and all 77 prior nodes, definitions, decorators and assertions are retained.",
+    "Valid immutable input and real output budget reach zero; ReportLimitError precedes encoding, and no partial bundle is returned.",
+    "Clean ordered Black, Ruff, scoped Pyright and the one focused test passed; current raw coverage executes line 179 and arc 178->179.",
+    "No production, dependency or example changes; original failures and qualified evidence remain immutable."
+  ],
+  "coverage_qualification": {
+    "original_named_body": {
+      "lines": "8/9",
+      "branches": "3/4"
+    },
+    "original_ast_range": "9/10 includes the executed declaration and does not satisfy the body floor.",
+    "focused_named_body": {
+      "lines": "7/9",
+      "branches": "3/4"
+    },
+    "separate_exact_source_union": {
+      "lines": "9/9",
+      "branches": "4/4"
+    },
+    "qualification": "Separate retained 118-case and new one-case proof. Raw counters are not augmented; the 119-case aggregate is pending."
+  },
+  "historical_final_run": {
+    "passed_nodes": 118,
+    "seconds": 79.185,
+    "stopped_at": "Actual named-callable coverage gap, not a test failure or reader attribution error.",
+    "contracts": "Not executed in that run."
+  },
+  "presentation": "Raw byte archives and original/readable identities remain separate. Three already committed generated Markdown newline qualifications remain unchanged; examples are excluded from this staging union.",
+  "findings": [],
+  "open_probes": [],
+  "pending": [
+    "Prepared aggregate 119-case final sequence and contracts",
+    "P5-T5 task and AC acceptance"
+  ],
+  "stage_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-rc2-ready-staging.2026-10-20T13-51.json",
+  "excluded": [
+    "Unchanged examples",
+    "Unrelated P6 preparation",
+    "Disabled 119 retry metadata; retain for final-gate evidence commit"
+  ],
+  "next_five": [
+    "P5-T5",
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1"
+  ]
+}

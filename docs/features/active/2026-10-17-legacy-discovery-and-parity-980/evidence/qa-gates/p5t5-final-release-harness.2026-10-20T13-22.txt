@@ -1,0 +1,65 @@
+"""Add the explicit P5-T5 execution release to the already bound candidate."""
+
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+from p5t5_prepare_final import records
+
+
+def main():
+    """Preserve disabled evidence and verify only existing identities before release."""
+    scratch = Path(__file__).resolve().parent
+    qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+    route = "inventory_analyzers_p5t5_final_gates_20261020"
+    profile = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+    matches = [item for item in records(checkpoint)
+               if item.get("delegation_id") == route and item.get("profile_sha256") == profile]
+    assert len(matches) == 1
+    assert matches[0]["phase"] == "S5_P5T5_final_gates"
+    assert hashlib.sha256(Path(matches[0]["profile_path"]).read_bytes()).hexdigest() == profile
+    disabled = qa / "p5t5-final-candidate-disabled.2026-10-20T13-10.json"
+    raw = disabled.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == "6d0b598b2bbdceff9393d0a3a5da98886a61032e9bfbae109bc097885d849ceb"
+    candidate = json.loads(raw)
+    review = qa / "p5t5-executor-renderer-ready.2026-10-20T13-17.json"
+    review_sha = hashlib.sha256(review.read_bytes()).hexdigest()
+    assert review_sha == "e362a02d712308c915e8b8844a207fa3e46ec3b1cbc3bed397102ddc9fe220ac"
+    # Reuse the frozen owner union without constructing another source or dependency inventory.
+    for path, digest in candidate["bindings"].items():
+        assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest, path
+    for name, record in candidate["harnesses"].items():
+        assert hashlib.sha256((scratch / name).read_bytes()).hexdigest() == record["sha256"], name
+    candidate.update(
+        execution_released=True, final_review_closed=True,
+        candidate_commit="8cfac33dc648ee7ec314cfb2efea169e6b2cd9a2",
+        authority_route=route,
+    )
+    candidate["retained_proof"]["final_review"] = {"path": review.as_posix(), "sha256": review_sha}
+    candidate["disabled_candidate"] = {"path": disabled.as_posix(), "sha256": hashlib.sha256(raw).hexdigest()}
+    candidate["limitations"][0] = "Task verification is released; independent final acceptance remains pending."
+    candidate["fixture_output_newline_qualification"] = (
+        "Three generated Markdown outputs retain their exact renderer-produced terminal blank lines. "
+        "The owner provenance and source-byte bindings are authoritative; examples are not normalized."
+    )
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate["released_at"] = stamp
+    output = qa / ("p5t5-final-candidate-released." + stamp + ".json")
+    assert not output.exists(), output
+    output.write_text(json.dumps(candidate, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    local = scratch / "candidate-released.json"
+    assert not local.exists()
+    local.write_bytes(output.read_bytes())
+    snapshot = qa / ("p5t5-final-release-harness." + stamp + ".txt")
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({"released_candidate": output.as_posix(),
+                      "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+                      "local_candidate": "SCRATCH/candidate-released.json",
+                      "node_count": candidate["node_count"], "execution_released": True}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\p5t5_final_coverage.py SCRATCH\\candidate-released.json SCRATCH\\p5t5-final-132232-combined-coverage.json SCRATCH\\p5t5-final-132232-coverage-result.json",
+  "completed_nodes": 0,
+  "exit_code": 1,
+  "finished_at": "2026-10-20T13:24:14.830906+00:00",
+  "label": "coverage-proof",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-132232-raw.2026-10-20T13-24.json",
+    "sha256": "f59ce5048d48ad7390cee41ffad18d5537eae20da90f913f2f243043a3fdae71"
+  },
+  "seconds": 1.016,
+  "stage": 6,
+  "started_at": "2026-10-20T13:24:13.814623+00:00",
+  "stderr": "Traceback (most recent call last):\n  File \"SCRATCH\\p5t5_final_coverage.py\", line 210, in <module>\n    main()\n    ~~~~^^\n  File \"SCRATCH\\p5t5_final_coverage.py\", line 179, in main\n    assert len(named_lines & proof_lines) / len(named_lines) >= .9, (path, name, \"named line floor\")\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py', '_trace', 'named line floor')\n",
+  "stdout": "",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-24"
+}

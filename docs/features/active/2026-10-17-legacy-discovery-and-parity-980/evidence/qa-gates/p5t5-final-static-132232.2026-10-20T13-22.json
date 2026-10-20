@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\p5t5_final_static.py SCRATCH\\candidate-released.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:22:52.471398+00:00",
+  "label": "static",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-static-132232-raw.2026-10-20T13-22.json",
+    "sha256": "c2bfbaf95f7917f8304fd2e6551eb46b0e10c71e23e004bd409abda68ffdd676"
+  },
+  "seconds": 1.015,
+  "stage": 4,
+  "started_at": "2026-10-20T13:22:51.456497+00:00",
+  "stderr": "",
+  "stdout": "{\n  \"files\": [\n    {\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py\",\n      \"physical_lines\": 329,\n      \"definitions\": 9,\n      \"loops\": [\n        66,\n        73,\n        143,\n        175,\n        217,\n        224,\n        266,\n        292,\n        76,\n        110,\n        230\n      ],\n      \"reviewed_unchanged_test_body\": false\n    },\n    {\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py\",\n      \"physical_lines\": 173,\n      \"definitions\": 8,\n      \"loops\": [\n        26,\n        105,\n        117,\n        123\n      ],\n      \"reviewed_unchanged_test_body\": false\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_gherkin.py\",\n      \"physical_lines\": 404,\n      \"definitions\": 18,\n      \"loops\": [\n        233\n      ],\n      \"reviewed_unchanged_test_body\": false\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_tags.py\",\n      \"physical_lines\": 181,\n      \"definitions\": 7,\n      \"loops\": [],\n      \"reviewed_unchanged_test_body\": false\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_render_limits.py\",\n      \"physical_lines\": 228,\n      \"definitions\": 11,\n      \"loops\": [\n        42,\n        67,\n        83\n      ],\n      \"reviewed_unchanged_test_body\": false\n    },\n    {\n      \"path\": \"tests/scripts/dev_tools/test_generate_acceptance_scenarios.py\",\n      \"physical_lines\": 488,\n      \"definitions\": 41,\n      \"loops\": [\n        362,\n        353,\n        357\n      ],\n      \"reviewed_unchanged_test_body\": true\n    },\n    {\n      \"path\": \"tests/scripts/dev_tools/test_acceptance_generation_projection.py\",\n      \"physical_lines\": 222,\n      \"definitions\": 4,\n      \"loops\": [],\n      \"reviewed_unchanged_test_body\": false\n    }\n  ],\n  \"retained_units\": [],\n  \"source_or_test_mutation\": false\n}\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-22"
+}

@@ -1,0 +1,137 @@
+"""Close the stopped P5-T5 run without repeating tests or changing its evidence."""
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+RUN_ID = "132232"
+STAGED = set()
+
+
+def sha(data):
+    """Bind original bytes without newline conversion."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Return an exact portable artifact reference."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(raw), "bytes": len(raw)}
+
+
+def save(path, value):
+    """Create an immutable LF UTF-8 evidence view."""
+    assert not path.exists(), path.name
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    STAGED.add(path)
+    return ref(path)
+
+
+def main():
+    """Retain the eight completed commands and four raw coverage streams."""
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate_path = QA / "p5t5-final-candidate-released.2026-10-20T13-22.json"
+    assert sha(candidate_path.read_bytes()) == "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84"
+    candidate = json.loads(candidate_path.read_bytes())
+    STAGED.update((candidate_path, QA / "p5t5-final-release-harness.2026-10-20T13-22.txt"))
+    receipts = []
+    # Preserve exact first-run records; current test repair does not rewrite historical bindings.
+    for label, minute in (
+        ("format", "13-22"), ("lint", "13-22"), ("types", "13-22"), ("static", "13-22"),
+        ("rendering", "13-24"), ("coverage-combine", "13-24"),
+        ("coverage-json", "13-24"), ("coverage-proof", "13-24"),
+    ):
+        path = QA / f"p5t5-final-{label}-{RUN_ID}.2026-10-20T{minute}.json"
+        payload = json.loads(path.read_bytes())
+        assert payload["candidate_sha256"] == sha(candidate_path.read_bytes())
+        assert payload["binding_before"] == payload["binding_after"]
+        assert payload["binding_before"]["changed"] == [] and not payload["timed_out"]
+        assert payload["exit_code"] == (1 if label == "coverage-proof" else 0)
+        archive = ROOT / payload["raw_archive"]["path"]
+        assert sha(archive.read_bytes()) == payload["raw_archive"]["sha256"]
+        STAGED.update((path, path.with_suffix(".md"), archive))
+        receipts.append(dict(ref(path), label=label, seconds=payload["seconds"],
+                             exit_code=payload["exit_code"], raw_archive=payload["raw_archive"]))
+        if label == "rendering":
+            nodes = re.findall(r"^(tests/.+?) PASSED(?:\s|$)", payload["stdout"], re.M)
+            assert nodes == list(reversed(candidate["nodes"]["rendering"])) and len(nodes) == 118
+    # Prepared executable readers remain byte-identical to their already frozen snapshots.
+    for name, record in candidate["harnesses"].items():
+        assert sha((SCRATCH / name).read_bytes()) == record["sha256"]
+        assert sha((ROOT / record["snapshot"]).read_bytes()) == record["sha256"]
+    entries = []
+    # Archive exact databases and JSON, including their original terminal newline state.
+    for label in ("rendering", "combined"):
+        for suffix in (".coverage", "-coverage.json"):
+            path = SCRATCH / f"p5t5-final-{RUN_ID}-{label}{suffix}"
+            raw = path.read_bytes()
+            entries.append({"path": "SCRATCH/" + path.name, "sha256": sha(raw), "bytes": len(raw),
+                            "crlf_count": raw.count(b"\r\n"), "terminal_lf": raw.endswith(b"\n"),
+                            "base64": base64.b64encode(raw).decode("ascii")})
+    archive_ref = save(QA / f"p5t5-final-first-run-coverage-raw.{stamp}.json", {
+        "task": "P5-T5", "run_id": RUN_ID, "entries": entries,
+        "qualification": "Exact raw coverage bytes; databases and JSON need not end with LF. "
+                         "Authored/readable evidence remains a distinct LF UTF-8 representation.",
+    })
+    snapshot = QA / f"p5t5-final-first-run-closure-harness.{stamp}.txt"
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    STAGED.add(snapshot)
+    closure = QA / f"p5t5-final-first-run-closure.{stamp}.json"
+    closure_ref = save(closure, {
+        "task": "P5-T5", "timestamp": stamp, "state": "STOPPED_AT_CALLABLE_COVERAGE_GATE",
+        "Command": "poetry run python SCRATCH/p5t5_retain_first_run.py", "EXIT_CODE": 0,
+        "candidate": ref(candidate_path), "checked_commit": candidate["candidate_commit"],
+        "run_id": RUN_ID, "receipts": receipts, "executed_nodes": nodes, "passed_nodes": 118,
+        "reversed_exact_population": True, "test_seconds": 79.185,
+        "failure": {"module": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+                    "callable": "_trace", "predicate": "coverage.py named-callable line coverage >= 90%",
+                    "receipt": receipts[-1]},
+        "unexecuted": ["four applicable contracts"],
+        "all_run_bindings_unchanged": True, "raw_coverage_archive": archive_ref,
+        "prepared_harnesses": candidate["harnesses"], "closure_harness": ref(snapshot),
+        "retained_proof": candidate["retained_proof"],
+        "qualification": "This closure retains the first run, not the repaired candidate. "
+                         "The 118 passing cases and stopped coverage gate remain historical proof. "
+                         "No source/test edits, coverage-floor changes, behavioral replay or Git operation occurred.",
+    })
+    markdown = closure.with_suffix(".md")
+    markdown.write_text(
+        "# P5-T5 retained first final run\n\n"
+        f"Timestamp: {stamp}\nCommand: poetry run python SCRATCH/p5t5_retain_first_run.py\nEXIT_CODE: 0\n\n"
+        "Format, lint, whole Pyright and scoped static checks passed. All 118 reversed cases passed "
+        "in 79.185 seconds. Coverage combination and JSON export passed; the named-callable line "
+        "coverage gate for `gherkin.py::_trace` failed. Four contracts were not executed.\n\n"
+        "Every executed stage retained unchanged candidate bindings and exact raw command streams. "
+        "The four original coverage streams and prepared reader identities are bound here. "
+        "No behavior was rerun and no source or test was changed by this closure.\n",
+        encoding="utf-8", newline="\n")
+    STAGED.add(markdown)
+    # Hygiene covers readable artifacts while base64 preserves the raw stream conventions.
+    for path in STAGED:
+        raw = path.read_bytes()
+        text = raw.decode("utf-8")
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path.name
+        assert all(line == line.rstrip() for line in text.splitlines()), path.name
+        assert str(ROOT) not in text and ROOT.as_posix() not in text, path.name
+        assert str(SCRATCH) not in text and SCRATCH.as_posix() not in text, path.name
+    staging = QA / f"p5t5-final-first-run-staging.{stamp}.json"
+    staging_ref = save(staging, {
+        "task": "P5-T5", "timestamp": stamp, "closure": closure_ref,
+        "stage_paths": sorted(path.relative_to(ROOT).as_posix() for path in STAGED | {staging}),
+        "bindings": [ref(path) for path in sorted(STAGED)],
+        "self_qualification": "Self is listed; its exact hash is reported externally.",
+    })
+    print(json.dumps({"closure": closure_ref, "staging": staging_ref, "paths": len(STAGED),
+                      "coverage_raw": archive_ref, "behavioral_execution": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()
