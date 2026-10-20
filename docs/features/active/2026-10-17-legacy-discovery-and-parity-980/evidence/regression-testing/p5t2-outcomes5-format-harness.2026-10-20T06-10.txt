@@ -1,0 +1,70 @@
+"""Capture one exact scoped tool invocation with separate raw streams."""
+import base64
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+S = Path(__file__).parent
+label = sys.argv[1]
+command = sys.argv[2:]
+if command[0] == "--":
+    command = command[1:]
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+T = "tests/discovery_runtime/"
+scope = [
+    *(R + name + ".py" for name in ("parity_report", "parity_rules", "parity_entry_rules", "parity_models", "report_models", "validation")),
+    *(T + "test_" + name + ".py" for name in ("parity_report", "parity_rules", "parity_clients", "parity_models", "report_models", "parity_report_projection")),
+    "scripts/dev_tools/discovery/parity_report.py", "tests/scripts/dev_tools/discovery/test_parity_report.py",
+]
+
+
+def hashes():
+    return {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in scope if Path(path).exists()}
+
+
+def safe(text):
+    for path, label in ((str(Path.cwd()), "WORKSPACE"), (str(S), "SCRATCH"), (str(S.resolve()), "SCRATCH")):
+        pattern = r"[\\/]".join(re.escape(part) for part in re.split(r"[\\/]", path))
+        text = re.sub(pattern, label, text, flags=re.I)
+    return text
+
+
+before = hashes()
+started = datetime.now(timezone.utc).isoformat()
+clock = time.perf_counter()
+env = dict(os.environ)
+env["PYTHONIOENCODING"] = "utf-8"
+env["COVERAGE_FILE"] = str(S / (label + ".coverage"))
+result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+elapsed = round(time.perf_counter() - clock, 3)
+now = datetime.now(timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+prefix = F / "evidence/regression-testing" / f"p5t2-{label}.{stamp}"
+harness = F / "evidence/regression-testing" / f"p5t2-{label}-harness.{stamp}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+payload = {
+    "task": "P5-T2", "timestamp_utc": now.isoformat(), "started_at": started,
+    "duration_seconds": elapsed, "command": [safe(value) for value in command],
+    "exit_code": result.returncode, "source_before": before, "source_after": hashes(),
+    "harness": {"path": harness.as_posix(), "sha256": hashlib.sha256(harness.read_bytes()).hexdigest()},
+}
+for stream in ("stdout", "stderr"):
+    raw = getattr(result, stream)
+    (S / f"{label}.{stream}").write_bytes(raw)
+    payload[stream] = {"sha256": hashlib.sha256(raw).hexdigest(), "base64": base64.b64encode(raw).decode()}
+Path(str(prefix) + ".json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+output = safe((result.stdout + result.stderr).decode("utf-8", errors="replace"))
+output = "\n".join(line.rstrip() for line in output.splitlines())
+Path(str(prefix) + ".md").write_text(
+    f"# P5-T2 {label}\n\nTimestamp: {stamp}\n\nCommand: {' '.join(payload['command'])}\n\n"
+    f"EXIT_CODE: {result.returncode}\n\nOutput Summary: Exact scoped stage completed in {elapsed}s; raw bytes are retained in the JSON receipt.\n\n"
+    f"```text\n{output}\n```\n", encoding="utf-8", newline="\n")
+print(json.dumps({"receipt": str(prefix) + ".json", "exit_code": result.returncode, "duration_seconds": elapsed, "tail": output[-1200:]}))
+sys.exit(result.returncode)

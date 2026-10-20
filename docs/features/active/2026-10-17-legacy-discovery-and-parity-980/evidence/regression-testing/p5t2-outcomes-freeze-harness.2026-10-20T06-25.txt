@@ -1,0 +1,291 @@
+"""Preserve the passing outcome slice without rerunning behavior or editing sources."""
+
+import ast
+import base64
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+F = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+E = F / "evidence/regression-testing"
+S = Path(__file__).parent
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+T = "tests/discovery_runtime/"
+OWNED = [
+    R + "parity_models.py",
+    R + "parity_rules.py",
+    R + "parity_entry_rules.py",
+    T + "test_parity_models.py",
+]
+CALLERS = [T + "test_parity_rules.py", T + "test_parity_clients.py"]
+EXPECTED = [
+    "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+    "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+    "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+    "20c411fb2ae13b85546ec432f4bb6f38f8deba2a280c211aad8a0f1f50ca6e42",
+]
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def reference(path):
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def archive(raw):
+    return {"sha256": sha(raw), "base64": base64.b64encode(raw).decode("ascii")}
+
+
+def write_json(path, value):
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8", newline="\n",
+    )
+
+
+def git_bytes(path):
+    return subprocess.check_output(["git", "show", "HEAD:" + path])
+
+
+def normalize_text(raw):
+    return raw.replace(b"\r\n", b"\n")
+
+
+def body(node):
+    statements = node.body
+    if statements and isinstance(statements[0], ast.Expr):
+        value = statements[0].value
+        if isinstance(value, ast.Constant) and isinstance(value.value, str):
+            statements = statements[1:]
+    return ast.dump(ast.Module(body=statements, type_ignores=[]), include_attributes=False)
+
+
+baseline_path = F / "evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json"
+baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+head = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+bindings = {}
+for path, expected in zip(OWNED, EXPECTED, strict=True):
+    raw = Path(path).read_bytes()
+    assert sha(raw) == expected
+    lines = raw.decode("utf-8").splitlines()
+    assert len(lines) <= 500
+    tree = ast.parse(raw)
+    assert all(
+        ast.get_docstring(node)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+    )
+    bindings[path] = {
+        "working_sha256": sha(raw), "physical_lines": len(lines),
+        "working_git_blob": subprocess.check_output(
+            ["git", "hash-object", "--no-filters", path]
+        ).decode().strip(),
+        "attributes": subprocess.check_output(
+            ["git", "check-attr", "text", "eol", "--", path]
+        ).decode().strip().splitlines(),
+    }
+
+preserved = {}
+for path in CALLERS + [R + "parity_target_rules.py"]:
+    raw, committed = Path(path).read_bytes(), git_bytes(path)
+    assert normalize_text(raw) == normalize_text(committed)
+    preserved[path] = {
+        "working_sha256": sha(raw), "head_sha256": sha(committed),
+        "equal_after_crlf_to_lf": True,
+    }
+
+stages = []
+for stage in ("format", "lint", "types", "tests"):
+    path = sorted(E.glob(f"p5t2-outcomes8-{stage}.*.json"))[-1]
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    assert receipt["exit_code"] == 0
+    for source in OWNED + CALLERS:
+        expected = sha(Path(source).read_bytes())
+        assert receipt["source_before"][source] == expected
+        assert receipt["source_after"][source] == expected
+    stages.append({**reference(path), "duration_seconds": receipt["duration_seconds"]})
+
+test_receipt = json.loads(Path(stages[-1]["path"]).read_text(encoding="utf-8"))
+test_stdout = base64.b64decode(test_receipt["stdout"]["base64"]).decode("utf-8")
+assert "91 passed in 11.98s" in test_stdout
+collection_path = sorted(E.glob("p5t2-outcomes8-collection.*.json"))[-1]
+collection = json.loads(collection_path.read_text(encoding="utf-8"))
+collected = base64.b64decode(collection["stdout"]["base64"]).decode("utf-8")
+nodes = [
+    line for line in collected.splitlines()
+    if line.startswith("tests/") and "::" in line
+]
+assert len(nodes) == 91 and len(set(nodes)) == 91
+assert sum(node.startswith(T + "test_parity_models.py::") for node in nodes) == 14
+
+raw_coverage = (S / "outcomes8-coverage.json").read_bytes()
+coverage = json.loads(raw_coverage)
+coverage["files"] = {
+    path.replace("\\", "/"): value for path, value in coverage["files"].items()
+}
+units = []
+for path, data in coverage["files"].items():
+    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        executed = [line for line in data["executed_lines"] if node.lineno <= line <= node.end_lineno]
+        missing = [line for line in data["missing_lines"] if node.lineno <= line <= node.end_lineno]
+        branches = [edge for edge in data["executed_branches"] if node.lineno <= edge[0] <= node.end_lineno]
+        absent = [edge for edge in data["missing_branches"] if node.lineno <= edge[0] <= node.end_lineno]
+        if executed or missing:
+            assert len(executed) / (len(executed) + len(missing)) >= 0.90
+        units.append({
+            "path": path, "name": node.name, "kind": type(node).__name__,
+            "start": node.lineno, "end": node.end_lineno,
+            "executed_lines": executed, "missing_lines": missing,
+            "executed_branches": branches, "missing_branches": absent,
+        })
+
+old_rules = git_bytes(R + "parity_rules.py")
+old_tree = ast.parse(old_rules)
+new_tree = ast.parse(Path(R + "parity_entry_rules.py").read_bytes())
+old_functions = {node.name: node for node in ast.walk(old_tree) if isinstance(node, ast.FunctionDef)}
+new_functions = {node.name: node for node in ast.walk(new_tree) if isinstance(node, ast.FunctionDef)}
+relocated = {}
+for name in ("_declares", "source", "target"):
+    assert body(old_functions[name]) == body(new_functions[name])
+    relocated[name] = {
+        "old_range": [old_functions[name].lineno, old_functions[name].end_lineno],
+        "new_range": [new_functions[name].lineno, new_functions[name].end_lineno],
+        "executable_body_ast_equal": True,
+    }
+
+report_path = R + "report_models.py"
+report_current, report_head = Path(report_path).read_bytes(), git_bytes(report_path)
+current_tree, head_tree = ast.parse(report_current), ast.parse(report_head)
+for tree in (current_tree, head_tree):
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == "DiscoveryReport":
+            for method in node.body:
+                if isinstance(method, ast.FunctionDef) and method.name == "to_markdown":
+                    method.body = [ast.Pass()]
+assert ast.dump(current_tree, include_attributes=False) == ast.dump(head_tree, include_attributes=False)
+assert test_receipt["source_before"][report_path] == test_receipt["source_after"][report_path]
+dependency_qualification = {
+    "path": report_path, "working_sha256": sha(report_current),
+    "head_sha256": sha(report_head),
+    "tested_before_and_after_sha256": test_receipt["source_before"][report_path],
+    "whole_module_ast_equal_except_DiscoveryReport_to_markdown": True,
+    "used_symbols": ["ReportBudget", "ReportLimitError"],
+    "qualification": (
+        "The sibling projection owner changed only DiscoveryReport.to_markdown. "
+        "Both consumed budget/error definitions and all other module code match HEAD. "
+        "This slice never calls the changed renderer, parity_report or validation. "
+        "After this passing run, its owner shortened only a renderer intent comment; "
+        "the tested stream and later working stream are recorded separately."
+    ),
+}
+
+now = datetime.now(timezone.utc)
+stamp = now.strftime("%Y-%m-%dT%H-%M")
+prefix = E / f"p5t2-outcomes-freeze.{stamp}"
+raw_path = E / f"p5t2-outcomes-raw-archive.{stamp}.json"
+coverage_path = E / f"p5t2-outcomes-coverage.{stamp}.json"
+harness_path = E / f"p5t2-outcomes-freeze-harness.{stamp}.txt"
+write_json(raw_path, {
+    "sources": {path: archive(Path(path).read_bytes()) for path in OWNED + CALLERS},
+    "accepted_original_parity_rules": archive(old_rules),
+    "coverage_json": archive(raw_coverage),
+    "coverage_database": archive((S / "outcomes8-tests.coverage").read_bytes()),
+    "initial_failed_population_coverage": archive((S / "outcomes5-coverage.json").read_bytes()),
+    "initial_failed_population_database": archive((S / "outcomes5-tests.coverage").read_bytes()),
+    "initial_binder": archive((S / "freeze_outcomes.before-crlf-fix.py").read_bytes()),
+    "binder_diagnostic": (
+        "AssertionError at freeze_outcomes.py line120: assert len(nodes)==91 and "
+        "len(set(nodes))==91. The original regex omitted the CR before Windows "
+        "line endings. Replaced with splitlines plus exact test-prefix selection; "
+        "source/tests/coverage and raw collection bytes are unchanged."
+    ),
+})
+write_json(coverage_path, coverage)
+harness_path.write_bytes(Path(__file__).read_bytes())
+freeze = {
+    "task": "P5-T2", "status": "OUTCOME_SUBSET_FROZEN_PENDING_INDEPENDENT_REVIEW",
+    "timestamp_utc": now.isoformat(), "head": head, "owned_paths": OWNED,
+    "bindings": bindings, "preserved_callers_and_target_proof": preserved,
+    "baseline": reference(baseline_path),
+    "interface": reference(F / "evidence/other/p5t2-interface-contract.2026-10-20T05-50.json"),
+    "retained_baseline_parity_proof": baseline["retained_parity_proof"],
+    "ordered_stages": stages, "test_count": 91, "retained_cases": 77, "new_cases": 14,
+    "collection_receipt": reference(collection_path), "collected_node_order": nodes,
+    "execution_order": [
+        T + "test_parity_models.py", T + "test_parity_rules.py", T + "test_parity_clients.py"
+    ],
+    "node_qualification": (
+        "The passing quiet run recorded all 91 cases with no skips; exact node IDs "
+        "were collected separately from the same frozen files and module order. "
+        "Per-node timing or verbose executed-name output is not claimed."
+    ),
+    "coverage": reference(coverage_path), "raw_archive": reference(raw_path),
+    "freeze_harness": reference(harness_path), "unit_ranges": units,
+    "relocated_executable_bodies": relocated,
+    "dependency_closure_qualification": dependency_qualification,
+    "coverage_disposition": {
+        "original": "Accepted parity_rules.py 146/146 statements and 73/74 branches; retained baseline receipt is authoritative.",
+        "changed": "Approval, classification, entry orchestration and completeness now retain outcomes and prospective budgets; all original 77 assertions remain exact and pass.",
+        "new": "parity_models 35/35 statements; parity_rules104/104 and38/38 branches; parity_entry_rules137/139 and53/56 branches.",
+        "unchanged": "TargetProof exact accepted body:99/99 statements and48/50 branches, matching accepted coverage.",
+        "uncovered": [
+            {"path": R + "parity_entry_rules.py", "line": 266, "reason": "Defensive row-count guard; public parsed-matrix retention rejects an oversized record population earlier."},
+            {"path": R + "parity_entry_rules.py", "line": 319, "reason": "Direct internal assess misuse guard; public entry routing requires resolved ownership before this call."},
+            {"path": R + "parity_entry_rules.py", "branch": [218, 191], "reason": "Nonselected approved decision loop continuation retained from original approval semantics."},
+            {"path": R + "parity_target_rules.py", "branches": [[101, 98], [157, 164]], "reason": "Unchanged accepted prior branch gaps; not new code."},
+        ],
+        "per_new_or_changed_unit_line_floor": "Every measured class/callable range is at least90%; raw executable lines and branch origins define ranges.",
+    },
+    "limitations": [
+        "Internal carriers do not validate caller authority; only snapshot-backed validators/report builders may establish report facts.",
+        "Complete=False preserves present-claim validation and may retain incomplete outcomes; authored state never substitutes for actual proof.",
+        "Resource exhaustion raises fixed ReportLimitError and returns no partial result.",
+        "Graph projection, validation integration, full final gates and P5-T2 acceptance remain pending.",
+    ],
+    "retained_failures": [
+        "Initial formatting/import/type-style diagnostics are retained in outcomes1 through outcomes4 receipts.",
+        "outcomes5 retains78 passing cases and9 fixture-import setup errors with exact raw diagnostics/coverage.",
+        "outcomes7 lint retains the test-only ParseLimits import-placement diagnostic; corrected before outcomes8.",
+    ],
+}
+write_json(Path(str(prefix) + ".json"), freeze)
+Path(str(prefix) + ".md").write_text(
+    f"# P5-T2 retained parity outcome freeze\n\nTimestamp: {stamp}\n\n"
+    "Command: poetry run python SCRATCH/freeze_outcomes.py\n\nEXIT_CODE: 0\n\n"
+    "Output Summary: Black, Ruff and scoped Pyright passed; 91 scoped cases passed "
+    "in 11.98 seconds (13.745 seconds harness), preserving all 77 existing cases.\n\n"
+    "The three runtime modules and one new test module are frozen. Carriers cover 35/35 "
+    "statements; main rules 104/104 statements and 38/38 branches; extracted entry rules "
+    "137/139 statements and 53/56 branches. Every measured class/callable exceeds the 90% "
+    "line floor. Two defensive guard statements remain unexecuted and are identified "
+    "in the manifest; unchanged TargetProof retains its accepted 99/99 and 48/50 proof.\n\n"
+    "The manifest binds exact source bytes, original diagnostics, ordered receipts, "
+    "raw/portable coverage and the accepted baseline. The sibling Markdown heading "
+    "change does not affect consumed ReportBudget or ReportLimitError definitions. "
+    "Only the outcome subset is ready for independent review; graph integration and "
+    "full task acceptance remain pending.\n",
+    encoding="utf-8", newline="\n",
+)
+stage_path = E / f"p5t2-outcomes-stage-paths.{stamp}.json"
+evidence = {path.as_posix() for path in E.glob("p5t2-outcomes*")}
+write_json(stage_path, {
+    "task": "P5-T2", "freeze": reference(Path(str(prefix) + ".json")),
+    "paths": sorted(set(OWNED) | evidence | {stage_path.as_posix()}),
+    "qualification": (
+        "Parent unions the independent review closure. Existing callers are unchanged "
+        "and are not staged. No projection, report_models or validation draft is included."
+    ),
+})
+print(json.dumps({
+    "freeze": reference(Path(str(prefix) + ".json")),
+    "stage_paths": reference(stage_path), "source_bindings": bindings,
+    "test_count": 91, "unit_ranges": len(units),
+}))

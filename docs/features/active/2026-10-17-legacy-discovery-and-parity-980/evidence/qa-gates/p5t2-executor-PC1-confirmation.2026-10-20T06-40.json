@@ -1,0 +1,140 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:40:02.692846+00:00",
+  "status": "READY_FOR_CHECKED_OUTCOME_WIP",
+  "route": "atomic_execution_p5t2_PC1_confirmation_20261020",
+  "head_at_confirmation": "2b069afb0d88ae1a3c17ef10f7a52c3936800462",
+  "retained_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.json",
+    "sha256": "d4df4cf955d5843124a01bd1d8bbe01b0f495e7150311686f463317a0ada8c4a",
+    "bytes": 10844
+  },
+  "outcome_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-freeze.2026-10-20T06-33.json",
+    "sha256": "57e5489513c8a7706ac294a023f398da5b959839a7ffd294214a0e1429a6fdde",
+    "bytes": 48389
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-stage-paths.2026-10-20T06-33.json",
+    "sha256": "b7d7a25e3a0222e2c6c063a701edbea75e321ce15d6989e64eb1354891e3c632",
+    "bytes": 12014
+  },
+  "original_outcome_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-freeze.2026-10-20T06-25.json",
+    "sha256": "5bf765cd3e16f77beb9e86ad58555b5e50c045d43c00e8ea36de5f922c45f0a0"
+  },
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-PC1-confirmation.2026-10-20T06-40-payload.json",
+    "sha256": "59f51d6fcd066287afdb98fcf2b3fb22eac3bb99c6f8f025b3455a018f8ae966",
+    "bytes": 260456
+  },
+  "confirmed_source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "original_sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "working_sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "30ee78c6db720a54bc9b758800681ef7f506893815bc6befafbc6950abd6383b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "original_sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "working_sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "physical_lines": 345,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "489b87f0249395689964d667cf836f4918dbfbfe07e7e8d21aaabab78acc1901"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "original_sha256": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9",
+      "working_sha256": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+      "physical_lines": 473,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "2d361328f71b5f8cb15e135b427a8d02ab7048beb8a7a01d84fd9af1763cd10c"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_models.py",
+      "original_sha256": "20c411fb2ae13b85546ec432f4bb6f38f8deba2a280c211aad8a0f1f50ca6e42",
+      "working_sha256": "cf3a2f855ce3eb0088a20a6da16c4236b28c1ef96cd1ff85ad4d4aa44023b477",
+      "physical_lines": 330,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "734201f2e85629fbe6e274d059eccaa30c2b3341170ea13a440f0f113781eee1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "original_sha256": "861e081226208f90a2f42a8be96d055ba60f5941f7a4d4b66b9c2ec9a5112ff7",
+      "working_sha256": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02",
+      "physical_lines": 498,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "dc0e328ae82620bce70a4c82b822c41df3ec964cf63df574739e3040d1e55f3f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_parity_report_projection.py",
+      "original_sha256": "a6d3a178bc9a20af966f0fb4b03d7a7e8f951dac35020215ca077c5238e2b1fb",
+      "working_sha256": "98fa71fe6a366e5975f1090b2bf8deab8dbe6e752cf6e37c32c8889ae5125033",
+      "physical_lines": 295,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "a7bd9ed2329adc7bd71d9863c2a0267b1bec1c8376dfa88568124ec9e763a063"
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "original_sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "working_sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4",
+      "physical_lines": 476,
+      "executable_ast_equal": true,
+      "executable_ast_sha256": "65e7ccfc72926e7b0b1fec746ca1b8374a8c6b40938d7f173c6d60d73af38f64"
+    }
+  ],
+  "PC1": {
+    "status": "CLOSED",
+    "scope": "Only the finite original approval, test/fake and validation.complete contracts plus the two projection branch-intent comments.",
+    "result": "Typed inputs/returns and effects now meet the named rule; docstring-stripped executable AST, assertions and decorators remain identical across all seven paths.",
+    "integration_status": "SOURCE_ONLY_PC1_CONFIRMED; first 25-case integration proof remains pending. Integration source/test files are excluded from this checkpoint."
+  },
+  "verified": {
+    "ordered_gates": [
+      "Black",
+      "Ruff",
+      "scoped Pyright",
+      "Pytest"
+    ],
+    "tests": 91,
+    "retained_cases": 77,
+    "new_outcome_cases": 14,
+    "pytest_seconds": 11.94,
+    "test_harness_seconds": 13.966,
+    "new_changed_statements": "276/278",
+    "new_changed_branches": "91/94",
+    "with_unchanged_TargetProof_statements": "375/377",
+    "with_unchanged_TargetProof_branches": "139/144",
+    "measured_ranges": 26,
+    "range_line_threshold": "All >=90%; exact executed/missing counts unchanged.",
+    "verbose_execution_order_matches_original_collection": true,
+    "raw_stream_archive_hashes_and_readable_transform": true,
+    "committed_outcome_dependency_closure": true
+  },
+  "findings": [],
+  "open_probes": [],
+  "qualifications": [
+    "Original review and semantic conclusions are reused. This reconciliation executed no tests or behavioral probes.",
+    "The new 91-case run repeats the same 77 accepted parity callers and 14 outcome cases; it is not an additional distinct population.",
+    "The two defensive entry-rule statement gaps, three entry branch destinations and two unchanged TargetProof branch gaps remain explicit in the frozen coverage.",
+    "AST ranges use raw executed/missing lines and branch origins, not incompatible coverage.py function denominators.",
+    "Raw embedded streams and coverage retain their SHA identities. Readable output normalizes workspace/scratch paths, line endings and trailing whitespace; coverage file keys normalize separators only.",
+    "Committed report_models supplies the consumed ReportBudget/ReportLimitError APIs. Current renderer changes are excluded from this checkpoint and are not required by outcome imports; the remaining module AST matches committed HEAD.",
+    "Earlier failure, relocated-body and collection-binder qualifications remain in the original owner closure. Preserved CRLF working streams have separate committed LF identities.",
+    "The integration PC1 receipt is retained losslessly inside this payload as source-only evidence; its owner files and pending graph/integration proof are excluded from the outcome staging union."
+  ],
+  "remaining": "P5-T2 graph projection, 25 affected integration cases, native composition and final ordered task gates remain pending.",
+  "plan_count": "42/84",
+  "source_AC_count": "17/66",
+  "task_checked": false,
+  "next_five_pending_tasks": [
+    "P5-T2",
+    "P5-T3",
+    "P5-T4",
+    "P5-T5",
+    "P6-T1"
+  ]
+}

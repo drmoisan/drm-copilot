@@ -1,0 +1,28 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T06:27:08.802974+00:00",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27-payload.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27-staging.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.json",
+      "sha256": "d4df4cf955d5843124a01bd1d8bbe01b0f495e7150311686f463317a0ada8c4a",
+      "bytes": 10844
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27.md",
+      "sha256": "a8b4d38b614a3bd7efc62b717c135da10739c147077933fc43d23144ae7295de",
+      "bytes": 1500
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-outcome-integration-review.2026-10-20T06-27-payload.json",
+      "sha256": "1df182023109ed4f44c2e1b5759df651f1907f533ae5b8649ef0d7bfcf6c9861",
+      "bytes": 149353
+    }
+  ],
+  "qualification": "Only new review artifacts; exact original source bytes are archived, source/test files remain owner-managed. Self hash is returned separately."
+}

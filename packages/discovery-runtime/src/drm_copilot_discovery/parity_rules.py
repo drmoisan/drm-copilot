@@ -1,9 +1,8 @@
-"""Check pinned source-to-target claims without promoting authored summaries."""
+"""Check pinned parity and retain outcomes independently of authored summaries."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from itertools import product
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from drm_copilot_discovery.claim_rules import ClaimContext
@@ -16,10 +15,18 @@ from drm_copilot_discovery.dimension_rules import (
 )
 from drm_copilot_discovery.evidence_rules import validate_evidence
 from drm_copilot_discovery.models import JsonObject
+from drm_copilot_discovery.parity_entry_rules import ParityEntryRules
+from drm_copilot_discovery.parity_models import (
+    ParityDimensionOutcome,
+)
+from drm_copilot_discovery.parity_models import (
+    ParityValidation as ParityValidation,
+)
 from drm_copilot_discovery.parity_target_rules import TargetProof
 from drm_copilot_discovery.reference_links import string_value
 from drm_copilot_discovery.references import index_references
-from drm_copilot_discovery.revision_rules import is_full_revision, validate_revisions
+from drm_copilot_discovery.report_models import ReportBudget
+from drm_copilot_discovery.revision_rules import validate_revisions
 from drm_copilot_discovery.runtime_claim_rules import has_text
 
 if TYPE_CHECKING:
@@ -29,31 +36,20 @@ if TYPE_CHECKING:
         FeatureObligation,
     )
     from drm_copilot_discovery.evidence_rules import EvidenceValidation
-    from drm_copilot_discovery.findings import Finding
     from drm_copilot_discovery.references import ArtifactRecord, ReferenceIndex
     from drm_copilot_discovery.repository_reader import RepositoryIdentity
     from drm_copilot_discovery.revision_rules import RevisionValidation
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
 
 
-@dataclass(frozen=True)
-class ParityValidation:
-    """Return bounded parity findings without granting aggregate completion."""
-
-    findings: tuple[Finding, ...]
-
-
-def _declares(matrix: ArtifactRecord, name: str, identity: RepositoryIdentity) -> bool:
-    """Require matrix role declarations to include the actual row identity."""
-    # Matrix role headers authorize only explicitly declared immutable identities.
-    return any(
-        row.get("id") == identity.id and row.get("revision") == identity.revision
-        for _, row in object_rows(matrix.document.get(name))
-    )
-
-
 class _ParityRules:
-    """Evaluate entries using existing graph, evidence and requirement assessments."""
+    """Check every authored classification using the accepted proof services.
+
+    Construct per assessment, then pass classifications to ParityEntryRules.
+    Outcomes record actual disposition/proof/conflict decisions independently
+    from bounded findings. Only private budgets and the caller's finding
+    collector mutate; there is no I/O, execution or policy approval.
+    """
 
     def __init__(
         self,
@@ -61,129 +57,16 @@ class _ParityRules:
         context: ClaimContext,
         proof: TargetProof,
         decisions: DecisionValidation,
-        dimensions: DimensionValidation,
-        *,
-        complete: bool,
     ) -> None:
-        """Keep per-call state private; reuse each immutable input assessment."""
-        self.snapshot, self.context, self.proof = snapshot, context, proof
-        self.decisions, self.dimensions, self.complete = decisions, dimensions, complete
-        self.seen: set[tuple[ArtifactRecord, str]] = set()
+        """Retain snapshot/context/proof/decisions; return None without I/O.
 
-    def source(
-        self, matrix: ArtifactRecord, row: JsonObject, pointer: str
-    ) -> ArtifactRecord | None:
-        """Resolve immutable source identity before considering any target status."""
-        field = pointer + "/source_contract_ref"
-        targets = self.context.targets(matrix, field)
-        source = targets[0] if len(targets) == 1 else None
-        if (
-            source is None
-            or source.kind != "feature-contract"
-            or source.document.get("feature_id") != row.get("feature_id")
-            or self.proof.blocked(matrix, field)
-            or not _declares(matrix, "source_repositories", source.artifact.repository)
-        ):
-            self.context.add(
-                "PARITY_SOURCE",
-                matrix,
-                field,
-                "Parity requires one source contract at its exact pin/hash.",
-            )
-            return None
-        return source
-
-    def target(
-        self, matrix: ArtifactRecord, row: JsonObject, pointer: str
-    ) -> RepositoryIdentity | None:
-        """Require the configured client's target pin and its matrix declaration."""
-        value = row.get("target_repository")
-        client = next(
-            (
-                item
-                for item in self.snapshot.profile.clients
-                if item.id == row.get("client_id")
-            ),
-            None,
-        )
-        if (
-            isinstance(value, JsonObject)
-            and client is not None
-            and is_full_revision(value.get("revision"))
-        ):
-            # Client assignment and target-role pin must both agree.
-            for target in self.proof.targets:
-                if (
-                    target.id == client.target_repository == value.get("id")
-                    and target.revision == value.get("revision")
-                    and _declares(matrix, "target_repositories", target)
-                ):
-                    return target
-        self.context.add(
-            "PARITY_TARGET",
-            matrix,
-            pointer + "/target_repository",
-            "Parity target must match its configured client and pin.",
-        )
-        return None
-
-    def approval(
-        self,
-        matrix: ArtifactRecord,
-        row: JsonObject,
-        pointer: str,
-        obligation: FeatureObligation,
-    ) -> bool:
-        """Retain current scoped changes/retirement without rewriting source facts."""
-        state, feature = row.get("parity_state"), obligation.feature
-        retired = state == "retired"
-        field = pointer + (
-            "/retirement_decision_ref" if retired else "/intentional_deviation_refs"
-        )
-        linked = self.context.targets(matrix, field)
-        selected: list[ArtifactRecord] = []
-        # Only current scoped approvals can authorize changes or whole retirement.
-        for item in self.decisions.approved:
-            request = decision_scope(
-                feature,
-                client_id=obligation.client_id,
-                platforms=(
-                    obligation.requirements.platforms
-                    if retired
-                    else tuple(item.scope.selectors[1])
-                ),
-                modes=(
-                    obligation.requirements.modes
-                    if retired
-                    else tuple(item.scope.selectors[2])
-                ),
-                dimensions=() if retired else tuple(item.scope.selectors[3]),
-            )
-            applicable = item.scope.covers(request)
-            # Changes can affect a subset; retirement must cover every required axis.
-            if not retired:
-                # Reject policies scoped exclusively to unrelated target contexts.
-                for selected_values, required_values in (
-                    (item.scope.selectors[1], obligation.requirements.platforms),
-                    (item.scope.selectors[2], obligation.requirements.modes),
-                ):
-                    applicable = applicable and (
-                        not selected_values
-                        or bool(selected_values.intersection(required_values))
-                    )
-            if item.record in linked and applicable:
-                selected.append(item.record)
-        valid = bool(selected) and len(selected) == len(
-            self.context.links(matrix, field)
-        )
-        if not valid:
-            self.context.add(
-                "PARITY_DECISION",
-                matrix,
-                field,
-                "Changed/retired parity needs current scoped approval.",
-            )
-        return valid
+        Types are DiscoverySnapshot, ClaimContext, TargetProof and
+        DecisionValidation respectively. They supply limits, resolved references,
+        independent target proof and current scoped approvals. ReportLimitError
+        aborts later work before an excess allocation; no inputs are changed.
+        """
+        self.context, self.proof, self.decisions = context, proof, decisions
+        self.budget = ReportBudget(snapshot.profile.limits.parse_limits())
 
     def classifications(
         self,
@@ -192,33 +75,64 @@ class _ParityRules:
         pointer: str,
         obligation: FeatureObligation,
         target: RepositoryIdentity,
-        *,
         required: bool,
-    ) -> frozenset[str]:
-        """Check every classification, including both fixed-mode representations."""
+    ) -> tuple[frozenset[str], tuple[ParityDimensionOutcome, ...], bool]:
+        """Check matrix/row/pointer and retain dimension outcomes.
+
+        matrix (ArtifactRecord), row (JsonObject) and pointer (str) identify
+        captured claims. obligation (FeatureObligation) supplies inherited axes,
+        target (RepositoryIdentity) supplies ownership, and required (bool)
+        requests completed proof. Returns (waived names, outcomes, validity).
+        Raises ReportLimitError before excess work; adds established diagnostics
+        without I/O or caller mutation.
+        """
         dimensions = row.get("dimensions")
-        values = dict(dimensions.items()) if isinstance(dimensions, JsonObject) else {}
-        # Preserve both representations so neither can hide invalid supplied proof.
-        fields = [
-            (name, value, pointer + "/dimensions/" + name)
-            for name, value in values.items()
-        ]
-        # Duplicate classifications must agree regardless of completion mode.
+        size = len(dimensions) if isinstance(dimensions, JsonObject) else 0
+        requirements = obligation.requirements
+        local_links = len(
+            self.context.by_source.get((matrix.artifact.path, matrix.pointer), ())
+        )
+        self.budget.work(
+            4 * (size + 3)
+            + len(requirements.dimensions)
+            + len(requirements.modes)
+            + len(requirements.platforms)
+            + (size + 3)
+            * (1 + local_links)
+            * (
+                len(self.context.index.links)
+                + len(self.decisions.approved)
+                + len(self.context.evidence.assessments)
+            )
+        )
+        values = dict(dimensions.members) if isinstance(dimensions, JsonObject) else {}
+        # Retain both representations so neither can hide invalid supplied proof.
+        fields: list[tuple[str, object, str]] = []
+        # Reserve repeated pointer text before allocating a joined location.
+        for name, value in values.items():
+            self.budget.text(pointer)
+            self.budget.text(name)
+            self.budget.spend(12)
+            fields.append((name, value, pointer + "/dimensions/" + name))
+        conflicts: set[str] = set()
+        # Explicit and nested fixed modes must agree in either validation mode.
         for mode in ("online", "offline", "mobile"):
             direct, nested = row.get(mode), values.get(mode)
             if isinstance(direct, JsonObject):
                 fields.append((mode, direct, pointer + "/" + mode))
-                if isinstance(nested, JsonObject) and any(
+                # These two authored values define classification consistency.
+                inconsistent = isinstance(nested, JsonObject) and any(
                     direct.get(key) != nested.get(key)
                     for key in ("applicability", "verification")
-                ):
+                )
+                if inconsistent:
+                    conflicts.add(mode)
                     self.context.add(
                         "PARITY_MODE_CONFLICT",
                         matrix,
                         pointer + "/" + mode,
                         "Explicit and nested mode classifications disagree.",
                     )
-        requirements = obligation.requirements
         names = (
             set(requirements.dimensions)
             | (set(requirements.modes) & {"online", "offline", "mobile"})
@@ -226,14 +140,15 @@ class _ParityRules:
         )
         present: set[str] = set()
         waived: set[str] = set()
-        # Optional claims stay truthful without creating required verification.
+        outcomes: list[ParityDimensionOutcome] = []
+        # Optional supplied claims remain truthful without inventing obligations.
         for name, value, location in fields:
             if not isinstance(value, JsonObject):
                 continue
             present.add(name)
-            applicability, verification = value.get("applicability"), value.get(
-                "verification"
-            )
+            applicability = string_value(value.get("applicability"))
+            verification = string_value(value.get("verification"))
+            disposition_valid = True
             if applicability == "not-applicable":
                 approval = covering_decisions(
                     self.context,
@@ -248,7 +163,10 @@ class _ParityRules:
                         dimensions=(name,),
                     ),
                 )
-                if has_text(value.get("rationale")) and (name not in names or approval):
+                disposition_valid = has_text(value.get("rationale")) and (
+                    name not in names or bool(approval)
+                )
+                if disposition_valid:
                     waived.add(name)
                 else:
                     self.context.add(
@@ -257,37 +175,59 @@ class _ParityRules:
                         location,
                         "Required exclusions need rationale and covering approval.",
                     )
-            if verification in ("passed", "failed") and not self.proof.evidence(
-                matrix,
-                location + "/evidence_refs",
-                target,
-                obligation.client_id or "",
-                sources=(obligation.feature,),
-                mode=name if name in {"online", "offline"} else None,
-                platform=(
-                    "mobile"
-                    if name == "mobile" and "mobile" in requirements.platforms
-                    else None
-                ),
-            ):
-                self.context.add(
-                    "PARITY_DIMENSION_PROOF",
+            proof_valid: bool | None = None
+            if verification in ("passed", "failed"):
+                proof_valid = self.proof.evidence(
                     matrix,
-                    location,
-                    "Dimension results need independent contextual target proof.",
+                    location + "/evidence_refs",
+                    target,
+                    obligation.client_id or "",
+                    sources=(obligation.feature,),
+                    mode=name if name in {"online", "offline"} else None,
+                    platform=(
+                        "mobile"
+                        if name == "mobile" and "mobile" in requirements.platforms
+                        else None
+                    ),
                 )
-            if (
+                if not proof_valid:
+                    self.context.add(
+                        "PARITY_DIMENSION_PROOF",
+                        matrix,
+                        location,
+                        "Dimension results need independent contextual target proof.",
+                    )
+            required_valid = not (
                 required
                 and name in names
                 and name not in waived
                 and (applicability != "applicable" or verification != "passed")
-            ):
+            )
+            if not required_valid:
                 self.context.add(
                     "PARITY_DIMENSION",
                     matrix,
                     location,
                     "Required dimensions need passing proof or approved exclusion.",
                 )
+            outcomes.append(
+                ParityDimensionOutcome(
+                    name=name,
+                    pointer=location,
+                    required=name in names,
+                    applicability=applicability,
+                    verification=verification,
+                    disposition_valid=disposition_valid,
+                    proof_valid=proof_valid,
+                    consistent=name not in conflicts,
+                    valid=(
+                        disposition_valid
+                        and proof_valid is not False
+                        and required_valid
+                        and name not in conflicts
+                    ),
+                )
+            )
         if required and names - present:
             self.context.add(
                 "PARITY_DIMENSION",
@@ -295,136 +235,24 @@ class _ParityRules:
                 pointer + "/dimensions",
                 "Required target classifications are absent.",
             )
-        return frozenset(waived)
-
-    def entry(self, matrix: ArtifactRecord, position: int, row: JsonObject) -> None:
-        """Separate honest incomplete states from unsupported full/approved claims."""
-        pointer = f"/entries/{position}"
-        source, target = self.source(matrix, row, pointer), self.target(
-            matrix, row, pointer
-        )
-        client = string_value(row.get("client_id"))
-        if source is None or target is None or client is None:
-            return
-        key = source, client
-        if key in self.seen:
-            self.context.add(
-                "PARITY_DUPLICATE",
-                matrix,
-                pointer,
-                "A source feature/client has multiple parity entries.",
+        # Missing required axes stay unresolved; absent optional axes are not required.
+        for name in sorted((names | {"online", "offline", "mobile"}) - present):
+            outcomes.append(
+                ParityDimensionOutcome(
+                    name=name,
+                    pointer=pointer + "/dimensions",
+                    required=name in names,
+                    applicability=None if name in names else "not-required",
+                    verification=None,
+                    disposition_valid=True,
+                    proof_valid=None,
+                    consistent=True,
+                    valid=not (required and name in names),
+                )
             )
-        self.seen.add(key)
-        obligation = next(
-            (
-                item
-                for item in self.dimensions.obligations
-                if item.feature == source and item.client_id == client
-            ),
-            None,
-        )
-        if obligation is None:
-            self.context.add(
-                "PARITY_REQUIREMENTS",
-                matrix,
-                pointer,
-                "The source feature/client lacks resolved requirement context.",
-            )
-            return
-        state = row.get("parity_state")
-        approved = (
-            self.approval(matrix, row, pointer, obligation)
-            if state in ("intentionally-changed", "retired")
-            else False
-        )
-        required = (
-            state == "full"
-            or self.complete
-            and obligation.required
-            and state == "intentionally-changed"
-        )
-        waived = self.classifications(
-            matrix, row, pointer, obligation, target, required=required
-        )
-        implementations = self.proof.links(matrix, pointer, source, target, client)
-        # Retirement waives implementation completion, never false present claims.
-        if state == "retired" and approved:
-            return
-        if state in ("full", "partial") or required:
-            if not implementations or not self.proof.evidence(
-                matrix,
-                pointer + "/evidence_refs",
-                target,
-                client,
-                sources=(source,),
-                execution=required,
-            ):
-                self.context.add(
-                    "PARITY_PROOF",
-                    matrix,
-                    pointer,
-                    "Parity claims need independently evidenced target implementation.",
-                )
-        if required:
-            # Linked components all contribute to the claimed implementation.
-            if any(
-                record.document.get("verification_state") != "passed"
-                for record in implementations
-            ):
-                self.context.add(
-                    "PARITY_VERIFICATION",
-                    matrix,
-                    pointer,
-                    "Every linked implementation needs passing verification.",
-                )
-            if row.get("blockers") or row.get("validation_status") != "pass":
-                self.context.add(
-                    "PARITY_STATE",
-                    matrix,
-                    pointer,
-                    "Completed parity needs no blockers and passing validation.",
-                )
-            platforms = set(obligation.requirements.platforms) - waived
-            modes = set(obligation.requirements.modes) - waived
-            # Passing components may divide coordinates but cannot omit any axis.
-            for platform, mode in product(sorted(platforms) or (None,), sorted(modes)):
-                if not any(
-                    self.proof.coordinate(record, platform, mode)
-                    for record in implementations
-                ):
-                    self.context.add(
-                        "PARITY_VERIFICATION",
-                        matrix,
-                        pointer,
-                        f"Missing target proof: {client}/{platform}/{mode}.",
-                    )
-        if (
-            self.complete
-            and obligation.required
-            and state not in ("full", "intentionally-changed", "retired")
-        ):
-            self.context.add(
-                "PARITY_INCOMPLETE",
-                matrix,
-                pointer,
-                "Required parity remains unassessed, partial, missing or conflicting.",
-            )
-
-    def required_entries(self) -> None:
-        """Account for every required feature/client without inferring empty success."""
-        # Optional features do not become mandatory through their mere presence.
-        for obligation in self.dimensions.obligations:
-            if (
-                obligation.required
-                and obligation.client_id is not None
-                and (obligation.feature, obligation.client_id) not in self.seen
-            ):
-                self.context.add(
-                    "PARITY_MISSING",
-                    obligation.feature,
-                    "",
-                    f"Required feature lacks parity for client {obligation.client_id}.",
-                )
+        # Retained checks survive diagnostic truncation independently.
+        valid = all(item.valid for item in outcomes)
+        return frozenset(waived), tuple(outcomes), valid
 
 
 def validate_parity(
@@ -439,8 +267,13 @@ def validate_parity(
 ) -> ParityValidation:
     """Validate present parity truth and optionally required target completeness.
 
-    Discovery and acceptance prerequisites remain separate rule-family results
-    for the later mode composer. This operation performs no I/O or source edits.
+    snapshot (DiscoverySnapshot) holds captured inputs; complete (bool) enables
+    required checks. Optional index (ReferenceIndex), evidence
+    (EvidenceValidation), revisions (RevisionValidation), decisions
+    (DecisionValidation) and dimensions (DimensionValidation) reuse accepted
+    assessments from the same snapshot. Returns ParityValidation with bounded
+    findings and immutable outcomes. ReportLimitError rejects excess retained
+    work; no I/O, source edits, execution or aggregate readiness is authorized.
     """
     index = index if index is not None else index_references(snapshot)
     evidence = (
@@ -463,23 +296,50 @@ def validate_parity(
             snapshot, index=index, evidence=evidence, decisions=decisions
         )
     )
+    budget = ReportBudget(snapshot.profile.limits.parse_limits())
+    budget.work(len(index.records) + len(index.links))
+    # Bound captured row/identifier storage before adding retained result carriers.
+    for record in index.records:
+        if record.kind == "parity-matrix":
+            budget.check(record.document)
     context = ClaimContext(
         index, evidence, snapshot.profile.limits.parse_limits().findings
     )
-    rules = _ParityRules(
+    proof = TargetProof(snapshot, context, revisions)
+    classifications = _ParityRules(snapshot, context, proof, decisions)
+    upstream = (
+        index.findings
+        + evidence.findings
+        + revisions.findings
+        + decisions.findings
+        + dimensions.findings
+    )
+    budget.work(len(upstream))
+    # Truncated upstream diagnostics cannot establish usable proof authority.
+    truncated = any(item.code == "FINDINGS_LIMIT" for item in upstream)
+    entries = ParityEntryRules(
         snapshot,
         context,
-        TargetProof(snapshot, context, revisions),
+        proof,
         decisions,
         dimensions,
+        classifications.classifications,
         complete=complete,
+        truncated=truncated,
     )
-    # Every matrix contributes to one deterministic snapshot accounting set.
+    # Every matrix contributes to one deterministic source/client accounting set.
     for matrix in index.records:
         if matrix.kind == "parity-matrix":
-            # Retain original array positions for actionable diagnostics.
+            # Preserve original array positions for actionable evidence locations.
             for position, row in object_rows(matrix.document.get("entries")):
-                rules.entry(matrix, position, row)
-    if complete:
-        rules.required_entries()
-    return ParityValidation(context.collector.findings)
+                entries.entry(matrix, position, row)
+    outcomes = entries.finish()
+    findings = context.collector.findings
+    # Exhaustion of our own diagnostic budget likewise cannot imply validity.
+    if any(item.code == "FINDINGS_LIMIT" for item in findings):
+        budget.work(len(outcomes))
+        # Preserve failed checks while conservatively removing truncated authority.
+        outcomes = tuple(
+            replace(item, valid=False, complete=False) for item in outcomes
+        )
+    return ParityValidation(findings, outcomes)
