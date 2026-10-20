@@ -1,0 +1,169 @@
+"""Reconcile fresh scoped coverage and separately retained exact-body proof."""
+
+import ast
+import datetime
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+from final_static import definitions, executable
+
+
+def sha(data):
+    """Return an exact-byte SHA-256 binding."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def read_bound(reference):
+    """Read a canonical evidence file only when its frozen bytes match."""
+    data = Path(reference["path"]).read_bytes()
+    assert sha(data) == reference["sha256"], reference["path"]
+    result = json.loads(data)
+    # Some frozen owners embed their unmodified raw report in a qualified receipt.
+    for key in reference.get("selector", []):
+        result = result[key]
+    return result
+
+
+def source(reference):
+    """Read the immutable committed source named by retained coverage evidence."""
+    data = subprocess.run(["git", "show", reference["source_ref"] + ":" + reference["path"]],
+                          capture_output=True, check=True).stdout
+    assert sha(data) == reference["source_sha256"], reference["path"]
+    return data
+
+
+def covered_file(document, path):
+    """Select a measured module after normalizing only Windows path separators."""
+    files = {name.replace("\\", "/"): data for name, data in document["files"].items()}
+    return files[path]
+
+
+def retained_mapping(record, current_source):
+    """Map only equivalent unchanged bodies, keeping old counters separately named."""
+    old_source = source(record)
+    old = definitions(ast.parse(old_source))[record["name"]]
+    new = definitions(ast.parse(current_source))[record["name"]]
+    assert executable(old) == executable(new), (record["path"], record["name"])
+    old_lines, new_lines = old_source.decode("utf-8").splitlines(), current_source.decode("utf-8").splitlines()
+    line_map = {old.lineno: new.lineno}
+    matcher = difflib.SequenceMatcher(a=old_lines[old.lineno - 1:old.end_lineno],
+                                     b=new_lines[new.lineno - 1:new.end_lineno], autojunk=False)
+    # Exact source-line matches are valid only within the independently equal AST body.
+    for operation, left, right, start, end in matcher.get_opcodes():
+        if operation == "equal":
+            line_map.update({old.lineno + a: new.lineno + b for a, b in zip(range(left, right), range(start, end))})
+    measured = covered_file(read_bound(record["coverage"]), record["path"])
+    lines = {line_map[line] for line in measured["executed_lines"]
+             if old.lineno <= line <= old.end_lineno and line in line_map}
+    arcs = set()
+    # A branch qualification requires both endpoint identities, including exit anchors.
+    for left, right in measured["executed_branches"]:
+        if old.lineno <= left <= old.end_lineno and abs(left) in line_map and abs(right) in line_map:
+            arcs.add((line_map[abs(left)] * (-1 if left < 0 else 1),
+                      line_map[abs(right)] * (-1 if right < 0 else 1)))
+    return lines, arcs, {"path": record["path"], "name": record["name"],
+                         "source_ref": record["source_ref"], "coverage": record["coverage"],
+                         "mapped_previously_executed_lines": sorted(lines),
+                         "mapped_previously_executed_branches": sorted(arcs),
+                         "raw_counters_augmented": False}
+
+
+def main():
+    """Enforce exact focused deltas and per-unit floors without rewriting raw data."""
+    manifest_path, coverage_path, result_path = map(Path, sys.argv[1:])
+    manifest = json.loads(manifest_path.read_bytes())
+    if manifest.get("execution_released") is not True:
+        raise SystemExit("Coverage gate requires the final release")
+    raw = coverage_path.read_bytes()
+    measured = json.loads(raw)
+    files = {name.replace("\\", "/"): value for name, value in measured["files"].items()}
+    assert set(files) == set(manifest["production"]), (sorted(files), manifest["production"])
+    ranges, deltas, qualifications, summaries = [], [], [], []
+    # Each fresh measured module retains its focused proof on the same reviewed bytes.
+    for path, data in files.items():
+        current_source = Path(path).read_bytes()
+        assert sha(current_source) == manifest["bindings"][path], path
+        fresh_lines = set(data["executed_lines"])
+        fresh_arcs = set(map(tuple, data["executed_branches"]))
+        prior_lines, prior_arcs, prior_refs = set(), set(), []
+        for prior in manifest["current_coverage_proofs"]:
+            if path not in prior["source_bindings"]:
+                continue
+            assert prior["source_bindings"][path] == sha(current_source), (path, "focused source drift")
+            old = covered_file(read_bound(prior["coverage"]), path)
+            prior_lines.update(old["executed_lines"])
+            prior_arcs.update(map(tuple, old["executed_branches"]))
+            prior_refs.append(prior["coverage"])
+        assert prior_refs, (path, "No exact-byte focused baseline")
+        lost_lines, lost_arcs = prior_lines - fresh_lines, prior_arcs - fresh_arcs
+        assert not lost_lines and not lost_arcs, (path, sorted(lost_lines), sorted(lost_arcs))
+        qualified_lines, qualified_arcs = set(), set()
+        for record in manifest["retained_units"]:
+            if record["path"] == path:
+                lines, arcs, qualification = retained_mapping(record, current_source)
+                qualified_lines.update(lines)
+                qualified_arcs.update(arcs)
+                qualifications.append(qualification)
+        all_lines = fresh_lines | set(data["missing_lines"])
+        all_arcs = fresh_arcs | set(map(tuple, data["missing_branches"]))
+        proof_lines = fresh_lines | (qualified_lines & all_lines)
+        proof_arcs = fresh_arcs | (qualified_arcs & all_arcs)
+        assert not all_lines or len(proof_lines) / len(all_lines) >= .9, (path, "module line floor")
+        assert not all_arcs or len(proof_arcs) / len(all_arcs) >= .75, (path, "module branch floor")
+        deltas.append({"path": path, "focused_proofs": prior_refs,
+                       "lost_previously_executed_lines": sorted(lost_lines),
+                       "lost_previously_executed_branches": sorted(lost_arcs)})
+        summaries.append({"path": path, "current_raw_summary": data["summary"],
+                          "separately_qualified_lines": sorted(qualified_lines - fresh_lines),
+                          "separately_qualified_branches": sorted(qualified_arcs - fresh_arcs),
+                          "proof_statement_total": len(all_lines), "proof_covered_statements": len(proof_lines),
+                          "proof_branch_total": len(all_arcs), "proof_covered_branches": len(proof_arcs),
+                          "remaining_unproved_lines": sorted(all_lines - proof_lines),
+                          "remaining_unproved_branches": sorted(all_arcs - proof_arcs)})
+        # Raw AST ranges remain distinct from coverage.py named body denominators.
+        for name, node in definitions(ast.parse(current_source)).items():
+            unit_lines = {line for line in all_lines if node.lineno <= line <= node.end_lineno}
+            unit_arcs = {arc for arc in all_arcs if node.lineno <= arc[0] <= node.end_lineno}
+            raw_executed = unit_lines & fresh_lines
+            effective = unit_lines & proof_lines
+            assert not unit_lines or len(effective) / len(unit_lines) >= .9, (path, name, "raw AST line floor")
+            family = "classes" if isinstance(node, ast.ClassDef) else "functions"
+            named = data.get(family, {}).get(name)
+            if named and named["summary"]["num_statements"]:
+                named_lines = set(named["executed_lines"]) | set(named["missing_lines"])
+                assert len(named_lines & proof_lines) / len(named_lines) >= .9, (path, name, "named line floor")
+            ranges.append({"path": path, "name": name, "kind": family, "start": node.lineno, "end": node.end_lineno,
+                           "current_raw_executed_lines": sorted(raw_executed),
+                           "current_raw_missing_lines": sorted(unit_lines - fresh_lines),
+                           "current_raw_executed_branches": sorted(unit_arcs & fresh_arcs),
+                           "current_raw_missing_branches": sorted(unit_arcs - fresh_arcs),
+                           "retained_unchanged_body_covered_lines": sorted((unit_lines & qualified_lines) - fresh_lines),
+                           "coverage_named_summary": named["summary"] if named else None,
+                           "remaining_unproved_lines": sorted(unit_lines - proof_lines),
+                           "remaining_unproved_branches": sorted(unit_arcs - proof_arcs)})
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+    combined_path = qa / ("p5t2-final-current-coverage." + stamp + ".json")
+    ranges_path = qa / ("p5t2-final-coverage-ranges." + stamp + ".json")
+    # Portable path spelling does not combine, manufacture, or change coverage counters.
+    measured["files"] = files
+    for destination, document in ((combined_path, measured), (ranges_path, {
+        "ranges": ranges, "modules": summaries, "deltas": deltas, "qualifications": qualifications,
+        "raw_coverage_sha256": sha(raw), "convention": manifest["coverage_convention"],
+    })):
+        assert not destination.exists(), destination
+        destination.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    result = {"current_coverage": {"path": combined_path.as_posix(), "sha256": sha(combined_path.read_bytes())},
+              "coverage_ranges": {"path": ranges_path.as_posix(), "sha256": sha(ranges_path.read_bytes())},
+              "range_count": len(ranges), "module_count": len(files),
+              "qualified_prior_proof_count": len(qualifications), "current_raw_counters_augmented": False}
+    result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,226 @@
+{
+  "task": "P5-T2",
+  "timestamp_utc": "2026-10-20T08:31:14.369750+00:00",
+  "status": "ACCEPTED",
+  "handoff_signal": "READY_FOR_ACCEPTANCE_COMMIT",
+  "route": "atomic_execution_p5t2_final_acceptance_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority_rechecked": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "routing": true,
+    "launch": true,
+    "provenance": true
+  },
+  "candidate_commit": "ff09cf47094f3212c831fbaf1d45e2ddbac8d46e",
+  "candidate": {
+    "bytes": 61872,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-candidate.2026-10-20T08-03.json",
+    "sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073"
+  },
+  "retained_independent_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-candidate-ready.2026-10-20T07-21.json",
+    "sha256": "defe2e6db240ef825c34b41db6ccf09afb2190cc187402ed1c947f1d3cf90827"
+  },
+  "owner_handoff": {
+    "bytes": 64104,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-handoff.2026-10-20T08-12.json",
+    "sha256": "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347"
+  },
+  "owner_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-closure.2026-10-20T08-15.json",
+    "sha256": "668919afc7931b25cbcd8fb388c2da8198e685cdbc17cecf8dc1131966d2f5f0"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-staging.2026-10-20T08-15.json",
+    "sha256": "238fff7750368d8d4ea579d085c87b58deb3c5270e7ca06142503c217b7afb1c"
+  },
+  "preparation_closure": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation-final-coverage-harness.2026-10-20T07-04.txt",
+      "sha256": "913aed49e1dbd1ff8276242d19167d42bb60ab59cb173313d45871c658697126",
+      "bytes": 10221
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation-final-gates-harness.2026-10-20T07-04.txt",
+      "sha256": "abe99d4f1b767eedf41ff455e5d052424b70d144dd1e69e808b95fd2b195cbda",
+      "bytes": 14558
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation-final-static-harness.2026-10-20T07-04.txt",
+      "sha256": "8b447f7c4f567e8073709c3858b168d78b162bc14a5371c2715e448be9a4608e",
+      "bytes": 4896
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation-normalization.2026-10-20T07-04.json",
+      "sha256": "58f317a916458230daa879244dd6414c36adcad299f5f7f642120f407e013e1c",
+      "bytes": 56090
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation-prepare-final-harness.2026-10-20T07-04.txt",
+      "sha256": "fecbbd261b706c16e222e98c08b1e232cafe329b8613d5d3554cff30108ed2b6",
+      "bytes": 12022
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation.2026-10-20T07-04.json",
+      "sha256": "5a541fe2225c24bf4772d107d352a142cd0718de25da2b5f66450472b6619357",
+      "bytes": 29625
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation.2026-10-20T07-04.md",
+      "sha256": "abc834f2506ef1ed148492a05247482be7f1274063085d253cf6b06ab5f83f74",
+      "bytes": 1103
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-reader-hygiene.2026-10-20T07-18.json",
+      "sha256": "48d885859dc2a182a48bbcb804b7a1506a2bc2f83a109c22d2577b63e92b9505",
+      "bytes": 3212
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-reader-hygiene.2026-10-20T07-18.md",
+      "sha256": "20f139136065a0ea4497faf900dcbdc493ba559dc0b1854487772f32864401ab",
+      "bytes": 586
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-composition-harness.2026-10-20T06-22.txt",
+      "sha256": "56d90ff04c11f44b1bf1f2f980bf6ac50c602818d73463bc90b9e8e9bdbde0a8",
+      "bytes": 13807
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-fixture-harness.2026-10-20T06-22.txt",
+      "sha256": "4455e60c7b99d607d84477d8af2cd73c477cd29c63930ecccebafdbcfe80356e",
+      "bytes": 9623
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-preparation.2026-10-20T06-22.json",
+      "sha256": "10eebf1a2675266f349a479ad0925b84f198611d96385e95e48da6fb5888ae82",
+      "bytes": 26969
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-preparation.2026-10-20T06-22.md",
+      "sha256": "47ba7b63279960f03f24b8ce0e959387dac96b683d4796c92d6de603db725f68",
+      "bytes": 1135
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-qualification-harness.2026-10-20T06-22.txt",
+      "sha256": "7501ba001f3f5824016526ef21de17791e8ef1f37acece504ded778639fd2443",
+      "bytes": 13429
+    }
+  ],
+  "reconciliation_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-executor-final-acceptance.2026-10-20T08-31-payload.json",
+    "sha256": "ff053e844d0f820fce09a7ab8063382ab491c5801096de4925805f6ed38a57b6",
+    "bytes": 237265
+  },
+  "verification": {
+    "commands": "Retained ordered Black --check, Ruff check, whole-repository Pyright, static checks, native composition, reverse outcome/graph/integration Pytest, coverage reconciliation and four contract cases.",
+    "task_cases": 175,
+    "batches": {
+      "outcomes": 91,
+      "graph": 58,
+      "integration": 26
+    },
+    "contract_cases": 4,
+    "native_checks": {
+      "candidate_identity": 24,
+      "expected_metrics": 16,
+      "total": 75
+    },
+    "native_other_checks": 35,
+    "native_scope": "Actual bounded Windows/Git capture, guarded publication, recapture, idempotency, grant and stale-state rejection; 24 identities and 16 metric checks are included in 75 total.",
+    "source_test_dependency_bindings": 24,
+    "harness_bindings": 5,
+    "raw_streams_decoded": 50,
+    "coverage_modules": 8,
+    "coverage_ranges": 70,
+    "retained_body_qualifications": 27,
+    "current_raw_coverage": {
+      "covered_lines": 817,
+      "num_statements": 877,
+      "covered_branches": 285,
+      "num_branches": 328
+    },
+    "current_plus_separate_qualified_proof": {
+      "proof_covered_statements": 875,
+      "proof_statement_total": 877,
+      "proof_covered_branches": 318,
+      "proof_branch_total": 328
+    },
+    "raw_counters_augmented": false,
+    "unproved_lines": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": [
+        268,
+        321
+      ]
+    },
+    "lost_previously_covered_lines_or_branches": [],
+    "source_or_test_edits_during_acceptance": [],
+    "behavioral_reruns_during_acceptance": []
+  },
+  "task_acceptance_mapping": [
+    {
+      "criterion": "Canonical parity totals per unique feature, feature-client obligation, authored entry and configured client.",
+      "evidence": "Retained candidate review and final 91 outcome plus 58 graph cases; actual native report metric assertions."
+    },
+    {
+      "criterion": "Every blocking finding remains explicit; authored states and verification counters do not imply evidence-backed completion.",
+      "evidence": "Closed GR1/GR2 and PC1 reviews, exact final outcome/graph populations and 26 integration controls."
+    },
+    {
+      "criterion": "Undeclared optional online/offline/mobile dimensions are not-required; invalid or unavailable authority does not become passed or a fabricated zero.",
+      "evidence": "Final graph/integration cases and native optional-axis/null-percentage assertions."
+    }
+  ],
+  "interface_handoff": [
+    "Runtime parity report production uses retained authoritative outcomes and source-scope ownership; requested validation mode remains distinct from parity-complete assessment.",
+    "Markdown/JSON output is derived, bounded and nonrecursive. The native fixture publishes through existing mutation authority and recomputes after recapture.",
+    "Legacy helper/adapter44 proof and outcome91 review remain reusable. Completion report and later CLI/service integration are pending tasks."
+  ],
+  "qualifications": [
+    "Current raw coverage is 817/877 statements and 285/328 branches. Separate exact-body proof gives 875/877 and 318/328; it does not modify raw counters or claim new repository-wide coverage.",
+    "The original helper, outcome, graph and integration failures and prior reader/normalization qualifications remain immutable in the referenced committed evidence.",
+    "Local reconciliation initially used the inherited short TEMP spelling. Path.resolve and samefile verified DANMOI~1 and DanMoisan identify the same existing runner scratch root; only that comparison spelling was corrected.",
+    "A second local reader compared actual reversed execution to forward prepared IDs. The runner explicitly reverses each batch; all 175 raw IDs exactly match that order and the immutable handoff. Both original checker diagnostics and scripts are retained.",
+    "Raw stream newline conventions and coverage file-key separators remain exact in archives. Readable paths, CRLF presentation and Git LF-normalized identities are qualified separately.",
+    "The synthetic native fixture intentionally reports failed/incomplete parity honestly; successful guarded publication does not promote its semantic parity result."
+  ],
+  "plan_checkoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "before_sha256": "7146ae60bd87fb7f3eff011137b3066fce27d7be312466b2ce108399d05d4eb8",
+    "after_sha256": "4b9d2e591dcd5a244637850e24e196d37f143107bfd9e7dede31b01a537f259e",
+    "change": "Only [P5-T2] unchecked to checked; all existing CRLF bytes retained."
+  },
+  "plan_status": {
+    "checked": 43,
+    "total": 84
+  },
+  "source_ACs": {
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+      "sha256": "6cfbda32f4569ea599e2a337f39cb19dbe76a141eff9e18dc4866132e18e3743",
+      "checked": 17,
+      "total": 66,
+      "AC23": "Markdown and JSON reports are generated."
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+      "sha256": "9e4fee44ba97836140c1ad4a5edc40480bb719b288825b29db7d76e1e33d32b0",
+      "checked": 17,
+      "total": 66,
+      "AC23": "Markdown and JSON reports are generated."
+    }
+  },
+  "source_AC_changes": [],
+  "AC23_disposition": "PARTIAL: coverage and parity reports delivered; completion-report task P5-T3 remains pending. Both source AC23 checkboxes stay unchecked.",
+  "limitations": [
+    "Installed coding-agent-host and non-Windows execution remain unverified.",
+    "Completion reports and later CLI/service tasks are pending; no full-feature acceptance is claimed."
+  ],
+  "findings": [],
+  "open_probes": [],
+  "next_five_tasks": [
+    "P5-T3",
+    "P5-T4",
+    "P5-T5",
+    "P6-T1",
+    "P6-T2"
+  ]
+}

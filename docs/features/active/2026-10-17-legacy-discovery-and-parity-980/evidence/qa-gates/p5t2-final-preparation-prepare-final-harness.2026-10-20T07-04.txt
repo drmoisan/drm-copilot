@@ -1,0 +1,157 @@
+"""Preserve a preparation-only final runner and exact historical node references."""
+
+import ast
+import base64
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import re
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+REGRESSION = FEATURE / "evidence/regression-testing"
+
+
+def bound(path, expected):
+    """Read one immutable prior receipt only when its exact recorded digest matches."""
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == expected, path
+    return json.loads(raw), {"path": path.as_posix(), "sha256": expected}
+
+
+def save_json(path, payload):
+    """Write a new canonical LF UTF-8 document with no replacement or blank padding."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+outcomes, outcome_ref = bound(REGRESSION / "p5t2-outcomes-pc1-freeze.2026-10-20T06-33.json",
+                            "57e5489513c8a7706ac294a023f398da5b959839a7ffd294214a0e1429a6fdde")
+integration, integration_ref = bound(REGRESSION / "p5t2-projection-final-freeze.2026-10-20T06-50.json",
+                                    "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d")
+graph, graph_ref = bound(REGRESSION / "p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+                        "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7")
+native, native_ref = bound(QA / "p5t2-native-preparation.2026-10-20T06-22.json",
+                          "10eebf1a2675266f349a479ad0925b84f198611d96385e95e48da6fb5888ae82")
+helper, helper_ref = bound(REGRESSION / "p5t2-helper-freeze.2026-10-20T06-00.json",
+                          "4a795e13b1b6b746e4664e7928fa6a971c3401a9b6d0ce83e9b5f6a3bccaee6a")
+normalization = json.loads((SCRATCH / "final-preparation-normalization.json").read_bytes())
+changed = next(item for item in normalization["entries"] if item["name"] == "final_coverage.py")
+assert ast.dump(ast.parse(base64.b64decode(changed["original_base64"]))) == ast.dump(ast.parse((SCRATCH / "final_coverage.py").read_bytes()))
+normalization["verified_correction"] = "One extra terminal blank line removed from final_coverage.py; all four original scripts had zero CR bytes; executable AST unchanged."
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+normalization_path = QA / ("p5t2-final-preparation-normalization." + stamp + ".json")
+save_json(normalization_path, normalization)
+nodes = {"outcomes": outcomes["executed_nodes"], "graph_before_repair": graph["executed_nodes"],
+         "integration": integration["final_population"]}
+assert [len(nodes[name]) for name in nodes] == [91, 36, 26]
+flattened = [node for values in nodes.values() for node in values]
+assert len(flattened) == len(set(flattened)) == 153
+harnesses = []
+# Parsing these inert runner files checks syntax only; no task module is imported.
+for name in ("final_gates.py", "final_static.py", "final_coverage.py", "prepare_final.py"):
+    path = SCRATCH / name
+    raw = path.read_bytes()
+    ast.parse(raw)
+    assert len(raw.splitlines()) <= 500, name
+    assert b"\r" not in raw and not raw.endswith(b"\n\n"), name
+    assert all(not line.rstrip(b"\n").endswith((b" ", b"\t")) for line in raw.splitlines(keepends=True)), name
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    snapshot = QA / ("p5t2-final-preparation-" + path.stem.replace("_", "-") + "-harness." + stamp + ".txt")
+    assert not snapshot.exists(), snapshot
+    snapshot.write_bytes(raw)
+    harnesses.append({"runtime_path": "SCRATCH/" + name, "path": snapshot.as_posix(),
+                      "sha256": hashlib.sha256(raw).hexdigest(), "physical_lines": len(raw.splitlines())})
+contracts = [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+]
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+payload = {
+    "task": "P5-T2", "timestamp": stamp, "state": "PREPARATION_ONLY_FINAL_BINDINGS_PENDING",
+    "execution_released": False, "production_or_test_mutations": False, "behavioral_commands_executed": [],
+    "route": "inventory_analyzers_p5t2_final_preparation_20261020",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+    "retained_references": {"outcomes": outcome_ref, "graph_before_repair": graph_ref,
+                            "integration": integration_ref, "native": native_ref, "helper": helper_ref},
+    "historical_nodes": nodes, "historical_counts": {name: len(value) for name, value in nodes.items()},
+    "historical_union_count": len(flattened), "historical_union_disjoint": True,
+    "announced_repaired_counts_pending_freeze": {"outcomes": 91, "graph": 58, "integration": 26, "total": 175},
+    "node_qualification": "Graph nodes remain historical until the authorized GR1/GR2 repair freeze. Only that explicit final freeze may extend this population.",
+    "harnesses": harnesses,
+    "preparation_checker_correction": {"path": normalization_path.as_posix(),
+                                       "sha256": hashlib.sha256(normalization_path.read_bytes()).hexdigest(),
+                                       "behavior_rerun_required": False},
+    "ordered_commands": [
+        "python -m black --check <exact final task source/test paths>",
+        "python -m ruff check <same exact paths>",
+        "python -m pyright",
+        "python SCRATCH/final_static.py <released candidate>",
+        "python NATIVE_SCRATCH/issue-980-p5t2-native-composition.py <retained fixture descriptor> <new result> --release <bound native release>",
+        "python -m pytest -v -o addopts= -p no:cacheprovider <reversed exact outcome nodes> <eight coverage modules> --cov-branch",
+        "python -m pytest -v -o addopts= -p no:cacheprovider <reversed exact final graph nodes> <same coverage modules> --cov-branch",
+        "python -m pytest -v -o addopts= -p no:cacheprovider <reversed exact integration nodes> <same coverage modules> --cov-branch",
+        "python -m coverage combine --keep <three independent databases>; coverage JSON; final_coverage.py",
+        "python -m pytest -v -o addopts= -p no:cacheprovider --no-cov <four exact contracts>",
+    ],
+    "coverage_targets": ["drm_copilot_discovery." + name for name in (
+        "parity_models", "parity_rules", "parity_entry_rules", "parity_target_rules",
+        "parity_report", "parity_metrics", "report_models", "validation")],
+    "coverage_policy": {
+        "current": "Preserve exact raw counters; compare fresh combined coverage to every matching final focused proof.",
+        "retained": "Reference helper44, unchanged ReportBudget/helper114 and unchanged validator bodies only after exact executable-AST identity and line/branch-origin mapping.",
+        "thresholds": "Each module/class/callable at least90% statement coverage; touched module branches at least75%; no lost previously covered behavior; separately named prior proof never alters raw JSON.",
+        "qualification": "Task-level proof, not a new repository-wide coverage measurement or feature acceptance.",
+    },
+    "contracts": contracts,
+    "timeouts_seconds": {"types": 300, "native": 600, "outcomes": 180, "graph": 240, "integration": 660, "contracts": 180},
+    "timeout_basis": "Prior outcomes11.94s; graph19.459s; integration25-case287.44s plus bounded two-case36.83s. Native has repeated real capture/assessment/publication with a finite600s ceiling.",
+    "progress": "20-second child progress; per-node completion and last node; bounded waits; exact stdout/stderr/progress archives persisted before failure propagation.",
+    "native": {
+        "harness_path": "NATIVE_SCRATCH/issue-980-p5t2-native-composition.py",
+        "harness_sha256": "56d90ff04c11f44b1bf1f2f980bf6ac50c602818d73463bc90b9e8e9bdbde0a8",
+        "fixture_receipt": "NATIVE_SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83.json",
+        "fixture_receipt_sha256": "c7106cf2a33beede99453ff8475c2c0bbf8b06295b2e573277b19eb824664273",
+        "expected_metrics_pending_final_producer_confirmation": native["expected_metrics_pending_producer_freeze"],
+        "release_fields": native["release_fields"],
+        "placement": "First test-stage regression proof immediately after clean format/lint/types/static.",
+    },
+    "required_release": [
+        "Explicit parent final execution authorization and closed complete graph review/repair confirmation.",
+        "Final graph source/test freeze, exact node population including only authorized regressions, raw coverage and named range mappings.",
+        "Exact source/test/dependency/harness bindings, complete reviewed code scope, native metric confirmation and release file.",
+        "Committed candidate/staging state required by tracked quality contracts; no new source hashes are inferred from historical observations.",
+        "Final current-focus coverage references plus retained body references and accepted prior line/branch mappings.",
+    ],
+    "limitations": ["No final gates, native publication, new test run or acceptance checkoff was performed in this preparation.",
+                    "Real Windows/Git fixture does not establish installed coding-agent-host or non-Windows execution.",
+                    "No successor implementation, CLI delivery or consumer repository is included."],
+}
+draft = SCRATCH / ("p5t2-final-preparation." + stamp + ".json")
+save_json(draft, payload)
+canonical = QA / draft.name
+save_json(canonical, payload)
+text = (f"# P5-T2 final gate preparation\n\nTimestamp: {stamp}\n"
+        "Command: `python SCRATCH/prepare_final.py` (receipt assembly and inert AST syntax parsing only)\n"
+        "EXIT_CODE: 0\n"
+        "Output Summary: Runner prepared; no source/test changes and no behavioral execution.\n\n"
+        "The historical disjoint population is 91 outcome + 36 graph + 26 integration = 153 nodes. The coordinator reports 22 required graph repair regressions, for a provisional 175 nodes. The graph repair freeze must provide and bind the final node list.\n\n"
+        "Order: format, lint, whole-repository types, exact-scope static checks, native capture/derive/guarded publication/recapture, three reversed isolated batches with coverage, and four applicable contracts.\n\n"
+        "The runner retains raw streams and exact before/after bindings, reports progress every20seconds, and stops on failure or source drift. Unchanged helper and validator proof remains separately qualified by executable AST; raw coverage is never augmented.\n\n"
+        "Release is pending the final graph repair/review, exact frozen bindings and confirmed native metric pointers. No completion claim is made.\n")
+canonical.with_suffix(".md").write_text(text.replace("every20seconds", "every 20 seconds"),
+                                       encoding="utf-8", newline="\n")
+# Validate readable evidence bytes without executing any final gate.
+for path in (canonical, canonical.with_suffix(".md")):
+    raw = path.read_bytes()
+    assert b"\r" not in raw and not raw.endswith(b"\n\n")
+    assert not re.search(rb"[ \t]+\r?$", raw, re.M), path
+    assert str(SCRATCH).encode() not in raw and str(ROOT).encode() not in raw, path
+print(json.dumps({"path": canonical.as_posix(), "sha256": hashlib.sha256(canonical.read_bytes()).hexdigest(),
+                  "historical_nodes": 153, "harness_count": len(harnesses), "execution_released": False}))

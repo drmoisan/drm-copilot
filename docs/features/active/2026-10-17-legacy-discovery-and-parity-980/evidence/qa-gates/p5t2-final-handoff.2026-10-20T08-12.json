@@ -1,0 +1,1243 @@
+{
+  "batches": [
+    {
+      "coverage": "SCRATCH/p5t2-final-080331-outcomes-coverage.json",
+      "coverage_sha256": "dd405d7362e8619060c594d8cb83fe4b82fc7bb292f49f9eb4a6ba9dbc666767",
+      "label": "outcomes",
+      "nodes": [
+        "tests/discovery_runtime/test_parity_clients.py::test_target_proof_helpers_reject_invalid_direct_context",
+        "tests/discovery_runtime/test_parity_clients.py::test_reused_assessments_and_artifact_order_have_identical_findings",
+        "tests/discovery_runtime/test_parity_clients.py::test_imported_historical_source_is_resolved_at_its_own_pin",
+        "tests/discovery_runtime/test_parity_clients.py::test_combined_repository_source_test_proof_is_not_target_execution[True]",
+        "tests/discovery_runtime/test_parity_clients.py::test_combined_repository_source_test_proof_is_not_target_execution[False]",
+        "tests/discovery_runtime/test_parity_clients.py::test_each_configured_client_has_an_independent_required_row",
+        "tests/discovery_runtime/test_parity_clients.py::test_passing_tests_cannot_cover_an_unrelated_coordinate[platforms-value1]",
+        "tests/discovery_runtime/test_parity_clients.py::test_passing_tests_cannot_cover_an_unrelated_coordinate[modes-value0]",
+        "tests/discovery_runtime/test_parity_clients.py::test_mobile_dimension_uses_configured_portable_platform",
+        "tests/discovery_runtime/test_parity_clients.py::test_required_nonapplicability_needs_explicit_scoped_waiver[False]",
+        "tests/discovery_runtime/test_parity_clients.py::test_required_nonapplicability_needs_explicit_scoped_waiver[True]",
+        "tests/discovery_runtime/test_parity_clients.py::test_retirement_does_not_hide_present_false_mode_claims[proof]",
+        "tests/discovery_runtime/test_parity_clients.py::test_retirement_does_not_hide_present_false_mode_claims[conflict]",
+        "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[False-retired]",
+        "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[False-intentionally-changed]",
+        "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[True-retired]",
+        "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[True-intentionally-changed]",
+        "tests/discovery_runtime/test_parity_clients.py::test_required_dimension_cannot_be_absent_or_unverified[False]",
+        "tests/discovery_runtime/test_parity_clients.py::test_required_dimension_cannot_be_absent_or_unverified[True]",
+        "tests/discovery_runtime/test_parity_clients.py::test_matching_duplicate_online_classifications_are_valid",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-mobile]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-offline]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-online]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-mobile]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-offline]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-online]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-mobile]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-offline]",
+        "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-online]",
+        "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[unassessed]",
+        "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[conflicting]",
+        "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[missing]",
+        "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[partial]",
+        "tests/discovery_runtime/test_parity_rules.py::test_non_evidence_source_links_do_not_disqualify_independent_target_capture",
+        "tests/discovery_runtime/test_parity_rules.py::test_wrong_target_revision_and_malformed_dimension_fail_without_exceptions",
+        "tests/discovery_runtime/test_parity_rules.py::test_capture_context_must_match_the_required_coordinate[browser-offline]",
+        "tests/discovery_runtime/test_parity_rules.py::test_capture_context_must_match_the_required_coordinate[other-online]",
+        "tests/discovery_runtime/test_parity_rules.py::test_one_passing_test_cannot_hide_an_explicit_failed_test",
+        "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[test_source2]",
+        "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[test_source1]",
+        "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[None]",
+        "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[Unavailable in the captured environment.-not-applicable]",
+        "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[Unavailable in the captured environment.-blocked]",
+        "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[None-not-applicable]",
+        "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[None-blocked]",
+        "tests/discovery_runtime/test_parity_rules.py::test_duplicate_entries_and_missing_required_entries_are_not_complete",
+        "tests/discovery_runtime/test_parity_rules.py::test_full_result_cannot_hide_explicit_blockers[validation_status-fail]",
+        "tests/discovery_runtime/test_parity_rules.py::test_full_result_cannot_hide_explicit_blockers[blockers-value0]",
+        "tests/discovery_runtime/test_parity_rules.py::test_passing_component_cannot_mask_another_linked_incomplete_component[not-run]",
+        "tests/discovery_runtime/test_parity_rules.py::test_passing_component_cannot_mask_another_linked_incomplete_component[failed]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[test_references-value5]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[verification_state-failed]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[feature_refs-value3]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[implementation_paths-value2]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[target_repository-None]",
+        "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[client_id-absent]",
+        "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[decision]",
+        "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[inventory]",
+        "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[documentation]",
+        "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[source]",
+        "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[environment-value4]",
+        "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[repository-foreign]",
+        "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[revision-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]",
+        "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[path-None]",
+        "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[checksum-value0]",
+        "tests/discovery_runtime/test_parity_rules.py::test_entry_requires_configured_target_identity[client_id-absent]",
+        "tests/discovery_runtime/test_parity_rules.py::test_entry_requires_configured_target_identity[target_repository-value0]",
+        "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[conflicting]",
+        "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[missing]",
+        "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[partial]",
+        "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[unassessed]",
+        "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[artifact_path-missing.json]",
+        "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[repository_id-foreign]",
+        "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[feature_id-absent]",
+        "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[revision-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]",
+        "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[artifact_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+        "tests/discovery_runtime/test_parity_rules.py::test_full_parity_uses_target_proof_and_preserves_snapshot",
+        "tests/discovery_runtime/test_parity_models.py::test_aggregate_entry_work_is_reserved_before_source_resolution",
+        "tests/discovery_runtime/test_parity_models.py::test_retained_input_budget_rejects_before_target_proof_construction[document_bytes]",
+        "tests/discovery_runtime/test_parity_models.py::test_retained_input_budget_rejects_before_target_proof_construction[artifact_records]",
+        "tests/discovery_runtime/test_parity_models.py::test_own_diagnostic_truncation_invalidates_an_otherwise_completed_row",
+        "tests/discovery_runtime/test_parity_models.py::test_missing_target_proof_is_retained_even_when_authored_state_is_full",
+        "tests/discovery_runtime/test_parity_models.py::test_upstream_findings_truncation_cannot_certify_complete_parity",
+        "tests/discovery_runtime/test_parity_models.py::test_invalid_source_preserves_an_invalid_authored_row",
+        "tests/discovery_runtime/test_parity_models.py::test_every_duplicate_row_is_excluded_from_validated_completion",
+        "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[conflicting]",
+        "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[partial]",
+        "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[unassessed]",
+        "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[missing]",
+        "tests/discovery_runtime/test_parity_models.py::test_completed_outcome_keeps_authored_state_and_actual_proof_distinct",
+        "tests/discovery_runtime/test_parity_models.py::test_existing_findings_constructor_and_reexport_preserve_identity"
+      ]
+    },
+    {
+      "coverage": "SCRATCH/p5t2-final-080331-graph-coverage.json",
+      "coverage_sha256": "b7f905f6efe6acd311f12085d052710de29d006655e982ce7ce44c73ae26c3f5",
+      "label": "graph",
+      "nodes": [
+        "tests/discovery_runtime/test_parity_report.py::test_axis_output_budget_rejects_before_processing_remaining_rows",
+        "tests/discovery_runtime/test_parity_report.py::test_graph_work_rejects_before_retaining_entry_locations",
+        "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[authored\\n# misleading-coverage]",
+        "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[coverage-report-coverage]",
+        "tests/discovery_runtime/test_report_models.py::test_heading_uses_only_closed_artifact_kind[parity-report-parity]",
+        "tests/discovery_runtime/test_parity_report.py::test_public_builder_reuses_complete_projection_with_independent_root_mode",
+        "tests/discovery_runtime/test_parity_report.py::test_graph_preflight_reserves_input_before_projection",
+        "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[1]",
+        "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[value1]",
+        "tests/discovery_runtime/test_parity_report.py::test_graph_entrypoints_reject_non_snapshot_inputs[None]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes2]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes1]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_present_optional_or_contradictory_claims_remain_independent[changes0]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_confirmed_empty_scope_has_real_zeros_and_null_percentages",
+        "tests/discovery_runtime/test_parity_metrics.py::test_missing_source_authority_is_unavailable_not_zero[inventory-snapshot]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_missing_source_authority_is_unavailable_not_zero[coverage-ledger]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_all_authored_blockers_preserve_row_location",
+        "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[superseded-0]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[rejected-0]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[approved-1]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[blocked-1]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_current_unresolved_decisions_exclude_historical_proposals[proposed-1]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_multiple_clients_do_not_multiply_source_feature_identity",
+        "tests/discovery_runtime/test_parity_metrics.py::test_duplicate_rows_are_all_invalid_and_count_one_missing_completion",
+        "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[feature_id-absent]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[artifact_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_invalid_source_stays_visible_without_verified_numerator[repository_id-wrong]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[retired]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[intentionally-changed]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[conflicting]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[missing]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[partial]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_authored_states_do_not_imply_approved_completion[unassessed]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_undeclared_optional_axis_is_not_required_and_never_passed[mobile]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_undeclared_optional_axis_is_not_required_and_never_passed[offline]",
+        "tests/discovery_runtime/test_parity_metrics.py::test_verified_full_parity_keeps_four_population_units",
+        "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[64]",
+        "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[32]",
+        "tests/discovery_runtime/test_parity_axes.py::test_custom_mode_membership_has_prospective_linear_work[8]",
+        "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[retained]",
+        "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[applicability]",
+        "tests/discovery_runtime/test_parity_axes.py::test_conflicting_representations_never_select_an_authored_status[verification]",
+        "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[not-run]",
+        "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[blocked]",
+        "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[failed]",
+        "tests/discovery_runtime/test_parity_axes.py::test_client_aggregation_retains_authored_state_after_actual_assessment[passed]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-mobile]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-offline]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[not-run-online]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-mobile]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-offline]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[blocked-online]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-mobile]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-offline]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[failed-online]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-mobile]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-offline]",
+        "tests/discovery_runtime/test_parity_axes.py::test_consistent_authored_state_counts_once_without_verified_proof[passed-online]"
+      ]
+    },
+    {
+      "coverage": "SCRATCH/p5t2-final-080331-integration-coverage.json",
+      "coverage_sha256": "2b6b0f4183152652fb8c09d8062d8742e9030688f4c48f9736d80a9292664713",
+      "label": "integration",
+      "nodes": [
+        "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[completion-report-initialized-root]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[loader]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[missing-profile]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-True]",
+        "tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-False]",
+        "tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[agent-output]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_unsupported_parity_report_modes_remain_errors[automatic]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_parity_preflight_rejects_excess_before_graph_work",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_multiple_derived_reports_reuse_one_complete_assessment",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_findings]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity_result]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_authored_parity_fields_cannot_override_recomputed_output[parity]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[artifact]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[loader]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_invalid_core_reports_unavailable_but_never_valid_output[missing-profile]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-True]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[planning-False]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-True]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[parity-complete-False]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-True]",
+        "tests/discovery_runtime/test_parity_report_projection.py::test_requested_mode_and_independent_parity_results[structural-False]"
+      ]
+    }
+  ],
+  "bindings": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "contracts": [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+  ],
+  "coverage": {
+    "coverage_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-ranges.2026-10-20T08-12.json",
+      "sha256": "b99e911f9862e40f981166df38233312c8c4ed14ab9a4ac87258f84ad0d86616"
+    },
+    "current_coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-current-coverage.2026-10-20T08-12.json",
+      "sha256": "5db392065b039ab8247d93211d6696419adcdc9364fae62ef968b0b8d8e16b51"
+    },
+    "current_raw_counters_augmented": false,
+    "module_count": 8,
+    "qualified_prior_proof_count": 27,
+    "range_count": 70
+  },
+  "finished_at": "2026-10-20T08:12:26.533495+00:00",
+  "limitations": [
+    "Task verification only; no feature acceptance or successor implementation.",
+    "Native proof uses a bounded Windows/Git fixture, not installed coding-agent-host or non-Windows execution.",
+    "Prior unchanged-body proof is kept separate; fresh raw coverage is not augmented.",
+    "No source/test, checkpoint, Git or acceptance-criteria changes are authorized."
+  ],
+  "native": {
+    "after": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+      "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+      "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+      "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+      "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+      "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+      "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+      "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+      "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+      "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+      "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+      "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    },
+    "checks": [
+      {
+        "label": "fixture-byte-identity-before",
+        "passed": true
+      },
+      {
+        "label": "checkout-identity",
+        "passed": true
+      },
+      {
+        "label": "actual-loaded-membership",
+        "passed": true
+      },
+      {
+        "label": "known-captured-bytes",
+        "passed": true
+      },
+      {
+        "label": "source-and-target-role-pins",
+        "passed": true
+      },
+      {
+        "label": "client-scope",
+        "passed": true
+      },
+      {
+        "label": "structural-contract",
+        "passed": true
+      },
+      {
+        "label": "qualification-read-only",
+        "passed": true
+      },
+      {
+        "label": "harness-release-hash",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:pyproject.toml",
+        "passed": true
+      },
+      {
+        "label": "candidate:scripts/dev_tools/discovery/io.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:scripts/dev_tools/discovery/parity_report.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/parity_test_support.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_axes.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_clients.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_metrics.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_models.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_report.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_report_projection.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_parity_rules.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_report_models.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/discovery_runtime/test_validation_modes.py",
+        "passed": true
+      },
+      {
+        "label": "candidate:tests/scripts/dev_tools/discovery/test_parity_report.py",
+        "passed": true
+      },
+      {
+        "label": "metric-projection-identity",
+        "passed": true
+      },
+      {
+        "label": "explicit-failure-result",
+        "passed": true
+      },
+      {
+        "label": "explicit-failure-findings",
+        "passed": true
+      },
+      {
+        "label": "nonempty-population-available",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/mobile/not_required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/mobile/required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/mobile/verification/percentage",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/mobile/verified",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/offline/not_required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/offline/required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/offline/verification/percentage",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/clients/0/dimensions/offline/verified",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/entries/complete",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/entries/state_counts/missing",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/entries/total",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/feature_client_obligations/completed_required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/feature_client_obligations/required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/source_features/completed_required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/source_features/required",
+        "passed": true
+      },
+      {
+        "label": "metric:/parity/source_features/total",
+        "passed": true
+      },
+      {
+        "label": "json-view-identity",
+        "passed": true
+      },
+      {
+        "label": "markdown-view-identity",
+        "passed": true
+      },
+      {
+        "label": "captured-input-immutability",
+        "passed": true
+      },
+      {
+        "label": "dry-run-dispositions",
+        "passed": true
+      },
+      {
+        "label": "dry-run-no-write",
+        "passed": true
+      },
+      {
+        "label": "publication-result",
+        "passed": true
+      },
+      {
+        "label": "publication-output-membership",
+        "passed": true
+      },
+      {
+        "label": "publication-invalidation-seam",
+        "passed": true
+      },
+      {
+        "label": "generated-json-membership",
+        "passed": true
+      },
+      {
+        "label": "generated-markdown-membership",
+        "passed": true
+      },
+      {
+        "label": "semantic-digest-stability",
+        "passed": true
+      },
+      {
+        "label": "full-snapshot-changed",
+        "passed": true
+      },
+      {
+        "label": "pinned-input-identity-stability",
+        "passed": true
+      },
+      {
+        "label": "authored-file-identity-stability",
+        "passed": true
+      },
+      {
+        "label": "recomputed-report-identity",
+        "passed": true
+      },
+      {
+        "label": "published-structural-validation",
+        "passed": true
+      },
+      {
+        "label": "failure-semantics-preserved",
+        "passed": true
+      },
+      {
+        "label": "idempotent-dispositions",
+        "passed": true
+      },
+      {
+        "label": "idempotent-no-invalidation",
+        "passed": true
+      },
+      {
+        "label": "missing-grant-rejected",
+        "passed": true
+      },
+      {
+        "label": "stale-original-rejected",
+        "passed": true
+      },
+      {
+        "label": "only-granted-report-bytes-changed",
+        "passed": true
+      }
+    ],
+    "elapsed_seconds": 150.74040680000326,
+    "fixture": "SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83",
+    "fixture_receipt_sha256": "c7106cf2a33beede99453ff8475c2c0bbf8b06295b2e573277b19eb824664273",
+    "input_sha256": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+    "operation_seconds": {
+      "authoritative-projection": 2.913404900027672,
+      "capture-baseline": 3.0997161000268534,
+      "commit-idempotent": 25.041462100023637,
+      "derive-parity": 2.9227069999906234,
+      "dry-run": 10.227641200006474,
+      "plan-idempotent": 6.249277399998391,
+      "plan-publication": 6.2549190999998245,
+      "publish-report": 70.42893930000719,
+      "recapture-published": 3.964240699977381,
+      "recompute-published": 2.9065592999977525,
+      "stale-original-dry-run": 10.227675699978136,
+      "structural-contract": 2.904498199990485,
+      "validate-published": 2.931149500014726
+    },
+    "publication_findings": [],
+    "qualifications": [
+      "Real Windows/Git local fixture; no consumer repository or network.",
+      "Fixture setup is separate from the measured guarded publication.",
+      "Missing target parity is intentionally incomplete, not passing proof.",
+      "Authority invalidation callback is fixture instrumentation, not an installed host gate."
+    ],
+    "report": {
+      "artifact_kind": "parity-report",
+      "counts": {
+        "coverage-ledger": 1,
+        "evidence-reference": 2,
+        "feature-contract": 1,
+        "inventory-snapshot": 1,
+        "parity-matrix": 1,
+        "scope": 1
+      },
+      "findings": [
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "ACCEPTANCE_CRITERIA",
+          "message": "Required features need explicit supported criteria.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/acceptance_criteria",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/observable_outputs",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_MISSING",
+          "message": "Required behavior needs an explicit classification.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/online",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/trigger",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "code": "PARITY_INCOMPLETE",
+          "message": "Required parity remains unassessed, partial, missing or conflicting.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        }
+      ],
+      "id": "parity",
+      "input_sha256": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+      "mode": "parity-complete",
+      "parity": {
+        "blockers": [
+          {
+            "blocker": "No target implementation or execution exists in this fixture.",
+            "id": "parity",
+            "path": "docs/migration/discovery/parity-matrix.json",
+            "pointer": "/entries/0",
+            "repository": "workspace-example",
+            "revision": "00367d1c6b0af4630878401524aae631b36bcd0a"
+          }
+        ],
+        "clients": [
+          {
+            "client_id": "browser",
+            "dimensions": {
+              "mobile": {
+                "applicable": 0,
+                "blocked": 0,
+                "conflicting": 0,
+                "disposed": 0,
+                "failed": 0,
+                "not_applicable": 0,
+                "not_required": 1,
+                "not_run": 0,
+                "obligations": 1,
+                "passed": 0,
+                "required": 0,
+                "required_pending": 0,
+                "required_verified": 0,
+                "retired": 0,
+                "unspecified": 0,
+                "verification": {
+                  "denominator": 0,
+                  "numerator": 0,
+                  "percentage": null,
+                  "unit": "required feature/client/dimension obligations"
+                },
+                "verified": 0
+              },
+              "observable_outputs": {
+                "applicable": 1,
+                "blocked": 0,
+                "conflicting": 0,
+                "disposed": 0,
+                "failed": 0,
+                "not_applicable": 0,
+                "not_required": 0,
+                "not_run": 1,
+                "obligations": 1,
+                "passed": 0,
+                "required": 1,
+                "required_pending": 1,
+                "required_verified": 0,
+                "retired": 0,
+                "unspecified": 0,
+                "verification": {
+                  "denominator": 1,
+                  "numerator": 0,
+                  "percentage": 0.0,
+                  "unit": "required feature/client/dimension obligations"
+                },
+                "verified": 0
+              },
+              "offline": {
+                "applicable": 0,
+                "blocked": 0,
+                "conflicting": 0,
+                "disposed": 0,
+                "failed": 0,
+                "not_applicable": 0,
+                "not_required": 1,
+                "not_run": 0,
+                "obligations": 1,
+                "passed": 0,
+                "required": 0,
+                "required_pending": 0,
+                "required_verified": 0,
+                "retired": 0,
+                "unspecified": 0,
+                "verification": {
+                  "denominator": 0,
+                  "numerator": 0,
+                  "percentage": null,
+                  "unit": "required feature/client/dimension obligations"
+                },
+                "verified": 0
+              },
+              "online": {
+                "applicable": 1,
+                "blocked": 0,
+                "conflicting": 0,
+                "disposed": 0,
+                "failed": 0,
+                "not_applicable": 0,
+                "not_required": 0,
+                "not_run": 1,
+                "obligations": 1,
+                "passed": 0,
+                "required": 1,
+                "required_pending": 1,
+                "required_verified": 0,
+                "retired": 0,
+                "unspecified": 0,
+                "verification": {
+                  "denominator": 1,
+                  "numerator": 0,
+                  "percentage": 0.0,
+                  "unit": "required feature/client/dimension obligations"
+                },
+                "verified": 0
+              },
+              "trigger": {
+                "applicable": 1,
+                "blocked": 0,
+                "conflicting": 0,
+                "disposed": 0,
+                "failed": 0,
+                "not_applicable": 0,
+                "not_required": 0,
+                "not_run": 1,
+                "obligations": 1,
+                "passed": 0,
+                "required": 1,
+                "required_pending": 1,
+                "required_verified": 0,
+                "retired": 0,
+                "unspecified": 0,
+                "verification": {
+                  "denominator": 1,
+                  "numerator": 0,
+                  "percentage": 0.0,
+                  "unit": "required feature/client/dimension obligations"
+                },
+                "verified": 0
+              }
+            }
+          }
+        ],
+        "entries": {
+          "complete": 0,
+          "duplicate_rows": 0,
+          "invalid": 0,
+          "invalid_entries": [],
+          "state_counts": {
+            "conflicting": 0,
+            "full": 0,
+            "intentionally-changed": 0,
+            "missing": 1,
+            "partial": 0,
+            "retired": 0,
+            "unassessed": 0
+          },
+          "total": 1,
+          "unresolved_source": 0,
+          "unresolved_target": 0,
+          "valid": 1,
+          "valid_state_counts": {
+            "conflicting": 0,
+            "full": 0,
+            "intentionally-changed": 0,
+            "missing": 1,
+            "partial": 0,
+            "retired": 0,
+            "unassessed": 0
+          }
+        },
+        "feature_client_obligations": {
+          "completed_required": 0,
+          "conflicting": 0,
+          "missing": 0,
+          "required": 1,
+          "total": 1
+        },
+        "metrics": {
+          "client_completion": {
+            "denominator": 1,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "required feature/client obligations"
+          },
+          "feature_completion": {
+            "denominator": 1,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "required source-feature identities"
+          }
+        },
+        "population_state": "available",
+        "source_features": {
+          "completed_required": 0,
+          "required": 1,
+          "total": 1
+        },
+        "unresolved_decisions": []
+      },
+      "parity_findings": [
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "ACCEPTANCE_CRITERIA",
+          "message": "Required features need explicit supported criteria.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/acceptance_criteria",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/observable_outputs",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_MISSING",
+          "message": "Required behavior needs an explicit classification.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/online",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/feature-contracts/feature.json",
+          "code": "DIMENSION_UNSPECIFIED",
+          "message": "Required applicability cannot remain absent or unspecified.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/trigger",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        },
+        {
+          "artifact_path": "docs/migration/discovery/parity-matrix.json",
+          "code": "PARITY_INCOMPLETE",
+          "message": "Required parity remains unassessed, partial, missing or conflicting.",
+          "next_action": "Correct the identity or supply the artifact, then validate again.",
+          "pointer": "/entries/0",
+          "related_ids": [],
+          "related_paths": [],
+          "severity": "error"
+        }
+      ],
+      "parity_result": "fail",
+      "schema_version": "2.0.0",
+      "validation_result": "fail"
+    },
+    "snapshot_sha256": "0acc01d47e2da91a85f40f1a981b5ac9d549fd0a79f9cf8c01a4abe15e4e42c2",
+    "state": "native-composition-passed",
+    "structural_findings": [],
+    "task": "P5-T2"
+  },
+  "node_count": 175,
+  "raw_files": [
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-format-080331.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 59,
+      "path": "SCRATCH/p5t2-final-format-080331.stderr",
+      "sha256": "24315bea89f680c399aecdf314732fa86f8f9b1e43b91a23310112252efd5bf6"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/p5t2-final-format-080331.progress.json",
+      "sha256": "16e9cea5635622074e91d27a21cb282434c3b4e5cf6286c5b2c9a0a40118661a"
+    },
+    {
+      "bytes": 19,
+      "path": "SCRATCH/p5t2-final-lint-080331.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-lint-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 217,
+      "path": "SCRATCH/p5t2-final-lint-080331.progress.json",
+      "sha256": "7fbf17ce735175a52cb2522e7e974ec92554027ebac64885eb8006b7f65fe06c"
+    },
+    {
+      "bytes": 194,
+      "path": "SCRATCH/p5t2-final-types-080331.stdout",
+      "sha256": "3307f698d88973f65006330f0737c9aec078e957a38c212bb8cf681e476f83bd"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-types-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/p5t2-final-types-080331.progress.json",
+      "sha256": "2cb1bdef6d14f830c990d4fa8eb54a8b62da6166311b1af8d7ae78cbe8a21f87"
+    },
+    {
+      "bytes": 8800,
+      "path": "SCRATCH/p5t2-final-static-080331.stdout",
+      "sha256": "10031cc955620cd1126068b4ea329b22b290880fc7b5d60218b19086e863e51a"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-static-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 219,
+      "path": "SCRATCH/p5t2-final-static-080331.progress.json",
+      "sha256": "2eb33d65d356daf6989dea633976263eb6aa352918f567cc4d6e827eb076fbfc"
+    },
+    {
+      "bytes": 3713,
+      "path": "SCRATCH/p5t2-final-native-080331.stdout",
+      "sha256": "fea8e8d459ea3a2814a3f14c87ee1e23869c8f2ae00c35b446849c7d99b0a015"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-native-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 221,
+      "path": "SCRATCH/p5t2-final-native-080331.progress.json",
+      "sha256": "c16ea9ab28159ba1cde9b3d7b321a222f0c209ae3966c0f7b90e059a74a7fdaf"
+    },
+    {
+      "bytes": 14333,
+      "path": "SCRATCH/p5t2-final-outcomes-080331.stdout",
+      "sha256": "1132dc6376d7077570e68ddbb237bb0e0bab610a0c467b65c1b03f9e3485f459"
+    },
+    {
+      "bytes": 1126,
+      "path": "SCRATCH/p5t2-final-outcomes-080331.stderr",
+      "sha256": "33c9450822fd970eb97cdf2616f7db9940849e86364c62dc7813d3932c8002cb"
+    },
+    {
+      "bytes": 358,
+      "path": "SCRATCH/p5t2-final-outcomes-080331.progress.json",
+      "sha256": "2783b6567d5972c5b675f94ddbd36af5dce5438c93b2fbc727f60541cdb0f058"
+    },
+    {
+      "bytes": 10470,
+      "path": "SCRATCH/p5t2-final-graph-080331.stdout",
+      "sha256": "d28d5fb3a493fcdbd9906546a2e4cc7218d8e995a9d57a4d270f4f5752774df4"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-graph-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 368,
+      "path": "SCRATCH/p5t2-final-graph-080331.progress.json",
+      "sha256": "dfe29a19d279dc8303ac86a4dc060ea28c8ea8f6b936f33344606f1eb0fe999f"
+    },
+    {
+      "bytes": 6429,
+      "path": "SCRATCH/p5t2-final-integration-080331.stdout",
+      "sha256": "90e159c27a33c815c7903d658c12e79d0ead633f1a7c5b9ac0ebd6f785e8a83e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-integration-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 376,
+      "path": "SCRATCH/p5t2-final-integration-080331.progress.json",
+      "sha256": "a04d2c48e76623fd2eaa5e223d6d4214f6da7c179291dd8913f26f2183525b27"
+    },
+    {
+      "bytes": 318,
+      "path": "SCRATCH/p5t2-final-coverage-combine-080331.stdout",
+      "sha256": "8acbb310ef28761e60e114ef9b79b644a4c3a6d8074b6a4b885b0c61000ed966"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-coverage-combine-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 229,
+      "path": "SCRATCH/p5t2-final-coverage-combine-080331.progress.json",
+      "sha256": "aa8cd5957f09345fc68a57fda6d018401e039b3d29ebdae93089d8ef58492e2b"
+    },
+    {
+      "bytes": 123,
+      "path": "SCRATCH/p5t2-final-coverage-json-080331.stdout",
+      "sha256": "afb34524ba0bb4581e4201705f85397f6130c63a23f578b2fb3344aacc6adb46"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-coverage-json-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 226,
+      "path": "SCRATCH/p5t2-final-coverage-json-080331.progress.json",
+      "sha256": "70ffdd2216a3a41e35b47d8534f0dc8abbca2bd5748cb92336191cfbc26ab5aa"
+    },
+    {
+      "bytes": 651,
+      "path": "SCRATCH/p5t2-final-coverage-proof-080331.stdout",
+      "sha256": "850683858a95d62cb4878754054fd6a237fe655bab092d5a220335d1c7a5989e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-coverage-proof-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 227,
+      "path": "SCRATCH/p5t2-final-coverage-proof-080331.progress.json",
+      "sha256": "7aff3e1e56519631db93823c03bed5dee06eccab0391c7e7aac0efa48fe54e28"
+    },
+    {
+      "bytes": 1015,
+      "path": "SCRATCH/p5t2-final-contracts-080331.stdout",
+      "sha256": "ddc35878d360d94e6394c9fcf00726c17cdd65dc4ed230a9acb912e4ef6df6ba"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-contracts-080331.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 362,
+      "path": "SCRATCH/p5t2-final-contracts-080331.progress.json",
+      "sha256": "03137ec4d557f647e3462bb4a0cb3e7b571958fc59d85506e888837bcd23a5c0"
+    }
+  ],
+  "receipts": [
+    {
+      "exit_code": 0,
+      "label": "format",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-format-080331.2026-10-20T08-03.json",
+      "seconds": 1.011,
+      "sha256": "d33b30d1ca5f2de7911a7af36abc5764588483a6b785820e9205872da07ad91c",
+      "stage": 1
+    },
+    {
+      "exit_code": 0,
+      "label": "lint",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-lint-080331.2026-10-20T08-03.json",
+      "seconds": 1.012,
+      "sha256": "2c1fb07bf2a98da7e256227f6cc5a0e008c355b8244975223b3195e05fd18ff8",
+      "stage": 2
+    },
+    {
+      "exit_code": 0,
+      "label": "types",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-types-080331.2026-10-20T08-03.json",
+      "seconds": 14.042,
+      "sha256": "0e1420102faa1669fe38cb9c3058e6f584f0e779aceaeb87e824335ff2369b17",
+      "stage": 3
+    },
+    {
+      "exit_code": 0,
+      "label": "static",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-static-080331.2026-10-20T08-03.json",
+      "seconds": 2.027,
+      "sha256": "04d86d78fa7fa0e419a5622084d8829605cadb42aa0c82fcfce0edcfb9737b2a",
+      "stage": 4
+    },
+    {
+      "exit_code": 0,
+      "label": "native",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-native-080331.2026-10-20T08-06.json",
+      "seconds": 151.326,
+      "sha256": "28d0446b2006d6660241f959bfa2b0bf4f58ab150f0a735553303322994dedd5",
+      "stage": 5
+    },
+    {
+      "exit_code": 0,
+      "label": "outcomes",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-outcomes-080331.2026-10-20T08-06.json",
+      "seconds": 13.041,
+      "sha256": "e03498288d19cc9584c5d630fb35c5e8ee26ae9adecf73d45e481c25ae7281ca",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "graph",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-graph-080331.2026-10-20T08-07.json",
+      "seconds": 39.097,
+      "sha256": "08ee07f81f4658c7aed833cc98d0e21656189d7dd0ab685d09e898116920e127",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "integration",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-integration-080331.2026-10-20T08-12.json",
+      "seconds": 308.635,
+      "sha256": "50a8d6e6c912710e22e3acb715ea8b417ca5793a32b05a2d9349036c56655b7c",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-combine",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-combine-080331.2026-10-20T08-12.json",
+      "seconds": 1.015,
+      "sha256": "8b1b77ff04d78b0908fe5e14b2562075588551fdcb33bde69dbec3f3caa6b001",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-json",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-json-080331.2026-10-20T08-12.json",
+      "seconds": 1.014,
+      "sha256": "f0e68a2ce961f4d4fafa2a9c6f489cdbd3472c2b59adea9f5c3a7dc0f603895e",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "coverage-proof",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-proof-080331.2026-10-20T08-12.json",
+      "seconds": 2.016,
+      "sha256": "e57514db93a2ab6cb98db09e88b2fce573393004eb86dfdbd9f9f7ce85a0bb83",
+      "stage": 6
+    },
+    {
+      "exit_code": 0,
+      "label": "contracts",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-contracts-080331.2026-10-20T08-12.json",
+      "seconds": 1.014,
+      "sha256": "65809038a695a87f68e90ba7ff74a259fbd572e7291a18de57edaed3390e398a",
+      "stage": 7
+    }
+  ],
+  "retained_proof": {
+    "graph": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-freeze.2026-10-20T07-15.json",
+      "sha256": "d8a99afce40d8d088b8dd45c1995e3f7886292c2300211b00c3ac68a586b3ceb"
+    },
+    "graph_helper_mappings": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-pre-repair-freeze.2026-10-20T06-56.json",
+      "sha256": "a7da6a30daee32b5d7fb9b2e7261a2cd4075f31b7a25b867a9cf3d76e0f51bb7"
+    },
+    "graph_qualification": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-graph-GR-evidence-qualification.2026-10-20T07-17.json",
+      "sha256": "d2de9a88f518bb02b39392d963c02e684043bd28952e62e0b2a08a791dfea521"
+    },
+    "helper": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-helper-freeze.2026-10-20T06-00.json",
+      "sha256": "4a795e13b1b6b746e4664e7928fa6a971c3401a9b6d0ce83e9b5f6a3bccaee6a"
+    },
+    "integration": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-projection-final-freeze.2026-10-20T06-50.json",
+      "sha256": "5d8d5c2ddaf692f8b8557ba3a31d63cdd47d51f6a722911ec5b4258928dd739d"
+    },
+    "outcomes": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-pc1-freeze.2026-10-20T06-33.json",
+      "sha256": "57e5489513c8a7706ac294a023f398da5b959839a7ffd294214a0e1429a6fdde"
+    }
+  },
+  "started_at": "2026-10-20T08:03:31.015483+00:00",
+  "status": "FINAL_GATES_PASSED_ACCEPTANCE_PENDING",
+  "task": "P5-T2",
+  "timestamp": "2026-10-20T08-12"
+}

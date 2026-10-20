@@ -1,0 +1,191 @@
+"""Prepare a synthetic nonempty Git fixture; no parity report or publication run."""
+
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+from uuid import uuid4
+
+from drm_copilot_discovery.catalog import load_catalog
+from drm_copilot_discovery.coverage_scope_rules import inventory_configuration_digest
+from drm_copilot_discovery.models import canonical_json, to_plain_value
+from drm_copilot_discovery.profile_v2 import ProfileV2
+from tests.discovery_runtime.validation_test_support import mode_profile, no_scope_snapshot
+from tests.schemas.discovery.v2_schema_test_support import load_fixture
+
+SCRATCH = Path(__file__).resolve().parent
+ROOT = "docs/migration/discovery/"
+
+
+def put(root, path, content):
+    """Write setup bytes only below the fresh operational fixture root."""
+    target = root / path
+    if root not in target.resolve().parents:
+        raise ValueError("Fixture path escapes its root")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(content)
+
+
+def git(root, *arguments):
+    """Run bounded fixture initialization commands and preserve subprocess errors."""
+    return subprocess.run(
+        ["git", "--no-optional-locks", "-C", str(root), *arguments],
+        capture_output=True, check=True, timeout=30,
+    ).stdout
+
+
+def link(kind, identifier):
+    """Return one schema-shaped local reference, without creating proof."""
+    return {"artifact_kind": kind, "id": identifier}
+
+
+def main():
+    """Materialize immutable source inputs and truthful missing-target authoring."""
+    started = time.monotonic()
+    root = SCRATCH / ("issue-980-p5t2-fixture-" + uuid4().hex)
+    root.mkdir()
+    inputs = {
+        ".gitattributes": b"* -text\n",
+        "src/Feature.cs": b"public static class Feature { public static int Value() => 1; }\n",
+        "docs/authored.md": b"# Synthetic source\nThe source declares a constant-returning method.\n",
+        ROOT + "evidence/confirmation.txt": (
+            b"Synthetic fixture scope selects src and docs/authored.md. "
+            b"This fixture records no target implementation, runtime execution or approval.\n"
+        ),
+    }
+    # Commit only actual source, authored documentation and local evidence payload.
+    for path, content in inputs.items():
+        put(root, path, content)
+    git(root, "init", "--quiet")
+    git(root, "config", "core.autocrlf", "false")
+    git(root, "add", "--", *sorted(inputs))
+    git(root, "-c", "user.name=Discovery fixture",
+        "-c", "user.email=discovery@example.invalid", "-c", "commit.gpgsign=false",
+        "commit", "--quiet", "-m", "Synthetic nonempty parity input")
+    revision = git(root, "rev-parse", "HEAD").decode("ascii").strip()
+    catalog = load_catalog()
+    document = to_plain_value(mode_profile(catalog).document)
+    document["repository"]["revision"] = revision
+    document["analyzers"]["enabled"] = ["repository"]
+    document["analyzers"]["extension_result_manifests"] = []
+    profile = ProfileV2(json.dumps(document), format="json", catalog=catalog)
+    seed = no_scope_snapshot(catalog, profile=profile)
+    documents = {
+        item.path: json.loads(item.content)
+        for item in seed.manifest.files if item.category != "evidence"
+    }
+    proof = documents[ROOT + "evidence/confirmation.json"]
+    proof.update(
+        checksum={"algorithm": "sha256", "value": hashlib.sha256(
+            inputs[ROOT + "evidence/confirmation.txt"]).hexdigest()},
+        notes="Synthetic scope selection only; no product approval or execution.",
+        author_or_agent={"kind": "tool", "id": "native-fixture"},
+    )
+    feature = load_fixture("feature-contract")
+    feature.update(
+        id="feature", feature_id="feature", lifecycle="draft",
+        observation_state="inferred", confidence="low",
+        source_evidence_refs=[link("evidence-reference", "source")],
+        runtime_evidence_refs=[], unresolved_behavior_refs=[],
+        product_decision_refs=[], product_decision_status="not-required",
+        target_relevance="required", required_dimensions=[],
+        acceptance_criteria=[], summary="A source declaration returns one; target is absent.",
+    )
+    behavior = {
+        "observation_state": "inferred",
+        "statement": "Static source reading only; runtime behavior has not been observed.",
+        "evidence_refs": [link("evidence-reference", "source")],
+        "unresolved_behavior_refs": [], "confidence": "low",
+    }
+    # Keep every required schema slot honest without asserting optional execution.
+    for name, value in tuple(feature.items()):
+        if isinstance(value, dict) and "observation_state" in value:
+            feature[name] = dict(behavior)
+    feature["state_transitions"] = {
+        "disposition": "none", "behavior": dict(behavior), "entries": [],
+        "rationale": "The fixture source declares no mutable state.",
+    }
+    feature_path = profile.artifacts["feature_contracts"] + "/feature.json"
+    documents[feature_path] = feature
+    source = load_fixture("evidence-reference")
+    source.update(
+        id="source", evidence_id="source", evidence_type="source",
+        repository=profile.repository.id, revision=revision, path="src/Feature.cs",
+        runtime_artifact=None, environment=None,
+        checksum={"algorithm": "sha256", "value": hashlib.sha256(inputs["src/Feature.cs"]).hexdigest()},
+        confidence="low", notes="Actual pinned synthetic source bytes, no execution.",
+        author_or_agent={"kind": "tool", "id": "native-fixture"},
+    )
+    documents[ROOT + "evidence/source.json"] = source
+    scope = documents[profile.artifacts["scope"]]
+    scope.update(
+        included_roots=["src"], included_components=[],
+        included_features=[link("feature-contract", "feature")],
+        required_coverage={"feature_refs": [link("feature-contract", "feature")],
+                           "client_ids": ["browser"], "modes": ["online"]},
+        disposition="in-scope", no_scope_rationale=None,
+    )
+    scope["confirmed_by"]["owner"] = "native-fixture"
+    inventory = documents[ROOT + "inventory/empty.json"]
+    inventory["scan_configuration_sha256"] = inventory_configuration_digest(profile)
+    inventory["files"] = [
+        {"path": path, "status": "inspected",
+         "sha256": hashlib.sha256(inputs[path]).hexdigest(), "size": len(inputs[path]),
+         "rationale": None, "diagnostic_ids": []}
+        for path in ("docs/authored.md", "src/Feature.cs")
+    ]
+    matrix = load_fixture("parity-matrix")
+    owner = {"id": profile.repository.id, "revision": revision}
+    matrix.update(id="parity", source_repositories=[owner], target_repositories=[owner])
+    row = matrix["entries"][0]
+    row.update(
+        id="entry", feature_id="feature", client_id="browser",
+        source_contract_ref={
+            "artifact_kind": "feature-contract", "repository_id": profile.repository.id,
+            "revision": revision, "artifact_path": feature_path,
+            "artifact_sha256": hashlib.sha256(canonical_json(feature)).hexdigest(),
+            "feature_id": "feature", "schema_version": "2.0.0",
+        },
+        target_repository=owner, target_implementation_refs=[], parity_state="missing",
+        evidence_refs=[], intentional_deviation_refs=[], retirement_decision_ref=None,
+        blockers=["No target implementation or execution exists in this fixture."],
+        validation_status=None, missing_reason="Target implementation has not been created.",
+    )
+    classification = {"applicability": "applicable", "verification": "not-run",
+                      "rationale": None, "evidence_refs": [], "product_decision_refs": []}
+    row["dimensions"] = {key: dict(classification) for key in ("trigger", "observable_outputs")}
+    row["online"] = dict(classification)
+    documents[profile.artifacts["parity_matrix"]] = matrix
+    # Artifact construction is setup, separate from the later guarded report writes.
+    for path, value in documents.items():
+        put(root, path, canonical_json(value))
+    for path in (*profile.production_roots, *profile.test_roots):
+        (root / path).mkdir(parents=True, exist_ok=True)
+    manifest = {
+        path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*")) if path.is_file()
+    }
+    receipt = {
+        "task": "P5-T2", "state": "materialized-not-yet-structurally-qualified",
+        "fixture": "SCRATCH/" + root.name, "profile_path": profile.artifacts["profile"],
+        "revision": revision, "files": manifest,
+        "source_path": "src/Feature.cs", "authored_documentation": "docs/authored.md",
+        "feature_path": feature_path, "matrix_path": profile.artifacts["parity_matrix"],
+        "expected_source_id": profile.repository.id, "client_id": "browser",
+        "expected_parity_result": "fail",
+        "qualifications": ["One combined source/target repository at actual local pin.",
+                           "No target implementation, execution, approval or host authority.",
+                           "Online required; offline/mobile are not declared required.",
+                           "Structural qualification and candidate composition still pending."],
+        "setup_seconds": time.monotonic() - started,
+    }
+    destination = SCRATCH / (root.name + ".json")
+    destination.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+                           encoding="utf-8", newline="\n")
+    print(json.dumps({"receipt": "SCRATCH/" + destination.name,
+                      "setup_seconds": receipt["setup_seconds"]}))
+
+
+if __name__ == "__main__":
+    main()
