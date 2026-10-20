@@ -1,0 +1,127 @@
+"""Bound the one open selector-comparison question without running rule suites."""
+
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from types import SimpleNamespace
+
+from drm_copilot_discovery.acceptance_generation import _Generation
+from drm_copilot_discovery.dimension_rules import FeatureObligation
+from drm_copilot_discovery.models import JsonObject, ParseLimits
+from drm_copilot_discovery.profile_models import ProfileRequirements
+from drm_copilot_discovery.references import ArtifactRecord, ReferenceIndex
+from drm_copilot_discovery.report_models import ReportBudget
+from drm_copilot_discovery.repository_reader import RepositoryIdentity
+from drm_copilot_discovery.snapshot import ArtifactSnapshot
+
+ROOT = Path.cwd()
+EXPECTED = {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py":
+        "b0ffeacb101d240d9c6585f3ae9b4d973ebf75030f0d09a998ed14b6a63287af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py":
+        "0edcab9fd33f17f85127d86aab89ea60868a1cb23d49eee7647418414e1562d0",
+    "tests/discovery_runtime/test_acceptance_generation.py":
+        "85c334d7e66841b1b45f73bc57af517f3b7d8c67187412a572f490b6bee2043f",
+    "tests/discovery_runtime/test_acceptance_decisions.py":
+        "bc7dfa0ff12f5cc68355f35dc60ef575b1d806d7345dc7249aa8b803a99be308",
+}
+for name, digest in EXPECTED.items():
+    assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+
+document = JsonObject((("id", "feature"), ("feature_id", "feature")))
+repository = RepositoryIdentity(id="source", revision="a" * 40)
+artifact = ArtifactSnapshot(
+    path="docs/feature.json", expected_kind="feature-contract",
+    repository=repository, document=document,
+)
+record = ArtifactRecord(artifact=artifact, kind="feature-contract", document=document)
+observations = []
+
+# Exercise only expansion over accepted-shaped immutable criteria and requirements.
+for width, size in ((32, 16), (4096, 16), (4096, 32)):
+    counts = {"equal_calls": 0, "equal_characters": 0, "hash_calls": 0}
+    text = "c" * width
+
+    class CountedIdentifier(str):
+        """Retain ordinary equality/hash semantics and count equal-text lengths."""
+
+        def __hash__(self):
+            """Count a hash invocation, preserving Python's ordinary string hash."""
+            counts["hash_calls"] += 1
+            return str.__hash__(self)
+
+        def __eq__(self, other):
+            """Count equality and equal string width; return ordinary equality."""
+            counts["equal_calls"] += 1
+            result = str.__eq__(self, other)
+            if result is True:
+                counts["equal_characters"] += len(self)
+            return result
+
+    selector = CountedIdentifier(text)
+    criterion = JsonObject((
+        ("id", "criterion"), ("client_ids", (selector,)),
+        ("platforms", ("absent-platform",)), ("modes", ("online",)),
+    ))
+    requirements = ProfileRequirements(
+        platforms=tuple(f"platform-{i:02}" for i in range(size)),
+        modes=tuple(f"mode-{i:02}" for i in range(size)), dimensions=(),
+    )
+    obligation = FeatureObligation(
+        feature=record, client_id=text, requirements=requirements,
+        required=True, waived=frozenset(),
+    )
+    budget = ReportBudget(ParseLimits())
+    client = SimpleNamespace(id=text, target_repository="source")
+    context = SimpleNamespace(
+        budget=budget, index=ReferenceIndex(records=(record,)),
+        snapshot=SimpleNamespace(profile=SimpleNamespace(clients=(client,))),
+        targets=(repository,), decisions=SimpleNamespace(approved=()),
+        dimensions=SimpleNamespace(obligations=(obligation,)),
+        criteria=lambda source, target: ((record, 0, criterion),),
+    )
+    generation = _Generation(context, "target-acceptance", (), (), ())
+    # Give expansion the same finite remaining work after prior source assessment.
+    capacity = 7000
+    budget.work_left = capacity
+    for name in counts:
+        counts[name] = 0
+    generation.expand(record)
+    observations.append({
+        "identifier_characters": width,
+        "platform_count": size,
+        "mode_count": size,
+        "coordinate_count": size * size,
+        "remaining_work_before": capacity,
+        "charged_work": capacity - budget.work_left,
+        **counts,
+        "candidate_count": len(generation.values),
+        "returned_without_limit_error": True,
+    })
+    assert counts["equal_calls"] == size * size
+    assert counts["equal_characters"] == width * size * size
+    assert not generation.values
+
+for name, digest in EXPECTED.items():
+    assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+
+result = {
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "source_bindings": EXPECTED,
+    "observations": observations,
+    "qualification": (
+        "Isolated actual _Generation.expand with real immutable record/criterion/"
+        "requirements and public criterion_applies. Call-local context/client seams "
+        "supply already-assessed values; no whole-snapshot or suite execution. "
+        "CountedIdentifier delegates str equality/hash unchanged. Equal-character "
+        "counts are the summed lengths of compared equal strings, not elapsed time "
+        "or a claim about CPU instructions. Input text hashing may be cached; the "
+        "observed repeated positive equality still compares equal distinct strings. "
+        "The positive client match is followed by a platform mismatch, so no output "
+        "copy or serialized-output reservation can cover this repeated text work."
+    ),
+}
+path = Path(__file__).with_suffix(".json")
+path.write_bytes((json.dumps(result, indent=2) + "\n").encode("utf-8"))
+print(json.dumps(result, indent=2))

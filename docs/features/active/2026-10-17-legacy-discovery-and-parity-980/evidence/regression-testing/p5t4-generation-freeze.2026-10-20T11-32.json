@@ -1,0 +1,436 @@
+{
+  "task": "P5-T4",
+  "Timestamp": "2026-10-20T11-32",
+  "status": "FOCUSED_SUBSET_FROZEN",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "bytes": 21193,
+      "physical_lines": 494,
+      "documented_definitions": 7,
+      "commented_loops": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "bytes": 21912,
+      "physical_lines": 488,
+      "documented_definitions": 14,
+      "commented_loops": 14
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "bytes": 18922,
+      "physical_lines": 486,
+      "documented_definitions": 10,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "sha256": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+      "bytes": 16114,
+      "physical_lines": 400,
+      "documented_definitions": 10,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "sha256": "132410ef98d30f02f21baf5047a429b75c18d30e0bb7ababd1045f47997419e4",
+      "bytes": 15471,
+      "physical_lines": 401,
+      "documented_definitions": 18,
+      "commented_loops": 0
+    }
+  ],
+  "borrowed": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py": "132410ef98d30f02f21baf5047a429b75c18d30e0bb7ababd1045f47997419e4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+    "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+    "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+  },
+  "ordered_receipts": {
+    "black": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-black.2026-10-20T11-18.json",
+      "sha256": "a67facbb232b6389a2cb319af2c48f9449c3688147f92e20c0419348356efa33",
+      "bytes": 5656
+    },
+    "ruff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-ruff.2026-10-20T11-18.json",
+      "sha256": "499ed8b04ede20dbf58252dd1cbe66e927a1ed2158df1bd433e20923bfa5b22c",
+      "bytes": 5600
+    },
+    "pyright": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-pyright.2026-10-20T11-18.json",
+      "sha256": "5bfa3da6188a2c14c9a96af3dc0a91f93980b3733dce7ad766093b1db1e0ae00",
+      "bytes": 5769
+    },
+    "precheck": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-precheck.2026-10-20T11-19.json",
+      "sha256": "db9a774bd88eeb259e1d0f41404aa5d980ef34b82dfec775826d6495ab62b259",
+      "bytes": 9730
+    },
+    "tests": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-tests.2026-10-20T11-24.json",
+      "sha256": "131dd81e28f863261a86dc06149f8296a80d2b0e86f3c385e8fd02a1408d928c",
+      "bytes": 19993
+    },
+    "coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-coverage.2026-10-20T11-24.json",
+      "sha256": "1c903dfe924d8ad8cd8ca30205195a7a68e50730133b52be8f9877a4d9d9ee89",
+      "bytes": 5384
+    }
+  },
+  "coverage_extension_receipts": {
+    "black": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-black.2026-10-20T11-30.json",
+      "sha256": "9caab5d6b970e250f90a7b9ec47227d1bb8e8332dc3220b67e3ecc633f5a523a",
+      "bytes": 5659
+    },
+    "ruff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-ruff.2026-10-20T11-30.json",
+      "sha256": "a734d9c67dfb773a2355f3c81fa974c7dfb463c9287613006845eb47f99d6434",
+      "bytes": 5602
+    },
+    "pyright": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-pyright.2026-10-20T11-30.json",
+      "sha256": "dbd8ffd88f341094b047495a8dc4fef31287580d189c99e9c75a2352fc1d939e",
+      "bytes": 5771
+    },
+    "tests": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-tests.2026-10-20T11-30.json",
+      "sha256": "9674ac26e920d2ce64acd027ce817b121bb73a9b44fb6a6b1768519b7e4d1d6c",
+      "bytes": 7210
+    },
+    "coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-coverage.2026-10-20T11-30.json",
+      "sha256": "fb8843d60caea34fbdf2442a683bc3756b0675fccd20037648c448da8d1aca3e",
+      "bytes": 5390
+    }
+  },
+  "elapsed_seconds": {
+    "black": 1.60973,
+    "ruff": 1.208996,
+    "pyright": 2.411775,
+    "precheck": 32.889198,
+    "tests": 305.832273,
+    "coverage": 1.612014
+  },
+  "coverage_extension_elapsed_seconds": {
+    "black": 2.011064,
+    "ruff": 1.812976,
+    "pyright": 2.814911,
+    "tests": 20.662473,
+    "coverage": 1.612122
+  },
+  "nodes": [
+    "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[False]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[True]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[statement]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[expected]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[revision]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[whitespace]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[The observed result is unknown.]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[Unicode \\u7d50\\u679c remains unverified.]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[feature_ids-selection0]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[client_ids-selection1]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[mode_ids-selection2]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[malformed]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[missing-profile]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[pins]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[draft]",
+    "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[duplicate]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[approved]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[proposed]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[rejected]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[superseded]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[scope]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[conflict]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[invalid-ref]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[identity-conflict]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[applicable]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[unspecified]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[not-applicable]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_imported_source_retains_original_provenance_and_distinct_target_owner",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_coordinate_comparisons_reserve_text_work_before_matching[32-16]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_coordinate_comparisons_reserve_text_work_before_matching[4096-16]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_coordinate_comparisons_reserve_text_work_before_matching[4096-32]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-criteria]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-modes]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-platforms]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_two_complete_rule_passes_are_independent_of_candidate_count",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[None]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value1]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value2]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value3]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value4]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[source_files]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[document_bytes]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[artifact_records]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_batch_pass_limit_and_output_capacity_fail_without_partial_result",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[None]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[True]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[other]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_legacy_client_selector_is_an_explicit_failure",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[foreign-owner]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[coordinate]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[duplicate]",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py::test_missing_reference_revision_rejects_before_output_reservation"
+  ],
+  "case_count": 53,
+  "original_case_count": 45,
+  "additive_test_preservation": [
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "repair5_sha256": "9110510dcd173c19e27323ce165d87b1ece6d3fb232a3d9c349b41e6bef83f10",
+      "qualification": "Original bytes reconstructed only by removing the four new test nodes, new Protocol and imports; exact repair5 SHA-256 verified."
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "repair5_sha256": "ed5c85929028eb52083835bb194ff78b4a506d029689a53230e4abbe92a41023",
+      "qualification": "Original bytes reconstructed only by removing the four new test nodes, new Protocol and imports; exact repair5 SHA-256 verified."
+    }
+  ],
+  "previously_unexecuted_nodes": [
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_batch_pass_limit_and_output_capacity_fail_without_partial_result",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_capacity_exhaustion_precedes_public_assessment[artifact_records]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_capacity_exhaustion_precedes_public_assessment[document_bytes]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_capacity_exhaustion_precedes_public_assessment[source_files]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_invalid_selectors_fail_without_coercion[None]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_invalid_selectors_fail_without_coercion[value1]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_invalid_selectors_fail_without_coercion[value2]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_invalid_selectors_fail_without_coercion[value3]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_invalid_selectors_fail_without_coercion[value4]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_legacy_client_selector_is_an_explicit_failure",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[applicable]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[not-applicable]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[unspecified]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_two_complete_rule_passes_are_independent_of_candidate_count",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[None]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[True]",
+    "tests/discovery_runtime/test_acceptance_decisions.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[other]"
+  ],
+  "test_relocations": [
+    {
+      "test": "test_generation_retains_exact_identity_refs_and_rule_authority",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "assertions_preserved": 11,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[False]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[True]"
+      ]
+    },
+    {
+      "test": "test_identity_survives_source_changes_while_provenance_changes",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "assertions_preserved": 4,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[statement]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[expected]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[revision]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_identity_survives_source_changes_while_provenance_changes[whitespace]"
+      ]
+    },
+    {
+      "test": "test_pending_criteria_preserve_questions_and_never_invent_then",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "assertions_preserved": 4,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[The observed result is unknown.]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[Unicode \\u7d50\\u679c remains unverified.]"
+      ]
+    },
+    {
+      "test": "test_unknown_filters_fail_explicitly_without_default_selection",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "assertions_preserved": 1,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[feature_ids-selection0]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[client_ids-selection1]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_unknown_filters_fail_explicitly_without_default_selection[mode_ids-selection2]"
+      ]
+    },
+    {
+      "test": "test_integrity_failures_remain_blocking_before_generation_authority",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "assertions_preserved": 2,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[malformed]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[missing-profile]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[pins]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[draft]",
+        "tests/discovery_runtime/test_acceptance_generation.py::test_integrity_failures_remain_blocking_before_generation_authority[duplicate]"
+      ]
+    },
+    {
+      "test": "test_empty_actual_population_does_not_create_fallback_scenarios",
+      "old_path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 2,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-criteria]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-modes]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_empty_actual_population_does_not_create_fallback_scenarios[no-platforms]"
+      ]
+    },
+    {
+      "test": "test_only_current_approved_scoped_policy_can_supply_target_expectations",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "assertions_preserved": 7,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[approved]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[proposed]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[rejected]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[superseded]"
+      ]
+    },
+    {
+      "test": "test_scope_conflicts_and_broken_links_never_create_ready_target_claims",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "assertions_preserved": 4,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[scope]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[conflict]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[invalid-ref]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_scope_conflicts_and_broken_links_never_create_ready_target_claims[identity-conflict]"
+      ]
+    },
+    {
+      "test": "test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "assertions_preserved": 5,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations"
+      ]
+    },
+    {
+      "test": "test_mobile_and_custom_modes_follow_actual_configuration",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "assertions_preserved": 5,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[applicable]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[unspecified]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_mobile_and_custom_modes_follow_actual_configuration[not-applicable]"
+      ]
+    },
+    {
+      "test": "test_two_complete_rule_passes_are_independent_of_candidate_count",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 1,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_two_complete_rule_passes_are_independent_of_candidate_count"
+      ]
+    },
+    {
+      "test": "test_invalid_selectors_fail_without_coercion",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 0,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[None]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value1]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value2]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value3]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_invalid_selectors_fail_without_coercion[value4]"
+      ]
+    },
+    {
+      "test": "test_capacity_exhaustion_precedes_public_assessment",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 1,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[source_files]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[document_bytes]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_capacity_exhaustion_precedes_public_assessment[artifact_records]"
+      ]
+    },
+    {
+      "test": "test_batch_pass_limit_and_output_capacity_fail_without_partial_result",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 0,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_batch_pass_limit_and_output_capacity_fail_without_partial_result"
+      ]
+    },
+    {
+      "test": "test_unsupported_kinds_cannot_select_an_implicit_generation_mode",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 0,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[None]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[True]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_unsupported_kinds_cannot_select_an_implicit_generation_mode[other]"
+      ]
+    },
+    {
+      "test": "test_legacy_client_selector_is_an_explicit_failure",
+      "old_path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "new_path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "assertions_preserved": 2,
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_legacy_client_selector_is_an_explicit_failure"
+      ]
+    }
+  ],
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage-ranges.2026-10-20T11-32.json",
+    "sha256": "ad45086a640a8fbf1e1ca3272594412c38c3e2dffeb55acb412904ddb1df0cab",
+    "bytes": 9694
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-final-archive.2026-10-20T11-32.json",
+    "sha256": "210b8f575e12a22480631c4dd66d530004460a9c9cc10c9f25fe4a07adb6939b",
+    "bytes": 107127
+  },
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.json",
+    "sha256": "fb4bc7b50176135884fdaf99149716eed9f656ffc3958b098c65bf5355b518fd",
+    "bytes": 19004
+  },
+  "executed_freeze_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-freeze-harness.2026-10-20T11-32.txt",
+    "sha256": "387afc8a68ae8179c813174f4c888782c3e8f725c2fe29cf213132785edd5408",
+    "bytes": 17795
+  },
+  "original_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-focused8-tests.2026-10-20T10-55.json",
+    "sha256": "5f1a90831ec9d8d24fb3a48b6caeffa8837790972e4cecf495c874ad97808de7",
+    "bytes": 17221
+  },
+  "qualifications": [
+    "GR1 reserves repeated selector hashing/equality character work before coordinate enumeration.",
+    "GT1 repairs invalid fixtures while retaining all original parametrizations/assertions; no production schema or rule is weakened.",
+    "GT2 binds imported original source path/pin/raw hash with distinct target ownership through final public ready membership.",
+    "Generation is pure in-memory composition, with no publication, installation, runtime pass, host or discovery-completion claim.",
+    "Accepted model and public rule proof are referenced unchanged; final reverse/whole-repository gates and independent acceptance remain pending.",
+    "Exact working bytes are bound; any later Git index normalization must be separately qualified.",
+    "The retained 49-case passing run and four new controls are separate ordered proofs over identical production bytes. Original 49 test/helper bytes are verified unchanged by exact-hash reconstruction. No 49-case replay was performed for coverage."
+  ]
+}

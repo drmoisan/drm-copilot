@@ -1,0 +1,16 @@
+{
+  "Timestamp": "2026-10-20T10-29",
+  "Command": "Test-Path packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py; read current native attestation",
+  "EXIT_CODE": 0,
+  "Output Summary": "Approved helper path absent before creation; routing, launch authority and provenance all true.",
+  "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+  "exists": false,
+  "baseline": "evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+  "baseline_sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3",
+  "contract": "evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+  "contract_sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51",
+  "approval": "P5T4_CONTEXT_SPLIT",
+  "scope": "Call-local budgets, retained public rule assessments, immutable prospective overlays and original raw references. Public generator/model signatures unchanged.",
+  "production_test_changes_at_capture": false,
+  "suites_run": false
+}
