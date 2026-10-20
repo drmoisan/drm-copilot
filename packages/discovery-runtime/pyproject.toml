@@ -10,7 +10,10 @@ authors = ["Dan Moisan"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "drm_copilot_discovery", from = "src" }]
-include = ["src/drm_copilot_discovery/py.typed"]
+include = [
+    "src/drm_copilot_discovery/py.typed",
+    { path = "src/drm_copilot_discovery/_build_manifest.json", format = ["sdist", "wheel"] },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"

@@ -1,0 +1,194 @@
+{
+  "task": "P6-T1 shared finite matrix reconciliation",
+  "utc": "2026-10-20T14:51:37.607391+00:00",
+  "matrix": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+  "matrix_sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575",
+  "source": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+  "source_sha256": "1c64dbe9ccf13142f229e3fa1bebd022fce7a8bfcb877074294f17efa12ea247",
+  "harness_sha256": "29c12c281eecc42fc58e5a9e99965ac49282e7f081dca67a1e84bd7cde593596",
+  "exact_operations": true,
+  "rows": [
+    {
+      "operation": "init",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "configure",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "profile",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "inventory",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "new-contract",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "new-scenario",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "update-artifact",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "link-evidence",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-profile",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-feature-contract",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-coverage-ledger",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-runtime-scenario",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-parity-matrix",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-unspecified-behavior",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-product-decision",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-evidence-reference",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-decisions",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "validate-all",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "coverage-report",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "parity-report",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "completion-report",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "generate-acceptance",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "snapshot-export",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "snapshot-import",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "import-inventory",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "migrate",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "doctor",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "read-source",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "prepare-agent",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    },
+    {
+      "operation": "finalize-agent",
+      "required_equal": true,
+      "allowed_equal": true,
+      "modes_equal": true
+    }
+  ],
+  "passed": true,
+  "qualification": "Static finite-table comparison, not a behavioral gate. Captured existence, authorization and domain checks remain with operation owners."
+}

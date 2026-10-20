@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import json
 from itertools import permutations
+from typing import TYPE_CHECKING
 
 import pytest
 
 from scripts.dev_tools import build_discovery_runtime as build
+
+if TYPE_CHECKING:
+    from drm_copilot_discovery.models import ParseLimits
 
 ROOT = "schemas/discovery/v1"
 SCHEMA_PATH = f"{ROOT}/example.schema.json"
@@ -28,11 +32,23 @@ class MemoryFileSystem:
     """Model declared source bytes and generated writes without disk access."""
 
     def __init__(self) -> None:
+        """Create isolated source/declaration bytes; return None without I/O.
+
+        Literal mutable storage belongs to this test instance only; no parameters
+        or expected exceptions. Later test operations record their own writes.
+        """
         self.content = {
             build.ALLOWLIST_PATH: allowlist_text().encode(),
             SCHEMA_PATH: SCHEMA,
             f"{build.SOURCE_ROOT}/__init__.py": b"import yaml\n",
             f"{build.SOURCE_ROOT}/nested/__init__.py": b"import hashlib\n",
+            f"{build.SOURCE_ROOT}/py.typed": b"",
+            f"{build.PACKAGE_ROOT}/pyproject.toml": (
+                b'[tool.poetry]\nname="drm-copilot-discovery"\nversion="2.0.0"\n'
+                b'[tool.poetry.dependencies]\npython=">=3.10,<4.0"\n'
+                b'PyYAML=">=6.0"\njsonschema="^4.25.1"\n'
+                b'referencing=">=0.37,<0.38"\nlxml=">=5.3.0"\n'
+            ),
         }
         self.writes: list[str] = []
 
@@ -41,6 +57,17 @@ class MemoryFileSystem:
         if path not in self.content:
             raise FileNotFoundError(path)
         return self.content[path]
+
+    def read_bounded(self, path: str, *, limit: int) -> bytes:
+        """Return memory bytes at path (str) within limit (int), without I/O.
+
+        Raises FileNotFoundError for absence and ResourceError for capacity.
+        Reads existing immutable content only; no state changes occur.
+        """
+        content = self.read_bytes(path)
+        if len(content) > limit:
+            raise build.ResourceError("Memory content exceeds read limit")
+        return content
 
     def write_bytes(self, path: str, content: bytes) -> None:
         """Record each write so check and repeat runs prove their side effects."""
@@ -55,6 +82,16 @@ class MemoryFileSystem:
                 reverse=True,
             )
         )
+
+    def list_build_files(self, *, limits: ParseLimits) -> tuple[str, ...]:
+        """Return memory package paths within limits (ParseLimits), without I/O.
+
+        ValueError rejects excess count; local enumeration does not change state.
+        """
+        result = self.list_files(build.SOURCE_ROOT)
+        if len(result) > limits.artifact_records:
+            raise ValueError("Memory enumeration exceeds limits")
+        return result
 
 
 def test_stage_then_check_is_idempotent_and_reports_closure() -> None:

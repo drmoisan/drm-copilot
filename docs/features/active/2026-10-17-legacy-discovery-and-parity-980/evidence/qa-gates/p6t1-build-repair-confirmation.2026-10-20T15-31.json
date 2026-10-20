@@ -1,0 +1,206 @@
+{
+  "Timestamp": "2026-10-20T15-31",
+  "status": "CLEAR_FOR_BOUNDED_BUILD_SLICE_CHECKPOINT",
+  "task": "P6-T1 BUILD-R1/R2/R3 repair confirmation only",
+  "reviewer": "01a159d5-e3e2-7c71-a150-0e37df63cf23",
+  "route": "build_identity_review_p6t1_confirmation_20261020 / S5_P6T1_build_repair_confirmation",
+  "task_baseline": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+  "current_checkpoint_head": "44cb1199efeb40d735c007c45098f41d6720204b",
+  "head_provenance": "Coordinator-reported analyzer-only checked checkpoint; source/evidence bindings verified independently by SHA-256. No Git commands run.",
+  "Command": "Get-FileHash for exact repair staging entries and dependency map; source/test inspection limited to BUILD-R1/R2/R3; retained ordered/reverse proof reconciliation",
+  "EXIT_CODE": 0,
+  "Output Summary": "All 20 repair staging entries and 16 dependencies match. Three original findings closed at the bound source hashes. No behavioral rerun or source mutation needed.",
+  "repair_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-freeze.2026-10-20T15-28.json",
+    "sha256": "868d9ef1a5fd1433b446712be10f59c57d8747cddc1bbbad391c4346cbdf45b2"
+  },
+  "repair_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-staging-manifest.2026-10-20T15-28.json",
+    "sha256": "45566f031be78617883ca74a4e59b759d9d60b931c4c7191b2e908a7c632d100"
+  },
+  "closed_findings": [
+    {
+      "id": "BUILD-R1",
+      "status": "closed",
+      "source": "build_identity.py build_file_paths; discovery_build_identity.py list_build_source_files",
+      "confirmation": "Both adapters use shared streaming scandir. Count rejection precedes name/path retention and metadata reads for the excess entry. Context manager closes the scanner on failure. Two exact controls assert only entries 0 and 1 consumed at limit 1 and closure recorded. Unsupported non-filesystem resource stores fail closed."
+    },
+    {
+      "id": "BUILD-R2",
+      "status": "closed",
+      "source": "discovery_build_identity.py package_metadata",
+      "confirmation": "No unconditional tomllib import. Fixed import_module tomllib/tomli selection preserves byte/syntax/structured bounds and immutable projection. Existing lock supplies nonoptional dev tomli 2.4.0 for Python 3.10. Missing-tomllib control preserves metadata values without installing packages."
+    },
+    {
+      "id": "BUILD-R3",
+      "status": "closed",
+      "source": "build_identity.py build_path_metadata and both adapters",
+      "confirmation": "Shared lstat rejects symbolic-link mode and Windows reparse bit 0x400, independent of Path.is_junction availability or interpreter version gates. Build root/ancestors, traversal members and installed read ancestors use it. Three controls cover enumeration, direct read and source traversal while convenience APIs raise AttributeError; original link cases retain rejection."
+    }
+  ],
+  "retained_gates": [
+    {
+      "stage": "format",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "7 files would be left unchanged."
+      ]
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "All checks passed!"
+      ]
+    },
+    {
+      "stage": "types",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "0 errors, 0 warnings, 0 informations"
+      ]
+    },
+    {
+      "stage": "reproductions",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "============================== 8 passed in 0.17s =============================="
+      ]
+    },
+    {
+      "stage": "tests",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+        "--cov=drm_copilot_discovery.build_identity",
+        "--cov=scripts.dev_tools.discovery_build_identity",
+        "--cov=scripts.dev_tools.build_discovery_runtime",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p6t1-build-repair3-coverage.json"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "TOTAL                                                                      551      0    234      0   100%",
+        "============================= 152 passed in 0.82s ============================="
+      ]
+    },
+    {
+      "stage": "reverse",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/discovery_runtime/test_build_identity.py"
+      ],
+      "exit_code": 0,
+      "summary": [
+        "============================= 152 passed in 0.43s ============================="
+      ]
+    }
+  ],
+  "coverage": "551/551 statements and 234/234 branches across the three bound production modules; original 144 case IDs and 33 caller assertions preserved. New population 152 cases, reverse 152 cases. Changed metadata fixture is scoped with monkeypatch and uses memory metadata/scanners.",
+  "retained_failures": [
+    "Original three-finding review and four probe diagnostics remain immutable.",
+    "Original static and candidate failures and 144-case archive retained.",
+    "Repair import-lint/type diagnostics retained.",
+    "Repair2 includes five passing controls and three setup/undo failures from deleting inherited Path methods; final repair uses unavailable-API stubs in scoped monkeypatch context. Failure history is not replaced by the final passing proof."
+  ],
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "limitations": [
+    "Actual Python 3.10/3.11 execution unavailable locally; only Python 3.13 listed by retained launcher inventory. Compatibility controls simulate missing module/convenience APIs.",
+    "Clearance is for these three findings and direct regression scope, not complete P6 service acceptance or repository-wide QA.",
+    "Live _build_manifest.json generation, wheel/install and native invocation remain held.",
+    "Shared service dependencies must be included through the independently accepted shared slice or explicitly identified as dependent WIP; this build union does not stage those dependencies.",
+    "No P6-T1 or AC checkbox changed; no source/test/config/resource/Git/checkpoint action performed."
+  ],
+  "shared_coordination": "rendering_review reports source confirmation clear at e8157910/0bcdcb5c/e62fa8e8; final shared freeze/union pending at confirmation write. Coordinator may combine exact independent unions when both are available.",
+  "ac_status": "Unchanged: P6-T1 remains in progress; full AC/checkoff remains coordinator-owned."
+}

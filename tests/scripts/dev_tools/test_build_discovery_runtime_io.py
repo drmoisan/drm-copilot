@@ -4,13 +4,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import stat
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
+from drm_copilot_discovery.models import ParseLimits
 
 from scripts.dev_tools import build_discovery_runtime as build
 from tests.scripts.dev_tools.test_build_discovery_runtime import MemoryFileSystem
+from tests.scripts.dev_tools.test_discovery_build_identity import (
+    memory_build_metadata as memory_build_metadata,
+)
 
 
 @dataclass(frozen=True)
@@ -22,19 +27,68 @@ class FakeBuildResult:
     stderr: str
 
 
+@pytest.mark.parametrize(
+    "kind", ("valid", "root-link", "child-link", "count", "depth", "other")
+)
+def test_build_source_enumeration_is_prospectively_bounded(
+    kind: str,
+    mem_fs_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    memory_build_metadata: dict[str, tuple[int, int]],
+) -> None:
+    """kind (str), memory Path and monkeypatch isolate bounded package traversal.
+
+    memory_build_metadata (dict[str,tuple[int,int]]) controls mode/reparse flags.
+    Returns None; assertions may fail. Only memory metadata is read or changed.
+    """
+    target = mem_fs_path / build.SOURCE_ROOT / "nested" / "source.py"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(b"")
+
+    if kind == "root-link":
+        memory_build_metadata[str(mem_fs_path)] = (stat.S_IFLNK, 0)
+    elif kind in ("child-link", "other"):
+        memory_build_metadata[str(target)] = (
+            stat.S_IFLNK if kind == "child-link" else 0,
+            0,
+        )
+    limits = ParseLimits(
+        artifact_records=1 if kind == "count" else 100,
+        nesting_depth=1 if kind == "depth" else 10,
+    )
+    filesystem = build.DiskBuildFileSystem(mem_fs_path)
+    if kind == "valid":
+        assert filesystem.list_build_files(limits=limits) == (
+            f"{build.SOURCE_ROOT}/nested/source.py",
+        )
+    else:
+        with pytest.raises(ValueError, match="Linked|Unsupported|limits"):
+            filesystem.list_build_files(limits=limits)
+
+
 def test_disk_boundary_reads_lists_and_writes_only_generated_paths(
     mem_fs_path: Path,
 ) -> None:
-    """Pathlib operations use the repository's in-memory filesystem fixture."""
+    """Check writes/limits with mem_fs_path (Path) backed entirely by memory.
+
+    Returns None; assertions may fail. Only fixture-owned memory changes.
+    """
     filesystem = build.DiskBuildFileSystem(mem_fs_path)
     output = f"{build.STAGE_ROOT}/schemas/example.json"
     filesystem.write_bytes(output, b"{}\n")
     assert filesystem.read_bytes(output) == b"{}\n"
+    assert filesystem.read_bounded(output, limit=3) == b"{}\n"
     assert filesystem.list_files(build.STAGE_ROOT) == (output,)
     with pytest.raises(build.ResourceError, match="restricted"):
         filesystem.write_bytes("src/code.py", b"changed")
     with pytest.raises(build.ResourceError, match="unsafe"):
         filesystem.read_bytes("schemas/../outside")
+    with pytest.raises(build.ResourceError, match="exceeds"):
+        filesystem.read_bounded(output, limit=2)
+    with pytest.raises(build.ResourceError, match="Invalid"):
+        filesystem.read_bounded(output, limit=-1)
+    filesystem.write_bytes(build.BUILD_MANIFEST_PATH, b"{}\n")
+    assert filesystem.read_bytes(build.BUILD_MANIFEST_PATH) == b"{}\n"
 
 
 def test_resolved_path_escape_is_rejected(
@@ -119,7 +173,11 @@ def test_missing_python_prevents_build(
 def test_cli_build_reports_wheel_digest_with_injected_builder(
     mem_fs_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """Return deterministic metadata while delegating build and byte reads."""
+    """Check distinct digests using mem_fs_path (Path) and capsys (CaptureFixture).
+
+    Returns None; assertions may fail. Local memory and captured output change;
+    the injected wheel callback starts no process and performs no disk I/O.
+    """
     calls: list[tuple[Path, Path]] = []
 
     def wheel_builder(repository: Path, output: Path) -> Path:
@@ -137,6 +195,8 @@ def test_cli_build_reports_wheel_digest_with_injected_builder(
     report = json.loads(capsys.readouterr().out)
     assert report["wheel"] == "runtime.whl"
     assert report["wheel_sha256"] == hashlib.sha256(b"wheel").hexdigest()
+    assert report["build_sha256"] != report["wheel_sha256"]
+    assert report["policy_version"] == 2
 
 
 def test_cli_stage_and_check_never_build(

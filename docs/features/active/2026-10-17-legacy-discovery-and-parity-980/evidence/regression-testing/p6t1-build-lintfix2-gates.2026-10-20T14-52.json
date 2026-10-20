@@ -1,0 +1,84 @@
+{
+  "Timestamp": "2026-10-20T14-52",
+  "label": "lintfix2",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "e842f9bca9ba0f5c095c7c9034ac00e49aeedaa8ea54cf4ca7b918bdb3dc9b26",
+    "scripts/dev_tools/discovery_build_identity.py": "0c23038f7791cf80e0e118e5623deb02a0e52a3f7ba84f50f966cd947ef66ace",
+    "scripts/dev_tools/build_discovery_runtime.py": "88e1d7f901e8f6df95210bf84aa7df16fd73d9064228e97bb23197fe55b67864",
+    "tests/discovery_runtime/test_build_identity.py": "7f045fcf72ab5cfcf37fbeb6705ac022ad2b5ad75e7e2105e07fe5f7853bf7ff",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "767dad5276b424f09e410ab5558d1cad67e8431557d1d9690a1e170b1df69e88",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "cc21ccf30d9ef40a7ac796fe55a6bd3d03cad7f9175570d7d609e6f577ffa5ab",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "7eb3b73ef1a82f6482a874adcd630e0b81f9c84b85dd233f2c95bb6da6def82f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "e842f9bca9ba0f5c095c7c9034ac00e49aeedaa8ea54cf4ca7b918bdb3dc9b26",
+    "scripts/dev_tools/discovery_build_identity.py": "8929a8f8f7917fb69f6c2ba4bf41debf8c3d2b7b255640feba046df28eaafe3d",
+    "scripts/dev_tools/build_discovery_runtime.py": "88e1d7f901e8f6df95210bf84aa7df16fd73d9064228e97bb23197fe55b67864",
+    "tests/discovery_runtime/test_build_identity.py": "7f045fcf72ab5cfcf37fbeb6705ac022ad2b5ad75e7e2105e07fe5f7853bf7ff",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "767dad5276b424f09e410ab5558d1cad67e8431557d1d9690a1e170b1df69e88",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f734fd83eac7ef3e8aa79647c511b74c73838801bcde9ca64a34a1b7c2fe234d",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "7eb3b73ef1a82f6482a874adcd630e0b81f9c84b85dd233f2c95bb6da6def82f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "lint-fix",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "--fix",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.13715399999637157,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-lintfix2-20261020T145246-lint-fix.stdout.bin",
+          "sha256": "da537c5975be44f5e33abfb1c6a0e62972ab330b4f47b2692e64dc0a943b1984",
+          "readable": "TC002 Move third-party import `drm_copilot_discovery.models.ParseLimits` into a type-checking block\n  --> scripts\\dev_tools\\build_discovery_runtime.py:22:42\n   |\n21 | from drm_copilot_discovery import __version__\n22 | from drm_copilot_discovery.models import ParseLimits\n   |                                          ^^^^^^^^^^^\n23 | from drm_copilot_discovery.resources import (\n24 |     MANIFEST_FILENAME,\n   |\nhelp: Move into type-checking block\n\nTC003 Move standard library import `pathlib.Path` into a type-checking block\n  --> scripts\\dev_tools\\discovery_build_identity.py:9:21\n   |\n 7 | from __future__ import annotations\n 8 |\n 9 | from pathlib import Path\n   |                     ^^^^\n10 | from typing import TYPE_CHECKING, cast\n   |\nhelp: Move into type-checking block\n\nTC002 Move third-party import `drm_copilot_discovery.models.ParseLimits` into a type-checking block\n  --> tests\\scripts\\dev_tools\\test_build_discovery_runtime.py:9:42\n   |\n 8 | import pytest\n 9 | from drm_copilot_discovery.models import ParseLimits\n   |                                          ^^^^^^^^^^^\n10 |\n11 | from scripts.dev_tools import build_discovery_runtime as build\n   |\nhelp: Move into type-checking block\n\nE501 Line too long (97 > 88)\n  --> tests\\scripts\\dev_tools\\test_build_discovery_runtime_io.py:26:89\n   |\n26 | @pytest.mark.parametrize(\"kind\", (\"valid\", \"root-link\", \"child-link\", \"count\", \"depth\", \"other\"))\n   |                                                                                         ^^^^^^^^^\n27 | def test_build_source_enumeration_is_prospectively_bounded(\n28 |     kind: str, mem_fs_path: Path, monkeypatch: pytest.MonkeyPatch\n   |\n\n\nFixed 2 errors:\n- scripts\\dev_tools\\discovery_build_identity.py:\n    1 \u00d7 I001 (unsorted-imports)\n- tests\\scripts\\dev_tools\\test_build_discovery_runtime.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 6 errors (2 fixed, 4 remaining).\nNo fixes available (3 hidden fixes can be enabled with the `--unsafe-fixes` option).\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-lintfix2-20261020T145246-lint-fix.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "9b0aeaf994b97cd2ec6c7735f74541dcbf9838eb862e0244c2c036fa29e3ddac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "failed-retained"
+}

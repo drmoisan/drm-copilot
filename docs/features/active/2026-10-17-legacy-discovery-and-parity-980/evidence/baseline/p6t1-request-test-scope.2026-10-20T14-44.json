@@ -1,0 +1,9 @@
+{
+  "timestamp_utc": "2026-10-20T14:44:28.488446+00:00",
+  "path": "tests/discovery_runtime/test_service_request_rules.py",
+  "absent_before_creation": true,
+  "source_sha256": "6e1b3e43944233f986835f5475020c752b488e5eb4c94508f9a9459f226feaeb",
+  "formatted_size_trigger": 559,
+  "moved": "Request fixture/table/parser rules only; function bodies/assertions unchanged by split.",
+  "original_baseline": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json"
+}
