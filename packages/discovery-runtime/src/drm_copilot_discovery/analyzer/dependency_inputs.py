@@ -5,16 +5,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, cast
 
-from .dependency_values import (
+from drm_copilot_discovery.analyzer.dependency_values import (
     DependencyValue as DependencyValue,
 )
-from .dependency_values import (
+from drm_copilot_discovery.analyzer.dependency_values import (
     Ecosystem as Ecosystem,
 )
-from .dependency_values import (
+from drm_copilot_discovery.analyzer.dependency_values import (
     dependency_value as dependency_value,
 )
-from .dependency_values import (
+from drm_copilot_discovery.analyzer.dependency_values import (
     safe_identifier as safe_identifier,
 )
 

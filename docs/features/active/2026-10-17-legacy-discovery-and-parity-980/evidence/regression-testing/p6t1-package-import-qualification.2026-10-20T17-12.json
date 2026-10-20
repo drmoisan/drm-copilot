@@ -1,0 +1,284 @@
+{
+  "Timestamp": "2026-10-20T17-12",
+  "status": "IMPORT_ONLY_READY_FOR_CONFIRMATION",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-package-import-original.2026-10-20T17-12.json",
+    "sha256": "276fa461cf5ec295cb9437d590519f243dd324c96608e818fec2758ca6798318",
+    "bytes": 9822
+  },
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+    "sha256": "94201847fa0893f091dbca3e5ed5af080676149f3c538b949920814feb84eb2e",
+    "bytes": 20918
+  },
+  "target": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+    "sha256": "3b2c5c1024e941839cdbd60701a3f07cff4fd78ab0c1a47a1b20de1e73450c3a",
+    "bytes": 7771
+  },
+  "tests": {
+    "path": "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+    "sha256": "2dbb00f662742bc00e81f4f3efc0d0bc84cd56329bb71f1aa7b4809889ddf33a",
+    "bytes": 13978
+  },
+  "qualification": "Exact byte substitution of four import targets only; complete AST equals the original after normalizing only those four targets/levels. All aliases, signatures, constants, docstrings and bodies are unchanged.",
+  "resolved_module": "drm_copilot_discovery.analyzer.dependency_values",
+  "captured_211_input_changes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py": {
+      "before": "9bf1b6e01a4adac30bb8481a88fc3a70cff8b66af5abfdb712b5908100749a90",
+      "after": "94201847fa0893f091dbca3e5ed5af080676149f3c538b949920814feb84eb2e"
+    }
+  },
+  "unchanged_input_count": 210,
+  "results": [
+    {
+      "stage": "format",
+      "argv": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.31413390004308894,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-format.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-format.stderr.bin",
+          "sha256": "b746261942fbf2a3759f07dc70d3825a6fc444269a620032fadcdd3ac05eb2e4",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n1 file would be left unchanged.\r\n"
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "argv": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.10663460002979264,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-lint.stdout.bin",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+          "readable": "All checks passed!\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-lint.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "types",
+      "argv": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7192026000120677,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-types.stdout.bin",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-types.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "tests",
+      "argv": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/discovery_runtime/analyzer/test_dependency_inputs.py",
+        "--cov=drm_copilot_discovery.analyzer.dependency_inputs",
+        "--cov=drm_copilot_discovery.analyzer.dependency_values",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p6t1-package-import-coverage.2026-10-20T17-12.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9307278999476694,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-tests.stdout.bin",
+          "sha256": "b09f3669a2519021252c645eaaf58626751c7cc71f7c50d093c9d2e759fd7d47",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 93 items\r\n\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/pkg-@scope/pkg] PASSED [  1%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-pkg-name-pkg-name] PASSED [  2%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-Upper-None] PASSED [  3%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-Example_Package-Example_Package] PASSED [  4%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[dotnet-Example.Package-Example.Package] PASSED [  5%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-None-None] PASSED [  6%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python--None] PASSED [  7%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-node_modules/pkg-None] PASSED [  8%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-../secret-None] PASSED [  9%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-https://user:secret@example.test-None] PASSED [ 10%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/../../secret-None] PASSED [ 11%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-caf\\xe9-None] PASSED [ 12%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 13%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-None] PASSED [ 15%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[None-missing-None] PASSED [ 16%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[-missing-None] PASSED [ 17%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.2.3-literal-1.2.3] PASSED [ 18%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[v1.0-beta+build-literal-v1.0-beta+build] PASSED [ 19%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[>=1.2,<2-constraint->=1.2,<2] PASSED [ 20%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[[1.0,2.0)-constraint-[1.0,2.0)] PASSED [ 21%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[^1.0 || ~2.0-constraint-^1.0 || ~2.0] PASSED [ 22%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[*-constraint-*] PASSED [ 23%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[next-tag-next] PASSED [ 24%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[workspace:*-workspace-None] PASSED [ 25%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[npm:other@1-alias-None] PASSED [ 26%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[git+https://secret-vcs-None] PASSED [ 27%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[hg+ssh://secret-vcs-None] PASSED [ 29%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[svn+https://secret-vcs-None] PASSED [ 30%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[https://name:secret@example.test/a-url-None] PASSED [ 31%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[file:../secret-local-None] PASSED [ 32%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[link:../secret-local-None] PASSED [ 33%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[./secret-local-None] PASSED [ 34%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[../secret-local-None] PASSED [ 35%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[/secret-local-None] PASSED [ 36%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[\\\\secret-local-None] PASSED [ 37%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[Z:\\\\secret-local-None] PASSED [ 38%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[$(Secret)-dynamic-None] PASSED [ 39%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[%Secret%-dynamic-None] PASSED [ 40%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[{secret}-dynamic-None] PASSED [ 41%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[private-token-unsupported-None] PASSED [ 43%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.0; secret-unsupported-None] PASSED [ 44%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111-unsupported-None] PASSED [ 45%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[|||-unsupported-None] PASSED [ 46%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[wrong-None] PASSED [ 47%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[literal-secret] PASSED [ 48%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[constraint-1.0] PASSED [ 49%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[tag-None] PASSED [ 50%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[local-secret] PASSED [ 51%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values0] PASSED [ 52%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values1] PASSED [ 53%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values2] PASSED [ 54%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values3] PASSED [ 55%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values4] PASSED [ 56%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values5] PASSED [ 58%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values6] PASSED [ 59%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values7] PASSED [ 60%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values8] PASSED [ 61%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values9] PASSED [ 62%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values10] PASSED [ 63%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_closed_anchors_preserve_json_occurrences_and_xml_lines PASSED [ 64%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes0] PASSED [ 65%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes1] PASSED [ 66%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes2] PASSED [ 67%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes3] PASSED [ 68%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes4] PASSED [ 69%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes5] PASSED [ 70%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes6] PASSED [ 72%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes7] PASSED [ 73%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes8] PASSED [ 74%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes9] PASSED [ 75%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes10] PASSED [ 76%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes11] PASSED [ 77%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes12] PASSED [ 78%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes13] PASSED [ 79%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes14] PASSED [ 80%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes15] PASSED [ 81%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes0] PASSED [ 82%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes1] PASSED [ 83%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes2] PASSED [ 84%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes3] PASSED [ 86%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes4] PASSED [ 87%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes5] PASSED [ 88%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_carriers_are_immutable_and_preserve_distinct_dependency_kinds PASSED [ 89%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[-1-] PASSED [ 90%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one-1-one] PASSED [ 91%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one\\r\\ntwo\\rthree\\n-3-one\\r\\ntwo\\rthree\\n] PASSED [ 92%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\r\\n-1-\\r\\n] PASSED [ 93%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\xef\\xbb\\xbfhello-1-hello] PASSED [ 94%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[caf\\xc3\\xa9-1-caf\\xe9] PASSED [ 95%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_shared_collector_redacts_values_and_keeps_requested_separate PASSED [ 96%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_diagnostic_deduplication_and_snapshot_isolation PASSED [ 97%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_empty_and_repeated_results_are_deterministic PASSED [ 98%]\r\ntests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_split_preserves_public_import_identity_and_signatures PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                                 Stmts   Miss Branch BrPart  Cover   Missing\r\n--------------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py     174     27     74     14    83%   90-93, 130, 289, 311, 318-319, 332, 335-336, 344-345, 348-350, 359, 373-374, 380-381, 389-390, 422, 428, 494\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_values.py     101      6     68      6    93%   35, 68, 80, 85, 87, 179\r\n--------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                                  275     33    142     20    87%\r\nCoverage JSON written to file WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p6t1-package-import-coverage.2026-10-20T17-12.json\r\n============================= 93 passed in 0.27s ==============================\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-import-2026-10-20T17-12-tests.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "nodes": [
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/pkg-@scope/pkg]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-pkg-name-pkg-name]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-Upper-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-Example_Package-Example_Package]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[dotnet-Example.Package-Example.Package]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-None-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python--None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-node_modules/pkg-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-../secret-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-https://user:secret@example.test-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[node-@scope/../../secret-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-caf\\xe9-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_identifier_allowlists_keep_only_literal_names[python-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[None-missing-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[-missing-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.2.3-literal-1.2.3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[v1.0-beta+build-literal-v1.0-beta+build]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[>=1.2,<2-constraint->=1.2,<2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[[1.0,2.0)-constraint-[1.0,2.0)]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[^1.0 || ~2.0-constraint-^1.0 || ~2.0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[*-constraint-*]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[next-tag-next]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[workspace:*-workspace-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[npm:other@1-alias-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[git+https://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[hg+ssh://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[svn+https://secret-vcs-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[https://name:secret@example.test/a-url-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[file:../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[link:../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[./secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[../secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[/secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[\\\\secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[Z:\\\\secret-local-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[$(Secret)-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[%Secret%-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[{secret}-dynamic-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[private-token-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[1.0; secret-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_version_classification_never_retains_reference_targets[|||-unsupported-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[wrong-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[literal-secret]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[constraint-1.0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[tag-None]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_constructor_cannot_bypass_sanitization[local-secret]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values6]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values7]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values8]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_anchor_rejects_dynamic_keys_or_fabricated_spans[values10]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_closed_anchors_preserve_json_occurrences_and_xml_lines",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes6]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes7]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes8]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes10]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes11]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes12]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes13]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes14]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_candidate_rejects_unsanitized_or_mutable_metadata[changes15]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes0]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes1]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes2]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes3]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes4]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_result_rejects_mutable_unsanitized_and_invalid_usage[changes5]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_carriers_are_immutable_and_preserve_distinct_dependency_kinds",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[-1-]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one-1-one]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[one\\r\\ntwo\\rthree\\n-3-one\\r\\ntwo\\rthree\\n]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\r\\n-1-\\r\\n]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[\\xef\\xbb\\xbfhello-1-hello]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_decode_preserves_valid_text_with_physical_line_boundaries[caf\\xc3\\xa9-1-caf\\xe9]",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_shared_collector_redacts_values_and_keeps_requested_separate",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_diagnostic_deduplication_and_snapshot_isolation",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_empty_and_repeated_results_are_deterministic",
+    "tests/discovery_runtime/analyzer/test_dependency_inputs.py::test_value_split_preserves_public_import_identity_and_signatures"
+  ],
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-raw-archive.2026-10-20T17-12.json",
+    "sha256": "538558da3e180fd969173e8e7d26dc30305b30bc68f15b3a0a86985eacded03c",
+    "bytes": 8889
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-coverage.2026-10-20T17-12.json",
+    "sha256": "3d5261f768d38167d47e00d205cd6a0b456034a96aa8713802633068cc09aab5",
+    "bytes": 26614
+  },
+  "coverage_summaries": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_inputs.py": {
+      "covered_lines": 147,
+      "num_statements": 174,
+      "percent_covered": 82.66129032258064,
+      "percent_covered_display": "83",
+      "missing_lines": 27,
+      "excluded_lines": 0,
+      "percent_statements_covered": 84.48275862068965,
+      "percent_statements_covered_display": "84",
+      "num_branches": 74,
+      "num_partial_branches": 14,
+      "covered_branches": 58,
+      "missing_branches": 16,
+      "percent_branches_covered": 78.37837837837837,
+      "percent_branches_covered_display": "78"
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\analyzer\\dependency_values.py": {
+      "covered_lines": 95,
+      "num_statements": 101,
+      "percent_covered": 92.89940828402366,
+      "percent_covered_display": "93",
+      "missing_lines": 6,
+      "excluded_lines": 0,
+      "percent_statements_covered": 94.05940594059406,
+      "percent_statements_covered_display": "94",
+      "num_branches": 68,
+      "num_partial_branches": 6,
+      "covered_branches": 62,
+      "missing_branches": 6,
+      "percent_branches_covered": 91.17647058823529,
+      "percent_branches_covered_display": "91"
+    }
+  },
+  "physical_lines": 500,
+  "packaging_retry": "Held pending independent confirmation and coordinator release.",
+  "staging_source": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py"
+  ],
+  "no_other_source_or_test_changes": true
+}

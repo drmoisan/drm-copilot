@@ -1,0 +1,83 @@
+{
+  "Timestamp": "2026-10-20T17-15",
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "current_head": "9ceebcd61c148dc4eba786d4172dfc43ee0c1e3e",
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-package-import-original.2026-10-20T17-12.json",
+      "working_sha256": "276fa461cf5ec295cb9437d590519f243dd324c96608e818fec2758ca6798318",
+      "expected_git_blob": "74c715dcc1716a557b85d1e8753f4469c288fc03",
+      "bytes": 9822
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-import-confirmation.2026-10-20T17-15.json",
+      "working_sha256": "388964cdbb4bf763bc411185ae04d045bada3f9b2a729b66cdb4a5044945e169",
+      "expected_git_blob": "abda2b633dd8bdbd18ae5b1457b9c66c9e3cb4e8",
+      "bytes": 5840
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-import-confirmation.2026-10-20T17-15.md",
+      "working_sha256": "c87a769b51c31227ee9123d4322ef1382cc82b8bc1347ee2bb409ad18390d864",
+      "expected_git_blob": "f253b38d10e86126e79d74b469b88ce04fe97549",
+      "bytes": 1031
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-build.2026-10-20T17-09.json",
+      "working_sha256": "dc1740ba72b0ff99d2a724dc785440caf326243e31e6d7486c96d32e50eae6e2",
+      "expected_git_blob": "a866478004cb3f26f90fb64453411dd4fb2f1589",
+      "bytes": 65330
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-raw-archive.2026-10-20T17-09.json",
+      "working_sha256": "34d6c4242f87bfa206ff9082c998500b147779abf0a0adfd287c0206bf5a5d24",
+      "expected_git_blob": "a067c75a75bb206bd39e8feea18fabbc798b17d4",
+      "bytes": 5172
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-coverage-full.2026-10-20T17-13.json",
+      "working_sha256": "ace609738028b5b89c7df19c8bb9e7582aa8486e5d5c3c7600970cc7f450f6fd",
+      "expected_git_blob": "79d5108af7ded5ebdb28542e844df4981b3f9f95",
+      "bytes": 26391
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-coverage.2026-10-20T17-12.json",
+      "working_sha256": "3d5261f768d38167d47e00d205cd6a0b456034a96aa8713802633068cc09aab5",
+      "expected_git_blob": "bbeffe094af8f5a66488b5310d75876267881aa2",
+      "bytes": 26614
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-qualification-full.2026-10-20T17-13.json",
+      "working_sha256": "8d3eb51be05ce185d8c503d2a097eaa4339ada1fe0777a769649b323cb2b4036",
+      "expected_git_blob": "2c961c39dfba2e4562ffebac98753487e14e3dc9",
+      "bytes": 69641
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-qualification.2026-10-20T17-12.json",
+      "working_sha256": "65e3d3fe031bf693dce953a903a700ff354fcb8a67cac85c1abdeb9de0c61600",
+      "expected_git_blob": "cc1c355814717586b82df5309df211ec2d6585c7",
+      "bytes": 37795
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-raw-archive-full.2026-10-20T17-13.json",
+      "working_sha256": "31cf61a51569433e909bb3ab042833d8f2cecb4539d0295db2bad5f5aa2e0d1b",
+      "expected_git_blob": "b1f47a9813c2a7069f0b94ef4374dd637d336bab",
+      "bytes": 10249
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-raw-archive.2026-10-20T17-12.json",
+      "working_sha256": "538558da3e180fd969173e8e7d26dc30305b30bc68f15b3a0a86985eacded03c",
+      "expected_git_blob": "6fb284339f34aba3ad03a4e942f78246f68d0c84",
+      "bytes": 8889
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+      "working_sha256": "94201847fa0893f091dbca3e5ed5af080676149f3c538b949920814feb84eb2e",
+      "expected_git_blob": "15d0f0c1d12f8a1c77bf5b79b80cc714a6183bda",
+      "bytes": 20918
+    }
+  ],
+  "include_manifest_itself": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-import-checked-staging.2026-10-20T17-15.json",
+  "qualification": "One changed source, seven owner import-prerequisite evidence files, original failed-build receipt/archive required by the baseline, two reviewer confirmation files and this self-manifest. Self working SHA and Git blob are supplied separately to avoid circular hashing. No tests, unrelated core continuation, native preparation or package output is staged. Package retry remains separate."
+}
