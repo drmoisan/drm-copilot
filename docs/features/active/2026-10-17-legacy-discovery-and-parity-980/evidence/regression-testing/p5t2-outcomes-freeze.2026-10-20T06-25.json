@@ -1,0 +1,2415 @@
+{
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t2-shared-baseline.2026-10-20T05-46.json",
+    "sha256": "dd8ff586304e142d0894f38eb7364729821d3866c680d7981782b9e829c08d86"
+  },
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py: eol: lf"
+      ],
+      "physical_lines": 471,
+      "working_git_blob": "b9922876c87775e93548319ad9e18b12e86668bb",
+      "working_sha256": "7efafe82f07bf4e3787629c64fbbb500054d8ffc6bc424394d954622d8cf75b9"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py: eol: lf"
+      ],
+      "physical_lines": 86,
+      "working_git_blob": "e480c81adb99304371c94a71b8fbf51902def0b9",
+      "working_sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "attributes": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py: text: auto",
+        "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py: eol: lf"
+      ],
+      "physical_lines": 345,
+      "working_git_blob": "ed439ace1c374de475b7d09ca76ad5401dde5d46",
+      "working_sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e"
+    },
+    "tests/discovery_runtime/test_parity_models.py": {
+      "attributes": [
+        "tests/discovery_runtime/test_parity_models.py: text: auto",
+        "tests/discovery_runtime/test_parity_models.py: eol: lf"
+      ],
+      "physical_lines": 292,
+      "working_git_blob": "6618b793f89028a6f9d7c2ed774e12141567b41d",
+      "working_sha256": "20c411fb2ae13b85546ec432f4bb6f38f8deba2a280c211aad8a0f1f50ca6e42"
+    }
+  },
+  "collected_node_order": [
+    "tests/discovery_runtime/test_parity_models.py::test_existing_findings_constructor_and_reexport_preserve_identity",
+    "tests/discovery_runtime/test_parity_models.py::test_completed_outcome_keeps_authored_state_and_actual_proof_distinct",
+    "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[missing]",
+    "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[unassessed]",
+    "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[partial]",
+    "tests/discovery_runtime/test_parity_models.py::test_incomplete_authored_states_never_become_complete[conflicting]",
+    "tests/discovery_runtime/test_parity_models.py::test_every_duplicate_row_is_excluded_from_validated_completion",
+    "tests/discovery_runtime/test_parity_models.py::test_invalid_source_preserves_an_invalid_authored_row",
+    "tests/discovery_runtime/test_parity_models.py::test_upstream_findings_truncation_cannot_certify_complete_parity",
+    "tests/discovery_runtime/test_parity_models.py::test_missing_target_proof_is_retained_even_when_authored_state_is_full",
+    "tests/discovery_runtime/test_parity_models.py::test_own_diagnostic_truncation_invalidates_an_otherwise_completed_row",
+    "tests/discovery_runtime/test_parity_models.py::test_retained_input_budget_rejects_before_target_proof_construction[artifact_records]",
+    "tests/discovery_runtime/test_parity_models.py::test_retained_input_budget_rejects_before_target_proof_construction[document_bytes]",
+    "tests/discovery_runtime/test_parity_models.py::test_aggregate_entry_work_is_reserved_before_source_resolution",
+    "tests/discovery_runtime/test_parity_rules.py::test_full_parity_uses_target_proof_and_preserves_snapshot",
+    "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[artifact_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+    "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[revision-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]",
+    "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[feature_id-absent]",
+    "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[repository_id-foreign]",
+    "tests/discovery_runtime/test_parity_rules.py::test_source_link_must_match_exact_identity_and_bytes[artifact_path-missing.json]",
+    "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[unassessed]",
+    "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[partial]",
+    "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[missing]",
+    "tests/discovery_runtime/test_parity_rules.py::test_incomplete_states_are_truthful_drafts_but_not_required_completion[conflicting]",
+    "tests/discovery_runtime/test_parity_rules.py::test_entry_requires_configured_target_identity[target_repository-value0]",
+    "tests/discovery_runtime/test_parity_rules.py::test_entry_requires_configured_target_identity[client_id-absent]",
+    "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[checksum-value0]",
+    "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[path-None]",
+    "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[revision-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]",
+    "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[repository-foreign]",
+    "tests/discovery_runtime/test_parity_rules.py::test_invalid_or_foreign_capture_cannot_support_full_parity[environment-value4]",
+    "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[source]",
+    "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[documentation]",
+    "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[inventory]",
+    "tests/discovery_runtime/test_parity_rules.py::test_nonexecution_payload_cannot_be_target_execution[decision]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[client_id-absent]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[target_repository-None]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[implementation_paths-value2]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[feature_refs-value3]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[verification_state-failed]",
+    "tests/discovery_runtime/test_parity_rules.py::test_implementation_claims_have_independent_integrity[test_references-value5]",
+    "tests/discovery_runtime/test_parity_rules.py::test_passing_component_cannot_mask_another_linked_incomplete_component[failed]",
+    "tests/discovery_runtime/test_parity_rules.py::test_passing_component_cannot_mask_another_linked_incomplete_component[not-run]",
+    "tests/discovery_runtime/test_parity_rules.py::test_full_result_cannot_hide_explicit_blockers[blockers-value0]",
+    "tests/discovery_runtime/test_parity_rules.py::test_full_result_cannot_hide_explicit_blockers[validation_status-fail]",
+    "tests/discovery_runtime/test_parity_rules.py::test_duplicate_entries_and_missing_required_entries_are_not_complete",
+    "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[None-blocked]",
+    "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[None-not-applicable]",
+    "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[Unavailable in the captured environment.-blocked]",
+    "tests/discovery_runtime/test_parity_rules.py::test_unexecuted_implementation_requires_an_explicit_reason[Unavailable in the captured environment.-not-applicable]",
+    "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[None]",
+    "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[test_source1]",
+    "tests/discovery_runtime/test_parity_rules.py::test_test_byte_ownership_cannot_be_substituted[test_source2]",
+    "tests/discovery_runtime/test_parity_rules.py::test_one_passing_test_cannot_hide_an_explicit_failed_test",
+    "tests/discovery_runtime/test_parity_rules.py::test_capture_context_must_match_the_required_coordinate[other-online]",
+    "tests/discovery_runtime/test_parity_rules.py::test_capture_context_must_match_the_required_coordinate[browser-offline]",
+    "tests/discovery_runtime/test_parity_rules.py::test_wrong_target_revision_and_malformed_dimension_fail_without_exceptions",
+    "tests/discovery_runtime/test_parity_rules.py::test_non_evidence_source_links_do_not_disqualify_independent_target_capture",
+    "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[partial]",
+    "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[missing]",
+    "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[conflicting]",
+    "tests/discovery_runtime/test_parity_clients.py::test_optional_rows_do_not_block_required_completion[unassessed]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-online]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-offline]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[applicability-mobile]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-online]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-offline]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[verification-mobile]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-online]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-offline]",
+    "tests/discovery_runtime/test_parity_clients.py::test_both_mode_representations_must_agree_and_have_valid_proof[proof-mobile]",
+    "tests/discovery_runtime/test_parity_clients.py::test_matching_duplicate_online_classifications_are_valid",
+    "tests/discovery_runtime/test_parity_clients.py::test_required_dimension_cannot_be_absent_or_unverified[True]",
+    "tests/discovery_runtime/test_parity_clients.py::test_required_dimension_cannot_be_absent_or_unverified[False]",
+    "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[True-intentionally-changed]",
+    "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[True-retired]",
+    "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[False-intentionally-changed]",
+    "tests/discovery_runtime/test_parity_clients.py::test_target_dispositions_need_current_covering_approval[False-retired]",
+    "tests/discovery_runtime/test_parity_clients.py::test_retirement_does_not_hide_present_false_mode_claims[conflict]",
+    "tests/discovery_runtime/test_parity_clients.py::test_retirement_does_not_hide_present_false_mode_claims[proof]",
+    "tests/discovery_runtime/test_parity_clients.py::test_required_nonapplicability_needs_explicit_scoped_waiver[True]",
+    "tests/discovery_runtime/test_parity_clients.py::test_required_nonapplicability_needs_explicit_scoped_waiver[False]",
+    "tests/discovery_runtime/test_parity_clients.py::test_mobile_dimension_uses_configured_portable_platform",
+    "tests/discovery_runtime/test_parity_clients.py::test_passing_tests_cannot_cover_an_unrelated_coordinate[modes-value0]",
+    "tests/discovery_runtime/test_parity_clients.py::test_passing_tests_cannot_cover_an_unrelated_coordinate[platforms-value1]",
+    "tests/discovery_runtime/test_parity_clients.py::test_each_configured_client_has_an_independent_required_row",
+    "tests/discovery_runtime/test_parity_clients.py::test_combined_repository_source_test_proof_is_not_target_execution[False]",
+    "tests/discovery_runtime/test_parity_clients.py::test_combined_repository_source_test_proof_is_not_target_execution[True]",
+    "tests/discovery_runtime/test_parity_clients.py::test_imported_historical_source_is_resolved_at_its_own_pin",
+    "tests/discovery_runtime/test_parity_clients.py::test_reused_assessments_and_artifact_order_have_identical_findings",
+    "tests/discovery_runtime/test_parity_clients.py::test_target_proof_helpers_reject_invalid_direct_context"
+  ],
+  "collection_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-collection.2026-10-20T06-21.json",
+    "sha256": "2088dbb6a2ffb947c65067454114ff85acc0d0db4b8839008f7fb1be5b66135d"
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-coverage.2026-10-20T06-25.json",
+    "sha256": "615f7213a1cc3c6414108e9b2e163ff7faa6b0c522e5097646ad59bb88cf5162"
+  },
+  "coverage_disposition": {
+    "changed": "Approval, classification, entry orchestration and completeness now retain outcomes and prospective budgets; all original 77 assertions remain exact and pass.",
+    "new": "parity_models 35/35 statements; parity_rules104/104 and38/38 branches; parity_entry_rules137/139 and53/56 branches.",
+    "original": "Accepted parity_rules.py 146/146 statements and 73/74 branches; retained baseline receipt is authoritative.",
+    "per_new_or_changed_unit_line_floor": "Every measured class/callable range is at least90%; raw executable lines and branch origins define ranges.",
+    "unchanged": "TargetProof exact accepted body:99/99 statements and48/50 branches, matching accepted coverage.",
+    "uncovered": [
+      {
+        "line": 266,
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+        "reason": "Defensive row-count guard; public parsed-matrix retention rejects an oversized record population earlier."
+      },
+      {
+        "line": 319,
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+        "reason": "Direct internal assess misuse guard; public entry routing requires resolved ownership before this call."
+      },
+      {
+        "branch": [
+          218,
+          191
+        ],
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+        "reason": "Nonselected approved decision loop continuation retained from original approval semantics."
+      },
+      {
+        "branches": [
+          [
+            101,
+            98
+          ],
+          [
+            157,
+            164
+          ]
+        ],
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+        "reason": "Unchanged accepted prior branch gaps; not new code."
+      }
+    ]
+  },
+  "dependency_closure_qualification": {
+    "head_sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "qualification": "The sibling projection owner changed only DiscoveryReport.to_markdown. Both consumed budget/error definitions and all other module code match HEAD. This slice never calls the changed renderer, parity_report or validation. After this passing run, its owner shortened only a renderer intent comment; the tested stream and later working stream are recorded separately.",
+    "tested_before_and_after_sha256": "a4d5051f29999b77ca2c931b317d00846dec2b7103094ac086f45f19eeeb5aca",
+    "used_symbols": [
+      "ReportBudget",
+      "ReportLimitError"
+    ],
+    "whole_module_ast_equal_except_DiscoveryReport_to_markdown": true,
+    "working_sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+  },
+  "execution_order": [
+    "tests/discovery_runtime/test_parity_models.py",
+    "tests/discovery_runtime/test_parity_rules.py",
+    "tests/discovery_runtime/test_parity_clients.py"
+  ],
+  "freeze_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-freeze-harness.2026-10-20T06-25.txt",
+    "sha256": "6da75a2f3cea77c0721f0d20ca6fe2011461040d2df9c08f7a4082f4c6a6151f"
+  },
+  "head": "2b069afb0d88ae1a3c17ef10f7a52c3936800462",
+  "interface": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t2-interface-contract.2026-10-20T05-50.json",
+    "sha256": "b5e347d946eff993e197f071734c4c09d5f3e526657fff456e67805c4a58a8d6"
+  },
+  "limitations": [
+    "Internal carriers do not validate caller authority; only snapshot-backed validators/report builders may establish report facts.",
+    "Complete=False preserves present-claim validation and may retain incomplete outcomes; authored state never substitutes for actual proof.",
+    "Resource exhaustion raises fixed ReportLimitError and returns no partial result.",
+    "Graph projection, validation integration, full final gates and P5-T2 acceptance remain pending."
+  ],
+  "new_cases": 14,
+  "node_qualification": "The passing quiet run recorded all 91 cases with no skips; exact node IDs were collected separately from the same frozen files and module order. Per-node timing or verbose executed-name output is not claimed.",
+  "ordered_stages": [
+    {
+      "duration_seconds": 1.774,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-format.2026-10-20T06-18.json",
+      "sha256": "b90ed32c4aa8ec98c71bfe33f4f256729cea5747353764f597d7c1f43b051481"
+    },
+    {
+      "duration_seconds": 1.503,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-lint.2026-10-20T06-18.json",
+      "sha256": "adf940cfe54435d42543635bdac6739279920d4e9f7d3047154a12f594a669a1"
+    },
+    {
+      "duration_seconds": 2.138,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-types.2026-10-20T06-19.json",
+      "sha256": "21a7e896a73c182508375d121ae7c0cefe686e83f75fe69f94ee252b934105ca"
+    },
+    {
+      "duration_seconds": 13.745,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes8-tests.2026-10-20T06-19.json",
+      "sha256": "d1777367938f6dc6602cd2b280f748e2ab4ec0338017368a64402033357ad141"
+    }
+  ],
+  "owned_paths": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+    "tests/discovery_runtime/test_parity_models.py"
+  ],
+  "preserved_callers_and_target_proof": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": {
+      "equal_after_crlf_to_lf": true,
+      "head_sha256": "596ddf30197b356c3439e9d4150b82d75bdf74c36cdcdb5730fe1ff2367606cb",
+      "working_sha256": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2"
+    },
+    "tests/discovery_runtime/test_parity_clients.py": {
+      "equal_after_crlf_to_lf": true,
+      "head_sha256": "45711eb94dd2c70c6b60422eb77e6999337ca027269c2ed20ecfb25cb85ed13a",
+      "working_sha256": "f2de0b73de39032f1606e30b1aaf37e7f0af3a5b2220ccedbf61ff59fa0e323d"
+    },
+    "tests/discovery_runtime/test_parity_rules.py": {
+      "equal_after_crlf_to_lf": true,
+      "head_sha256": "0cb4a860d5667b2e7de5ee3a53bae71387b29370a093a1e96852a063d66b2a04",
+      "working_sha256": "8da02e8961415be42ae0383b1a81442447993a457f28d9cb549e51031f60445c"
+    }
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-outcomes-raw-archive.2026-10-20T06-25.json",
+    "sha256": "0fcf42bb7371f5226f389e738f52c54eac301b79c89eb5261bbc35c06a1ce1ed"
+  },
+  "relocated_executable_bodies": {
+    "_declares": {
+      "executable_body_ast_equal": true,
+      "new_range": [
+        46,
+        56
+      ],
+      "old_range": [
+        46,
+        52
+      ]
+    },
+    "source": {
+      "executable_body_ast_equal": true,
+      "new_range": [
+        106,
+        131
+      ],
+      "old_range": [
+        73,
+        94
+      ]
+    },
+    "target": {
+      "executable_body_ast_equal": true,
+      "new_range": [
+        133,
+        170
+      ],
+      "old_range": [
+        96,
+        128
+      ]
+    }
+  },
+  "retained_baseline_parity_proof": {
+    "bytes": 22290,
+    "coverage": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+        "baseline_statements": 0,
+        "branch_percent": 98.64864864864865,
+        "branches": 74,
+        "classification": "new production module",
+        "covered_branches": 73,
+        "covered_lines": 146,
+        "line_percent": 100.0,
+        "statements": 146
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py": {
+        "baseline_statements": 0,
+        "branch_percent": 96.0,
+        "branches": 50,
+        "classification": "new production module",
+        "covered_branches": 48,
+        "covered_lines": 99,
+        "line_percent": 100.0,
+        "statements": 99
+      }
+    },
+    "matched_paths": [
+      {
+        "bytes": 19719,
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+        "sha256": "bdb0be0ba7c06c437aaa815a6dc8ba39b6826818ca3ecabdcca5486dcb26f257"
+      },
+      {
+        "bytes": 12611,
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+        "sha256": "311b16b0572fb3d5f8eba4ef77ea716f86f278856d2b8069a475c1689d9244e2"
+      },
+      {
+        "bytes": 8216,
+        "path": "tests/discovery_runtime/parity_test_support.py",
+        "sha256": "8069e692561897967e98b188c0c965d7d638ae18ab2ba8048bd79cb74725fc67"
+      },
+      {
+        "bytes": 17585,
+        "path": "tests/discovery_runtime/test_parity_clients.py",
+        "sha256": "f2de0b73de39032f1606e30b1aaf37e7f0af3a5b2220ccedbf61ff59fa0e323d"
+      },
+      {
+        "bytes": 14978,
+        "path": "tests/discovery_runtime/test_parity_rules.py",
+        "sha256": "8da02e8961415be42ae0383b1a81442447993a457f28d9cb549e51031f60445c"
+      }
+    ],
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t8-coverage-metrics.2026-10-18T10-19.json",
+    "sha256": "5fb01c9bb593bb3d85efd983dd23b76074445a6fab96abfc4154248f8bccb968",
+    "tests": 77
+  },
+  "retained_cases": 77,
+  "retained_failures": [
+    "Initial formatting/import/type-style diagnostics are retained in outcomes1 through outcomes4 receipts.",
+    "outcomes5 retains78 passing cases and9 fixture-import setup errors with exact raw diagnostics/coverage.",
+    "outcomes7 lint retains the test-only ParseLimits import-placement diagnostic; corrected before outcomes8."
+  ],
+  "status": "OUTCOME_SUBSET_FROZEN_PENDING_INDEPENDENT_REVIEW",
+  "task": "P5-T2",
+  "test_count": 91,
+  "timestamp_utc": "2026-10-20T06:25:37.842609+00:00",
+  "unit_ranges": [
+    {
+      "end": 56,
+      "executed_branches": [],
+      "executed_lines": [
+        46,
+        53
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_declares",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 46
+    },
+    {
+      "end": 471,
+      "executed_branches": [
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          103
+        ],
+        [
+          117,
+          124
+        ],
+        [
+          117,
+          131
+        ],
+        [
+          151,
+          157
+        ],
+        [
+          151,
+          164
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          164
+        ],
+        [
+          158,
+          157
+        ],
+        [
+          158,
+          163
+        ],
+        [
+          191,
+          192
+        ],
+        [
+          191,
+          220
+        ],
+        [
+          208,
+          210
+        ],
+        [
+          208,
+          218
+        ],
+        [
+          210,
+          214
+        ],
+        [
+          210,
+          218
+        ],
+        [
+          218,
+          219
+        ],
+        [
+          223,
+          224
+        ],
+        [
+          223,
+          230
+        ],
+        [
+          265,
+          267
+        ],
+        [
+          279,
+          280
+        ],
+        [
+          279,
+          282
+        ],
+        [
+          283,
+          284
+        ],
+        [
+          283,
+          290
+        ],
+        [
+          292,
+          293
+        ],
+        [
+          292,
+          301
+        ],
+        [
+          318,
+          320
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          352
+        ],
+        [
+          353,
+          354
+        ],
+        [
+          353,
+          370
+        ],
+        [
+          363,
+          364
+        ],
+        [
+          363,
+          370
+        ],
+        [
+          371,
+          373
+        ],
+        [
+          371,
+          416
+        ],
+        [
+          377,
+          378
+        ],
+        [
+          377,
+          384
+        ],
+        [
+          384,
+          385
+        ],
+        [
+          384,
+          392
+        ],
+        [
+          401,
+          403
+        ],
+        [
+          401,
+          415
+        ],
+        [
+          408,
+          401
+        ],
+        [
+          408,
+          409
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          421,
+          428
+        ],
+        [
+          443,
+          445
+        ],
+        [
+          443,
+          458
+        ],
+        [
+          445,
+          446
+        ],
+        [
+          445,
+          458
+        ],
+        [
+          446,
+          445
+        ],
+        [
+          446,
+          451
+        ],
+        [
+          460,
+          461
+        ],
+        [
+          460,
+          471
+        ]
+      ],
+      "executed_lines": [
+        59,
+        69,
+        91,
+        92,
+        93,
+        94,
+        95,
+        97,
+        101,
+        102,
+        103,
+        104,
+        106,
+        114,
+        115,
+        116,
+        117,
+        124,
+        130,
+        131,
+        133,
+        141,
+        143,
+        151,
+        157,
+        158,
+        163,
+        164,
+        170,
+        172,
+        184,
+        185,
+        188,
+        189,
+        191,
+        192,
+        207,
+        208,
+        210,
+        214,
+        218,
+        219,
+        220,
+        223,
+        224,
+        230,
+        232,
+        239,
+        243,
+        244,
+        253,
+        256,
+        265,
+        267,
+        268,
+        269,
+        270,
+        271,
+        279,
+        280,
+        281,
+        282,
+        283,
+        284,
+        290,
+        291,
+        292,
+        293,
+        299,
+        300,
+        301,
+        303,
+        316,
+        317,
+        318,
+        320,
+        321,
+        326,
+        329,
+        332,
+        333,
+        336,
+        343,
+        350,
+        351,
+        352,
+        353,
+        354,
+        362,
+        363,
+        364,
+        370,
+        371,
+        373,
+        377,
+        378,
+        384,
+        385,
+        386,
+        392,
+        393,
+        394,
+        401,
+        403,
+        407,
+        408,
+        409,
+        415,
+        416,
+        421,
+        422,
+        428,
+        436,
+        442,
+        443,
+        445,
+        446,
+        451,
+        458,
+        460,
+        461,
+        466,
+        471
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [
+        [
+          218,
+          191
+        ],
+        [
+          265,
+          266
+        ],
+        [
+          318,
+          319
+        ]
+      ],
+      "missing_lines": [
+        266,
+        319
+      ],
+      "name": "ParityEntryRules",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 59
+    },
+    {
+      "end": 104,
+      "executed_branches": [
+        [
+          101,
+          102
+        ],
+        [
+          101,
+          103
+        ]
+      ],
+      "executed_lines": [
+        69,
+        91,
+        92,
+        93,
+        94,
+        95,
+        97,
+        101,
+        102,
+        103,
+        104
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 69
+    },
+    {
+      "end": 131,
+      "executed_branches": [
+        [
+          117,
+          124
+        ],
+        [
+          117,
+          131
+        ]
+      ],
+      "executed_lines": [
+        106,
+        114,
+        115,
+        116,
+        117,
+        124,
+        130,
+        131
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "source",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 106
+    },
+    {
+      "end": 170,
+      "executed_branches": [
+        [
+          151,
+          157
+        ],
+        [
+          151,
+          164
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          157,
+          164
+        ],
+        [
+          158,
+          157
+        ],
+        [
+          158,
+          163
+        ]
+      ],
+      "executed_lines": [
+        133,
+        141,
+        143,
+        151,
+        157,
+        158,
+        163,
+        164,
+        170
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "target",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 133
+    },
+    {
+      "end": 230,
+      "executed_branches": [
+        [
+          191,
+          192
+        ],
+        [
+          191,
+          220
+        ],
+        [
+          208,
+          210
+        ],
+        [
+          208,
+          218
+        ],
+        [
+          210,
+          214
+        ],
+        [
+          210,
+          218
+        ],
+        [
+          218,
+          219
+        ],
+        [
+          223,
+          224
+        ],
+        [
+          223,
+          230
+        ]
+      ],
+      "executed_lines": [
+        172,
+        184,
+        185,
+        188,
+        189,
+        191,
+        192,
+        207,
+        208,
+        210,
+        214,
+        218,
+        219,
+        220,
+        223,
+        224,
+        230
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          218,
+          191
+        ]
+      ],
+      "missing_lines": [],
+      "name": "approval",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 172
+    },
+    {
+      "end": 301,
+      "executed_branches": [
+        [
+          265,
+          267
+        ],
+        [
+          279,
+          280
+        ],
+        [
+          279,
+          282
+        ],
+        [
+          283,
+          284
+        ],
+        [
+          283,
+          290
+        ],
+        [
+          292,
+          293
+        ],
+        [
+          292,
+          301
+        ]
+      ],
+      "executed_lines": [
+        232,
+        239,
+        243,
+        244,
+        253,
+        256,
+        265,
+        267,
+        268,
+        269,
+        270,
+        271,
+        279,
+        280,
+        281,
+        282,
+        283,
+        284,
+        290,
+        291,
+        292,
+        293,
+        299,
+        300,
+        301
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          265,
+          266
+        ]
+      ],
+      "missing_lines": [
+        266
+      ],
+      "name": "entry",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 232
+    },
+    {
+      "end": 434,
+      "executed_branches": [
+        [
+          318,
+          320
+        ],
+        [
+          350,
+          351
+        ],
+        [
+          350,
+          352
+        ],
+        [
+          353,
+          354
+        ],
+        [
+          353,
+          370
+        ],
+        [
+          363,
+          364
+        ],
+        [
+          363,
+          370
+        ],
+        [
+          371,
+          373
+        ],
+        [
+          371,
+          416
+        ],
+        [
+          377,
+          378
+        ],
+        [
+          377,
+          384
+        ],
+        [
+          384,
+          385
+        ],
+        [
+          384,
+          392
+        ],
+        [
+          401,
+          403
+        ],
+        [
+          401,
+          415
+        ],
+        [
+          408,
+          401
+        ],
+        [
+          408,
+          409
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          421,
+          428
+        ]
+      ],
+      "executed_lines": [
+        303,
+        316,
+        317,
+        318,
+        320,
+        321,
+        326,
+        329,
+        332,
+        333,
+        336,
+        343,
+        350,
+        351,
+        352,
+        353,
+        354,
+        362,
+        363,
+        364,
+        370,
+        371,
+        373,
+        377,
+        378,
+        384,
+        385,
+        386,
+        392,
+        393,
+        394,
+        401,
+        403,
+        407,
+        408,
+        409,
+        415,
+        416,
+        421,
+        422,
+        428
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          318,
+          319
+        ]
+      ],
+      "missing_lines": [
+        319
+      ],
+      "name": "assess",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 303
+    },
+    {
+      "end": 471,
+      "executed_branches": [
+        [
+          443,
+          445
+        ],
+        [
+          443,
+          458
+        ],
+        [
+          445,
+          446
+        ],
+        [
+          445,
+          458
+        ],
+        [
+          446,
+          445
+        ],
+        [
+          446,
+          451
+        ],
+        [
+          460,
+          461
+        ],
+        [
+          460,
+          471
+        ]
+      ],
+      "executed_lines": [
+        436,
+        442,
+        443,
+        445,
+        446,
+        451,
+        458,
+        460,
+        461,
+        466,
+        471
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "finish",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py",
+      "start": 436
+    },
+    {
+      "end": 35,
+      "executed_branches": [],
+      "executed_lines": [
+        15,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "ParityDimensionOutcome",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "start": 15
+    },
+    {
+      "end": 71,
+      "executed_branches": [],
+      "executed_lines": [
+        39,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "ParityEntryOutcome",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "start": 39
+    },
+    {
+      "end": 86,
+      "executed_branches": [],
+      "executed_lines": [
+        75,
+        85,
+        86
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "ParityValidation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py",
+      "start": 75
+    },
+    {
+      "end": 255,
+      "executed_branches": [
+        [
+          112,
+          113
+        ],
+        [
+          112,
+          117
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          119,
+          136
+        ],
+        [
+          121,
+          119
+        ],
+        [
+          121,
+          122
+        ],
+        [
+          128,
+          119
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          231
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          146,
+          148
+        ],
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          178
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          179,
+          180
+        ],
+        [
+          179,
+          200
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          200
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          213
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          239
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          254
+        ]
+      ],
+      "executed_lines": [
+        45,
+        54,
+        68,
+        69,
+        71,
+        89,
+        90,
+        91,
+        92,
+        95,
+        108,
+        110,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        128,
+        129,
+        130,
+        136,
+        141,
+        142,
+        143,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        166,
+        169,
+        170,
+        172,
+        178,
+        179,
+        180,
+        193,
+        194,
+        200,
+        206,
+        207,
+        213,
+        231,
+        232,
+        239,
+        240,
+        254,
+        255
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_ParityRules",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "start": 45
+    },
+    {
+      "end": 345,
+      "executed_branches": [
+        [
+          302,
+          303
+        ],
+        [
+          302,
+          305
+        ],
+        [
+          303,
+          302
+        ],
+        [
+          303,
+          304
+        ],
+        [
+          331,
+          332
+        ],
+        [
+          331,
+          336
+        ],
+        [
+          332,
+          331
+        ],
+        [
+          332,
+          334
+        ],
+        [
+          334,
+          331
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          345
+        ]
+      ],
+      "executed_lines": [
+        258,
+        278,
+        279,
+        282,
+        287,
+        292,
+        299,
+        300,
+        302,
+        303,
+        304,
+        305,
+        308,
+        309,
+        310,
+        317,
+        319,
+        320,
+        331,
+        332,
+        334,
+        335,
+        336,
+        337,
+        339,
+        340,
+        342,
+        345
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "validate_parity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "start": 258
+    },
+    {
+      "end": 69,
+      "executed_branches": [],
+      "executed_lines": [
+        54,
+        68,
+        69
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "start": 54
+    },
+    {
+      "end": 255,
+      "executed_branches": [
+        [
+          112,
+          113
+        ],
+        [
+          112,
+          117
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          119,
+          136
+        ],
+        [
+          121,
+          119
+        ],
+        [
+          121,
+          122
+        ],
+        [
+          128,
+          119
+        ],
+        [
+          128,
+          129
+        ],
+        [
+          145,
+          146
+        ],
+        [
+          145,
+          231
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          146,
+          148
+        ],
+        [
+          152,
+          153
+        ],
+        [
+          152,
+          178
+        ],
+        [
+          169,
+          170
+        ],
+        [
+          169,
+          172
+        ],
+        [
+          179,
+          180
+        ],
+        [
+          179,
+          200
+        ],
+        [
+          193,
+          194
+        ],
+        [
+          193,
+          200
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          206,
+          213
+        ],
+        [
+          231,
+          232
+        ],
+        [
+          231,
+          239
+        ],
+        [
+          239,
+          240
+        ],
+        [
+          239,
+          254
+        ]
+      ],
+      "executed_lines": [
+        71,
+        89,
+        90,
+        91,
+        92,
+        95,
+        108,
+        110,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        119,
+        120,
+        121,
+        122,
+        124,
+        128,
+        129,
+        130,
+        136,
+        141,
+        142,
+        143,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        166,
+        169,
+        170,
+        172,
+        178,
+        179,
+        180,
+        193,
+        194,
+        200,
+        206,
+        207,
+        213,
+        231,
+        232,
+        239,
+        240,
+        254,
+        255
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "classifications",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py",
+      "start": 71
+    },
+    {
+      "end": 29,
+      "executed_branches": [],
+      "executed_lines": [
+        22,
+        24,
+        25,
+        29
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_payload_paths",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 22
+    },
+    {
+      "end": 303,
+      "executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          81
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          81,
+          89
+        ],
+        [
+          82,
+          81
+        ],
+        [
+          82,
+          88
+        ],
+        [
+          96,
+          98
+        ],
+        [
+          96,
+          109
+        ],
+        [
+          98,
+          96
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          101
+        ],
+        [
+          101,
+          108
+        ],
+        [
+          131,
+          132
+        ],
+        [
+          131,
+          165
+        ],
+        [
+          135,
+          155
+        ],
+        [
+          135,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          158,
+          159
+        ],
+        [
+          158,
+          160
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          162,
+          163
+        ],
+        [
+          162,
+          164
+        ],
+        [
+          178,
+          180
+        ],
+        [
+          178,
+          229
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          180,
+          187
+        ],
+        [
+          187,
+          188
+        ],
+        [
+          187,
+          206
+        ],
+        [
+          189,
+          194
+        ],
+        [
+          189,
+          195
+        ],
+        [
+          195,
+          187
+        ],
+        [
+          195,
+          205
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          225
+        ],
+        [
+          221,
+          224
+        ],
+        [
+          221,
+          225
+        ],
+        [
+          225,
+          228
+        ],
+        [
+          225,
+          229
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          236
+        ],
+        [
+          252,
+          253
+        ],
+        [
+          252,
+          262
+        ],
+        [
+          262,
+          263
+        ],
+        [
+          262,
+          270
+        ],
+        [
+          278,
+          283
+        ],
+        [
+          278,
+          284
+        ]
+      ],
+      "executed_lines": [
+        32,
+        35,
+        42,
+        43,
+        44,
+        46,
+        52,
+        54,
+        55,
+        67,
+        69,
+        70,
+        78,
+        79,
+        81,
+        82,
+        88,
+        89,
+        91,
+        96,
+        98,
+        99,
+        100,
+        101,
+        108,
+        109,
+        111,
+        129,
+        131,
+        132,
+        135,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        167,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        178,
+        180,
+        181,
+        187,
+        188,
+        189,
+        194,
+        195,
+        205,
+        206,
+        207,
+        208,
+        221,
+        224,
+        225,
+        228,
+        229,
+        230,
+        236,
+        238,
+        247,
+        248,
+        249,
+        250,
+        252,
+        253,
+        262,
+        263,
+        269,
+        270,
+        272,
+        276,
+        277,
+        278,
+        283,
+        284,
+        286
+      ],
+      "kind": "ClassDef",
+      "missing_branches": [
+        [
+          101,
+          98
+        ],
+        [
+          157,
+          164
+        ]
+      ],
+      "missing_lines": [],
+      "name": "TargetProof",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 32
+    },
+    {
+      "end": 50,
+      "executed_branches": [],
+      "executed_lines": [
+        35,
+        42,
+        43,
+        44,
+        46
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 35
+    },
+    {
+      "end": 65,
+      "executed_branches": [],
+      "executed_lines": [
+        52,
+        54,
+        55
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "blocked",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 52
+    },
+    {
+      "end": 89,
+      "executed_branches": [
+        [
+          78,
+          79
+        ],
+        [
+          78,
+          81
+        ],
+        [
+          81,
+          82
+        ],
+        [
+          81,
+          89
+        ],
+        [
+          82,
+          81
+        ],
+        [
+          82,
+          88
+        ]
+      ],
+      "executed_lines": [
+        67,
+        69,
+        70,
+        78,
+        79,
+        81,
+        82,
+        88,
+        89
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "identity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 67
+    },
+    {
+      "end": 109,
+      "executed_branches": [
+        [
+          96,
+          98
+        ],
+        [
+          96,
+          109
+        ],
+        [
+          98,
+          96
+        ],
+        [
+          98,
+          99
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          101
+        ],
+        [
+          101,
+          108
+        ]
+      ],
+      "executed_lines": [
+        91,
+        96,
+        98,
+        99,
+        100,
+        101,
+        108,
+        109
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          101,
+          98
+        ]
+      ],
+      "missing_lines": [],
+      "name": "source_payload",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 91
+    },
+    {
+      "end": 165,
+      "executed_branches": [
+        [
+          131,
+          132
+        ],
+        [
+          131,
+          165
+        ],
+        [
+          135,
+          155
+        ],
+        [
+          135,
+          156
+        ],
+        [
+          157,
+          158
+        ],
+        [
+          158,
+          159
+        ],
+        [
+          158,
+          160
+        ],
+        [
+          160,
+          161
+        ],
+        [
+          160,
+          162
+        ],
+        [
+          162,
+          163
+        ],
+        [
+          162,
+          164
+        ]
+      ],
+      "executed_lines": [
+        111,
+        129,
+        131,
+        132,
+        135,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [
+        [
+          157,
+          164
+        ]
+      ],
+      "missing_lines": [],
+      "name": "evidence",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 111
+    },
+    {
+      "end": 236,
+      "executed_branches": [
+        [
+          178,
+          180
+        ],
+        [
+          178,
+          229
+        ],
+        [
+          180,
+          181
+        ],
+        [
+          180,
+          187
+        ],
+        [
+          187,
+          188
+        ],
+        [
+          187,
+          206
+        ],
+        [
+          189,
+          194
+        ],
+        [
+          189,
+          195
+        ],
+        [
+          195,
+          187
+        ],
+        [
+          195,
+          205
+        ],
+        [
+          207,
+          208
+        ],
+        [
+          207,
+          225
+        ],
+        [
+          221,
+          224
+        ],
+        [
+          221,
+          225
+        ],
+        [
+          225,
+          228
+        ],
+        [
+          225,
+          229
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          236
+        ]
+      ],
+      "executed_lines": [
+        167,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        178,
+        180,
+        181,
+        187,
+        188,
+        189,
+        194,
+        195,
+        205,
+        206,
+        207,
+        208,
+        221,
+        224,
+        225,
+        228,
+        229,
+        230,
+        236
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "implementation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 167
+    },
+    {
+      "end": 270,
+      "executed_branches": [
+        [
+          252,
+          253
+        ],
+        [
+          252,
+          262
+        ],
+        [
+          262,
+          263
+        ],
+        [
+          262,
+          270
+        ]
+      ],
+      "executed_lines": [
+        238,
+        247,
+        248,
+        249,
+        250,
+        252,
+        253,
+        262,
+        263,
+        269,
+        270
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "links",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 238
+    },
+    {
+      "end": 303,
+      "executed_branches": [
+        [
+          278,
+          283
+        ],
+        [
+          278,
+          284
+        ]
+      ],
+      "executed_lines": [
+        272,
+        276,
+        277,
+        278,
+        283,
+        284,
+        286
+      ],
+      "kind": "FunctionDef",
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "coordinate",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_target_rules.py",
+      "start": 272
+    }
+  ]
+}
