@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\p5t4-final-114033-acceptance.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T11:46:13.570802+00:00",
+  "label": "coverage-combine",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-combine-114033-raw.2026-10-20T11-46.json",
+    "sha256": "f6bd0c8092cbe01ab1794e9a3641cf2eda5e239ef60c81434589128718878798"
+  },
+  "seconds": 1.014,
+  "stage": 6,
+  "started_at": "2026-10-20T11:46:12.557021+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t4-acceptance\\p5t4-final-114033-acceptance.coverage\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T11-46"
+}

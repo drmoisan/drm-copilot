@@ -1,0 +1,29 @@
+{
+  "Timestamp": "2026-10-20T11-36",
+  "binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-candidate-binding.2026-10-20T11-36.json",
+    "sha256": "08798b1ee6e523a0fa65025249c2d307a71937e0cb1e19f8755a3dd42a7e5924"
+  },
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-focused-coverage-view.2026-10-20T11-36.json",
+      "sha256": "f542f2dec2eab66304b8372de7649ba94af22331e2b115b52a11f197015b8c76"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-candidate-disabled.2026-10-20T11-36.json",
+      "sha256": "ea11b094a6bc3ff8397f28fed2477960f77f59643939100c2cc1dd339183b007"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-bind-harness.2026-10-20T11-36.txt",
+      "sha256": "73cf053c73e220275f05974032e07e80f6590ee04757d4d98c27e121015080a8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-candidate-binding.2026-10-20T11-36.json",
+      "sha256": "08798b1ee6e523a0fa65025249c2d307a71937e0cb1e19f8755a3dd42a7e5924"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-candidate-binding.2026-10-20T11-36.md",
+      "sha256": "c6d45cb924c11371492f94fab244f15aabb50f1950087a5d994f37dc42c8437b"
+    }
+  ]
+}

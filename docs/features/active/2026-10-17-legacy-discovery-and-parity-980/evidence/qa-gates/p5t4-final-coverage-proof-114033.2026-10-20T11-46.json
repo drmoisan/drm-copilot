@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\final_coverage.py SCRATCH\\candidate-released.json SCRATCH\\p5t4-final-114033-combined-coverage.json SCRATCH\\p5t4-final-114033-coverage-result.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T11:46:15.637249+00:00",
+  "label": "coverage-proof",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-proof-114033-raw.2026-10-20T11-46.json",
+    "sha256": "abe96da0948aff536a9be2ec0c4d0db4abf8d93ae9b18503b9680799481c975a"
+  },
+  "seconds": 1.014,
+  "stage": 6,
+  "started_at": "2026-10-20T11:46:14.623322+00:00",
+  "stderr": "",
+  "stdout": "{\n  \"current_coverage\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-current-coverage.2026-10-20T11-46.json\",\n    \"sha256\": \"ed7db4e2c0b164c5820652a40f67355b887ac8e19562dd2c8990cb868c7ba87c\"\n  },\n  \"coverage_ranges\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-ranges.2026-10-20T11-46.json\",\n    \"sha256\": \"f98c5c61765c671c6a5dcf62503e9b95e7c5069e70ba8ca4da681bddcda271d2\"\n  },\n  \"range_count\": 35,\n  \"module_count\": 3,\n  \"qualified_prior_proof_count\": 0,\n  \"current_raw_counters_augmented\": false\n}\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T11-46"
+}

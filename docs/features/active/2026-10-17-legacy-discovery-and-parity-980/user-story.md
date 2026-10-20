@@ -99,11 +99,11 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [ ] Publishing/conversion validation covers the assets.
 - [ ] Generated outputs contain no unsupported references.
 ### Acceptance scenarios
-- [ ] Confirmed contracts generate linked acceptance scenarios.
+- [x] Confirmed contracts generate linked acceptance scenarios.
 - [ ] Platform-mode tags are supported.
 - [ ] Offline/mobile tags are supported when configured.
-- [ ] Unresolved behavior does not become a false expected result.
-- [ ] Scenarios preserve contract and decision traceability.
+- [x] Unresolved behavior does not become a false expected result.
+- [x] Scenarios preserve contract and decision traceability.
 ### Documentation
 - [ ] Architecture and ownership boundaries are documented.
 - [ ] A consumer setup guide exists.

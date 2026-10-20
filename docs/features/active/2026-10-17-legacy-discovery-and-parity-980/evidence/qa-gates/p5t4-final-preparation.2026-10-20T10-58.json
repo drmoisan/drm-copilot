@@ -1,0 +1,165 @@
+{
+  "Command": "poetry run python SCRATCH/prepare_final.py",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T10-58",
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p5t4_prepare_20261020",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P5T4_final_preparation",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "baseline_and_proof": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+      "sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"
+    },
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+      "sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51"
+    },
+    "model_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+      "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"
+    },
+    "models": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json",
+      "sha256": "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b"
+    },
+    "prior_final_closure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-closure.2026-10-20T09-57.json",
+      "sha256": "48e10bb1084fce341ce4764dd66bbd4aa2fbc3a5b14207dc9d281b6caa2acd6d"
+    },
+    "prior_final_handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+      "sha256": "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"
+    }
+  },
+  "composition": {
+    "assertions": [
+      "final ready membership",
+      "pending criteria preserve questions",
+      "exact identity, source digest and immutable references",
+      "schema and public acceptance-rule validity",
+      "deterministic rerun and unchanged snapshot",
+      "current approved scoped policy only"
+    ],
+    "extra_behavioral_run": false,
+    "kind": "in-memory public generator, schema and accepted-rule composition",
+    "native_execution": false,
+    "nodes": [],
+    "publication": false,
+    "required_selector_families": [
+      "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority",
+      "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations"
+    ]
+  },
+  "execution_released": false,
+  "frozen_bindings_checked": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+    "pyproject.toml": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac"
+  },
+  "harnesses": {
+    "final_coverage.py": {
+      "accepted_predecessor_sha256": "64aa473f6bf37672f2a6b5dc69ae24eb1ebc1a1f9a07bf86995203cc3bd884bf",
+      "physical_lines": 210,
+      "runtime_path": "SCRATCH/final_coverage.py",
+      "sha256": "0d9e869bf7450535a39d46aa8f218e3c7f5cde0a2dbd1896923bd2efd01db071",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_coverage.2026-10-20T10-58.txt"
+    },
+    "final_gates.py": {
+      "accepted_predecessor_sha256": "7de869c83078b20587f72b61992e97f5d2cedeb88a57d57a42c7cff9173a25d0",
+      "physical_lines": 273,
+      "runtime_path": "SCRATCH/final_gates.py",
+      "sha256": "49b82d61d9ca580163da854164d9e10c456998e6a7334157eaa15b0aef85577e",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_gates.2026-10-20T10-58.txt"
+    },
+    "final_static.py": {
+      "accepted_predecessor_sha256": "fdb0f9a1a89c6c5989a44d35dbdef4c0502e5dde11865e885c31b2c78180571d",
+      "physical_lines": 113,
+      "runtime_path": "SCRATCH/final_static.py",
+      "sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-final_static.2026-10-20T10-58.txt"
+    },
+    "prepare_final.py": {
+      "physical_lines": 221,
+      "runtime_path": "SCRATCH/prepare_final.py",
+      "sha256": "f9aa6d8ac8982da1f283a3e4b249775db7968defc81e2a1d9941d2069d5e30e9",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-prepared-prepare_final.2026-10-20T10-58.txt"
+    }
+  },
+  "missing_release_bindings": [
+    "Final generation source/test/dependency hashes and exact passing node list",
+    "Final generation raw per-unit coverage, timing and retained diagnostic references",
+    "Combined independent review closure and checked candidate commit",
+    "Parent execution release and final candidate manifest with all exact bindings"
+  ],
+  "native_execution_released": false,
+  "population": {
+    "binding_rule": "Concatenate owner executed-node lists, assert disjoint completeness, reverse the entire union once, then compare every passed ID/order.",
+    "final_exact_count": null,
+    "generation_collected_pending_final_freeze": 45,
+    "models": 70,
+    "node_sources": {
+      "generation": null,
+      "models": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json",
+        "sha256": "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b"
+      }
+    },
+    "nominal_total_not_released": 115
+  },
+  "preparation_delta": "Reuse accepted P5-T3 runners/readers. Remove native fixture/publication stage, use one new-module union and three measured production modules, update task labels. Static/coverage qualification mechanisms and raw/readable conventions remain.",
+  "scope": {
+    "contracts": [
+      "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+      "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+      "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+      "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+    ],
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_acceptance_properties.py",
+      "tests/discovery_runtime/test_acceptance_generation.py",
+      "tests/discovery_runtime/test_acceptance_decisions.py"
+    ]
+  },
+  "source_or_test_mutation": false,
+  "stage_order": [
+    "Black --check",
+    "Ruff check",
+    "whole-repository Pyright",
+    "exact new-scope architecture/size/intent/purity/isolation",
+    "one fresh Pytest process over the exact full reversed task-node union",
+    "coverage capture/combine/reconciliation with raw module/class/callable data",
+    "four applicable quality-tier/package contracts"
+  ],
+  "status": "PREPARATION_READY_EXECUTION_DISABLED",
+  "suites_executed": false,
+  "task": "P5-T4",
+  "template": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-template.2026-10-20T10-58.json",
+    "sha256": "3428ae22a0ed799733cc6f214f75e71b4365e1df64289b90173945c8564190e3"
+  },
+  "timeout_basis": "660 seconds is a provisional finite task-batch limit; confirm against the complete owner timing before release. Progress every 20 seconds. Not a host-hook limit."
+}

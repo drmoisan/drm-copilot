@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "6bc9df21f498a274faeef548fe1a1c1f06bc89779ad448d57b0e5b04ca97c14b"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\final_static.py SCRATCH\\candidate-released.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T11:40:50.806934+00:00",
+  "label": "static",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-static-114033-raw.2026-10-20T11-40.json",
+    "sha256": "9bc9eb318c0252283d5c5f44969c1918ddcef309cd6210214a21e9f785aaf52d"
+  },
+  "seconds": 1.014,
+  "stage": 4,
+  "started_at": "2026-10-20T11:40:49.793158+00:00",
+  "stderr": "",
+  "stdout": "{\n  \"files\": [\n    {\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py\",\n      \"physical_lines\": 418,\n      \"definitions\": 14,\n      \"loops\": [\n        41,\n        180,\n        120,\n        128,\n        249,\n        253,\n        357,\n        380,\n        399,\n        138\n      ]\n    },\n    {\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py\",\n      \"physical_lines\": 494,\n      \"definitions\": 7,\n      \"loops\": [\n        93,\n        332,\n        433,\n        378,\n        397,\n        409\n      ]\n    },\n    {\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py\",\n      \"physical_lines\": 488,\n      \"definitions\": 14,\n      \"loops\": [\n        61,\n        71,\n        64,\n        125,\n        164,\n        191,\n        265,\n        365,\n        368,\n        380,\n        450,\n        171,\n        258,\n        323\n      ]\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_properties.py\",\n      \"physical_lines\": 475,\n      \"definitions\": 24,\n      \"loops\": [\n        338,\n        360\n      ]\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_generation.py\",\n      \"physical_lines\": 486,\n      \"definitions\": 10,\n      \"loops\": [\n        65,\n        158,\n        190\n      ]\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_decisions.py\",\n      \"physical_lines\": 400,\n      \"definitions\": 8,\n      \"loops\": [\n        119,\n        295,\n        124\n      ]\n    },\n    {\n      \"path\": \"tests/discovery_runtime/test_acceptance_generation_limits.py\",\n      \"physical_lines\": 401,\n      \"definitions\": 16,\n      \"loops\": []\n    }\n  ],\n  \"retained_units\": [],\n  \"source_or_test_mutation\": false\n}\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T11-40"
+}

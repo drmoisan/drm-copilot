@@ -1,0 +1,198 @@
+{
+  "Timestamp": "2026-10-20T11-57",
+  "Command": "poetry run python SCRATCH/issue-980-p5t4-final-reconcile.py",
+  "EXIT_CODE": 0,
+  "task": "P5-T4",
+  "status": "ACCEPTED",
+  "handoff_signal": "READY_FOR_ACCEPTANCE_COMMIT",
+  "route": "atomic_execution_p5t4_acceptance_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_authority_rechecked": true,
+  "candidate_commit": "7425d43598b9f75a8052d351eadffb5fea64791d",
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-reconciliation.2026-10-20T11-57.json",
+    "sha256": "3138f70f4030d79f291664819f8e1398eed2f1cfd1388f54e5621dba0178b01a",
+    "bytes": 412129
+  },
+  "owner_handoff": {
+    "bytes": 31512,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+    "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9"
+  },
+  "owner_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-closure.2026-10-20T11-46.json",
+    "sha256": "f13c2976c090870f9e45deab316e0a97c24049d5466f46c8c8a96baed5f5934a"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-staging.2026-10-20T11-46.json",
+    "sha256": "c6ba17340bb08a99fec6dc397e5600f14e438b70ecd2c49a8b9b9edd710df0bc"
+  },
+  "retained_generation_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-repair-confirmation.2026-10-20T11-36.json",
+    "sha256": "8086643347c934cd9797d8ce3335f23c830bcb8b6b6e69478e8c32ef9b46ea75"
+  },
+  "retained_model_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+    "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"
+  },
+  "verification": {
+    "ordered_toolchain": [
+      "Black",
+      "Ruff",
+      "whole-repository Pyright",
+      "static policy/architecture",
+      "123 reversed task cases",
+      "coverage reconciliation",
+      "four affected contracts"
+    ],
+    "python_toolchain": "PASS",
+    "task_cases": 123,
+    "contracts": 4,
+    "pure_composition_nodes_in_task_population": 9,
+    "native_execution": false,
+    "candidate_bindings": 23,
+    "owned_working_index_commit_bindings": 7,
+    "coverage_modules": 3,
+    "coverage_ranges": 35,
+    "raw_coverage": {
+      "covered_lines": 505,
+      "num_statements": 511,
+      "covered_branches": 184,
+      "num_branches": 190
+    },
+    "lost_focused_lines": [],
+    "lost_focused_branches": [],
+    "raw_counters_augmented": false,
+    "behavior_rerun_during_acceptance": false
+  },
+  "task_acceptance_mapping": [
+    "Stable canonical scenario identity includes actual source/target kind, feature, criterion, client and mode coordinates; permutation and repeat generation preserve identity.",
+    "Confirmed contracts and currently approved scoped decisions provide ready expectations with immutable source/target references and digest provenance.",
+    "Unknown, unresolved, contradictory or unapproved expectations stay pending and preserve questions without invented expected results.",
+    "Counted selector work and aggregate expansion/text/record reservations reject before the protected work; imported-source original paths and distinct target ownership are verified."
+  ],
+  "AC_mapping": [
+    {
+      "id": "AC-48",
+      "criterion": "Confirmed contracts generate linked acceptance scenarios.",
+      "basis": "Source/target ready membership and public schema/rule composition controls verify linked confirmed-contract scenarios."
+    },
+    {
+      "id": "AC-51",
+      "criterion": "Unresolved behavior does not become a false expected result.",
+      "basis": "Pending-criterion, contradictory/unapproved decision and no-invented-Then controls verify unknown behavior cannot become an expected result."
+    },
+    {
+      "id": "AC-52",
+      "criterion": "Scenarios preserve contract and decision traceability.",
+      "basis": "Exact reference/digest, current approved policy, and imported-source/distinct-target controls verify contract and decision traceability."
+    }
+  ],
+  "interface_handoff": [
+    "The pure snapshot generator returns immutable normalized ready or pending acceptance records with stable identity, actual coordinates and traceable evidence.",
+    "P5-T5 consumes those records for Markdown/Gherkin and platform/mode tags. Pending records must retain questions and must not receive executable expected steps.",
+    "Generation itself performs no file writes, target implementation, acceptance-criteria checkoff, publication or host readiness promotion."
+  ],
+  "qualifications": [
+    "The handoff limitation saying the final union has not run is stale preparation wording: the exact completed 123-node receipt and closure prove the final reversed union passed. The original handoff remains unchanged.",
+    "Exact base64 raw streams retain original bytes/newlines; readable views use the verified OBSERVED_PATH_ALIASES same-file roots and CR/LF normalization.",
+    "Current coverage includes six missing statements and six missing branch destinations; no full-coverage claim or raw counter augmentation is made.",
+    "Composition is pure in-memory generation; native publication, rendering and CLI/host proof are outside P5-T4."
+  ],
+  "historical_failures": "The committed model/generation manifests retain original partial runs, fixture failures, counted-work defect, documentation repairs, and separate four-control coverage extension. Final acceptance does not rewrite them.",
+  "document_changes": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "before_sha256": "cbb266940feee4916642dbcf65ad25ea463456c5647eede77de5b63dff19368d",
+      "after_sha256": "b28b688894450ee269605de6f50d2df2ae02f161a81e1b49457be733e559eeab",
+      "after_git_lf_sha256": "832bec69d6ee60dd1c72ba4889096e21c4fef7a2194bac0f62f707a6842c791e",
+      "newly_checked": [
+        "P5-T4"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "before_sha256": "9c0eff6ffad0d0711fa0e000f8cbb78e7f4715ac2a8b28440bef0de4b6a78baf",
+      "after_sha256": "0547f417f7f4e673828c0ac021c333a81a66cc82f4c799dec142faf3c840fe90",
+      "after_git_lf_sha256": "0547f417f7f4e673828c0ac021c333a81a66cc82f4c799dec142faf3c840fe90",
+      "newly_checked": [
+        "AC-48",
+        "AC-51",
+        "AC-52"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+      "before_sha256": "26b9738375d200453de4ef52c4a2417297ab9ec7381447d32e2d46dc402c8ca3",
+      "after_sha256": "c2926539c8451e7fa3969e061988b0a0188eb5fd9e4105027816b8fcf39ebffa",
+      "after_git_lf_sha256": "c2926539c8451e7fa3969e061988b0a0188eb5fd9e4105027816b8fcf39ebffa",
+      "newly_checked": [
+        "AC-48",
+        "AC-51",
+        "AC-52"
+      ],
+      "only_checkboxes_changed": true,
+      "line_endings_preserved": true
+    }
+  ],
+  "plan_status": {
+    "checked": 45,
+    "total": 84,
+    "remaining": 39
+  },
+  "source_ACs": {
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+      "checked": 21,
+      "total": 66,
+      "remaining": 45,
+      "newly_checked": [
+        "AC-48",
+        "AC-51",
+        "AC-52"
+      ]
+    },
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+      "checked": 21,
+      "total": 66,
+      "remaining": 45,
+      "newly_checked": [
+        "AC-48",
+        "AC-51",
+        "AC-52"
+      ]
+    }
+  },
+  "limitations": [
+    "Six statements and six branch destinations remain uncovered as explicitly bound in the final raw coverage; all 35 measured ranges meet the required gate.",
+    "AC-49/AC-50 tags and Markdown/Gherkin rendering remain P5-T5 work.",
+    "Service/CLI, native publication, installed-host/cross-OS operation and whole-feature completion remain pending."
+  ],
+  "findings": [],
+  "open_probes": [],
+  "next_five_tasks": [
+    {
+      "id": "P5-T5",
+      "title": "Render traceable Markdown and executable-ready Gherkin only."
+    },
+    {
+      "id": "P6-T1",
+      "title": "Expose the versioned Python service and fixed gateway."
+    },
+    {
+      "id": "P6-T2",
+      "title": "Register every required noninteractive console command."
+    },
+    {
+      "id": "P6-T3",
+      "title": "Finish safe legacy entry-point compatibility and remove checkout coupling."
+    },
+    {
+      "id": "P7-T1",
+      "title": "Author the four constrained specialist contracts canonically."
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "Command": "poetry run python SCRATCH/close_final.py FINAL_HANDOFF",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T11-46",
+  "batch_nodes": {
+    "acceptance": 123
+  },
+  "binding_qualification": "Working bytes match the released candidate and immutable owner manifests. Checked commit/push authority is the coordinator release; closure performs no Git operation.",
+  "candidate": {
+    "bytes": 31181,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-candidate-released.2026-10-20T11-40.json",
+    "sha256": "04e475da4d094aa121bcc94fb7c703390245e182f51bf5967cbfc3f6f17aae66"
+  },
+  "checked_commit": "7425d43598b9f75a8052d351eadffb5fea64791d",
+  "closure_harness": {
+    "bytes": 9016,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-closure-harness.2026-10-20T11-46.txt",
+    "sha256": "c2a83994b98e1d3b8679f870460743e8d7e242344e3089bb69ea6148a516e6f6"
+  },
+  "command_archives": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-format-114033-raw.2026-10-20T11-40.json",
+      "sha256": "51a6ce6da7756476165f65e34575e1375d88f2f5b41d16e2e32f291198346189"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-lint-114033-raw.2026-10-20T11-40.json",
+      "sha256": "0ecdde5b353961043eefb49c3d6c16465d66957736c71fbd74b12b34a3e87198"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-types-114033-raw.2026-10-20T11-40.json",
+      "sha256": "37745cde1066da19a9d3e9b1aedc5009d3e4d2232e1454074929fdace3a7f17e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-static-114033-raw.2026-10-20T11-40.json",
+      "sha256": "9bc9eb318c0252283d5c5f44969c1918ddcef309cd6210214a21e9f785aaf52d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-acceptance-114033-raw.2026-10-20T11-46.json",
+      "sha256": "ee4d5488019aa48cd35dd3a81446152ed4565de290ec96e94448781d817b7c83"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-combine-114033-raw.2026-10-20T11-46.json",
+      "sha256": "f6bd0c8092cbe01ab1794e9a3641cf2eda5e239ef60c81434589128718878798"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-json-114033-raw.2026-10-20T11-46.json",
+      "sha256": "2e13f21c09c9ce098d5b4cec5f241baddc2a5c45ccbae5ff38b1fd30ec57f1b1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-proof-114033-raw.2026-10-20T11-46.json",
+      "sha256": "abe96da0948aff536a9be2ec0c4d0db4abf8d93ae9b18503b9680799481c975a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-contracts-114033-raw.2026-10-20T11-46.json",
+      "sha256": "4bc8b1e65be0625a50c3466f45edef6fab53d55be4f54f56d530a4442fe3f205"
+    }
+  ],
+  "composition": {
+    "assertions": [
+      "final ready membership",
+      "pending criteria preserve questions",
+      "exact identity, source digest and immutable references",
+      "schema and public acceptance-rule validity",
+      "deterministic rerun and unchanged snapshot",
+      "current approved scoped policy only"
+    ],
+    "extra_behavioral_run": false,
+    "kind": "in-memory public generator, schema and accepted-rule composition",
+    "native_execution": false,
+    "nodes": [
+      "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[False]",
+      "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority[True]",
+      "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[The observed result is unknown.]",
+      "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then[Unicode \\u7d50\\u679c remains unverified.]",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[approved]",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[proposed]",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[rejected]",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations[superseded]",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_imported_source_retains_original_provenance_and_distinct_target_owner"
+    ],
+    "publication": false,
+    "required_selector_families": [
+      "tests/discovery_runtime/test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority",
+      "tests/discovery_runtime/test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then",
+      "tests/discovery_runtime/test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations"
+    ]
+  },
+  "contract_nodes": 4,
+  "coverage": {
+    "coverage_ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-coverage-ranges.2026-10-20T11-46.json",
+      "sha256": "f98c5c61765c671c6a5dcf62503e9b95e7c5069e70ba8ca4da681bddcda271d2"
+    },
+    "current_coverage": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-current-coverage.2026-10-20T11-46.json",
+      "sha256": "ed7db4e2c0b164c5820652a40f67355b887ac8e19562dd2c8990cb868c7ba87c"
+    },
+    "current_raw_counters_augmented": false,
+    "module_count": 3,
+    "qualified_prior_proof_count": 0,
+    "range_count": 35
+  },
+  "failures_retained": "Owner manifests retain original model and generation failures, review and repair proof.",
+  "handoff": {
+    "bytes": 31512,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+    "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9"
+  },
+  "limitations": [
+    "Task verification only; independent task acceptance remains pending.",
+    "Pure in-memory transform; no publication, CLI, installed-host or runtime-completion claim.",
+    "Scoped coverage is not a newly measured repository-wide coverage result."
+  ],
+  "qualification": "Final fresh coverage retains each focused executed line/arc. Historical generation 49+4 proofs remain separate from this complete 123-node process. No source/test edit, behavioral rerun or acceptance checkoff occurred during closure.",
+  "remaining_raw_archive": {
+    "bytes": 359957,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-remaining-raw.2026-10-20T11-46.json",
+    "sha256": "16cb2de0f6b01f1a1d6e5d7405a987447250dfc4b8c988d1c3cb9a1e157f8ef7"
+  },
+  "retained_proof": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+      "sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"
+    },
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+      "sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51"
+    },
+    "final_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-repair-confirmation.2026-10-20T11-36.json",
+      "sha256": "8086643347c934cd9797d8ce3335f23c830bcb8b6b6e69478e8c32ef9b46ea75"
+    },
+    "generation": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-freeze.2026-10-20T11-32.json",
+      "sha256": "503514e75b8e2aab7ec01cb7dff079a553cfb330be8168a42750806e7d7846c1"
+    },
+    "generation_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-staging.2026-10-20T11-32.json",
+      "sha256": "84a15f63b9c85de5bf53a2df1a6aa5ece4effdaf519c8ca814fd9691be21937a"
+    },
+    "model_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+      "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"
+    },
+    "models": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json",
+      "sha256": "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b"
+    },
+    "prior_final_closure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-closure.2026-10-20T09-57.json",
+      "sha256": "48e10bb1084fce341ce4764dd66bbd4aa2fbc3a5b14207dc9d281b6caa2acd6d"
+    },
+    "prior_final_handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+      "sha256": "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"
+    }
+  },
+  "source_test_working_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_acceptance_generation_limits.py": "132410ef98d30f02f21baf5047a429b75c18d30e0bb7ababd1045f47997419e4",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac"
+  },
+  "stage_seconds": {
+    "acceptance": 321.701,
+    "contracts": 1.018,
+    "coverage-combine": 1.014,
+    "coverage-json": 1.013,
+    "coverage-proof": 1.014,
+    "format": 1.011,
+    "lint": 1.01,
+    "static": 1.014,
+    "types": 14.04
+  },
+  "state": "FROZEN_FINAL_VERIFICATION_ACCEPTANCE_PENDING",
+  "task": "P5-T4",
+  "task_nodes": 123,
+  "unproved_branches": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": [
+      [
+        297,
+        298
+      ],
+      [
+        347,
+        348
+      ]
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": [
+      [
+        52,
+        53
+      ],
+      [
+        72,
+        71
+      ],
+      [
+        166,
+        169
+      ],
+      [
+        382,
+        383
+      ]
+    ]
+  },
+  "unproved_lines": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": [
+      298,
+      348,
+      353
+    ],
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": [
+      53,
+      169,
+      383
+    ]
+  }
+}

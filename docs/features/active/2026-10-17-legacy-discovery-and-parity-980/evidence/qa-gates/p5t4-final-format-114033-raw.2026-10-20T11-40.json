@@ -1,0 +1,29 @@
+{
+  "entries": [
+    {
+      "base64": "W1siQzovVXNlcnMvRGFuTW9pc2FuL0FwcERhdGEvTG9jYWwvVGVtcC9pc3N1ZS05ODAtcDV0NC1hY2NlcHRhbmNlIiwgIlNDUkFUQ0giXSwgWyJDOlxcVXNlcnNcXERhbk1vaXNhblxcQXBwRGF0YVxcTG9jYWxcXFRlbXBcXGlzc3VlLTk4MC1wNXQ0LWFjY2VwdGFuY2UiLCAiU0NSQVRDSCJdLCBbIkM6L1VzZXJzL0Rhbk1vaXNhbi9yZXBvcy9kcm0tY29waWxvdC13dC8yMDI2LTEwLTE3VDIyLTMwIiwgIldPUktTUEFDRSJdLCBbIkM6XFxVc2Vyc1xcRGFuTW9pc2FuXFxyZXBvc1xcZHJtLWNvcGlsb3Qtd3RcXDIwMjYtMTAtMTdUMjItMzAiLCAiV09SS1NQQUNFIl0sIFsiQzovVXNlcnMvREFOTU9JfjEvQXBwRGF0YS9Mb2NhbC9UZW1wL0lTREM3NH4xIiwgIlNDUkFUQ0giXSwgWyJDOlxcVXNlcnNcXERBTk1PSX4xXFxBcHBEYXRhXFxMb2NhbFxcVGVtcFxcSVNEQzc0fjEiLCAiU0NSQVRDSCJdLCBbIkM6L1VzZXJzL0RBTk1PSX4xL3JlcG9zL0RSTS1DT34yLzIwMjYtMX4yIiwgIldPUktTUEFDRSJdLCBbIkM6XFxVc2Vyc1xcREFOTU9JfjFcXHJlcG9zXFxEUk0tQ09+MlxcMjAyNi0xfjIiLCAiV09SS1NQQUNFIl1d",
+      "bytes": 576,
+      "path": "OBSERVED_PATH_ALIASES",
+      "sha256": "4f9f4c56fefa5a2875f2ccaeef3555666a2c8ca2ba57dfb29b5d3831342ba1e4"
+    },
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t4-final-format-114033.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "QWxsIGRvbmUhIOKcqCDwn42wIOKcqA0KNyBmaWxlcyB3b3VsZCBiZSBsZWZ0IHVuY2hhbmdlZC4NCg==",
+      "bytes": 58,
+      "path": "SCRATCH/p5t4-final-format-114033.stderr",
+      "sha256": "84b9efe87539186dc93860b3f3a897d1a12d9d88af87ec1dd653ef7f7d1eab58"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDEsICJsYWJlbCI6ICJmb3JtYXQiLCAic3RhdHVzIjogImZpbmlzaGVkIiwgImNvbXBsZXRlZCI6IDAsICJsYXN0X25vZGUiOiBudWxsLCAic3RhcnRlZF9hdCI6ICIyMDI2LTEwLTIwVDExOjQwOjMzLjY4NDQ5NSswMDowMCIsICJ0aW1lb3V0X3NlY29uZHMiOiAzMDAsICJwaWQiOiAxMTM5MiwgImVsYXBzZWRfc2Vjb25kcyI6IDEuMDExLCAiZXhpdF9jb2RlIjogMH0K",
+      "bytes": 219,
+      "path": "SCRATCH/p5t4-final-format-114033.progress.json",
+      "sha256": "06b8d86d1050f100e29eeaa89ffe94f2e8301b0a6e17244ca02af79220a8895d"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

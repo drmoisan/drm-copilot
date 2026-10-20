@@ -315,7 +315,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test structural/discovery/parity/planning mode labels, blocking findings/warnings, stale/conflicting refs, incomplete artifacts, pending scenarios, deduplicated actions, both renderings, safe report replacement, and no unconditional readiness.
   - Acceptance: Completion is derived from the selected validated mode and current digest; generated views cannot overwrite authored evidence/contracts or authorize a host gate.
 
-- [ ] [P5-T4] Generate stable ready or pending acceptance records.
+- [x] [P5-T4] Generate stable ready or pending acceptance records.
   - Files and behavior: Create R/{acceptance_models,acceptance_generation}.py and PT/test_{acceptance_generation,acceptance_decisions,acceptance_properties}.py; move reusable stable-ID/digest logic from DT/generate_acceptance_scenarios.py into this authority.
   - Tests and proof: Cover kind/feature/criterion/client/mode-derived identities, immutable source refs, approved scoped decisions, supersession, known legacy characterization, target requirements, unresolved/proposed/rejected expectations, and permutation/content-change properties.
   - Acceptance: Confirmed requirements yield linked ready specifications; unknown or contradictory expectations remain pending with no invented expected result, and generation never modifies implementation AC files.

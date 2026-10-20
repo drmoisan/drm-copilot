@@ -1,0 +1,221 @@
+"""Bind preparation only; never import production or run a final gate."""
+
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+RUNTIME = "packages/discovery-runtime/src/drm_copilot_discovery/"
+TESTS = "tests/discovery_runtime/"
+ROUTE = "inventory_analyzers_p5t4_prepare_20261020"
+PROFILE_SHA = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+
+
+def sha(data):
+    """Bind exact bytes without newline or encoding normalization."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def reference(relative, expected):
+    """Verify one existing canonical artifact without rewriting its bytes."""
+    path = FEATURE / relative
+    data = path.read_bytes()
+    assert sha(data) == expected, relative
+    return {"path": path.as_posix(), "sha256": expected}
+
+
+def records(value):
+    """Find the existing routing record without copying the whole checkpoint."""
+    if isinstance(value, dict):
+        yield value
+        # The checkpoint contains both list and mapping receipt containers.
+        for item in value.values():
+            yield from records(item)
+    elif isinstance(value, list):
+        # Preserve receipt identity rather than assuming a checkpoint array index.
+        for item in value:
+            yield from records(item)
+
+
+def write_json(path, value):
+    """Write a new LF UTF-8 evidence file and refuse historical replacement."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def main():
+    """Retain released preparation scope while leaving execution fail-closed."""
+    checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+    matches = [item for item in records(checkpoint) if item.get("delegation_id") == ROUTE]
+    routing = [item for item in matches if item.get("profile_sha256") == PROFILE_SHA]
+    assert len(routing) == 1, "Exact preparation routing receipt is missing or ambiguous"
+    authority = routing[0]
+    assert authority["phase"] == "S5_P5T4_final_preparation"
+    assert authority["model"] == "gpt-6-astra" and authority["model_reasoning_effort"] == "max"
+    assert sha(Path(authority["profile_path"]).read_bytes()) == PROFILE_SHA
+    references = {
+        "baseline": reference("evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+                              "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"),
+        "contract": reference("evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+                              "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51"),
+        "models": reference("evidence/regression-testing/p5t4-models-freeze.2026-10-20T10-38.json",
+                            "18fbd8e8ee34d2d6cece03f9a586aa4970c2c2d38c824cc3fb5bfc91ca47bb6b"),
+        "model_review": reference("evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+                                  "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea"),
+        "prior_final_handoff": reference("evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+                                         "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41"),
+        "prior_final_closure": reference("evidence/qa-gates/p5t3-final-closure.2026-10-20T09-57.json",
+                                         "48e10bb1084fce341ce4764dd66bbd4aa2fbc3a5b14207dc9d281b6caa2acd6d"),
+    }
+    model = json.loads(Path(references["models"]["path"]).read_bytes())
+    model_nodes = model["executed_nodes"]
+    assert len(model_nodes) == len(set(model_nodes)) == 70
+    frozen_bindings = {path: item["sha256"] for group in ("owned", "dependencies")
+                       for path, item in model[group].items()}
+    # Moving generation files are deliberately not read or assigned candidate hashes.
+    for path, expected in frozen_bindings.items():
+        assert sha(Path(path).read_bytes()) == expected, path
+    prior_scripts = {
+        "final_gates.py": "7de869c83078b20587f72b61992e97f5d2cedeb88a57d57a42c7cff9173a25d0",
+        "final_static.py": "fdb0f9a1a89c6c5989a44d35dbdef4c0502e5dde11865e885c31b2c78180571d",
+        "final_coverage.py": "64aa473f6bf37672f2a6b5dc69ae24eb1ebc1a1f9a07bf86995203cc3bd884bf",
+    }
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    harnesses, paths = {}, []
+    # Preserve exact reusable runners, checking only reader syntax and artifact hygiene.
+    for name in (*prior_scripts, "prepare_final.py"):
+        data = (SCRATCH / name).read_bytes()
+        text = data.decode("utf-8")
+        tree = ast.parse(text)
+        assert len(text.splitlines()) <= 500 and b"\r" not in data and data.endswith(b"\n")
+        assert not data.endswith(b"\n\n")
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                if node.func.attr in {"read_text", "write_text"}:
+                    assert any(k.arg == "encoding" and isinstance(k.value, ast.Constant)
+                               and k.value.value == "utf-8" for k in node.keywords), (name, node.lineno)
+        destination = QA / ("p5t4-final-prepared-" + name.replace(".py", "") + "." + stamp + ".txt")
+        assert not destination.exists(), destination
+        destination.write_bytes(data)
+        paths.append(destination)
+        harnesses[name] = {"runtime_path": "SCRATCH/" + name,
+                           "sha256": sha(data), "physical_lines": len(text.splitlines()),
+                           "snapshot": destination.as_posix()}
+        if name in prior_scripts:
+            previous = SCRATCH.parent / "issue-980-p5t3-completion" / name
+            assert sha(previous.read_bytes()) == prior_scripts[name], name
+            harnesses[name]["accepted_predecessor_sha256"] = prior_scripts[name]
+    production = [RUNTIME + name + ".py" for name in
+                  ("acceptance_models", "acceptance_generation", "acceptance_generation_context")]
+    tests = [TESTS + name + ".py" for name in
+             ("test_acceptance_properties", "test_acceptance_generation", "test_acceptance_decisions")]
+    contracts = [
+        "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+        "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+    ]
+    raw_model = next(item for item in model["ordered_receipts"] if "-tests." in item["path"])
+    assert sha(Path(raw_model["path"]).read_bytes()) == raw_model["sha256"]
+    composition = {
+        "kind": "in-memory public generator, schema and accepted-rule composition",
+        "nodes": [],
+        "required_selector_families": [
+            TESTS + "test_acceptance_generation.py::test_generation_retains_exact_identity_refs_and_rule_authority",
+            TESTS + "test_acceptance_generation.py::test_pending_criteria_preserve_questions_and_never_invent_then",
+            TESTS + "test_acceptance_decisions.py::test_only_current_approved_scoped_policy_can_supply_target_expectations",
+        ],
+        "assertions": ["final ready membership", "pending criteria preserve questions",
+                       "exact identity, source digest and immutable references",
+                       "schema and public acceptance-rule validity",
+                       "deterministic rerun and unchanged snapshot", "current approved scoped policy only"],
+        "extra_behavioral_run": False, "publication": False, "native_execution": False,
+    }
+    template = {
+        "task": "P5-T4", "execution_released": False, "final_review_closed": False,
+        "candidate_commit": None, "files": production + tests, "production": production,
+        "bindings": frozen_bindings, "harnesses": harnesses,
+        "nodes": {"acceptance": []}, "node_count": None, "batch_order": ["acceptance"],
+        "coverage_targets": ["drm_copilot_discovery." + Path(path).stem for path in production],
+        "current_coverage_proofs": [{"source_bindings": {
+            RUNTIME + "acceptance_models.py": model["owned"][RUNTIME + "acceptance_models.py"]["sha256"]},
+            "coverage": {**raw_model, "selector": ["coverage.json"]}}],
+        "retained_units": [], "retained_segments": [], "retained_only_modules": [],
+        "retained_loop_qualifications": {}, "retained_docstring_qualifications": {},
+        "coverage_convention": "Fresh raw counters and AST/named callable ranges; no lost focused lines/arcs; "
+                               "new module/class/callable line coverage at least 90%, module branches at least 75%. "
+                               "Unchanged accepted dependency proof stays separately referenced.",
+        "composition": composition, "contracts": contracts,
+        "timeouts": {"types": 300, "acceptance": 660, "contracts": 300},
+        "retained_proof": references,
+        "limitations": ["Preparation only; no final gate or behavioral execution.",
+                        "Pure snapshot transform; publication, CLI and installed-host verification are outside P5-T4.",
+                        "Generation candidate and exact final node union are not yet bound."],
+    }
+    template_path = QA / ("p5t4-final-template." + stamp + ".json")
+    template_ref = write_json(template_path, template)
+    paths.append(template_path)
+    receipt = {
+        "Timestamp": stamp, "Command": "poetry run python SCRATCH/prepare_final.py", "EXIT_CODE": 0,
+        "status": "PREPARATION_READY_EXECUTION_DISABLED", "task": "P5-T4",
+        "authority": authority, "execution_released": False, "native_execution_released": False,
+        "source_or_test_mutation": False, "suites_executed": False,
+        "baseline_and_proof": references, "frozen_bindings_checked": frozen_bindings,
+        "template": template_ref, "harnesses": harnesses,
+        "scope": {"production": production, "tests": tests, "contracts": contracts},
+        "stage_order": ["Black --check", "Ruff check", "whole-repository Pyright",
+                        "exact new-scope architecture/size/intent/purity/isolation",
+                        "one fresh Pytest process over the exact full reversed task-node union",
+                        "coverage capture/combine/reconciliation with raw module/class/callable data",
+                        "four applicable quality-tier/package contracts"],
+        "population": {"models": 70, "generation_collected_pending_final_freeze": 45,
+                       "nominal_total_not_released": 115, "final_exact_count": None,
+                       "node_sources": {"models": references["models"], "generation": None},
+                       "binding_rule": "Concatenate owner executed-node lists, assert disjoint completeness, "
+                                       "reverse the entire union once, then compare every passed ID/order."},
+        "composition": composition,
+        "timeout_basis": "660 seconds is a provisional finite task-batch limit; confirm against the "
+                         "complete owner timing before release. Progress every 20 seconds. Not a host-hook limit.",
+        "preparation_delta": "Reuse accepted P5-T3 runners/readers. Remove native fixture/publication stage, "
+                             "use one new-module union and three measured production modules, update task labels. "
+                             "Static/coverage qualification mechanisms and raw/readable conventions remain.",
+        "missing_release_bindings": ["Final generation source/test/dependency hashes and exact passing node list",
+                                     "Final generation raw per-unit coverage, timing and retained diagnostic references",
+                                     "Combined independent review closure and checked candidate commit",
+                                     "Parent execution release and final candidate manifest with all exact bindings"],
+    }
+    receipt_path = QA / ("p5t4-final-preparation." + stamp + ".json")
+    receipt_ref = write_json(receipt_path, receipt)
+    paths.append(receipt_path)
+    markdown = QA / ("p5t4-final-preparation." + stamp + ".md")
+    markdown.write_text(
+        "# P5-T4 final preparation\n\n"
+        f"Timestamp: {stamp}\nCommand: poetry run python SCRATCH/prepare_final.py\nEXIT_CODE: 0\n"
+        "Output Summary: PREPARATION_READY; execution disabled. Three production and three test paths; "
+        "70 frozen model nodes plus the owner's final generation population. No suite or native execution.\n\n"
+        "The prepared sequence is format, lint, whole-repository types, scoped static checks, one reversed "
+        "task union, coverage reconciliation, and four contracts. Existing new generation cases supply "
+        "pure public composition; no publication or host proof is added.\n\n"
+        "Final generation freeze, combined review, checked commit and explicit execution release remain required. "
+        "The nominal 115 nodes and 660-second timeout are not a released population or a completed test claim.\n\n"
+        f"Exact scope, retained baseline, runner hashes and release fields: `{receipt_path.name}`.\n",
+        encoding="utf-8", newline="\n")
+    paths.append(markdown)
+    # Only preparation artifacts enter this compact staging list; owner files are excluded.
+    staging = {"Timestamp": stamp, "preparation": receipt_ref,
+               "paths": [{"path": path.as_posix(), "sha256": sha(path.read_bytes())} for path in paths]}
+    staging_ref = write_json(QA / ("p5t4-final-preparation-staging." + stamp + ".json"), staging)
+    print(json.dumps({"preparation": receipt_ref, "staging": staging_ref,
+                      "harnesses": harnesses, "execution_released": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()
