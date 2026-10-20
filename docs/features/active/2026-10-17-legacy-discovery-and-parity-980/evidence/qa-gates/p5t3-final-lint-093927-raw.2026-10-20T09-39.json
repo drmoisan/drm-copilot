@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+      "bytes": 19,
+      "path": "SCRATCH/p5t3-final-lint-093927.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t3-final-lint-093927.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDIsICJsYWJlbCI6ICJsaW50IiwgInN0YXR1cyI6ICJmaW5pc2hlZCIsICJjb21wbGV0ZWQiOiAwLCAibGFzdF9ub2RlIjogbnVsbCwgInN0YXJ0ZWRfYXQiOiAiMjAyNi0xMC0yMFQwOTozOToyOC4xNjE5NTArMDA6MDAiLCAidGltZW91dF9zZWNvbmRzIjogMzAwLCAicGlkIjogMjI1MjAsICJlbGFwc2VkX3NlY29uZHMiOiAxLjAxMywgImV4aXRfY29kZSI6IDB9Cg==",
+      "bytes": 217,
+      "path": "SCRATCH/p5t3-final-lint-093927.progress.json",
+      "sha256": "b6c003a1649941951df55a0ae58d080624ec7f601f736b45addf9d9a395d4f3a"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}

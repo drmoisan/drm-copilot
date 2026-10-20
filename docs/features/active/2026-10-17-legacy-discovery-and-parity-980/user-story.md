@@ -69,7 +69,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [ ] Individual artifact validators exist.
 - [ ] A complete validation command exists.
 - [ ] Blocking failures return nonzero exit codes.
-- [ ] Markdown and JSON reports are generated.
+- [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.
 ### Hooks
 - [ ] Verified claims require evidence.

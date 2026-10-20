@@ -1,0 +1,156 @@
+"""Archive the completed P5-T3 run using the accepted P5-T2 closure convention."""
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+NATIVE = SCRATCH.parent / "codex-legacy-discovery" / "issue-980"
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+HANDOFF = Path(sys.argv[1])
+CANDIDATE = QA / "p5t3-final-candidate-native-repair.2026-10-20T09-46.json"
+STAGED = set()
+
+
+def sha(data):
+    """Return the identity of exact bytes, without newline conversion."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Bind one existing repository artifact by portable path and exact bytes."""
+    path = path.resolve()
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(data), "bytes": len(data)}
+
+
+def save(path, value):
+    """Create one new LF UTF-8 receipt and retain its staging path."""
+    if path.exists():
+        raise ValueError("An immutable closure artifact already exists")
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    STAGED.add(path)
+    return ref(path)
+
+
+def main():
+    """Preserve raw output and exact current/committed bindings without executing tests."""
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    handoff, candidate = json.loads(HANDOFF.read_bytes()), json.loads(CANDIDATE.read_bytes())
+    assert sha(CANDIDATE.read_bytes()) == "1a0da6fa3b283be26954f6c755db3056a1aacb869074bd2e05e51070cb5e0ef2"
+    assert handoff["status"] == "FINAL_GATES_PASSED_ACCEPTANCE_PENDING"
+    assert handoff["candidate_sha256"] == sha(CANDIDATE.read_bytes())
+    assert handoff["bindings"]["changed"] == [] and handoff["node_count"] == 108
+    assert all(sha((ROOT / path).read_bytes()) == digest for path, digest in candidate["bindings"].items())
+    STAGED.update(path for path in QA.glob("p5t3-final-*") if path.suffix in {".json", ".md", ".txt"})
+    review_path = ROOT / candidate["docstring_qualification_review"]["path"]
+    STAGED.add(review_path)
+    if review_path.with_suffix(".md").exists():
+        STAGED.add(review_path.with_suffix(".md"))
+    archives = []
+    # Every command already archived original stdout/stderr/progress before returning.
+    for record in handoff["receipts"]:
+        receipt = ROOT / record["path"]
+        assert sha(receipt.read_bytes()) == record["sha256"]
+        payload = json.loads(receipt.read_bytes())
+        archive = ROOT / payload["raw_archive"]["path"]
+        assert sha(archive.read_bytes()) == payload["raw_archive"]["sha256"]
+        STAGED.update((receipt, receipt.with_suffix(".md"), archive))
+        archives.append(payload["raw_archive"])
+    for key in ("coverage_ranges", "current_coverage"):
+        record = handoff["coverage"][key]
+        path = ROOT / record["path"]
+        assert sha(path.read_bytes()) == record["sha256"]
+        STAGED.add(path)
+    run_id = handoff["receipts"][0]["path"].split("-format-", 1)[1].split(".", 1)[0]
+    raw_paths = [(SCRATCH / f"p5t3-final-{run_id}-{label}{suffix}", "SCRATCH")
+                 for label in ("producer", "legacy", "semantic", "combined")
+                 for suffix in (".coverage", "-coverage.json")]
+    raw_paths.append((SCRATCH / f"p5t3-final-{run_id}-coverage-result.json", "SCRATCH"))
+    raw_paths.extend((NATIVE / candidate["native"][key].removeprefix("NATIVE_SCRATCH/"), "NATIVE_SCRATCH")
+                     for key in ("fixture_receipt", "release_path", "result_path"))
+    descriptor = json.loads(raw_paths[-3][0].read_bytes())
+    fixture = NATIVE / descriptor["fixture"].removeprefix("SCRATCH/")
+    raw_paths.extend((fixture / f"docs/migration/discovery/reports/completion-report.{suffix}", "FIXTURE_REPORT")
+                     for suffix in ("json", "md"))
+    raw_paths.extend((path, "SCRATCH") for path in sorted(SCRATCH.glob("rebind-20261020T093920.*")))
+    entries = []
+    # Exact databases and JSON retain all original bytes, including absent final newlines.
+    for path, label in raw_paths:
+        data = path.read_bytes()
+        entries.append({"path": label + "/" + path.name, "bytes": len(data), "sha256": sha(data),
+                        "crlf_count": data.count(b"\r\n"), "terminal_lf": data.endswith(b"\n"),
+                        "base64": base64.b64encode(data).decode("ascii")})
+    raw_ref = save(QA / f"p5t3-final-remaining-raw.{stamp}.json", {
+        "task": "P5-T3", "timestamp": stamp, "entries": entries,
+        "qualification": "Exact base64 bytes; raw databases/coverage JSON need no terminal newline. Readable receipts are separate LF UTF-8 streams."})
+    git_bindings = []
+    # Qualify working/index/commit normalization explicitly instead of assuming raw equality.
+    for path in candidate["files"]:
+        current = (ROOT / path).read_bytes()
+        index = subprocess.run(["git", "show", ":" + path], capture_output=True, check=True).stdout
+        committed = subprocess.run(["git", "show", candidate["candidate_commit"] + ":" + path],
+                                   capture_output=True, check=True).stdout
+        assert index == committed and current.replace(b"\r\n", b"\n") == committed.replace(b"\r\n", b"\n")
+        git_bindings.append({"path": path, "working_sha256": sha(current), "index_sha256": sha(index),
+                             "commit_sha256": sha(committed), "raw_equal": current == index == committed,
+                             "qualification": "identical" if current == committed else "CRLF-to-LF only"})
+    snapshot = QA / f"p5t3-final-closure-harness.{stamp}.txt"
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    STAGED.add(snapshot)
+    checks = handoff["native"]["checks"]
+    ranges = json.loads((ROOT / handoff["coverage"]["coverage_ranges"]["path"]).read_bytes())
+    summary = {
+        "task": "P5-T3", "Timestamp": stamp, "Command": "python SCRATCH/close_final.py FINAL_HANDOFF", "EXIT_CODE": 0,
+        "state": "FROZEN_FINAL_VERIFICATION_ACCEPTANCE_PENDING", "checked_commit": candidate["candidate_commit"],
+        "candidate": ref(CANDIDATE), "handoff": ref(HANDOFF), "source_test_git_bindings": git_bindings,
+        "batch_nodes": {batch["label"]: len(batch["nodes"]) for batch in handoff["batches"]},
+        "task_nodes": 108, "contract_nodes": len(handoff["contracts"]), "native_assertions": len(checks),
+        "stage_seconds": {record["label"]: record["seconds"] for record in handoff["receipts"]},
+        "native_operation_seconds": handoff["native"]["operation_seconds"],
+        "prior_native_observation": {"task": "P5-T2", "whole_native_seconds": 151.326,
+                                    "qualification": "Different assertion/publication population; neither harness duration establishes an installed-host timeout."},
+        "coverage": handoff["coverage"], "remaining_raw_archive": raw_ref, "command_archives": archives,
+        "unproved_lines": {record["path"]: record["remaining_unproved_lines"] for record in ranges["modules"]
+                           if record["remaining_unproved_lines"]},
+        "retained_proof": handoff["retained_proof"], "closure_harness": ref(snapshot),
+        "failures_retained": ["static nested accepted-helper docstring assertion", "native missing-path KeyError before publication"],
+        "limitations": handoff["limitations"],
+        "qualification": "Raw coverage remains separate from accepted unchanged-body and reviewer-confirmed statement/arc mappings. Both new report-kind arcs execute currently. No source/test edit, behavior rerun or acceptance checkoff occurred during closure.",
+    }
+    closure = QA / f"p5t3-final-closure.{stamp}.json"
+    save(closure, summary)
+    markdown = QA / f"p5t3-final-closure.{stamp}.md"
+    markdown.write_text(
+        f"# P5-T3 final verification\n\nTimestamp: {stamp}\nCommand: `python SCRATCH/close_final.py FINAL_HANDOFF`\nEXIT_CODE: 0\n\n"
+        f"All seven stages passed on `{candidate['candidate_commit']}`. Native Windows/Git composition passed {len(checks)} assertions before the reversed 54 producer, 31 legacy and 23 semantic cases. Four applicable repository contracts passed.\n\n"
+        "Current raw coverage and retained exact source/coordinate qualifications are reported separately. Source/test bytes remained frozen. The original static and native harness failures, their diagnostics and their bounded corrections remain retained.\n\n"
+        f"Final handoff: `{HANDOFF.name}`; SHA-256 `{sha(HANDOFF.read_bytes())}`.\n\n"
+        "Raw databases, coverage JSON, native release/result and published report bytes are preserved without newline conversion. Native invalidation observations prove only fixture instrumentation. They do not establish installed coding-agent host hooks or non-Windows execution. Independent task acceptance remains pending.\n",
+        encoding="utf-8", newline="\n")
+    STAGED.add(markdown)
+    # Check only authored/readable streams; embedded exact raw bytes remain unmodified.
+    for path in STAGED:
+        raw = path.read_bytes()
+        text = raw.decode("utf-8")
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path.name
+        assert all(line == line.rstrip() for line in text.splitlines()), path.name
+        assert str(ROOT) not in text and ROOT.as_posix() not in text, path.name
+        assert str(SCRATCH) not in text and SCRATCH.as_posix() not in text, path.name
+    staging = QA / f"p5t3-final-staging.{stamp}.json"
+    save(staging, {"task": "P5-T3", "timestamp": stamp, "closure": ref(closure),
+                  "stage_paths": sorted(path.relative_to(ROOT).as_posix() for path in STAGED | {staging}),
+                  "bindings": [ref(path) for path in sorted(STAGED)],
+                  "self_qualification": "Self path is listed; exact SHA is reported externally."})
+    print(json.dumps({"closure": ref(closure), "staging": ref(staging), "stage_path_count": len(STAGED),
+                      "raw_entries": len(entries), "native_assertions": len(checks)}))
+
+
+if __name__ == "__main__":
+    main()

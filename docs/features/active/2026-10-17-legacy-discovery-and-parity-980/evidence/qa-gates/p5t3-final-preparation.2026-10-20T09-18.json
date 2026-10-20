@@ -1,0 +1,291 @@
+{
+  "Timestamp": "2026-10-20T09-18",
+  "accepted_prerequisite_commit": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+  "announced_population_not_a_collected_or_passed_claim": {
+    "affected_existing_caller": 1,
+    "legacy": 31,
+    "nominal_union": 105,
+    "producer_planning": 19,
+    "producer_pure": 35,
+    "semantic_completion": 19
+  },
+  "behavioral_commands_executed": [],
+  "contracts": [
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+    "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+  ],
+  "coverage_policy": {
+    "current": "Exact raw module/class/callable coverage, plus zero lost lines/arcs from final focused proofs on identical bytes.",
+    "limits": "Task-scoped verification only; not repository-wide remeasurement or feature acceptance.",
+    "retained": "Accepted prerequisite bodies require immutable source hashes, bound raw coverage, executable-AST equality and old/new line/branch-origin maps. Never add retained counts to raw JSON.",
+    "thresholds": "At least90% statements per module/class/callable and75% touched-module branches, with unchanged qualifications explicit and all critical changed behavior proved."
+  },
+  "coverage_targets": [
+    "drm_copilot_discovery.completion_report",
+    "drm_copilot_discovery.validation",
+    "drm_copilot_discovery.validation_operation",
+    "drm_copilot_discovery.report_models",
+    "drm_copilot_discovery.report_rendering",
+    "scripts.dev_tools.discovery.completion_report"
+  ],
+  "executed_frozen_nodes": {
+    "producer": [
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-structural-Structural validation]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-discovery-complete-Discovery completion]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-parity-complete-Parity completion]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-planning-Planning prerequisite]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-structural-Structural validation]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-discovery-complete-Discovery completion]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-parity-complete-Parity completion]",
+      "tests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-planning-Planning prerequisite]",
+      "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[none]",
+      "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[discovery-complete]",
+      "tests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[parity-complete]",
+      "tests/discovery_runtime/test_completion_report.py::test_exact_actions_preserve_every_original_diagnostic_index",
+      "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order0]",
+      "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order1]",
+      "tests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order2]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[agent-output]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[custom]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[None]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[True]",
+      "tests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[mode5]",
+      "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[list]",
+      "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[member]",
+      "tests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[validity]",
+      "tests/discovery_runtime/test_completion_report.py::test_public_preflight_requires_a_captured_snapshot",
+      "tests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[ascii]",
+      "tests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[unicode]",
+      "tests/discovery_runtime/test_completion_report.py::test_grouping_reserves_work_before_visiting_supplied_findings",
+      "tests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[False]",
+      "tests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[True]",
+      "tests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[coverage]",
+      "tests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[parity]",
+      "tests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[schema_version-2.0.0]",
+      "tests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[artifact_kind-completion-report]",
+      "tests/discovery_runtime/test_completion_report.py::test_empty_legacy_counts_remain_compatibility_only",
+      "tests/discovery_runtime/test_completion_planning.py::test_public_builder_delegates_one_exact_mode_and_identifier",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[none]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[one]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[extra]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[duplicate]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[kind]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[identifier]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[json]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[md]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[member]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_any_nonexact_grant_pair_before_projection[list]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[agent-output]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[custom]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_rejects_unsupported_modes_before_capture_or_grants[True]",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_requires_an_actual_captured_workspace",
+      "tests/discovery_runtime/test_completion_planning.py::test_planning_reserves_captured_file_comparisons_before_projection",
+      "tests/discovery_runtime/test_completion_planning.py::test_paired_views_support_dry_run_replacement_and_exact_unchanged_skip",
+      "tests/discovery_runtime/test_completion_planning.py::test_malformed_core_diagnostic_cannot_pass_prospective_mutation_validation"
+    ]
+  },
+  "execution_released": false,
+  "fixture_mutations": false,
+  "harnesses": [
+    {
+      "explicit_text_encoding_or_binary_reads": true,
+      "lf_utf8": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-preparation-final-gates-harness.2026-10-20T09-18.txt",
+      "physical_lines": 292,
+      "runtime_path": "SCRATCH/final_gates.py",
+      "sha256": "7de869c83078b20587f72b61992e97f5d2cedeb88a57d57a42c7cff9173a25d0",
+      "syntax_only": true
+    },
+    {
+      "explicit_text_encoding_or_binary_reads": true,
+      "lf_utf8": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-preparation-final-static-harness.2026-10-20T09-18.txt",
+      "physical_lines": 95,
+      "runtime_path": "SCRATCH/final_static.py",
+      "sha256": "3faa80b2230ac8d323a3a446cc128c6956d6bf571b8666b53fdb0d3d1cc05518",
+      "syntax_only": true
+    },
+    {
+      "explicit_text_encoding_or_binary_reads": true,
+      "lf_utf8": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-preparation-final-coverage-harness.2026-10-20T09-18.txt",
+      "physical_lines": 176,
+      "runtime_path": "SCRATCH/final_coverage.py",
+      "sha256": "a059fa7987a5809719b9715e15a44ca344d5894490da26a98020c6925d5d5c03",
+      "syntax_only": true
+    },
+    {
+      "explicit_text_encoding_or_binary_reads": true,
+      "lf_utf8": true,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-preparation-prepare-final-harness.2026-10-20T09-18.txt",
+      "physical_lines": 215,
+      "runtime_path": "SCRATCH/prepare_final.py",
+      "sha256": "d10a1e59355f30b4d20168225af9c4ebf1d441d7819f027e21d3bd0a5a7f34b6",
+      "syntax_only": true
+    }
+  ],
+  "limitations": [
+    "No final gate, task unit test, native publication or fixture mutation executed during preparation.",
+    "Native fixture can prove actual Windows/Git composition only; no installed coding-agent-host hooks or non-Windows claim.",
+    "No successor, CLI-delivery or feature-completion acceptance is implied."
+  ],
+  "native": {
+    "execution_released": false,
+    "expected_contract": {
+      "both": {
+        "counts": {
+          "coverage-ledger": 1,
+          "evidence-reference": 2,
+          "feature-contract": 1,
+          "inventory-snapshot": 1,
+          "parity-matrix": 1,
+          "scope": 1
+        },
+        "findings_complete": true,
+        "planning_prerequisite": null
+      },
+      "creation": {
+        "assessment_state": "available",
+        "blocking_findings": [],
+        "findings": [],
+        "mode": "structural",
+        "mode_label": "Structural validation",
+        "validation_result": "pass",
+        "warning_findings": []
+      },
+      "malformed": {
+        "assessment_state": "unavailable",
+        "counts": null,
+        "planning_error": "MUTATION_INVALID",
+        "planning_prerequisite": null,
+        "validation_result": "fail"
+      },
+      "replacement": {
+        "assessment_state": "available",
+        "blocking_findings": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "codes": [
+          "ACCEPTANCE_CRITERIA",
+          "DIMENSION_UNSPECIFIED",
+          "DIMENSION_MISSING",
+          "DIMENSION_UNSPECIFIED",
+          "PARITY_INCOMPLETE"
+        ],
+        "mode": "parity-complete",
+        "mode_label": "Parity completion",
+        "retained_finding_counts": {
+          "error": 5,
+          "info": 0,
+          "warning": 0
+        },
+        "validation_result": "fail",
+        "warning_findings": []
+      },
+      "wrong_grants": "MUTATION_GRANT"
+    },
+    "fixture": {
+      "bytes": 7110,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-fixture.2026-10-20T08-50.json",
+      "sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355"
+    },
+    "fixture_receipt": "NATIVE_SCRATCH/issue-980-p5t3-native-fixture.2026-10-20T08-50.json",
+    "harness_path": "NATIVE_SCRATCH/issue-980-p5t3-native-composition.py",
+    "harness_sha256": "b3d6e78f5f7af0c9d10cb9f6f6f91c16f0fbc754e44e3a0c41abcda65206c1f3",
+    "mutation_scope": "Only exact granted completion-report.json and completion-report.md within the preserved fixture after explicit release."
+  },
+  "native_hygiene": {
+    "explicit_text_encoding_or_binary_reads": true,
+    "lf_utf8": true,
+    "physical_lines": 297,
+    "syntax_only": true
+  },
+  "ordered_commands": [
+    "python -m black --check <frozen task source/test paths>",
+    "python -m ruff check <same paths>",
+    "python -m pyright",
+    "python SCRATCH/final_static.py <released exact candidate>",
+    "python NATIVE_SCRATCH/issue-980-p5t3-native-composition.py <preserved descriptor> <new result> --release <static-success release>",
+    "python -m pytest -v -o addopts= -p no:cacheprovider <reversed producer54 exact nodes> <six measured modules> --cov-branch",
+    "python -m pytest -v -o addopts= -p no:cacheprovider <reversed legacy31 exact nodes> <same measured modules> --cov-branch",
+    "python -m pytest -v -o addopts= -p no:cacheprovider <reversed final semantic/affected caller nodes> <same measured modules> --cov-branch",
+    "python -m coverage combine --keep <separate databases>; coverage json; final_coverage.py",
+    "python -m pytest -v -o addopts= -p no:cacheprovider --no-cov <four retained applicable contracts>"
+  ],
+  "pending_release_bindings": [
+    "Complete closed independent candidate review, checked commit/push and explicit parent execution authorization.",
+    "Final semantic/actual-caller successful nodes and any authorized new control; exact complete source/test/dependency hashes and per-unit coverage.",
+    "Exact legacy31 node identities or an explicitly authorized collection-only binding step.",
+    "Owner-qualified moved unchanged body references and final current coverage baselines.",
+    "Disjoint final node union, exact task file scope, harness hashes and owner-confirmed independent native expectations.",
+    "Finite final deadlines informed by the actual owner-focused timings."
+  ],
+  "population_policy": "Only final owner-frozen exact nodes may authorize execution. Legacy nonverbose proof establishes 31 passes but has no exact node list; do not infer parameter IDs. No standalone rendering105 or mechanical8 replay.",
+  "production_test_mutations": false,
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "progress": "Immediate stage start/completion and20-second child elapsed/PID/completed-node/last-node updates; stop and preserve raw streams on the first failure or byte drift.",
+  "provisional_timeouts_seconds": {
+    "contracts": 180,
+    "format": 300,
+    "legacy": 180,
+    "lint": 300,
+    "native": 660,
+    "producer": 660,
+    "semantic": 660,
+    "static": 300,
+    "types": 300
+  },
+  "raw_readable_policy": "Read source/text as UTF-8 or bytes. Raw output/SQLite/coverage JSON are exact bytes, including CRLF and absent final newline. Authored receipts/readable views are portable LF UTF-8 with no trailing spaces or blank lines.",
+  "retained_references": {
+    "legacy31": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+      "sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92"
+    },
+    "mechanical8": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-mechanical-freeze.2026-10-20T08-52.json",
+      "sha256": "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4"
+    },
+    "native": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-preparation.2026-10-20T08-50.json",
+      "sha256": "4d467c845b14d6f593516de66e17819e4df106062d65df2df11658550cc7c0ef"
+    },
+    "prior_runner": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-preparation.2026-10-20T07-04.json",
+      "sha256": "5a541fe2225c24bf4772d107d352a142cd0718de25da2b5f66450472b6619357"
+    },
+    "producer54": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+      "sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991"
+    },
+    "producer_pure35": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+      "sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719"
+    },
+    "rendering105": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-rendering-freeze.2026-10-20T08-45.json",
+      "sha256": "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2"
+    }
+  },
+  "route": "inventory_analyzers_p5t3_final_prepare_20261020",
+  "scope": "Four temporary final runner scripts and this compact canonical preparation evidence only.",
+  "script_changes_from_accepted_runner": [
+    "P5-T3 task/evidence labels and the exact retained native harness.",
+    "Observed GetLongPathNameW/GetShortPathNameW root normalization; originals retained in raw base64.",
+    "Native static-success release is written only after the four actual static stages pass.",
+    "Exact batch-order completeness and bounded alias suffix validation.",
+    "Optional prior source_path/source_name for moved unchanged AST coverage bodies.",
+    "Explicit retained-only prerequisite modules may reuse accepted bound body proof without a duplicate batch."
+  ],
+  "semantic_pending": "Initial20 reported17 passes and3 fixture failures. Test-only correction and one necessary coverage-report fallthrough control are pending parent confirmation/final freeze; no successful20/21-case claim.",
+  "state": "PREPARATION_READY_FINAL_RELEASE_PENDING",
+  "task": "P5-T3",
+  "timeout_basis": "Native performs two guarded publications versus the accepted151.326s one-publication fixture. Producer pure35 took29.391s and planning19 took132.548s; legacy31 took0.799s. Initial semantic20 took142.07s with3 fixture failures; confirm final semantic timing before release."
+}

@@ -1,0 +1,287 @@
+"""Bind completed owner proof to the explicitly released final runner."""
+
+import ast
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+from final_static import definitions
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+REG = FEATURE / "evidence/regression-testing"
+R = "packages/discovery-runtime/src/drm_copilot_discovery/"
+PREREQUISITE = "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d"
+
+
+def sha(raw):
+    """Hash exact stored bytes without textual normalization."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def read(path, digest):
+    """Read an immutable owner receipt after checking its announced hash."""
+    raw = path.read_bytes()
+    assert sha(raw) == digest, path
+    return json.loads(raw), {"path": path.as_posix(), "sha256": digest}
+
+
+def save(path, value):
+    """Create a portable LF UTF-8 authored receipt without overwriting evidence."""
+    assert not path.exists(), path
+    text = json.dumps(value, indent=2, sort_keys=True) + "\n"
+    assert not re.search(r"[A-Za-z]:[\\/]", text), path
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def extract_coverage(archive_ref, identifier):
+    """Decode already retained raw coverage; preserve its byte identity separately."""
+    archive, _ = read(Path(archive_ref["path"]), archive_ref["sha256"])
+    entries = [entry for entry in archive["entries"] if entry["identifier"] == identifier]
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry["encoding"] == "gzip+base64"
+    raw = gzip.decompress(base64.b64decode(entry["data"]))
+    assert sha(raw) == entry["sha256"] and len(raw) == entry["bytes"]
+    return json.loads(raw), {"archive": archive_ref, "identifier": identifier,
+                            "raw_sha256": sha(raw), "raw_bytes": len(raw)}
+
+
+def main():
+    """Assemble only existing manifests, exact nodes and accepted coverage mappings."""
+    profile = Path(".codex/agents/python-typed-engineer-c4.toml")
+    assert sha(profile.read_bytes()) == "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    route = "inventory_analyzers_p5t3_final_20261020"
+    checkpoint_text = Path("artifacts/orchestration/orchestrator-state.json").read_text(encoding="utf-8")
+    assert route in checkpoint_text
+    release = json.loads(checkpoint_text)["execution_progress"]["p5t3_progress"]["final_gate_release"]
+    assert release["execution_released"] is True and release["final_review_closed"] is True
+    assert release["expected_case_count"] == 108 and release["task"] == "P5-T3"
+    assert release["native"]["execution_released"] is True
+    assert release["native"]["expected_contract_confirmed"] is True
+    candidate_commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, check=True).stdout.decode("utf-8").strip()
+    assert candidate_commit == release["candidate_commit"] == "a00b2b36a388088a9cd641defadfd8e8c0e8f64c"
+    preparation, prep_ref = read(QA / "p5t3-final-preparation.2026-10-20T09-18.json",
+                               "2e4a75eca4ecb1ab0a0dbb008021d3981e5089ce4c9a1ee276f48d883858a219")
+    producer, producer_ref = read(REG / "p5t3-producer-freeze.2026-10-20T09-15.json",
+                                 "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991")
+    semantic, semantic_ref = read(REG / "p5t3-semantics-freeze.2026-10-20T09-27.json",
+                                 "29f00c84225e64d98a556b51d45615f5d58c004f1d9fe2d76f5688545d95355c")
+    source_map, map_ref = read(Path(semantic["source_freeze"]["path"]),
+                              semantic["source_freeze"]["sha256"])
+    legacy, legacy_ref = read(REG / "p5t3-legacy-freeze.2026-10-20T08-55.json",
+                             "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92")
+    collection, collection_ref = read(QA / "p5t3-final-legacy-collection.2026-10-20T09-28.json",
+                                     "974409de19874ffdd01cce88ca7dccaac28c0bb8288889cefaeee4a002a2131f")
+    rendering, rendering_ref = read(REG / "p5t3-rendering-freeze.2026-10-20T08-45.json",
+                                   "d1ba1c6b9b0692dcdfa910c2f2b69b8c96ad509d0b6e4c5bb63415db864032f2")
+    mechanical, mechanical_ref = read(REG / "p5t3-mechanical-freeze.2026-10-20T08-52.json",
+                                     "f7e3551b96c3b0095527a58a12da3ffb65cdc10490b7c5afecd2ac77171ee6c4")
+    _, review_ref = read(QA / "p5t3-executor-candidate-ready.2026-10-20T09-31.json",
+                        "5865f935ac62cc008d30200983ec1efed38953d80e53d9286d06dd82f583815e")
+    _, reviewed_union = read(QA / "p5t3-composition-review.staging.2026-10-20T09-19.json",
+                            "ae7d384f9564071856de3b537e7fd1680cac6c52fc19e7b7ff9ea9d3c2b80662")
+    assert semantic["latest_test_result"]["exit_code"] == collection["exit_code"] == 0
+    assert all(status == "PASSED" for _, status in semantic["latest_test_result"]["nodes"])
+    nodes = {
+        "producer": [node for proof in producer["proof"] for node in proof["nodes"]],
+        "legacy": collection["nodes"],
+        "semantic": [node for node, _ in semantic["latest_test_result"]["nodes"]],
+    }
+    flattened = [node for batch in nodes.values() for node in batch]
+    assert [len(nodes[name]) for name in nodes] == [54, 31, 23]
+    assert len(flattened) == len(set(flattened)) == 108
+    planning_ref = producer["proof"][1]["receipt"]
+    planning, _ = read(Path(planning_ref["path"]), planning_ref["sha256"])
+    assert planning["before"] == planning["after"]
+    expected = dict(planning["after"])
+    expected.update(legacy["dependencies"])
+    expected.update({path: record["sha256"] for path, record in semantic["dependency_bindings"].items()})
+    expected.update(semantic["current_bindings"])
+    files = set(semantic["owned_paths"]) | set(mechanical["owned_paths"])
+    # Each owner contributes only its frozen scope; no new repository inventory is made.
+    for owner in (producer, legacy, rendering):
+        for record in owner["scope"]:
+            files.add(record["path"])
+            expected[record["path"]] = record["sha256"]
+    io_test = legacy["unchanged_io_test"]
+    files.add(io_test["path"])
+    expected[io_test["path"]] = io_test["sha256"]
+    for path in mechanical["owned_paths"]:
+        if path not in expected:
+            expected[path] = mechanical["bindings"][path]["sha256"]
+    bindings = {path: sha(Path(path).read_bytes()) for path in expected}
+    assert bindings == expected
+    sources = {path: Path(path).read_bytes() for path in sorted(files)}
+    assert all(sha(raw) == bindings[path] for path, raw in sources.items())
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    archive_ref = {"path": (QA / "p5t3-producer-source-archive.2026-10-20T09-01.json").as_posix(),
+                   "sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0"}
+    pure_raw, pure_binding = extract_coverage(archive_ref, "SCRATCH/p5t3-producer-pure2-coverage.json")
+    planning_raw, planning_binding = extract_coverage(
+        producer["raw_archive"], "SCRATCH/p5t3-producer-planning3-coverage.json")
+    focused_path = QA / ("p5t3-final-focused-coverage-binding." + stamp + ".json")
+    focused_ref = save(focused_path, {
+        "pure": pure_raw, "planning": planning_raw,
+        "raw_sources": {"pure": pure_binding, "planning": planning_binding},
+        "qualification": "Parsed exact retained JSON counters only; raw byte identities remain in referenced lossless archives. No behavioral run or coverage calculation occurred.",
+    })
+    current_proofs = [
+        {"coverage": {**focused_ref, "selector": [label]},
+         "source_bindings": {R + "completion_report.py": bindings[R + "completion_report.py"]}}
+        for label in ("pure", "planning")
+    ]
+    current_proofs.append({
+        "coverage": {**semantic_ref, "selector": ["coverage_raw"]},
+        "source_bindings": {path: bindings[path] for path in source_map["mapping"]},
+    })
+    current_proofs.append({"coverage": legacy["raw_coverage"],
+                           "source_bindings": {legacy["scope"][0]["path"]: legacy["scope"][0]["sha256"]}})
+    retained_units = []
+    retained_only = [R + "report_models.py", R + "report_rendering.py"]
+    # Reuse the accepted prerequisite's exact executable bodies without replaying its tests.
+    for path in retained_only:
+        raw = subprocess.run(["git", "show", PREREQUISITE + ":" + path],
+                             capture_output=True, check=True).stdout
+        assert raw == sources[path]
+        for name in definitions(ast.parse(raw)):
+            retained_units.append({"path": path, "name": name, "source_ref": PREREQUISITE,
+                                   "source_sha256": sha(raw), "coverage": rendering["raw_coverage"],
+                                   "accepted_prerequisite": rendering_ref})
+    segments = []
+    # Bind the already reviewed coordinates; never describe changed bodies as equivalent.
+    for path, mapping in source_map["mapping"].items():
+        original = subprocess.run(["git", "show", PREREQUISITE + ":" + path],
+                                  capture_output=True, check=True).stdout
+        assert sha(original) == mapping["before_sha256"]
+        assert bindings[path] == mapping["after_sha256"]
+        proof = semantic["coverage_proof"][path]
+        values = set(mapping["unchanged_text_line_map"].values())
+        assert set(proof["retained_prior_lines"]) <= values
+        assert all(abs(a) in values and abs(b) in values for a, b in proof["retained_prior_arcs"])
+        assert not proof["unproved_lines"] and not proof["unproved_arcs"]
+        segments.append({
+            "path": path, "current_sha256": bindings[path],
+            "original_source": {"path": path, "source_ref": PREREQUISITE, "source_sha256": sha(original)},
+            "source_map": {**map_ref, "selector": ["mapping", path]},
+            "proof": {**semantic_ref, "selector": ["coverage_proof", path]},
+            "review_confirmation": review_ref,
+        })
+    loop_qualifications = {}
+    # Only existing identical accepted loops may retain their original comment placement.
+    for path, raw in sources.items():
+        parsed, lines = ast.parse(raw), raw.decode("utf-8").splitlines()
+        missing = [node for node in ast.walk(parsed) if isinstance(node, (ast.For, ast.AsyncFor, ast.While))
+                   and not lines[node.lineno - 2].lstrip().startswith("#")]
+        if missing:
+            old = subprocess.run(["git", "show", PREREQUISITE + ":" + path],
+                                 capture_output=True, check=True).stdout
+            old_loops = {ast.dump(node) for node in ast.walk(ast.parse(old))
+                         if isinstance(node, (ast.For, ast.AsyncFor, ast.While))}
+            assert all(ast.dump(node) in old_loops for node in missing), path
+            loop_qualifications[path] = {str(node.lineno): sha(ast.dump(node).encode("utf-8")) for node in missing}
+    harnesses = {}
+    original_harnesses = {Path(item["runtime_path"]).name: item for item in preparation["harnesses"]}
+    # Preserve all prior runner hashes; only the authorized coverage reader may differ.
+    for name in ("final_gates.py", "final_static.py", "final_coverage.py", "prepare_final.py"):
+        raw = (SCRATCH / name).read_bytes()
+        ast.parse(raw)
+        assert len(raw.splitlines()) <= 500 and b"\r" not in raw and not raw.endswith(b"\n\n")
+        assert not re.search(rb"[ \t]+\r?$", raw, re.M)
+        if name != "final_coverage.py":
+            assert sha(raw) == original_harnesses[name]["sha256"]
+        else:
+            changed = QA / ("p5t3-final-rebound-coverage-reader." + stamp + ".txt")
+            assert not changed.exists()
+            changed.write_bytes(raw)
+        harnesses[name] = {"runtime_path": "SCRATCH/" + name, "sha256": sha(raw)}
+    native = dict(preparation["native"])
+    native.update(execution_released=True, expected_contract_confirmed=True,
+                  fixture_receipt_sha256=native["fixture"]["sha256"],
+                  release_path="NATIVE_SCRATCH/issue-980-p5t3-native-release.json",
+                  result_path="NATIVE_SCRATCH/issue-980-p5t3-native-result.json")
+    native_root = SCRATCH.parent / "codex-legacy-discovery/issue-980"
+    for key, digest in (("harness_path", native["harness_sha256"]),
+                        ("fixture_receipt", native["fixture_receipt_sha256"])):
+        target = native_root / native[key].removeprefix("NATIVE_SCRATCH/")
+        assert sha(target.read_bytes()) == digest
+    harnesses["native"] = {"runtime_path": native["harness_path"], "sha256": native["harness_sha256"]}
+    manifest = {
+        "task": "P5-T3", "timestamp": stamp, "execution_released": True,
+        "final_review_closed": True, "candidate_commit": candidate_commit, "route": route,
+        "status": "FINAL_BINDINGS_READY_EXECUTION_RELEASED",
+        "files": sorted(files), "bindings": bindings, "harnesses": harnesses,
+        "production": [R + name + ".py" for name in (
+            "completion_report", "validation", "validation_operation", "report_models", "report_rendering")]
+            + ["scripts/dev_tools/discovery/completion_report.py"],
+        "coverage_targets": preparation["coverage_targets"],
+        "nodes": nodes, "batch_order": ["producer", "legacy", "semantic"], "node_count": 108,
+        "current_coverage_proofs": current_proofs, "retained_units": retained_units,
+        "retained_only_modules": retained_only, "retained_segments": segments,
+        "retained_loop_qualifications": loop_qualifications,
+        "coverage_convention": "Fresh raw coverage stays unchanged. Accepted prerequisite bodies and reviewed unchanged statement/arc segments are separately named. Every unqualified changed line/branch must execute.",
+        "retained_proof": {"producer": producer_ref, "legacy": legacy_ref, "legacy_collection": collection_ref,
+                           "semantic": semantic_ref, "rendering": rendering_ref, "mechanical": mechanical_ref,
+                           "review": review_ref, "reviewed_union": reviewed_union,
+                           "original_preparation": prep_ref},
+        "timeouts": {"types": 300, "native": 660, "producer": 660, "legacy": 180,
+                     "semantic": 660, "contracts": 180},
+        "native": native, "contracts": preparation["contracts"], "limitations": preparation["limitations"],
+        "dependency_qualification": "Producer planning19 remains historical on validation f55628e2; the final reversed54 batch must repeat those19 on e20b53fc. No separate pre-final replay.",
+    }
+    candidate = QA / ("p5t3-final-candidate-preparation." + stamp + ".json")
+    candidate_ref = save(candidate, manifest)
+    script = Path(__file__).read_bytes()
+    snapshot = QA / ("p5t3-final-rebind-harness." + stamp + ".txt")
+    assert not snapshot.exists()
+    snapshot.write_bytes(script)
+    addendum = {
+        "task": "P5-T3", "Timestamp": stamp, "state": "PREPARATION_REBOUND_EXECUTION_RELEASED",
+        "route": route, "candidate": candidate_ref, "original_preparation": prep_ref,
+        "nodes": {name: len(value) for name, value in nodes.items()}, "disjoint_union": 108,
+        "source_test_paths": len(files), "bound_source_dependency_streams": len(bindings),
+        "reader_delta": {
+            "old": original_harnesses["final_coverage.py"], "new_path": changed.as_posix(),
+            "new_sha256": harnesses["final_coverage.py"]["sha256"],
+            "reason": "Read only the independently confirmed semantic coordinates with original/current source bindings; require fresh coverage for all remaining lines and branches.",
+            "review": review_ref, "raw_counters_augmented": False,
+        },
+        "collection": collection_ref, "coverage_binding": focused_ref,
+        "producer_timing": "Pure35 29.391s; planning19 132.548s harness.",
+        "semantic_timing": {"pytest_seconds": 177.59, "harness_seconds": semantic["latest_test_result"]["duration_seconds"]},
+        "assembly_harness": {"path": snapshot.as_posix(), "sha256": sha(script)},
+        "original_native_unchanged": native["harness_sha256"], "execution_released": True,
+        "release": release, "pending": [],
+    }
+    addendum_path = QA / ("p5t3-final-preparation-rebind." + stamp + ".json")
+    addendum_ref = save(addendum_path, addendum)
+    text = (
+        f"# P5-T3 final preparation rebind\n\nTimestamp: {stamp}\n"
+        "Command: `python SCRATCH/rebind_final.py` (receipt/source binding only)\n"
+        "EXIT_CODE: 0\n"
+        "Output Summary: 108 exact distinct nodes; final execution is explicitly released.\n\n"
+        "Producer 54, legacy 31 and semantic/caller 23 populations are frozen. Legacy identifiers "
+        "were collected without running test bodies. The existing native harness and three other "
+        "prepared scripts are byte-identical. The sole reader adaptation consumes reviewer-confirmed "
+        "unchanged coordinates inside changed validator bodies, preserving raw counters and requiring "
+        "current execution for every unqualified point.\n\n"
+        "No production/test/Git/checkpoint edits or native fixture changes occurred. "
+        "The reviewed candidate is committed and parent final execution authority is recorded.\n"
+    )
+    addendum_path.with_suffix(".md").write_text(text, encoding="utf-8", newline="\n")
+    assert len(script.splitlines()) <= 500
+    print(json.dumps({"addendum": addendum_ref, "candidate": candidate_ref,
+                      "nodes": 108, "reader_sha256": harnesses["final_coverage.py"]["sha256"],
+                      "execution_released": True}))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "7493ebd28cc5340355547e87fd3ce9fd40228ff350ffa3ca841760f918e7168f"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "7493ebd28cc5340355547e87fd3ce9fd40228ff350ffa3ca841760f918e7168f"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t3-final-candidate-qualified.2026-10-20T09-44.json",
+  "candidate_sha256": "2857c6f423799d2741c7855500b921c7d7f2c5a10fa6df745bd6db10c11174ef",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u NATIVE_SCRATCH\\issue-980-p5t3-native-composition.py NATIVE_SCRATCH\\issue-980-p5t3-native-fixture.2026-10-20T08-50.json NATIVE_SCRATCH\\issue-980-p5t3-native-result.json --release NATIVE_SCRATCH\\issue-980-p5t3-native-release.json",
+  "completed_nodes": 0,
+  "exit_code": 1,
+  "finished_at": "2026-10-20T09:44:45.601511+00:00",
+  "label": "native",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-native-094421-raw.2026-10-20T09-44.json",
+    "sha256": "ed7ef9af47ebd8198b167ca48a235e0e13413b4534b90c07a322ea25e279774b"
+  },
+  "seconds": 7.029,
+  "stage": 5,
+  "started_at": "2026-10-20T09:44:38.572779+00:00",
+  "stderr": "Traceback (most recent call last):\n  File \"NATIVE_SCRATCH\\issue-980-p5t3-native-composition.py\", line 297, in <module>\n    main()\n    ~~~~^^\n  File \"NATIVE_SCRATCH\\issue-980-p5t3-native-composition.py\", line 173, in main\n    check(\"completion-output-absence\", all(snapshot.file(path) is None for path in outputs))\n                                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"NATIVE_SCRATCH\\issue-980-p5t3-native-composition.py\", line 173, in <genexpr>\n    check(\"completion-output-absence\", all(snapshot.file(path) is None for path in outputs))\n                                           ~~~~~~~~~~~~~^^^^^^\n  File \"WORKSPACE\\packages\\discovery-runtime\\src\\drm_copilot_discovery\\snapshot.py\", line 270, in file\n    raise KeyError(path)\nKeyError: 'docs/migration/discovery/reports/completion-report.json'\n",
+  "stdout": "PASS accepted-fixture-byte-identity\nPASS checkout-identity\nPASS captured-byte-identity\nPASS semantic-input-identity\nPASS actual-core-structural-pass\n",
+  "timed_out": false,
+  "timeout_seconds": 660,
+  "timestamp": "2026-10-20T09-44"
+}

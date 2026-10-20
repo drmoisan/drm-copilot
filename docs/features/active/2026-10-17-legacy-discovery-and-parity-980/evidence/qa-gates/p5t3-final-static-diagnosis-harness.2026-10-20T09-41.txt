@@ -1,0 +1,96 @@
+"""Consolidate the existing final static predicates without running later gates."""
+
+import ast
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+from final_static import definitions, executable
+
+ROOT = Path.cwd()
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+MANIFEST = QA / "p5t3-final-candidate-preparation.2026-10-20T09-39.json"
+ACCEPTED = "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4"
+
+
+def sha(raw):
+    """Bind exact bytes or normalized AST text without modifying source."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def main():
+    """Collect every existing predicate failure and qualify only identical callers."""
+    manifest = json.loads(MANIFEST.read_bytes())
+    findings, qualifications, checked, historical = [], [], [], {}
+    # This diagnosis uses precisely the released file population and existing predicates.
+    for relative in manifest["files"]:
+        raw = Path(relative).read_bytes()
+        assert sha(raw) == manifest["bindings"][relative]
+        tree, lines = ast.parse(raw), raw.decode("utf-8").splitlines()
+        if len(lines) > 500:
+            findings.append({"path": relative, "rule": "size"})
+        names = {id(node): name for name, node in definitions(tree).items()}
+        imports, calls = [], []
+        # Continue after a predicate failure so one scratch correction covers the set.
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imports.extend(item.name for item in node.names)
+            if isinstance(node, ast.ImportFrom) and node.module:
+                imports.append(node.module)
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and not ast.get_docstring(node):
+                finding = {"path": relative, "name": names[id(node)], "line": node.lineno, "rule": "docstring"}
+                findings.append(finding)
+                old = subprocess.run(["git", "show", ACCEPTED + ":" + relative], capture_output=True, check=True).stdout
+                previous = definitions(ast.parse(old))[finding["name"]]
+                assert raw == old and executable(previous) == executable(node)
+                qualifications.append({**finding, "source_ref": ACCEPTED, "source_sha256": sha(old),
+                                       "current_sha256": sha(raw), "executable_ast_sha256": sha(executable(node).encode("utf-8")),
+                                       "reason": "Unchanged accepted nested test fake; this task did not add or modify its contract."})
+            if isinstance(node, (ast.For, ast.AsyncFor, ast.While)) and not lines[node.lineno - 2].lstrip().startswith("#"):
+                expected = manifest["retained_loop_qualifications"].get(relative, {}).get(str(node.lineno))
+                if expected != sha(ast.dump(node).encode("utf-8")):
+                    findings.append({"path": relative, "line": node.lineno, "rule": "loop_intent"})
+            if isinstance(node, ast.Call):
+                calls.append(ast.unparse(node.func))
+        conditions = {
+            "external_import": not any(name.split(".")[0] in {"subprocess", "tempfile", "socket", "requests", "http", "urllib"} for name in imports),
+            "execution_call": not any(name in {"open", "eval", "exec", "compile"} for name in calls),
+            "write_call": not any(name.endswith((".write_bytes", ".write_text", ".mkdir", ".unlink")) for name in calls),
+            "runtime_dependency": not relative.startswith("packages/") or not any(name.startswith("scripts") for name in imports),
+            "runtime_read": not relative.startswith("packages/") or not any(name.endswith((".read_bytes", ".read_text", ".glob", ".rglob")) for name in calls),
+            "test_temporary": not relative.startswith("tests/") or not any(isinstance(node, ast.Name) and node.id in {"tmp_path", "tmpdir"} for node in ast.walk(tree)),
+        }
+        findings.extend({"path": relative, "rule": rule} for rule, valid in conditions.items() if not valid)
+        checked.append({"path": relative, "sha256": sha(raw), "lines": len(lines)})
+    # Retain the existing exact executable-body checks without running their test suites.
+    for record in manifest["retained_units"]:
+        source_path = record.get("source_path", record["path"])
+        key = (record["source_ref"], source_path)
+        if key not in historical:
+            historical[key] = subprocess.run(["git", "show", ":".join(key)], capture_output=True, check=True).stdout
+        old = historical[key]
+        assert sha(old) == record["source_sha256"]
+        previous = definitions(ast.parse(old))[record.get("source_name", record["name"])]
+        current = definitions(ast.parse(Path(record["path"]).read_bytes()))[record["name"]]
+        if executable(previous) != executable(current):
+            findings.append({"path": record["path"], "name": record["name"], "rule": "retained_body"})
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    payload = {"Timestamp": stamp, "Command": "python SCRATCH/qualify_static.py", "EXIT_CODE": 0,
+               "scope": "Existing released static predicates only; no behavioral/native execution.",
+               "candidate": {"path": MANIFEST.relative_to(ROOT).as_posix(), "sha256": sha(MANIFEST.read_bytes())},
+               "checked": checked, "findings": findings, "proposed_qualifications": qualifications,
+               "retained_bodies_checked": len(manifest["retained_units"]),
+               "source_test_mutation": False, "rule_widening": False}
+    path = QA / ("p5t3-final-static-diagnosis." + stamp + ".json")
+    assert not path.exists()
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    snapshot = QA / ("p5t3-final-static-diagnosis-harness." + stamp + ".txt")
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes()),
+                      "findings": findings, "qualifications": len(qualifications)}))
+
+
+if __name__ == "__main__":
+    main()

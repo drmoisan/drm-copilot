@@ -1,0 +1,31 @@
+{
+  "Command": "python SCRATCH/final_static.py FINAL_CANDIDATE",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T09-44",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-candidate-qualified.2026-10-20T09-44.json",
+    "sha256": "2857c6f423799d2741c7855500b921c7d7f2c5a10fa6df745bd6db10c11174ef"
+  },
+  "change": "Only exact accepted nested helpers may reuse their missing-docstring baseline; all other predicates and all source/test bytes remain unchanged.",
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-static-diagnosis.2026-10-20T09-41.json",
+    "sha256": "68cae889f6f4491fdaf3afa411a4b973c8692224ad3cc872dae7aff500ed90a3"
+  },
+  "execution_started": false,
+  "new_harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-qualified-static-harness.2026-10-20T09-44.txt",
+    "sha256": "fdb0f9a1a89c6c5989a44d35dbdef4c0502e5dde11865e885c31b2c78180571d"
+  },
+  "old_harness_sha256": "3faa80b2230ac8d323a3a446cc128c6956d6bf571b8666b53fdb0d3d1cc05518",
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-candidate-preparation.2026-10-20T09-39.json",
+    "sha256": "a8f32a9141c427961e76428c514e813c7b8ec1f159049fda5d3504732d45bd16"
+  },
+  "qualification_only": true,
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-static-baseline-qualification.2026-10-20T09-42.json",
+    "sha256": "5b66a540157c94f5c4eb8c58ae0c349ae623f481865438716e19b9960f06b57d"
+  },
+  "source_test_mutation": false,
+  "unchanged_nodes": 108
+}

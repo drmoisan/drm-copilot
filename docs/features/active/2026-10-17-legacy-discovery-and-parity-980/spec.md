@@ -724,7 +724,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 - [ ] Individual artifact validators exist.
 - [ ] A complete validation command exists.
 - [ ] Blocking failures return nonzero exit codes.
-- [ ] Markdown and JSON reports are generated.
+- [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.
 
 **Hooks**

@@ -310,7 +310,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover unique features versus feature-client totals, all parity states, required/applicable per-client online/offline/mobile verification, blockers, unresolved decisions, and invalid source references.
   - Acceptance: Parity reports use the canonical entry model, retain every blocking finding, and classify undeclared optional dimensions as not-required rather than passed.
 
-- [ ] [P5-T3] Render explicit completion results and next actions.
+- [x] [P5-T3] Render explicit completion results and next actions.
   - Files and behavior: Move/rework DT/discovery/completion_report.py into R/completion_report.py with a thin adapter; create R/report_rendering.py, PT/test_{completion_report,report_rendering}.py, and update Set D completion/I/O tests.
   - Tests and proof: Test structural/discovery/parity/planning mode labels, blocking findings/warnings, stale/conflicting refs, incomplete artifacts, pending scenarios, deduplicated actions, both renderings, safe report replacement, and no unconditional readiness.
   - Acceptance: Completion is derived from the selected validated mode and current digest; generated views cannot overwrite authored evidence/contracts or authorize a host gate.
