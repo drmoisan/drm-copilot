@@ -1,0 +1,117 @@
+{
+  "stage": "repair",
+  "label": "p5t1-legacy-import-repair",
+  "started": "2026-10-19T14:52:05.666180+00:00",
+  "finished": "2026-10-19T14:52:06.827011+00:00",
+  "command": "poetry run ruff check --select I --fix scripts/dev_tools/discovery/coverage_report.py",
+  "exit_code": 0,
+  "duration_seconds": 1.161,
+  "source_before": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "5027c2059d6c0ca5939bd3957b741ff9f61abd7797941a2a7b1bfdcc478a4cbc",
+      "physical_lines": 123
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "a1cd10a1b22550e6978b530bebc9d9eab5856059f38e9b0ce7b2c9f86bd5dd3a",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "a1cd10a1b22550e6978b530bebc9d9eab5856059f38e9b0ce7b2c9f86bd5dd3a",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-import-repair-145206.stdout.bin",
+      "raw_sha256": "be0468a2a6fb98af372c981e2b787cc3e899b68e22618ee6e9e19fc80ae58869",
+      "raw_bytes": 138,
+      "presentation": "\nFixed 1 error:\n- scripts\\dev_tools\\discovery\\coverage_report.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 1 error (1 fixed, 0 remaining).\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-import-repair-145206.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 legacy coverage adapter subset"
+}

@@ -1,0 +1,33 @@
+{
+  "status": "REVIEWABLE_LIST_ONLY_DEPENDENCY_CLOSURE_REQUIRED",
+  "files": {
+    "scripts/dev_tools/discovery/coverage_report.py": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+    "tests/scripts/dev_tools/discovery/test_rendering.py": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-coverage.2026-10-19T14-54.json": "43d6c138aee81f6c46aa73936cfee75bf28cd2b48af568cf2ddbeb1d53503ce3",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-freeze.2026-10-19T14-54.json": "cc6c50c83a1263b872eea1ee632abf9d7e139c09a86b4554b9274762f39d0e38",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-import-repair.2026-10-19T14-52.json": "28abf001a4552a2ace292e6459656abbd03822d32fa25eaca8da5ef8add87bb0",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-import-repair.2026-10-19T14-52.md": "542ed3e7fd831e8b0a66fe25cbf7cb7b18b34ad2822dbae723d105bcd18ac316",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-lossless-archive.2026-10-19T14-54.json": "57b2488366de65f52f905b68c5aae648c7936f0cf22dbfb8ebce21160d8df2bf",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass1-format.2026-10-19T14-51.json": "9d2b8d86bf439ff87759e5e6b613610c07d5c7cbb9ffd13d943575ea0eabbe6d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass1-format.2026-10-19T14-51.md": "bbb885b856b3b11bf496d346606849c82cd2e46b0f5d6e90c73d7013a65dae44",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass2-format.2026-10-19T14-51.json": "cecd10c747006a2d19cb54025176ab82df988d4d6465e639456a8184498b673b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass2-format.2026-10-19T14-51.md": "d80d947b83dc02857300ac7699d879277b7ef75432387b2102df3ef63e0443f3",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass2-lint.2026-10-19T14-51.json": "e7f93e818ce5d40e2a00fce8329e8759b1c897034b2008ba333dcfbb48a124b3",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass2-lint.2026-10-19T14-51.md": "65aa29ad0f903605a91dc986464ec5dd36e576f64cffc75b8c171e96eb9e2c6b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-format.2026-10-19T14-52.json": "a896651d117a7a6b091420bd015f58de389b6633289b62a41409d2d49ed2e39c",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-format.2026-10-19T14-52.md": "ed947952dd3b210344d8aab62dec8e45ef7e4af3ab8ab9ae964ae6a61864e944",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-lint.2026-10-19T14-52.json": "952dc9e0d57697f7ac2d57bdb2d776625afb8614235ddd7b6432e24a871aaff5",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-lint.2026-10-19T14-52.md": "e862bdb647d51162e63e1126531ba4b81e2631a1d26f3c5fb91848af5c491e5a",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-types.2026-10-19T14-52.json": "3a224839df4f02830e23c786fcd920fc2222db6e124106014b401c0b16068255",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass3-types.2026-10-19T14-52.md": "2e56cd8b76fd550ca1a29927b49a0a7fd0b1afabd08f177ae8c1bae53908137b",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-format.2026-10-19T14-52.json": "47726cb48fe63cbc908fdf3128cd2870fecd892c14a6b7377ddcfbdf4a26e6b7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-format.2026-10-19T14-52.md": "ab6fd876d93b18be9f82fa0bcb3364638faed293e490781311c22e12a19515dc",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-lint.2026-10-19T14-52.json": "5f6a35f3e4a6fcf5cf1eac018f4b78a8036501ec606fa071b157f77ed7b71833",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-lint.2026-10-19T14-52.md": "ee93c26596b69cadae67b3ebc13e48659cf660664d483903ae503896370759ed",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-types.2026-10-19T14-53.json": "a2e1a2649c6de6cb87421c91b1e01f05bcb3c100c84b9b6352f2f038f806330d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-types.2026-10-19T14-53.md": "9440110aac0dcfef8001fb84bdb8684b800affcf5136e2a6e5ba46676d68a9a6",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-unit.2026-10-19T14-53.json": "a9287bae00eb1eebce805a27d5edf018b247713cdcf31bddb62b5e74203420b1",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-unit.2026-10-19T14-53.md": "7ab5a3b3a2788b283efba98b2afe7bf4e8340ab4815cbde592fe94fb1087663d"
+  }
+}

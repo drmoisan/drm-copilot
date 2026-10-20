@@ -1,0 +1,117 @@
+{
+  "stage": "format",
+  "label": "p5t1-legacy-pass1-format",
+  "started": "2026-10-19T14:51:33.923671+00:00",
+  "finished": "2026-10-19T14:51:35.688958+00:00",
+  "command": "poetry run black scripts/dev_tools/discovery/coverage_report.py tests/scripts/dev_tools/discovery/test_coverage_report.py tests/scripts/dev_tools/discovery/test_rendering.py",
+  "exit_code": 0,
+  "duration_seconds": 1.765,
+  "source_before": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "5027c2059d6c0ca5939bd3957b741ff9f61abd7797941a2a7b1bfdcc478a4cbc",
+      "physical_lines": 123
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "fa7d36a508d63d2ea71d54edd05049516b8240150d069879ee2080cbee18dd50",
+      "physical_lines": 373
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "a4c9699f0c1690e0afc2988373351ebec7ff9c350b8a8e0cdb8c5e7971b3a4fb",
+      "physical_lines": 115
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "5027c2059d6c0ca5939bd3957b741ff9f61abd7797941a2a7b1bfdcc478a4cbc",
+      "physical_lines": 123
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "bbf3cfe7f4ee63c472b5c9de1a13fbc869f10d149e1f04d9834097ffe9729413",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ee14298ea7c4631a3ac7d91b4bf04899ac7b24917ea51d74c5297ff76ee4c823",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass1-format-145135.stdout.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass1-format-145135.stderr.bin",
+      "raw_sha256": "1310f190aa7c5a8244763b2a8d36a8f5145f99267a7c47ffdc8cbeb49c0ab391",
+      "raw_bytes": 207,
+      "presentation": "reformatted tests\\scripts\\dev_tools\\discovery\\test_rendering.py\r\nreformatted tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n2 files reformatted, 1 file left unchanged.\r\n"
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 legacy coverage adapter subset"
+}

@@ -1,0 +1,201 @@
+"""Recover existing checks and bind a dependency-complete checked subset without reruns."""
+import ast
+import base64
+import difflib
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+EVIDENCE = FEATURE / 'evidence/regression-testing'
+RUNTIME = Path('packages/discovery-runtime/src')
+STAMP = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+PREFIX = EVIDENCE / ('p5t1-models-freeze.' + STAMP)
+OWNED = [
+    'packages/discovery-runtime/src/drm_copilot_discovery/report_models.py',
+    'tests/discovery_runtime/test_report_models.py',
+    'scripts/dev_tools/discovery/coverage_report.py',
+    'tests/scripts/dev_tools/discovery/test_coverage_report.py',
+    'tests/scripts/dev_tools/discovery/test_rendering.py',
+]
+EXCLUDED = [
+    'packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py',
+    'packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py',
+]
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def binding(path):
+    path = Path(path)
+    data = path.read_bytes()
+    return {'path':path.as_posix(),'sha256':sha(data),'bytes':len(data)}
+
+def write_json(path, value):
+    Path(path).write_text(json.dumps(value,indent=2,sort_keys=True,ensure_ascii=True)+'\n', encoding='utf-8', newline='\n')
+
+def portable(text):
+    for path,label in ((str(ROOT),'WORKSPACE'),(str(SCRATCH),'SCRATCH')):
+        pattern = '[\\\\/]'.join(re.escape(part) for part in re.split(r'[\\/]', path))
+        text = re.sub(pattern,label,text,flags=re.I)
+    return '\n'.join(line.rstrip() for line in text.splitlines()).rstrip()+'\n'
+
+def git(*args):
+    result = subprocess.run(['git',*args],capture_output=True,check=True)
+    return result.stdout
+
+baseline = FEATURE/'evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json'
+legacy_path = EVIDENCE/'p5t1-legacy-freeze.2026-10-19T14-54.json'
+legacy = json.loads(legacy_path.read_text())
+head = git('rev-parse','HEAD').decode().strip()
+source_bindings = {name:{**binding(name),'physical_lines':len(Path(name).read_text().splitlines())} for name in OWNED}
+excluded_before = {name:sha(Path(name).read_bytes()) for name in EXCLUDED}
+for name in OWNED[2:]:
+    assert source_bindings[name]['sha256'] == legacy['bindings'][name]['sha256']
+assert all(row['physical_lines'] <= 500 for row in source_bindings.values())
+
+# Preserve exact originals before any readable-only portability normalization.
+archive_entries = []
+normalizations = []
+for path in sorted(EVIDENCE.glob('p5t1-models*.json')):
+    payload = json.loads(path.read_text())
+    if 'command' not in payload:
+        continue
+    before = path.read_bytes()
+    archive_entries.append({**binding(path),'base64':base64.b64encode(before).decode()})
+    commands = [portable(value).rstrip('\n') for value in payload['command']]
+    if commands != payload['command']:
+        payload['command'] = commands
+        normalizations.append({'path':path.as_posix(),'before_sha256':sha(before),'kind':'command path display only'})
+        write_json(path,payload)
+        normalizations[-1]['after_sha256'] = sha(path.read_bytes())
+    for field in ('stdout','stderr'):
+        data = base64.b64decode(payload[field]['base64'])
+        assert sha(data) == payload[field]['sha256']
+        archive_entries.append({'name':path.name+':'+field,'sha256':sha(data),'base64':base64.b64encode(data).decode()})
+for path in sorted(EVIDENCE.glob('p5t1-models*.md')):
+    before = path.read_bytes()
+    after = portable(before.decode('utf-8')).encode('utf-8')
+    if before != after:
+        archive_entries.append({**binding(path),'base64':base64.b64encode(before).decode()})
+        path.write_bytes(after)
+        normalizations.append({'path':path.as_posix(),'before_sha256':sha(before),'after_sha256':sha(after),'kind':'readable path/whitespace normalization only'})
+old_source = SCRATCH/'report_models.pre-sr1.py'
+assert sha(old_source.read_bytes()) == '9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c'
+archive_entries.append({'name':'report_models.pre-sr1.py','sha256':sha(old_source.read_bytes()),'base64':base64.b64encode(old_source.read_bytes()).decode()})
+raw_coverage = SCRATCH/'models7-coverage.json'
+archive_entries.append({'name':'models7-coverage.json','sha256':sha(raw_coverage.read_bytes()),'base64':base64.b64encode(raw_coverage.read_bytes()).decode()})
+archive_path = EVIDENCE/('p5t1-models-lossless-archive.'+STAMP+'.json')
+write_json(archive_path,{'timestamp_utc':datetime.now(timezone.utc).isoformat(),'entries':archive_entries,'normalizations':normalizations})
+
+# Read the already executed four stages; never launch a checker or test again.
+stages = []
+for stage in ('black','ruff','pyright','pytest'):
+    path = EVIDENCE/f'p5t1-models7-{stage}.2026-10-19T15-06.json'
+    value = json.loads(path.read_text())
+    assert value['exit_code'] == 0
+    assert value['source_before'] == value['source_after']
+    for name in OWNED[:2]:
+        assert value['source_after'][name] == source_bindings[name]['sha256']
+    harness = value['harness']
+    assert sha(Path(harness['path']).read_bytes()) == harness['sha256']
+    for field in ('stdout','stderr'):
+        raw = (SCRATCH/f'models7-{stage}.{field}').read_bytes()
+        assert raw == base64.b64decode(value[field]['base64'])
+    stages.append({**binding(path),'stage':stage,'duration_seconds':value['duration_seconds'],'started_at':value['started_at'],'harness':harness})
+stdout = (SCRATCH/'models7-pytest.stdout').read_text(encoding='utf-8')
+nodes = re.findall(r'^(tests/.*) PASSED\s+\[',stdout,re.M)
+assert len(nodes) == len(set(nodes)) == 114
+assert [node for node in nodes if 'tests/scripts/' in node] == legacy['nodes']
+
+# A static local-import closure includes package initializers and accepted test configuration.
+def module_paths(module):
+    parts = module.split('.')
+    base = RUNTIME if parts[0] == 'drm_copilot_discovery' else Path('.')
+    if parts[0] not in {'drm_copilot_discovery','scripts','tests'}:
+        return []
+    target = base.joinpath(*parts)
+    paths = []
+    for length in range(1,len(parts)+1):
+        initial = base.joinpath(*parts[:length])/'__init__.py'
+        if initial.is_file():
+            paths.append(initial)
+    if target.with_suffix('.py').is_file():
+        paths.append(target.with_suffix('.py'))
+    return paths
+
+pending = [Path(name) for name in OWNED]
+seen = set()
+while pending:
+    path = pending.pop()
+    name = path.as_posix()
+    if name in seen:
+        continue
+    seen.add(name)
+    tree = ast.parse(path.read_text(encoding='utf-8-sig'))
+    for node in ast.walk(tree):
+        modules = []
+        if isinstance(node,ast.Import):
+            modules = [item.name for item in node.names]
+        elif isinstance(node,ast.ImportFrom) and not node.level:
+            modules = [node.module or ''] + [(node.module+'.'+item.name) for item in node.names if node.module]
+        for module in modules:
+            pending.extend(module_paths(module))
+    for parent in path.parents:
+        if (parent/'conftest.py').is_file():
+            pending.append(parent/'conftest.py')
+for name in ('pyproject.toml','poetry.lock'):
+    seen.add(name)
+closure = []
+for name in sorted(seen-set(OWNED)):
+    working = Path(name).read_bytes()
+    committed = git('show',f'{head}:{name}')
+    relation = 'exact' if working == committed else 'CRLF-to-LF only' if working.replace(b'\r\n',b'\n') == committed.replace(b'\r\n',b'\n') else 'changed'
+    assert relation != 'changed',name
+    closure.append({'path':name,'working_sha256':sha(working),'committed_sha256':sha(committed),'git_blob':git('rev-parse',f'{head}:{name}').decode().strip(),'relation':relation})
+assert not set(EXCLUDED)&seen
+
+coverage = json.loads(raw_coverage.read_text())
+coverage['files'] = {name.replace('\\','/'):value for name,value in coverage['files'].items()}
+coverage_path = EVIDENCE/('p5t1-models-coverage.'+STAMP+'.json')
+write_json(coverage_path,coverage)
+units = []
+for name,data in coverage['files'].items():
+    assert data['summary']['missing_lines'] == data['summary']['missing_branches'] == 0
+    for node in ast.walk(ast.parse(Path(name).read_text(encoding='utf-8'))):
+        if isinstance(node,(ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef)):
+            lines = [line for line in data['executed_lines'] if node.lineno <= line <= node.end_lineno]
+            branches = [edge for edge in data['executed_branches'] if node.lineno <= edge[0] <= node.end_lineno]
+            units.append({'path':name,'name':node.name,'kind':type(node).__name__,'start':node.lineno,'end':node.end_lineno,'covered_statements':len(lines),'missing_statements':0,'covered_branch_destinations':len(branches),'missing_branch_destinations':0})
+scope_diff = ''.join(difflib.unified_diff(old_source.read_text().splitlines(True),Path(OWNED[0]).read_text().splitlines(True),fromfile='original/report_models.py',tofile='repaired/report_models.py'))
+details_path = EVIDENCE/('p5t1-models-coverage-closure.'+STAMP+'.json')
+write_json(details_path,{'task':'P5-T1','head':head,'import_closure':closure,'coverage_units':units,'repair_diff':scope_diff,'normalizations':normalizations,'excluded_drafts':excluded_before})
+harness_path = EVIDENCE/('p5t1-models-freeze-harness.'+STAMP+'.txt')
+harness_path.write_bytes(Path(__file__).read_bytes())
+stage_paths = sorted({*OWNED,*(path.as_posix() for path in EVIDENCE.glob('p5t1-models*')),
+    *(path.as_posix() for path in (FEATURE/'evidence/baseline').glob('p5t1-models-test-split.*'))})
+manifest = {'task':'P5-T1','status':'FROZEN_HELPER_LEGACY_FOR_BOUNDED_CONFIRMATION_NOT_TASK_ACCEPTANCE',
+    'timestamp_utc':datetime.now(timezone.utc).isoformat(),'head':head,
+    'baseline':binding(baseline),'historical_legacy_freeze':binding(legacy_path),
+    'review':binding(FEATURE/'evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.json'),
+    'owned_source_test_bindings':source_bindings,'stages':stages,'test_count':114,'new_model_cases':77,'retained_legacy_cases':37,'nodes':nodes,
+    'coverage':binding(coverage_path),'coverage_totals':coverage['totals'],'coverage_closure':binding(details_path),
+    'lossless_archive':binding(archive_path),'harness':binding(harness_path),'stage_paths':stage_paths,
+    'qualifications':['No checks or tests were replayed on resume.','Raw stdout/stderr and raw coverage remain losslessly archived; readable command/path normalization changes no diagnostic or result.',
+        'The original models-format formatter succeeded; its outer display wrapper subsequently failed on the host cp1252 console. Exact executed harness and raw formatter streams are retained.',
+        'Only static local import closure is measured here; installed third-party dependencies remain the accepted Poetry environment.',
+        'Coverage graph drafts are excluded and unchanged; whole P5-T1 acceptance remains pending.']}
+write_json(str(PREFIX)+'.json',manifest)
+Path(str(PREFIX)+'.md').write_text('# P5-T1 checked helper and legacy subset\n\nTimestamp: '+STAMP+'\n\nStatus: Frozen for bounded independent confirmation; P5-T1 acceptance remains pending.\n\nRecovered ordered pass7: Black, Ruff, Pyright and 114 passing cases (77 model and all 37 frozen legacy callers). Helper: 141/141 statements and 64/64 branches. Wrapper: 38/38 statements and 4/4 branches. All measured callable/class ranges have no uncovered executable statement or branch.\n\nSR1 changes only the two immutable mapping traversal sites to direct member traversal. The original 64-member comparison probe is preserved; the new counted tests observe zero Mapping searches at 1, 16 and 64 members. All frozen legacy files remain byte-identical.\n\nThe paired JSON binds exact source bytes, ordered nodes, raw/portable coverage, static import closure against HEAD, original diagnostics, executed harnesses and qualified readable normalization. Runtime coverage graph drafts remain excluded and unchanged.\n',encoding='utf-8',newline='\n')
+stage_paths.extend([str(PREFIX)+'.json',str(PREFIX)+'.md'])
+staging_path = EVIDENCE/('p5t1-models-staging.'+STAMP+'.json')
+write_json(staging_path,{'task':'P5-T1','manifest':binding(str(PREFIX)+'.json'),'stage_paths':sorted(set(stage_paths)),
+    'bindings':[binding(path) for path in sorted(set(stage_paths))]})
+assert excluded_before == {name:sha(Path(name).read_bytes()) for name in EXCLUDED}
+assert source_bindings == {name:{**binding(name),'physical_lines':len(Path(name).read_text().splitlines())} for name in OWNED}
+print(json.dumps({'manifest':binding(str(PREFIX)+'.json'),'staging':binding(staging_path),'closure_files':len(closure),'units':len(units),'tests':len(nodes)}))

@@ -1,0 +1,447 @@
+{
+  "coverage_units": [
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 3,
+      "end": 30,
+      "kind": "ClassDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "ReportLimitError",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 21
+    },
+    {
+      "covered_branch_destinations": 50,
+      "covered_statements": 75,
+      "end": 172,
+      "kind": "ClassDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "ReportBudget",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 33
+    },
+    {
+      "covered_branch_destinations": 4,
+      "covered_statements": 8,
+      "end": 193,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "_freeze",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 175
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 5,
+      "end": 205,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "bounded_object",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 196
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 4,
+      "end": 233,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "ratio",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 208
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 15,
+      "end": 278,
+      "kind": "ClassDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "DiscoveryReport",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 237
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 3,
+      "end": 289,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "_legacy_version",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 281
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 7,
+      "end": 303,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "parse_coverage_ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 292
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 8,
+      "end": 326,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "build_coverage_rows",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 306
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 4,
+      "end": 340,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "render_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 329
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 2,
+      "end": 30,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 28
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 9,
+      "end": 61,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 44
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 4,
+      "end": 71,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "work",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 63
+    },
+    {
+      "covered_branch_destinations": 2,
+      "covered_statements": 4,
+      "end": 80,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "spend",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 73
+    },
+    {
+      "covered_branch_destinations": 12,
+      "covered_statements": 15,
+      "end": 105,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "text",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 82
+    },
+    {
+      "covered_branch_destinations": 32,
+      "covered_statements": 42,
+      "end": 172,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "check",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 107
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 2,
+      "end": 257,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "__post_init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 250
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 2,
+      "end": 261,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "to_dict",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 259
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 2,
+      "end": 265,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "to_json",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 263
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 6,
+      "end": 278,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "to_markdown",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "start": 267
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 3,
+      "end": 48,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "_default_coverage_ledger_validator",
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "start": 37
+    },
+    {
+      "covered_branch_destinations": 0,
+      "covered_statements": 5,
+      "end": 68,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "parse_args",
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "start": 51
+    },
+    {
+      "covered_branch_destinations": 4,
+      "covered_statements": 21,
+      "end": 123,
+      "kind": "FunctionDef",
+      "missing_branch_destinations": 0,
+      "missing_statements": 0,
+      "name": "main",
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "start": 71
+    }
+  ],
+  "excluded_drafts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "6d9de2d71e7e70c7cb1118a27bcbea20d84720af8e3790df9ebc85e2f1d67deb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "822a090042744c00f8c03ae4b0d8ec8556d82985f9ca2adac8610a856faa946d"
+  },
+  "head": "2920686f68849957d91e2c94f525a32e466d1d8e",
+  "import_closure": [
+    {
+      "committed_sha256": "344b549da438c0c73fa6fe89eefd43943bc688e2c023c8f8e1bab9caedc8c767",
+      "git_blob": "e0a034cc16796f0b956e2172ef826f93423611bc",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/__init__.py",
+      "relation": "exact",
+      "working_sha256": "344b549da438c0c73fa6fe89eefd43943bc688e2c023c8f8e1bab9caedc8c767"
+    },
+    {
+      "committed_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "git_blob": "7f095e147f9e2dd2260217baae4b5614b20324af",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "relation": "exact",
+      "working_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647"
+    },
+    {
+      "committed_sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+      "git_blob": "914d66577862386944012a938cffccd3f3c73651",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "relation": "exact",
+      "working_sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512"
+    },
+    {
+      "committed_sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+      "git_blob": "1483f8f63cb46d078d9fb1780faa3525f53246a8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "relation": "exact",
+      "working_sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a"
+    },
+    {
+      "committed_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "relation": "exact",
+      "working_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "committed_sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "git_blob": "a95fff36a8c0929739a88978e093e5544318d2b1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+      "relation": "exact",
+      "working_sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f"
+    },
+    {
+      "committed_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "relation": "exact",
+      "working_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "committed_sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "git_blob": "8de39ffb5f40f0f8f77e6aebbe8ce69e4d2f1502",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "relation": "exact",
+      "working_sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "committed_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "git_blob": "e32df068248da1397f023e7e5b563d471f2fb862",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "relation": "exact",
+      "working_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1"
+    },
+    {
+      "committed_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "git_blob": "ff3a5faf89785b828cdcea695d7739b7cd3b54fc",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "relation": "exact",
+      "working_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    },
+    {
+      "committed_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "git_blob": "c6f4c0611e63170e88fc4067528f06351c6dcfa7",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "relation": "exact",
+      "working_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08"
+    },
+    {
+      "committed_sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+      "git_blob": "65e1419a4d75657591af50a5b9d286339a1a7839",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "relation": "exact",
+      "working_sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086"
+    },
+    {
+      "committed_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "git_blob": "aff2bf88f5aff90ab6afbfa89f8559ffe8d11409",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "relation": "exact",
+      "working_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b"
+    },
+    {
+      "committed_sha256": "8fa6db4120ba602e46916f832e06b3289f4cc40822e04a50a81a07ad40b521ab",
+      "git_blob": "a48d39176eb3cc0d493f6e8dcb2d7c561d8900bd",
+      "path": "poetry.lock",
+      "relation": "exact",
+      "working_sha256": "8fa6db4120ba602e46916f832e06b3289f4cc40822e04a50a81a07ad40b521ab"
+    },
+    {
+      "committed_sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "git_blob": "c407c56cb06e3bcd50465af80748ab44ee3e6cd2",
+      "path": "pyproject.toml",
+      "relation": "exact",
+      "working_sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284"
+    },
+    {
+      "committed_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "git_blob": "8b137891791fe96927ad78e64b0aad7bded08bdc",
+      "path": "scripts/__init__.py",
+      "relation": "exact",
+      "working_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "path": "scripts/dev_tools/__init__.py",
+      "relation": "exact",
+      "working_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "committed_sha256": "caed600ceadab5a063dd1454acd783d5cb9715e7570d0fc66c017cc0d848a389",
+      "git_blob": "4183b539ca4974da2b018c692bdafcf5efd35f41",
+      "path": "scripts/dev_tools/discovery/__init__.py",
+      "relation": "exact",
+      "working_sha256": "caed600ceadab5a063dd1454acd783d5cb9715e7570d0fc66c017cc0d848a389"
+    },
+    {
+      "committed_sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "git_blob": "183b5670de1c2c0341b40474dcbe8562d180b18a",
+      "path": "scripts/dev_tools/discovery/io.py",
+      "relation": "exact",
+      "working_sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796"
+    },
+    {
+      "committed_sha256": "dd3dea118f1b7217cadbbba12f228fe96932ed4e1fb95c2123aaa2963497f3dd",
+      "git_blob": "4d2bfd2108aa243d7eb99cbd5dd118fd987b8c8c",
+      "path": "scripts/dev_tools/fix_all_branches_extra.py",
+      "relation": "exact",
+      "working_sha256": "dd3dea118f1b7217cadbbba12f228fe96932ed4e1fb95c2123aaa2963497f3dd"
+    },
+    {
+      "committed_sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "git_blob": "269cfcf5cfda44ef1bbd25c89642db64c2886cc6",
+      "path": "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "relation": "exact",
+      "working_sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8"
+    },
+    {
+      "committed_sha256": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+      "git_blob": "0efe7ba891fae534d6b0c90d9ff418f4007d2837",
+      "path": "tests/conftest.py",
+      "relation": "exact",
+      "working_sha256": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf"
+    },
+    {
+      "committed_sha256": "485217912212097a29fc57525a27a8e1110642e37165b484eb449b4e31a8e18c",
+      "git_blob": "bb6d5763002627a9ff2948d43dc394053159144d",
+      "path": "tests/scripts/dev_tools/conftest.py",
+      "relation": "exact",
+      "working_sha256": "485217912212097a29fc57525a27a8e1110642e37165b484eb449b4e31a8e18c"
+    }
+  ],
+  "normalizations": [
+    {
+      "after_sha256": "d8c80cc48d7ae1d69aca8a1daed82f396079dc19038b9514d122733d3b05b595",
+      "before_sha256": "88de02a9b60c5e12052e26c2cd7453d4600194055133eed4b4fcd044a989e328",
+      "kind": "command path display only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models7-pytest.2026-10-19T15-06.json"
+    },
+    {
+      "after_sha256": "05d6fcbc70ae09e23b2d47fc00c27c9822c40291fc7a47f26aa27026c11e72d3",
+      "before_sha256": "17baa380d893ca35cb9e5173f4a615810a53a2e8bf82bd8201b8bbeefbf1d9e1",
+      "kind": "readable path/whitespace normalization only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-pyright.2026-10-19T14-49.md"
+    },
+    {
+      "after_sha256": "418dcac2948c097c4642f075175b703f2784e38df0118445b4a42df2de16d205",
+      "before_sha256": "023b0141056cdcdde0a20fa32acc90bfa20c5df5414e116e01046fe53c77833e",
+      "kind": "readable path/whitespace normalization only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models7-pytest.2026-10-19T15-06.md"
+    }
+  ],
+  "repair_diff": "--- original/report_models.py\n+++ repaired/report_models.py\n@@ -133,8 +133,11 @@\n                     + 2 * depth * len(mapping)\n                     + 2 * (depth - 1)\n                 )\n-            # Keys and values both consume bounded visits before copying members.\n-            for key, child in mapping.items():\n+            members = (\n+                mapping.members if isinstance(mapping, JsonObject) else mapping.items()\n+            )\n+            # Direct immutable pairs avoid repeated linear Mapping key lookups.\n+            for key, child in members:\n                 if type(key) is not str:\n                     raise ValueError(\"Report keys must be strings\")\n                 self.check(key, depth + 1)\n@@ -177,10 +180,11 @@\n     \"\"\"\n     if type(value) in (dict, JsonObject):\n         mapping = cast(\"dict[str, object] | JsonObject\", value)\n-        # The prospective pass has reserved every member before this allocation.\n-        return JsonObject(\n-            tuple((key, _freeze(child)) for key, child in mapping.items())\n-        )\n+        members = (\n+            mapping.members if isinstance(mapping, JsonObject) else mapping.items()\n+        )\n+        # The prospective pass reserved direct pairs before this linear copy.\n+        return JsonObject(tuple((key, _freeze(child)) for key, child in members))\n     if type(value) in (list, tuple):\n         # Preserve authored array order while detaching mutable caller containers.\n         return tuple(\n",
+  "task": "P5-T1"
+}

@@ -1,27 +1,27 @@
-"""Coverage report CLI: render a Coverage Ledger artifact as a report.
+"""Route the legacy coverage CLI through bounded runtime compatibility helpers.
 
-Purpose:
-    Implement the `dev.discovery.coverage-report` Poetry console-script: read
-    a Coverage Ledger artifact, validate it, and render a deterministic
-    human-readable report from its entries.
-
-Constraints:
-    Field names used by `build_coverage_rows` (a top-level `"entries"` list,
-    each entry an arbitrary dict with an optional `"id"` field) are a
-    documented, minimal, domain-neutral placeholder shape pending
-    `legacy-discovery-schemas` (#9002); see `plan.2026-07-17T15-03.md`
-    "Open Questions / Notes".
+The public parse/build/render names remain available for existing callers.
+They summarize v1 or safe placeholder entries without establishing v2 graph
+completeness. This adapter owns only argument, validation and I/O routing.
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from scripts.dev_tools.discovery import rendering
+from drm_copilot_discovery.report_models import (
+    build_coverage_rows as build_coverage_rows,
+)
+from drm_copilot_discovery.report_models import (
+    parse_coverage_ledger as parse_coverage_ledger,
+)
+from drm_copilot_discovery.report_models import (
+    render_coverage_report as render_coverage_report,
+)
+
 from scripts.dev_tools.discovery.io import (
     ArtifactValidationError,
     ArtifactValidator,
@@ -34,96 +34,12 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
-def parse_coverage_ledger(text: str) -> dict[str, Any]:
-    """Parse Coverage Ledger artifact text into a plain dict.
-
-    Args:
-        text (str): Raw, already-validated Coverage Ledger JSON text.
-
-    Returns:
-        dict[str, Any]: The parsed artifact document.
-
-    Raises:
-        json.JSONDecodeError: Propagated unchanged when `text` is not valid
-            JSON. Callers only invoke this after `validate_or_raise` has
-            already accepted `text`, so this path is not expected in normal
-            operation.
-
-    Side Effects:
-        None.
-    """
-    return json.loads(text)
-
-
-def build_coverage_rows(
-    artifact: dict[str, Any],
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Build sorted report rows and a summary from a parsed Coverage Ledger.
-
-    Args:
-        artifact (dict[str, Any]): Parsed Coverage Ledger document. Entries
-            are read from an optional top-level `"entries"` list; an absent
-            key is treated as an empty list.
-
-    Returns:
-        tuple[list[dict[str, Any]], dict[str, Any]]: A tuple of
-        `(sorted_rows, summary)`, where `summary` currently carries only
-        `"total_entries"`.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    entries = artifact.get("entries", [])
-    return rendering.sort_rows(entries), {"total_entries": len(entries)}
-
-
-def render_coverage_report(rows: list[dict[str, Any]], summary: dict[str, Any]) -> str:
-    """Render sorted coverage rows and a summary into report text.
-
-    Args:
-        rows (list[dict[str, Any]]): Sorted Coverage Ledger entries, as
-            produced by `build_coverage_rows`.
-        summary (dict[str, Any]): Aggregate summary dict, as produced by
-            `build_coverage_rows`.
-
-    Returns:
-        str: Deterministic, pretty-printed JSON report text.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    return rendering.render_pretty_json({"summary": summary, "entries": rows})
-
-
 def _default_coverage_ledger_validator(text: str) -> list[str]:
-    """Bind and invoke the real upstream Coverage Ledger validator.
+    """Validate text (str) through the lazily loaded upstream v1 validator.
 
-    Purpose:
-        Provide the default `ArtifactValidator` used by `main` when no
-        test-injected validator is supplied. The upstream import is
-        performed lazily, inside this function body, so importing this
-        module never hard-fails if the upstream validator module is
-        unavailable, and so unit tests (which always inject a fake
-        validator) never trigger this import path.
-
-    Args:
-        text (str): Raw Coverage Ledger artifact text to validate.
-
-    Returns:
-        list[str]: Empty list when `text` conforms to the Coverage Ledger
-        schema; otherwise one or more human-readable error strings.
-
-    Raises:
-        None beyond what the upstream validator itself may raise.
-
-    Side Effects:
-        May read a local or cached schema file via the upstream validator.
+    Returns list[str] errors, empty on success. Propagates upstream exceptions;
+    the validator may read a local schema. Lazy binding preserves caller
+    injection and keeps schema access out of ordinary adapter imports.
     """
     from scripts.dev_tools.validate_discovery_schema_artifacts import (
         validate_coverage_ledger_text,
@@ -133,14 +49,10 @@ def _default_coverage_ledger_validator(text: str) -> list[str]:
 
 
 def parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
-    """Parse command-line arguments for the coverage-report CLI.
+    """Parse argv (Sequence[str] or None) into input/output path arguments.
 
-    Args:
-        argv (Sequence[str] | None): Argument list; `None` defers to
-            `argparse`'s own `sys.argv[1:]` default.
-
-    Returns:
-        argparse.Namespace: Parsed arguments with `input` and `output`.
+    Returns argparse.Namespace; None reads sys.argv. Raises SystemExit for help
+    or invalid arguments, with argparse output to stdout/stderr. No file I/O.
     """
     parser = argparse.ArgumentParser(
         description="Render a deterministic report from a Coverage Ledger artifact"
@@ -161,23 +73,25 @@ def main(
     *,
     validator: ArtifactValidator | None = None,
 ) -> int:
-    """Entry point for the `dev.discovery.coverage-report` CLI.
+    """Read, validate and render one legacy ledger through injectable seams.
 
     Args:
-        argv (Sequence[str] | None): Argument list; defaults to
-            `sys.argv[1:]` via `parse_args`.
-        validator (ArtifactValidator | None): Optional injected validator,
-            used by tests in place of the real lazily-imported default.
+        argv (Sequence[str] | None): CLI arguments; None uses sys.argv.
+        validator (ArtifactValidator | None): Injected schema checker or the
+            lazy upstream default. It cannot bypass runtime helper validation.
 
     Returns:
-        int: `0` on success; `1` when validation fails.
+        int: Zero after rendering; one for validator or helper rejection.
 
     Raises:
-        None. `ArtifactValidationError` is caught internally.
+        OSError: Input/output boundary failures propagate unchanged.
+        SystemExit: argparse rejects arguments or handles help.
+        Exception: Unexpected injected validator failures propagate unchanged.
 
     Side Effects:
-        Reads the input artifact from disk, writes the rendered report to
-        disk or stdout, and may print validation errors to stderr.
+        Reads the input and writes a compatibility report to disk or stdout.
+        Validation errors go to stderr; helper failures use a fixed diagnostic
+        so malformed source text is never echoed. No v2 publication occurs.
     """
     args = parse_args(argv)
     active_validator = validator or _default_coverage_ledger_validator
@@ -186,16 +100,22 @@ def main(
     try:
         validate_or_raise(text, active_validator)
     except ArtifactValidationError as exc:
-        # Fail fast: print every validator-reported error and return
-        # non-zero without parsing or rendering the artifact.
+        # Preserve each validator diagnostic without attempting report generation.
         for error in exc.errors:
             print(error, file=sys.stderr)
         return 1
 
-    artifact = parse_coverage_ledger(text)
-    rows, summary = build_coverage_rows(artifact)
-    report_text = render_coverage_report(rows, summary)
+    # Runtime helpers retain version, shape and resource authority even when
+    # an injected validator accepts arbitrary text. Emit nothing on rejection.
+    try:
+        artifact = parse_coverage_ledger(text)
+        rows, summary = build_coverage_rows(artifact)
+        report_text = render_coverage_report(rows, summary)
+    except ValueError:
+        print("Coverage ledger cannot be rendered as a legacy report", file=sys.stderr)
+        return 1
 
+    # Preserve explicit destination routing through the monkeypatchable I/O seam.
     if args.output:
         write_report(Path(args.output), report_text)
     else:

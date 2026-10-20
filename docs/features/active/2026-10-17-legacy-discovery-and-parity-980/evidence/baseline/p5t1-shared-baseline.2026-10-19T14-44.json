@@ -1,0 +1,337 @@
+{
+  "absent": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "tests/discovery_runtime/test_coverage_report.py"
+  ],
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "baseline_statements": 0,
+      "branch_percent": 100.0,
+      "branches": 42,
+      "classification": "new production module",
+      "covered_branches": 42,
+      "covered_lines": 133,
+      "line_percent": 100.0,
+      "statements": 133
+    },
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "covered_branches": 4,
+      "covered_lines": 38,
+      "excluded_lines": 4,
+      "missing_branches": 0,
+      "missing_lines": 2,
+      "num_branches": 4,
+      "num_partial_branches": 0,
+      "num_statements": 40,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 95.45454545454545,
+      "percent_covered_display": "95",
+      "percent_statements_covered": 95.0,
+      "percent_statements_covered_display": "95"
+    }
+  },
+  "deferred": [
+    "test_parity_report.py",
+    "test_completion_report.py",
+    "test_io.py"
+  ],
+  "existing": [
+    {
+      "committed_sha256": "c8d326c7c6fded0ba8d7737c8160e3273d3c175f871155d0b29ff0cbc8682530",
+      "git_blob": "34f4b23885c4fc0ed1406a12128de37cbe75bbce",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "c8d326c7c6fded0ba8d7737c8160e3273d3c175f871155d0b29ff0cbc8682530",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "physical_lines": 392,
+      "sha256": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e"
+    },
+    {
+      "committed_sha256": "3b7df16c5cf14ee078615259a3012ab449f101ac647257945bbf9e144acd9cb5",
+      "git_blob": "fd9a7c10881dc23e5c34f684934402d286124a79",
+      "normalization": "exact",
+      "normalized_sha256": "3b7df16c5cf14ee078615259a3012ab449f101ac647257945bbf9e144acd9cb5",
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "physical_lines": 207,
+      "sha256": "3b7df16c5cf14ee078615259a3012ab449f101ac647257945bbf9e144acd9cb5"
+    },
+    {
+      "committed_sha256": "775d6a5123cc7c705c52ce84c3671149004777a6abac6a12eebcf0fe9da2354d",
+      "git_blob": "2b9ada06226170a88f70b5c468b93a7122e9b603",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "775d6a5123cc7c705c52ce84c3671149004777a6abac6a12eebcf0fe9da2354d",
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "physical_lines": 355,
+      "sha256": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+    },
+    {
+      "committed_sha256": "625eb79296c8ee3ead537977f0257e0bc904beea7a61205074157c3c3be42828",
+      "git_blob": "3de114f6f26355ace2678e0cb4a8b6c71705d63f",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "625eb79296c8ee3ead537977f0257e0bc904beea7a61205074157c3c3be42828",
+      "path": "tests/discovery_runtime/test_agent_output.py",
+      "physical_lines": 461,
+      "sha256": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371"
+    },
+    {
+      "committed_sha256": "5ae1b7977edea13f12b936223d9774a5a33b4d71cf18bd53bd8e34fc60fbaac3",
+      "git_blob": "b160f59fd8188db6f5df81b1468666405b1a9b4e",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "5ae1b7977edea13f12b936223d9774a5a33b4d71cf18bd53bd8e34fc60fbaac3",
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "physical_lines": 453,
+      "sha256": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd"
+    },
+    {
+      "committed_sha256": "38cc73a3b42380d33c74aa533046c2a8998af08f1cf197ca19fb58a7aa74f1b0",
+      "git_blob": "68d206611c84c08707cd52ab1faf564611f3cb22",
+      "normalization": "exact",
+      "normalized_sha256": "38cc73a3b42380d33c74aa533046c2a8998af08f1cf197ca19fb58a7aa74f1b0",
+      "path": "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "physical_lines": 175,
+      "sha256": "38cc73a3b42380d33c74aa533046c2a8998af08f1cf197ca19fb58a7aa74f1b0"
+    },
+    {
+      "committed_sha256": "803468945f9e435f66436d31d2467d8ab3a580c7da26b7325c18c03c38641956",
+      "git_blob": "fbbab31dc5e730189b2015e1731735def08788e8",
+      "normalization": "exact",
+      "normalized_sha256": "803468945f9e435f66436d31d2467d8ab3a580c7da26b7325c18c03c38641956",
+      "path": "tests/scripts/dev_tools/discovery/test_rendering.py",
+      "physical_lines": 86,
+      "sha256": "803468945f9e435f66436d31d2467d8ab3a580c7da26b7325c18c03c38641956"
+    },
+    {
+      "committed_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "normalization": "exact",
+      "normalized_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "physical_lines": 170,
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "committed_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+      "git_blob": "03fe3327734efd5126140fd207c7df9a33f1a57a",
+      "normalization": "exact",
+      "normalized_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "physical_lines": 270,
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "committed_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "git_blob": "ff3a5faf89785b828cdcea695d7739b7cd3b54fc",
+      "normalization": "exact",
+      "normalized_sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "physical_lines": 382,
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    },
+    {
+      "committed_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "git_blob": "e32df068248da1397f023e7e5b563d471f2fb862",
+      "normalization": "exact",
+      "normalized_sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "physical_lines": 374,
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1"
+    },
+    {
+      "committed_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122",
+      "git_blob": "efda855183af4b16b7b58d5f777de62da5edd346",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "physical_lines": 436,
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c"
+    },
+    {
+      "committed_sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce",
+      "git_blob": "c80efcd24bc4a90c76b6f159af21bbb0023584e3",
+      "normalization": "exact",
+      "normalized_sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py",
+      "physical_lines": 428,
+      "sha256": "14114f09662b286866fdf092b2cf748694ad03829893139e6c9aef257b8b79ce"
+    },
+    {
+      "committed_sha256": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a",
+      "git_blob": "f3a8d71c6858647728d0ccee86eafb90e91f8854",
+      "normalization": "exact",
+      "normalized_sha256": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_rules.py",
+      "physical_lines": 340,
+      "sha256": "233cc452931fbcfecc0e257c0e7f657cc098031fe77eabe755c1dd2fff36d88a"
+    },
+    {
+      "committed_sha256": "0804a42f5e05201cc17efa98b5e23075fd611b8bb1040b1332150fdbb2ecd2f2",
+      "git_blob": "8da49f40331e9ba045901a3faec28b50db8065be",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "0804a42f5e05201cc17efa98b5e23075fd611b8bb1040b1332150fdbb2ecd2f2",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "physical_lines": 341,
+      "sha256": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32"
+    },
+    {
+      "committed_sha256": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8",
+      "git_blob": "280d4d877416873632c55a152b1d5e1f28c07635",
+      "normalization": "exact",
+      "normalized_sha256": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/runtime_claim_rules.py",
+      "physical_lines": 237,
+      "sha256": "9ed14bdc675a7b68653d9c65831235d432c88dcb97308e29c394bdc73b2f6df8"
+    },
+    {
+      "committed_sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+      "git_blob": "fe791c05ff764b04b8a7da49392dc5a04cb1f724",
+      "normalization": "exact",
+      "normalized_sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "physical_lines": 306,
+      "sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863"
+    },
+    {
+      "committed_sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+      "git_blob": "d799ca09f3be9ed1f912cae3801d5353e6846785",
+      "normalization": "exact",
+      "normalized_sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "physical_lines": 309,
+      "sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda"
+    },
+    {
+      "committed_sha256": "41b941a13e8ec3571ead48e5562282c9080b2b60e41e45c038d9e88cfaefcf4d",
+      "git_blob": "4d6960a8975d91df8dea3c11ec39a74438073ce7",
+      "normalization": "CRLF-to-LF only",
+      "normalized_sha256": "41b941a13e8ec3571ead48e5562282c9080b2b60e41e45c038d9e88cfaefcf4d",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "physical_lines": 179,
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2"
+    },
+    {
+      "committed_sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+      "git_blob": "364e087f13c4323f56bc289808dbef9a44807d87",
+      "normalization": "exact",
+      "normalized_sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "physical_lines": 477,
+      "sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65"
+    },
+    {
+      "committed_sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "git_blob": "7f7cf81d5e18d9fbd617eab84eba4b34da94b644",
+      "normalization": "exact",
+      "normalized_sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "physical_lines": 458,
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc"
+    },
+    {
+      "committed_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "git_blob": "de5dfad1cd931ef1bf4139e989d24ed09cb383b1",
+      "normalization": "exact",
+      "normalized_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/findings.py",
+      "physical_lines": 156,
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    {
+      "committed_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "git_blob": "c6f4c0611e63170e88fc4067528f06351c6dcfa7",
+      "normalization": "exact",
+      "normalized_sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "physical_lines": 102,
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08"
+    }
+  ],
+  "exit_code": 0,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline-harness.2026-10-19T14-44.txt",
+    "sha256": "cdcf8bb2fc8400a0a99951690e6b29a310fba37bbbd7db110217c82113a72529"
+  },
+  "head": "2920686f68849957d91e2c94f525a32e466d1d8e",
+  "planned_population": [
+    "tests/discovery_runtime/test_validation_modes.py",
+    "tests/discovery_runtime/test_agent_output.py",
+    "tests/discovery_runtime/test_mutation_plan.py",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py",
+    "tests/discovery_runtime/test_coverage_report.py"
+  ],
+  "profile": {
+    "path": ".codex/agents/python-typed-engineer-c4.toml",
+    "sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "projection_contract": {
+    "authority": "validation._Validation.report invokes the same coverage_summary; public generation invokes report_projection; no recursion or injected validator authority.",
+    "counts": "Source-owned selected inventory identities; missing-ledger gaps; independent inspection/disposition; valid exclusions; unique required features versus client obligations; explicit runtime and evidence proof units.",
+    "empty": "Null zero-denominator percentages. Separate discovery result/findings retain empty or uninventoried blockers independently from requested structural mode.",
+    "generation": "build_coverage_report(snapshot, *, identifier=\"coverage\", mode=\"discovery-complete\") -> CoverageReport",
+    "invalid": "Coverage generation retains structural failures with unavailable population; other report kinds retain existing invalid-input behavior.",
+    "json_value": "Existing JsonObject is a frozen dataclass Mapping, not a dict alias.",
+    "legacy": "Pure v1 parse/build/render helpers in report_models; legacy adapter keeps only CLI/I/O routing. v2 never derives completeness from a dict or injected validator.",
+    "resources": "Prospective input/traversal and escaped UTF-8 output budgets before copying/encoding; fixed failure without partial success.",
+    "summary": "coverage_summary(snapshot, *, index, evidence, claims, dimensions, findings) -> JsonObject"
+  },
+  "proof_policy": "Exact unchanged production-byte proof reused; no accepted suites replayed. Test callers are rebound at current accepted HEAD and remain in the affected post-change population.",
+  "retained_evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/initial-file-inventory.2026-10-18T03-48.json",
+      "sha256": "2d0a28299ece3f26d04255f915bc496b6bc31086292a1660fc8db1ad66e0a35c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage-metrics.2026-10-18T10-57.json",
+      "sha256": "a93ede5c14bb52a5b2a8a18e2a8d4419c3adef0ed6703422faa604567f12eb9a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-coverage.2026-10-18T03-51.json",
+      "sha256": "81267702ae4c8b86f4cbdfbf9ee8f19960abc27fe3d13bd70480429d33ee1881"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p4t1-executor-prior-manifest.2026-10-19T01-45.json",
+      "sha256": "298b39de4fa4e2f2be0b87b756c93e0b2851aabeeae1b8dc9a8949144a012b2d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-coverage.2026-10-18T10-57.json",
+      "sha256": "f92b8c5e06629cccd26e1060a8df1eab3c19468cc98175025aa46ad429753420"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-pass7-black.2026-10-18T10-47.md",
+      "sha256": "e8741524876dddcbdaeac7983d2a166ba2206b7ae8f8275dce6bbb8c1ea3c67d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-pass7-ruff.2026-10-18T10-47.md",
+      "sha256": "f10b0b617cde03190edcb70f2aaf5f25d550935d4989ccddaf7c31c5dc29f672"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-pass7-pyright.2026-10-18T10-47.md",
+      "sha256": "a07374241ca9502af1fa5688be9ce8d058cc34fe86d4958d4b40deb7e8eb2545"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t9-pass7-tests.2026-10-18T10-54.md",
+      "sha256": "54a10fda811bd80a936a493a2c11e423596f6dc9e5965b4c7293f7f93c0ea487"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-format.2026-10-18T03-49.md",
+      "sha256": "8a2870243374c84bd1540bf32b0306f1c60578a9ebba4ad049ec304400725ef0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-lint.2026-10-18T03-49.md",
+      "sha256": "37be7b25e229a6a9dc23b6ba8520d66be8e566d1dd94196f592c0f436e60b8f7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-types.2026-10-18T03-49.md",
+      "sha256": "ba8968c8876a42c3eb955e5999ef9f208be0bf73dd1e731a781967f854bef1a2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/python-tests.2026-10-18T03-51.md",
+      "sha256": "b086f7f0747b699a5570cc3a03ff592049845eb723cbb94c766f9d9c09afb06c"
+    }
+  ],
+  "route": "inventory_analyzers_p5t1_coverage_implementation",
+  "status": "BASELINE_READY",
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T14:44:17.109362+00:00"
+}

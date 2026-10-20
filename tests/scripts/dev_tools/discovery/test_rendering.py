@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from drm_copilot_discovery.rendering import render_pretty_json, sort_rows
 
+from scripts.dev_tools.discovery.coverage_report import render_coverage_report
+
 
 def test_sort_rows_sorts_ascending_by_id_field() -> None:
     """Rows supplied in reverse id order should sort into ascending id
@@ -84,3 +86,38 @@ def test_render_pretty_json_is_deterministic() -> None:
     second = render_pretty_json(data)
 
     assert first == second
+
+
+def test_coverage_adapter_retains_pretty_json_escaping_and_single_lf() -> None:
+    """Retain legacy Unicode/newline bytes without external effects."""
+    rows: list[dict[str, object]] = [
+        {
+            "unit_id": "unit",
+            "unit_kind": "file",
+            "status": "contracted",
+            "notes": "é\nline",
+        }
+    ]
+    summary: dict[str, object] = {"total_entries": 1}
+
+    result = render_coverage_report(rows, summary)
+
+    assert result == render_pretty_json({"entries": rows, "summary": summary})
+    assert "\\u00e9\\nline" in result
+    assert result.endswith("}\n") and not result.endswith("\n\n")
+    assert "\r" not in result
+    assert rows[0]["status"] == "contracted"
+
+
+def test_explicit_v1_unit_sort_preserves_rows_and_original_order() -> None:
+    """Respect the unit_id selector while leaving the caller's collection unchanged."""
+    rows = [
+        {"unit_id": "z", "status": "characterized"},
+        {"unit_id": "a", "status": "excluded"},
+    ]
+
+    result = sort_rows(rows, id_field="unit_id")
+
+    assert result == [rows[1], rows[0]]
+    assert result[0] is rows[1]
+    assert rows[0]["unit_id"] == "z"

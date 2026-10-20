@@ -1,0 +1,117 @@
+{
+  "stage": "types",
+  "label": "p5t1-legacy-pass3-types",
+  "started": "2026-10-19T14:52:18.158194+00:00",
+  "finished": "2026-10-19T14:52:20.081897+00:00",
+  "command": "poetry run pyright scripts/dev_tools/discovery/coverage_report.py tests/scripts/dev_tools/discovery/test_coverage_report.py tests/scripts/dev_tools/discovery/test_rendering.py",
+  "exit_code": 1,
+  "duration_seconds": 1.924,
+  "source_before": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "a1cd10a1b22550e6978b530bebc9d9eab5856059f38e9b0ce7b2c9f86bd5dd3a",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "a1cd10a1b22550e6978b530bebc9d9eab5856059f38e9b0ce7b2c9f86bd5dd3a",
+      "physical_lines": 394
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass3-types-145220.stdout.bin",
+      "raw_sha256": "c9c91f0dc63aee2cc383f77b1cc9293c22e05acb2d2b7affc22322f9ee8a0a95",
+      "raw_bytes": 5697,
+      "presentation": ".\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:238:64 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> str\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:238:71 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:240:42 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown, value: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:240:49 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:240:55 - error: Type of parameter \"value\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:240:76 - error: Argument type is unknown\n  \u00a0\u00a0Argument corresponds to parameter \"object\" in function \"append\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:269:64 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:269:71 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:271:42 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown, value: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:271:49 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:271:55 - error: Type of parameter \"value\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:271:76 - error: Argument type is unknown\n  \u00a0\u00a0Argument corresponds to parameter \"object\" in function \"append\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:309:19 - error: Argument of type \"(value: str) -> list[str]\" cannot be assigned to parameter \"validator\" of type \"ArtifactValidator | None\" in function \"main\"\n  \u00a0\u00a0Type \"(value: str) -> list[str]\" is not assignable to type \"ArtifactValidator | None\"\n  \u00a0\u00a0\u00a0\u00a0Type \"(value: str) -> list[str]\" is not assignable to type \"(text: str) -> list[str]\"\n  \u00a0\u00a0\u00a0\u00a0\u00a0\u00a0Parameter name mismatch: \"text\" versus \"value\"\n  \u00a0\u00a0\u00a0\u00a0\"FunctionType\" is not assignable to \"None\" (reportArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:343:64 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:343:71 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:361:48 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> None\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:361:55 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:361:74 - error: Argument type is unknown\n  \u00a0\u00a0Argument corresponds to parameter \"object\" in function \"append\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:383:64 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(path: Unknown) -> Literal['{}']\" (reportUnknownArgumentType)\n  .\\tests\\scripts\\dev_tools\\discovery\\test_coverage_report.py:383:71 - error: Type of parameter \"path\" is unknown (reportUnknownLambdaType)\n20 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-legacy-pass3-types-145220.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 legacy coverage adapter subset"
+}

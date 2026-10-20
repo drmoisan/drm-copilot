@@ -1,0 +1,49 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "pyright",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "tests/discovery_runtime/test_report_models.py",
+    "scripts/dev_tools/discovery/coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py"
+  ],
+  "duration_seconds": 2.139,
+  "exit_code": 1,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models5-pyright-harness.2026-10-19T15-05.txt",
+    "sha256": "3075598fbbe01eae3cccc3b26ed589fafc1d32dabd34789cec55e6c3dcb0b0cb"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "6d9de2d71e7e70c7cb1118a27bcbea20d84720af8e3790df9ebc85e2f1d67deb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "822a090042744c00f8c03ae4b0d8ec8556d82985f9ca2adac8610a856faa946d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_report_models.py": "71575571bec96d6d260306ce20c092f239c25895aa8bac376f8ac9bf4a295ad1",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "6d9de2d71e7e70c7cb1118a27bcbea20d84720af8e3790df9ebc85e2f1d67deb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "822a090042744c00f8c03ae4b0d8ec8556d82985f9ca2adac8610a856faa946d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_report_models.py": "71575571bec96d6d260306ce20c092f239c25895aa8bac376f8ac9bf4a295ad1",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "started_at": "2026-10-19T15:05:48.183131+00:00",
+  "stderr": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "YzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBcdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9yZXBvcnRfbW9kZWxzLnB5CiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBcdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9yZXBvcnRfbW9kZWxzLnB5Ojg3OjE2IC0gZXJyb3I6IENhbm5vdCBhc3NpZ24gdG8gYXR0cmlidXRlICJkb2N1bWVudCIgZm9yIGNsYXNzICJEaXNjb3ZlcnlSZXBvcnQiCiAgwqDCoEF0dHJpYnV0ZSAiZG9jdW1lbnQiIGlzIHJlYWQtb25seSAocmVwb3J0QXR0cmlidXRlQWNjZXNzSXNzdWUpCiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBcdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9yZXBvcnRfbW9kZWxzLnB5OjI4MDo1IC0gZXJyb3I6IFR5cGUgb2YgInZhbHVlIiBpcyBwYXJ0aWFsbHkgdW5rbm93bgogIMKgwqBUeXBlIG9mICJ2YWx1ZSIgaXMgImRpY3Rbc3RyLCBvYmplY3QgfCBsaXN0W1Vua25vd25dXSIgKHJlcG9ydFVua25vd25WYXJpYWJsZVR5cGUpCiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBcdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9yZXBvcnRfbW9kZWxzLnB5OjI4NToyOSAtIGVycm9yOiBBcmd1bWVudCB0eXBlIGlzIHBhcnRpYWxseSB1bmtub3duCiAgwqDCoEFyZ3VtZW50IGNvcnJlc3BvbmRzIHRvIHBhcmFtZXRlciAiYXJ0aWZhY3QiIGluIGZ1bmN0aW9uICJidWlsZF9jb3ZlcmFnZV9yb3dzIgogIMKgwqBBcmd1bWVudCB0eXBlIGlzICJkaWN0W3N0ciwgb2JqZWN0IHwgbGlzdFtVbmtub3duXV0iIChyZXBvcnRVbmtub3duQXJndW1lbnRUeXBlKQozIGVycm9ycywgMCB3YXJuaW5ncywgMCBpbmZvcm1hdGlvbnMKV0FSTklORzogdGhlcmUgaXMgYSBuZXcgcHlyaWdodCB2ZXJzaW9uIGF2YWlsYWJsZSAodjEuMS40MDkgLT4gdjEuMS40MTQpLg0KUGxlYXNlIGluc3RhbGwgdGhlIG5ldyB2ZXJzaW9uIG9yIHNldCBQWVJJR0hUX1BZVEhPTl9GT1JDRV9WRVJTSU9OIHRvIGBsYXRlc3RgDQoNCg==",
+    "sha256": "57e9a26defbf76380d001adc3d94104193a4e996a57175f7b3a72a88a432b451"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T15:05:50.325039+00:00"
+}
