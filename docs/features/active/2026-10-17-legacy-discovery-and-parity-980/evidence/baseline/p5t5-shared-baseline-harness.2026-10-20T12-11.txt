@@ -1,0 +1,179 @@
+"""Freeze scoped renderer/Set E inputs without replaying predecessor behavior."""
+
+import ast
+import base64
+import gzip
+import hashlib
+import json
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from pathlib import Path
+
+sys.stdout.reconfigure(encoding="utf-8")
+ROOT = Path.cwd()
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+EVIDENCE = FEATURE / "evidence"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+BASELINE = "8f58c3d5248c06bbabf789d64ef0a72ce8ceb368"
+LEGACY = "scripts/dev_tools/generate_acceptance_scenarios.py"
+SET_E = "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+NEW = [
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "tests/discovery_runtime/test_gherkin.py",
+    "tests/discovery_runtime/test_acceptance_tags.py",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+]
+
+
+def read(path: Path) -> dict:
+    """Decode trusted evidence with explicit UTF-8; do not execute source."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def digest(raw: bytes) -> str:
+    """Return the exact byte stream SHA-256."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def binding(path: Path) -> dict:
+    """Bind a repository stream without copying its content."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest(raw),
+            "bytes": len(raw), "physical_lines": len(raw.splitlines())}
+
+
+def objects(value: object):
+    """Enumerate evidence objects for exact recorded identity lookup."""
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from objects(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from objects(child)
+
+
+def write(path: Path, value: object) -> None:
+    """Write an authored LF-only JSON view with one terminal newline."""
+    path.write_bytes((json.dumps(value, indent=2) + "\n").encode("utf-8"))
+
+
+head = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
+assert head == BASELINE
+state = read(ROOT / "artifacts/orchestration/orchestrator-state.json")
+route = next(row for row in objects(state)
+             if row.get("delegation_id") == "workspace_operations_p5t5_renderer_20261020")
+assert digest((ROOT / route["profile_path"]).read_bytes()) == route["profile_sha256"]
+authority_path = Path(
+    "C:/Users/DanMoisan/.codex/authority/epic-entry/"
+    "0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/"
+    "01a15153-48ad-74d1-9f2d-e3ad413dafb4/"
+    "codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json"
+)
+authority = read(authority_path)
+assert all(authority[key] is True for key in
+           ("routing_valid", "launch_authority_valid", "provenance_valid"))
+assert authority["profile_sha256"] == route["profile_sha256"]
+contract_path = EVIDENCE / "other/p5t5-rendering-contract-delta.2026-10-20T11-11.json"
+contract = read(contract_path)
+assert digest(contract_path.read_bytes()) == "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef"
+preparation_path = EVIDENCE / "other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json"
+preparation = read(preparation_path)
+inventory_path = EVIDENCE / "baseline/initial-file-inventory.2026-10-18T03-48.json"
+inventory = read(inventory_path)
+for path in (LEGACY, SET_E):
+    original = next(row for row in objects(inventory) if row.get("path") == path)
+    assert original["sha256"] == digest((ROOT / path).read_bytes())
+assert all(not (ROOT / path).exists() for path in NEW)
+examples = ROOT / "examples/discovery/v2/acceptance"
+assert not examples.exists()
+dependencies = {
+    row["path"] for row in preparation["source_bindings"]
+} | {
+    "packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+    for name in ("acceptance_models", "acceptance_generation", "acceptance_generation_context")
+} | {
+    "tests/discovery_runtime/" + name + ".py"
+    for name in ("test_acceptance_generation", "test_acceptance_decisions", "test_snapshot_io")
+}
+test_tree = ast.parse((ROOT / SET_E).read_text(encoding="utf-8"))
+test_defs = []
+for node in test_tree.body:
+    if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+        test_defs.append({
+            "name": node.name, "start": node.lineno, "end": node.end_lineno,
+            "ast_sha256": digest(ast.dump(node).encode("utf-8")),
+            "assertions": sum(isinstance(item, ast.Assert) for item in ast.walk(node)),
+            "decorators": [ast.dump(item) for item in node.decorator_list],
+        })
+junit_path = EVIDENCE / "baseline/python-junit.2026-10-18T03-51.xml"
+cases = [node for node in ET.fromstring(junit_path.read_bytes()).iter("testcase")
+         if node.get("classname") == "tests.scripts.dev_tools.test_generate_acceptance_scenarios"]
+assert len(cases) == 34
+assert all(not list(node) or all(child.tag not in {"failure", "error", "skipped"}
+                                for child in node) for node in cases)
+metrics_path = EVIDENCE / "baseline/python-coverage-metrics.2026-10-18T03-51.json"
+metrics = read(metrics_path)["discovery_files"][LEGACY.replace("/", "\\")]
+members = []
+for path in (LEGACY, SET_E):
+    raw = (ROOT / path).read_bytes()
+    encoded = base64.b64encode(gzip.compress(raw, mtime=0)).decode("ascii")
+    assert gzip.decompress(base64.b64decode(encoded)) == raw
+    members.append({**binding(ROOT / path), "encoding": "gzip+base64", "payload": encoded})
+out = EVIDENCE / "baseline"
+archive = out / f"p5t5-shared-baseline-originals.{STAMP}.json"
+write(archive, {"Timestamp": STAMP, "members": members})
+harness = out / f"p5t5-shared-baseline-harness.{STAMP}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+manifest = out / f"p5t5-shared-baseline.{STAMP}.json"
+write(manifest, {
+    "task": "P5-T5", "Timestamp": STAMP, "status": "BASELINE_INTERFACE_FROZEN",
+    "accepted_head": head, "authority": {
+        "route": route, "native_sha256": digest(authority_path.read_bytes()),
+        "routing_valid": True, "launch_authority_valid": True, "provenance_valid": True,
+    },
+    "absent_paths": NEW, "absent_example_prefix": "examples/discovery/v2/acceptance/",
+    "existing": [binding(ROOT / path) for path in sorted(dependencies)],
+    "legacy_proof": {
+        "original_inventory": binding(inventory_path), "junit": binding(junit_path),
+        "coverage": binding(metrics_path), "metrics": metrics,
+        "nodes": [SET_E + "::" + node.get("name", "") for node in cases],
+        "preserved_definitions": test_defs, "raw_originals": binding(archive),
+        "scope": "All 34 legacy cases remain compatibility-only; executable assertions/decorators/helpers are preserved. No suite replay.",
+    },
+    "accepted_generation_proof": [
+        binding(EVIDENCE / "qa-gates/p5t4-final-handoff.2026-10-20T11-46.json"),
+        binding(EVIDENCE / "qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json"),
+    ],
+    "contract_source": binding(contract_path), "preparation": binding(preparation_path),
+    "public_api": contract["proposed_public_api"], "output_contract": contract["output_contract"],
+    "shared_fixture": {
+        "module": "tests.discovery_runtime.test_acceptance_generation",
+        "helpers": ["generation_snapshot", "capture_documents", "amended", "imported_snapshot", "source_criterion"],
+        "decision_helpers": "tests.discovery_runtime.test_acceptance_decisions.policy_snapshot/observation",
+        "catalog": "tests.discovery_runtime.test_snapshot_io.snapshot_catalog",
+        "factory": "drm_copilot_discovery.acceptance_generation.generate_acceptance",
+        "proof": "Accepted 123-case final P5-T4 union; no baseline replay. Factories retain schema-valid captured bytes/pins and require no temporary files.",
+    },
+    "owners": {
+        "workspace_operations": NEW[:3] + ["examples/discovery/v2/acceptance/"],
+        "source_inspection_preparation": [SET_E, NEW[3]],
+    },
+    "set_e_independence": "Four new v2 projection test functions consume accepted generation/model/validate_document APIs only; no renderer import. Unknown/missing data cannot establish ready membership. Renderer file-output controls remain with its owner.",
+    "remaining_gates": "Coordinator implementation release; ordered owned format/lint/types/tests and per-unit coverage; one consolidated review/final reversed union. No production/test mutations in this capture.",
+    "executed_harness": binding(harness),
+})
+manifest.with_suffix(".md").write_bytes((
+    "# P5-T5 shared baseline and rendering interface\n\n"
+    f"Timestamp: {STAMP}\n\nCommand: `poetry run python SCRATCH/p5t5-shared-baseline.py`\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: exact accepted HEAD, four absent code/test paths and absent "
+    "example directory verified. Existing Set E source/test bytes match the retained initial "
+    "inventory; 34 passing legacy cases and 186/186 statements plus 42/42 branches are reused. "
+    "The accepted 123-case generator proof is referenced without replay. Public rendering "
+    "API/output and independent Set E fixture consumption are bound in the paired manifest. "
+    "Implementation remains subject to coordinator release.\n"
+).encode("utf-8"))
+print(json.dumps({"manifest": binding(manifest), "archive": binding(archive),
+                  "harness": binding(harness), "legacy_nodes": len(cases)}, indent=2))

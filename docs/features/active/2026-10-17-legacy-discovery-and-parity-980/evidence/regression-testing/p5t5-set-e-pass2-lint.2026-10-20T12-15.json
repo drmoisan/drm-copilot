@@ -1,0 +1,175 @@
+{
+  "Timestamp": "2026-10-20T12-15",
+  "Command": "poetry run ruff check tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+  "EXIT_CODE": 0,
+  "duration_seconds": 1.2096041000040714,
+  "started": "2026-10-20T12:15:18.993707+00:00",
+  "finished": "2026-10-20T12:15:20.202057+00:00",
+  "source_before": {
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": {
+      "sha256": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe",
+      "physical_lines": 488
+    },
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": {
+      "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+      "physical_lines": 222
+    },
+    "examples/discovery/v2/acceptance-specification.example.yaml": {
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+      "physical_lines": 36
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": {
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "physical_lines": 494
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": {
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "physical_lines": 488
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": {
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "physical_lines": 489
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": {
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "physical_lines": 231
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": {
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "physical_lines": 36
+    },
+    "schemas/discovery/v2/acceptance-specification.schema.json": {
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "physical_lines": 64
+    },
+    "schemas/discovery/v2/common.schema.json": {
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "physical_lines": 177
+    },
+    "scripts/dev_tools/generate_acceptance_scenarios.py": {
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "physical_lines": 492
+    },
+    "tests/discovery_runtime/test_acceptance_decisions.py": {
+      "sha256": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+      "physical_lines": 400
+    },
+    "tests/discovery_runtime/test_acceptance_generation.py": {
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "physical_lines": 486
+    },
+    "tests/discovery_runtime/test_snapshot_io.py": {
+      "sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+      "physical_lines": 277
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": {
+      "sha256": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe",
+      "physical_lines": 488
+    },
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": {
+      "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+      "physical_lines": 222
+    },
+    "examples/discovery/v2/acceptance-specification.example.yaml": {
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+      "physical_lines": 36
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": {
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "physical_lines": 494
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": {
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "physical_lines": 488
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": {
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "physical_lines": 489
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": {
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "physical_lines": 231
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": {
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "physical_lines": 36
+    },
+    "schemas/discovery/v2/acceptance-specification.schema.json": {
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "physical_lines": 64
+    },
+    "schemas/discovery/v2/common.schema.json": {
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "physical_lines": 177
+    },
+    "scripts/dev_tools/generate_acceptance_scenarios.py": {
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "physical_lines": 492
+    },
+    "tests/discovery_runtime/test_acceptance_decisions.py": {
+      "sha256": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+      "physical_lines": 400
+    },
+    "tests/discovery_runtime/test_acceptance_generation.py": {
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "physical_lines": 486
+    },
+    "tests/discovery_runtime/test_snapshot_io.py": {
+      "sha256": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+      "physical_lines": 277
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_bytes": 19,
+      "raw_base64": "QWxsIGNoZWNrcyBwYXNzZWQhCg==",
+      "presentation": "All checks passed!\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "SCRATCH=owned external temporary harness directory",
+    "WORKSPACE=current repository checkout"
+  ],
+  "raw_stream_rule": "base64 decodes to exact captured child bytes; presentation replaces only explicit host path aliases"
+}
