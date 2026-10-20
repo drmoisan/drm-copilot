@@ -1,0 +1,44 @@
+{
+  "Timestamp": "2026-10-20T09:09:25.505498+00:00",
+  "status": "REVIEW_EVIDENCE_ONLY_NOT_STAGED",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-payload.2026-10-20T09-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-staging.2026-10-20T09-09.json"
+  ],
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-payload.2026-10-20T09-09.json",
+      "sha256": "3d3abb24f580c54b764dd0471fa98b11c2c5cea791fd0191fee948acc903cb75"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+      "sha256": "3187ca526a066823017a1ad3018404efeb94b2c459b3e8d89e3d3b88b0ccc7b3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.md",
+      "sha256": "645fe8ad291f1244213e01e942409ad3ef7c47f32756b2f5fb9546f2f3a5c1fb"
+    }
+  ],
+  "self_identity": "Hash returned externally; no recursive self-hash.",
+  "retained_owner_refs": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.json",
+      "sha256": "48b9fd0a719512655a3f9a8973896d1faa6cd61379f1fc4dc92f8020eeb87508"
+    },
+    {
+      "bytes": 46825,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+      "sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0"
+    },
+    {
+      "bytes": 9585,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+      "sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719"
+    }
+  ],
+  "scope": "Only four new independent source-review evidence files. Producer implementation and pending planning proof remain owned separately.",
+  "checked_WIP_readiness": false,
+  "task_acceptance": false
+}

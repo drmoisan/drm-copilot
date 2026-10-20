@@ -308,15 +308,7 @@ def test_invalid_public_modes_and_unparsed_projection_raise_explicitly(
                 identifier="report",
                 mode=cast("ValidationMode", mode),
             )
-    # Completion still rejects; coverage/parity expose unavailable-input envelopes.
-    for kind in ("completion-report",):
-        with pytest.raises(ValueError, match="structurally parsed"):
-            report_projection(
-                replace(snapshot, manifest=replace(snapshot.manifest, files=())),
-                kind=kind,
-                identifier="report",
-                mode="structural",
-            )
+    # Malformed report diagnostics are covered by each dedicated projection test.
 
 
 def test_semantic_digest_tracks_changed_source_bytes(

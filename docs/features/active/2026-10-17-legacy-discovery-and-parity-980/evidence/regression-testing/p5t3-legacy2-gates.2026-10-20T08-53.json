@@ -1,0 +1,125 @@
+{
+  "Timestamp": "2026-10-20T08-53",
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "scripts/dev_tools/discovery/completion_report.py": "e80f35bf04a06d3da912aa1567736369ece2fbc468633920fd9dd8b949dec7e7",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "2a1055cec342edbb42874ff61bbf7b609490ac2a8cc871775f3d9648b0a3b237",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "scripts/dev_tools/discovery/completion_report.py": "e80f35bf04a06d3da912aa1567736369ece2fbc468633920fd9dd8b949dec7e7",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "2a1055cec342edbb42874ff61bbf7b609490ac2a8cc871775f3d9648b0a3b237",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "coverage": null,
+  "dependencies": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py"
+  ],
+  "harness_sha256": "f36ddd4ef2566965f9c013042a090a5c06b3ac5ba1e4fb7768c542a4379c9a9c",
+  "label": "legacy2",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5579881999874488,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-format-2026-10-20T08-53.stderr.bin",
+          "readable": "All done! \\u2728 \\U0001f370 \\u2728\r\n3 files would be left unchanged.\r\n",
+          "sha256": "814c0f4c496423065215825ae383556f90c7a25251a3476981901eadca298486"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-format-2026-10-20T08-53.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.10672209999756888,
+      "stage": "lint",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-lint-2026-10-20T08-53.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-lint-2026-10-20T08-53.stdout.bin",
+          "readable": "All checks passed!\n",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.7885371000156738,
+      "stage": "types",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-types-2026-10-20T08-53.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-legacy2-types-2026-10-20T08-53.stdout.bin",
+          "readable": "WORKSPACE\\scripts\\dev_tools\\discovery\\completion_report.py\n  WORKSPACE\\scripts\\dev_tools\\discovery\\completion_report.py:21:51 - error: \"parse_coverage_ledger\" is unknown import symbol (reportAttributeAccessIssue)\n  WORKSPACE\\scripts\\dev_tools\\discovery\\completion_report.py:21:51 - error: Type of \"parse_coverage_ledger\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\scripts\\dev_tools\\discovery\\completion_report.py:135:9 - error: Type of \"coverage\" is unknown (reportUnknownVariableType)\n  WORKSPACE\\scripts\\dev_tools\\discovery\\completion_report.py:137:44 - error: Argument type is unknown\n  \u00a0\u00a0Argument corresponds to parameter \"coverage_artifact\" in function \"build_completion_summary\" (reportUnknownArgumentType)\nWORKSPACE\\tests\\scripts\\dev_tools\\discovery\\test_completion_report.py\n  WORKSPACE\\tests\\scripts\\dev_tools\\discovery\\test_completion_report.py:37:9 - error: Argument of type \"dict[str, list[dict[str, str]]]\" cannot be assigned to parameter \"coverage_artifact\" of type \"dict[str, object]\" in function \"build_completion_summary\"\n  \u00a0\u00a0\"dict[str, list[dict[str, str]]]\" is not assignable to \"dict[str, object]\"\n  \u00a0\u00a0\u00a0\u00a0Type parameter \"_VT@dict\" is invariant, but \"list[dict[str, str]]\" is not the same as \"object\"\n  \u00a0\u00a0\u00a0\u00a0Consider switching from \"dict\" to \"Mapping\" which is covariant in the value type (reportArgumentType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\discovery\\test_completion_report.py:37:28 - error: Argument of type \"dict[str, list[dict[str, str]]]\" cannot be assigned to parameter \"parity_artifact\" of type \"dict[str, object]\" in function \"build_completion_summary\"\n  \u00a0\u00a0\"dict[str, list[dict[str, str]]]\" is not assignable to \"dict[str, object]\"\n  \u00a0\u00a0\u00a0\u00a0Type parameter \"_VT@dict\" is invariant, but \"list[dict[str, str]]\" is not the same as \"object\"\n  \u00a0\u00a0\u00a0\u00a0Consider switching from \"dict\" to \"Mapping\" which is covariant in the value type (reportArgumentType)\n6 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+          "sha256": "10e1f58fbb5016bb482ef2cb71bedc5f7429f152743c706b65b1ce98dcafd1b5"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "scripts/dev_tools/discovery/completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_io.py"
+  ],
+  "status": "failed"
+}

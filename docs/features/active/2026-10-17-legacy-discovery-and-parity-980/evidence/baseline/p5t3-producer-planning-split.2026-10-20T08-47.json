@@ -1,0 +1,12 @@
+{
+  "Timestamp": "2026-10-20T08-47",
+  "Command": "Check approved planning-test path absence before creation",
+  "EXIT_CODE": 0,
+  "Output Summary": "Approved cohesive test split absent; production ownership unchanged.",
+  "path": "tests/discovery_runtime/test_completion_planning.py",
+  "exists": false,
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+    "sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d"
+  }
+}

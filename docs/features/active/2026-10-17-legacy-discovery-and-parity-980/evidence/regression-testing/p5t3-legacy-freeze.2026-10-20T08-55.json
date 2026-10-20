@@ -1,0 +1,147 @@
+{
+  "Timestamp": "2026-10-20T08-55",
+  "baseline_cases": 11,
+  "baseline_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-coverage.2026-10-20T08-40.json",
+    "physical_lines": 1,
+    "sha256": "05d501ca0026aa8177936f9b8d9855c3028e62d3a4c3ed0aac912d637588e7d2"
+  },
+  "baseline_gates": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-gates.2026-10-20T08-40.json",
+    "physical_lines": 134,
+    "sha256": "e035c5a9202349bd5d9be23014d3f4d3fb0ec358bdb0347fc6ec9e0962a4dcc8"
+  },
+  "baseline_summary": {
+    "covered_branches": 6,
+    "covered_lines": 47,
+    "excluded_lines": 4,
+    "missing_branches": 0,
+    "missing_lines": 4,
+    "num_branches": 6,
+    "num_partial_branches": 0,
+    "num_statements": 51,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100",
+    "percent_covered": 92.98245614035088,
+    "percent_covered_display": "93",
+    "percent_statements_covered": 92.15686274509804,
+    "percent_statements_covered_display": "92"
+  },
+  "cases": 31,
+  "compatibility_change": "Only unsupported readiness=ready claims are removed. Counts/present flags, deterministic text, dual named input flags, injected validators, validation-before-build, stderr errors, output destination and stdout remain. Generated summary explicitly states legacy-artifact-compatibility-only; v2 or malformed input fails despite injected acceptance.",
+  "corrections": [
+    "Shortened argparse help line for Ruff E501.",
+    "Imported public parse_coverage_ledger from its actual report_models owner; annotated historical test dicts for invariant typed helper parameters."
+  ],
+  "coverage_ranges": [
+    {
+      "covered": 3,
+      "end": 46,
+      "missing": [],
+      "name": "_default_coverage_ledger_validator",
+      "percentage": 100,
+      "start": 36
+    },
+    {
+      "covered": 3,
+      "end": 59,
+      "missing": [],
+      "name": "_default_parity_matrix_validator",
+      "percentage": 100,
+      "start": 49
+    },
+    {
+      "covered": 6,
+      "end": 80,
+      "missing": [],
+      "name": "parse_args",
+      "percentage": 100,
+      "start": 62
+    },
+    {
+      "covered": 31,
+      "end": 151,
+      "missing": [],
+      "name": "main",
+      "percentage": 100,
+      "start": 83
+    }
+  ],
+  "current_summary": {
+    "covered_branches": 6,
+    "covered_lines": 53,
+    "excluded_lines": 4,
+    "missing_branches": 0,
+    "missing_lines": 0,
+    "num_branches": 6,
+    "num_partial_branches": 0,
+    "num_statements": 53,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100",
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100"
+  },
+  "delta": {
+    "branch_coverage_percentage_points": 0,
+    "line_coverage_percentage_points": 7.843137254901961,
+    "new_failures": 0,
+    "new_lint_findings": 0,
+    "new_type_findings": 0
+  },
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2"
+  },
+  "gates": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-gates.2026-10-20T08-54.json",
+    "physical_lines": 157,
+    "sha256": "ed909900e4997c21092e174296ee526db2c07c643442128851f499c787b90283"
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-legacy-gate-harness.2026-10-20T08-55.txt",
+    "physical_lines": 78,
+    "sha256": "f36ddd4ef2566965f9c013042a090a5c06b3ac5ba1e4fb7768c542a4379c9a9c"
+  },
+  "limitations": [
+    "This is legacy-only adapter proof, not v2 completion/planning/publication acceptance.",
+    "Pure runtime helper coverage belongs to producer owner; no duplicate gate calculations were added.",
+    "Full-task/native acceptance remains independently owned."
+  ],
+  "new_cases": "Twelve malformed/v2 duplicate/nonfinite/shape cases across both inputs; default validators exact ordered diagnostics; argv=None; three missing-argument cases; three unexpected-boundary propagation cases.",
+  "original_cases_preserved": "Seven original logical cases retained; entry-count test renamed for compatibility authority. Three readiness assertions replaced by explicit compatibility label and absence checks. Four I/O tests byte-identical.",
+  "raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-coverage.2026-10-20T08-54.json",
+    "physical_lines": 1,
+    "sha256": "0cedafa020e30782e8914cd0e979c0d884b0f60e28f01eae6210609671d0bece"
+  },
+  "raw_policy": "Original binary stdout/stderr and coverage SQLite retained under SCRATCH paths in receipts; readable JSON uses case-insensitive WORKSPACE substitutions and escaped CR/LF. Raw coverage keys remain relative.",
+  "retained_attempts": [
+    "evidence/regression-testing/p5t3-legacy1-gates.2026-10-20T08-53.json",
+    "evidence/regression-testing/p5t3-legacy2-gates.2026-10-20T08-53.json"
+  ],
+  "scope": [
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "physical_lines": 155,
+      "sha256": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "physical_lines": 382,
+      "sha256": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25"
+    }
+  ],
+  "status": "focused-legacy-subset-frozen-review-pending",
+  "unchanged_io_test": {
+    "path": "tests/scripts/dev_tools/discovery/test_io.py",
+    "physical_lines": 87,
+    "sha256": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  }
+}

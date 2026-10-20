@@ -1,0 +1,92 @@
+{
+  "Timestamp": "2026-10-20T09:21:00.163396+00:00",
+  "command": "python SCRATCH/issue-980-p5t3-semantic-review.py",
+  "scope": "Two bounded public dispatch calls on memory snapshots; no suite or fixture rewrite.",
+  "source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-source-freeze.2026-10-20T09-14.json",
+    "sha256": "0cbec7581e100facd8a726fea7018c4c2c12e26ce701c6ed3e486d12ea6e6334",
+    "bytes": 85338
+  },
+  "baseline_commit": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+  "baseline_validation_sha256": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+  "supported_report_kinds": [
+    "completion-report",
+    "coverage-report",
+    "parity-report",
+    "validation-report"
+  ],
+  "valid_validation_report": {
+    "schema_version": "2.0.0",
+    "artifact_kind": "validation-report",
+    "id": "validation",
+    "mode": "structural",
+    "input_sha256": "28b6f4210edf45455737259e7c3cb4b82eb64bb07e49db66e11996e3dddbb8fa",
+    "validation_result": "pass",
+    "counts": {},
+    "findings": []
+  },
+  "malformed_validation_report": {
+    "schema_version": "2.0.0",
+    "artifact_kind": "validation-report",
+    "id": "validation",
+    "mode": "structural",
+    "input_sha256": "da10239275b77cc6f9c88f003ec53c942a413521f199fcf8d41362f3f31caab7",
+    "validation_result": "fail",
+    "counts": null,
+    "findings": [
+      {
+        "code": "PROFILE_REQUIRED",
+        "severity": "error",
+        "artifact_path": "docs/migration/discovery/domain-profile.yaml",
+        "pointer": "",
+        "related_ids": [],
+        "related_paths": [],
+        "message": "Captured profile bytes are missing.",
+        "next_action": "Correct the inputs and validate the requested mode."
+      }
+    ],
+    "completion": {
+      "assessment_state": "unavailable",
+      "blocking_findings": [
+        0
+      ],
+      "findings_complete": true,
+      "mode_label": "Structural validation",
+      "next_actions": [
+        {
+          "action": "Correct the inputs and validate the requested mode.",
+          "finding_indices": [
+            0
+          ]
+        }
+      ],
+      "planning_prerequisite": null,
+      "retained_finding_counts": {
+        "error": 1,
+        "info": 0,
+        "warning": 0
+      },
+      "warning_findings": []
+    }
+  },
+  "observed_regression": "Malformed validation-report returns completion fields instead of its prior ValueError.",
+  "fixture_failure": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-pass3-tests.2026-10-20T09-15.json",
+      "sha256": "d1554fcf3a404287b548bf80ab24e602248f10153d8666800cf7d01dc1fc7615",
+      "bytes": 33347
+    },
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-lossless-archive.2026-10-20T09-15.json",
+      "sha256": "16aaa3dd09da9c448381fd7971797547ae6858a6cbd7b8b28e63e37eeb553412",
+      "bytes": 238154
+    },
+    "raw_stdout_sha256": "42128ea580cdb46ee437e5446239b3800ee8eb4275c8faf888786e3ef506fbb2",
+    "raw_stdout_bytes": 23498,
+    "identical_path_collision_count": 3,
+    "failing_test_line": 177,
+    "preceding_malformed_assertions_reached_and_passed": true,
+    "remaining_agent_output_assertion_executed": false
+  },
+  "source_test_hashes_unchanged": true
+}
