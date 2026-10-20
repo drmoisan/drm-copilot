@@ -1,0 +1,172 @@
+{
+  "Timestamp": "2026-10-20T15-49",
+  "Command": "Bounded acceptance-selector ordered proof, body-range and staging confirmation",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "authority": {
+    "delegation_id": "rendering_review_p6t1_selector_proof_20261020",
+    "phase": "S5_P6T1_acceptance_selector_confirmation",
+    "agent_type": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_authority_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Current persisted resumed route and existing native launch attestation verified before evidence write."
+  },
+  "source_review": {
+    "path": "evidence/qa-gates/p6t1-acceptance-selector-source-review.2026-10-20T15-18.json",
+    "sha256": "bfbaa536c37a57e383ff1b92eb0dc193ef76454b66f0fbeac2e9ae8a197154c5",
+    "qualification": "Retained unchanged; source semantics were not reopened."
+  },
+  "freeze": {
+    "path": "evidence/regression-testing/p6t1-selection-freeze.2026-10-20T15-34.json",
+    "sha256": "0044a29dd6b2deb259a66be8c771636fb10e15792abf0dfd4c0ca9c8ca9b4879"
+  },
+  "owner_staging": {
+    "path": "evidence/regression-testing/p6t1-selection-staging.2026-10-20T15-34.json",
+    "sha256": "50852296c63749e6983562edc9901e405d821f3aa304f87de3e32168b47a6fbc",
+    "paths": 38
+  },
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py",
+      "sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "lf_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "bytes": 10075,
+      "physical_lines": 235
+    },
+    "tests/discovery_runtime/test_service_selection.py": {
+      "path": "tests/discovery_runtime/test_service_selection.py",
+      "sha256": "890d1e4899cdc1e6fbb3747843bc26603db5dfd923e79c90b7d069a6840b3ac2",
+      "lf_sha256": "890d1e4899cdc1e6fbb3747843bc26603db5dfd923e79c90b7d069a6840b3ac2",
+      "bytes": 14211,
+      "physical_lines": 338
+    }
+  },
+  "findings": [],
+  "proof": {
+    "ordered_sequence": [
+      "Black",
+      "Ruff",
+      "Pyright",
+      "29 tests",
+      "coverage export"
+    ],
+    "all_exit_codes": 0,
+    "passing_unique_nodes": 29,
+    "elapsed_seconds": 37.28061,
+    "source_before_after_current_identical": true,
+    "raw_readable_streams": 10,
+    "stage_archive_payloads": 20,
+    "freeze_archive_payloads": 9,
+    "coverage_raw_sha256": "88fbff11f1e2a2bd1f7f9b900372ad5cceff7262103ce44f92011bedbef1262d",
+    "raw_module_statements": [
+      115,
+      116
+    ],
+    "raw_module_branches": [
+      49,
+      50
+    ],
+    "named_body_ranges": [
+      {
+        "name": "_invalid",
+        "start": 19,
+        "end": 35,
+        "statements": [
+          1,
+          1
+        ],
+        "branches": [
+          0,
+          0
+        ],
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      {
+        "name": "_selectors",
+        "start": 38,
+        "end": 64,
+        "statements": [
+          16,
+          16
+        ],
+        "branches": [
+          10,
+          10
+        ],
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      {
+        "name": "_feature_id",
+        "start": 67,
+        "end": 80,
+        "statements": [
+          7,
+          7
+        ],
+        "branches": [
+          2,
+          2
+        ],
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      {
+        "name": "resolve_feature_ids",
+        "start": 83,
+        "end": 178,
+        "statements": [
+          49,
+          49
+        ],
+        "branches": [
+          24,
+          24
+        ],
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      {
+        "name": "select_acceptance_platforms",
+        "start": 181,
+        "end": 235,
+        "statements": [
+          28,
+          29
+        ],
+        "branches": [
+          13,
+          14
+        ],
+        "missing_lines": [
+          202
+        ],
+        "missing_branches": [
+          [
+            201,
+            202
+          ]
+        ]
+      }
+    ],
+    "qualification": "Five named body ranges use actual coverage.py function counters and AST declaration/end boundaries. Each exceeds the unchanged 90% statement floor. select_acceptance_platforms retains one uncovered defensive capacity rejection at line 202; it is not relabeled covered. No accepted historical coverage is added. Raw coverage EOF and archived CRLF bytes remain exact. UTF-8 raw/readable aliases and archived runner trimming rules reconcile."
+  },
+  "dependencies": {
+    "current_committed_head": "2f63b6eaed7f80c392aba68c17b21ee8c9228804",
+    "task_source_baseline": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+    "nonowned_committed_binding_count": 18,
+    "binding_receipt": "evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.json",
+    "qualification": "All 18 bound non-owned dependencies match committed HEAD under permitted CRLF-to-LF comparison. Shared/build checkpoint advance is accepted; those source/evidence paths are excluded from the selector union. The prior source review, all 38 owner paths, owner manifest and current confirmation are included."
+  },
+  "effects": {
+    "tests_replayed": false,
+    "source_review_reopened": false,
+    "source_test_git_checkpoint_edits": false,
+    "core_gateway_review": false,
+    "whole_task_acceptance": false
+  },
+  "next": "Coordinator may commit only the exact self-bound selector union. P6-T1 composed final acceptance remains pending. Current phase P6; upcoming P6-T1, P6-T2, P6-T3, P7-T1, P7-T2."
+}

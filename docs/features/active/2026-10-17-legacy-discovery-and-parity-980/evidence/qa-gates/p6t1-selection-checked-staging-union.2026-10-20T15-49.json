@@ -1,0 +1,264 @@
+{
+  "Timestamp": "2026-10-20T15-49",
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "current_head": "2f63b6eaed7f80c392aba68c17b21ee8c9228804",
+  "task_source_baseline": "2c69b559bbd5dfe1f97c23947bd5d25d607e0303",
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-acceptance-selector-source-review.2026-10-20T15-18.json",
+      "working_sha256": "bfbaa536c37a57e383ff1b92eb0dc193ef76454b66f0fbeac2e9ae8a197154c5",
+      "expected_git_blob": "d12bc3d3769565d40f66577b1f2ccac297c58c78",
+      "bytes": 6637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-selection-proof-confirmation.2026-10-20T15-49.json",
+      "working_sha256": "db4a52dc68001307f0f03741740e8406a669dc589edd8b5ede9fdba847b39d89",
+      "expected_git_blob": "e67fb279f31ba5ada73af247430968b43db903db",
+      "bytes": 5805
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-selection-proof-confirmation.2026-10-20T15-49.md",
+      "working_sha256": "e4cb0dff19aa04ec056ae1748e0475cc9b4fa4b5b3de04b3066631a5ff8d4e19",
+      "expected_git_blob": "e56044ca8b859db5ed19401830241e7d05a31236",
+      "bytes": 1012
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-black-raw.2026-10-20T15-15.json",
+      "working_sha256": "a1cc525f87382e9e750feca8b7d5a274bf6f3c1f39869a0c2e577e934c55337c",
+      "expected_git_blob": "799f06c123226740314f712fa7335e0fe167edff",
+      "bytes": 5572
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-black.2026-10-20T15-15.json",
+      "working_sha256": "5cde3e9d7f214ae7a3bf25a9049332d8b38ac023db046ab1bdd85cf901b924ae",
+      "expected_git_blob": "bbec9c50e802f471575f21de57344c0edd075a66",
+      "bytes": 6553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-black.2026-10-20T15-15.md",
+      "working_sha256": "19d47cdbb1f2d4dd98a1b87a14c0eba423a056b62e49f9415ab9461615ad3cfa",
+      "expected_git_blob": "d4811734e0a144b2658e532f6a23ebcf3fbafb88",
+      "bytes": 335
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-ruff-raw.2026-10-20T15-15.json",
+      "working_sha256": "1a09de2f91461e232ba0f3dca7ba63e3f5b9f60026aebff16b4d4ad16dcfabfb",
+      "expected_git_blob": "ccf8b09e9d4ff5b51f0106ca10d920b7e373a124",
+      "bytes": 6057
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-ruff.2026-10-20T15-15.json",
+      "working_sha256": "5aa5a790f3882f60e601c423cce488d4c4acbf1c096c4d3c246b7adaa0ab91ce",
+      "expected_git_blob": "5e137aa53546a11956d75c3fe70ba8bcd11b4921",
+      "bytes": 7471
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused1-static-ruff.2026-10-20T15-15.md",
+      "working_sha256": "d7d27ec6de144ca0522530593e6e5be7a1bd975c2b891a5b6f39f1b2d393bb0b",
+      "expected_git_blob": "acfb3ce03b26167485943c81a1f85a03286216f5",
+      "bytes": 1245
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-black-raw.2026-10-20T15-15.json",
+      "working_sha256": "a1cc525f87382e9e750feca8b7d5a274bf6f3c1f39869a0c2e577e934c55337c",
+      "expected_git_blob": "799f06c123226740314f712fa7335e0fe167edff",
+      "bytes": 5572
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-black.2026-10-20T15-15.json",
+      "working_sha256": "175df66bd1c448061b1dd433f59389a1b2ce6fc26664f4c21953b4507153ae20",
+      "expected_git_blob": "dd30fa075e0c73de072ca35dfb31e419eae14401",
+      "bytes": 6553
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-black.2026-10-20T15-15.md",
+      "working_sha256": "1339f7b67ccd9be97f3d1f7cacfa6560f839280a3ff7b62582ea7295a9ed0dd5",
+      "expected_git_blob": "649f0e5aba37d0e82772ee474f59c3da44e5c8b7",
+      "bytes": 335
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-pyright-raw.2026-10-20T15-15.json",
+      "working_sha256": "0bc3e4c627c82d2dd5246cd94331a624bb82202c9485101c0a8d5c2a2bf9c930",
+      "expected_git_blob": "e607adf32296c8745e4d8480baaf52da503fb623",
+      "bytes": 5709
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-pyright.2026-10-20T15-15.json",
+      "working_sha256": "1774c3d649da16d30dce5509dad8bb9f32f81e2bec42c95f788f1f8fc6ceaae1",
+      "expected_git_blob": "271b7c9485afd81112a6b0cd1e970612e58e5045",
+      "bytes": 6665
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-pyright.2026-10-20T15-15.md",
+      "working_sha256": "11f196eafb9fa8407ab198a4aab7ee47e92c93dbd02dd59c8288f11ab451f180",
+      "expected_git_blob": "a7260a3871c93cd2d8ef71dc3ad2fb298d83c3e9",
+      "bytes": 465
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-ruff-raw.2026-10-20T15-15.json",
+      "working_sha256": "7e976a5eebec0139cc38ba11dd64e0ff28072d9e20cd87396f9cc6d741369081",
+      "expected_git_blob": "d98663cd448428f37bb19d2ba712a17fe6f58294",
+      "bytes": 5520
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-ruff.2026-10-20T15-15.json",
+      "working_sha256": "a764ff20700c8be67076eddba9f7e70bfca51e85811e076997cf24ac302ad7ca",
+      "expected_git_blob": "23a6aaad2fda83944ab491de4635d26e6e629509",
+      "bytes": 6495
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused2-static-ruff.2026-10-20T15-15.md",
+      "working_sha256": "5892512f13138ba0eefae6ff9f3915f7a61b38d96043aee1432d9dfb1492153a",
+      "expected_git_blob": "595119339119ea4f02d2758e377aab81a8b59303",
+      "bytes": 294
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-black-raw.2026-10-20T15-26.json",
+      "working_sha256": "a1cc525f87382e9e750feca8b7d5a274bf6f3c1f39869a0c2e577e934c55337c",
+      "expected_git_blob": "799f06c123226740314f712fa7335e0fe167edff",
+      "bytes": 5572
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-black.2026-10-20T15-26.json",
+      "working_sha256": "ae9d45b1f72706efbd9156d727da56375d674cd19afcef0143a59c1a20578b92",
+      "expected_git_blob": "1c303f1f8926e15a3d6c34295f2c647983c55f1b",
+      "bytes": 6546
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-black.2026-10-20T15-26.md",
+      "working_sha256": "4c02a3e10381cb1c515a75e4b12fce798ef7bc844e1a204506bff1b82e884edd",
+      "expected_git_blob": "3f75682a4685a27422495d1f3c7d98d5ee939ce4",
+      "bytes": 335
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-coverage-raw.2026-10-20T15-27.json",
+      "working_sha256": "d55b30181f3ab72cc8984d39a2c93a571f93f7bcfb94bb511ce6e8e6e2883e8d",
+      "expected_git_blob": "aaa5072fd69c636b07b22aacca88f3cc45308e9a",
+      "bytes": 5653
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-coverage.2026-10-20T15-27.json",
+      "working_sha256": "865fe5074bbc2d6e4cec67f09c052d06e5ad88b2ab73df15558aa56f7d0a4e10",
+      "expected_git_blob": "5f148a2936d473f0c8722f918d7ab1ed09517485",
+      "bytes": 6502
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-coverage.2026-10-20T15-27.md",
+      "working_sha256": "08b174be50cb9fb977bbc98ca0b1da1febab14401141556cacdd9104c7e5829c",
+      "expected_git_blob": "29558bb4bf294552cfdbcf604f454c03678bdaa6",
+      "bytes": 294
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-pyright-raw.2026-10-20T15-26.json",
+      "working_sha256": "0bc3e4c627c82d2dd5246cd94331a624bb82202c9485101c0a8d5c2a2bf9c930",
+      "expected_git_blob": "e607adf32296c8745e4d8480baaf52da503fb623",
+      "bytes": 5709
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-pyright.2026-10-20T15-26.json",
+      "working_sha256": "a59b7849c428c0150633b5f357da9aad48608d0f705e78fccb0c08e8263a15de",
+      "expected_git_blob": "de2568776e028a6fa381d2fe176db444d907c80a",
+      "bytes": 6658
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-pyright.2026-10-20T15-26.md",
+      "working_sha256": "eb74dae0a23fcdc16409173c4723a6eca451c6f8d13238d7b685bd43c6c094b1",
+      "expected_git_blob": "7d7f85bce81bd7e766d0084606658359edf0a66c",
+      "bytes": 465
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-ruff-raw.2026-10-20T15-26.json",
+      "working_sha256": "7e976a5eebec0139cc38ba11dd64e0ff28072d9e20cd87396f9cc6d741369081",
+      "expected_git_blob": "d98663cd448428f37bb19d2ba712a17fe6f58294",
+      "bytes": 5520
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-ruff.2026-10-20T15-26.json",
+      "working_sha256": "34fb7288da1a3128a83e1b8d828cb25a298b2d7ec4b4261e88824b85e00d31d7",
+      "expected_git_blob": "471643f15c5e410b1ba918e5dbec8f8d76b64489",
+      "bytes": 6489
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-ruff.2026-10-20T15-26.md",
+      "working_sha256": "af98f638f7494b847932317e22d008d7a999fb76f58d2cbcb4bf57b33f1b77e7",
+      "expected_git_blob": "684c9bbe7fd43f361321f0340e56ed202e7d1bc9",
+      "bytes": 294
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests-raw.2026-10-20T15-27.json",
+      "working_sha256": "4c68e3531d19ada4b13ef277d0e774b07a8819be56f11528ff4e55dd49ab4ca6",
+      "expected_git_blob": "683776d685fe0e53140e504a2eed223aadf57951",
+      "bytes": 6606
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.json",
+      "working_sha256": "e7887913f5399053f3a82e32c79c44ea32791b291804ccb2572f2313088f73e1",
+      "expected_git_blob": "19c7ac00dffbc18db5cf10db5dbaf0e6c001c09d",
+      "bytes": 14307
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.md",
+      "working_sha256": "76153b57992e39a4a1b47c0249e615abe4b0698e21c5b7a3c238c64c3c2770c1",
+      "expected_git_blob": "95aa68aa01614116afe70f82250d18ac96174e3c",
+      "bytes": 4440
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-freeze-originals.2026-10-20T15-34.json",
+      "working_sha256": "e293a6e7168a75be427bc825f646c8b6860180c4e7f3ae3c996645810f092b7f",
+      "expected_git_blob": "316bf02978d1287bbd464de188a36d837bb3f792",
+      "bytes": 36935
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-freeze.2026-10-20T15-34.json",
+      "working_sha256": "0044a29dd6b2deb259a66be8c771636fb10e15792abf0dfd4c0ca9c8ca9b4879",
+      "expected_git_blob": "529eabb1c480d4efe4d52574d0d46e7aa7da8b43",
+      "bytes": 12293
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-freeze.2026-10-20T15-34.md",
+      "working_sha256": "dc5698356444773aeb58fb4c180c25e3a4d2bbafe3c11e23bb88116424318e17",
+      "expected_git_blob": "93749245130d54f3615e2f91c5558872acc7c582",
+      "bytes": 653
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-initial-format-black-raw.2026-10-20T15-15.json",
+      "working_sha256": "e75beeffe2fa162de358cfd8b7b895e857078f2be0208acf25a95ac5689b9827",
+      "expected_git_blob": "d086e7ed9cce6e3e13e1155125cbf0f8eede8a87",
+      "bytes": 5633
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-initial-format-black.2026-10-20T15-15.json",
+      "working_sha256": "f7d430ea1c9c00d2c8ca9c9034605444c133ea28cba96d9376ce5f7b772eb4ee",
+      "expected_git_blob": "de11c1c51b168c5063223f6d5a489166cb30315c",
+      "bytes": 6615
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-initial-format-black.2026-10-20T15-15.md",
+      "working_sha256": "fd616baf81efdb7c3ccd81a24dbb9827b01ce03cca1210ebfe3f329cede4fe4d",
+      "expected_git_blob": "12ea246e6004b57f415c6aa686d7459f9b8226c3",
+      "bytes": 417
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-staging.2026-10-20T15-34.json",
+      "working_sha256": "50852296c63749e6983562edc9901e405d821f3aa304f87de3e32168b47a6fbc",
+      "expected_git_blob": "f1c857c7fe59a04df5f89246d956d40f52652ad2",
+      "bytes": 15632
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py",
+      "working_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "expected_git_blob": "01ff17420f1b618def82d480d3501ee613e42809",
+      "bytes": 10075
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_selection.py",
+      "working_sha256": "890d1e4899cdc1e6fbb3747843bc26603db5dfd923e79c90b7d069a6840b3ac2",
+      "expected_git_blob": "f22f336bd5831b31f762bd708f4642db2dee1852",
+      "bytes": 14211
+    }
+  ],
+  "include_manifest_itself": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-selection-checked-staging-union.2026-10-20T15-49.json",
+  "qualification": "38 owner paths plus owner manifest, prior source review and current JSON/Markdown confirmation; include this self-manifest as well. Self SHA256 and Git blob are returned separately to avoid circular hashing. Working hashes preserve raw bytes; Git blobs apply path-specific normalization. Already committed shared/build and unfinished core/gateway are excluded. No staging or Git mutation performed."
+}

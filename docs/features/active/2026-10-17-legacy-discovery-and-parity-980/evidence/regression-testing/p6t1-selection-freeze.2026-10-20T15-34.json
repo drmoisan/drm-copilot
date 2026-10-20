@@ -1,0 +1,277 @@
+{
+  "task": "P6-T1",
+  "subset": "selection",
+  "status": "FOCUSED_PASS_PENDING_REVIEWED_CHECKPOINT",
+  "created_utc": "2026-10-20T15:34:39.759991+00:00",
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py",
+      "sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "lf_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "bytes": 10075,
+      "physical_lines": 235
+    },
+    "tests/discovery_runtime/test_service_selection.py": {
+      "path": "tests/discovery_runtime/test_service_selection.py",
+      "sha256": "890d1e4899cdc1e6fbb3747843bc26603db5dfd923e79c90b7d069a6840b3ac2",
+      "lf_sha256": "890d1e4899cdc1e6fbb3747843bc26603db5dfd923e79c90b7d069a6840b3ac2",
+      "bytes": 14211,
+      "physical_lines": 338
+    }
+  },
+  "ordered_stages": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-black.2026-10-20T15-26.json",
+      "sha256": "ae9d45b1f72706efbd9156d727da56375d674cd19afcef0143a59c1a20578b92",
+      "stage": "black",
+      "elapsed_seconds": 2.615152,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-black-raw.2026-10-20T15-26.json",
+        "sha256": "a1cc525f87382e9e750feca8b7d5a274bf6f3c1f39869a0c2e577e934c55337c"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-ruff.2026-10-20T15-26.json",
+      "sha256": "34fb7288da1a3128a83e1b8d828cb25a298b2d7ec4b4261e88824b85e00d31d7",
+      "stage": "ruff",
+      "elapsed_seconds": 1.209845,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-ruff-raw.2026-10-20T15-26.json",
+        "sha256": "7e976a5eebec0139cc38ba11dd64e0ff28072d9e20cd87396f9cc6d741369081"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-pyright.2026-10-20T15-26.json",
+      "sha256": "a59b7849c428c0150633b5f357da9aad48608d0f705e78fccb0c08e8263a15de",
+      "stage": "pyright",
+      "elapsed_seconds": 2.212533,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-pyright-raw.2026-10-20T15-26.json",
+        "sha256": "0bc3e4c627c82d2dd5246cd94331a624bb82202c9485101c0a8d5c2a2bf9c930"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.json",
+      "sha256": "e7887913f5399053f3a82e32c79c44ea32791b291804ccb2572f2313088f73e1",
+      "stage": "tests",
+      "elapsed_seconds": 37.28061,
+      "completed_nodes": 29,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests-raw.2026-10-20T15-27.json",
+        "sha256": "4c68e3531d19ada4b13ef277d0e774b07a8819be56f11528ff4e55dd49ab4ca6"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-coverage.2026-10-20T15-27.json",
+      "sha256": "865fe5074bbc2d6e4cec67f09c052d06e5ad88b2ab73df15558aa56f7d0a4e10",
+      "stage": "coverage",
+      "elapsed_seconds": 1.611322,
+      "completed_nodes": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-coverage-raw.2026-10-20T15-27.json",
+        "sha256": "d55b30181f3ab72cc8984d39a2c93a571f93f7bcfb94bb511ce6e8e6e2883e8d"
+      }
+    }
+  ],
+  "exact_nodes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.json",
+    "sha256": "e7887913f5399053f3a82e32c79c44ea32791b291804ccb2572f2313088f73e1",
+    "key": "executed_nodes",
+    "count": 29
+  },
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py": {
+      "source_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "module": {
+        "covered_lines": 115,
+        "num_statements": 116,
+        "percent_covered": 98.79518072289157,
+        "percent_covered_display": "99",
+        "missing_lines": 1,
+        "excluded_lines": 2,
+        "percent_statements_covered": 99.13793103448276,
+        "percent_statements_covered_display": "99",
+        "num_branches": 50,
+        "num_partial_branches": 1,
+        "covered_branches": 49,
+        "missing_branches": 1,
+        "percent_branches_covered": 98.0,
+        "percent_branches_covered_display": "98"
+      },
+      "missing_lines": [
+        202
+      ],
+      "missing_branches": [
+        [
+          201,
+          202
+        ]
+      ],
+      "functions": {
+        "_invalid": {
+          "start_line": 19,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_selectors": {
+          "start_line": 38,
+          "summary": {
+            "covered_lines": 16,
+            "num_statements": 16,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 10,
+            "num_partial_branches": 0,
+            "covered_branches": 10,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_feature_id": {
+          "start_line": 67,
+          "summary": {
+            "covered_lines": 7,
+            "num_statements": 7,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "resolve_feature_ids": {
+          "start_line": 83,
+          "summary": {
+            "covered_lines": 49,
+            "num_statements": 49,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 24,
+            "num_partial_branches": 0,
+            "covered_branches": 24,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "select_acceptance_platforms": {
+          "start_line": 181,
+          "summary": {
+            "covered_lines": 28,
+            "num_statements": 29,
+            "percent_covered": 95.34883720930233,
+            "percent_covered_display": "95",
+            "missing_lines": 1,
+            "excluded_lines": 0,
+            "percent_statements_covered": 96.55172413793103,
+            "percent_statements_covered_display": "97",
+            "num_branches": 14,
+            "num_partial_branches": 1,
+            "covered_branches": 13,
+            "missing_branches": 1,
+            "percent_branches_covered": 92.85714285714286,
+            "percent_branches_covered_display": "93"
+          },
+          "missing_lines": [
+            202
+          ],
+          "missing_branches": [
+            [
+              201,
+              202
+            ]
+          ]
+        }
+      },
+      "classes": {}
+    }
+  },
+  "coverage_attribution": "Current coverage.py named function/class bodies, excluding declaration lines. Raw module coverage remains separate. Protocol declarations have zero executable bodies. No historical coverage is added to current totals.",
+  "source_stability": {
+    "reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-focused3-tests.2026-10-20T15-27.json",
+      "sha256": "e7887913f5399053f3a82e32c79c44ea32791b291804ccb2572f2313088f73e1"
+    },
+    "keys": [
+      "before",
+      "after"
+    ],
+    "each_ordered_stage_identical": true,
+    "current_bindings_match": true
+  },
+  "retained": {
+    "shared_dependency": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-freeze.2026-10-20T15-34.json",
+      "sha256": "fa15d9c6baa761682075afa49181bf54684ba489a5ce2e24599489f0fb1a2536"
+    },
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1"
+    },
+    "source_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-acceptance-selector-source-review.2026-10-20T15-18.json",
+      "sha256": "bfbaa536c37a57e383ff1b92eb0dc193ef76454b66f0fbeac2e9ae8a197154c5"
+    }
+  },
+  "preservation": {},
+  "raw_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-freeze-originals.2026-10-20T15-34.json",
+    "sha256": "e293a6e7168a75be427bc825f646c8b6860180c4e7f3ae3c996645810f092b7f"
+  },
+  "archive_decode_verified": true,
+  "presentation": {
+    "readable": "Explicit UTF-8; authored JSON/Markdown use LF and exactly one terminal newline.",
+    "raw": "Original source, scripts, coverage database and coverage JSON are unchanged. Raw coverage JSON's missing terminal newline and original script/source CRLF or terminal blank lines are retained inside the archive.",
+    "raw_to_readable": "Each executed stage retains stdout/stderr/harness/runner_base in its existing archive. The archived runner's readable() replaces the two path aliases, normalizes CR/LF, strips line-end whitespace and trims the final readable stream.",
+    "aliases": {
+      "archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-freeze-originals.2026-10-20T15-34.json",
+        "sha256": "e293a6e7168a75be427bc825f646c8b6860180c4e7f3ae3c996645810f092b7f"
+      },
+      "member": "path-aliases.json"
+    }
+  },
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selection-staging.2026-10-20T15-34.json",
+  "limitations": "Subset proof only. P6-T1 composed final gates and independent acceptance remain with the coordinator. No operation handlers, host authority, publication or live build-manifest verification is claimed."
+}
