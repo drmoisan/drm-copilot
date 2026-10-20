@@ -1,0 +1,1191 @@
+{
+  "Timestamp": "2026-10-20T10-38",
+  "Command": "poetry run python SCRATCH/gates.py pass3",
+  "EXIT_CODE": 0,
+  "status": "MODEL_SUBSET_READY_FOR_INDEPENDENT_REVIEW_NOT_P5T4_ACCEPTANCE",
+  "owned": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac",
+      "physical_lines": 475
+    }
+  },
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "baseline": "evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+  "contract": "evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-format.2026-10-20T10-36.json",
+      "sha256": "e27fa50a54f0e12335c69e7ac29ce17a4e3f26c827bc92e2782f6c88cea34c7d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-lint.2026-10-20T10-36.json",
+      "sha256": "84b04921a5b04d77c980adda9cafc59667fee5758aabc29d79c2cb1ccfa192ff"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-tests.2026-10-20T10-36.json",
+      "sha256": "b1628621295a97de5b2f47f2846c31e28f161502d53040931f14884809e4ef48"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-types.2026-10-20T10-36.json",
+      "sha256": "c635a7aef216a8ebead2a1a38c0bedcff7827fbb4e317c0b6a4cfc60a6a0ecf9"
+    }
+  ],
+  "executed_nodes": [
+    "tests/discovery_runtime/test_acceptance_properties.py::test_canonical_identity_bytes_and_full_digest_are_fixed",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes0]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes1]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes2]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes3]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes4]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes5]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes6]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes7]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes8]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_each_identity_coordinate_distinguishes_scenarios[changes9]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[Upper]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1start]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[bad space]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a..b]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a-]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[a/b]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\xe9]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[\\ud800]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[1]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_invalid_required_identifiers_are_rejected[None]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes0]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes1]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes2]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes3]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes4]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes5]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_coordinate_contracts_reject_ambiguous_shapes[changes6]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_identity_byte_boundary_and_limits_type",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[online-False-expected0]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-False-expected1]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[mobile-False-expected2]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[custom-True-expected3]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_tags_require_actual_mode_and_explicit_mobile[offline-True-expected4]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_tags_omit_null_coordinates_and_reject_invalid_inputs",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[Expected.]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[\\xe9\\U0001f600\\n\\t\\\\\"]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_detached_serialization_keeps_content_out_of_identity[A changed statement.]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_revisions_and_nonidentity_metadata_leave_scenario_id_unchanged",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[feature_id-other]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[id-other]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[scenario_id-other]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[artifact_kind-other]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_rejects_identity_projection_mismatch[schema_version-1.0.0]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[repository]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[identity]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[document]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_specification_requires_exact_immutable_types[limits]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_legacy_owner_and_unicode_encoded_budget",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_permutations_and_exact_duplicates_have_identical_results",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[content]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_conflicting_equal_keys_never_choose_by_order[owner]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[absent]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[content]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[owner]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[pending]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[duplicate]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_ready_membership_requires_exact_unique_ready_candidate[invalid]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[error]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[warning]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_findings_preserve_blocking_authority[info]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value0]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[ready-value1]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value2]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[specifications-value3]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[findings-value4]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_generation_rejects_mutable_or_mistyped_values[limits-value5]",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_aggregate_limits_reject_before_unbounded_work",
+    "tests/discovery_runtime/test_acceptance_properties.py::test_hash_collision_is_rejected"
+  ],
+  "behavioral_result": {
+    "passed": 70,
+    "failed": 0,
+    "harness_seconds": 2.2292678999947384,
+    "pytest_seconds": 0.41
+  },
+  "coverage": {
+    "module": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+    "statements": 180,
+    "covered_statements": 180,
+    "branch_arcs": 82,
+    "covered_branch_arcs": 82,
+    "units": [
+      {
+        "name": "_identifier",
+        "kind": "FunctionDef",
+        "start": 28,
+        "end": 49,
+        "executed_statements": [
+          28,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          41,
+          42,
+          43,
+          44,
+          45,
+          47,
+          48,
+          49
+        ],
+        "covered_statements": 15,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            36
+          ],
+          [
+            37,
+            38
+          ],
+          [
+            37,
+            39
+          ],
+          [
+            41,
+            42
+          ],
+          [
+            41,
+            48
+          ],
+          [
+            42,
+            43
+          ],
+          [
+            42,
+            44
+          ],
+          [
+            44,
+            45
+          ],
+          [
+            44,
+            47
+          ],
+          [
+            48,
+            -28
+          ],
+          [
+            48,
+            49
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceIdentity",
+        "kind": "ClassDef",
+        "start": 53,
+        "end": 148,
+        "executed_statements": [
+          53,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          81,
+          87,
+          89,
+          96,
+          97,
+          107,
+          108,
+          112,
+          114,
+          115,
+          116,
+          117,
+          118,
+          120,
+          126,
+          128,
+          129,
+          130,
+          131,
+          132,
+          136,
+          138,
+          139,
+          140,
+          142,
+          148
+        ],
+        "covered_statements": 35,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            108,
+            112
+          ],
+          [
+            108,
+            114
+          ],
+          [
+            114,
+            115
+          ],
+          [
+            114,
+            117
+          ],
+          [
+            115,
+            116
+          ],
+          [
+            115,
+            120
+          ],
+          [
+            117,
+            118
+          ],
+          [
+            117,
+            120
+          ],
+          [
+            120,
+            126
+          ],
+          [
+            120,
+            128
+          ],
+          [
+            128,
+            129
+          ],
+          [
+            128,
+            131
+          ],
+          [
+            129,
+            128
+          ],
+          [
+            129,
+            130
+          ],
+          [
+            131,
+            132
+          ],
+          [
+            131,
+            140
+          ],
+          [
+            132,
+            136
+          ],
+          [
+            132,
+            138
+          ],
+          [
+            138,
+            139
+          ],
+          [
+            138,
+            140
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceIdentity.__post_init__",
+        "kind": "FunctionDef",
+        "start": 81,
+        "end": 87,
+        "executed_statements": [
+          81,
+          87
+        ],
+        "covered_statements": 2,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceIdentity.key",
+        "kind": "FunctionDef",
+        "start": 89,
+        "end": 140,
+        "executed_statements": [
+          89,
+          96,
+          97,
+          107,
+          108,
+          112,
+          114,
+          115,
+          116,
+          117,
+          118,
+          120,
+          126,
+          128,
+          129,
+          130,
+          131,
+          132,
+          136,
+          138,
+          139,
+          140
+        ],
+        "covered_statements": 22,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            108,
+            112
+          ],
+          [
+            108,
+            114
+          ],
+          [
+            114,
+            115
+          ],
+          [
+            114,
+            117
+          ],
+          [
+            115,
+            116
+          ],
+          [
+            115,
+            120
+          ],
+          [
+            117,
+            118
+          ],
+          [
+            117,
+            120
+          ],
+          [
+            120,
+            126
+          ],
+          [
+            120,
+            128
+          ],
+          [
+            128,
+            129
+          ],
+          [
+            128,
+            131
+          ],
+          [
+            129,
+            128
+          ],
+          [
+            129,
+            130
+          ],
+          [
+            131,
+            132
+          ],
+          [
+            131,
+            140
+          ],
+          [
+            132,
+            136
+          ],
+          [
+            132,
+            138
+          ],
+          [
+            138,
+            139
+          ],
+          [
+            138,
+            140
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceIdentity.scenario_id",
+        "kind": "FunctionDef",
+        "start": 142,
+        "end": 148,
+        "executed_statements": [
+          142,
+          148
+        ],
+        "covered_statements": 2,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "acceptance_tags",
+        "kind": "FunctionDef",
+        "start": 151,
+        "end": 200,
+        "executed_statements": [
+          151,
+          164,
+          165,
+          168,
+          169,
+          176,
+          177,
+          178,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200
+        ],
+        "covered_statements": 28,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            164,
+            165
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            180,
+            181
+          ],
+          [
+            180,
+            184
+          ],
+          [
+            181,
+            180
+          ],
+          [
+            181,
+            182
+          ],
+          [
+            184,
+            185
+          ],
+          [
+            184,
+            187
+          ],
+          [
+            187,
+            188
+          ],
+          [
+            187,
+            190
+          ],
+          [
+            193,
+            194
+          ],
+          [
+            193,
+            195
+          ],
+          [
+            195,
+            196
+          ],
+          [
+            195,
+            197
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceSpecification",
+        "kind": "ClassDef",
+        "start": 204,
+        "end": 279,
+        "executed_statements": [
+          204,
+          219,
+          220,
+          221,
+          222,
+          224,
+          230,
+          231,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          249,
+          250,
+          251,
+          253,
+          254,
+          255,
+          256,
+          260,
+          261,
+          263,
+          269,
+          270,
+          272,
+          278,
+          279
+        ],
+        "covered_statements": 30,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            231,
+            236
+          ],
+          [
+            231,
+            237
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            249,
+            253
+          ],
+          [
+            250,
+            249
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            253,
+            254
+          ],
+          [
+            253,
+            256
+          ],
+          [
+            254,
+            253
+          ],
+          [
+            254,
+            255
+          ],
+          [
+            256,
+            260
+          ],
+          [
+            256,
+            261
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceSpecification.__post_init__",
+        "kind": "FunctionDef",
+        "start": 224,
+        "end": 261,
+        "executed_statements": [
+          224,
+          230,
+          231,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          249,
+          250,
+          251,
+          253,
+          254,
+          255,
+          256,
+          260,
+          261
+        ],
+        "covered_statements": 19,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            231,
+            236
+          ],
+          [
+            231,
+            237
+          ],
+          [
+            249,
+            250
+          ],
+          [
+            249,
+            253
+          ],
+          [
+            250,
+            249
+          ],
+          [
+            250,
+            251
+          ],
+          [
+            253,
+            254
+          ],
+          [
+            253,
+            256
+          ],
+          [
+            254,
+            253
+          ],
+          [
+            254,
+            255
+          ],
+          [
+            256,
+            260
+          ],
+          [
+            256,
+            261
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceSpecification.to_dict",
+        "kind": "FunctionDef",
+        "start": 263,
+        "end": 270,
+        "executed_statements": [
+          263,
+          269,
+          270
+        ],
+        "covered_statements": 3,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceSpecification.to_json",
+        "kind": "FunctionDef",
+        "start": 272,
+        "end": 279,
+        "executed_statements": [
+          272,
+          278,
+          279
+        ],
+        "covered_statements": 3,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "_finding_fields",
+        "kind": "FunctionDef",
+        "start": 282,
+        "end": 297,
+        "executed_statements": [
+          282,
+          288
+        ],
+        "covered_statements": 2,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "_encoded",
+        "kind": "FunctionDef",
+        "start": 300,
+        "end": 309,
+        "executed_statements": [
+          300,
+          306,
+          307,
+          308,
+          309
+        ],
+        "covered_statements": 5,
+        "missing_statements": [],
+        "covered_branch_arcs": [],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceGeneration",
+        "kind": "ClassDef",
+        "start": 313,
+        "end": 418,
+        "executed_statements": [
+          313,
+          328,
+          329,
+          330,
+          331,
+          333,
+          340,
+          342,
+          346,
+          347,
+          348,
+          352,
+          353,
+          354,
+          355,
+          357,
+          358,
+          359,
+          362,
+          363,
+          364,
+          365,
+          366,
+          367,
+          368,
+          371,
+          374,
+          375,
+          376,
+          377,
+          378,
+          380,
+          381,
+          382,
+          383,
+          384,
+          385,
+          386,
+          387,
+          394,
+          397,
+          399,
+          400,
+          401,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          409,
+          413,
+          416
+        ],
+        "covered_statements": 53,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            342,
+            346
+          ],
+          [
+            342,
+            347
+          ],
+          [
+            348,
+            352
+          ],
+          [
+            348,
+            353
+          ],
+          [
+            357,
+            358
+          ],
+          [
+            357,
+            378
+          ],
+          [
+            358,
+            359
+          ],
+          [
+            358,
+            362
+          ],
+          [
+            368,
+            371
+          ],
+          [
+            368,
+            374
+          ],
+          [
+            374,
+            375
+          ],
+          [
+            374,
+            376
+          ],
+          [
+            380,
+            381
+          ],
+          [
+            380,
+            399
+          ],
+          [
+            381,
+            382
+          ],
+          [
+            381,
+            383
+          ],
+          [
+            387,
+            394
+          ],
+          [
+            387,
+            397
+          ],
+          [
+            399,
+            400
+          ],
+          [
+            399,
+            407
+          ],
+          [
+            400,
+            401
+          ],
+          [
+            400,
+            402
+          ],
+          [
+            405,
+            399
+          ],
+          [
+            405,
+            406
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      },
+      {
+        "name": "AcceptanceGeneration.__post_init__",
+        "kind": "FunctionDef",
+        "start": 333,
+        "end": 418,
+        "executed_statements": [
+          333,
+          340,
+          342,
+          346,
+          347,
+          348,
+          352,
+          353,
+          354,
+          355,
+          357,
+          358,
+          359,
+          362,
+          363,
+          364,
+          365,
+          366,
+          367,
+          368,
+          371,
+          374,
+          375,
+          376,
+          377,
+          378,
+          380,
+          381,
+          382,
+          383,
+          384,
+          385,
+          386,
+          387,
+          394,
+          397,
+          399,
+          400,
+          401,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          409,
+          413,
+          416
+        ],
+        "covered_statements": 48,
+        "missing_statements": [],
+        "covered_branch_arcs": [
+          [
+            342,
+            346
+          ],
+          [
+            342,
+            347
+          ],
+          [
+            348,
+            352
+          ],
+          [
+            348,
+            353
+          ],
+          [
+            357,
+            358
+          ],
+          [
+            357,
+            378
+          ],
+          [
+            358,
+            359
+          ],
+          [
+            358,
+            362
+          ],
+          [
+            368,
+            371
+          ],
+          [
+            368,
+            374
+          ],
+          [
+            374,
+            375
+          ],
+          [
+            374,
+            376
+          ],
+          [
+            380,
+            381
+          ],
+          [
+            380,
+            399
+          ],
+          [
+            381,
+            382
+          ],
+          [
+            381,
+            383
+          ],
+          [
+            387,
+            394
+          ],
+          [
+            387,
+            397
+          ],
+          [
+            399,
+            400
+          ],
+          [
+            399,
+            407
+          ],
+          [
+            400,
+            401
+          ],
+          [
+            400,
+            402
+          ],
+          [
+            405,
+            399
+          ],
+          [
+            405,
+            406
+          ]
+        ],
+        "missing_branch_arcs": [],
+        "line_percent": 100.0
+      }
+    ],
+    "raw_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass3-tests.2026-10-20T10-36.json#/coverage.json",
+    "baseline_delta": "New module absent at accepted baseline; zero pre-existing executable statements. No accepted predecessor files changed or tests replayed."
+  },
+  "retained_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-pass2-tests.2026-10-20T10-35.json",
+    "sha256": "9d75d140548cc73b33eda48b69d0409322660b3e5b04c0dcf8a2c90c63f62795",
+    "result": "69 passed, one fixture failure",
+    "correction": "Only test construction changed: direct AcceptanceGeneration receives duplicate warnings before findings-limit enforcement; production unchanged. Prior exact test bytes reconstructed by inverse one-block replacement and verified against original receipt SHA."
+  },
+  "lossless_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-models-lossless-archive.2026-10-20T10-38.json",
+    "sha256": "7a822a7b18d3eeb85539bdcc1c6f97e5dd5e757fd772a64698750c5a13e2371b"
+  },
+  "scope_checks": {
+    "physical_lines": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": 418,
+      "tests/discovery_runtime/test_acceptance_properties.py": 475
+    },
+    "new_suppressions": false,
+    "unit_external_io": false,
+    "new_dependencies": false,
+    "git_checkpoint_plan_mutation": false
+  },
+  "qualifications": [
+    "Model consistency is not semantic acceptance proof; generation must supply final public-rule ready membership.",
+    "Generation, schemas, validators, legacy adapters and publication were not changed or tested by this slice.",
+    "No unified-diff whitespace exceptions are needed; exact source bytes are in the lossless archive.",
+    "Initial lint and test diagnostics and consolidation-format check are retained in their original receipts.",
+    "The shared baseline/contract and separately owned specification clarification remain coordinator-managed prerequisites."
+  ]
+}

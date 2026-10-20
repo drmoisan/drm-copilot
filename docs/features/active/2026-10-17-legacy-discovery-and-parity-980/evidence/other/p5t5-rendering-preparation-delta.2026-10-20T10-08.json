@@ -1,0 +1,163 @@
+{
+  "Timestamp": "2026-10-20T10-08",
+  "status": "READ_ONLY_PREPARATION_READY_NOT_IMPLEMENTATION_RELEASE",
+  "task": "P5-T5",
+  "retained_authority": [
+    "execution_progress.p5_acceptance_preparation.result",
+    "execution_progress.p5_acceptance_preparation.identity_resolution",
+    "evidence/other/p5t4-preparation-delta.2026-10-20T09-40.json"
+  ],
+  "scope": "Rendering helpers and Set E adaptation delta only; eligibility and identity research reused unchanged.",
+  "reusable_seams": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "symbols": "ReportBudget.work/spend/text/check; bounded_object",
+      "use": "Reuse prospective traversal/retained JSON bounds. text/check measure JSON bytes, not arbitrary Gherkin/Markdown escaping. Count the actual selected output encoding and fixed wrappers before allocation; use spend/work for that explicit budget."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "symbols": "render_pretty_json; sort_rows",
+      "use": "Reuse deterministic JSON formatting for traceability blocks after bounding. sort_rows fallback is not the canonical acceptance identity order; consume the frozen P5-T4 ordering/key instead."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "symbols": "render_report_markdown(document, *, limits)",
+      "use": "Generic report JSON wrapper with coverage/parity/completion heading; not a scenario-prose or ready/pending renderer. Do not repurpose its coverage fallback for acceptance or change accepted report bytes."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "symbols": "relative_path; collision_key; check_path_collisions",
+      "use": "Pure portable path checks including reserved Windows names and NFC/casefold collisions; pre-reserve aggregate path work before calling. Actual grants/containment/CAS publication remains service-owned."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "symbols": "AcceptanceValidation.ready; validate_acceptance; acceptance_source_digest",
+      "use": "Retain accepted readiness/digest authority through P5-T4 generated result. Rendering must not infer ready from tags, fields or report completion."
+    }
+  ],
+  "missing_helpers": "No public Gherkin renderer, Markdown prose escaper or acceptance-tag encoder exists in the inspected runtime/legacy generator. No Gherkin parser dependency is declared in root/runtime pyproject; do not add one implicitly.",
+  "rendering_contract": [
+    "Consume immutable P5-T4 records with captured ownership, canonical identity/order and validated ready membership. No caller-supplied ready override; reject malformed ownership/traceability instead of silently creating pending output.",
+    "Emit only validated ready records into .feature; pending records with then=null remain in companion Markdown/structured data. Superseded/unsupported records are never executable. Empty ready population must not synthesize a Scenario, step or expected result.",
+    "Feature/scenario/client/platform/mode tags derive from actual frozen coordinates. Schema-valid identifiers already preserve dot, underscore and hyphen and fit the tag alphabet; do not lowercase/strip punctuation into collisions. Omit null optional coordinates; offline/mobile tags depend on actual configured applicability, not substring/display-name guesses.",
+    "Detect noninjective distinct-token mappings and distinct scenario/output identity collisions. Repeating the same feature/client tag on multiple scenarios is intentional and must not be misclassified as a collision. Reuse portable output path collision checks.",
+    "Choose and document a fixed single-line quoted/escaped statement convention for Gherkin; raw CR/LF, controls, quotes, backslashes, pipes, triple quotes, Feature:/Scenario:/Examples:/tags must remain data. Escape or reject invalid Unicode before encoding. Escaped display text does not prove consumer step execution; no step definitions or test code are emitted.",
+    "Markdown uses fixed headings and bounded escaped/literal data for authored statements, pending reasons and traceability. Keep arbitrary paths/labels out of raw Markdown links/HTML. Canonical/pretty JSON data blocks are reusable; the generic report wrapper itself is not the view.",
+    "Retain original source repository/revision/path/raw hash/schema/feature reference, evidence refs, product decision refs and source content digest in both ready traceability and pending companion views. Do not replace originals with imported destination paths, reconstructed hashes or unresolved IDs.",
+    "Reserve input traversal, tag encoding, expansion, maximum sort comparisons, path/collision indexes, traceability copies and aggregate encoded bytes of every output before allocation. Count escaping expansion, UTF-8 width, wrapper/fence/comment bytes and LF. Abort exhaustion without partial output or writes."
+  ],
+  "planned_ownership": {
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_gherkin.py",
+      "tests/discovery_runtime/test_acceptance_tags.py"
+    ],
+    "examples": "examples/discovery/v2/acceptance/",
+    "other_owners": "P5-T4 owns models/identity/generation/eligibility. P6-T3 owns full legacy CLI/service adapter/publication. Request a cohesive helper split before any new file would exceed500 lines."
+  },
+  "test_boundary": {
+    "gherkin": [
+      "Ready versus pending/superseded; no ready produces no synthetic executable scenario; mixed result preserves every pending reason and traceability.",
+      "Exact deterministic LF output and permutation independence using frozen canonical keys; source/evidence/decision refs retained byte-meaningfully.",
+      "Single-line/control/CRLF/Unicode/quote/backslash/pipe/triple-quote/backtick/HTML/keyword/tag injection fixtures; authored text cannot create extra Feature/Scenario/Examples/tag/step lines.",
+      "Exact-capacity and one-over aggregate byte/work/path/tag/traceability cases; invalid scalar rejects before encode; no partial result.",
+      "Duplicate/conflicting IDs and portable output filename aliases fail; no implementation code/step definitions/checkoff/publication."
+    ],
+    "tags": [
+      "All required coordinate tags; source repository distinction via scenario identity; valid punctuation preserved; duplicate identical coordinate tags allowed across scenarios.",
+      "Two clients same platform, one client multiple platforms, custom modes, absent/null optional coordinates; configured applicable offline/mobile only.",
+      "Noninjective encoding collision and hostile/invalid token rejection; no fallback/default invented mode."
+    ],
+    "reuse": "Reuse P5-T4 valid generated fixtures and accepted readiness proof; no rerun of all acceptance-rule/report tests. Unit tests remain memory-only. Freeze actual test nodes only after tests exist; this preparation runs no collection or suites."
+  },
+  "set_e": {
+    "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+    "retain": [
+      "test_determinism_byte_identical_repeat: byte identity and one LF",
+      "test_determinism_invariant_to_input_ordering: stable canonical order, replace old three-ref sort key only for v2",
+      "test_determinism_source_digest_stable: repeat stable/content change affects digest; v2 uses accepted acceptance_source_digest",
+      "test_domain_neutrality_module_source_and_output_fields",
+      "test_cli_collect_input_paths_sorted",
+      "test_cli_main_success_stdout; test_cli_main_success_writes_output: routing/exact rendered bytes",
+      "test_cli_check_matches; test_cli_check_mismatch; test_cli_check_requires_output; test_cli_check_target_absent: read-only check behavior",
+      "test_negative_inputs_return_one_with_message: missing/malformed input errors without a false successful result"
+    ],
+    "compatibility_only_or_replace": [
+      "test_seam_falls_back_to_convention_when_absent and absent-tree message must remain explicitly legacy-only or use actual packaged v1/v2 catalog; no v2 readiness authority from fallback path.",
+      "test_projection_feature_contract_positive, parity_matrix_positive, runtime_characterization_positive, adapters_ignore_unknown_fields and non_list_string_field_ignored describe permissive legacy placeholder projections. Retain only as labeled legacy compatibility; v2 uses strict schema/captured records and cannot silently ignore malformed strings.",
+      "test_positive_generation_maps_given_when_then concatenates parity Then claims; replace v2 claim with exact validated criterion/decision expectation.",
+      "test_positive_generation_derives_stable_id and top_level_fields retain legacy v1 meaning only; v2 uses frozen structured identity and acceptance-specification envelope.",
+      "test_positive_generation_null_refs_when_none_match must not imply a ready v2 fallback/cross-product. V2 missing expectation is pending or invalid as decided by P5-T4.",
+      "test_cli_parse_args_defaults_and_flags requiring runtime characterization is current legacy compatibility, not a universal v2 prerequisite; complete registration/CLI change belongs to P6-T3."
+    ],
+    "split": "Current test488 and legacy source492 lines: do not append. Before changes, approve disjoint projection/generation/CLI test modules and helper ownership. P5-T5 should adapt projection/generation expectations using actual frozen public v2 APIs; keep legacy CLI behavior tests until P6-T3. No test weakening or v2 call through the three-placeholder-document build_document."
+  },
+  "pending_p5t4_dependencies": [
+    "Exact exported immutable result/carrier names and fields, validated ready membership and rejected/pending diagnostic representation.",
+    "Frozen canonical identity bytes/order, existing scenario discriminator participation, generated ID and collision policy; approved narrow spec clarification remains P5-T4-owned.",
+    "Tag responsibility: schema requires tags in structured records, so generation and rendering must share one frozen tag policy before independent implementation; renderer cannot append authoritative tags after P5-T4 validation. Freeze a public model/tag seam or explicit ownership adjustment.",
+    "Exact plain-statement versus escaped-display convention and output bundle naming/budget contract; no existing Gherkin grammar helper makes this decision.",
+    "No production adapter prerequisite established for rendering alone. If Set E migration needs legacy source adaptation before P6-T3, request the exact narrow seam and owner rather than silently extending the492-line generator."
+  ],
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "physical_lines": 36
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "physical_lines": 231
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "physical_lines": 489
+    },
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "physical_lines": 492
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "37996647e6c8136fd853d8db30cb3a3357b3a8d8535b27c06f4ee611c16f59d3",
+      "physical_lines": 488
+    },
+    {
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "physical_lines": 64
+    },
+    {
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+      "physical_lines": 177
+    },
+    {
+      "path": "examples/discovery/v2/acceptance-specification.example.yaml",
+      "sha256": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+      "physical_lines": 36
+    }
+  ],
+  "effects": {
+    "source_test_spec_plan_checkpoint_git_changes": false,
+    "behavioral_suites": false,
+    "external_or_consumer_access": false,
+    "evidence_only": true
+  },
+  "preparation_note": "Initial evidence construction had a PowerShell array-expression grouping error before source hashing; corrected explicit literal path array supplied all10 source bindings. No code or behavior executed."
+}

@@ -1,0 +1,103 @@
+{
+  "Timestamp": "2026-10-20T10-35",
+  "Command": "poetry run pyright packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py tests/discovery_runtime/test_acceptance_properties.py",
+  "EXIT_CODE": 0,
+  "duration_seconds": 2.1742799000057857,
+  "started": "2026-10-20T10:35:23.492262+00:00",
+  "finished": "2026-10-20T10:35:25.665262+00:00",
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "26735c9911483103887c28a99fd05f10d240bd701e1ae0140f5b51f67da59bde",
+      "physical_lines": 470
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": {
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    "tests/discovery_runtime/test_acceptance_properties.py": {
+      "sha256": "26735c9911483103887c28a99fd05f10d240bd701e1ae0140f5b51f67da59bde",
+      "physical_lines": 470
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_bytes": 194,
+      "raw_base64": "MCBlcnJvcnMsIDAgd2FybmluZ3MsIDAgaW5mb3JtYXRpb25zCldBUk5JTkc6IHRoZXJlIGlzIGEgbmV3IHB5cmlnaHQgdmVyc2lvbiBhdmFpbGFibGUgKHYxLjEuNDA5IC0+IHYxLjEuNDE0KS4NClBsZWFzZSBpbnN0YWxsIHRoZSBuZXcgdmVyc2lvbiBvciBzZXQgUFlSSUdIVF9QWVRIT05fRk9SQ0VfVkVSU0lPTiB0byBgbGF0ZXN0YA0KDQo=",
+      "presentation": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "SCRATCH=owned external temporary harness directory",
+    "WORKSPACE=current repository checkout"
+  ],
+  "raw_stream_rule": "base64 decodes to exact captured child bytes; presentation replaces only explicit host path aliases"
+}

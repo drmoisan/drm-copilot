@@ -1,0 +1,140 @@
+{
+  "Timestamp": "2026-10-20T10-26",
+  "Command": "Freeze P5-T4 shared API from the verified spec, retained preparation, accepted APIs and read-only generation-owner agreement",
+  "EXIT_CODE": 0,
+  "status": "CONTRACT_FROZEN_NOT_IMPLEMENTATION_RELEASE",
+  "authority": "source_inspection_p5t4_contract_20261020 / S5_P5T4_shared_contract",
+  "profile_sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363",
+  "native_authority": {
+    "routing_valid": true,
+    "model": "gpt-6-astra",
+    "provenance_valid": true,
+    "effort": "high",
+    "launch_authority_valid": true,
+    "agent_type": "python-typed-engineer-c3-elevated"
+  },
+  "baseline": {
+    "path": "evidence/baseline/p5t4-shared-baseline.2026-10-20T10-23.json",
+    "sha256": "d4946e9eaf0791d84fb19c52fe83c71ec2db9d6f43030f648869e82f8199d0c3"
+  },
+  "specification": {
+    "sha256": "9c0eff6ffad0d0711fa0e000f8cbb78e7f4715ac2a8b28440bef0de4b6a78baf",
+    "receipt": "evidence/other/p5t4-specification-identity.2026-10-20T10-17.json",
+    "receipt_sha256": "986e18df66cf9a5444603517606ab726b3ff6a498fdd6bbaf88250384551bed2",
+    "path": "spec.md"
+  },
+  "public_models": {
+    "acceptance_tags": "acceptance_tags(identity:AcceptanceIdentity, *, limits:ParseLimits, mobile_applicable:bool=False)->tuple[str,...]",
+    "AcceptanceGeneration": {
+      "invariants": "Aggregate bounds before retention/sorting; deterministic canonical-identity ordering; ready is a unique exact subset of specifications and documents must state ready. Model validates data consistency only; generator supplies membership exclusively from the final public AcceptanceValidation. Any retained blocking integrity/structural finding excludes executable ready authority. No writable ready flag, write plan, implementation result or AC state.",
+      "constructor": "frozen, keyword-only dataclass: specifications:tuple[AcceptanceSpecification,...], ready:tuple[AcceptanceSpecification,...], findings:tuple[Finding,...], limits:ParseLimits"
+    },
+    "module": "drm_copilot_discovery.acceptance_models",
+    "AcceptanceKind": "Literal['legacy-characterization', 'target-acceptance']",
+    "AcceptanceSpecification": {
+      "constructor": "frozen, keyword-only dataclass: repository:RepositoryIdentity, identity:AcceptanceIdentity, document:JsonObject, limits:ParseLimits",
+      "invariants": "Prospectively bounded immutable document, consistent kind/feature/criterion/client/platform/mode/id/scenario_id with identity, separate repository ownership and pin retained. Closed-v2 structure and semantic readiness are validated by the generation batch; constructing this data value alone establishes neither. Detached serializations contain the schema document, not an invented top-level repository property.",
+      "methods": [
+        "to_dict()->dict[str,object]",
+        "to_json()->str"
+      ]
+    },
+    "AcceptanceIdentity": {
+      "constructor": "frozen, keyword-only dataclass: source_repository_id:str, kind:AcceptanceKind, feature_id:str, criterion_id:str, client_id:str|None, platform_id:str|None, mode_id:str, linked_scenario:tuple[str,str]|None=None",
+      "invariants": "Exact immutable scalar/tuple types; bounded valid identifiers; target requires client/platform; legacy requires client=None. Linked scenario is (repository_id, existing scenario_id), never the generated scenario ID. No revision or mutable display/content fields.",
+      "methods": [
+        "key(*, limits:ParseLimits)->JsonObject",
+        "scenario_id(*, limits:ParseLimits)->str"
+      ]
+    }
+  },
+  "generator": {
+    "errors": "Malformed API argument types or exhausted bounds raise fixed ValueError without a partial successful result. Invalid captured inputs, unresolved or ambiguous references, unknown selectors and conflicting identity content retain bounded Findings and cannot authorize ready output.",
+    "selectors": "feature_ids entries are (source_repository_id, feature_id). Empty filters select only actual captured/configured eligible values; unknown or ambiguous selectors yield findings and never broaden selection. Nonempty client_ids for legacy-characterization is an explicit selector error. No default client, fallback criterion or implicit online mode.",
+    "limits": "Use snapshot.limits and existing ReportBudget; callers cannot replace root limits through artifact data.",
+    "signature": "generate_acceptance(snapshot:DiscoverySnapshot, *, kind:AcceptanceKind, feature_ids:tuple[tuple[str,str],...]=(), client_ids:tuple[str,...]=(), mode_ids:tuple[str,...]=())->AcceptanceGeneration",
+    "module": "drm_copilot_discovery.acceptance_generation"
+  },
+  "identity": {
+    "collision": "Exact duplicate identity/content/owner may deduplicate; equal canonical keys with differing criteria/approval/content or unequal keys with equal output IDs are blocking, never selected by input order. Model consistency violations raise ValueError; generation records domain collision Findings and excludes affected authority.",
+    "discriminator": "One candidate per distinct explicitly linked runtime-characterization scenario whose repository/scenario identity and matching actual coordinate resolve unambiguously through ReferenceIndex. Scenario/source ownership mismatch is blocking. If no linked scenario supplies that coordinate, an explicit criterion may use retained feature trigger/preconditions with linked_scenario=None; missing action remains pending. No record without a real criterion and mode.",
+    "encoding": "JsonObject with every listed member; null is explicit; linked_scenario is null or the two-element tuple encoded as JSON array. Use existing canonical_json: ordinal sorted object keys, compact separators, ensure_ascii=False, strict UTF-8, one trailing LF. Bound prior to constructing/copying/encoding. No delimiter concatenation, Unicode folding, case folding or identifier punctuation removal.",
+    "ordering": "Canonical key bytes order specifications and ready subsets deterministically; ordinal sorted unique tags and findings use accepted finding ordering.",
+    "canonical_members": [
+      "source_repository_id",
+      "kind",
+      "feature_id",
+      "criterion_id",
+      "client_id",
+      "platform_id",
+      "mode_id",
+      "linked_scenario"
+    ],
+    "scenario_id": "scn- followed by all 64 lowercase hexadecimal SHA-256 digits of canonical key bytes; normalized document id and scenario_id equal this generated value.",
+    "excluded": [
+      "repository revision",
+      "source file path",
+      "display names",
+      "unrelated metadata",
+      "statements",
+      "evidence content",
+      "source content digest"
+    ]
+  },
+  "tags": {
+    "ownership": "Tags are included before closed-schema/prospective acceptance validation. P5-T5 renders these validated tags and cannot add authoritative tags or override applicability.",
+    "alphabet": "Existing validated identifier spelling is already inside the tag alphabet; preserve dots, underscores and hyphens verbatim. Reject invalid or over-budget identifiers rather than lossy normalization. Repeated common feature/client tags across records are intentional, not collisions.",
+    "base": [
+      "@feature_<feature_id>",
+      "@scenario_<scenario_id>",
+      "@client_<client_id> when non-null",
+      "@platform_<platform_id> when non-null",
+      "@mode_<mode_id>"
+    ],
+    "mobile": "Generator sets mobile_applicable=True only for an explicitly configured mobile coordinate or required mobile dimension for that exact feature/client, explicit applicable classification from the feature or configured client default, and no accepted waiver. Do not infer mobile from arbitrary platform/client names or treat unspecified optional mobile as applicable. The public tag function checks the boolean shape but does not itself establish semantic proof.",
+    "offline": "Add @offline only when the actual selected mode_id equals offline."
+  },
+  "traceability": {
+    "expectations": "Then is exactly the eligible criterion expected_result as a one-item tuple; no concatenated proof labels, invented outputs or promotion of observation status to target execution. Approved scoped target decisions may establish target requirements while legacy uncertainty remains unresolved. Proposed/rejected/superseded/conflicting or unknown expectations cannot provide Then.",
+    "digest": "Reuse acceptance_source_digest(sources, decisions) over exactly the linked feature-contract and product-decision ArtifactRecords expected by validate_acceptance. Preserve canonical dedup/order and revision participation. This is distinct from identity and raw-reference hashes. Selected observation evidence remains explicitly traced; do not replace the accepted digest algorithm with the old legacy helper or add undeclared digest inputs.",
+    "ownership": "Legacy specifications retain source RepositoryIdentity and client=None. Target specifications retain the selected configured client target repository and its captured pin. Separate immutable ownership remains alongside each schema document.",
+    "source_reference": "Use original source repository ID, pinned revision, original artifact path, raw immutable artifact SHA-256, feature ID and schema version. Resolve with ReferenceIndex and validate through existing revision/reference rules; use captured immutable bytes, never reserialized JSON as the raw reference hash."
+  },
+  "validation": {
+    "reuse": "Use public ApprovedDecision.scope/decision_scope/criterion_applies and DimensionValidation obligations for bounded candidate selection; no private _AcceptanceRules calls or copied readiness rules. Reuse shared rule contexts once per immutable overlay; no per-record complete assessment or discovery-complete prerequisite.",
+    "authority": "Retain input schema/reference/revision/evidence/claim blockers and malformed/ambiguous source integrity. Demotion must never erase or disguise these findings. A pending record is an unresolved expectation, not a workaround for invalid traceability. Final schema checks apply to normalized pending and ready documents. Truncated findings or incomplete assessments cannot establish ready authority.",
+    "prospective": "Use immutable in-memory candidate ArtifactSnapshots with correct repository ownership and canonical candidate bytes. Preserve original captured source files, pins and original paths. Do not overwrite unrelated captured records or mask existing graph findings. Publication/CAS remains later service ownership.",
+    "resource": "Reserve input scans, selectors, indexing, coordinate products, candidate/ref copying, tag/key text, sorting, both prospective overlays/passes and final retained bytes before allocation or iteration. No uncontrolled Cartesian products, regex work, repeated per-record graph walks or partial output on exhaustion.",
+    "passes": "At most two fixed whole-batch prospective acceptance passes: construct bounded tentative records, validate with public validate_acceptance(complete=False) and shared index/evidence/decisions/dimensions, demote unsupported expectations to then=None/unresolved/nonempty pending reasons, and validate the complete final batch once. Only final returned ready membership survives."
+  },
+  "ownership": {
+    "later": "P5-T5 Gherkin/Markdown consumes normalized generated values and final validated ready membership; P6 owns CLI/service publication. Implementation tests and AC checkoff remain consumer-owned.",
+    "workspace_operations": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "tests/discovery_runtime/test_acceptance_generation.py",
+      "tests/discovery_runtime/test_acceptance_decisions.py"
+    ],
+    "source_inspection_preparation": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "tests/discovery_runtime/test_acceptance_properties.py"
+    ],
+    "frozen_existing": "No existing validator, legacy generator, report, schema, spec, checkpoint, plan or AC edits authorized by this contract."
+  },
+  "focused_testing": {
+    "proof": "No existing 95-case accepted rule suite or report suite replay. New exact node population and coverage are frozen only after tests exist. All new callables target repository coverage requirements and ordered Black/Ruff/Pyright/Pytest.",
+    "models": "Immutable values/detached serialization, exact key bytes and known digest, repository/client/platform/mode/scenario distinctions, names/statements/pins excluded from identity, canonical permutation/dedup/collision behavior, strict identifier/tag alphabet and null coordinates, @offline and explicitly assessed @mobile, byte/node/record/depth bounds and malformed types.",
+    "generation": "Both kinds and exact ownership/pins/original paths; verified source and approved target validator roundtrip; pending missing action/unknown expectation; wrong scope and proposed/rejected/superseded/conflicting approvals; malformed/ambiguous/raw-hash/revision failures remain blocking; explicit scenario linkage; custom/empty modes and unknown selectors; prospective expansion/output limits; counted at-most-two whole-batch acceptance assessments."
+  },
+  "prerequisites": [
+    "Parent must explicitly release the frozen ownership before either source writer starts.",
+    "No existing-validator extraction is required by the agreed two-pass seam. If implementation cannot fit either module/test within 500 lines, request the exact cohesive split before editing an additional path.",
+    "No general schema/tag/legacy adapter changes are authorized; actual incompatibility must be reported before widening scope."
+  ],
+  "effects": {
+    "git_checkpoint_plan_mutation": false,
+    "source_test_mutation": false,
+    "consumer_access": false,
+    "suites": false,
+    "external_research": false
+  }
+}

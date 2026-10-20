@@ -1,0 +1,162 @@
+{
+  "Timestamp": "2026-10-20T10-23",
+  "Command": "Read-only Test-Path/Get-FileHash/ReadAllLines binding of the explicitly listed P5-T4 paths and accepted proof; no test execution",
+  "EXIT_CODE": 0,
+  "Output Summary": "Five planned source/test paths absent. Accepted dependency bytes and retained proof are bound. No production/test edits or suites. P2-T7 final accepted proof is 95 cases; 94 was an earlier passing candidate.",
+  "status": "BASELINE_FROZEN_CONTRACT_ONLY",
+  "authority": "source_inspection_p5t4_contract_20261020 / S5_P5T4_shared_contract",
+  "accepted_predecessor": "25a66a8cf74842d8e2f99989f6a6b4efb075e58f",
+  "planned_paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "exists": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_properties.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "exists": false
+    }
+  ],
+  "source_bindings": [
+    {
+      "lines": 489,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4"
+    },
+    {
+      "lines": 309,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda"
+    },
+    {
+      "lines": 477,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65"
+    },
+    {
+      "lines": 458,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc"
+    },
+    {
+      "lines": 436,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c"
+    },
+    {
+      "lines": 339,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "lines": 263,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391"
+    },
+    {
+      "lines": 310,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+      "sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443"
+    },
+    {
+      "lines": 64,
+      "path": "schemas/discovery/v2/acceptance-specification.schema.json",
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888"
+    },
+    {
+      "lines": 492,
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39"
+    },
+    {
+      "lines": 170,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "lines": 270,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "lines": 178,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+    },
+    {
+      "lines": 374,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_models.py",
+      "sha256": "5b5bfc297ffd66667e729974c6427f5588c7b7b5e48de591adfc3d694e383bf1"
+    },
+    {
+      "lines": 382,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py",
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2"
+    },
+    {
+      "lines": 177,
+      "path": "schemas/discovery/v2/common.schema.json",
+      "sha256": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe"
+    },
+    {
+      "lines": 815,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "sha256": "9c0eff6ffad0d0711fa0e000f8cbb78e7f4715ac2a8b28440bef0de4b6a78baf"
+    },
+    {
+      "lines": 559,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "sha256": "cbb266940feee4916642dbcf65ad25ea463456c5647eede77de5b63dff19368d"
+    }
+  ],
+  "retained_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p2t7-dimension-acceptance.2026-10-18T09-59.md",
+      "sha256": "2968cba1ba6c139ab348be2ef26e4c97736274efcf12d8b3f0af31a76f2c37b2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t7-coverage-metrics.2026-10-18T09-59.json",
+      "sha256": "b82643d25b6d03d09d5d987fba70abe93d993f666f0aab8890eaf08ac4a46deb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p2t7-coverage.2026-10-18T09-59.json",
+      "sha256": "4f5d12693a9b2e38c754b13c97e9baeff05fca25e9419e324b623444b7948f7a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-preparation-delta.2026-10-20T09-40.json",
+      "sha256": "c12e4839dad279a2d64c6989962a43a2515f1dfd189b2fe0b17bf0cd8e9c2e52"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json",
+      "sha256": "505ded2a0c83147a08a860c8dd16479c172bd782c969f4ccb76db5f8f41d93b3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-specification-identity.2026-10-20T10-17.json",
+      "sha256": "986e18df66cf9a5444603517606ab726b3ff6a498fdd6bbaf88250384551bed2"
+    }
+  ],
+  "qa_reuse": {
+    "execution": "No fresh Black/Ruff/Pyright/Pytest; contract-only release explicitly reuses unchanged accepted proof",
+    "future_nodes": "Not yet authored or collected; no claimed case count",
+    "new_modules": "No baseline executable lines; paths absent",
+    "accepted_rules": "P2-T7 final 95 focused and 95 reversed; 246/249 production statements and 104/108 branch arcs; exact raw coverage and metrics referenced"
+  },
+  "effects": {
+    "test_changes": false,
+    "git_mutation": false,
+    "suites": false,
+    "checkpoint_changes": false,
+    "source_changes": false
+  }
+}
