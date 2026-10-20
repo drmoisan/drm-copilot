@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-10-20T17-28",
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "head": "172313a2adf7c353aaf08910c3a11deaf7aad976",
+  "scope": "Package identity checkpoint only",
+  "entries": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "working_sha256": "c05c22a870a0ae74431ee32f84a89bfddda39230310265dbb0b563e44290978a",
+      "expected_git_blob": "568d2b3770c1c1e0963e4ea8d9fc2d0be877b911",
+      "bytes": 22217
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "working_sha256": "6e432439ab962443f732d3c2fb2d46ab364ff0dbf0ca9cfe42cbe4e0f46173b3",
+      "expected_git_blob": "5acc2dd54407cdb6748248ccbcb54e1cc2439ef6",
+      "bytes": 340141
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-identity-confirmation.2026-10-20T17-28.json",
+      "working_sha256": "cfc8b5b7dc512b946acf7135f52b89db5c883b6a30589220fd4ddee5cecae57a",
+      "expected_git_blob": "f5731f079036f9e3dee9a9ed7078bace70b2609f",
+      "bytes": 5428
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-identity-confirmation.2026-10-20T17-28.md",
+      "working_sha256": "210ab76e58aa188e442781ddf57cf766e0c9eaadcd0f58b25ea87447a55eb382",
+      "expected_git_blob": "6997692464c1f6b0d3e6c4bd1431229c76aa3c64",
+      "bytes": 1149
+    }
+  ],
+  "include_manifest_itself": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-package-identity-checked-staging.2026-10-20T17-28.json",
+  "manifest_self_binding": "Manifest hash and expected Git blob returned separately to avoid a circular self-hash.",
+  "exclusions": [
+    "Original locator-bearing packaging audit receipts, whose exact bytes are embedded in the readable bundle",
+    "Native, installed-composition, continuation and final-runner evidence",
+    "Unrelated source, tests, resources, plan, acceptance and checkpoint changes"
+  ],
+  "acceptance": "P6-T1 remains unchecked; no actual-host or whole-task acceptance."
+}
