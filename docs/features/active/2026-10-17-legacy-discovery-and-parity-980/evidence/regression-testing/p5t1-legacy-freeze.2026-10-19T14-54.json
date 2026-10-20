@@ -1,0 +1,266 @@
+{
+  "status": "FROZEN_LEGACY_SUBSET_FOR_REVIEW_DEPENDENCY_CLOSURE_PENDING_NOT_P5T1_ACCEPTANCE",
+  "timestamp_utc": "2026-10-19T14:54:31.173349+00:00",
+  "authority": {
+    "route": "source_inspection_p5t1_legacy_coverage_adapter",
+    "attestation_key": "8c04f3a3fe50ba17fbccaeea1ac48b0e041f0d2d43733042fe4427dff9d50221",
+    "profile_sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363"
+  },
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f"
+  },
+  "owned_paths": [
+    "scripts/dev_tools/discovery/coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_rendering.py"
+  ],
+  "bindings": {
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "physical_lines": 127
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "physical_lines": 421
+    },
+    "tests/scripts/dev_tools/discovery/test_rendering.py": {
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "physical_lines": 123
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "physical_lines": 336
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": {
+      "sha256": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+      "physical_lines": 102
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": {
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+      "physical_lines": 418
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py": {
+      "sha256": "7fbd06a89b99fbbf0fa66d15eb3829ffde735986fbac30b436ad515651cc388f",
+      "physical_lines": 156
+    },
+    "scripts/dev_tools/discovery/io.py": {
+      "sha256": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+      "physical_lines": 17
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "physical_lines": 142
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "dependency_only": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/io.py",
+    "scripts/dev_tools/discovery/io.py",
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+    "pyproject.toml"
+  ],
+  "nodes": [
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_and_render_coverage_report_sorts_and_counts_entries",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_render_coverage_report_is_deterministic",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_and_prints_errors_on_validation_failure",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_coverage_rows_handles_missing_entries_key",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_0_on_success",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_on_failure",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_writes_to_stdout_when_output_omitted",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.0.0]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.2.3]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[secret malformed text]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[null]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[[]]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": null}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": {}}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [\"secret\"]}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [], \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [{\"secret\": NaN}]}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.0.0\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.99.0\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"unknown\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[parse_coverage_ledger]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[build_coverage_rows]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[render_coverage_report]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_path_and_validator_seams_preserve_call_order",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_default_validator_and_sys_argv_remain_injectable",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments0]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments1]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments2]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[read_artifact_text]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[write_report]",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_sorts_ascending_by_id_field",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_falls_back_to_joined_field_sort_when_id_absent",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_sort_rows_falls_back_when_id_field_partially_present",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_render_pretty_json_exact_literal_output",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_render_pretty_json_is_deterministic",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_coverage_adapter_retains_pretty_json_escaping_and_single_lf",
+    "tests/scripts/dev_tools/discovery/test_rendering.py::test_explicit_v1_unit_sort_preserves_rows_and_original_order"
+  ],
+  "test_count": 37,
+  "retained_original_case_count": 12,
+  "gate_records": {
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-format.2026-10-19T14-52.json": "47726cb48fe63cbc908fdf3128cd2870fecd892c14a6b7377ddcfbdf4a26e6b7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-lint.2026-10-19T14-52.json": "5f6a35f3e4a6fcf5cf1eac018f4b78a8036501ec606fa071b157f77ed7b71833",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-types.2026-10-19T14-53.json": "a2e1a2649c6de6cb87421c91b1e01f05bcb3c100c84b9b6352f2f038f806330d",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-unit.2026-10-19T14-53.json": "a9287bae00eb1eebce805a27d5edf018b247713cdcf31bddb62b5e74203420b1"
+  },
+  "timings_seconds": {
+    "format": 1.763,
+    "lint": 1.186,
+    "types": 1.967,
+    "unit": 2.005
+  },
+  "coverage": {
+    "scripts\\dev_tools\\discovery\\coverage_report.py": {
+      "summary": {
+        "covered_lines": 38,
+        "num_statements": 38,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 4,
+        "num_partial_branches": 0,
+        "covered_branches": 4,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "_default_coverage_ledger_validator": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "parse_args": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "main": {
+          "covered_lines": 20,
+          "num_statements": 20,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "": {
+          "covered_lines": 12,
+          "num_statements": 12,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 4,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      "classes": {
+        "": {
+          "covered_lines": 38,
+          "num_statements": 38,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 4,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  },
+  "coverage_delta": {
+    "line_percent_before": 95,
+    "line_percent_after": 100,
+    "branch_percent_before": 100,
+    "branch_percent_after": 100,
+    "lint_new_findings": 0,
+    "type_new_diagnostics": 0,
+    "new_test_failures": 0
+  },
+  "archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-lossless-archive.2026-10-19T14-54.json",
+    "sha256": "57b2488366de65f52f905b68c5aae648c7936f0cf22dbfb8ebce21160d8df2bf"
+  },
+  "coverage_artifact": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-coverage.2026-10-19T14-54.json",
+    "sha256": "43d6c138aee81f6c46aa73936cfee75bf28cd2b48af568cf2ddbeb1d53503ce3"
+  },
+  "static_audit": {
+    "scope": [
+      "scripts/dev_tools/discovery/coverage_report.py",
+      "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "tests/scripts/dev_tools/discovery/test_rendering.py"
+    ],
+    "docstrings": "pass",
+    "explicit_loop_intent": "pass",
+    "size_under_500": true
+  },
+  "qualifications": [
+    "All 12 original tests retained; safe placeholders remain compatibility counts only.",
+    "Helper compatibility accepts the v1 minor/patch family; the unchanged upstream default validator remains pinned to its existing 1.0.0 schema-selection behavior.",
+    "No v2 graph authority, publication or runtime business logic is added to the CLI.",
+    "Original format/lint/type correction receipts are retained. No behavioral failure occurred.",
+    "Shared runtime helper semantics and coherent dependency commit remain owned by inventory_analyzers; this is not standalone readiness or whole-task acceptance.",
+    "Raw source/harness/command streams are losslessly archived; readable command views trim trailing spaces. No whitespace exceptions."
+  ]
+}

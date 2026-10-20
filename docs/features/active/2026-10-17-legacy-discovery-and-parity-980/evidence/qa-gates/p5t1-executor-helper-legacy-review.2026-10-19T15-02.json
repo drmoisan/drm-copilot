@@ -1,0 +1,140 @@
+{
+  "Timestamp": "2026-10-19T15-02",
+  "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-publish-subset-review.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Complete incremental review: one blocking helper resource finding; legacy adapter has no independent defect. No open probes.",
+  "task": "P5-T1",
+  "status": "CHANGES_REQUIRED_SCOPED_FINDINGS_FROZEN",
+  "task_acceptance": false,
+  "authority": {
+    "route": "atomic_execution_p5t1_incremental_compatibility_review",
+    "phase": "S5_P5T1_incremental_compatibility_review",
+    "profile": ".codex/agents/atomic-executor-c4.toml",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "native_routing_launch_provenance": "All true; actual gpt-6-astra/max matches exact profile"
+  },
+  "reviewed_scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "9cab8065896f11bc8f9e928d20ce2ee39103a78b137208dbf14eeb0fc3ffad6c",
+      "bytes": 14148
+    },
+    {
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "bytes": 4435
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "bytes": 14811
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_rendering.py",
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "bytes": 4067
+    }
+  ],
+  "legacy_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-freeze.2026-10-19T14-54.json",
+    "sha256": "cc6c50c83a1263b872eea1ee632abf9d7e139c09a86b4554b9274762f39d0e38",
+    "bytes": 14561
+  },
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f",
+    "bytes": 18320
+  },
+  "reused_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-format.2026-10-19T14-52.json",
+      "sha256": "47726cb48fe63cbc908fdf3128cd2870fecd892c14a6b7377ddcfbdf4a26e6b7",
+      "bytes": 5156,
+      "stage": "format",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-lint.2026-10-19T14-52.json",
+      "sha256": "5f6a35f3e4a6fcf5cf1eac018f4b78a8036501ec606fa071b157f77ed7b71833",
+      "bytes": 5089,
+      "stage": "lint",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-types.2026-10-19T14-53.json",
+      "sha256": "a2e1a2649c6de6cb87421c91b1e01f05bcb3c100c84b9b6352f2f038f806330d",
+      "bytes": 5272,
+      "stage": "types",
+      "exit_code": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-pass4-unit.2026-10-19T14-53.json",
+      "sha256": "a9287bae00eb1eebce805a27d5edf018b247713cdcf31bddb62b5e74203420b1",
+      "bytes": 11415,
+      "stage": "unit",
+      "exit_code": 0
+    }
+  ],
+  "reused_test_count": 37,
+  "retained_original_cases": 12,
+  "reused_legacy_coverage": {
+    "statements": [
+      38,
+      38
+    ],
+    "branches": [
+      4,
+      4
+    ]
+  },
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes.2026-10-19T14-59.json",
+    "sha256": "fdd4eebc96fc98614b4669701b551ef56fde1fad8ae9657a97d431abc3d6d331",
+    "bytes": 4415
+  },
+  "probe_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-model-probes-payload.2026-10-19T14-59.json",
+    "sha256": "5f4f4934efa95a63a1fcd188254cd04e4bc4630e7102aed98fd5172ee88958eb",
+    "bytes": 13233
+  },
+  "findings": [
+    {
+      "id": "P5-T1-SR1",
+      "severity": "blocking",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "lines": [
+        137,
+        182
+      ],
+      "title": "Avoid uncharged quadratic lookup during immutable report traversal",
+      "observed": "Both ReportBudget.check and _freeze use mapping.items() for exact JsonObject values. Mapping.items retrieves each value through JsonObject.__getitem__, whose retained public mapping implementation searches members linearly. The new caller therefore performs n(n+1)/2 comparisons per pass.",
+      "reproduction": "For one 64-member immutable object, document_bytes=65536 and artifact_records=4, ReportBudget.check succeeds after 2080 key comparisons while charging 129 nodes and zero of its 256 work units. bounded_object repeats the lookup traversal and performs 4160 comparisons. The 16/32/64-member probe uses actual line-event comparison counts, with no elapsed-time assertion.",
+      "impact": "Wide valid report objects can perform quadratic unreserved work before encoding even though their byte, depth and node reservations pass. Construction and Markdown budget checks expose the same new caller pattern.",
+      "required_change": "Iterate the exact immutable JsonObject.members pairs directly, while retaining dict.items for exact dictionaries and the current preallocation/shape checks. Keep the accepted models.py API unchanged. Add a small counted regression showing no keyed lookup during immutable budget/freeze traversal, preserving output identity and rejection semantics.",
+      "rule": "P5-T1 bounded report projection; ReportBudget's explicit independent work/traversal capacities; general-code-change fail-fast resource invariants."
+    }
+  ],
+  "cleared_scope": [
+    "Legacy CLI remains a thin runtime forwarding adapter with preserved validator, argparse, stdout/file I/O and exception seams.",
+    "Injected validator success cannot bypass explicit v2, malformed shape, duplicate key or nonfinite input rejection before report output.",
+    "22 independent compact/pretty JSON capacity controls match exact encoded bytes, including UTF-8, ASCII escapes, nested structures and finite numeric values.",
+    "Markdown fences remain intact; zero denominator is null rather than completion; dictionaries are detached and repeated rendering is stable.",
+    "Frozen source/test files satisfy the 500-line bound; new contracts and intent comments are present. Existing isolated tests use memory seams."
+  ],
+  "dependency_closure": "The legacy adapter directly imports report_models. It cannot be declared independently commit-ready until the helper repair and its pending focused behavior/coverage proof are complete. Remaining imports are retained existing runtime/I/O/validator APIs.",
+  "excluded_live_scope": [
+    "Runtime coverage_report.py",
+    "Runtime validation.py",
+    "Graph/report tests",
+    "tests/discovery_runtime/test_report_models.py"
+  ],
+  "open_behavioral_probes": [],
+  "pending_proof": [
+    "Owner's focused report_models behavior and per-range coverage evidence",
+    "Later frozen runtime report candidate and complete task gates"
+  ],
+  "tests_replayed": false,
+  "predecessor_review_repeated": false,
+  "source_test_mutations": false,
+  "checkoffs": false
+}

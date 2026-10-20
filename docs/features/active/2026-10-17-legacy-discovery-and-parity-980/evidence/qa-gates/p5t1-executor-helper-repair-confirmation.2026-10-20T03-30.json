@@ -1,0 +1,126 @@
+{
+  "Timestamp": "2026-10-20T03-30",
+  "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-confirm-helper.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "SR1 closed; helper and legacy dependency subset ready for checked WIP; P5-T1 remains pending.",
+  "task": "P5-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "whole_task_accepted": false,
+  "findings": [],
+  "open_probes": [],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-freeze.2026-10-20T03-23.json",
+    "sha256": "533d40493b030131e607b6dcbdd6b1b9b3d3f75bfe7a3c614dce64da29ffbfdf",
+    "bytes": 31688
+  },
+  "original_review": {
+    "bytes": 7467,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-legacy-review.2026-10-19T15-02.json",
+    "sha256": "f52dfc84e6edea287f79c28c64c52a5f4728a914833effb4452651620479d76d"
+  },
+  "repair_scope": "Only ReportBudget.check and _freeze now traverse exact JsonObject.members; dict behavior retained, no accepted primitive changed.",
+  "reproduction": [
+    {
+      "operation": "ReportBudget.check",
+      "members": 16,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    },
+    {
+      "operation": "bounded_object",
+      "members": 16,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    },
+    {
+      "operation": "ReportBudget.check",
+      "members": 32,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    },
+    {
+      "operation": "bounded_object",
+      "members": 32,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    },
+    {
+      "operation": "ReportBudget.check",
+      "members": 64,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    },
+    {
+      "operation": "bounded_object",
+      "members": 64,
+      "key_lookups": 0,
+      "key_comparisons": 0
+    }
+  ],
+  "recovered_proof": {
+    "cases": 114,
+    "model_cases": 77,
+    "retained_legacy_cases": 37,
+    "model_statements": [
+      141,
+      141
+    ],
+    "model_branches": [
+      64,
+      64
+    ],
+    "wrapper_statements": [
+      38,
+      38
+    ],
+    "wrapper_branches": [
+      4,
+      4
+    ],
+    "measured_ranges": 23,
+    "replayed_suites": false
+  },
+  "dependencies": {
+    "committed_local_count": 23,
+    "commit": "2920686f68849957d91e2c94f525a32e466d1d8e",
+    "closure": {
+      "bytes": 19063,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-coverage-closure.2026-10-20T03-23.json",
+      "sha256": "2992a298ec22f2a08236db7c220195f67db005464dd31c8fb1e7715a24325ab4"
+    },
+    "qualification": "Only five scoped source/test paths require this WIP; runtime graph drafts are excluded. Third-party packages remain the accepted Poetry environment."
+  },
+  "normalizations": [
+    {
+      "after_sha256": "d8c80cc48d7ae1d69aca8a1daed82f396079dc19038b9514d122733d3b05b595",
+      "before_sha256": "88de02a9b60c5e12052e26c2cd7453d4600194055133eed4b4fcd044a989e328",
+      "kind": "command path display only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models7-pytest.2026-10-19T15-06.json"
+    },
+    {
+      "after_sha256": "05d6fcbc70ae09e23b2d47fc00c27c9822c40291fc7a47f26aa27026c11e72d3",
+      "before_sha256": "17baa380d893ca35cb9e5173f4a615810a53a2e8bf82bd8201b8bbeefbf1d9e1",
+      "kind": "readable path/whitespace normalization only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-pyright.2026-10-19T14-49.md"
+    },
+    {
+      "after_sha256": "418dcac2948c097c4642f075175b703f2784e38df0118445b4a42df2de16d205",
+      "before_sha256": "023b0141056cdcdde0a20fa32acc90bfa20c5df5414e116e01046fe53c77833e",
+      "kind": "readable path/whitespace normalization only",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models7-pytest.2026-10-19T15-06.md"
+    }
+  ],
+  "raw_qualification": "All 67 archive entries decode to original hashes. The pytest receipt differs only in its coverage-output command path; stdout/stderr, exit, timing and bindings are exact. Historical raw Markdown and command bytes remain archived; normalized views are not asserted to be raw identity.",
+  "predecessor_suites_replayed": false,
+  "checkoffs": false,
+  "source_test_mutations": false,
+  "pending": [
+    "Frozen runtime graph-report candidate review",
+    "Complete P5-T1 ordered gates and acceptance"
+  ],
+  "checker_qualification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-helper-checker-qualification.2026-10-20T03-30.json",
+    "sha256": "6ecfe93f63c50e5d601c7ab85db923a8128bc79e761d1f173b8bd8986e2e6454",
+    "bytes": 20056
+  }
+}

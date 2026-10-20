@@ -1,0 +1,39 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "pyright",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py"
+  ],
+  "duration_seconds": 1.817,
+  "exit_code": 1,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-models-pyright-harness.2026-10-19T14-49.txt",
+    "sha256": "ae3b0fc3600f07c53eed11f9336fb4a7bf86872935599822bedc9a5a27a98aa2"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "334159c105eb396bd980609b39c390f2545e55018d301479db4ad35cedac3d8b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "334159c105eb396bd980609b39c390f2545e55018d301479db4ad35cedac3d8b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "1f9d5a78fdefbec6659b6a8d0d121497e9819ba35640c7198dcb4926cb36255e",
+    "tests/discovery_runtime/test_agent_output.py": "06b80ecc9dcc6e9fdc24c7001fe2d3be33605611158bf7b496246524b9138371",
+    "tests/discovery_runtime/test_mutation_plan.py": "c168c8ce947dbd34b04e02b96fe73dfd043351d92cd376646c29fc9c8ddc3fbd",
+    "tests/discovery_runtime/test_validation_modes.py": "ce23a61febdf5a085a515cd350296ed86b7decef00ffac631d6d381897fdfaed"
+  },
+  "started_at": "2026-10-19T14:49:55.086725+00:00",
+  "stderr": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "YzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBccGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxyZXBvcnRfbW9kZWxzLnB5CiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBccGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxyZXBvcnRfbW9kZWxzLnB5OjE0OToyMyAtIGVycm9yOiBVbm5lY2Vzc2FyeSAiY2FzdCIgY2FsbDsgdHlwZSBpcyBhbHJlYWR5ICJzdHIiIChyZXBvcnRVbm5lY2Vzc2FyeUNhc3QpCiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBccGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxyZXBvcnRfbW9kZWxzLnB5OjE1MToyMyAtIGVycm9yOiBVbm5lY2Vzc2FyeSAiY2FzdCIgY2FsbDsgdHlwZSBpcyBhbHJlYWR5ICJpbnQiIChyZXBvcnRVbm5lY2Vzc2FyeUNhc3QpCiAgYzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBccGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxyZXBvcnRfbW9kZWxzLnB5OjE1NjoyMiAtIGVycm9yOiBVbm5lY2Vzc2FyeSAiY2FzdCIgY2FsbDsgdHlwZSBpcyBhbHJlYWR5ICJmbG9hdCIgKHJlcG9ydFVubmVjZXNzYXJ5Q2FzdCkKMyBlcnJvcnMsIDAgd2FybmluZ3MsIDAgaW5mb3JtYXRpb25zCldBUk5JTkc6IHRoZXJlIGlzIGEgbmV3IHB5cmlnaHQgdmVyc2lvbiBhdmFpbGFibGUgKHYxLjEuNDA5IC0+IHYxLjEuNDE0KS4NClBsZWFzZSBpbnN0YWxsIHRoZSBuZXcgdmVyc2lvbiBvciBzZXQgUFlSSUdIVF9QWVRIT05fRk9SQ0VfVkVSU0lPTiB0byBgbGF0ZXN0YA0KDQo=",
+    "sha256": "6f4b44e697fb440e2d89c4c62a0ea277935ce49a8dd3c6dd61437d7bb7f0d209"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T14:49:56.905837+00:00"
+}
