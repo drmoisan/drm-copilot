@@ -1,0 +1,187 @@
+{
+  "stage": "tests",
+  "label": "p5t3-semantics-repair1-precheck",
+  "started": "2026-10-20T09:22:44.500768+00:00",
+  "finished": "2026-10-20T09:23:48.702387+00:00",
+  "duration_seconds": 64.202,
+  "command": "poetry run pytest tests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment tests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary -o addopts= -v --cov=drm_copilot_discovery.validation --cov=drm_copilot_discovery.validation_operation --cov-config=SCRATCH/issue-980-coverage.ini --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-semantic-repair-precheck-coverage.json",
+  "exit_code": 0,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "physical_lines": 310
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": {
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "physical_lines": 36
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "physical_lines": 173
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+      "physical_lines": 413
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "physical_lines": 345
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "sha256": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+      "physical_lines": 473
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+      "physical_lines": 494
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "4d53a1d6fb0451bfce590301e0431b332f153a21dae925e035ec5c5b7787ce97",
+      "physical_lines": 316
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113",
+      "physical_lines": 468
+    },
+    "tests/discovery_runtime/test_parity_report.py": {
+      "sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+      "physical_lines": 399
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": {
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+      "physical_lines": 261
+    },
+    "tests/discovery_runtime/test_completion_projection.py": {
+      "sha256": "3720cc8f5133a35b1170ebf5ef92530fa247172695b1697351064f449315ce6e",
+      "physical_lines": 418
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "physical_lines": 310
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": {
+      "sha256": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+      "physical_lines": 36
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "physical_lines": 173
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py": {
+      "sha256": "78503e3682d87e3715064fc1516a91961bc54b5b054902f9c3270a49e7fbe334",
+      "physical_lines": 413
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py": {
+      "sha256": "ef33a9a2c709ef3c44fa5c04867e62da36a228471e313068365d5ff03d540cc4",
+      "physical_lines": 86
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py": {
+      "sha256": "b9e177f3365f7b2e3b268a6cb10981074f52bd39cdf77251187a3dcffedd286e",
+      "physical_lines": 345
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py": {
+      "sha256": "b32b37c76be125dde75be8b0470c4e287ef123cd7af666981c811317973d7566",
+      "physical_lines": 473
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+      "physical_lines": 494
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "sha256": "4d53a1d6fb0451bfce590301e0431b332f153a21dae925e035ec5c5b7787ce97",
+      "physical_lines": 316
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113",
+      "physical_lines": 468
+    },
+    "tests/discovery_runtime/test_parity_report.py": {
+      "sha256": "51fdeee1e65a4f236e4ea8a9a0d19b38dd792c982d8f5d69f9cb3f28ff3b39cf",
+      "physical_lines": 399
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": {
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+      "physical_lines": 261
+    },
+    "tests/discovery_runtime/test_completion_projection.py": {
+      "sha256": "3720cc8f5133a35b1170ebf5ef92530fa247172695b1697351064f449315ce6e",
+      "physical_lines": 418
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t3-semantics-repair1-precheck-092348.stdout.bin",
+      "raw_sha256": "6192af0aeec88abd6cee2c04f8466f6fc0eee7e7a5ec6cc772b43056401ef9da",
+      "raw_bytes": 2387,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 5 items\r\n\r\ntests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[missing-profile] PASSED [ 20%]\r\ntests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[malformed] PASSED [ 40%]\r\ntests/discovery_runtime/test_completion_projection.py::test_malformed_completion_retains_diagnostics_without_semantic_assessment[loader] PASSED [ 60%]\r\ntests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[False] PASSED [ 80%]\r\ntests/discovery_runtime/test_completion_projection.py::test_validation_report_preserves_plain_envelope_and_strict_input_boundary[True] PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                           Stmts   Miss Branch BrPart  Cover   Missing\r\n--------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\validation.py                89     33     44     10    56%   95, 97, 110-160, 163, 171, 205, 208, 210, 218-221, 245\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\validation_operation.py      98     36     22      4    57%   138-153, 161-231, 244, 263-293, 297\r\n--------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                            187     69     66     14    56%\r\nCoverage JSON written to file SCRATCH/issue-980-semantic-repair-precheck-coverage.json\r\n======================== 5 passed in 62.40s (0:01:02) =========================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t3-semantics-repair1-precheck-092348.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  }
+}

@@ -10,6 +10,10 @@ from drm_copilot_discovery.agent_output import (
     historical_report,
     validate_agent_output,
 )
+from drm_copilot_discovery.completion_report import (
+    completion_preflight,
+    completion_summary,
+)
 from drm_copilot_discovery.coverage_report import (
     coverage_preflight,
     unavailable_coverage_summary,
@@ -103,7 +107,7 @@ def validate_snapshot(
     output_valid, manifest_digest = None, None
     review_findings: tuple[Finding, ...] = ()
     if not any(item.severity == "error" for item in findings):
-        validation = _Validation(snapshot)
+        validation = _Validation(snapshot, input_findings=tuple(findings))
         findings.extend(validation.evaluate(mode))
         # Derived statuses/counts must equal recomputation; they are never inputs to it.
         for artifact in snapshot.artifacts:
@@ -192,8 +196,9 @@ def report_projection(
     """Project snapshot (DiscoverySnapshot) for kind/identifier (str) and root mode.
 
     Returns dict[str, object] without I/O or publication. Coverage/parity retain
-    structural failures and unavailable counts; completion rejects those inputs.
-    Raises ValueError for unsupported kind/mode, invalid completion inputs or
+    structural failures and unavailable counts; completion retains diagnostics.
+    Validation reports continue to reject structurally invalid inputs.
+    Raises ValueError for unsupported kind/mode or
     resource excess. No caller mutation or injected validation authority exists.
     """
     if kind not in REPORT_KINDS or mode == "agent-output":
@@ -203,6 +208,8 @@ def report_projection(
         coverage_preflight(snapshot)
     elif kind == "parity-report":
         parity_preflight(snapshot)
+    elif kind == "completion-report":
+        completion_preflight(snapshot)
     failures = _schema_findings(snapshot)
     if any(item.severity == "error" for item in failures):
         # Invalid core bytes cannot supply counts, yet diagnostic reports can
@@ -230,5 +237,27 @@ def report_projection(
                     item.to_dict() for item in failures
                 ],
             }
-        raise ValueError("Report projection requires structurally parsed inputs")
-    return _Validation(snapshot).report(kind=kind, identifier=identifier, mode=mode)
+        # Only completion adds diagnostics; validation reports retain strict refusal.
+        if kind != "completion-report":
+            raise ValueError("Report projection requires structurally parsed inputs")
+        # Diagnostic completion cannot construct semantic proof or grant validity.
+        if mode not in _MODES:
+            raise ValueError("Unsupported report or validation mode")
+        return {
+            "schema_version": "2.0.0",
+            "artifact_kind": kind,
+            "id": identifier,
+            "mode": mode,
+            "input_sha256": report_input_digest(snapshot),
+            "validation_result": "fail",
+            "counts": None,
+            "findings": [item.to_dict() for item in failures],
+            "completion": to_plain_value(
+                completion_summary(
+                    snapshot, mode=mode, findings=failures, structural_valid=False
+                )
+            ),
+        }
+    return _Validation(snapshot, input_findings=failures).report(
+        kind=kind, identifier=identifier, mode=mode
+    )

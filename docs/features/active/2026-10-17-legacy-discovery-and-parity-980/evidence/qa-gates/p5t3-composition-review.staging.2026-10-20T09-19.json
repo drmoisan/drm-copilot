@@ -1,0 +1,338 @@
+{
+  "Timestamp": "2026-10-20T09-19",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-coverage.2026-10-20T08-40.json",
+      "working_sha256": "05d501ca0026aa8177936f9b8d9855c3028e62d3a4c3ed0aac912d637588e7d2",
+      "expected_git_blob": "8be33b796c71c7c97a74192f1577f5cabef9883f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-gates.2026-10-20T08-40.json",
+      "working_sha256": "e035c5a9202349bd5d9be23014d3f4d3fb0ec358bdb0347fc6ec9e0962a4dcc8",
+      "expected_git_blob": "0b7b67b13c9e923da08f89b55955d95ab58d14dc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-producer-planning-split.2026-10-20T08-47.json",
+      "working_sha256": "726950c275036b0299a92f0b0a65c75064a6c4816dc2cb8a288bd7ad1cbbf4cc",
+      "expected_git_blob": "708c5be18f19c1ae3e93f6e6c2d40ef0f056ebc0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-legacy-gate-harness.2026-10-20T08-55.txt",
+      "working_sha256": "f36ddd4ef2566965f9c013042a090a5c06b3ac5ba1e4fb7768c542a4379c9a9c",
+      "expected_git_blob": "aa7bc6b791b1077edd4476305e4f5a0f2864ba07"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-composition-review.2026-10-20T09-18.json",
+      "working_sha256": "2262289de23212fad841267d644ab2a8ce5f213be6840ced0ab98a904ed653de",
+      "expected_git_blob": "59c680974b9ea4b0503c5c71feba296a8f9b4244"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-composition-review.2026-10-20T09-18.md",
+      "working_sha256": "fa5f42fdfe02d81a828e43c622c3d988c91c6b19dd55f1ed7e90c9ccf9d59dae",
+      "expected_git_blob": "ea5aea4e8ddc01b48c1a9e48a36d35ab72ace365"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-payload.2026-10-20T09-09.json",
+      "working_sha256": "3d3abb24f580c54b764dd0471fa98b11c2c5cea791fd0191fee948acc903cb75",
+      "expected_git_blob": "442068122c2bb6f069a92dbdee07b2e2ff0944db"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+      "working_sha256": "3187ca526a066823017a1ad3018404efeb94b2c459b3e8d89e3d3b88b0ccc7b3",
+      "expected_git_blob": "86f94ad7b2840364df5ca04439bba143db226cab"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.md",
+      "working_sha256": "645fe8ad291f1244213e01e942409ad3ef7c47f32756b2f5fb9546f2f3a5c1fb",
+      "expected_git_blob": "d21d8c6d81cf483a15aa27e36760ebcea8b28abe"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-staging.2026-10-20T09-09.json",
+      "working_sha256": "5d40abc45c7fb3d90de0e5841ae848dd27c257171732c4c7cd784028421a1e0b",
+      "expected_git_blob": "8dfd3942e9902466b202d38248bbe41cdbed75dd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-legacy-review.2026-10-20T09-08.json",
+      "working_sha256": "e5f20914219e54f6131c346ab529247ad3d830c3aa7172f374de609b64243cb4",
+      "expected_git_blob": "b5a17bdf6d3f3ec1936e51387f0875dd0432a82c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-legacy-review.2026-10-20T09-08.md",
+      "working_sha256": "8b1be2271bade7f0dc25224ee0601e4195781746af6efc872093391a40885a7f",
+      "expected_git_blob": "226f17c137f7f08cd14cbf43942105968d96a514"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-legacy-review.staging.2026-10-20T09-09.json",
+      "working_sha256": "fa746dc97402e8b3a20c2021d1f7a7d93b12aa20804b0f5a7ccc3d4a27a69133",
+      "expected_git_blob": "3a6feb32f20db611f9e68867fbd954605b9c5b4a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+      "working_sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0",
+      "expected_git_blob": "7bf507aff79fe25fb472dd14fb6a760b51ed8055"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze-harness.2026-10-20T09-01.txt",
+      "working_sha256": "6c42dd60b63ee99182fc800f5c82409c22245b2bb5de1c1c47b1bc2eeda6a530",
+      "expected_git_blob": "5ad1a2b68a0ce2fabf0b68b724af2be62c691685"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.json",
+      "working_sha256": "48b9fd0a719512655a3f9a8973896d1faa6cd61379f1fc4dc92f8020eeb87508",
+      "expected_git_blob": "6f23b33065893b115233c77346b5ab0a271efcf8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.md",
+      "working_sha256": "c6a59b563d2874b708211bb8161877a81691347969995b2c5d3af78fca99aa65",
+      "expected_git_blob": "01eaca6b4e91b74e1c2bc0b0f492cbd2847c14d9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+      "working_sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92",
+      "expected_git_blob": "03bf1ccb21e3d3bce4c1927923b9f241d0e0df21"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-staging.2026-10-20T08-55.json",
+      "working_sha256": "6286d9f599b9a32c2b86a0cf6500beec3dff0e21cf7cdf8aa7420faeb8a77678",
+      "expected_git_blob": "a3d2b4239907c25728829419f2ba20faceef4447"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy1-gates.2026-10-20T08-53.json",
+      "working_sha256": "8053b55f1e43975257242f74101bcc85202b719d743fc9fb62e4280db5623821",
+      "expected_git_blob": "9df34f15094e51a8f0821636e2a14467b3d4fbf4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy2-gates.2026-10-20T08-53.json",
+      "working_sha256": "11aee283b5a6ba7363cb48dc45a2b7fa76b898286b5dd7df50f6bd984c10a36a",
+      "expected_git_blob": "f4f12152358d92c589a67472f1fca414c1176832"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-coverage.2026-10-20T08-54.json",
+      "working_sha256": "0cedafa020e30782e8914cd0e979c0d884b0f60e28f01eae6210609671d0bece",
+      "expected_git_blob": "ddc23d247935f33771e17ffcab9a5d1d9b38381f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy3-gates.2026-10-20T08-54.json",
+      "working_sha256": "ed909900e4997c21092e174296ee526db2c07c643442128851f499c787b90283",
+      "expected_git_blob": "137f321854fc9ed03d8f7c1485c55e8ea366b130"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-archive.2026-10-20T09-15.json",
+      "working_sha256": "4c6fbc7c627f783ab6b42fc3b92663949863f8a8f8beb555da97cd2659d1c4d3",
+      "expected_git_blob": "e0f52d915037d92083b2ffa14e2f819c8a8e0590"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-freeze-harness.2026-10-20T09-15.txt",
+      "working_sha256": "12daf9514963f60270bbce4c6a433e2c8f16de688d3f4d4cda8d33e37d3ff2e4",
+      "expected_git_blob": "b1c069110efe62b6a2b2339c395b28a5f5a1a058"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+      "working_sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991",
+      "expected_git_blob": "97639d00da548fb6d17edcb74da3d6cc78396782"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.md",
+      "working_sha256": "e2a21a4c48ceadb0f7878c8e6f102f6dd1a9c9563ba3f469865c6a29c00ad21d",
+      "expected_git_blob": "7590dc571ca9ae4896b6d6363a7d26f84cc2a7f8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.json",
+      "working_sha256": "e30a80c19c225ba1fa02a2fd6dd979b58b18c296f8deb7185b25d277af7a88d9",
+      "expected_git_blob": "30cc7b1b624cf7b98cab8404afb63d7b63ee62fd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.md",
+      "working_sha256": "14b85a1b9c2cad81fa79d0bea39dd94bfeef49c1102e7f47aa699d587f1f847e",
+      "expected_git_blob": "ce4c477a3027955792952f52c70da6c63d2dc554"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.json",
+      "working_sha256": "58278ad4f17f93eb31539897201b092ea973b17bab043baa1e5de3119a727e4a",
+      "expected_git_blob": "93e40a657a32ebf7ffbd10fc8b83b08a8fb52c8f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.md",
+      "working_sha256": "0203f563cb47c17e856b8682089ad45e3d2c373e5d7c91f0c8d14077c7f2e106",
+      "expected_git_blob": "715ee22ab4eba4169e0aab5b0ac46a9f12f1a032"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.json",
+      "working_sha256": "0c5d88281fc8529e35fa3c963b37363488ae5e2c05c461799b3fa03a2c06d16c",
+      "expected_git_blob": "71d579d3bb514cb25db5b73ca41aafd3ca960a3a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.md",
+      "working_sha256": "ed6ecb79dff83c45207f700dcdca30846a50868a315b6f2f69fc9f9d1c6804bc",
+      "expected_git_blob": "fd4e29c73016362a9d00c10d71390a97513cbeba"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.json",
+      "working_sha256": "569b678a8e054e830e8a373cb6bd30110defec8a214e4b63b6f2d5f82e503088",
+      "expected_git_blob": "04eb0ef5207b9fcfcee96654db5914ee23d688aa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.md",
+      "working_sha256": "df8c7406e93e2800f39ee655d92cf368ffcb3c9aa9be0bc06a1fa171ee2a2d50",
+      "expected_git_blob": "3a8bf4e747f401e46bca3063f8f17d5502e5adc9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.json",
+      "working_sha256": "2b7998259e45c25ee488b3bdeaf25ae481a2e1e6b829873069b8a69aacedea56",
+      "expected_git_blob": "a4f071273c6af90e3adddcf91042a0fb40cf336e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.md",
+      "working_sha256": "4070b0cba31d4e1ecd9705891d49faf70ca071f461a0445637c3097ddb0c7495",
+      "expected_git_blob": "e0f21fa8c064ed634317dd0bfd8b8f3a1fd5cd24"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.json",
+      "working_sha256": "177c849b157d7b0e728ab1e5485a25915c931f355135541a0ff566d0cb7b65be",
+      "expected_git_blob": "5c9ba3a55f19b62ea7b82fc49f5c269da6f7abbb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.md",
+      "working_sha256": "1d0b06b05d50561ef81ba6dbe1c8038c459c8355d6aa0990eafd143e8e5dbfe7",
+      "expected_git_blob": "04ce6dd482adf697ef13a859940f688127ae8aad"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.json",
+      "working_sha256": "29337c2a74b71cb07628eec7964591d41a15620dae32e41a3643a03af311fb9e",
+      "expected_git_blob": "45433c6028328306f956d05523152a3b475c86c2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.md",
+      "working_sha256": "5af372c1edc9c5c7365e7c6e7216c244db1bec78a960bde7e41f3abfb78057f4",
+      "expected_git_blob": "9cb96adc70f20afcb38ecf88623058a6bfd34c70"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.json",
+      "working_sha256": "613bf695b8e9f58e109f83cfe377ae521d35f1bde4302ea7d41b0ee295dfdc45",
+      "expected_git_blob": "f1c0012bc1fe05564bdea8163537aa87fe0a96bd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.md",
+      "working_sha256": "501ca68217f89a6d22cabba8b25f4d587f37b4b925c0bb6f1a29df69c92f07ae",
+      "expected_git_blob": "79c442c528970e532c0dfc29e942e4810fe0899d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.json",
+      "working_sha256": "8dd9b0360a75f9619772fea127c7be5317c8ba50a0da50dd44b63df50a16c9a4",
+      "expected_git_blob": "47546c88576fbaf2833c5638260579854b52c503"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.md",
+      "working_sha256": "61a82c2389f83d1051b1647a08a3237d2a2c702aaebcb32667295225adec0a89",
+      "expected_git_blob": "9f938d6dde254c3eb54c7a95987b081fb522f848"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.json",
+      "working_sha256": "0bad75826793db6bd7aaca885296707a913c9f24a4d1727772e7dd25bbf48702",
+      "expected_git_blob": "51aa1340728b1cc1c93333b5e16457826d42108d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.md",
+      "working_sha256": "d23654350614f4b79840a285f9a3160c0f6f030a0f0438286292839913d7f84c",
+      "expected_git_blob": "da43a51c86c53415df43ab1ea59d61c5126385aa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.json",
+      "working_sha256": "9f0ad8cbfd037492af4668f9e53cb0ab4c50c6ef5560b1f089889e0df00fdf09",
+      "expected_git_blob": "642c85e34344497510b5e790dbcd89771b7589a1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.md",
+      "working_sha256": "d8bb73e8202c906a7091a0a183f066b99bb1aa3f3472535aa05e8dc059152815",
+      "expected_git_blob": "7e4efc625b21b1c54df6b2b1d28e2269cba53195"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.json",
+      "working_sha256": "fec17f46fec8c052a08ec4c8088c7d8df09821e21803c7b3a3e3cb7d7309ab7b",
+      "expected_git_blob": "b69d80fc96d19904f3a26790aaae10bd437d5212"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.md",
+      "working_sha256": "f002d82d8a227b40aaad2389457c6a34ba03b3628bcbc92f3ffec62bc1e7e652",
+      "expected_git_blob": "9ff78f0345233334a64292a52b094770f0be2ceb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.json",
+      "working_sha256": "1b6a1c2035b50b5ac608537bba7a8863b0a36f6e9cf44363ddaf12f3b3dcbe99",
+      "expected_git_blob": "b7a0d3178db87617c47809f8e98c780ffc9e586b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.md",
+      "working_sha256": "28c8e213a6a1e9ee77531ed864a8d46a7b3880bedcdc973b6d193d89f943b699",
+      "expected_git_blob": "883149e73ff06bd9ae4611e4c52634d0f480d08b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.json",
+      "working_sha256": "407a609c1269e77af928b7e839b095519d5b1d405f59a8a59fd20d80e4970b27",
+      "expected_git_blob": "6571e344d6c7faa8b354e1c7eaffbf51475f6900"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.md",
+      "working_sha256": "7d355c8d32204d55dab06263b9e276f91b49e1004c3af0469cfaa15091c5f540",
+      "expected_git_blob": "103774d8519f769efc3e9eb34f59e630915d75de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+      "working_sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719",
+      "expected_git_blob": "e610347f955a793c56296b928faba4f498f2be78"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.md",
+      "working_sha256": "424ca6dd64490979a031d161e090e5063ed97e3e5970baa4b7346422007b9e30",
+      "expected_git_blob": "de59629abdf820649027e6e1e77555aa8229af22"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-staging.2026-10-20T09-15.json",
+      "working_sha256": "d8c7aee353aec650d7e473bb1b2cb1db414f30bca0fefb8fdbccf7d3f7a161f4",
+      "expected_git_blob": "34557640365895813be9253b2ce3be1954448a1b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "working_sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+      "expected_git_blob": "e81ad97e993fe9057c9c1ea83b42d33700c5faeb"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "working_sha256": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6",
+      "expected_git_blob": "5ff2631a655fe3b0fc5fb6141a9221f42bc0e713"
+    },
+    {
+      "path": "tests/discovery_runtime/test_completion_planning.py",
+      "working_sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214",
+      "expected_git_blob": "a8d250e2bbe9e6faa39e37bb13b5153a7e3c1586"
+    },
+    {
+      "path": "tests/discovery_runtime/test_completion_report.py",
+      "working_sha256": "0403687ca7be3c7606ca734d0c28e80b05646da067b6d5e90b2c5309cc1df962",
+      "expected_git_blob": "513375084393672b0f6b00219554d9c180e906eb"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "working_sha256": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25",
+      "expected_git_blob": "f67afa77c3ede5ff06ef222ba5eb188607fb395b"
+    }
+  ],
+  "status": "PRODUCER_PLANNING_PROOF_CLEAR_SEMANTIC_REVIEW_PENDING",
+  "whole_candidate_commit_ready": false,
+  "include_manifest_itself": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-composition-review.staging.2026-10-20T09-19.json",
+  "condition": "Semantic validation-report malformed-input dispatch repair, exact dependency rebinding, separate acceptance and final composed gate remain pending. This union is conditional and excludes semantic owner files. Preserve the19-case planning proof against its exact recorded snapshot; coordinator determines affected rebinding after repair.",
+  "required_semantic_dependencies": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "recorded_sha256": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+      "current_sha256": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+      "matches": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+      "recorded_sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "current_sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "matches": true
+    }
+  ]
+}

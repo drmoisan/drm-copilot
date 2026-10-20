@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from drm_copilot_discovery.acceptance_rules import validate_acceptance
 from drm_copilot_discovery.agent_output import REPORT_KINDS
 from drm_copilot_discovery.claim_rules import validate_claims
+from drm_copilot_discovery.completion_report import completion_summary
 from drm_copilot_discovery.completion_rules import validate_completion
 from drm_copilot_discovery.coverage_report import coverage_summary
 from drm_copilot_discovery.coverage_rules import validate_coverage
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.dimension_rules import DimensionValidation
     from drm_copilot_discovery.parity_rules import ParityValidation
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
+    from drm_copilot_discovery.validation import ValidationMode
 
 
 def _findings(values: Iterable[Finding], limit: int) -> tuple[Finding, ...]:
@@ -49,10 +51,18 @@ class _Validation:
     against these results rather than re-entering validation or trusting status.
     """
 
-    def __init__(self, snapshot: DiscoverySnapshot) -> None:
-        """Build shared semantic assessments after all structural bytes pass."""
+    def __init__(
+        self, snapshot: DiscoverySnapshot, *, input_findings: tuple[Finding, ...] = ()
+    ) -> None:
+        """Assess snapshot (DiscoverySnapshot) after structural validation passes.
+
+        input_findings (tuple[Finding, ...]) retains trusted structural warnings
+        for completion recomputation. Return None; cache only this immutable
+        operation's assessments without I/O or mutation of caller values.
+        """
         self.snapshot = snapshot
         self.limit = snapshot.profile.limits.parse_limits().findings
+        self.input_findings = input_findings
         # Derived report envelopes have no authored graph identity or schema resource.
         core = replace(
             snapshot,
@@ -224,10 +234,14 @@ class _Validation:
         """Return fields for kind, identifier and mode (str) from shared assessments.
 
         Coverage/parity add independently evaluated complete results and populations;
-        requested-mode findings remain unchanged. Raises ValueError on invalid
-        modes or resource limits. No I/O, publication or caller mutation occurs.
+        their requested-mode findings remain unchanged. Completion retains trusted
+        input warnings and evaluates only its selected mode. Raises ValueError
+        on invalid modes or resource limits. No I/O or caller mutation occurs.
         """
         findings = self.evaluate(mode)
+        # Completion preserves trusted input warnings without assessing another mode.
+        if kind == "completion-report":
+            findings = _findings((*self.input_findings, *findings), self.limit)
         # Control mirrors do not add discovery facts or inflate report counts.
         counts = Counter(
             record.kind for record in self.index.records if record.kind not in _CONTROL
@@ -279,6 +293,15 @@ class _Validation:
             result["completion_findings" if coverage else "parity_findings"] = [
                 item.to_dict() for item in complete
             ]
+        elif kind == "completion-report":
+            result["completion"] = to_plain_value(
+                completion_summary(
+                    self.snapshot,
+                    mode=cast("ValidationMode", mode),
+                    findings=findings,
+                    structural_valid=True,
+                )
+            )
         return result
 
 

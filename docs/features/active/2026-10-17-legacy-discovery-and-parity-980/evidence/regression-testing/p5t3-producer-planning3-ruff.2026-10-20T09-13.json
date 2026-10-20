@@ -1,0 +1,61 @@
+{
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+    "tests/discovery_runtime/test_completion_planning.py": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+    "tests/discovery_runtime/test_completion_planning.py": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214"
+  },
+  "clean": true,
+  "command": [
+    "poetry",
+    "run",
+    "ruff",
+    "check",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "tests/discovery_runtime/test_completion_planning.py"
+  ],
+  "elapsed_seconds": 1.594187,
+  "exit_code": 0,
+  "harness_sha256": "4d493ef3c9143ef878e77a161217137042eaa324751d692e8c684821de52d56f",
+  "population": null,
+  "raw": {
+    "stderr": {
+      "bytes": 0,
+      "scratch_relative": "p5t3-producer-planning3-ruff.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 19,
+      "scratch_relative": "p5t3-producer-planning3-ruff.stdout",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "stage": "ruff",
+  "started_utc": "2026-10-20T09:13:02.824860+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!",
+  "task": "P5-T3",
+  "unchanged_pure_proof": "p5t3-producer-pure2-tests.2026-10-20T08-52.json"
+}

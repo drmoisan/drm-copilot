@@ -1,0 +1,71 @@
+{
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "517cabe0e82456db27f7a7e637add28d4037fa848e65bfa9a20d63bd6e2ff06b",
+    "tests/discovery_runtime/test_completion_report.py": "90be5a38f5d22cc951aec043cfa510faba2744bccbf80723cd19bcf0ffb9e33a"
+  },
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "f74bcdde7ba59d32934646f43577472f82da36702160057ac82a7f8b99eee91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "517cabe0e82456db27f7a7e637add28d4037fa848e65bfa9a20d63bd6e2ff06b",
+    "tests/discovery_runtime/test_completion_report.py": "90be5a38f5d22cc951aec043cfa510faba2744bccbf80723cd19bcf0ffb9e33a"
+  },
+  "clean": true,
+  "command": [
+    "poetry",
+    "run",
+    "coverage",
+    "run",
+    "--branch",
+    "--source=drm_copilot_discovery.completion_report",
+    "-m",
+    "pytest",
+    "-v",
+    "--tb=short",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "tests/discovery_runtime/test_completion_report.py"
+  ],
+  "elapsed_seconds": 29.391055,
+  "exit_code": 0,
+  "harness_sha256": "56bad2714b0d3cfb482da6475483b1a61c86f2348f71841dfaf13476f8f6e765",
+  "population": [
+    "tests/discovery_runtime/test_completion_report.py"
+  ],
+  "raw": {
+    "stderr": {
+      "bytes": 0,
+      "scratch_relative": "p5t3-producer-pure2-tests.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "bytes": 5112,
+      "scratch_relative": "p5t3-producer-pure2-tests.stdout",
+      "sha256": "1c2ed3c6fcf5b9b3aca5db153c6ea254b84a103ed16b4b6a8fe5cad383b1a395"
+    }
+  },
+  "stage": "tests",
+  "started_utc": "2026-10-20T08:51:34.539300+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- <WORKSPACE>\\.venv\\Scripts\\python.exe\nrootdir: <WORKSPACE>\nconfigfile: pyproject.toml\ncollecting ... collected 35 items\n\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-structural-Structural validation] PASSED [  2%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-discovery-complete-Discovery completion] PASSED [  5%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-parity-complete-Parity completion] PASSED [  8%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[False-planning-Planning prerequisite] PASSED [ 11%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-structural-Structural validation] PASSED [ 14%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-discovery-complete-Discovery completion] PASSED [ 17%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-parity-complete-Parity completion] PASSED [ 20%]\ntests/discovery_runtime/test_completion_report.py::test_mode_and_availability_do_not_invent_readiness[True-planning-Planning prerequisite] PASSED [ 22%]\ntests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[none] PASSED [ 25%]\ntests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[discovery-complete] PASSED [ 28%]\ntests/discovery_runtime/test_completion_report.py::test_planning_exposes_only_configured_prerequisite[parity-complete] PASSED [ 31%]\ntests/discovery_runtime/test_completion_report.py::test_exact_actions_preserve_every_original_diagnostic_index PASSED [ 34%]\ntests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order0] PASSED [ 37%]\ntests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order1] PASSED [ 40%]\ntests/discovery_runtime/test_completion_report.py::test_action_index_permutation_property[order2] PASSED [ 42%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[agent-output] PASSED [ 45%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[] PASSED [ 48%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[custom] PASSED [ 51%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[None] PASSED [ 54%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[True] PASSED [ 57%]\ntests/discovery_runtime/test_completion_report.py::test_unsupported_modes_fail_before_any_preflight[mode5] PASSED [ 60%]\ntests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[list] PASSED [ 62%]\ntests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[member] PASSED [ 65%]\ntests/discovery_runtime/test_completion_report.py::test_malformed_summary_arguments_fail_explicitly[validity] PASSED [ 68%]\ntests/discovery_runtime/test_completion_report.py::test_public_preflight_requires_a_captured_snapshot PASSED [ 71%]\ntests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[ascii] PASSED [ 74%]\ntests/discovery_runtime/test_completion_report.py::test_action_encoding_is_bounded_before_a_summary_can_escape[unicode] PASSED [ 77%]\ntests/discovery_runtime/test_completion_report.py::test_grouping_reserves_work_before_visiting_supplied_findings PASSED [ 80%]\ntests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[False] PASSED [ 82%]\ntests/discovery_runtime/test_completion_report.py::test_legacy_summary_counts_actual_rows_without_readiness[True] PASSED [ 85%]\ntests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[coverage] PASSED [ 88%]\ntests/discovery_runtime/test_completion_report.py::test_explicit_v2_cannot_pass_through_legacy_helpers[parity] PASSED [ 91%]\ntests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[schema_version-2.0.0] PASSED [ 94%]\ntests/discovery_runtime/test_completion_report.py::test_legacy_render_rejects_versioned_authority_envelopes[artifact_kind-completion-report] PASSED [ 97%]\ntests/discovery_runtime/test_completion_report.py::test_empty_legacy_counts_remain_compatibility_only PASSED [100%]\n\n============================= 35 passed in 27.58s =============================",
+  "task": "P5-T3"
+}

@@ -1,0 +1,134 @@
+{
+  "Timestamp": "2026-10-20T08-40",
+  "after": {
+    "scripts/dev_tools/discovery/completion_report.py": "b7b6d4205f16c4e0902e954936be79c47a2845e5cd705c7a887a4e911c3fdfd1",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "dc431b8a5531fd4e729639f0d826b59ec9bb232bd16d482bb89815009f063262",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "before": {
+    "scripts/dev_tools/discovery/completion_report.py": "b7b6d4205f16c4e0902e954936be79c47a2845e5cd705c7a887a4e911c3fdfd1",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "dc431b8a5531fd4e729639f0d826b59ec9bb232bd16d482bb89815009f063262",
+    "tests/scripts/dev_tools/discovery/test_io.py": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f"
+  },
+  "coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-baseline-coverage.2026-10-20T08-40.json",
+  "harness_sha256": "9ceb6d2dbf96aa0e21f39e0f9edeab09fd311aabd6a5df860033c7538fcb4bba",
+  "label": "baseline",
+  "raw_policy": "Exact binary streams in SCRATCH; JSON readable strings replace only workspace/scratch absolute paths; CR/LF preserved as escapes.",
+  "results": [
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.45067890000063926,
+      "stage": "format",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-format-2026-10-20T08-40.stderr.bin",
+          "readable": "All done! \\u2728 \\U0001f370 \\u2728\r\n3 files would be left unchanged.\r\n",
+          "sha256": "814c0f4c496423065215825ae383556f90c7a25251a3476981901eadca298486"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-format-2026-10-20T08-40.stdout.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11134319999837317,
+      "stage": "lint",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-lint-2026-10-20T08-40.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-lint-2026-10-20T08-40.stdout.bin",
+          "readable": "All checks passed!\n",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7894134999951348,
+      "stage": "types",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-types-2026-10-20T08-40.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-types-2026-10-20T08-40.stdout.bin",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41"
+        }
+      }
+    },
+    {
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py",
+        "--cov=scripts.dev_tools.discovery.completion_report",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\baseline\\p5t3-baseline-coverage.2026-10-20T08-40.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7262051999859978,
+      "stage": "tests",
+      "streams": {
+        "stderr": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-tests-2026-10-20T08-40.stderr.bin",
+          "readable": "",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "path": "SCRATCH/issue-980-p5t3-baseline-tests-2026-10-20T08-40.stdout.bin",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollected 11 items\r\n\r\ntests\\scripts\\dev_tools\\discovery\\test_completion_report.py .......      [ 63%]\r\ntests\\scripts\\dev_tools\\discovery\\test_io.py ....                        [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                               Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------\r\nscripts\\dev_tools\\discovery\\completion_report.py      51      4      6      0    93%   124-128, 154-158\r\n----------------------------------------------------------------------------------------------\r\nTOTAL                                                 51      4      6      0    93%\r\nCoverage JSON written to file WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\baseline\\p5t3-baseline-coverage.2026-10-20T08-40.json\r\n============================= 11 passed in 0.18s ==============================\r\n",
+          "sha256": "9b2c90e538a83198feec4f69d1f53243d47b806f3e8947a0abf1825731fac526"
+        }
+      }
+    }
+  ],
+  "scope": [
+    "scripts/dev_tools/discovery/completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py",
+    "tests/scripts/dev_tools/discovery/test_io.py"
+  ],
+  "status": "focused-pass-not-task-acceptance"
+}

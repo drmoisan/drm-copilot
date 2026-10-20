@@ -1,0 +1,119 @@
+{
+  "Timestamp": "2026-10-20T09:21:00.165302+00:00",
+  "task": "P5-T3",
+  "status": "SEMANTIC_REVIEW_REPAIR_REQUIRED",
+  "route": "atomic_execution_p5t3_semantic_review_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_routing_launch_provenance_verified": true,
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "f55628e293c80db1fa76ffa19d38bc17d09961603beb9203597a228a378edb6f",
+      "bytes": 10168
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+      "sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "bytes": 12999
+    },
+    {
+      "path": "tests/discovery_runtime/test_completion_projection.py",
+      "sha256": "e0dfd5fd1ba5640b8c26742c95ca4dd5d883fb9c6776dc2a246e05b9976636ac",
+      "bytes": 13683
+    },
+    {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113",
+      "bytes": 17062
+    }
+  ],
+  "mechanical_base": "d8cdc87f8b70ef7311eb907966b13bbdbc48d89d",
+  "source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-source-freeze.2026-10-20T09-14.json",
+    "sha256": "0cbec7581e100facd8a726fea7018c4c2c12e26ce701c6ed3e486d12ea6e6334",
+    "bytes": 85338
+  },
+  "interface": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-interface-contract.2026-10-20T08-23.json",
+    "sha256": "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61",
+    "bytes": 14662
+  },
+  "retained_producer_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-producer-source-review.2026-10-20T09-09.json",
+    "sha256": "3187ca526a066823017a1ad3018404efeb94b2c459b3e8d89e3d3b88b0ccc7b3",
+    "bytes": 5416
+  },
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-semantic-probe.2026-10-20T09-21.json",
+    "sha256": "0ca60fd9e0b2fd1e5673524453556044798be6662ee335ffa93028b459177b24",
+    "bytes": 3433
+  },
+  "payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-executor-semantic-payload.2026-10-20T09-21.json",
+    "sha256": "3513e0e1b090146ef903619f0bab0a2e7607bd484d31c990363ece0578cb6713",
+    "bytes": 28616
+  },
+  "source_conclusions": [
+    "Trusted input findings are merged only for completion, through the retained bounded deterministic collector; selected-mode results and truncation authority are preserved.",
+    "Per-operation evaluate/complete caching and all accepted rule bodies are unchanged. Completion summarizes the selected result without another mode or recursive validation.",
+    "Coverage/parity projection branches and their requested/complete result separation are unchanged.",
+    "Malformed completion returns the original input diagnostics, fail/null/unavailable, without constructing the semantic operation. Prospective authority remains with existing validation/mutation gates.",
+    "The reviewed four files satisfy the 500-line limit, typed intent contracts and memory-only test isolation."
+  ],
+  "findings": [
+    {
+      "id": "SD1",
+      "kind": "production_dispatch_regression",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "lines": [
+        208,
+        211,
+        239,
+        256
+      ],
+      "problem": "Catch-all completion dispatch also captures supported validation-report. Malformed validation-report now emits a completion summary; its old boundary raised ValueError. Valid validation-report also acquires the new completion preflight.",
+      "required_change": "Select completion_preflight and the malformed completion envelope only for completion-report. Preserve the existing validation-report valid envelope and malformed ValueError.",
+      "regressions": "Retain one valid validation-report compatibility control and one malformed validation-report rejection control."
+    },
+    {
+      "id": "ST1",
+      "kind": "test_fixture_defect",
+      "path": "tests/discovery_runtime/test_completion_projection.py",
+      "lines": [
+        174,
+        183
+      ],
+      "problem": "Positional slicing treats canonically sorted artifact/manifest tuples as append-ordered and duplicates scope.yaml, preventing the three agent-output refusal assertions from running.",
+      "required_change": "Choose newly added artifact and file paths by membership relative to baseline paths; preserve all existing assertions and the three intended prospective faults."
+    }
+  ],
+  "coverage_reconciliation": {
+    "new_guard_false_arc": [
+      243,
+      246
+    ],
+    "retained_control": "tests/discovery_runtime/test_validation_modes.py::test_report_projection_is_recomputed_and_nonrecursive[coverage-report-initialized-root]",
+    "completion_else_false_arc": [
+      296,
+      305
+    ],
+    "qualification": "The second arc is reachable for the supported validation-report kind and must not be labeled unreachable. A valid validation-report regression exercises it.",
+    "raw_coverage_unchanged": true,
+    "whole_module_acceptance": false
+  },
+  "existing_run": {
+    "passed": 17,
+    "failed": 3,
+    "pytest_seconds": 142.07,
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-semantics-pass3-tests.2026-10-20T09-15.json",
+      "sha256": "d1554fcf3a404287b548bf80ab24e602248f10153d8666800cf7d01dc1fc7615",
+      "bytes": 33347
+    }
+  },
+  "open_behavioral_probes": [],
+  "checked_WIP_readiness": false,
+  "task_acceptance": false,
+  "plan_AC_edits": false,
+  "pending": "Narrow owner repairs, clean focused proof and exact coverage confirmation; final task gates remain pending."
+}

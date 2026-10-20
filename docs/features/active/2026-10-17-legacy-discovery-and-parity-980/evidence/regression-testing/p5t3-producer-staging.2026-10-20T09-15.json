@@ -1,0 +1,265 @@
+{
+  "Timestamp": "2026-10-20T09-15",
+  "content_bindings": [
+    {
+      "bytes": 555,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-producer-planning-split.2026-10-20T08-47.json",
+      "sha256": "726950c275036b0299a92f0b0a65c75064a6c4816dc2cb8a288bd7ad1cbbf4cc"
+    },
+    {
+      "bytes": 46825,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+      "sha256": "40be07f7d204d6c2ca99410deecf4c3d1d887d523e52294dd1d35150fb42b8a0"
+    },
+    {
+      "bytes": 6657,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze-harness.2026-10-20T09-01.txt",
+      "sha256": "6c42dd60b63ee99182fc800f5c82409c22245b2bb5de1c1c47b1bc2eeda6a530"
+    },
+    {
+      "bytes": 3601,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.json",
+      "sha256": "48b9fd0a719512655a3f9a8973896d1faa6cd61379f1fc4dc92f8020eeb87508"
+    },
+    {
+      "bytes": 470,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.md",
+      "sha256": "c6a59b563d2874b708211bb8161877a81691347969995b2c5d3af78fca99aa65"
+    },
+    {
+      "bytes": 24500,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-archive.2026-10-20T09-15.json",
+      "sha256": "4c6fbc7c627f783ab6b42fc3b92663949863f8a8f8beb555da97cd2659d1c4d3"
+    },
+    {
+      "bytes": 9382,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-freeze-harness.2026-10-20T09-15.txt",
+      "sha256": "12daf9514963f60270bbce4c6a433e2c8f16de688d3f4d4cda8d33e37d3ff2e4"
+    },
+    {
+      "bytes": 14033,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+      "sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991"
+    },
+    {
+      "bytes": 492,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.md",
+      "sha256": "e2a21a4c48ceadb0f7878c8e6f102f6dd1a9c9563ba3f469865c6a29c00ad21d"
+    },
+    {
+      "bytes": 4640,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.json",
+      "sha256": "e30a80c19c225ba1fa02a2fd6dd979b58b18c296f8deb7185b25d277af7a88d9"
+    },
+    {
+      "bytes": 433,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.md",
+      "sha256": "14b85a1b9c2cad81fa79d0bea39dd94bfeef49c1102e7f47aa699d587f1f847e"
+    },
+    {
+      "bytes": 4562,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.json",
+      "sha256": "58278ad4f17f93eb31539897201b092ea973b17bab043baa1e5de3119a727e4a"
+    },
+    {
+      "bytes": 349,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.md",
+      "sha256": "0203f563cb47c17e856b8682089ad45e3d2c373e5d7c91f0c8d14077c7f2e106"
+    },
+    {
+      "bytes": 4676,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.json",
+      "sha256": "0c5d88281fc8529e35fa3c963b37363488ae5e2c05c461799b3fa03a2c06d16c"
+    },
+    {
+      "bytes": 467,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.md",
+      "sha256": "ed6ecb79dff83c45207f700dcdca30846a50868a315b6f2f69fc9f9d1c6804bc"
+    },
+    {
+      "bytes": 4503,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.json",
+      "sha256": "569b678a8e054e830e8a373cb6bd30110defec8a214e4b63b6f2d5f82e503088"
+    },
+    {
+      "bytes": 296,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.md",
+      "sha256": "df8c7406e93e2800f39ee655d92cf368ffcb3c9aa9be0bc06a1fa171ee2a2d50"
+    },
+    {
+      "bytes": 4562,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.json",
+      "sha256": "2b7998259e45c25ee488b3bdeaf25ae481a2e1e6b829873069b8a69aacedea56"
+    },
+    {
+      "bytes": 349,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.md",
+      "sha256": "4070b0cba31d4e1ecd9705891d49faf70ca071f461a0445637c3097ddb0c7495"
+    },
+    {
+      "bytes": 4519,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.json",
+      "sha256": "177c849b157d7b0e728ab1e5485a25915c931f355135541a0ff566d0cb7b65be"
+    },
+    {
+      "bytes": 294,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.md",
+      "sha256": "1d0b06b05d50561ef81ba6dbe1c8038c459c8355d6aa0990eafd143e8e5dbfe7"
+    },
+    {
+      "bytes": 4676,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.json",
+      "sha256": "29337c2a74b71cb07628eec7964591d41a15620dae32e41a3643a03af311fb9e"
+    },
+    {
+      "bytes": 467,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.md",
+      "sha256": "5af372c1edc9c5c7365e7c6e7216c244db1bec78a960bde7e41f3abfb78057f4"
+    },
+    {
+      "bytes": 4503,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.json",
+      "sha256": "613bf695b8e9f58e109f83cfe377ae521d35f1bde4302ea7d41b0ee295dfdc45"
+    },
+    {
+      "bytes": 296,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.md",
+      "sha256": "501ca68217f89a6d22cabba8b25f4d587f37b4b925c0bb6f1a29df69c92f07ae"
+    },
+    {
+      "bytes": 7628,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.json",
+      "sha256": "8dd9b0360a75f9619772fea127c7be5317c8ba50a0da50dd44b63df50a16c9a4"
+    },
+    {
+      "bytes": 3266,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.md",
+      "sha256": "61a82c2389f83d1051b1647a08a3237d2a2c702aaebcb32667295225adec0a89"
+    },
+    {
+      "bytes": 4616,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.json",
+      "sha256": "0bad75826793db6bd7aaca885296707a913c9f24a4d1727772e7dd25bbf48702"
+    },
+    {
+      "bytes": 493,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.md",
+      "sha256": "d23654350614f4b79840a285f9a3160c0f6f030a0f0438286292839913d7f84c"
+    },
+    {
+      "bytes": 4471,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.json",
+      "sha256": "9f0ad8cbfd037492af4668f9e53cb0ab4c50c6ef5560b1f089889e0df00fdf09"
+    },
+    {
+      "bytes": 347,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.md",
+      "sha256": "d8bb73e8202c906a7091a0a183f066b99bb1aa3f3472535aa05e8dc059152815"
+    },
+    {
+      "bytes": 4422,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.json",
+      "sha256": "fec17f46fec8c052a08ec4c8088c7d8df09821e21803c7b3a3e3cb7d7309ab7b"
+    },
+    {
+      "bytes": 286,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.md",
+      "sha256": "f002d82d8a227b40aaad2389457c6a34ba03b3628bcbc92f3ffec62bc1e7e652"
+    },
+    {
+      "bytes": 4585,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.json",
+      "sha256": "1b6a1c2035b50b5ac608537bba7a8863b0a36f6e9cf44363ddaf12f3b3dcbe99"
+    },
+    {
+      "bytes": 465,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.md",
+      "sha256": "28c8e213a6a1e9ee77531ed864a8d46a7b3880bedcdc973b6d193d89f943b699"
+    },
+    {
+      "bytes": 4412,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.json",
+      "sha256": "407a609c1269e77af928b7e839b095519d5b1d405f59a8a59fd20d80e4970b27"
+    },
+    {
+      "bytes": 294,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.md",
+      "sha256": "7d355c8d32204d55dab06263b9e276f91b49e1004c3af0469cfaa15091c5f540"
+    },
+    {
+      "bytes": 9585,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+      "sha256": "235e7b873529c5ea0e7cb211ac6dc129077e10b881759ac99131388e131a6719"
+    },
+    {
+      "bytes": 5298,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.md",
+      "sha256": "424ca6dd64490979a031d161e090e5063ed97e3e5970baa4b7346422007b9e30"
+    },
+    {
+      "bytes": 11322,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69"
+    },
+    {
+      "bytes": 15345,
+      "path": "tests/discovery_runtime/test_completion_planning.py",
+      "sha256": "1efc093aad863a4170da91cfd06fba08a082a2da3f18764a861113110e737214"
+    },
+    {
+      "bytes": 15649,
+      "path": "tests/discovery_runtime/test_completion_report.py",
+      "sha256": "0403687ca7be3c7606ca734d0c28e80b05646da067b6d5e90b2c5309cc1df962"
+    }
+  ],
+  "manifest": {
+    "bytes": 14033,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+    "sha256": "1288e9d1fe027ac3408d00e187159ad5bfed60f7cfac71fb94ee6d0cd1f48991"
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-producer-planning-split.2026-10-20T08-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-archive.2026-10-20T09-01.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze-harness.2026-10-20T09-01.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-producer-source-freeze.2026-10-20T09-01.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-archive.2026-10-20T09-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-final-freeze-harness.2026-10-20T09-15.txt",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-freeze.2026-10-20T09-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning1format-black.2026-10-20T08-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-black.2026-10-20T08-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-pyright.2026-10-20T08-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning2-ruff.2026-10-20T08-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-black.2026-10-20T09-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-coverage.2026-10-20T09-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-pyright.2026-10-20T09-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-ruff.2026-10-20T09-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-planning3-tests.2026-10-20T09-15.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure1format-black.2026-10-20T08-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-black.2026-10-20T08-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-coverage.2026-10-20T08-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-pyright.2026-10-20T08-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-ruff.2026-10-20T08-51.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-pure2-tests.2026-10-20T08-52.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-producer-staging.2026-10-20T09-15.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+    "tests/discovery_runtime/test_completion_planning.py",
+    "tests/discovery_runtime/test_completion_report.py"
+  ]
+}
