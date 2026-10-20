@@ -226,3 +226,49 @@ def test_tag_prefix_and_existing_tag_are_reserved_before_joining(
         render_acceptance(result)
     assert seen[-2] == "  "
     assert seen[-1] is tag
+
+
+def test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise trace exhaustion through rendering; return None.
+
+    monkeypatch (pytest.MonkeyPatch) supplies one actual, fully spent output
+    budget and observes serialization. A valid retained specification must raise
+    ReportLimitError before encoding or returning a partial bundle. Only local
+    counters and test bindings change; no I/O or shared fixture mutation occurs.
+    """
+    item = specification()
+    result = generation((item,), (item,))
+    output = AcceptanceTextOutput(result.limits)
+    output.budget.spend(output.budget.bytes_left)
+    calls = 0
+    returned: list[AcceptanceRenderBundle] = []
+
+    def spent_output(limits: ParseLimits) -> AcceptanceTextOutput:
+        """Return the spent local budget for limits (ParseLimits), without I/O.
+
+        Assert the renderer's original policy is retained; no new limits or
+        partial rendered values are created.
+        """
+        assert limits == result.limits
+        return output
+
+    def forbidden(value: object, **options: object) -> str:
+        """Observe value (object)/options (object keyword values); raise AssertionError.
+
+        Only the local call counter changes; this encoder must remain unused.
+        No I/O or input mutation occurs.
+        """
+        nonlocal calls
+        calls += 1
+        raise AssertionError("serialization preceded the exhausted trace guard")
+
+    monkeypatch.setattr(gherkin, "_Output", spent_output)
+    monkeypatch.setattr(json, "dumps", forbidden)
+    assert output.budget.bytes_left == 0
+    with pytest.raises(ReportLimitError):
+        returned.append(render_acceptance(result))
+    assert calls == 0
+    assert returned == []
+    assert output.budget.bytes_left == 0

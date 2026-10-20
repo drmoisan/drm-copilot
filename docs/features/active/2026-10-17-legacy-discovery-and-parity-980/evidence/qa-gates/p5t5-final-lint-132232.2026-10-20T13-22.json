@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py tests/discovery_runtime/test_gherkin.py tests/discovery_runtime/test_acceptance_tags.py tests/discovery_runtime/test_acceptance_render_limits.py tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:22:34.367843+00:00",
+  "label": "lint",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-lint-132232-raw.2026-10-20T13-22.json",
+    "sha256": "b649047fd34840595d9a7267488f687d6e0a8ad675c37410ab81de606a54957c"
+  },
+  "seconds": 1.014,
+  "stage": 2,
+  "started_at": "2026-10-20T13:22:33.353783+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-22"
+}

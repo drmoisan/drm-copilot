@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b8bcc74616c7cd606fb5f033573bc093a858aaa60c67e578814401bb63fa401e"
+  },
+  "candidate": "SCRATCH\\candidate-released.json",
+  "candidate_sha256": "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\p5t5-final-132232-rendering.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:24:12.758433+00:00",
+  "label": "coverage-combine",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-combine-132232-raw.2026-10-20T13-24.json",
+    "sha256": "e841b023d22666401c0936360c77b3d8010bb5b6717f8a9872b6973214587612"
+  },
+  "seconds": 1.05,
+  "stage": 6,
+  "started_at": "2026-10-20T13:24:11.707998+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t5-gherkin\\p5t5-final-132232-rendering.coverage\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-24"
+}

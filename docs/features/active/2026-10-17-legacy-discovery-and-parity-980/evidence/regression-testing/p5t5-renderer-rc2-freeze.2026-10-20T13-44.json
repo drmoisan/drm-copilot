@@ -1,0 +1,215 @@
+{
+  "task": "P5-T5",
+  "status": "RC2_FOCUSED_PASS_PENDING_CONFIRMATION_AND_FINAL119",
+  "created_utc": "2026-10-20T13:44:47.317275+00:00",
+  "candidate": {
+    "tests/discovery_runtime/test_acceptance_render_limits.py": {
+      "sha256": "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125",
+      "lf_sha256": "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125",
+      "physical_lines": 274
+    }
+  },
+  "repair": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-body-coverage-finding.2026-10-20T13-36.json",
+    "sha256": "cd884905f8752271885dc59564d8debb691f84837ce0dac9d211e3cac2e638cb"
+  },
+  "retained_renderer_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze.2026-10-20T13-07.json",
+    "sha256": "d6fbe1f305a6f4d46771497147cfc3a3f8630b361f3f653d87068bafdaf3047b"
+  },
+  "retained_final118_pass": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-rendering-132232.2026-10-20T13-24.json",
+    "sha256": "284879b8b54352d8335df9486bdfabdd5e0957d70a8823ea1ce6b2b44cdbad19",
+    "bytes": 30704
+  },
+  "retained_final_coverage_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-132232.2026-10-20T13-24.json",
+    "sha256": "9a52235bf55cdc203334331cd51a4b2de14476b4e17f32f01b341381ed56dc31",
+    "bytes": 1680
+  },
+  "retained_final_raw_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-coverage-proof-132232-raw.2026-10-20T13-24.json",
+    "sha256": "f59ce5048d48ad7390cee41ffad18d5537eae20da90f913f2f243043a3fdae71"
+  },
+  "ordered_stages": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-black.2026-10-20T13-41.json",
+      "sha256": "77f449a79ebe6fab990c1de250c714959ffb5b34e7cf3911186779f976800803",
+      "stage": "black",
+      "elapsed_seconds": 1.609396,
+      "executed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-ruff.2026-10-20T13-41.json",
+      "sha256": "25af80a3c4fba4458a5314bb18bfd798fa8d7651096947b5188fec269f12e2ef",
+      "stage": "ruff",
+      "elapsed_seconds": 1.40929,
+      "executed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-pyright.2026-10-20T13-41.json",
+      "sha256": "c8077b712b683a33ffa7d3d04f8bc960c29befa101b9333070889f4a16b32de9",
+      "stage": "pyright",
+      "elapsed_seconds": 2.212462,
+      "executed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-tests.2026-10-20T13-41.json",
+      "sha256": "599947b0dbf5d5675b266876ea3e0c8bcb43ade922593ba15cd690261133dd00",
+      "stage": "tests",
+      "elapsed_seconds": 2.013331,
+      "executed_nodes": [
+        "tests/discovery_runtime/test_acceptance_render_limits.py::test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle"
+      ]
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-coverage.2026-10-20T13-41.json",
+      "sha256": "3fdaff8fe54b7ba62401d1c015f37d499e946a0c27da9be2b442b878e872a1dc",
+      "stage": "coverage",
+      "elapsed_seconds": 1.611598,
+      "executed_nodes": []
+    }
+  ],
+  "preservation": {
+    "exact_original_test_prefix": true,
+    "original_module_ast_after_removing_only_new_test": true,
+    "retained_local_test_functions": [
+      "test_file_capacity_counts_raw_utf8_without_phantom_newline",
+      "test_bundle_capacity_sums_raw_utf8_paths_and_content",
+      "test_path_measurement_rejects_invalid_scalars_and_capacity_types",
+      "test_json_container_limits_reject_before_encoder",
+      "test_json_unicode_scalar_guard_precedes_encoding",
+      "test_escaped_output_work_is_reserved_before_detachment_and_encoding",
+      "test_tag_prefix_and_existing_tag_are_reserved_before_joining"
+    ],
+    "renderer77_nodes_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair-audit.2026-10-20T13-01.json",
+      "sha256": "ebe73fc77b859bf6304bb804407f05f0ee411862aff407eaff2c1afd12d7945f"
+    },
+    "renderer77_nodes_key": "current_nodes",
+    "existing_renderer_nodes_preserved": 77,
+    "added_node": "tests/discovery_runtime/test_acceptance_render_limits.py::test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle",
+    "renderer_nodes_after_addition": 78,
+    "final_task_union_pending": 119,
+    "production_and_examples": "All existing byte bindings held before/after each stage; no example is in this repair's stage scope.",
+    "before_after_binding_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-tests.2026-10-20T13-41.json",
+      "sha256": "599947b0dbf5d5675b266876ea3e0c8bcb43ade922593ba15cd690261133dd00",
+      "stage": "tests",
+      "elapsed_seconds": 2.013331,
+      "executed_nodes": [
+        "tests/discovery_runtime/test_acceptance_render_limits.py::test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle"
+      ]
+    },
+    "models_and_generator": "Accepted proof retained without replay."
+  },
+  "narrow_named_body_proof": {
+    "module": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "callable": "_trace",
+    "executed_lines": [
+      164,
+      165,
+      175,
+      176,
+      177,
+      178,
+      179
+    ],
+    "executed_branches": [
+      [
+        175,
+        176
+      ],
+      [
+        175,
+        177
+      ],
+      [
+        178,
+        179
+      ]
+    ],
+    "summary": {
+      "covered_lines": 7,
+      "num_statements": 9,
+      "percent_covered": 76.92307692307692,
+      "percent_covered_display": "77",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 77.77777777777777,
+      "percent_statements_covered_display": "78",
+      "num_branches": 4,
+      "num_partial_branches": 1,
+      "covered_branches": 3,
+      "missing_branches": 1,
+      "percent_branches_covered": 75.0,
+      "percent_branches_covered_display": "75"
+    },
+    "exact_new_guard": {
+      "line": 179,
+      "branch": [
+        178,
+        179
+      ]
+    },
+    "declaration_line_157_excluded": true,
+    "retained118_plus_narrow_source_bound_union": {
+      "executed_lines": [
+        164,
+        165,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        185
+      ],
+      "executed_branches": [
+        [
+          175,
+          176
+        ],
+        [
+          175,
+          177
+        ],
+        [
+          178,
+          179
+        ],
+        [
+          178,
+          180
+        ]
+      ],
+      "statements": "9/9",
+      "branches": "4/4"
+    },
+    "qualification": "The narrow run is 1/1, not a new aggregate test run. Its named body is 7/9 statements and 3/4 branches. The exact-source retained118-plus-narrow set union is supporting proof only; the authoritative119-case aggregate remains pending. No coverage floor or attribution rule changed."
+  },
+  "test_mechanism": "Build a valid specification and generation before patching; exhaust the actual output budget with spend(); supply that object at the renderer's constructor seam; assert ReportLimitError, zero JSON encoding and no returned partial bundle.",
+  "purity": {
+    "forbidden_io_calls": [],
+    "new_function_contracts_present": true
+  },
+  "raw_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-originals.2026-10-20T13-44.json",
+    "sha256": "faaab529ffe5cb665dd55958fd8f117e6627c6697d8d5513fca9c84db1c6ef7e"
+  },
+  "reused_reader": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze-originals.2026-10-20T13-07.json",
+      "sha256": "0504bd8ab5f9d641b0f97db29fe0b60fc9372955b16a52089486f4cf7c2cd29e"
+    },
+    "member": "freeze-harness.py",
+    "sha256": "40b822ba8ec8666d602b6e55863d8cc4aa774ccbd6ffbff022a6784362339165"
+  },
+  "presentation": {
+    "authored": "Explicit UTF-8, LF, one terminal newline, no trailing whitespace.",
+    "raw": "Exact raw coverage JSON has no terminal newline and remains unchanged inside the lossless archive. Original binary coverage and subprocess streams are retained with byte counts and hashes.",
+    "examples": "Previously committed example bytes, including terminal blank lines, remain exact and are excluded from repair staging."
+  },
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-rc2-staging.2026-10-20T13-44.json",
+  "scope": "One test-only repair; no production, legacy, model, example, checkpoint, Git or acceptance edits."
+}
