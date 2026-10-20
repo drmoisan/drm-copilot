@@ -1,0 +1,183 @@
+{
+  "Timestamp": "2026-10-20T14-58",
+  "status": "OWNED_REPAIR_CLOSURE_NO_GIT_MUTATION",
+  "paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "bytes": 12432,
+      "physical_lines": 304
+    },
+    {
+      "path": "tests/discovery_runtime/analyzer/test_inventory_selection.py",
+      "sha256": "a4f581f553f99d1b52f3dfed50b6d21d075ed224700fc45b99082e3de4db30cd",
+      "bytes": 16304,
+      "physical_lines": 420
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-format.2026-10-20T14-45.json",
+      "sha256": "e7405a8e064fe7540d1e9eb2be0ff97544c2b0238dea90446586ee6b0fbcb3fb",
+      "bytes": 7875,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-lint.2026-10-20T14-45.json",
+      "sha256": "f7d7eb0810c55ca834ae54f78409df298bb139617706655f9c72faea5fbd1e6f",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-tests.2026-10-20T14-50.json",
+      "sha256": "ab9995f57d2388b160346ced5a4b8770786e5028ca9ec3afa505154c97e65fd8",
+      "bytes": 109409,
+      "physical_lines": 3170
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-full-types.2026-10-20T14-45.json",
+      "sha256": "3c1c2ee506363dd65316fdfbb1619469376fe38384341ac08a08c49e24390159",
+      "bytes": 8155,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-format.2026-10-20T14-43.json",
+      "sha256": "a377022ac5ee9a4a7ec70f71810b75121f49078e43ecfb2b9adf32a9133a9ebd",
+      "bytes": 7873,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-lint.2026-10-20T14-43.json",
+      "sha256": "83f1c034bc695597a5f7c479c56f92c6640a25b138a20f6b4cf67cc682336ff0",
+      "bytes": 7744,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-tests.2026-10-20T14-44.json",
+      "sha256": "c3d049a3098c158427830c033b5e086e4fc48c48324809fdab3d52855b574089",
+      "bytes": 71258,
+      "physical_lines": 2510
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-precheck-types.2026-10-20T14-43.json",
+      "sha256": "1a70b93c358f5be145a23d2ef84d8fb47e9628f8c11bcc47c2ccdea489e2d12a",
+      "bytes": 8156,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-format.2026-10-20T14-52.json",
+      "sha256": "031b66ba8779adff0849e6d38ca5d55852c3cec0da7ae48e2b1e3fba5abd88b6",
+      "bytes": 7875,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-lint.2026-10-20T14-52.json",
+      "sha256": "1e9480f0ec2a743e0b4a86c432aae9c96975dac4de40ecf78e9be668aca0beca",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-tests.2026-10-20T14-58.json",
+      "sha256": "f15f10b2fe7fa5279df78693f23ebfd3e0505648bb3ce04d165e2c37806382ff",
+      "bytes": 102515,
+      "physical_lines": 3170
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-full-types.2026-10-20T14-52.json",
+      "sha256": "5f0b20a84cb8fafdab7a3fb1b63f3262e09c2001cfb77112248b3bf884b3065a",
+      "bytes": 8155,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-format.2026-10-20T14-51.json",
+      "sha256": "fdaa6c0c488a106880837375748fb1d4c3b608ebe9402eae4df48106ec6e1549",
+      "bytes": 7874,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-lint.2026-10-20T14-51.json",
+      "sha256": "f5132aebb1864c5997f81230a1d436532822bfad7ce33a7f44259b7240c9d923",
+      "bytes": 7745,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-tests.2026-10-20T14-51.json",
+      "sha256": "0627df73178ae948b3ca121f83f90fc34a8085461bce50ed5040346905887c9c",
+      "bytes": 67193,
+      "physical_lines": 2427
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair2-precheck-types.2026-10-20T14-51.json",
+      "sha256": "3c8a0fe5203bb1ab4ee611e1312efbcbde85e386fae40824e7871dde6b3a8998",
+      "bytes": 8156,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-consolidate-format.2026-10-20T14-43.json",
+      "sha256": "1525fbee724a82619be89b8b0dc6516355edc4dc4914383a46c4373b26266d92",
+      "bytes": 8232,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-consolidate-lint.2026-10-20T14-43.json",
+      "sha256": "917abdeec36d0bf4b700e3fad25ca3ddc26ffdc82365e2bb4397b33c6a2c237e",
+      "bytes": 7751,
+      "physical_lines": 165
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-initial-archive.2026-10-20T14-50.json",
+      "sha256": "192323b11d87183489981bffab86367f86eb919492eb254d4d4f6ee2a93d8d00",
+      "bytes": 38915,
+      "physical_lines": 19
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-archive.2026-10-20T14-58.json",
+      "sha256": "71094cbd4b61d747c02b3ea5cf0e234e11c91269a5da4aac939177c737f87d86",
+      "bytes": 19021,
+      "physical_lines": 44
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-repair-freeze.2026-10-20T14-58.json",
+      "sha256": "3c746489deba14a892632ff33f5f2223da2ddd13ab058643bbec0c0c8ddf9a8a",
+      "bytes": 32225,
+      "physical_lines": 867
+    }
+  ],
+  "retain_prior_union": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-staging.2026-10-20T14-31.json",
+    "sha256": "799797df30d88e880c8eb7f459d9f27653ebbd7b9c51918291d4951f05a42766",
+    "bytes": 4760,
+    "physical_lines": 104
+  },
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-selectors-review.2026-10-20T14-40.json",
+      "sha256": "ef3db7b1e9a32bde92a4e07e0105a5004f941c9fcca2ad6b089fee8493d52888",
+      "bytes": 11347,
+      "physical_lines": 157
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-resource-refresh.2026-10-20T14-35.json",
+      "sha256": "d02cd1a08abc9859fdaecc5a10347253f3aab6f0a5fc0b088337de7cb65e942c",
+      "bytes": 891,
+      "physical_lines": 16
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json",
+      "sha256": "50ff833bbb4dfc03d9370c32eb748d36d03459e261fe9c2b40e995a25dac26b1",
+      "bytes": 23481,
+      "physical_lines": 541
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-shared-baseline-originals.2026-10-20T14-17.json",
+      "sha256": "1cf917d8a4b54ec11fca67eaef693a4e283b83067032c156055787f87149bb04",
+      "bytes": 55785,
+      "physical_lines": 98
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-selectors-lossless-archive.2026-10-20T14-31.json",
+      "sha256": "5280cc2e8b21efb506d23cafb990a016f37c593567d52d8b3f71c2238492478b",
+      "bytes": 18307,
+      "physical_lines": 35
+    }
+  ],
+  "union_rule": "Retain prior evidence and unchanged registry path. Replace only the two source/test hashes in prior owned union with this repair; do not restage historical hashes for those paths. Generated resources and other owners sources are referenced, not included."
+}

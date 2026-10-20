@@ -38,6 +38,7 @@ if TYPE_CHECKING:
         InventoryResult,
         ParseResult,
     )
+    from drm_copilot_discovery.analyzer.registry import InventoryRegistry
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.models import JsonObject
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace, MutationPlan
@@ -180,6 +181,8 @@ def run_inventory(
     author_or_agent: JsonObject,
     catalog: SchemaCatalog,
     dry_run: bool = False,
+    analyzer_ids: tuple[str, ...] | None = None,
+    analyzer_registry: InventoryRegistry | None = None,
 ) -> InventoryResult:
     """Run configured adapters over frozen bytes; default and dry-run never write.
 
@@ -191,16 +194,41 @@ def run_inventory(
     provenance/schema inputs. dry_run (bool) expresses read-only intent. Returns
     InventoryResult; configuration or validation failures raise ValueError. Performs
     no I/O or mutation.
+
+    analyzer_ids (tuple[str, ...] | None) narrows configured IDs without changing
+    profile identity. analyzer_registry (InventoryRegistry | None) supplies trusted
+    adapter selection; None uses installed dispatch. Invalid returned identities
+    raise ValueError before any analyze callback. Publication independently
+    reconstructs installed behavior and never trusts injected analysis.
     """
     from drm_copilot_discovery.analyzer.emitter import inventory_result
-    from drm_copilot_discovery.analyzer.registry import select_analyzers
+    from drm_copilot_discovery.analyzer.registry import (
+        InstalledInventoryRegistry,
+        normalized_analyzer_ids,
+    )
 
-    adapters = select_analyzers(capture.profile)
+    expected_ids = normalized_analyzer_ids(capture.profile, analyzer_ids=analyzer_ids)
+    registry = (
+        InstalledInventoryRegistry() if analyzer_registry is None else analyzer_registry
+    )
+    adapters = registry.select(capture.profile, analyzer_ids=expected_ids)
+    if type(adapters) is not tuple or len(adapters) != len(expected_ids):
+        raise ValueError("Inventory registry returned a different adapter selection")
+    # Read each bounded identifier once before any adapter receives source bytes.
+    actual_ids = tuple(adapter.identifier for adapter in adapters)
+    # Reject collaborator-defined equality and unbounded text before comparison.
+    for identifier in actual_ids:
+        if type(identifier) is not str or not 1 <= len(identifier) <= 19:
+            raise ValueError(
+                "Inventory registry returned a different adapter selection"
+            )
+    if actual_ids != expected_ids:
+        raise ValueError("Inventory registry returned a different adapter selection")
     # Execute only fixed selected adapters over the same immutable input bytes.
     return inventory_result(
         capture,
         tuple(adapter.analyze(capture) for adapter in adapters),
-        analyzer_ids=tuple(adapter.identifier for adapter in adapters),
+        analyzer_ids=expected_ids,
         timestamp=timestamp,
         author_or_agent=author_or_agent,
         catalog=catalog,
@@ -213,6 +241,7 @@ def plan_inventory(
     *,
     grants: tuple[WriteGrant, ...],
     invocation: InvocationContext | None = None,
+    analyzer_ids: tuple[str, ...] | None = None,
 ) -> MutationPlan:
     """Plan one inventory publication using exact caller-authenticated grants.
 
@@ -226,6 +255,10 @@ def plan_inventory(
     Returns MutationPlan; raises MutationError or ValueError for changed inputs,
     diagnostics, schema failures or unauthorized paths. Performs no I/O, publication
     or authority changes.
+
+    analyzer_ids (tuple[str, ...] | None) is the same explicit selection used for
+    analysis; None reconstructs all configured adapters. The installed registry
+    exclusively owns reconstruction; returned metadata never selects callbacks.
     """
     from drm_copilot_discovery.analyzer.input_capture import capture_snapshot
     from drm_copilot_discovery.models import canonical_json
@@ -242,6 +275,7 @@ def plan_inventory(
         timestamp=cast("str", metadata["timestamp"]),
         author_or_agent=cast("JsonObject", metadata["author_or_agent"]),
         catalog=baseline.snapshot.catalog,
+        analyzer_ids=analyzer_ids,
     )
     if result != expected:
         raise MutationError(

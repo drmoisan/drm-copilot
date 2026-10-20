@@ -1,0 +1,16 @@
+{
+  "timestamp_utc": "2026-10-20T14:35:40.879881+00:00",
+  "status": "RESOURCE_REFRESH_COMPLETE_SCHEMA_BEHAVIOR_QA_PENDING",
+  "source": "schemas/discovery/v2/service-result.schema.json",
+  "before": {
+    "manifest.json": "3c3edf7c867f5bc06399e4f488542d4444653eb8b61ad1051b40760e29f63c4c",
+    "schemas/discovery/v2/service-result.schema.json": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b"
+  },
+  "after": {
+    "manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "schemas/discovery/v2/service-result.schema.json": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de"
+  },
+  "other_resources_byte_identical": 38,
+  "offline_reference_closure": "PASS via existing make_resource_stage",
+  "coordination": "Analyzer 71-case window ended; build owner held pure helper/import bytes. No actual build manifest generated."
+}
