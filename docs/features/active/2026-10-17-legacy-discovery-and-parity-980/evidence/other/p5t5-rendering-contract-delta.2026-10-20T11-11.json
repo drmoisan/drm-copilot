@@ -1,0 +1,95 @@
+{
+  "Timestamp": "2026-10-20T11-11",
+  "status": "PREPARATION_READY_NOT_IMPLEMENTATION_RELEASE",
+  "task": "P5-T5",
+  "prior": "evidence/other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json",
+  "prior_sha256": "505ded2a0c83147a08a860c8dd16479c172bd782c969f4ccb76db5f8f41d93b3",
+  "accepted_model_commit": "797a2429",
+  "changed_dependencies": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "physical_lines": 418
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_properties.py",
+      "sha256": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac",
+      "physical_lines": 475
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-models-review.2026-10-20T10-45.json",
+      "sha256": "f09671d7c8deb23be9932897dc1fbad63648948940bc0a3262cab19f7dd2daea",
+      "physical_lines": 228
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t4-shared-contract.2026-10-20T10-26.json",
+      "sha256": "781bb83641526e6b848286f93d1726315cb454008356d3ccac805d74c3ee6b51",
+      "physical_lines": 140
+    }
+  ],
+  "resolved_model_contract": [
+    "AcceptanceGeneration(specifications, ready, findings, limits) is frozen, bounded and normalized by canonical identity. Exact duplicate specifications deduplicate; conflicting content/ownership or scenario-ID collisions fail. ready contains canonical candidate instances in the same order; error findings prohibit ready membership.",
+    "AcceptanceSpecification retains repository ownership separately from its closed JsonObject. Its identity and scenario_id are stable content-independent coordinates. Renderer never derives IDs from titles, statements, filenames or legacy three-ref keys.",
+    "acceptance_tags(identity, *, limits, mobile_applicable=False) is the shared tag authority. Preserve generated tags exactly in sorted order; do not re-infer mobile or alter offline from display text. Valid punctuation has no lossy escape. Renderer only checks output-safe shape/alphabet and duplicate/collision invariants."
+  ],
+  "proposed_public_api": {
+    "module": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "file": "@dataclass(frozen=True, kw_only=True) AcceptanceRenderedFile: path: str; content: bytes",
+    "bundle": "@dataclass(frozen=True, kw_only=True) AcceptanceRenderBundle: files: tuple[AcceptanceRenderedFile, ...]",
+    "render": "render_acceptance(generation: AcceptanceGeneration) -> AcceptanceRenderBundle",
+    "contract": "Pure function; exact carrier type only, no ready override, raw document sequence, path root, snapshot reload, validation mode or caller-injected validator. Inherit generation.limits for aggregate output capacity. Invalid shape/encoding/collisions raise ValueError or existing PathPolicyError; capacity raises ReportLimitError. Return no partial bundle; no I/O, grants, acceptance changes or step definitions.",
+    "authority": "Only generation.ready emits executable scenarios. A document readiness=ready outside that subset remains withheld and visible in Markdown. Model construction checks consistency, not semantic proof: trusted service must call generate_acceptance on a captured snapshot, then render that exact result. Renderer output and Python type checks never become host/gate authority; untrusted serialized ready lists cannot enter via an adapter."
+  },
+  "output_contract": {
+    "names": "Always acceptance.md. For each validated ready item: <kind>/<scenario_id>.feature, where kind is the closed legacy-characterization or target-acceptance value and scenario_id is the existing scn-<fullSHA256>. No user title/path determines a filename. Files tuple sorts ordinally by path; check portable collisions prospectively. No .feature file for empty ready population.",
+    "markdown": "acceptance.md is the complete traceable view and companion pending report: fixed summary/findings section plus canonically ordered ready and non-executable sections. Include source content digest, separate repository owner/pin, identity, complete source/evidence/decision refs, original given/when/then, pending reasons and retained findings/actions. Explicitly distinguish actual pending state from a ready-looking record withheld by validation; never relabel or drop either.",
+    "gherkin": "One file per ready specification. Fixed Feature title based on scenario_id; exact generated tags immediately before Scenario; Scenario name is scenario_id. Emit Given then And for ordered given statements, exactly one When, then Then/And for ordered expected statements. Empty given emits no invented setup. No Background, Rule, Examples, Scenario Outline, data table or doc string.",
+    "statement_convention": "Every authored statement is represented as one JSON string literal immediately after the fixed Gherkin keyword, using ensure_ascii=True and no physical newline. Example: Given \"processor idle\". Backslash, quote, control, CR/LF and non-ASCII characters escape reversibly; pipes and triple quotes remain inside that one quoted step text, never table/doc-string syntax. Preserve original strings in Markdown traceability. This is a declared display/step-text convention, not an assertion that an arbitrary consumer runner unescapes JSON or that matching step definitions exist.",
+    "traceability": "Gherkin comment lines use a fixed # prefix followed by one bounded ASCII-escaped sorted-key JSON object retaining owner, identity, digest and all source/evidence/decision refs; authored values cannot produce a second physical comment/tag/step line. Markdown uses fixed headings and JSON literal blocks rather than raw authored links, HTML or prose. JSON escaping keeps embedded newline/fence/control text inside a quoted value; no source reference is replaced by an imported destination or reconstructed hash.",
+    "bounds": "Use ReportBudget for structural/work reservations, but measure the selected ASCII JSON-string escaping and actual wrapper/keyword/comment/indent/LF bytes before creating strings or encoding. Reserve aggregate path and tag scans, record/statement/ref/finding traversal, maximum comparisons and all files+Markdown retained bytes before allocation. Same generation.limits caps the whole bundle, not each file independently. Validate Unicode scalars; fail without any partial files on exhaustion."
+  },
+  "smallest_set_e_delta": {
+    "existing": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py (488 lines)",
+    "new": "tests/scripts/dev_tools/test_acceptance_generation_projection.py (proposed cohesive test-only split)",
+    "migrate_to_v2": [
+      "test_positive_generation_maps_given_when_then: use schema-valid captured generator output; Then exactly the eligible criterion/approved scoped decision, not concatenated parity text.",
+      "test_positive_generation_derives_stable_id: use AcceptanceIdentity.scenario_id and retain the existing scenario discriminator plus source/client/platform/mode coordinates.",
+      "test_positive_generation_top_level_fields: closed acceptance-specification schema plus separate captured owner, not the legacy scenario-set envelope.",
+      "test_positive_generation_null_refs_when_none_match: explicit pending/withheld or blocking result with no executable fallback, not a synthetic ready cross-product."
+    ],
+    "preserve_legacy": "Existing test_projection_* remain explicitly labeled legacy-placeholder compatibility tests until P6-T3 replaces their caller: retain malformed structural errors, unknown-field behavior and permissive input behavior as legacy assertions only. Do not make them call v2 with placeholder dictionaries. Keep schema-fallback and legacy CLI flags/stdout/check/write/missing/malformed controls intact, labeled compatibility-only where authority could be misunderstood.",
+    "retained_properties": "Keep original stable bytes, deterministic order, digest-change, domain neutrality, sorted input paths and read-only --check assertions. Add their v2 counterparts only where the four migrated tests or renderer tests need them; reuse P5-T4 property proof rather than duplicating70 model cases.",
+    "production_prerequisite": "None established for P5-T5. New runtime render API and v2 projection tests can coexist with unchanged safe legacy entrypoints. The full generate_acceptance_scenarios.py CLI/import adapter remains P6-T3; do not grow or rewrite its492 lines here. Replacing legacy projection implementations earlier requires a separate exact authorization, not an inferred prerequisite."
+  },
+  "isolated_owners": [
+    {
+      "owner": "renderer",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+        "tests/discovery_runtime/test_gherkin.py",
+        "tests/discovery_runtime/test_acceptance_tags.py",
+        "examples/discovery/v2/acceptance/"
+      ],
+      "contract": "Own pure bundle/render implementation, exact escaping/output byte fixtures, readiness consumption and bounded tag/traceability/path tests. Consume accepted model; never change acceptance_models or generator."
+    },
+    {
+      "owner": "set-e-test-adaptation",
+      "paths": [
+        "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+        "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+      ],
+      "contract": "Test-only relocation/compatibility labeling and four true-v2 projection cases. Consume P5-T4 frozen public generation fixture/API; keep old CLI negatives unchanged. No production adapter or shared renderer-test fixture edits. Can prepare against model contract; behavioral proof waits for accepted P5-T4."
+    }
+  ],
+  "release_dependencies": [
+    "Parent approval of these exact public names/output filenames and quoted statement convention; no current requirement conflict identified.",
+    "P5-T4 accepted generation repair/freeze and a schema-valid shared fixture/public factory for Set E; active generation files are intentionally not frozen or promoted by this preparation.",
+    "If gherkin.py or either test approaches500 lines, request a cohesive bounded text/budget helper split before editing additional paths."
+  ],
+  "effects": {
+    "source_test_spec_plan_checkpoint_git_changes": false,
+    "suites_or_collection": false,
+    "consumer_access": false,
+    "evidence_only": true
+  }
+}

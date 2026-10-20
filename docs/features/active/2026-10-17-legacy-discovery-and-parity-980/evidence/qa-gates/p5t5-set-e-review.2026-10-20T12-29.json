@@ -1,0 +1,131 @@
+{
+  "Timestamp": "2026-10-20T12-29",
+  "Command": "Independent frozen Set E source and retained proof reconciliation; no suite execution",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_SET_E_SUBSET_COMMIT",
+  "task": "P5-T5",
+  "task_acceptance": false,
+  "authority": {
+    "delegation_id": "rendering_review_p5t5_set_e_20261020",
+    "phase": "S5_P5T5_set_e_review",
+    "agent_id": "01a1587f-5823-7210-9d39-169420f2da62",
+    "agent_type": "atomic-executor-c3-elevated",
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "routing_valid": true,
+    "launch_authority_valid": true,
+    "provenance_valid": true,
+    "qualification": "Current persisted route and existing native SubagentStart attestation independently reread for the resumed bounded review."
+  },
+  "findings": [],
+  "source_review": {
+    "legacy": "Only module documentation changed; preserved executable module AST, all 39 definitions, 64 assertions, decorators and exact 34-case baseline population.",
+    "v2": "Four documented test functions expand to seven cases: exact captured Given/When and source or approved-target criterion; full linked identity and SHA-256; imported closed document with separate captured owner; pending expectation versus blocked missing reference/selector.",
+    "fixtures": "Inspected exact reused fixture helpers: immutable captured bytes/pins, explicit approved scoped criterion, linked scenario, separate imported source versus target, and detached recapture. No renderer import, production changes, temporary-file/process/network test dependencies, new suppressions or mutable global state.",
+    "size": "Legacy test 488 lines; new v2 test 222 lines.",
+    "coverage": "No production change. Preserved legacy coverage meets retained baseline. Narrow v2 coverage is supporting observation only; accepted P5-T4 proof remains authoritative."
+  },
+  "proof": {
+    "legacy_module_body_ast_preserved": true,
+    "legacy_definitions_verified": 39,
+    "legacy_assertions": 64,
+    "legacy_decorators_preserved": true,
+    "baseline_original_payloads_verified": 2,
+    "source_review_findings": [],
+    "ordered_receipts": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-format.2026-10-20T12-16.json",
+        "sha256": "1d07795c89fad49fa8a04d3313b2163726a0190b33c945d48c514c071c471c9e",
+        "started": "2026-10-20T12:16:12.914517+00:00",
+        "finished": "2026-10-20T12:16:14.479455+00:00",
+        "command": "poetry run black --check tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-lint.2026-10-20T12-16.json",
+        "sha256": "3513226bdd41e94a3cd8d45fcd496e2fad4ffa66cb10eacb0066314d6e90f5f6",
+        "started": "2026-10-20T12:16:14.485910+00:00",
+        "finished": "2026-10-20T12:16:15.701669+00:00",
+        "command": "poetry run ruff check tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-types.2026-10-20T12-16.json",
+        "sha256": "2b341bb82bbd7196c68a9670af9e8a7e55a54eb347e40aaf41516cea9af59315",
+        "started": "2026-10-20T12:16:15.707435+00:00",
+        "finished": "2026-10-20T12:16:17.916387+00:00",
+        "command": "poetry run pyright tests/scripts/dev_tools/test_generate_acceptance_scenarios.py tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-pass3-tests.2026-10-20T12-17.json",
+        "sha256": "d1f5d19af0798957e6b2ff8b2daf806980079a73a28b915815066c313df94594",
+        "started": "2026-10-20T12:16:17.926275+00:00",
+        "finished": "2026-10-20T12:17:08.573306+00:00",
+        "command": "poetry run python SCRATCH\\run_set_e.py"
+      }
+    ],
+    "nodes": 41,
+    "legacy_nodes": 34,
+    "v2_nodes": 7,
+    "reports": 123,
+    "legacy_statements": "186/186",
+    "legacy_branch_arcs": "42/42",
+    "all_final_source_dependency_bindings_match": true,
+    "coverage_qualification": "Narrow v2 coverage is observational and does not supersede accepted P5-T4 coverage proof.",
+    "archive_payloads_verified": 7,
+    "raw_readable_streams_verified": 24,
+    "whitespace_metadata_verified": true,
+    "original_type_failure_three_replacements_only": true,
+    "historical_runner_equals_successful_runner": true,
+    "reference_bindings": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json": {
+        "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+        "committed": false
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-originals.2026-10-20T12-11.json": {
+        "sha256": "1588e9bc3b66c73d204a392b37e3ba79bbd4eae3332b1e89b99071289e0818e3",
+        "committed": false
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json": {
+        "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9",
+        "committed": true
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json": {
+        "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6",
+        "committed": true
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-harness.2026-10-20T12-11.txt": {
+        "sha256": "d83608ef0cb34dcff474198c6f9501741cca17dc4370ff32f506b9f1e3125e85",
+        "committed": false
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-preparation-delta.2026-10-20T10-08.json": {
+        "sha256": "505ded2a0c83147a08a860c8dd16479c172bd782c969f4ccb76db5f8f41d93b3",
+        "committed": true
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json": {
+        "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef",
+        "committed": false
+      }
+    },
+    "coverage_summaries_verified": 4,
+    "qualified_callable_summaries_verified": 49
+  },
+  "owner_freeze": {
+    "path": "evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+    "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4"
+  },
+  "historical_outcomes": {
+    "types": "Pass1 exited 1 for three snapshot.limits references; archived original transforms exactly to final source by replacing those references with result.limits.",
+    "tests": "Pass2 exited 3 because scratch tests.py shadowed the repository tests package. Nested 34-case output is incomplete and does not establish acceptance. Original runner retained; identical payload succeeds as run_set_e.py after ordered restart."
+  },
+  "whitespace": "Verified gzip/base64 originals, byte hashes, CRLF/lone-LF counts, terminal blanks and trailing whitespace metadata. Evidence JSON uses LF with one terminal newline; raw stream CR/LF remains preserved. Original readable path casing is retained, including lower-case drive spelling; alias transforms match exact captured harness behavior.",
+  "staging": {
+    "manifest": "p5t5-set-e-review.staging.2026-10-20T12-29.json",
+    "scope": "Only two tests, owned receipts/archive/freeze/staging, four uncommitted baseline/contract prerequisites, and review artifacts. Already committed preparation and P5-T4 acceptance evidence remain exact references.",
+    "excluded": "Active renderer, renderer tests/examples/evidence, P6 preparation, production changes, checkpoint, plan and AC changes."
+  },
+  "effects": {
+    "behavioral_replay": false,
+    "production_test_plan_checkpoint_git_mutation": false,
+    "evidence_only": true
+  }
+}

@@ -1,9 +1,9 @@
-"""Unit tests for the deterministic acceptance-scenario generator.
+"""Compatibility-only tests for the legacy acceptance-scenario generator.
 
-Covers positive generation, determinism, negative/malformed input, the
-schema-location seam, the CLI surface, and the domain-neutrality invariant. No
-temporary files are used; the in-memory ``mem_fs_path`` fixture from
-``tests/conftest.py`` backs all read/write. Each test uses Arrange-Act-Assert.
+Placeholder projections and fallback scenarios establish no v2 readiness.
+Retain positive/negative generation, determinism, schema/CLI and neutrality
+assertions until the CLI migration. No temporary files are used; the in-memory
+``mem_fs_path`` fixture backs all read/write. Each test uses Arrange-Act-Assert.
 """
 
 from __future__ import annotations
