@@ -1,0 +1,116 @@
+{
+  "Timestamp": "2026-10-20T15-18",
+  "Command": "Read-only bounded review of frozen acceptance selector source",
+  "EXIT_CODE": 0,
+  "status": "SOURCE_CLEAR_BEHAVIORAL_PROOF_PENDING",
+  "task": "P6-T1",
+  "authority": {
+    "delegation_id": "rendering_review_p6t1_acceptance_selector_20261020",
+    "phase": "S5_P6T1_acceptance_selector_review",
+    "agent_type": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_authority_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Current persisted resumed route and existing valid native launch attestation verified before evidence write."
+  },
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py",
+    "sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+    "lines": 235,
+    "expected_git_blob": "01ff17420f1b618def82d480d3501ee613e42809"
+  },
+  "functions": [
+    {
+      "name": "_invalid",
+      "start": 19,
+      "end": 35,
+      "ast_sha256": "8d1c3d85832835c6a2c5971a0cbabf90222e37296bbe9cec545b8ec8b0f778b6"
+    },
+    {
+      "name": "_selectors",
+      "start": 38,
+      "end": 64,
+      "ast_sha256": "c80a74b29c269074e2efd542a413c48eeac9139b81b5abc21274ff1a2d1e728d"
+    },
+    {
+      "name": "_feature_id",
+      "start": 67,
+      "end": 80,
+      "ast_sha256": "48245f78445806dc069633109dddace579d178c9f9a96fe22c5b37f51331c1de"
+    },
+    {
+      "name": "resolve_feature_ids",
+      "start": 83,
+      "end": 178,
+      "ast_sha256": "80665907a95787e642957dbbbe81a89828e33c3e14a10603f82896e440df7d08"
+    },
+    {
+      "name": "select_acceptance_platforms",
+      "start": 181,
+      "end": 235,
+      "ast_sha256": "7916f1103e34d8067a5cb3c7f1de279e08453245e53740032db969290ec539b3"
+    }
+  ],
+  "findings": [],
+  "checks": {
+    "feature_identity": "Uses index_references and candidates with explicit feature_id namespace; membership requires configured full source (id, revision) pin. Exactly one source-owned record is required. Explicit repository disambiguates; target-only/unknown repository, missing ID and duplicate source matches reject. Repository-only selection cannot widen into the omitted all-source default. No local-first preference.",
+    "platform_projection": "Exact platform membership filters actual generated specifications across every client/mode, with None excluded from named matches. Original specification instances and id-based original ready membership are retained. Public constructor normalizes consistency only; no readiness, stable-ID, linked identity, document, pin, digest or tag is synthesized.",
+    "failure_semantics": "All original findings survive projection, including blockers outside selected coordinates. Unmatched platform with original error findings returns the complete original generation; unmatched nonblocking generation raises ServiceRequestError. Empty selectors return the original generation.",
+    "resource_bounds": "Exact tuples/strings checked before selector hashing/sorting; selector count/text/sort costs are reserved. Feature selection invokes accepted aggregate generation_preflight before index construction and keeps its work budget for source traversal/candidate scans/result ordering. Platform projection reserves aggregate visits, coordinate text, membership and tuple allocation; immutable AcceptanceGeneration constructor enforces aggregate projected payload limits. No root limits are widened.",
+    "policies": "235 lines, five intent-documented functions, pure local selection with no I/O, source mutation, arbitrary collaborator callback or new dependency. Public signatures match approved release."
+  },
+  "accepted_contracts": [
+    {
+      "path": "evidence/other/p6t1-contract-decisions.2026-10-20T12-25.json",
+      "sha256": "0db96ff2158109d58384ad8ff4b7e52f9de5423a6a9f82d70cbeeadc6983176b"
+    },
+    {
+      "path": "evidence/other/p6t1-release-preparation.2026-10-20T13-26.json",
+      "sha256": "9b3fdf7cbdabed00de84c1ebe61c81814ad9e17b9475fc4e9a7e75b150dbe19d"
+    }
+  ],
+  "dependency_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "working_sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "git_blob": "0e5186310edba608814b80f1888af330f81ba596"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "working_sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "git_blob": "0271204c051a7ac929f8a6922fbe65471ae70534"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "working_sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "git_blob": "efda855183af4b16b7b58d5f777de62da5edd346"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "git_blob": "908612c6aad30ea9e4b5cb8800d2eb33b0930a3f"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "working_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+      "git_blob": "03fe3327734efd5126140fd207c7df9a33f1a57a"
+    }
+  ],
+  "qualification": "Only the frozen selector source is cleared. Accepted generator/model/renderer proofs are retained, not re-reviewed or replayed. Moving tests and shared service carriers are outside this review. ServiceRequestError is consumed through the frozen public interface; shared implementation and dependency-complete composed behavior remain pending.",
+  "verification": {
+    "source_read": true,
+    "hash_and_ast_binding": true,
+    "behavioral_execution": false,
+    "tests_collection": false,
+    "coverage_claim": false,
+    "source_test_git_checkpoint_mutation": false,
+    "commit_ready": false,
+    "whole_task_acceptance": false
+  },
+  "diagnostics": [
+    {
+      "description": "Initial read-only rg command used unsupported shell brace expansion; PowerShell rejected parsing before any process or file mutation. Reissued with explicit paths.",
+      "output": "ParserError: Missing argument in parameter list."
+    }
+  ],
+  "next": "Owner completes ordered focused behavioral proof and freezes exact test/dependency receipts. Coordinator requests bounded evidence confirmation before any checked commit. Current phase P6; upcoming P6-T1, P6-T2, P6-T3, P7-T1, P7-T2."
+}
