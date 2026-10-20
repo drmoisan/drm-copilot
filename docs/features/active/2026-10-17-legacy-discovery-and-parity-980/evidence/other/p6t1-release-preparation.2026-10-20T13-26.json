@@ -1,0 +1,131 @@
+{
+  "Timestamp": "2026-10-20T13-26",
+  "status": "PREPARATION_READY_NOT_RELEASED",
+  "route": "snapshot_inventory_p6t1_release_preparation_20261020",
+  "retained": [
+    {"path":"evidence/other/p6t1-service-preparation-delta.2026-10-20T12-13.json","sha256":"da4d4993ad1f2b84e590a922bdfee9dd6939b7bff2d922ab196b53b7dbdf2aac"},
+    {"path":"evidence/other/p6t1-contract-decisions.2026-10-20T12-25.json","sha256":"0db96ff2158109d58384ad8ff4b7e52f9de5423a6a9f82d70cbeeadc6983176b"}
+  ],
+  "aliases": {"R":"packages/discovery-runtime/src/drm_copilot_discovery","PT":"tests/discovery_runtime","DT":"scripts/dev_tools"},
+  "renderer": {
+    "commit": "8cfac33dc648ee7ec314cfb2efea169e6b2cd9a2",
+    "bindings": [
+      {"path":"R/gherkin.py","lines":329,"sha256":"7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457"},
+      {"path":"R/acceptance_render_text.py","lines":173,"sha256":"4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6"}
+    ],
+    "public": [
+      "AcceptanceRenderedFile(*, path: str, content: bytes)",
+      "AcceptanceRenderBundle(*, files: tuple[AcceptanceRenderedFile, ...])",
+      "render_acceptance(generation: AcceptanceGeneration) -> AcceptanceRenderBundle"
+    ],
+    "composition": "The trusted service selector receives the actual authoritative generation result, retains exact candidate instances and all findings, intersects original ready membership, and returns the bounded immutable projection approved at 12:25. Pass that same projection once to render_acceptance. Its public constructors check consistency/resources only; neither construction nor rendering grants readiness.",
+    "outputs": "The bundle exposes files, not a dictionary or string. acceptance.md contains selected candidates plus ALL retained findings; only exact ready members produce <kind>/<scenario-id>.feature. Paths are bundle-relative: map once under the configured acceptance root and obtain exact grants/CAS. Preserve structured source ownership and publish intended structured specifications/views in one prospectively validated mutation. No renderer status assessment or direct writes.",
+    "compatibility": "No renderer/helper signature or behavioral change required. The already approved trusted-subset qualification governs the docstring's public-generator provenance requirement; arbitrary constructed results remain unauthorized. Existing JSON-quoted Gherkin, bounded traceability, ordering and collision behavior remain unchanged."
+  },
+  "shared_contract": {
+    "owner_file": "R/service_contracts.py",
+    "state": "Proposed implementation signatures and data shapes frozen by this preparation for coordinator release; not implemented.",
+    "principles": "Frozen keyword-only carriers; immutable JsonObject/tuple fields; exact versioned schema remains wire authority. No duplicate graph/status calculation. Constructor/type checks do not establish authority. Keep canonical schema headers as serializer constants, not caller-overridable fields.",
+    "types": {
+      "Operation": "Literal of the exact 30 service-request operation values; no aliases or arbitrary strings.",
+      "Mode": "Literal['structural','agent-output','discovery-complete','parity-complete','planning'].",
+      "OutputFormat": "Literal['json','markdown','both']. Acceptance output_format remains the existing operation input, not a new envelope field.",
+      "ServiceRequest": "Frozen fields: id:str, request_id:str, operation:Operation, mode:Mode, workspace_root:str, profile_path:str|None, dry_run:bool, write:bool, format:OutputFormat, inputs:JsonObject, invocation_ref:str|None, authorization_ref:str|None. Retain exact immutable operation inputs; fixed operation validation rejects inapplicable combinations.",
+      "RuntimeIdentity": "Frozen fields: package_version:str, schema_version:str, build_sha256:str, policy_version:int, policy_sha256:str. Exact versions/digests originate from approved installed identity verification, not caller JSON.",
+      "ServiceArtifact": "Frozen fields: path:str, kind:str (validated output-kind), status:Literal['planned','created','updated','skipped','conflict'], sha256:str, content:str|None=None. Serialize absent content by omission, never wire null.",
+      "DiscoveryResult": "Frozen fields: operation:Operation|None, mode:Mode|None, ok:bool, exit_code:Literal[0,1,2,3], findings:tuple[Finding,...], artifacts:tuple[ServiceArtifact,...], summary:JsonObject, input_manifest:InputManifest|None, runtime:RuntimeIdentity|None. summary retains the existing closed schema shape, including optional deployment/source_reads. Conditional nulls follow the approved 12:25 failure branch exactly.",
+      "ServiceAuthority": "Frozen trusted fields: principal:Literal['local-user','host'], author_or_agent:str, invocation:InvocationContext|None, grants:tuple[WriteGrant,...], read_selection:ReadSelection|None. Never deserialize this carrier from request fields. Missing host authority cannot construct a local-user fallback.",
+      "ServiceRequestError": "Typed invocation error retaining ordered findings and only recognized operation/mode (otherwise None). It is not used to classify arbitrary downstream ValueError as user error.",
+      "Clock": "Callable[[], datetime]; require timezone-aware values and normalize to UTC RFC3339 at attribution/capture boundaries. Clock does not affect deterministic report/acceptance identity."
+    },
+    "functions": [
+      "parse_service_request(value: JsonValue, *, catalog: SchemaCatalog, limits: ParseLimits) -> ServiceRequest",
+      "DiscoveryResult.to_dict() -> dict[str, object]",
+      "DiscoveryResult.to_json() -> str",
+      "validate_service_result(result: DiscoveryResult, *, catalog: SchemaCatalog, limits: ParseLimits) -> None",
+      "service.execute(request: JsonValue, *, io: ServiceIO, repository_reader: RepositoryReader | None, clock: Clock, analyzer_registry: InventoryRegistry) -> DiscoveryResult"
+    ],
+    "ports": {
+      "ServiceIO.initialization": "Read-only property -> InitializationIO. Reuse its bound workspace_root/catalog/metadata/read_bytes/primitives/open_directory; no parallel filesystem abstraction. The explicit repository_reader argument is the execution selection; reject an incompatible independently bound reader rather than silently switching.",
+      "ServiceIO.activation": "Read-only property -> ActivationStore; preserve its existing configuration and protected registry operations.",
+      "ServiceIO.runtime_identity": "() -> RuntimeIdentity; verified installed identity or typed unavailable/corrupt failure. A resource hash is not a fallback.",
+      "ServiceIO.authorize": "(request: ServiceRequest, *, baseline: CapturedWorkspace | None) -> ServiceAuthority. Trusted provider verifies explicit principal and opaque references; capture unavailable/bootstrap uses None honestly. Provider must not authorize source reads or writes solely from request assertions. Native host implementation remains unavailable until P8.",
+      "ServiceIO.writer": "(baseline: CapturedWorkspace, *, authority: ServiceAuthority) -> MutationWriter. Writer captures the same bounded/pinned inputs and preserves guard/freshness/CAS/invalidation. Publication still requires existing plan_mutation/commit_mutation checks.",
+      "InventoryRegistry": "Owned by analyzer/registry.py, not redefined in shared contracts. select(profile: ProfileV2, *, analyzer_ids: tuple[str,...] | None = None) -> tuple[InventoryAdapter,...]. The installed implementation is fixed and consent-aware."
+    },
+    "dependencies": "service_contracts imports accepted models, findings, snapshots and boundary types; it must not import service/operations/gateway/doctor, build_identity implementation or renderer. build_identity returns shared RuntimeIdentity; service composes that provider. InventoryRegistry belongs to its analyzer owner and is consumed by service, avoiding duplicate Protocols.",
+    "error_rules": "Gateway bounded decoding handles malformed JSON; service handles schema-invalid JsonValue. Both use the approved honest result shape with recognized enum values only. Result serialization validates against the core service-result schema. Partial writes preserve concrete artifacts and cannot use the empty pre-execution branch."
+  },
+  "ownership": [
+    {
+      "slice":"shared-contract",
+      "production":["R/service_contracts.py"],
+      "tests":["PT/test_service_failures.py"],
+      "responsibility":"Typed carriers/ports, immutable wire projection, request/result schema enforcement and failure mapping. One owner freezes these declarations first; other owners do not edit this file."
+    },
+    {
+      "slice":"failure-envelope",
+      "production":["schemas/discovery/v2/service-result.schema.json"],
+      "tests":["tests/schemas/discovery/test_v2_service_result_failures.py","tests/schemas/discovery/v2_control_test_support.py (only necessary fixture reuse)"],
+      "generated":["R/_resources/schemas/discovery/v2/service-result.schema.json","R/_resources/manifest.json"],
+      "responsibility":"Only the approved conditional failure branches. Own generated resource refresh until handed to packaging; retain accepted schema negative controls."
+    },
+    {
+      "slice":"build-identity",
+      "production":["DT/discovery_build_identity.py","DT/build_discovery_runtime.py","R/build_identity.py","packages/discovery-runtime/pyproject.toml"],
+      "tests":["tests/scripts/dev_tools/test_discovery_build_identity.py","tests/scripts/dev_tools/test_build_discovery_runtime.py","tests/scripts/dev_tools/test_build_discovery_runtime_io.py","PT/test_build_identity.py"],
+      "generated":["R/_build_manifest.json"],
+      "responsibility":"Approved code-inclusive build/policy definitions and installed verification. During parallel source work test pure/in-memory manifests; freeze the actual generated package identity only after all packaged source/schema bytes are stable. Do not regenerate another owner's resource files concurrently."
+    },
+    {
+      "slice":"fixed-analyzer-selectors",
+      "production":["R/analyzer/registry.py","R/analyzer/pipeline.py"],
+      "tests":["PT/analyzer/test_inventory_selection.py","PT/analyzer/test_registry.py","PT/analyzer/test_registry_dispatch.py","PT/analyzer/test_pipeline.py"],
+      "responsibility":"Fixed selector validation, InventoryRegistry port and threaded subset execution/reconstruction. Canonical plan reconstruction never accepts injected adapter callbacks."
+    },
+    {
+      "slice":"acceptance-selector",
+      "production":["R/service_selection.py"],
+      "tests":["PT/test_service_selection.py"],
+      "responsibility":"Unique feature qualification and approved trusted exact platform projection. Public seams: resolve_feature_ids(snapshot:DiscoverySnapshot, *, feature_ids:tuple[str,...]=(), repository_id:str|None=None)->tuple[tuple[str,str],...]; select_acceptance_platforms(generation:AcceptanceGeneration, *, platform_ids:tuple[str,...]=())->AcceptanceGeneration. Use shared ServiceRequestError for invalid selectors; preserve original blocking generation rather than misclassifying missing failed output. No generator/model/renderer edits."
+    },
+    {
+      "slice":"core-service",
+      "production":["R/service.py","R/operations.py"],
+      "tests":["PT/test_service.py"],
+      "responsibility":"Fixed operation routing, authenticated capture, existing runtime composition and publication. Consume all frozen contracts. Do not edit prerequisite owners' files. Retain prior concrete-size trigger for service_reports.py/service_mutations.py; they are not automatically released by this artifact."
+    },
+    {
+      "slice":"gateway-doctor",
+      "production":["R/gateway.py","R/doctor.py"],
+      "tests":["PT/test_gateway.py","PT/test_doctor.py"],
+      "responsibility":"Fixed stdin/stdout gateway and truthful read-only installation/capability status. Consume shared contracts and installed identity provider; native host authority stays unavailable. P6-T2/T3 retain CLI registrations and compatibility callers."
+    }
+  ],
+  "proposed_workers": {
+    "workspace_operations":"Shared contract and failure-envelope first, then acceptance-selector after their contract freeze. Exclusive ownership of service_contracts/test_service_failures and canonical/generated result schema through its resource refresh.",
+    "source_inspection_preparation":"Fixed analyzer selector and canonical reconstruction slice.",
+    "snapshot_inventory_capture":"Installed build identity slice, consuming frozen RuntimeIdentity and the approved resource-stage handoff.",
+    "inventory_analyzers":"Core service after current final gates and prerequisite interface freezes.",
+    "gateway_doctor":"Keep with the core-service owner unless the coordinator delegates the already disjoint gateway/doctor pair after shared freeze; no additional writer is required.",
+    "generation_order":"Schema owner finalizes canonical result schema, refreshes its staged resource copy and resource manifest, and freezes their hashes. Build-identity owner may develop pure projection/verification against in-memory entries concurrently but must not refresh those files. After all new package source additions and accepted source repairs are frozen, the coordinator grants one packaging window to regenerate/verify the resource stage and then generate _build_manifest.json over that exact source/resource closure. Additions such as service_contracts, service_selection, service, operations, gateway, doctor and build_identity invalidate any earlier actual build manifest. Treat earlier live manifests only as intermediate artifacts; never claim their whole-package identity survived source additions. No two owners regenerate the resource or build manifests concurrently."
+  },
+  "sequence": [
+    "Wait for accepted P5-T5 and explicit P6 release. Capture one shared baseline covering the union of approved prerequisite and planned service paths; retain prior proofs, do not repeat predecessor suites.",
+    "Freeze shared carrier/port declarations before dependent owners implement against them. Failure schema and fixed analyzer selector slices can independently prepare and validate against their existing interfaces after baseline; neither needs service behavior.",
+    "Build pure identity projection and acceptance selector can proceed independently once shared names/errors are frozen. Build installed-provider proof waits for RuntimeIdentity; no live whole-package manifest is treated as stable while sources move.",
+    "Shared request/result behavioral proof waits for the approved failure schema. Gateway/doctor may use typed memory ports after shared freeze, but actual composed gateway needs core service and verified installed identity.",
+    "Core service composes only frozen selector/registry/identity/schema interfaces. Cross-slice behavior waits for source hash windows. Serialize resource refresh, final generated build manifest and final installed composition after packaged source/schema freeze.",
+    "Each dependency-complete slice can independently freeze/review/checked-commit; do not imply whole P6 acceptance or release from a preparatory contract."
+  ],
+  "limits_and_open_points": {
+    "size":"Keep every source/test <=500 lines. Existing generator/context remain untouched. The approved pure build helper keeps the 408-line builder bounded. Shared contracts contain declarations/wire mapping only; no operation handlers. Request a named cohesive split before crossing the limit rather than suppressing policy.",
+    "real_pending":"No new product decision identified. These are proposed shared signatures for coordinator release; implementation must still verify exact type imports and static compatibility. Missing native host authority is an explicit P8 dependency, not a local-user fallback. Final package identity necessarily waits for stable packaged bytes.",
+    "scope":"No additional production path beyond the previously proposed service_contracts and approved four-decision paths. The accepted renderer/helper require no mutation."
+  },
+  "verification": {
+    "performed":"Read-only retained artifact hash checks, final renderer interface inspection and exact source hashes/line counts.",
+    "not_performed":"No tests, collection, baseline, gates, source/schema edits, staging, checkpoint writes or acceptance.",
+    "retained_state":"Both prior artifacts remain byte-identical. P5-T5 acceptance remains pending; no P6 implementation release."
+  }
+}

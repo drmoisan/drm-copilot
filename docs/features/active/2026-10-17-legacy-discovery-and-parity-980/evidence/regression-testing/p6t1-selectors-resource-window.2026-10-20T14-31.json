@@ -1,0 +1,9 @@
+{
+  "qualification": "Generated resource manifest and service-result schema were held unchanged by workspace_operations during the 14:24-14:29 selector batch. They were not instrumented in the runner dependency map; shared baseline and immediate post-run comparison match. Catalog code was not modified. This supplements rather than rewrites the original receipt.",
+  "status": "POST_RUN_RESOURCE_BASELINE_MATCH",
+  "bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "3c3edf7c867f5bc06399e4f488542d4444653eb8b61ad1051b40760e29f63c4c"
+  },
+  "Timestamp": "2026-10-20T14-31"
+}

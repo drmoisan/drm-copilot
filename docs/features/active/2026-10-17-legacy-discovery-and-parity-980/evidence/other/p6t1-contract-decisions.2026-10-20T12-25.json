@@ -1,0 +1,118 @@
+{
+  "Timestamp": "2026-10-20T12-25",
+  "status": "DECISIONS_READY_PENDING_COORDINATOR_APPROVAL",
+  "scope": "Four P6-T1 mismatches only; evidence preparation, not implementation or acceptance.",
+  "route": "snapshot_inventory_p6t1_decisions_20261020 / S5_P6T1_contract_decisions",
+  "previous_preparation": {
+    "path": "evidence/other/p6t1-service-preparation-delta.2026-10-20T12-13.json",
+    "sha256": "da4d4993ad1f2b84e590a922bdfee9dd6939b7bff2d922ab196b53b7dbdf2aac",
+    "state": "Preserved unchanged; reuse its caller, authority and operation analysis."
+  },
+  "aliases": {
+    "R": "packages/discovery-runtime/src/drm_copilot_discovery",
+    "PT": "tests/discovery_runtime",
+    "DT": "scripts/dev_tools"
+  },
+  "decisions": [
+    {
+      "id": "acceptance-selectors",
+      "choice": "Add a bounded trusted service_selection.py helper; leave the 494-line generator and 488-line context unchanged.",
+      "feature_ids": "Use index_references(snapshot) and ReferenceIndex.candidates('feature-contract', feature_id, repository=repository_id, identity_field='feature_id'). Require exactly one source-owned record per requested ID; pass its qualified repository/feature pair to generate_acceptance. Never prefer local ownership or first match. repository_id disambiguates; repository-only selection selects its bounded complete source-feature set, rejecting unknown/non-source ownership. Omitted selectors retain all-source behavior.",
+      "platform_ids": "Run authoritative generation first. Filter specifications by exact identity.platform_id and ready by intersection with original ready. Reuse exact immutable specification objects, documents, pins, IDs, tags, digests and limits; retain ALL original findings, including those outside the selected platforms. Build the bounded AcceptanceGeneration projection through its public constructor. Render and publish the same trusted projection. No readiness, gate, tags or provenance are recomputed. Empty platform_ids returns the unfiltered result. A named platform does not match a None coordinate.",
+      "unmatched": "If original generation has no blocking errors, an explicit platform absent from all generated coordinates is invalid selection (exit 2), not successful empty output. If generation already blocks, preserve its exit-1 diagnostics and describe selection as unavailable; do not infer invalid configuration from absent failed-generation output. Preserve pending selected candidates and global diagnostics. Filtering cannot change failed generation into success.",
+      "bounds": "Reserve selector text/count, index traversal, membership and result allocation using root ParseLimits/ReportBudget. Full generation remains bounded before filtering; filtering does not widen limits or hide resource failures.",
+      "paths": ["R/service_selection.py (new)", "PT/test_service_selection.py (new)"],
+      "tests": [
+        "Unique/ambiguous/missing feature IDs; explicit repository disambiguation; duplicate same-owner records; non-source and repository-only selection.",
+        "Exact candidate bytes/object ownership and ready intersection; named versus None platform; pending candidates; unselected blocking findings retained; unmatched versus blocked generation.",
+        "Default selector compatibility, deterministic ordering and prospective selector/index/output bounds."
+      ],
+      "compatibility": "No request schema or generator signature changes. Qualify the prior exact-result rendering contract explicitly: only this trusted exact-subset projection may narrow generated output; caller-supplied ready membership and renderer assessment remain prohibited."
+    },
+    {
+      "id": "failure-envelope",
+      "choice": "Keep the same closed result_version 2.0.0 envelope; add narrow conditional pre-execution failure branches to service-result.schema.json.",
+      "shape": "operation and mode independently allow null only with ok=false and exit_code=2. Retain recognized values; unknown/missing values become null, never doctor/structural or an arbitrary echoed string. runtime and input_manifest allow null only with ok=false and exit_code in [2,3] when unavailable. Keep every envelope key required. Non-null runtime keeps the existing strict referenced definition; no other control schema is weakened.",
+      "guards": "Any null context field requires artifacts=[], summary.counts=[], validation_result=null, receipt_ref=null and invocation_ref=null, with an actionable fixed-code error and pointer. Success and exit 1 require genuine operation/mode/runtime/input_manifest. Executed partial-write failures retain real captured context and partial artifact results and cannot use the empty pre-execution branch. Unavailable runtime provenance prevents execution. Unavailable host authority returns exit 3 with valid operation/mode retained.",
+      "paths": [
+        "schemas/discovery/v2/service-result.schema.json",
+        "R/_resources/schemas/discovery/v2/service-result.schema.json (generated)",
+        "R/_resources/manifest.json (generated)",
+        "tests/schemas/discovery/test_v2_service_result_failures.py (new)",
+        "tests/schemas/discovery/v2_control_test_support.py (only necessary fixture reuse)"
+      ],
+      "tests": [
+        "Malformed/missing/unknown operation and mode with recognized counterpart retained; runtime unavailable; manifest unavailable versus actually captured empty inputs.",
+        "Null success/exit-1 context, arbitrary names, inconsistent exit codes and any receipt/artifact/count in pre-execution failure rejected.",
+        "Retain existing control success/failure/dry-run/report-generation cases and test_result_envelope_rejects_ambiguous_success_fields runtime=None success rejection; verify packaged schema parity/closure."
+      ],
+      "compatibility": "All previously valid envelopes remain valid. Older installed strict schemas reject the new failures, so canonical and packaged schemas must ship together. Future P6 gateway/result types and P8 TS result parser must model these conditional nulls and fail closed. Retained extension caller search found no established service-result parser; legacy text parsers remain outside this envelope until planned adapter migration.",
+      "approval": "Approve failure-field nullability as a precise interpretation of the approved envelope. A fabricated empty/zero-hash manifest is not an alternative."
+    },
+    {
+      "id": "installed-build-and-policy",
+      "choice": "Add deterministic R/_build_manifest.json through approved build/resource staging. build_sha256 is the hash of canonical manifest bytes containing package/schema versions, declared package/dependency metadata and sorted relative path/size/hash entries for every shipped runtime .py, py.typed and staged resource, including the resource manifest. Exclude itself, bytecode, dist-info and archive metadata. Verify installed payload bytes against entries before execution. This is installed-content build identity, explicitly not the external wheel archive SHA-256.",
+      "policy": "Recommend numeric policy_version=2 as the major component of accepted snapshot.VERSIONS policy 2.0.0; preserve the complete policy version in the manifest. policy_sha256 hashes a separately domain-labelled canonical projection of the complete policy version plus all runtime Python and allowlisted resources, including schemas/templates. The conservative code-inclusive closure avoids guessing which functions affect policy. It is never the resource-only digest. Code/schema/template changes invalidate policy identity; declared build metadata additionally participates in build identity.",
+      "paths": [
+        "DT/discovery_build_identity.py (new pure projection helper)",
+        "DT/build_discovery_runtime.py (bounded orchestration wiring; currently 408 lines)",
+        "R/build_identity.py (new bounded installed reader/verification boundary)",
+        "R/_build_manifest.json (generated)",
+        "packages/discovery-runtime/pyproject.toml (explicit wheel/sdist manifest inclusion)",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py (new)",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+        "PT/test_build_identity.py (new)"
+      ],
+      "tests": [
+        "Stable ordering/self exclusion; code/schema/template/build-metadata changes; exact versions and complete source closure.",
+        "Missing/duplicate/unsafe/stale entries and changed installed payload fail closed without zero/resource-hash fallback.",
+        "Retain staging check and external wheel digest behavior. Unit filesystem/resources are in-memory; actual installed-wheel verification requires its separately authorized packaging proof."
+      ],
+      "compatibility": "Keep resource-manifest API/format and snapshot VERSIONS/digest semantics unchanged. Older/unverified installed packages return runtime=null exit 3. Existing external wheel hash remains separate release evidence. Identity grants no native authority and does not claim interpreter/dependency-environment attestation.",
+      "approval": "The numeric policy mapping and installed-content build digest are proposed definitions requiring approval; neither is represented as an already implemented provenance mechanism."
+    },
+    {
+      "id": "fixed-analyzer-subsets",
+      "choice": "The approved repeatable analyzer selector and dotnet/vsto shortcuts require more than configured-all dispatch. Add optional keyword analyzer_ids: tuple[str,...] | None = None to select_analyzers, run_inventory and plan_inventory. None retains configured-all behavior. Explicit selections must be nonempty, unique, fixed-known, enabled and consented; normalize deterministic order and validate the entire set before imports.",
+      "injection": "Define a small typed InventoryRegistry selection port in analyzer/registry.py for trusted service DI. Its installed implementation uses fixed select_analyzers. run_inventory accepts this trusted port only after fixed selector validation and checks returned adapter IDs match the selection exactly. plan_inventory reconstructs with canonical installed select_analyzers and the same explicit normalized selector passed by the service. It does not accept adapter callbacks or infer authorized selection from result metadata. Divergent injected analysis fails INVENTORY_INPUTS. Never mutate profile or its digest to encode transient selection.",
+      "paths": [
+        "R/analyzer/registry.py (164 lines)",
+        "R/analyzer/pipeline.py (270 lines)",
+        "PT/analyzer/test_inventory_selection.py (new)",
+        "PT/analyzer/test_registry.py",
+        "PT/analyzer/test_registry_dispatch.py",
+        "PT/analyzer/test_pipeline.py"
+      ],
+      "tests": [
+        "Default byte compatibility; explicit subset and accurate analyzer metadata; empty/duplicate/unknown/disabled selection rejected before imports; optional consent.",
+        "Exact subset publication reconstruction, selector/result tampering, wrong/missing/extra injected adapters and divergent analysis.",
+        "Preserve pin capture, freshness, CAS/grants and extension merge default path. Alias selectors map only to dotnet and office-vsto fixed IDs."
+      ],
+      "compatibility": "Existing callers retain configured-all behavior. Reserved metadata and extension merge reconstruction remain unchanged. The injected trusted collaborator is not a request-selected executable/module registry."
+    }
+  ],
+  "bindings": [
+    {"path":"schemas/discovery/v2/service-request.schema.json","lines":212,"sha256":"e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"},
+    {"path":"schemas/discovery/v2/service-result.schema.json","lines":125,"sha256":"26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b"},
+    {"path":"scripts/dev_tools/build_discovery_runtime.py","lines":408,"sha256":"4173504dee2aa98740b705c4113cc427f6fa713e1c1fb3761a79d902b7eb062e"},
+    {"path":"packages/discovery-runtime/pyproject.toml","lines":20,"sha256":"a52184773b6a7cbd1ad512ecb74adac0e8d7906e60a18f956f2e0200b3c86cc1"},
+    {"path":"packages/discovery-runtime/resource-manifest.json","lines":49,"sha256":"04d4519350221015ec201089abacf1a47dbf99bc73c6e64579cc57668c82c02b"},
+    {"path":"R/acceptance_generation.py","lines":494,"sha256":"7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f"},
+    {"path":"R/acceptance_generation_context.py","lines":488,"sha256":"06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a"},
+    {"path":"R/acceptance_models.py","lines":418,"sha256":"aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a"},
+    {"path":"R/references.py","lines":436,"sha256":"9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c"},
+    {"path":"R/analyzer/pipeline.py","lines":270,"sha256":"81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d"},
+    {"path":"R/analyzer/registry.py","lines":164,"sha256":"d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5"},
+    {"path":"R/snapshot.py","lines":270,"sha256":"9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"},
+    {"path":"R/resources.py","lines":215,"sha256":"4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086"}
+  ],
+  "handoff": {
+    "order": "Approve these decisions/prerequisite scopes; prepare failure schema and packaging provenance; implement independent selector and fixed analyzer seams; freeze contracts before service/gateway composition.",
+    "size": "Every new code/test file <=500 lines. Keep generator/context unchanged. Use the named packaging helper rather than overgrowing the existing builder.",
+    "pending_approval": "Failure nullability, numeric policy/build-content definitions and trusted exact-subset rendering qualification. No further technical blocker identified within these four mismatches.",
+    "native": "Host authority remains unavailable/fail-closed until P8. Preserve retained timeout/cancellation requirement without optimization.",
+    "verification": "Read-only inspection and hashes only. No suites, collection, baseline, coverage or implementation claim. Previous preparation unchanged; P5-T5 moving renderer files not frozen."
+  },
+  "transport_note": "The initial evidence-only PowerShell prose write was rejected before execution: PROMOTION_MCP_ONLY_BLOCKED: Direct GitHub issue creation via `gh` bypasses the approved drm-copilot MCP promotion path. That command contained no gh invocation or issue action. Parent authorized normal file-edit transport; no hook/policy changes or bypass, and no source/test/schema/Git mutation."
+}

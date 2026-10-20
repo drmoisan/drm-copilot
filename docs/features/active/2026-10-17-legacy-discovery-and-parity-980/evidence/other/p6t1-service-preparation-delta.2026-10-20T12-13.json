@@ -1,0 +1,257 @@
+{
+  "Timestamp": "2026-10-20T12-13",
+  "status": "PREPARATION_READY_NOT_IMPLEMENTATION_RELEASE",
+  "task": "P6-T1",
+  "head": "8f58c3d5248c06bbabf789d64ef0a72ce8ceb368",
+  "retained": "execution_progress.phase6_specialist; approved P6-T1 plan/spec. No prior eligibility or external research repeated.",
+  "pending_renderer": {
+    "contract": "evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json",
+    "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef",
+    "qualification": "API/output convention approved with original safe compatibility assertions and negatives preserved. Implementation active; no moving gherkin/test bytes bound here."
+  },
+  "existing_surface": {
+    "capture": "capture_workspace(*, workspace_root, profile_path, metadata, read_bytes, catalog, repository=None)->CapturedWorkspace; SnapshotIO and PathPolicy own bounded non-following local reads. load_snapshot(*,io,profile_path,repository=None,catalog=None) composes immutable input bytes; reuse accepted exact definition when implementing.",
+    "configuration": "select_configuration(*,candidates,locator,activation,catalog,profile_path=None,controlled=False); ActivationStore.configure(ConfigurationRequest)->ConfigurationResult with trusted authorize_root/revocation/store collaborators. InitializationIO provides bootstrap capture; plan_initialization/commit_initialization and plan_migration/commit_migration preserve no-overwrite and partial-result semantics.",
+    "validation": "validate_snapshot(snapshot:DiscoverySnapshot|None,*,mode,invocation=None)->SnapshotValidation; report_projection(snapshot,*,kind,identifier,mode)->dict[str,object]. Root mode reports must use these public authoritative projections; agent-output retains distinct output_valid versus review PASS/FAIL.",
+    "mutation": "plan_mutation(baseline,changes:tuple[MutationChange,...],*,grants:tuple[WriteGrant,...],invocation=None,transport=None)->MutationPlan; commit_mutation(plan,*,writer:MutationWriter,dry_run=False)->MutationResult. Grants authenticate exact kind/id/path; null expected hash means absence; replacement requires captured digest. Writer recaptures full state under guards and invalidates authority before attempted writes; preserve partial/uncertain paths on failure.",
+    "drafts": "plan_contract(baseline,ContractDraft,*,grants,invocation=None), plan_scenario(baseline,ScenarioDraft,*,grants,invocation=None), plan_evidence_link(baseline,EvidenceLink,*,grants,invocation=None) return MutationPlan. Whole-document updates use MutationChange/plan_mutation; no text patch or direct overwrite.",
+    "inventory": "capture_snapshot(snapshot)->InventoryCapture; pin_inventory_sources(workspace,repository)->CapturedWorkspace must be composed consistently in initial and writer.capture paths. run_inventory(capture,*,timestamp,author_or_agent,catalog,dry_run=False)->InventoryResult and plan_inventory(baseline,result,*,grants,invocation=None) reconstruct exact captured inputs. select_analyzers(profile)->tuple[InventoryAdapter,...] is fixed and consent-aware.",
+    "extensions": "merge_extension_inventory(snapshot,*,timestamp,author_or_agent,manifest_paths=None)->InventoryResult. Data-only imported manifests; no executable/module configuration. Generate merged content internally then validated mutation; do not feed a merged result into core-only plan_inventory reconstruction or bypass claim validation.",
+    "reports": "build_coverage_report/build_parity_report/build_completion_report produce DiscoveryReport from public report_projection. plan_completion_report(baseline,*,mode,grants,identifier=\"completion\")->MutationPlan plans exact JSON/Markdown report paths. Coverage/parity/validation pair publication must compose same report_projection/DiscoveryReport/MutationChange/plan_mutation, not duplicate gate calculations or use legacy write_report.",
+    "acceptance": "generate_acceptance(snapshot,*,kind,feature_ids:tuple[tuple[str,str],...]=(),client_ids:tuple[str,...]=(),mode_ids:tuple[str,...]=())->AcceptanceGeneration. Render exact generated result through approved render_acceptance contract. Structured specifications retain owner outside JSON; ready views only generation.ready. Plan all intended source and rendered outputs together with exact grants/CAS and one prospective validation; do not write rendered output before structured validation. Existing path_policy maps acceptance-specification and acceptance-view to the acceptance root; plan_mutation already permits opaque acceptance-view .md/.feature bytes while validating the structured prospective graph. Use that route for generated views; no new publication bypass is required.",
+    "source_reads": "SourceReader(profile,*,catalog,workspace_root,metadata,read_bytes,selection,limits=DEFAULT_LIMITS).inspect(SourceReadRequest)->SourceReadResult. ReadSelection is caller-authenticated, not deserialized from request. Retain bounds, freshness and literal/regex policy.",
+    "resources": "__version__, load_resource_manifest/read_resource and core catalog use installed importlib resources with hashes. ResourceManifest records runtime_version and resource entries; it does not itself provide a full Python-build digest or numeric policy-version provenance."
+  },
+  "service_contract": {
+    "entry": "execute(request, *, io, repository_reader, clock, analyzer_registry) -> DiscoveryResult; freeze typed request/result and collaborator Protocols before independent handlers.",
+    "io": "Trusted ServiceIO owns explicit workspace binding, local input reads/capture, authenticated principal/context/grants/read selection, configured activation store, guarded writer, installed resources and bootstrap/migration adapters. Request JSON supplies data and opaque correlation refs only; it cannot supply collaborators, authority storage, grants or role claims.",
+    "principal": "Explicit trusted local-user principal selects root local path. A host principal must resolve and consume authenticated protected invocation/authorization refs and bind workspace/profile/request digest/expiry/one-use before returning InvocationContext/grants/ReadSelection. Missing/unavailable host provider fails closed with exit3; never fall back to local-user because attribution is absent. InvocationContext construction or mirrored JSON schema validation grants no authority.",
+    "registry": "Trusted injected registry must expose only fixed known identifiers, enforce configured selection/consent and reject unknown selectors before imports. Request values never choose Python functions/modules/executables. Preserve plan_inventory reconstruction against published bytes.",
+    "clock": "Injected callable supplies explicit capture timestamp/attribution where required; no clock contributes to deterministic report or acceptance identity/content digest. Freeze return type/RFC3339 conversion once.",
+    "result": "Immutable versioned result validates against exact service-result schema before serialization. Map stable findings with ordered_findings; artifacts carry normalized path/kind/planned|created|updated|skipped|conflict/hash and optional content. summary has closed message/counts/validation_result/receipt_ref/invocation_ref fields, not arbitrary report JSON. Keep full report bodies in artifacts.content; unavailable metrics must not be converted to true-zero counts.",
+    "exit": "0 selected operation/gate passes;1 blocking graph/semantic findings;2 malformed invocation/configuration/path/version;3 dependency/I/O/authority/runtime failure. Preserve original MutationError findings and partial writes. Do not catch every ValueError as invocation error: classify at the parsing, authority, projection or commit boundary. Native output validity and review failure cannot be collapsed into unconditional ok."
+  },
+  "fixed_operations": {
+    "workspace": [
+      "init",
+      "configure",
+      "profile",
+      "inventory",
+      "snapshot-export",
+      "snapshot-import",
+      "import-inventory",
+      "migrate",
+      "doctor",
+      "read-source"
+    ],
+    "artifacts": [
+      "new-contract",
+      "new-scenario",
+      "update-artifact",
+      "link-evidence"
+    ],
+    "validation": [
+      "validate-profile",
+      "validate-feature-contract",
+      "validate-coverage-ledger",
+      "validate-runtime-scenario",
+      "validate-parity-matrix",
+      "validate-unspecified-behavior",
+      "validate-product-decision",
+      "validate-evidence-reference",
+      "validate-decisions",
+      "validate-all"
+    ],
+    "projections": [
+      "coverage-report",
+      "parity-report",
+      "completion-report",
+      "generate-acceptance"
+    ],
+    "host_deferred": [
+      "prepare-agent",
+      "finalize-agent"
+    ],
+    "rule": "Match canonical schema enum exactly; validate required/forbidden inputs, modes, write/dry-run/format combinations for each operation before I/O. P6-T2 maps aliases/dotnet/vsto shortcuts. Host-deferred operations return explicit unavailable authority until P8 integration, never a synthetic native receipt."
+  },
+  "gateway_doctor": {
+    "gateway": "Fixed python -I -m drm_copilot_discovery.gateway; bounded one-request stdin JSON with duplicate-key/nonfinite/depth/size rejection via parse_document. No shell/string interpolation, executable/module dispatch, multiple requests, trailing junk or mixed log/result stdout. One bounded versioned JSON response, matching process exit; stderr diagnostics remain separate. Inject stream/adapter seams for memory-only tests; no subprocess in unit tests.",
+    "doctor": "Read-only installed package/catalog/resource integrity plus configuration selection/profile findings. Initially explicit native-capability unavailable and receipt_ref=null; no configured boolean/JSON can claim attestation. Plain local runtime health and unavailable agent capability are distinct; requesting a native capability cannot yield success until P8-T8 protected probe provider exists."
+  },
+  "concrete_decisions_before_release": [
+    "Request feature_ids are unqualified strings while accepted generate_acceptance takes repository/feature pairs. Freeze unqualified resolution with ambiguous IDs rejected, optionally using the existing repository_id as a single-source selector, or authorize an exact canonical request-schema qualified-selector extension; never guess among same-named features. platform_ids is present in request schema but generator has no platform selector: reject unsupported use or approve explicit semantics, not silently ignore it.",
+    "Result operation/mode are closed valid enums even for exit2, so malformed JSON or unknown operation/mode cannot be truthfully echoed in a valid result. Freeze an explicit malformed-request envelope convention or narrowly authorized conditional schema change; do not mislabel failure as doctor/structural or fabricate a requested operation.",
+    "Result runtime requires build_sha256, integer policy_version and policy_sha256 even during missing/corrupt-runtime failures. Freeze actual installed build/policy provenance and an unavailable-runtime failure representation. Do not label a resource-only digest as full runtime build identity without a documented contract or fill unknown hashes with invented zeros.",
+    "run_inventory and plan_inventory hardwire select_analyzers(profile). Service injected registry and requested analyzer subset/shortcut must preserve reconstruction. Either define the port as accepted fixed-pipeline execution with strict configured selection, or approve one cohesive public selection seam threaded through execution/reconstruction; a fake/filtered result cannot bypass current planner checks."
+  ],
+  "ownership_proposal": [
+    "Contract owner: new service_contracts.py (proposed prerequisite) plus test_service_failures.py owns immutable request/result, typed trusted ports, envelope/error mapping and strict operation input contracts. This avoids extending accepted general models.py and prevents shared-file conflicts.",
+    "Service owner: service.py and operations.py plus test_service.py owns execute/capture/authorization and fixed map composition. Four planned production files alone risk one operations module exceeding500 lines across30 canonical operations; allocate cohesive service_reports.py and service_mutations.py only after concrete handler sizing, with exact ownership before edits. Do not split one operation between concurrent writers.",
+    "Gateway/doctor owner: gateway.py, doctor.py and test_gateway.py/test_doctor.py consumes frozen contracts/ports and installed metadata provider. No CLI registrations or legacy adapter changes; P6-T2/T3 retain those boundaries."
+  ],
+  "smallest_tests": [
+    "Parameterize the closed operation map with real supported validators and in-memory captured fixtures; each operation gets one successful or accurate blocked composition, not repeated predecessor internal matrices.",
+    "Request field/mode/write/dry-run/format boundary table; aliases normalized only by future CLI; unknown operation/extra execution field rejected before collaborator calls.",
+    "Explicit local-user versus authenticated host; forged/null/stale/replayed/mismatched refs, agent-output missing InvocationContext, root-only operation denial, unavailable native provider, no role fallback.",
+    "Whole operation capture+pin+projection+plan+fresh recapture+commit using in-memory seams; no-write dry-run, exact CAS, unchanged idempotency, concurrent source changes, partial/uncertain writes and authority-revocation failure. Reuse accepted low-level proofs.",
+    "Gateway one versioned result, duplicate/nonfinite/trailing/truncated/oversized inputs, inconsistent result rejected, clean stdout/process status, read/write dependency failures; no unit process/tempfiles/network.",
+    "Doctor installed resources/version/profile success or exact missing/corrupt diagnostics; native unavailable cannot self-attest; no writes/Git/process/network or hidden config mutation.",
+    "Authoritative report body/selected mode, unavailable versus zero, generated-doc digest stability; acceptance exact generated result and structured/rendered publication. Bind P5-T5 final hashes later."
+  ],
+  "dependent_callers": {
+    "current_schema_tests": [
+      "tests/schemas/discovery/test_v2_control_schemas.py",
+      "tests/schemas/discovery/v2_control_test_support.py",
+      "tests/discovery_runtime/test_schema_validation.py"
+    ],
+    "legacy": "Sets A-F adapter tests remain P6-T3 unless P6-T1 actually changes an existing public caller. No current Python service/gateway implementation or caller was found; new API tests are planned paths.",
+    "registration": "Retain prior exact P6-T2 test_init_cli.test_console_script_registered_in_pyproject disposition. Keep runtime [tool.poetry.scripts] before dependencies per accepted inventory assertion.",
+    "schema_prerequisite": "Any approved wire-schema change must update canonical schema, bundled/runtime copies and affected catalog/control tests through existing resource packaging rules; do not silently alter only a local schema."
+  },
+  "timing": "Retain P8 timeout/cancellation follow-on: evidence/qa-gates/p5t3-final-native-094649.2026-10-20T09-51.json records guarded creation and replacement each exceeding71seconds. This is measured native composition, not a proven host timeout limit. Keep cancellation/partial-result boundaries observable; no unrelated optimization or timeout workaround in P6 preparation.",
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/configuration.py",
+      "sha256": "0193463923026c5c06d4154b6854a9445682e3a05f372a81f2859b422494d3d2",
+      "lines": 310
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "lines": 453
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+      "lines": 340
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py",
+      "sha256": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+      "lines": 496
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "lines": 426
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "lines": 437
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+      "sha256": "a86f2201ca0509cb38be71d97b70e530f7c8e582dc44a3cd83aee886eb13161c",
+      "lines": 481
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_contracts.py",
+      "sha256": "a317f11b60ccffcb05fe040a28162388dd40d87de06506d4615455260755a00d",
+      "lines": 396
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/draft_scenarios.py",
+      "sha256": "0e43b453774fcd10f669dc643ebcf33a11712ad9778a92343d85829d7ae0c1a1",
+      "lines": 231
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_linking.py",
+      "sha256": "98a0b6dda37acb98fe143ce680f3a5caa3b65eccc15047394c1929d1a0cc4f18",
+      "lines": 343
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py",
+      "sha256": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+      "lines": 476
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab",
+      "lines": 413
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "81188c721592ffbe90feb1e04a28e2aafa18c5a44f18b5357630884641a0362d",
+      "lines": 270
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "d794b057a0d35081c0276c21b4bca184aaeb193d021e35da14a0cd2d6d184ce5",
+      "lines": 164
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py",
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "lines": 311
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py",
+      "sha256": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+      "lines": 328
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "lines": 263
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "lines": 339
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+      "lines": 261
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "lines": 418
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "lines": 494
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py",
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "lines": 481
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+      "lines": 215
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py",
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "lines": 411
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "lines": 483
+    }
+  ],
+  "schema_bindings": [
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "lines": 212
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
+      "lines": 125
+    }
+  ],
+  "effects": {
+    "source_test_plan_spec_checkpoint_git_changes": false,
+    "suites": false,
+    "external_or_consumer_access": false,
+    "evidence_only": true
+  }
+}
