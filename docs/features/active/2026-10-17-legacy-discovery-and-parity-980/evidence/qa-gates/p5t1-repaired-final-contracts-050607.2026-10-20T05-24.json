@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m pytest -v -o addopts= -p no:cacheprovider --no-cov tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+  "completed_nodes": 4,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:24:18.603503+00:00",
+  "label": "contracts",
+  "last_node": "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+  "pid": 41248,
+  "raw": [
+    {
+      "bytes": 1015,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.stdout",
+      "sha256": "9cdccb66650989ebc9682265fe34882165b9b2ce93366d085d18e67e8bb91d4e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 362,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-contracts.progress.json",
+      "sha256": "c7f06e058b8ffd8e23787f7e070dc0b2f10f503b8c09328e17c833fde836dbd2"
+    }
+  ],
+  "seconds": 1.011,
+  "stage": 7,
+  "started_at": "2026-10-20T05:24:17.592893+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 4 items\r\n\r\ntests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree PASSED [ 25%]\r\ntests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers PASSED [ 50%]\r\ntests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python PASSED [ 75%]\r\ntests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage PASSED [100%]\r\n\r\n============================== 4 passed in 0.13s ==============================\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-24"
+}

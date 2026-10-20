@@ -1,0 +1,287 @@
+"""Prepare the released bounded repair sequence without running any gate."""
+import ast
+import base64
+import datetime
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root, scratch = Path.cwd(), Path(__file__).resolve().parent
+feature = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+qa, regression = feature / "evidence/qa-gates", feature / "evidence/regression-testing"
+scope_path = "packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py"
+contract_path = "tests/discovery_runtime/test_coverage_report_contract.py"
+direct_path = "tests/discovery_runtime/test_coverage_scope.py"
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def sha(data):
+    """Return an exact byte digest."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def reference(path):
+    """Bind an existing repository-relative evidence stream."""
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def read(path):
+    """Load a retained JSON record without changing its bytes."""
+    return json.loads(path.read_bytes())
+
+
+def create(path, text):
+    """Write only a new LF preparation stream, with one terminal newline."""
+    assert not path.exists(), path
+    value = text.replace("\r\n", "\n").rstrip() + "\n"
+    assert "\r" not in value
+    path.write_text(value, encoding="utf-8", newline="\n")
+
+
+state = read(Path("artifacts/orchestration/orchestrator-state.json"))
+route = next(item for item in state["codex_model_routing_receipts"]
+             if item["delegation_id"] == "workspace_operations_p5t1_repaired_final_preparation_20261020")
+profile_hash = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+assert route["profile_sha256"] == sha(Path(route["profile_path"]).read_bytes()) == profile_hash
+authority_path = Path.home() / ".codex/authority/epic-entry/0a00160052dfcee84f12df9a9b8cfcdde1c2dedd8ace3ebd457a161fa9c1b2c3/01a15153-48ad-74d1-9f2d-e3ad413dafb4/codex-routing-attestation.f50a381e7b3554fe77176b5c0429a53b56579adb36427614259db5bc6770a5d6.json"
+authority = read(authority_path)
+assert authority["profile_sha256"] == profile_hash
+assert all(authority[key] is True for key in ("routing_valid", "launch_authority_valid", "provenance_valid"))
+held_path = qa / "p5t1-final-candidate.2026-10-20T04-22.json"
+held = read(held_path)
+assert sha(held_path.read_bytes()) == "73479107eede840a220cf2243a7b9d11d65744bda837deda3958fb1267c192fe"
+boundary_path = feature / "evidence/baseline/p5t1-report-boundary-baseline.2026-10-20T04-47.json"
+boundary = read(boundary_path)
+scope_old = base64.b64decode(boundary["owned"][scope_path]["base64"])
+assert sha(scope_old) == boundary["owned"][scope_path]["sha256"]
+baseline_coverage = read(Path(boundary["accepted_coverage"]["path"]))
+baseline_scope = baseline_coverage["files"][scope_path]
+assert baseline_scope["summary"]["covered_lines"] == 142
+assert baseline_scope["summary"]["covered_branches"] == 78
+focused_path = regression / "p5t1-report-boundary4-tests.2026-10-20T04-55.json"
+focused = read(focused_path)
+assert focused["exit_code"] == 0
+focused_stdout = base64.b64decode(focused["stdout"]["base64"]).decode()
+extra_nodes = re.findall(r"^(tests/.+?) PASSED(?:\s|$)", focused_stdout, re.M)
+assert len(extra_nodes) == len(set(extra_nodes)) == 9
+assert not set(extra_nodes) & set(held["nodes"]["graph"])
+
+# This read-only preparation permits only the two independently owned repair streams.
+bindings = dict(held["bindings"])
+for path, old_sha in bindings.items():
+    actual = sha(Path(path).read_bytes())
+    assert path in (scope_path, contract_path) or actual == old_sha, path
+    bindings[path] = actual
+assert bindings[scope_path] == "6f3e34a5018f167c9bb0e665384d3929eb1d2f5f37036f11007380c0784cfd02"
+assert bindings[contract_path] == "31d1a668bf3b5d1f7254da11c7ff4b8158bafb5c4cc9c070f84810fbc3a6a0a7"
+assert bindings[direct_path] == "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3"
+
+before_ast = ast.parse(scope_old)
+after_ast = ast.parse(Path(scope_path).read_bytes())
+old_defs = {node.name: node for node in before_ast.body
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef))}
+new_defs = {node.name: node for node in after_ast.body
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef))}
+assert old_defs.keys() == new_defs.keys()
+changed_definitions = [name for name in old_defs
+                      if ast.dump(old_defs[name]) != ast.dump(new_defs[name])]
+assert changed_definitions == ["_inventory"], changed_definitions
+unchanged = [{"name": name, "old_range": [old_defs[name].lineno, old_defs[name].end_lineno],
+              "new_range": [new_defs[name].lineno, new_defs[name].end_lineno],
+              "ast_sha256": sha(ast.dump(new_defs[name]).encode())}
+             for name in old_defs if name != "_inventory"]
+mapping, changed_lines = {}, []
+for operation, a, b, c, d in difflib.SequenceMatcher(
+        a=scope_old.decode().splitlines(),
+        b=Path(scope_path).read_text(encoding="utf-8").splitlines(), autojunk=False).get_opcodes():
+    if operation == "equal":
+        mapping.update({old + 1: new + 1 for old, new in zip(range(a, b), range(c, d))})
+    else:
+        changed_lines.extend(range(c + 1, d + 1))
+assert set(changed_lines) <= set(range(new_defs["_inventory"].lineno, new_defs["_inventory"].end_lineno + 1))
+scope_proof = {
+    "source_baseline": reference(boundary_path),
+    "coverage_baseline": boundary["accepted_coverage"],
+    "baseline_sha256": sha(scope_old),
+    "changed_callable": "_inventory",
+    "unchanged_top_level_definitions": unchanged,
+    "old_to_current_equal_line_map": {str(key): value for key, value in mapping.items()},
+    "changed_lines": changed_lines,
+    "current_changed_callable_requirement": "All mapped prior executed lines and branch destinations of _inventory remain covered; every changed executable line is covered; new callable coverage is at least 90%.",
+    "retained_requirement": "Only exact unchanged callable AST bodies retain P2-T6 proof. Retained coverage is separate from the current raw coverage report.",
+}
+
+selectors = [
+    ("test_complete_scan_requires_exact_captured_input_accounting",
+     ["missing-COVERAGE_INPUTS", "extra-COVERAGE_INPUTS", "changed-hash-COVERAGE_INPUTS",
+      "duplicate-COVERAGE_FILES", "unsorted-COVERAGE_FILES", "unreadable-COVERAGE_SCAN",
+      "excluded-COVERAGE_SCAN"],
+     "Retain exact current input membership, byte hashes, ordering, duplicates and unreadable/excluded states."),
+    ("test_scan_failures_block_only_global_or_selected_inputs",
+     ["None-True", "src/component.cs-True", "src/new.cs-True", "src2/other.cs-False"],
+     "Retain global versus selected path diagnostic boundaries reached by _inventory."),
+    ("test_skipped_paths_require_explicit_inventory_exclusion_accounting",
+     ["Generated files.", ""],
+     "Retain the expected-input union for skipped paths with and without explicit rationale."),
+    ("test_excluded_selected_scan_input_requires_scope_rationale", [],
+     "Retain explicit justified exclusion without converting it into inspected coverage."),
+    ("test_current_configuration_is_checked_only_against_its_own_profile", ["False", "True"],
+     "Retain local current configuration and imported-origin exemption boundaries."),
+    ("test_malformed_inventory_rows_do_not_crash_or_shift_selection", [],
+     "Retain malformed row positions and missing-input diagnostics.")
+]
+direct_nodes = []
+selector_records = []
+for name, ids, reason in selectors:
+    prefix = direct_path + "::" + name
+    nodes = [prefix + "[" + value + "]" for value in ids] if ids else [prefix]
+    direct_nodes.extend(nodes)
+    selector_records.append({"selector": prefix, "nodes": nodes, "reason": reason})
+assert len(direct_nodes) == 17
+
+# Derive the new runner from the preserved successful streaming runner, not from a second architecture.
+runner = (scratch / "issue-980-p5t1-final-gates.py").read_text(encoding="utf-8")
+runner = runner.replace("p5t1-final-", "p5t1-repaired-final-")
+runner = runner.replace("issue-980-p5t1-repaired-final-architecture.py", "issue-980-p5t1-repaired-architecture.py")
+start = runner.index("data_files = []")
+runner = runner[:start] + '''native_result_path = scratch / f"issue-980-p5t1-repaired-final-{run_id}-native-result.json"
+native = run(5, "native-precheck", [scratch / "issue-980-p5t1-final-native.py", native_result_path],
+    module=False, timeout=manifest["timeout_seconds"]["native"])
+native_result = json.loads(native_result_path.read_bytes())
+assert native_result["passed"] == len(native_result["checks"]) == 14
+assert len(re.findall(r"^PASS ", native["stdout"], re.M)) == 14
+raw_files.append({"path": "SCRATCH/" + native_result_path.name,
+    "sha256": sha(native_result_path.read_bytes()), "bytes": native_result_path.stat().st_size})
+native_stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+native_evidence = qa / ("p5t1-repaired-final-native-result." + native_stamp + ".json")
+write(native_evidence, native_result)
+data_files = []
+''' + runner[start + len("data_files = []\n"):]
+runner = runner.replace('for batch in ("graph", "callers"):',
+                        'for batch in ("scope", "graph", "callers"):')
+runner = runner.replace('modules = list(reversed(manifest["forward_test_module_order"][batch]))',
+                        'modules = list(reversed(manifest["forward_test_module_order"][batch]))')
+runner = runner.replace('result = run(5, batch + "-reverse"', 'result = run(6, batch + "-reverse"')
+runner = runner.replace('run(5, "coverage-', 'run(6, "coverage-')
+coverage_begin = runner.index("coverage = json.loads(combined_json.read_bytes())")
+coverage_end = runner.index('contracts = run(6, "contracts"')
+runner = runner[:coverage_begin] + '''coverage_check_path = scratch / f"issue-980-p5t1-repaired-final-{run_id}-coverage-check.json"
+run(6, "coverage-check", [scratch / "issue-980-p5t1-repaired-coverage.py",
+    manifest_path, combined_json, coverage_check_path], module=False)
+coverage_check = json.loads(coverage_check_path.read_bytes())
+coverage_evidence = Path(coverage_check["coverage"]["path"])
+ranges_path = Path(coverage_check["ranges"]["path"])
+range_results = coverage_check["range_results"]
+raw_files.extend({"path": "SCRATCH/" + path.name, "sha256": sha(path.read_bytes()), "bytes": path.stat().st_size}
+    for path in (combined_database, combined_json, coverage_check_path))
+''' + runner[coverage_end:]
+runner = runner.replace('contracts = run(6, "contracts"', 'contracts = run(7, "contracts"')
+runner = runner.replace('"unit_count": 187', '"unit_count": 213')
+runner = runner.replace('"native_pending": True', '"native_pending": False')
+runner = runner.replace('"unit_cases": 187', '"unit_cases": 213')
+runner = runner.replace('"stages1_6": stage_path.as_posix()', '"completed_sequence": stage_path.as_posix()')
+runner = runner.replace('"p5t1-repaired-final-stages1-6."', '"p5t1-repaired-final-complete."')
+runner = runner.replace('"binding_sha256": binding(), "native_pending": False',
+    '"binding_sha256": binding(), "native_pending": False, "native": {"path": native_evidence.as_posix(), "sha256": sha(native_evidence.read_bytes())}')
+create(scratch / "issue-980-p5t1-repaired-gates.py", runner)
+
+architecture = (scratch / "issue-980-p5t1-final-architecture.py").read_text(encoding="utf-8")
+architecture = architecture.replace('assert lines[node.lineno - 2].lstrip().startswith("#"), (path, node.lineno)',
+'''if not lines[node.lineno - 2].lstrip().startswith("#"):
+                assert path.as_posix() == manifest["scope_path"], (path, node.lineno)
+                old_line = manifest["scope_policy_retained_loops"].get(str(node.lineno))
+                assert old_line is not None, (path, node.lineno, "new uncommented loop")
+                assert manifest["scope_policy_loop_hashes"][str(node.lineno)] == hashlib.sha256(ast.dump(node).encode()).hexdigest()''')
+architecture = architecture.replace("assert len(checked) == 8", "assert len(checked) == 9")
+create(scratch / "issue-980-p5t1-repaired-architecture.py", architecture)
+
+old_loops = {node.lineno: node for node in ast.walk(before_ast) if isinstance(node, (ast.For, ast.While))}
+new_loops = {node.lineno: node for node in ast.walk(after_ast) if isinstance(node, (ast.For, ast.While))}
+policy_loops, loop_hashes = {}, {}
+for old_line, old_node in old_loops.items():
+    new_line = mapping.get(old_line)
+    if new_line in new_loops and ast.dump(old_node) == ast.dump(new_loops[new_line]):
+        policy_loops[str(new_line)] = old_line
+        loop_hashes[str(new_line)] = sha(ast.dump(new_loops[new_line]).encode())
+
+files = []
+for entry in held["files"]:
+    path = entry["path"]
+    files.append({**entry, "sha256": bindings[path],
+                  "physical_lines": len(Path(path).read_bytes().splitlines()),
+                  "git_binding_status": "Rebind checked repair HEAD before execution" if path == contract_path else "unchanged held candidate"})
+files.append({"path": scope_path, "sha256": bindings[scope_path],
+              "physical_lines": len(Path(scope_path).read_bytes().splitlines()),
+              "git_binding_status": "Rebind checked repair HEAD before execution"})
+manifest = {
+    **held, "timestamp": stamp, "execution_released": False,
+    "head": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, check=True).stdout.decode().strip(),
+    "route": route, "authority_sha256": sha(authority_path.read_bytes()),
+    "held_candidate": reference(held_path),
+    "held_handoff": reference(qa / "p5t1-final-held-handoff.2026-10-20T04-45.json"),
+    "held_raw_archive": reference(qa / "p5t1-final-held-original-streams.2026-10-20T04-45.json"),
+    "held_native_failure": reference(qa / "p5t1-final-native-finding.2026-10-20T04-44.json"),
+    "focused_boundary_proof": reference(focused_path),
+    "repair_confirmation_and_checked_commit": "Required before execution; preparation is not release.",
+    "files": files, "bindings": bindings,
+    "nodes": {"scope": direct_nodes, "graph": held["nodes"]["graph"] + extra_nodes, "callers": held["nodes"]["callers"]},
+    "forward_test_module_order": {**held["forward_test_module_order"],
+                                  "scope": [entry["selector"] for entry in selector_records]},
+    "node_counts": {"scope": 17, "graph": 58, "callers": 138},
+    "scope_selection": selector_records,
+    "scope_node_basis": "Static literal pytest parameter IDs from unchanged test source; no extra collection or test run.",
+    "coverage_targets": [*held["coverage_targets"], "drm_copilot_discovery.coverage_scope_rules"],
+    "production": [*held["production"], scope_path],
+    "scope_path": scope_path, "scope_proof": scope_proof,
+    "scope_policy_retained_loops": policy_loops, "scope_policy_loop_hashes": loop_hashes,
+    "timeout_seconds": {"scope": 300, "graph": 600, "callers": 1800, "native": 600},
+    "native_pending": True, "native_order": "First test-stage regression precheck after format/lint/types/static; all original 14 assertions unchanged.",
+    "new_sequence": ["format", "lint", "types", "static", "native14", "scope17", "graph58",
+                     "callers138", "coverage-combine/check", "contracts4"],
+    "replay_rationale": {
+        "graph": "Complete inventory population and report result depend on the repaired expected-input predicate.",
+        "callers": "All three actual callers consume complete inventory/coverage/acceptance validation; their prior proof binds old source.",
+        "scope": "Six direct existing selectors exercise the changed callable and its input/error boundaries.",
+        "retained": "Do not replay unchanged helper114, ledger-disposition population or other unchanged scope callables."},
+    "progress": "One-second raw progress snapshots retain completed count/latest node; every stage has actual elapsed time and finite timeout. Preserve available bytes before any timeout.",
+}
+harnesses = {}
+for name in ("issue-980-p5t1-repaired-prepare.py", "issue-980-p5t1-repaired-gates.py",
+             "issue-980-p5t1-repaired-architecture.py", "issue-980-p5t1-repaired-coverage.py"):
+    raw = (scratch / name).read_bytes()
+    assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), name
+    ast.parse(raw)
+    target = qa / (name.removeprefix("issue-980-").removesuffix(".py") + "-harness." + stamp + ".txt")
+    assert not target.exists()
+    target.write_bytes(raw)
+    harnesses[name] = reference(target)
+native_ref = reference(qa / "p5t1-final-native-harness.2026-10-20T04-27.txt")
+assert sha((scratch / "issue-980-p5t1-final-native.py").read_bytes()) == native_ref["sha256"]
+harnesses["issue-980-p5t1-final-native.py"] = native_ref
+manifest["harnesses"] = harnesses
+path = qa / ("p5t1-repaired-final-preparation." + stamp + ".json")
+create(path, json.dumps(manifest, indent=2, sort_keys=True))
+markdown = f"""# P5-T1 repaired final preparation
+
+Timestamp: {stamp}
+Command: `poetry run python SCRATCH/issue-980-p5t1-repaired-prepare.py`
+EXIT_CODE: 0
+Output Summary: Preparation only; no gate or behavioral execution. Four measured modules, 213 affected unit cases, four contracts, unchanged native 14 assertions first.
+
+The sequence is formatting, lint, whole-repository types, static checks, the original native regression precheck, isolated reverse direct-scope/graph/caller batches, coverage reconciliation and the four existing contracts. Failure or changed source restarts formatting.
+
+The six direct selectors account for 17 cases and are listed with reasons in the paired JSON. The other populations are 58 graph and 138 callers. No helper/legacy114 or unrelated ledger-disposition replay is planned.
+
+P2-T6 scope coverage is retained only for exact unchanged callable ASTs. Current changed-function, changed-line and no-loss checks remain mandatory and separate from current raw coverage.
+
+The original native assertions and harness are byte-identical. All 14 execute before the long caller replay; previous assertions10-14 were unexecuted. The historical failure, diagnostic and raw archive remain immutable.
+
+Execution requires the independent repair confirmation, checked commit/push, fresh exact routing receipt and a release binding of this preparation to committed source hashes.
+"""
+create(path.with_suffix(".md"), markdown)
+print(json.dumps({"preparation": reference(path), "scope": len(files),
+                  "nodes": manifest["node_counts"], "native_assertions": 14,
+                  "harnesses": harnesses, "execution_started": False}, indent=2))
