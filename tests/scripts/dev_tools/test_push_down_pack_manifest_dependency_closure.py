@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -43,6 +43,9 @@ from tests.scripts.dev_tools.pack_manifest_dependency_scan import (
     find_missing_dependencies,
     find_unrecognized_psscriptroot,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RESOURCES_ROOT = REPO_ROOT / "extensions" / "drm-copilot" / "resources"
@@ -63,6 +66,8 @@ ISSUE_984_CODEX_CORE_PATHS = (
     ".codex/hooks/enforce-completion-helpers.ps1",
     ".codex/scripts/post-codex-worktree-session.ps1",
 )
+CLAUDE_SCAN_ANCHOR = ".claude/hooks/enforce-completion-consistency.ps1"
+CODEX_SCAN_ANCHOR = ".codex/hooks/enforce-completion-consistency.ps1"
 
 
 @dataclass(frozen=True)
@@ -213,15 +218,113 @@ def _closure_gaps(surface: Surface) -> list[str]:
     return gaps
 
 
-def test_scanned_source_floor() -> None:
-    """Scan at least one PowerShell source per surface, so no check is vacuous."""
+def _scan_floor_gaps(
+    label: str, scanned: set[str], expected: set[str], anchor: str
+) -> list[str]:
+    """Return one message per defect of a surface's scanned PowerShell set.
 
-    # Count the distinct scanned sources of each surface.
-    for surface in (claude_surface(), codex_surface()):
+    Args:
+        label (str): Surface name used in every message.
+        scanned (set[str]): Sources the scanner actually visits.
+        expected (set[str]): Sources derived independently from the manifests.
+        anchor (str): A source known to carry a `$PSScriptRoot` dependency.
+
+    Returns:
+        list[str]: A missing-anchor message and a mismatch message (naming the
+        missing and extra members) when each applies; empty when clean.
+    """
+
+    gaps: list[str] = []
+    # Two independent defects: a dropped anchor source, and any drift between
+    # the scanned set and the manifest-derived set (a silently narrowed scan).
+    if anchor not in scanned:
+        gaps.append(f"{label}: anchor {anchor} is not scanned")
+    if scanned != expected:
+        missing = sorted(expected - scanned)
+        extra = sorted(scanned - expected)
+        gaps.append(
+            f"{label}: scanned {len(scanned)} sources, expected {len(expected)}; "
+            f"missing {missing}; extra {extra}"
+        )
+    return gaps
+
+
+def test_scan_floor_gaps_reports_each_defect() -> None:
+    """The helper is silent when clean and names label, anchor, and mismatch."""
+
+    anchor = "hooks/a.ps1"
+    full = {anchor, "hooks/b.ps1"}
+
+    assert _scan_floor_gaps("demo", full, full, anchor) == []
+
+    missing_anchor = _scan_floor_gaps("demo", {"hooks/b.ps1"}, {"hooks/b.ps1"}, anchor)
+    assert len(missing_anchor) == 1
+    assert "demo" in missing_anchor[0] and anchor in missing_anchor[0]
+
+    mismatch = _scan_floor_gaps("demo", {anchor}, full | {"hooks/c.ps1"}, anchor)
+    assert len(mismatch) == 1
+    assert "demo" in mismatch[0]
+    assert "hooks/b.ps1" in mismatch[0] and "hooks/c.ps1" in mismatch[0]
+
+
+def test_scanned_source_floor() -> None:
+    """Scan every manifested PowerShell source, including the surface anchor."""
+
+    gaps: list[str] = []
+    # Compare each surface's scanned set with the distinct PowerShell entries of
+    # its manifests and virtual resources, and require its anchor source.
+    for label, surface, anchor in (
+        ("claude", claude_surface(), CLAUDE_SCAN_ANCHOR),
+        ("codex", codex_surface(), CODEX_SCAN_ANCHOR),
+    ):
         scanned = {s for paths in surface.powershell_sources().values() for s in paths}
-        assert (
-            len(scanned) >= 1
-        ), f"no PowerShell source scanned in {surface.bundle_root}"
+        expected = {
+            path
+            for path in (
+                *surface.virtual,
+                *(p for m in surface.manifests.values() for p in m),
+            )
+            if path.endswith(POWERSHELL_SUFFIXES)
+        }
+        gaps.extend(_scan_floor_gaps(label, scanned, expected, anchor))
+    assert gaps == []
+
+
+def _narrowed_to(kept: str) -> Callable[[Surface], dict[str, list[str]]]:
+    """Return a ``Surface.powershell_sources`` stand-in that scans one source.
+
+    Args:
+        kept (str): The only PowerShell source the stand-in reports.
+
+    Returns:
+        Callable[[Surface], dict[str, list[str]]]: A method replacement that
+        maps the core pack to ``kept``.
+    """
+
+    def narrowed(_surface: Surface) -> dict[str, list[str]]:
+        """Report only ``kept`` under the core pack."""
+
+        return {"core": [kept]}
+
+    return narrowed
+
+
+def test_scanned_source_floor_rejects_narrowed_scan(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A scan narrowed to one non-anchor source per surface fails the floor."""
+
+    # Narrow each surface in turn to a single source that is not its anchor.
+    for surface, anchor in (
+        (claude_surface(), CLAUDE_SCAN_ANCHOR),
+        (codex_surface(), CODEX_SCAN_ANCHOR),
+    ):
+        full = surface.powershell_sources()
+        survivor = next(s for paths in full.values() for s in paths if s != anchor)
+        monkeypatch.setattr(Surface, "powershell_sources", _narrowed_to(survivor))
+        with pytest.raises(AssertionError):
+            test_scanned_source_floor()
+        monkeypatch.undo()
 
 
 def test_claude_manifest_powershell_dependency_closure() -> None:
