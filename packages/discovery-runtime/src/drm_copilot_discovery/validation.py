@@ -14,6 +14,11 @@ from drm_copilot_discovery.agent_output import (
 )
 from drm_copilot_discovery.claim_rules import validate_claims
 from drm_copilot_discovery.completion_rules import validate_completion
+from drm_copilot_discovery.coverage_report import (
+    coverage_preflight,
+    coverage_summary,
+    unavailable_coverage_summary,
+)
 from drm_copilot_discovery.coverage_rules import validate_coverage
 from drm_copilot_discovery.decision_rules import validate_decisions
 from drm_copilot_discovery.dimension_rules import validate_dimensions
@@ -41,6 +46,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from drm_copilot_discovery.agent_output import InvocationContext
+    from drm_copilot_discovery.dimension_rules import DimensionValidation
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
 
 ValidationMode: TypeAlias = Literal[
@@ -161,6 +167,9 @@ class _Validation:
             "structural": self.base,
             "agent-output": self.base,
         }
+        self._complete_source: (
+            tuple[tuple[Finding, ...], DimensionValidation] | None
+        ) = None
 
     def evaluate(self, mode: str) -> tuple[Finding, ...]:
         """Return exact policy-mode findings while reusing lower-level assessments."""
@@ -186,39 +195,53 @@ class _Validation:
     def complete(self, *, parity: bool) -> tuple[Finding, ...]:
         """Apply source discovery before optional target parity completeness."""
         snapshot = self.snapshot
-        sources = repository_pins(snapshot.profile)[0]
-        # Target-local draft ledgers do not replace or block required source discovery.
-        source_index = replace(
-            self.index,
-            records=tuple(
-                record
-                for record in self.index.records
-                if record.kind not in {"scope", "coverage-ledger", "inventory-snapshot"}
-                or record.artifact.repository in sources
-            ),
-        )
-        coverage = validate_coverage(
-            snapshot,
-            complete=True,
-            index=source_index,
-            evidence=self.evidence,
-            claims=self.claims,
-        )
-        dimensions = validate_dimensions(
-            snapshot,
-            complete=True,
-            index=self.index,
-            evidence=self.evidence,
-            decisions=self.decisions,
-        )
-        acceptance = validate_acceptance(
-            snapshot,
-            complete=True,
-            index=source_index,
-            evidence=self.evidence,
-            decisions=self.decisions,
-            dimensions=dimensions,
-        )
+        # Both completion modes share source proof within this immutable operation.
+        if self._complete_source is None:
+            sources = repository_pins(snapshot.profile)[0]
+            # Target-local draft ledgers cannot replace required source discovery.
+            source_index = replace(
+                self.index,
+                records=tuple(
+                    record
+                    for record in self.index.records
+                    if record.kind
+                    not in {"scope", "coverage-ledger", "inventory-snapshot"}
+                    or record.artifact.repository in sources
+                ),
+            )
+            coverage = validate_coverage(
+                snapshot,
+                complete=True,
+                index=source_index,
+                evidence=self.evidence,
+                claims=self.claims,
+            )
+            dimensions = validate_dimensions(
+                snapshot,
+                complete=True,
+                index=self.index,
+                evidence=self.evidence,
+                decisions=self.decisions,
+            )
+            acceptance = validate_acceptance(
+                snapshot,
+                complete=True,
+                index=source_index,
+                evidence=self.evidence,
+                decisions=self.decisions,
+                dimensions=dimensions,
+            )
+            # Retain family order and defer aggregate truncation to the final result.
+            self._complete_source = (
+                (
+                    *self.base,
+                    *coverage.findings,
+                    *dimensions.findings,
+                    *acceptance.findings,
+                ),
+                dimensions,
+            )
+        common, dimensions = self._complete_source
         completion = validate_completion(
             snapshot,
             index=self.index,
@@ -228,13 +251,7 @@ class _Validation:
             dimensions=dimensions,
             parity=parity,
         )
-        values = [
-            *self.base,
-            *coverage.findings,
-            *dimensions.findings,
-            *acceptance.findings,
-            *completion.findings,
-        ]
+        values = [*common, *completion.findings]
         if parity:
             values.extend(
                 validate_parity(
@@ -250,13 +267,18 @@ class _Validation:
         return _findings(values, self.limit)
 
     def report(self, *, kind: str, identifier: str, mode: str) -> dict[str, object]:
-        """Project recomputed report fields for comparison and later P5 rendering."""
+        """Return fields for kind, identifier and mode (str) from shared assessments.
+
+        Coverage adds independently evaluated discovery results and population;
+        requested-mode findings remain unchanged. Raises ValueError on invalid
+        modes or resource limits. No I/O, publication or caller mutation occurs.
+        """
         findings = self.evaluate(mode)
         # Control mirrors do not add discovery facts or inflate report counts.
         counts = Counter(
             record.kind for record in self.index.records if record.kind not in _CONTROL
         )
-        return {
+        result: dict[str, object] = {
             "schema_version": "2.0.0",
             "artifact_kind": kind,
             "id": identifier,
@@ -268,6 +290,26 @@ class _Validation:
             "counts": dict(sorted(counts.items())),
             "findings": [item.to_dict() for item in findings],
         }
+        # Only coverage gains discovery-specific fields; other report envelopes
+        # retain their existing comparison contract and requested-mode semantics.
+        if kind == "coverage-report":
+            complete = self.evaluate("discovery-complete")
+            result["coverage"] = to_plain_value(
+                coverage_summary(
+                    self.snapshot,
+                    index=self.index,
+                    evidence=self.evidence,
+                    claims=self.claims,
+                    dimensions=self.dimensions,
+                    findings=complete,
+                )
+            )
+            result["discovery_result"] = (
+                "fail" if any(item.severity == "error" for item in complete) else "pass"
+            )
+            # Preserve the exact complete assessment independently of the chosen mode.
+            result["completion_findings"] = [item.to_dict() for item in complete]
+        return result
 
 
 def validate_snapshot(
@@ -383,10 +425,37 @@ def validate_snapshot(
 def report_projection(
     snapshot: DiscoverySnapshot, *, kind: str, identifier: str, mode: ValidationMode
 ) -> dict[str, object]:
-    """Return recomputed structured fields, without rendering or writing a report."""
+    """Project snapshot (DiscoverySnapshot) for kind/identifier (str) and root mode.
+
+    Returns dict[str, object] without I/O or publication. Coverage reports retain
+    structural failures and unavailable counts; other kinds reject those inputs.
+    Raises ValueError for unsupported kind/mode, invalid non-coverage inputs or
+    resource excess. No caller mutation or injected validation authority exists.
+    """
     if kind not in REPORT_KINDS or mode == "agent-output":
         raise ValueError("Reports require a supported report kind and root review mode")
+    # Reserve coverage work before structural validation or aggregate projection.
+    if kind == "coverage-report":
+        coverage_preflight(snapshot)
     failures = _schema_findings(snapshot)
     if any(item.severity == "error" for item in failures):
+        # Invalid core bytes cannot supply counts, yet coverage can truthfully
+        # render the original blockers without running any semantic assessments.
+        if kind == "coverage-report":
+            if mode not in _MODES:
+                raise ValueError("Unsupported report or validation mode")
+            return {
+                "schema_version": "2.0.0",
+                "artifact_kind": kind,
+                "id": identifier,
+                "mode": mode,
+                "input_sha256": report_input_digest(snapshot),
+                "validation_result": "fail",
+                "counts": {},
+                "findings": [item.to_dict() for item in failures],
+                "coverage": to_plain_value(unavailable_coverage_summary()),
+                "discovery_result": "fail",
+                "completion_findings": [item.to_dict() for item in failures],
+            }
         raise ValueError("Report projection requires structurally parsed inputs")
     return _Validation(snapshot).report(kind=kind, identifier=identifier, mode=mode)

@@ -1,0 +1,307 @@
+"""Bind the completed producer repair proof without executing any checks again."""
+import ast
+import base64
+import difflib
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+EVIDENCE = FEATURE / "evidence/regression-testing"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+RUNTIME = "packages/discovery-runtime/src/drm_copilot_discovery/"
+OWNED = (
+    RUNTIME + "coverage_report.py",
+    RUNTIME + "coverage_population.py",
+    "tests/discovery_runtime/test_coverage_report.py",
+    "tests/discovery_runtime/test_coverage_report_contract.py",
+)
+EXPECTED = {
+    OWNED[0]: "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+    OWNED[1]: "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+    RUNTIME + "validation.py": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+    RUNTIME + "report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+}
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def binding(path):
+    path = Path(path)
+    raw = path.read_bytes()
+    return {"path": path.as_posix(), "sha256": sha(raw), "bytes": len(raw)}
+
+
+def write_json(path, value):
+    Path(path).write_text(
+        json.dumps(value, sort_keys=True, indent=2, ensure_ascii=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def entry(name, raw):
+    return {"name": name, "sha256": sha(raw), "base64": base64.b64encode(raw).decode()}
+
+
+for name, expected in EXPECTED.items():
+    assert sha(Path(name).read_bytes()) == expected, name
+sources = {
+    name: {**binding(name), "physical_lines": len(Path(name).read_text().splitlines())}
+    for name in OWNED
+}
+assert all(item["physical_lines"] <= 500 for item in sources.values())
+stages = []
+for stage, minute in (
+    ("format", "04-04"),
+    ("lint", "04-04"),
+    ("types", "04-04"),
+    ("tests", "04-05"),
+):
+    path = EVIDENCE / f"p5t1-graph12-{stage}.2026-10-20T{minute}.json"
+    receipt = json.loads(path.read_text())
+    assert receipt["exit_code"] == 0
+    for name in (*OWNED, *EXPECTED):
+        expected = sha(Path(name).read_bytes())
+        assert receipt["source_before"][name] == expected, (stage, name)
+        assert receipt["source_after"][name] == expected, (stage, name)
+    for stream in ("stdout", "stderr"):
+        raw = base64.b64decode(receipt[stream]["base64"])
+        assert sha(raw) == receipt[stream]["sha256"]
+        assert raw == (SCRATCH / f"graph12-{stage}.{stream}").read_bytes()
+    assert binding(receipt["harness"]["path"])["sha256"] == receipt["harness"]["sha256"]
+    stages.append(
+        {
+            **binding(path),
+            "stage": stage,
+            "started_at": receipt["started_at"],
+            "duration_seconds": receipt["duration_seconds"],
+            "exit_code": receipt["exit_code"],
+            "executed_harness": receipt["harness"],
+        }
+    )
+stdout = (SCRATCH / "graph12-tests.stdout").read_text(encoding="utf-8")
+nodes = re.findall(r"^(tests/.*) PASSED\s+\[", stdout, re.M)
+assert len(nodes) == len(set(nodes)) == 49
+initial = json.loads(
+    (EVIDENCE / "p5t1-graph10-pytest.2026-10-20T03-59.json").read_text()
+)
+initial_output = base64.b64decode(initial["stdout"]["base64"]).decode("utf-8")
+initial_nodes = re.findall(r"^(tests/.*) (?:PASSED|FAILED)\s+\[", initial_output, re.M)
+assert nodes == initial_nodes
+assert initial["source_before"][RUNTIME + "validation.py"] != initial["source_after"][
+    RUNTIME + "validation.py"
+]
+
+raw_coverage = (SCRATCH / "graph12-coverage.json").read_bytes()
+coverage = json.loads(raw_coverage)
+coverage["files"] = {
+    name.replace("\\", "/"): value for name, value in coverage["files"].items()
+}
+assert set(coverage["files"]) == set(OWNED[:2])
+coverage_path = EVIDENCE / f"p5t1-graph-coverage.{STAMP}.json"
+write_json(coverage_path, coverage)
+units = []
+for name, measured in coverage["files"].items():
+    for node in ast.walk(ast.parse(Path(name).read_text(encoding="utf-8"))):
+        if not isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        executed = [
+            line
+            for line in measured["executed_lines"]
+            if node.lineno <= line <= node.end_lineno
+        ]
+        missing = [
+            line
+            for line in measured["missing_lines"]
+            if node.lineno <= line <= node.end_lineno
+        ]
+        executed_branches = [
+            edge
+            for edge in measured["executed_branches"]
+            if node.lineno <= edge[0] <= node.end_lineno
+        ]
+        missing_branches = [
+            edge
+            for edge in measured["missing_branches"]
+            if node.lineno <= edge[0] <= node.end_lineno
+        ]
+        total = len(executed) + len(missing)
+        branch_total = len(executed_branches) + len(missing_branches)
+        assert not total or len(executed) / total >= 0.9, (name, node.name)
+        assert not branch_total or len(executed_branches) / branch_total >= 0.75
+        units.append(
+            {
+                "path": name,
+                "name": node.name,
+                "kind": type(node).__name__,
+                "start": node.lineno,
+                "end": node.end_lineno,
+                "executed_lines": executed,
+                "missing_lines": missing,
+                "executed_branches": executed_branches,
+                "missing_branches": missing_branches,
+                "line_percent": None if not total else 100 * len(executed) / total,
+                "branch_percent": (
+                    None if not branch_total else 100 * len(executed_branches) / branch_total
+                ),
+            }
+        )
+archive = [entry(name, Path(name).read_bytes()) for name in OWNED]
+archive.extend(
+    entry(name, (SCRATCH / name).read_bytes())
+    for name in (
+        "graph10-coverage.json",
+        "graph12-coverage.json",
+        "coverage_report-before-pr1-pr4.py",
+        "coverage_population-before-pr1-pr4.py",
+    )
+)
+deltas = {}
+for name in OWNED[:2]:
+    original_name = Path(name).stem + "-before-pr1-pr4.py"
+    original = (SCRATCH / original_name).read_text()
+    current = Path(name).read_text()
+    deltas[name] = "".join(
+        difflib.unified_diff(
+            original.splitlines(True),
+            current.splitlines(True),
+            fromfile="original/" + Path(name).name,
+            tofile="repaired/" + Path(name).name,
+        )
+    )
+archive_path = EVIDENCE / f"p5t1-graph-lossless-archive.{STAMP}.json"
+write_json(archive_path, {"task": "P5-T1", "entries": archive})
+coverage_details = EVIDENCE / f"p5t1-graph-coverage-ranges.{STAMP}.json"
+write_json(
+    coverage_details,
+    {
+        "task": "P5-T1",
+        "mapping": "AST inclusive ranges; branch destinations mapped by origin line",
+        "units": units,
+        "producer_repair_deltas": deltas,
+        "uncovered": {
+            "coverage_population.py": {
+                "statements": {
+                    "238": "Malformed component identifier guard; normal schema-valid rows exclude it.",
+                    "278": "Duplicate source feature/scenario identity guard; accepted reference validation remains authoritative.",
+                },
+                "branch_destinations": {
+                    "93->92": "Non-error claim/reference finding skip.",
+                    "237->238": "Malformed component identifier branch.",
+                    "277->278": "Duplicate source identity branch.",
+                    "320->319": "Resolved runtime target outside the required source feature kind/ownership.",
+                },
+            }
+        },
+        "baseline": "Both producer modules are new; no accepted producer coverage is replaced. Committed report_models/helper/legacy and accepted validator baseline proofs remain independently referenced.",
+    },
+)
+harness = EVIDENCE / f"p5t1-graph-freeze-harness.{STAMP}.txt"
+harness.write_bytes(Path(__file__).read_bytes())
+history = []
+for path in sorted(EVIDENCE.glob("p5t1-graph*.json")):
+    value = json.loads(path.read_text())
+    if "command" in value:
+        for stream in ("stdout", "stderr"):
+            raw = base64.b64decode(value[stream]["base64"])
+            assert sha(raw) == value[stream]["sha256"], path
+        history.append(
+            {
+                **binding(path),
+                "exit_code": value["exit_code"],
+                "duration_seconds": value["duration_seconds"],
+            }
+        )
+references = {
+    "baseline": FEATURE / "evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "original_review": FEATURE / "evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+    "original_probe_archive": FEATURE / "evidence/qa-gates/p5t1-executor-producer-probes-payload.2026-10-20T03-47.json",
+    "committed_helper_proof": EVIDENCE / "p5t1-models-freeze.2026-10-20T03-23.json",
+    "validator_repair_freeze": EVIDENCE / "p5t1-projection-repair-freeze.2026-10-20T04-03.json",
+}
+manifest = {
+    "task": "P5-T1",
+    "status": "FROZEN_GRAPH_CANDIDATE_FOR_INDEPENDENT_REVIEW_NOT_TASK_ACCEPTANCE",
+    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    "owned_source_test_bindings": sources,
+    "stable_dependencies": {
+        name: binding(name) for name in EXPECTED if name not in OWNED
+    },
+    "references": {name: binding(path) for name, path in references.items()},
+    "stages": stages,
+    "nodes": nodes,
+    "test_count": len(nodes),
+    "coverage": binding(coverage_path),
+    "coverage_ranges": binding(coverage_details),
+    "coverage_totals": coverage["totals"],
+    "lossless_archive": binding(archive_path),
+    "harness": binding(harness),
+    "historical_receipts": history,
+    "qualifications": [
+        "The initial graph10 batch had 47 passes and two captured-byte fixture failures. Its validator dependency changed, so public composition proof is provisional. Its exact raw streams, source bindings and coverage remain retained.",
+        "Graph12 repeats the same 49 node identities after fixture-only corrections and holds both producers plus repaired validator unchanged across all four ordered stages.",
+        "Missing or ambiguous real ledger/scope selection returns null selection-dependent populations. Captured known_inventory_refs remain references only and do not establish validated selection. A real empty ledger retains selected inventory gaps.",
+        "Runtime required/observed/verified/missing use selected nonexcluded runtime-required component identities; source scenarios/features/runs remain distinct. Passed text without accepted source proof cannot create verified coverage.",
+        "Raw coverage and source bytes are losslessly archived. Portable coverage changes only filename separators; historical evidence is not rewritten.",
+        "Two population statements and four branch destinations remain uncovered and are explicitly listed. Every measured class/callable has at least 90 percent statement coverage; no cases were added solely for 100 percent.",
+        "The committed 114-case helper/legacy proof is reused unchanged. Whole-task final ordered/reversed checks and native composition remain pending.",
+    ],
+}
+manifest_path = EVIDENCE / f"p5t1-graph-freeze.{STAMP}.json"
+write_json(manifest_path, manifest)
+readable = EVIDENCE / f"p5t1-graph-freeze.{STAMP}.md"
+readable.write_text(
+    "# P5-T1 coverage producer candidate\n\n"
+    f"Timestamp: {STAMP}\n\nCommand: Recover and bind completed graph12 receipts; no checks replayed.\n\n"
+    "EXIT_CODE: 0\n\nOutput Summary: Black, Ruff, Pyright and all 49 graph tests pass with unchanged producer and validator bytes. Independent review and whole-task final acceptance remain pending.\n\n"
+    "Coverage report: 111/111 statements and 26/26 branch destinations. Population: 113/115 statements and 46/50 branch destinations. The paired range artifact identifies both uncovered statements and four branch destinations; every measured class/callable meets the required statement threshold.\n\n"
+    "Selection-dependent counts are unavailable/null when the accepted scope query cannot establish authority from a real ledger. Captured inventory references remain visible separately. Empty real ledgers preserve selected inventory gaps. Runtime required, observed, verified and missing counts use explicit component units and accepted source evidence.\n\n"
+    "The initial 47/49 result is preserved, including its changed-validator qualification. The clean loop repeats the same 49 identities after two capture-fixture corrections. Its raw streams and exact executed harnesses remain in the stage receipts; raw coverage and source snapshots are losslessly archived. The committed helper/legacy 114-case proof is reused without replay.\n\n"
+    "The paired JSON binds exact source/test/dependency hashes, four stage durations, ordered nodes, original review/probes, coverage and the replay harness. Production and test files are frozen for the consolidated independent review.\n",
+    encoding="utf-8",
+    newline="\n",
+)
+stage_paths = {
+    *OWNED,
+    *(path.as_posix() for path in EVIDENCE.glob("p5t1-graph*")),
+    *(
+        path.as_posix()
+        for path in (FEATURE / "evidence/baseline").glob("p5t1-graph-contract-test-split.*")
+    ),
+    *(
+        path.as_posix()
+        for path in (FEATURE / "evidence/baseline").glob("p5t1-population-split.*")
+    ),
+}
+staging = EVIDENCE / f"p5t1-graph-staging.{STAMP}.json"
+write_json(
+    staging,
+    {
+        "task": "P5-T1",
+        "manifest": binding(manifest_path),
+        "stage_paths": sorted(stage_paths),
+        "bindings": [binding(name) for name in sorted(stage_paths)],
+    },
+)
+assert sources == {
+    name: {**binding(name), "physical_lines": len(Path(name).read_text().splitlines())}
+    for name in OWNED
+}
+print(
+    json.dumps(
+        {
+            "manifest": binding(manifest_path),
+            "staging": binding(staging),
+            "tests": len(nodes),
+            "units": len(units),
+            "source_test_bindings": sources,
+        }
+    )
+)

@@ -1,0 +1,26 @@
+"""Bind the approved cohesive coverage population split without changing its baseline."""
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+import black
+
+feature = Path('docs/features/active/2026-10-17-legacy-discovery-and-parity-980')
+baseline = feature / 'evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json'
+source = Path('packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py')
+target = source.with_name('coverage_population.py')
+assert not target.exists()
+stamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M')
+prefix = feature / ('evidence/baseline/p5t1-population-split.' + stamp)
+harness = Path(str(prefix)+'.txt')
+harness.write_bytes(Path(__file__).read_bytes())
+data = {'task':'P5-T1', 'timestamp_utc':datetime.now(timezone.utc).isoformat(),
+    'absent':target.as_posix(),
+    'baseline':{'path':baseline.as_posix(),'sha256':hashlib.sha256(baseline.read_bytes()).hexdigest()},
+    'sizing':{'path':source.as_posix(),'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+        'physical_lines':len(source.read_text().splitlines()),
+        'black_forecast_lines':len(black.format_str(source.read_text(),mode=black.Mode()).splitlines())},
+    'harness':{'path':harness.as_posix(),'sha256':hashlib.sha256(harness.read_bytes()).hexdigest()}}
+Path(str(prefix)+'.json').write_text(json.dumps(data,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+Path(str(prefix)+'.md').write_text('# P5-T1 approved population split\n\nTimestamp: '+stamp+'\n\nConfirmed absent: `'+target.as_posix()+'`. The existing draft is 334 lines before formatting and 528 after a read-only Black forecast. The helper owns source identity/scope and accepted proof-query aggregation only.\n',encoding='utf-8',newline='\n')
+print(json.dumps({'path':str(prefix)+'.json','sha256':hashlib.sha256(Path(str(prefix)+'.json').read_bytes()).hexdigest()}))

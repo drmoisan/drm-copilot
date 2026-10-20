@@ -1,0 +1,47 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "black",
+    "--check",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py"
+  ],
+  "duration_seconds": 1.774,
+  "exit_code": 0,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph4-black-harness.2026-10-20T03-36.txt",
+    "sha256": "3075598fbbe01eae3cccc3b26ed589fafc1d32dabd34789cec55e6c3dcb0b0cb"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "f1da578149f69f9353e2f286d108a4ba6f5cefc255210c31f2fe7cb1d773fadc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+    "tests/discovery_runtime/test_agent_output.py": "d1eb4f08d612ba14004f695e5cfb88a4c6b2438e36adea205ff6ee866f4404e4",
+    "tests/discovery_runtime/test_mutation_plan.py": "3d6e7b1595added257c3e33042be2e64ba14e0d952ff2fa83d640dc1f273db42",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/discovery_runtime/test_validation_modes.py": "3ef303f3490426929e90c2f32cf7aa4c1cc7641c2737e81139b57449e7ca331d"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "f1da578149f69f9353e2f286d108a4ba6f5cefc255210c31f2fe7cb1d773fadc",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+    "tests/discovery_runtime/test_agent_output.py": "d1eb4f08d612ba14004f695e5cfb88a4c6b2438e36adea205ff6ee866f4404e4",
+    "tests/discovery_runtime/test_mutation_plan.py": "3d6e7b1595added257c3e33042be2e64ba14e0d952ff2fa83d640dc1f273db42",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/discovery_runtime/test_validation_modes.py": "3ef303f3490426929e90c2f32cf7aa4c1cc7641c2737e81139b57449e7ca331d"
+  },
+  "started_at": "2026-10-20T03:36:56.695316+00:00",
+  "stderr": {
+    "base64": "QWxsIGRvbmUhIOKcqCDwn42wIOKcqA0KMiBmaWxlcyB3b3VsZCBiZSBsZWZ0IHVuY2hhbmdlZC4NCg==",
+    "sha256": "42952929f98ff284b84ffc33f5fca4e517620f9b2ceb3fca1375e504affa8195"
+  },
+  "stdout": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-20T03:36:58.471965+00:00"
+}

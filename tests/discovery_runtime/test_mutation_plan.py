@@ -451,3 +451,34 @@ def test_capture_rejects_metadata_changes_during_loading(
             read_bytes=store.read,
             catalog=mutation_catalog,
         )
+
+
+@pytest.mark.parametrize(
+    "field", ["coverage", "discovery_result", "completion_findings"]
+)
+def test_coverage_report_mutations_reject_forged_projection_fields(
+    mutation_catalog: SchemaCatalog, field: str
+) -> None:
+    """Reject forged field (str) via real graph recomputation without writing bytes."""
+    store, baseline = mutation_case(mutation_catalog)
+    value = report_projection(
+        baseline.snapshot,
+        kind="coverage-report",
+        identifier="coverage",
+        mode="structural",
+    )
+    value[field] = "forged"
+    change = MutationChange(
+        artifact_kind="coverage-report",
+        artifact_id="coverage",
+        path=baseline.snapshot.profile.artifacts["reports"] + "/coverage-report.json",
+        content=json.dumps(value).encode(),
+        expected_sha256=None,
+    )
+    before = dict(store.files)
+
+    with pytest.raises(MutationError, match="MUTATION_INVALID") as failure:
+        plan_mutation(baseline, (change,), grants=grants_for(change))
+
+    assert "REPORT_RESULT" in {item.code for item in failure.value.findings}
+    assert store.files == before

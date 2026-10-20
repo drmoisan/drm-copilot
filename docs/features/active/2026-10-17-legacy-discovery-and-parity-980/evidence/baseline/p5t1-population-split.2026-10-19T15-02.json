@@ -1,0 +1,19 @@
+{
+  "absent": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-shared-baseline.2026-10-19T14-44.json",
+    "sha256": "db5f95182b86745dbf345e2acab31e038804e7919cb2f115f9cf78bf664b370f"
+  },
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t1-population-split.2026-10-19T15-02.txt",
+    "sha256": "b9a34aac096ad34cbaf3dc35a48cf42f0cd59e34098a0caa6e33d764695dbba6"
+  },
+  "sizing": {
+    "black_forecast_lines": 528,
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "physical_lines": 334,
+    "sha256": "822a090042744c00f8c03ae4b0d8ec8556d82985f9ca2adac8610a856faa946d"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-19T15:02:38.282092+00:00"
+}

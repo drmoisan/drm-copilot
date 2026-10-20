@@ -1,0 +1,225 @@
+{
+  "Timestamp": "2026-10-20T03-47",
+  "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-producer-probes.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Five bounded controls reproduce missing-ledger accounting and unreserved root-comparison work.",
+  "results": {
+    "source_bindings": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "f1da578149f69f9353e2f286d108a4ba6f5cefc255210c31f2fe7cb1d773fadc",
+      "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74"
+    },
+    "probes": [
+      {
+        "probe": "known_scope_inventory_without_ledger",
+        "ledger_present": true,
+        "known_selected_inventory_components": 2,
+        "coverage": {
+          "components": {
+            "blocked": 0,
+            "conflicting_ledger": 0,
+            "dispositioned": 0,
+            "excluded": 0,
+            "excluded_valid": 0,
+            "feature_linked": 0,
+            "inspected": 0,
+            "inspection_blocked": 0,
+            "inventoried": 2,
+            "missing_ledger": 2,
+            "runtime_required": 0,
+            "runtime_supported": 0,
+            "runtime_undetermined": 2,
+            "total": 2,
+            "undispositioned": 2,
+            "uninspected": 0,
+            "unselected": 0,
+            "with_update_evidence": 0
+          },
+          "features": {
+            "confidence_counts": {},
+            "required": 0,
+            "required_client_obligations": 0,
+            "total": 0,
+            "verified_claims": 0,
+            "with_evidence": 0
+          },
+          "metrics": {
+            "component_evidence": {
+              "denominator": 2,
+              "numerator": 0,
+              "percentage": 0.0,
+              "unit": "selected component update-proof obligations"
+            },
+            "evidence_completeness": {
+              "denominator": 2,
+              "numerator": 0,
+              "percentage": 0.0,
+              "unit": "source feature or selected component update-proof obligations"
+            },
+            "feature_contract_coverage": {
+              "denominator": 2,
+              "numerator": 0,
+              "percentage": 0.0,
+              "unit": "selected nonexcluded component identities"
+            },
+            "feature_evidence": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "source feature proof obligations"
+            },
+            "inspection": {
+              "denominator": 2,
+              "numerator": 0,
+              "percentage": 0.0,
+              "unit": "selected nonexcluded component identities"
+            },
+            "runtime_characterization": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "selected nonexcluded runtime-required component identities"
+            }
+          },
+          "population_state": "available",
+          "runtime": {
+            "result_counts": {},
+            "source_scenarios": 0,
+            "supported_features": 0,
+            "supported_scenarios": 0
+          },
+          "unresolved_behaviors": 0
+        },
+        "accepted_rule_findings": [
+          "COVERAGE_MISSING"
+        ]
+      },
+      {
+        "probe": "known_scope_inventory_without_ledger",
+        "ledger_present": false,
+        "known_selected_inventory_components": 2,
+        "coverage": {
+          "components": {
+            "blocked": 0,
+            "conflicting_ledger": 0,
+            "dispositioned": 0,
+            "excluded": 0,
+            "excluded_valid": 0,
+            "feature_linked": 0,
+            "inspected": 0,
+            "inspection_blocked": 0,
+            "inventoried": 0,
+            "missing_ledger": 0,
+            "runtime_required": 0,
+            "runtime_supported": 0,
+            "runtime_undetermined": 0,
+            "total": 0,
+            "undispositioned": 0,
+            "uninspected": 0,
+            "unselected": 0,
+            "with_update_evidence": 0
+          },
+          "features": {
+            "confidence_counts": {},
+            "required": 0,
+            "required_client_obligations": 0,
+            "total": 0,
+            "verified_claims": 0,
+            "with_evidence": 0
+          },
+          "metrics": {
+            "component_evidence": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "selected component update-proof obligations"
+            },
+            "evidence_completeness": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "source feature or selected component update-proof obligations"
+            },
+            "feature_contract_coverage": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "selected nonexcluded component identities"
+            },
+            "feature_evidence": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "source feature proof obligations"
+            },
+            "inspection": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "selected nonexcluded component identities"
+            },
+            "runtime_characterization": {
+              "denominator": 0,
+              "numerator": 0,
+              "percentage": null,
+              "unit": "selected nonexcluded runtime-required component identities"
+            }
+          },
+          "population_state": "available",
+          "runtime": {
+            "result_counts": {},
+            "source_scenarios": 0,
+            "supported_features": 0,
+            "supported_scenarios": 0
+          },
+          "unresolved_behaviors": 0
+        },
+        "accepted_rule_findings": [
+          "COVERAGE_LEDGER"
+        ]
+      },
+      {
+        "probe": "scope_root_comparison_work",
+        "components": 64,
+        "roots": 16,
+        "work_capacity": 32768,
+        "work_before_collect": 32753,
+        "work_charged": 897,
+        "work_after_collect": 31856,
+        "selected": 64,
+        "root_predicate_calls": 65,
+        "root_comparisons": 1040,
+        "preflight_passed": true,
+        "collect_returned": true
+      },
+      {
+        "probe": "scope_root_comparison_work",
+        "components": 64,
+        "roots": 128,
+        "work_capacity": 32768,
+        "work_before_collect": 32753,
+        "work_charged": 897,
+        "work_after_collect": 31856,
+        "selected": 64,
+        "root_predicate_calls": 65,
+        "root_comparisons": 8320,
+        "preflight_passed": true,
+        "collect_returned": true
+      },
+      {
+        "probe": "scope_root_comparison_work",
+        "components": 64,
+        "roots": 1024,
+        "work_capacity": 32768,
+        "work_before_collect": 32753,
+        "work_charged": 897,
+        "work_after_collect": 31856,
+        "selected": 64,
+        "root_predicate_calls": 65,
+        "root_comparisons": 66560,
+        "preflight_passed": true,
+        "collect_returned": true
+      }
+    ]
+  },
+  "qualification": "Schema-valid synthetic artifacts; accepted indexing/evidence/claim/coverage services and unchanged path predicate. No moving validation composer or graph tests were imported. Root instrumentation counts yielded selectors without changing predicate behavior; no timing assertion."
+}

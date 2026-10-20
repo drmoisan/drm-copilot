@@ -1,0 +1,46 @@
+{
+  "command": [
+    "poetry",
+    "run",
+    "pyright",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py"
+  ],
+  "duration_seconds": 2.106,
+  "exit_code": 1,
+  "harness": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph3-pyright-harness.2026-10-20T03-36.txt",
+    "sha256": "3075598fbbe01eae3cccc3b26ed589fafc1d32dabd34789cec55e6c3dcb0b0cb"
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "aaacbe00025a98d4e030a9330039b8d8fb3737a36410c4a7d36b0a740debbf21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+    "tests/discovery_runtime/test_agent_output.py": "d1eb4f08d612ba14004f695e5cfb88a4c6b2438e36adea205ff6ee866f4404e4",
+    "tests/discovery_runtime/test_mutation_plan.py": "3d6e7b1595added257c3e33042be2e64ba14e0d952ff2fa83d640dc1f273db42",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/discovery_runtime/test_validation_modes.py": "3ef303f3490426929e90c2f32cf7aa4c1cc7641c2737e81139b57449e7ca331d"
+  },
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "1b716c64b0dea1a41bb49fa079932af138b37b136ec22ea19a2adcb004841f74",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "aaacbe00025a98d4e030a9330039b8d8fb3737a36410c4a7d36b0a740debbf21",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "fd48c7b881924d6f81edaf20739c627bec3727d067ce06e0da18e4ab9f3727a3",
+    "tests/discovery_runtime/test_agent_output.py": "d1eb4f08d612ba14004f695e5cfb88a4c6b2438e36adea205ff6ee866f4404e4",
+    "tests/discovery_runtime/test_mutation_plan.py": "3d6e7b1595added257c3e33042be2e64ba14e0d952ff2fa83d640dc1f273db42",
+    "tests/discovery_runtime/test_report_models.py": "f8316622f32683be6fc8cdb13e93d04fb8cf896404d3c4e658f422df4e85b871",
+    "tests/discovery_runtime/test_validation_modes.py": "3ef303f3490426929e90c2f32cf7aa4c1cc7641c2737e81139b57449e7ca331d"
+  },
+  "started_at": "2026-10-20T03:36:41.459238+00:00",
+  "stderr": {
+    "base64": "",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "YzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzBccGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxjb3ZlcmFnZV9yZXBvcnQucHkKICBjOlxVc2Vyc1xEYW5Nb2lzYW5ccmVwb3NcZHJtLWNvcGlsb3Qtd3RcMjAyNi0xMC0xN1QyMi0zMFxwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XGNvdmVyYWdlX3JlcG9ydC5weToxNDE6OSAtIGVycm9yOiBObyBvdmVybG9hZHMgZm9yICJ1cGRhdGUiIG1hdGNoIHRoZSBwcm92aWRlZCBhcmd1bWVudHMKICDCoMKgQXJndW1lbnQgdHlwZXM6IChpbnQsIGludCwgaW50KSAocmVwb3J0Q2FsbElzc3VlKQogIGM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXHBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3ZlcnlcY292ZXJhZ2VfcmVwb3J0LnB5OjIzNzoxNiAtIGVycm9yOiBUeXBlICJ0dXBsZVtkaWN0W0xpdGVyYWxbJ3RvdGFsJywgJ2ludmVudG9yaWVkJywgJ3Vuc2VsZWN0ZWQnLCAnbWlzc2luZ19sZWRnZXInLCAnY29uZmxpY3RpbmdfbGVkZ2VyJywgJ2luc3BlY3RlZCcsICdpbnNwZWN0aW9uX2Jsb2NrZWQnLCAndW5pbnNwZWN0ZWQnLCAnZGlzcG9zaXRpb25lZCcsICd1bmRpc3Bvc2l0aW9uZWQnLCAnYmxvY2tlZCcsICdleGNsdWRlZCcsICdleGNsdWRlZF92YWxpZCcsICdmZWF0dXJlX2xpbmtlZCcsICdydW50aW1lX3JlcXVpcmVkJywgJ3J1bnRpbWVfdW5kZXRlcm1pbmVkJywgJ3J1bnRpbWVfc3VwcG9ydGVkJywgJ3dpdGhfdXBkYXRlX2V2aWRlbmNlJ10sIGludF0sIGRpY3Rbc3RyLCBKc29uT2JqZWN0XV0iIGlzIG5vdCBhc3NpZ25hYmxlIHRvIHJldHVybiB0eXBlICJ0dXBsZVtkaWN0W3N0ciwgaW50XSwgZGljdFtzdHIsIEpzb25PYmplY3RdXSIKICDCoMKgImRpY3RbTGl0ZXJhbFsndG90YWwnLCAnaW52ZW50b3JpZWQnLCAndW5zZWxlY3RlZCcsICdtaXNzaW5nX2xlZGdlcicsICdjb25mbGljdGluZ19sZWRnZXInLCAnaW5zcGVjdGVkJywgJ2luc3BlY3Rpb25fYmxvY2tlZCcsICd1bmluc3BlY3RlZCcsICdkaXNwb3NpdGlvbmVkJywgJ3VuZGlzcG9zaXRpb25lZCcsICdibG9ja2VkJywgJ2V4Y2x1ZGVkJywgJ2V4Y2x1ZGVkX3ZhbGlkJywgJ2ZlYXR1cmVfbGlua2VkJywgJ3J1bnRpbWVfcmVxdWlyZWQnLCAncnVudGltZV91bmRldGVybWluZWQnLCAncnVudGltZV9zdXBwb3J0ZWQnLCAnd2l0aF91cGRhdGVfZXZpZGVuY2UnXSwgaW50XSIgaXMgbm90IGFzc2lnbmFibGUgdG8gImRpY3Rbc3RyLCBpbnRdIgogIMKgwqDCoMKgVHlwZSBwYXJhbWV0ZXIgIl9LVEBkaWN0IiBpcyBpbnZhcmlhbnQsIGJ1dCAiTGl0ZXJhbFsndG90YWwnLCAnaW52ZW50b3JpZWQnLCAndW5zZWxlY3RlZCcsICdtaXNzaW5nX2xlZGdlcicsICdjb25mbGljdGluZ19sZWRnZXInLCAnaW5zcGVjdGVkJywgJ2luc3BlY3Rpb25fYmxvY2tlZCcsICd1bmluc3BlY3RlZCcsICdkaXNwb3NpdGlvbmVkJywgJ3VuZGlzcG9zaXRpb25lZCcsICdibG9ja2VkJywgJ2V4Y2x1ZGVkJywgJ2V4Y2x1ZGVkX3ZhbGlkJywgJ2ZlYXR1cmVfbGlua2VkJywgJ3J1bnRpbWVfcmVxdWlyZWQnLCAncnVudGltZV91bmRldGVybWluZWQnLCAncnVudGltZV9zdXBwb3J0ZWQnLCAnd2l0aF91cGRhdGVfZXZpZGVuY2UnXSIgaXMgbm90IHRoZSBzYW1lIGFzICJzdHIiIChyZXBvcnRSZXR1cm5UeXBlKQoyIGVycm9ycywgMCB3YXJuaW5ncywgMCBpbmZvcm1hdGlvbnMKV0FSTklORzogdGhlcmUgaXMgYSBuZXcgcHlyaWdodCB2ZXJzaW9uIGF2YWlsYWJsZSAodjEuMS40MDkgLT4gdjEuMS40MTQpLg0KUGxlYXNlIGluc3RhbGwgdGhlIG5ldyB2ZXJzaW9uIG9yIHNldCBQWVJJR0hUX1BZVEhPTl9GT1JDRV9WRVJTSU9OIHRvIGBsYXRlc3RgDQoNCg==",
+    "sha256": "d9ec696bdd1cd26dc7b82d6ad7e465728704a9ba07e0c6d1193c2f6a2d9c9f54"
+  },
+  "task": "P5-T1",
+  "timestamp_utc": "2026-10-20T03:36:43.567833+00:00"
+}

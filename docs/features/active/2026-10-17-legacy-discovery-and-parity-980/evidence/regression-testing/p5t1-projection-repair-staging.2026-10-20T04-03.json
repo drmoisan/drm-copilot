@@ -1,0 +1,29 @@
+{
+  "status": "LIST_ONLY_NOT_STAGED",
+  "files": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+    "tests/discovery_runtime/test_validation_modes.py": "b7ca69c95525fb5cc84c58ae4e27f435982c24ce867aed63c625e6a6bc413fe3",
+    "tests/discovery_runtime/test_agent_output.py": "425779f32370db9718d1ec354bd5f437192519920eb9b3dcb5ab28728f7fbe40",
+    "tests/discovery_runtime/test_mutation_plan.py": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-archive.2026-10-20T04-03.json": "7031478c2e19ba810654192f0bbdcea04c0b0d84a8331199d3d071547eb04693",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-count-before.2026-10-20T03-58.json": "4df1c9f8e284eea203a39d3de7ed385e0f1dd285dd596b069d935ee0fea573a9",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-count-before.2026-10-20T03-58.md": "e6f1551db22df66977976374abd4c1be6b9e882eb05aee55b524dbee69079e0f",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-freeze.2026-10-20T04-03.json": "9ab59c5939f4b8fb1f157cfd467bbcb1d01cbd68f017de4ee92d001769fd1841",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair1-format.2026-10-20T03-58.json": "8aff41161a5ab396f10509c3a06111665647d616102c783e9054cefbe9c2382c",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair1-format.2026-10-20T03-58.md": "d68dfb33d24eeda4115c496d07263e45aae7d6f161183c07c837bab27ab2ce7e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-format.2026-10-20T03-59.json": "df1082ca6ce6dc75f45173004d0b8827c9d976af9a224f192be0334bade5f8df",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-format.2026-10-20T03-59.md": "e41c2af6112274d07e24a5a333875f01cd19464e6f8c0ecf529abe76a91f7289",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-lint.2026-10-20T03-59.json": "4783882d5771dd006540f5f6341e86cb0f3ad14b41e2a26825f7735c775fc674",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-lint.2026-10-20T03-59.md": "dc1d1ecb4695e2c02d9aa0afeb2a9d87e5fb5a15db4fc00788f9edcc39d16492",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-types.2026-10-20T03-59.json": "2852fd099db324a3345d90b34833ce8d9ad71597d6f450c934a457e09ca0b287",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair2-types.2026-10-20T03-59.md": "c368e3c1c56b2eeac5c098eaa8bff17b6943b5c44450adf83bd0e38b23bbabc7",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-format.2026-10-20T03-59.json": "8217a2f1deed280d6a30d2bfb7e529d0a69d78ce6e9dcc554819aca18ac47898",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-format.2026-10-20T03-59.md": "96d60709336a5eeb0a9f70adb6d9c96f80ccae1f3108c331ee66cd1f94d3d355",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-lint.2026-10-20T04-00.json": "b06ebf5c676562f534dd0572213de580ab60483d7188b4e9167213f11878ee77",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-lint.2026-10-20T04-00.md": "84a9ee2dc94df96a908d155b2ef24f090ec4862897a77ef25b2f5cc7fa21e56f",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-narrow.2026-10-20T04-02.json": "f49c2db307fb821a64eb6c58ee9d5c26e3ea5fd7df46fa6063bc1dd491724364",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-narrow.2026-10-20T04-02.md": "feb3eb853fa6c989476ab200774b1e6844567db306deacedd0b3e7408aedd94e",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-types.2026-10-20T04-00.json": "eb4e59a4a2a50166fd477b839a66e35c101c0831d6a98519f4d823dcdaef5481",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-types.2026-10-20T04-00.md": "9c577e7760acae90df0439fd95d9ab12fd54020e555866da52d917b996efaf6a"
+  }
+}

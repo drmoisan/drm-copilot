@@ -191,8 +191,9 @@ def test_loader_findings_are_preserved_and_deterministically_sorted(
     [None, "", "/report.json"],
     ids=["initialized-root", "absent-root", "absent-report"],
 )
+@pytest.mark.parametrize("kind", ["completion-report", "coverage-report"])
 def test_report_projection_is_recomputed_and_nonrecursive(
-    snapshot_catalog: SchemaCatalog, missing_output: str | None
+    snapshot_catalog: SchemaCatalog, missing_output: str | None, kind: str
 ) -> None:
     """Adding the exact derived report changes full identity but not its semantic
     digest.
@@ -206,11 +207,9 @@ def test_report_projection_is_recomputed_and_nonrecursive(
                 missing_paths=(snapshot.profile.artifacts["reports"] + missing_output,),
             ),
         )
-    value = report_projection(
-        snapshot, kind="completion-report", identifier="report", mode="planning"
-    )
+    value = report_projection(snapshot, kind=kind, identifier="report", mode="planning")
     record = document_record(
-        snapshot.profile, "completion-report", ROOT + "reports/report.json", value
+        snapshot.profile, kind, ROOT + "reports/report.json", value
     )
     with_report = captured(
         snapshot.profile,
@@ -234,7 +233,18 @@ def test_report_projection_is_recomputed_and_nonrecursive(
     }
 
 
-@pytest.mark.parametrize("case", ["id", "mode", "extra", "agent-output"])
+@pytest.mark.parametrize(
+    "case",
+    [
+        "id",
+        "mode",
+        "extra",
+        "agent-output",
+        "coverage",
+        "discovery_result",
+        "completion_findings",
+    ],
+)
 def test_authored_report_contract_cannot_replace_recomputation(
     snapshot_catalog: SchemaCatalog, case: str
 ) -> None:
@@ -247,6 +257,12 @@ def test_authored_report_contract_cannot_replace_recomputation(
         value.pop(case)
     elif case == "extra":
         value["ready"] = True
+    elif case == "coverage":
+        value["coverage"] = {}
+    elif case == "discovery_result":
+        value["discovery_result"] = "fail"
+    elif case == "completion_findings":
+        value["completion_findings"] = [{"code": "AUTHORED_SUCCESS"}]
     else:
         value["mode"] = "agent-output"
     record = document_record(
@@ -283,6 +299,7 @@ def test_invalid_public_modes_and_unparsed_projection_raise_explicitly(
             identifier="report",
             mode=cast("ValidationMode", "automatic"),
         )
+    # Public caller mistakes fail before constructing any report assessment.
     for kind, mode in (("unknown", "structural"), ("coverage-report", "agent-output")):
         with pytest.raises(ValueError, match="Reports require"):
             report_projection(
@@ -291,13 +308,15 @@ def test_invalid_public_modes_and_unparsed_projection_raise_explicitly(
                 identifier="report",
                 mode=cast("ValidationMode", mode),
             )
-    with pytest.raises(ValueError, match="structurally parsed"):
-        report_projection(
-            replace(snapshot, manifest=replace(snapshot.manifest, files=())),
-            kind="coverage-report",
-            identifier="report",
-            mode="structural",
-        )
+    # Only coverage has a truthful unavailable-input envelope; other kinds still reject.
+    for kind in ("completion-report", "parity-report"):
+        with pytest.raises(ValueError, match="structurally parsed"):
+            report_projection(
+                replace(snapshot, manifest=replace(snapshot.manifest, files=())),
+                kind=kind,
+                identifier="report",
+                mode="structural",
+            )
 
 
 def test_semantic_digest_tracks_changed_source_bytes(
@@ -353,3 +372,105 @@ def test_composed_warning_findings_are_bounded_and_truncation_blocks(
         count, snapshot.profile.limits.parse_limits().findings
     )
     assert ("FINDINGS_LIMIT" in {item.code for item in result.findings}) is not passed
+
+
+@pytest.mark.parametrize("fault", ["missing-profile", "loader"])
+def test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts(
+    snapshot_catalog: SchemaCatalog, fault: str
+) -> None:
+    """For fault (str), project blockers without trusting invalid population bytes."""
+    snapshot = no_scope_snapshot(snapshot_catalog)
+    if fault == "missing-profile":
+        snapshot = replace(
+            snapshot,
+            manifest=replace(
+                snapshot.manifest,
+                files=tuple(
+                    item
+                    for item in snapshot.manifest.files
+                    if item.path != snapshot.profile.artifacts["profile"]
+                ),
+            ),
+        )
+    else:
+        snapshot = replace(
+            snapshot,
+            findings=(
+                Finding(
+                    code="CAPTURE_ERROR",
+                    message="Unavailable",
+                    next_action="Recapture.",
+                ),
+            ),
+        )
+    structural = validate_snapshot(snapshot, mode="structural")
+
+    report = report_projection(
+        snapshot, kind="coverage-report", identifier="coverage", mode="structural"
+    )
+
+    assert report["validation_result"] == report["discovery_result"] == "fail"
+    assert report["findings"] == report["completion_findings"]
+    assert report["findings"] == [item.to_dict() for item in structural.findings]
+    assert report["counts"] == {}
+    assert report["coverage"] == {
+        "population_state": "unavailable",
+        "components": None,
+        "features": None,
+        "runtime": None,
+        "unresolved_behaviors": None,
+        "metrics": None,
+        "known_inventory_refs": None,
+    }
+    assert report["input_sha256"] == report_input_digest(snapshot)
+    assert not validate_snapshot(snapshot, mode="planning").ok
+    with pytest.raises(ValueError, match="Unsupported report or validation mode"):
+        report_projection(
+            snapshot,
+            kind="coverage-report",
+            identifier="coverage",
+            mode=cast("ValidationMode", "automatic"),
+        )
+
+
+@pytest.mark.parametrize("draft", [False, True])
+@pytest.mark.parametrize("mode", ["structural", "discovery-complete", "planning"])
+def test_coverage_preserves_requested_mode_and_independent_discovery_results(
+    snapshot_catalog: SchemaCatalog, draft: bool, mode: ValidationMode
+) -> None:
+    """For draft (bool) and mode, use the existing assessments without new gates."""
+    snapshot = (
+        captured(mode_profile(snapshot_catalog, draft=True), snapshot_catalog)
+        if draft
+        else no_scope_snapshot(snapshot_catalog)
+    )
+    requested = validate_snapshot(snapshot, mode=mode)
+    complete = validate_snapshot(snapshot, mode="discovery-complete")
+
+    report = report_projection(
+        snapshot, kind="coverage-report", identifier="coverage", mode=mode
+    )
+
+    assert report["validation_result"] == requested.validation_result
+    assert report["findings"] == [item.to_dict() for item in requested.findings]
+    assert report["discovery_result"] == complete.validation_result
+    assert report["completion_findings"] == [
+        item.to_dict() for item in complete.findings
+    ]
+    population = as_object(report["coverage"])
+    assert population["population_state"] == ("unavailable" if draft else "available")
+    if draft:
+        assert all(
+            population[key] is None
+            for key in (
+                "components",
+                "features",
+                "runtime",
+                "unresolved_behaviors",
+                "metrics",
+            )
+        )
+    other = report_projection(
+        snapshot, kind="parity-report", identifier="parity", mode=mode
+    )
+    assert not ({"coverage", "discovery_result", "completion_findings"} & other.keys())
