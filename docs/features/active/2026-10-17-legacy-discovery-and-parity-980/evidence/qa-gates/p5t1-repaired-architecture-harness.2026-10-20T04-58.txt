@@ -1,0 +1,48 @@
+"""Check the exact frozen remaining scope; reuse accepted helper policy proof."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+manifest = json.loads(Path(sys.argv[1]).read_bytes())
+checked = []
+for entry in manifest["files"]:
+    path = Path(entry["path"])
+    data = path.read_bytes()
+    assert hashlib.sha256(data).hexdigest() == entry["sha256"]
+    lines, tree = data.decode("utf-8").splitlines(), ast.parse(data)
+    assert len(lines) <= 500, path
+    definitions, loops, imports, calls = [], [], [], []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
+        elif isinstance(node, ast.Import):
+            imports.extend(item.name for item in node.names)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            definitions.append(node.name)
+            assert ast.get_docstring(node), (path, node.name)
+        if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            loops.append(node.lineno)
+            if not lines[node.lineno - 2].lstrip().startswith("#"):
+                assert path.as_posix() == manifest["scope_path"], (path, node.lineno)
+                old_line = manifest["scope_policy_retained_loops"].get(str(node.lineno))
+                assert old_line is not None, (path, node.lineno, "new uncommented loop")
+                assert manifest["scope_policy_loop_hashes"][str(node.lineno)] == hashlib.sha256(ast.dump(node).encode()).hexdigest()
+        if isinstance(node, ast.Call):
+            calls.append(ast.unparse(node.func))
+    assert not any(item.split(".")[0] in {"subprocess", "socket", "requests", "http", "urllib", "tempfile"} for item in imports), path
+    assert not any(item in {"open", "eval", "exec", "compile"} for item in calls), path
+    assert not any(item.endswith((".write_bytes", ".write_text", ".mkdir", ".unlink")) for item in calls), path
+    if path.as_posix().startswith("packages/"):
+        assert not any(item.startswith("scripts") for item in imports), path
+        assert not any(item.endswith((".read_bytes", ".read_text", ".glob", ".rglob")) for item in calls), path
+    else:
+        assert not any(isinstance(node, ast.Name) and node.id in {"tmp_path", "tmpdir"} for node in ast.walk(tree)), path
+    checked.append({"path": path.as_posix(), "lines": len(lines), "definitions": len(definitions), "loops": len(loops)})
+helper = json.loads(Path(manifest["retained_helper"]["path"]).read_bytes())
+for path, entry in helper["owned_source_test_bindings"].items():
+    assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == entry["sha256"]
+    assert len(Path(path).read_bytes().splitlines()) <= 500
+assert len(checked) == 9
+print(json.dumps({"checks": checked, "retained_helper_paths": 5, "no_production_or_test_changes": True}, indent=2))

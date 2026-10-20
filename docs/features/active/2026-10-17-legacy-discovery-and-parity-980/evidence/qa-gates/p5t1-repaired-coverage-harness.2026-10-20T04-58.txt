@@ -1,0 +1,153 @@
+"""Reconcile current coverage with exact retained proof without merging old counters."""
+import ast
+import base64
+import datetime
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+manifest_path, coverage_path, result_path = map(Path, sys.argv[1:])
+manifest = json.loads(manifest_path.read_bytes())
+coverage = json.loads(coverage_path.read_bytes())
+coverage["files"] = {path.replace("\\", "/"): value for path, value in coverage["files"].items()}
+assert set(coverage["files"]) == set(manifest["production"])
+ranges, regressions = [], []
+scope_path = manifest["scope_path"]
+scope_record = json.loads(Path(manifest["scope_proof"]["source_baseline"]["path"]).read_bytes())
+scope_old = base64.b64decode(scope_record["owned"][scope_path]["base64"])
+scope_coverage = json.loads(Path(manifest["scope_proof"]["coverage_baseline"]["path"]).read_bytes())["files"][scope_path]
+mapping = {int(key): value for key, value in manifest["scope_proof"]["old_to_current_equal_line_map"].items()}
+scope_new = ast.parse(Path(scope_path).read_bytes())
+scope_old_tree = ast.parse(scope_old)
+old_functions = {node.name: node for node in scope_old_tree.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+new_functions = {node.name: node for node in scope_new.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+changed = new_functions["_inventory"]
+changed_lines = set(manifest["scope_proof"]["changed_lines"])
+
+
+def sha(data):
+    """Return SHA-256 for an existing exact byte stream."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def write(path, value):
+    """Create canonical LF JSON without replacing historical evidence."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+for path, data in coverage["files"].items():
+    if path == scope_path:
+        current = data["functions"]["_inventory"]
+        old = scope_coverage["functions"]["_inventory"]
+        lost_lines = [mapping[line] for line in old["executed_lines"]
+                      if line in mapping and mapping[line] not in data["executed_lines"]]
+        mapped_arcs = []
+        for left, right in old["executed_branches"]:
+            if abs(left) in mapping and abs(right) in mapping:
+                mapped_arcs.append((mapping[abs(left)] * (-1 if left < 0 else 1),
+                                    mapping[abs(right)] * (-1 if right < 0 else 1)))
+        lost_arcs = sorted(set(mapped_arcs) - set(map(tuple, data["executed_branches"])))
+        assert not lost_lines, ("scope changed-callable prior lines", lost_lines)
+        assert not lost_arcs, ("scope changed-callable prior branches", lost_arcs)
+        assert not changed_lines & set(data["missing_lines"])
+        assert current["summary"]["percent_statements_covered"] >= 90
+        assert current["summary"]["percent_branches_covered"] >= 90
+        retained_lines, retained_arcs = set(), set()
+        retained_functions = []
+        for name, old_node in old_functions.items():
+            if name == "_inventory":
+                continue
+            node = new_functions[name]
+            assert ast.dump(node) == ast.dump(old_node), name
+            retained_lines.update(mapping[line] for line in scope_coverage["executed_lines"]
+                                  if old_node.lineno <= line <= old_node.end_lineno and line in mapping)
+            for left, right in scope_coverage["executed_branches"]:
+                if (old_node.lineno <= abs(left) <= old_node.end_lineno
+                        and abs(left) in mapping and abs(right) in mapping):
+                    retained_arcs.add((mapping[abs(left)] * (-1 if left < 0 else 1),
+                                       mapping[abs(right)] * (-1 if right < 0 else 1)))
+            retained_functions.append(name)
+        qualified_missing = set(data["missing_lines"]) - retained_lines
+        qualified_branches = set(map(tuple, data["missing_branches"])) - retained_arcs
+        assert not qualified_missing, ("unproved scope lines", sorted(qualified_missing))
+        assert not qualified_branches, ("unproved scope branches", sorted(qualified_branches))
+        regressions.append({"path": path, "current_raw_summary": data["summary"],
+            "changed_callable_current_summary": current["summary"],
+            "lost_previously_covered_changed_callable_lines": lost_lines,
+            "lost_previously_covered_changed_callable_branches": lost_arcs,
+            "uncovered_changed_lines": sorted(changed_lines & set(data["missing_lines"])),
+            "retained_unchanged_callable_names": retained_functions,
+            "qualified_previous_proof_lines": sorted(retained_lines),
+            "qualified_previous_proof_arcs": sorted(retained_arcs),
+            "combined_evidence_unproved_lines": sorted(qualified_missing),
+            "combined_evidence_unproved_branches": sorted(qualified_branches),
+            "qualification": "Prior exact unchanged-body proof is referenced separately; current coverage JSON has not been augmented."})
+    elif path.endswith("/validation.py"):
+        assert data["summary"]["percent_statements_covered"] == 100
+        assert data["summary"]["percent_branches_covered"] == 100
+        previous = subprocess.run(["git", "show", manifest["accepted_baseline"] + ":" + path],
+                                  capture_output=True, check=True).stdout.decode().splitlines()
+        current_source = Path(path).read_text(encoding="utf-8").splitlines()
+        line_map, new_lines = {}, set()
+        for operation, a, b, c, d in difflib.SequenceMatcher(a=previous, b=current_source, autojunk=False).get_opcodes():
+            if operation == "equal":
+                line_map.update({old + 1: new + 1 for old, new in zip(range(a, b), range(c, d))})
+            else:
+                new_lines.update(range(c + 1, d + 1))
+        lost = [line_map[line] for line in manifest["validation_baseline"]["executed_lines"]
+                if line in line_map and line_map[line] in data["missing_lines"]]
+        assert not lost and not new_lines & set(data["missing_lines"])
+        regressions.append({"path": path, "lost_previously_covered": lost,
+                            "uncovered_changed_lines": sorted(new_lines & set(data["missing_lines"]))})
+    else:
+        old = next(value for name, value in manifest["graph_coverage"]["files"].items()
+                   if name.replace("\\", "/") == path)
+        assert set(old["executed_lines"]) <= set(data["executed_lines"])
+        assert set(map(tuple, old["executed_branches"])) <= set(map(tuple, data["executed_branches"]))
+        assert set(data["missing_lines"]) <= set(old["missing_lines"])
+        assert data["summary"]["percent_statements_covered"] >= 90
+        regressions.append({"path": path, "retained_known_missing_lines": data["missing_lines"],
+                            "retained_known_missing_branches": data["missing_branches"],
+                            "lost_previously_covered": []})
+
+    # Keep current raw ranges separate from named coverage.py body denominators.
+    def visit(body, prefix=""):
+        """Record exact current ranges and qualify only proven unchanged scope bodies."""
+        for node in body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                name = prefix + node.name
+                family = "classes" if isinstance(node, ast.ClassDef) else "functions"
+                named = data.get(family, {}).get(name)
+                executed = [line for line in data["executed_lines"] if node.lineno <= line <= node.end_lineno]
+                missing = [line for line in data["missing_lines"] if node.lineno <= line <= node.end_lineno]
+                count = len(executed) + len(missing)
+                retained = path == scope_path and name.split(".")[0] != "_inventory"
+                if not retained:
+                    assert not count or len(executed) / count >= .9, (path, name)
+                    if named and named["summary"]["num_statements"]:
+                        assert named["summary"]["percent_statements_covered"] >= 90, (path, name)
+                ranges.append({"path": path, "name": name, "kind": family, "start": node.lineno,
+                    "end": node.end_lineno, "executed_statements": len(executed),
+                    "missing_statements": missing, "raw_statement_total": count,
+                    "coverage_named_summary": named["summary"] if named else None,
+                    "retained_exact_unchanged_body_proof": retained})
+                visit(node.body, name + ".")
+    visit(ast.parse(Path(path).read_bytes()).body)
+
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+coverage_evidence = qa / ("p5t1-repaired-final-combined-coverage." + stamp + ".json")
+ranges_evidence = qa / ("p5t1-repaired-final-coverage-ranges." + stamp + ".json")
+write(coverage_evidence, coverage)
+write(ranges_evidence, {"ranges": ranges, "regressions": regressions,
+                       "convention": manifest["coverage_convention"],
+                       "scope_proof": manifest["scope_proof"]})
+write(result_path, {"coverage": {"path": coverage_evidence.as_posix(), "sha256": sha(coverage_evidence.read_bytes())},
+                    "ranges": {"path": ranges_evidence.as_posix(), "sha256": sha(ranges_evidence.read_bytes())},
+                    "range_results": ranges, "regressions": regressions})
+print(json.dumps({"range_count": len(ranges), "regressions": len(regressions),
+                  "current_raw_counters_unmodified": True}))

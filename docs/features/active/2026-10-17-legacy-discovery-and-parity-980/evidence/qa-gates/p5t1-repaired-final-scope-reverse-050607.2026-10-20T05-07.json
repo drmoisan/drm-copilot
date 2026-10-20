@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m pytest -v -o addopts= -p no:cacheprovider tests/discovery_runtime/test_coverage_scope.py::test_malformed_inventory_rows_do_not_crash_or_shift_selection tests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile tests/discovery_runtime/test_coverage_scope.py::test_excluded_selected_scan_input_requires_scope_rationale tests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting tests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting --cov=drm_copilot_discovery.coverage_report --cov=drm_copilot_discovery.coverage_population --cov=drm_copilot_discovery.validation --cov=drm_copilot_discovery.coverage_scope_rules --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\issue-980-p5t1-repaired-final-050607-scope-coverage.raw.json",
+  "completed_nodes": 17,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:07:03.962287+00:00",
+  "label": "scope-reverse",
+  "last_node": "tests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[excluded-COVERAGE_SCAN]",
+  "pid": 29832,
+  "raw": [
+    {
+      "bytes": 3885,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.stdout",
+      "sha256": "8a158b1b5bfd6f92ea4301c01b45dd922a6288fc26a5784c9a20094831988bd3"
+    },
+    {
+      "bytes": 1133,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.stderr",
+      "sha256": "4386b4349ea3972b727ea7f7a934c50a18326f01c928ba1bcc4435860e9fcc63"
+    },
+    {
+      "bytes": 381,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-scope-reverse.progress.json",
+      "sha256": "48a475e086ee05db939b83c0b60b3dc8daf0281587621aec30fb752add58a3cc"
+    }
+  ],
+  "seconds": 3.015,
+  "stage": 6,
+  "started_at": "2026-10-20T05:07:00.947742+00:00",
+  "stderr": "WORKSPACE\\.venv\\Lib\\site-packages\\coverage\\inorout.py:495: CoverageWarning: Module drm_copilot_discovery.coverage_report was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.2/messages.html#warning-module-not-imported\r\n  self.warn(f\"Module {pkg} was never imported.\", slug=\"module-not-imported\")\r\nWORKSPACE\\.venv\\Lib\\site-packages\\coverage\\inorout.py:495: CoverageWarning: Module drm_copilot_discovery.coverage_population was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.2/messages.html#warning-module-not-imported\r\n  self.warn(f\"Module {pkg} was never imported.\", slug=\"module-not-imported\")\r\nWORKSPACE\\.venv\\Lib\\site-packages\\coverage\\inorout.py:495: CoverageWarning: Module drm_copilot_discovery.validation was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.13.2/messages.html#warning-module-not-imported\r\n  self.warn(f\"Module {pkg} was never imported.\", slug=\"module-not-imported\")\r\n",
+  "stdout": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 17 items\r\n\r\ntests/discovery_runtime/test_coverage_scope.py::test_malformed_inventory_rows_do_not_crash_or_shift_selection PASSED [  5%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile[False] PASSED [ 11%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_current_configuration_is_checked_only_against_its_own_profile[True] PASSED [ 17%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_excluded_selected_scan_input_requires_scope_rationale PASSED [ 23%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting[Generated files.] PASSED [ 29%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_skipped_paths_require_explicit_inventory_exclusion_accounting[] PASSED [ 35%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[None-True] PASSED [ 41%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src/component.cs-True] PASSED [ 47%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src/new.cs-True] PASSED [ 52%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_scan_failures_block_only_global_or_selected_inputs[src2/other.cs-False] PASSED [ 58%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[missing-COVERAGE_INPUTS] PASSED [ 64%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[extra-COVERAGE_INPUTS] PASSED [ 70%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[changed-hash-COVERAGE_INPUTS] PASSED [ 76%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[duplicate-COVERAGE_FILES] PASSED [ 82%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[unsorted-COVERAGE_FILES] PASSED [ 88%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[unreadable-COVERAGE_SCAN] PASSED [ 94%]\r\ntests/discovery_runtime/test_coverage_scope.py::test_complete_scan_requires_exact_captured_input_accounting[excluded-COVERAGE_SCAN] PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                           Stmts   Miss Branch BrPart  Cover   Missing\r\n--------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\coverage_scope_rules.py     142     15     78     14    87%   112, 149, 289-295, 311-317, 325, 331->333, 339, 350, 366-372, 383, 390, 407->404, 416, 418\r\n--------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                            142     15     78     14    87%\r\nCoverage JSON written to file SCRATCH\\issue-980-p5t1-repaired-final-050607-scope-coverage.raw.json\r\n============================= 17 passed in 1.66s ==============================\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-07"
+}

@@ -300,7 +300,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 5 — Generated reports and acceptance specifications
 
-- [ ] [P5-T1] Compute discovery coverage from the validated graph.
+- [x] [P5-T1] Compute discovery coverage from the validated graph.
   - Files and behavior: Move/rework DT/discovery/coverage_report.py into R/coverage_report.py with a thin adapter; create R/report_models.py and PT/test_coverage_report.py; update Set D coverage/rendering assertions.
   - Tests and proof: Assert all requested component/inspection/disposition/feature/runtime/evidence/unresolved counts, explicit numerators/denominators, null zero-denominator percentages, exclusions, stable ordering, findings and input digest.
   - Acceptance: Coverage JSON and its Markdown view agree exactly and do not treat an empty, invalid, or uninventoried graph as complete.

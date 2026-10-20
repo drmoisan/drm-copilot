@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\issue-980-p5t1-repaired-architecture.py docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:06:24.767120+00:00",
+  "label": "architecture",
+  "last_node": null,
+  "pid": 68028,
+  "raw": [
+    {
+      "bytes": 1515,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.stdout",
+      "sha256": "3de3ebcd058a48a2a8b75a7f752dc1b75d9439858fe4272ccd16579c0e59d98e"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 224,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-architecture.progress.json",
+      "sha256": "55d1078364d0b362b6288386ae505dce65e4292122db2344e6541087d7812a04"
+    }
+  ],
+  "seconds": 1.01,
+  "stage": 4,
+  "started_at": "2026-10-20T05:06:23.757318+00:00",
+  "stderr": "",
+  "stdout": "{\r\n  \"checks\": [\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py\",\r\n      \"lines\": 430,\r\n      \"definitions\": 8,\r\n      \"loops\": 5\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py\",\r\n      \"lines\": 337,\r\n      \"definitions\": 9,\r\n      \"loops\": 9\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/validation.py\",\r\n      \"lines\": 461,\r\n      \"definitions\": 10,\r\n      \"loops\": 2\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_coverage_report.py\",\r\n      \"lines\": 477,\r\n      \"definitions\": 11,\r\n      \"loops\": 0\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_coverage_report_contract.py\",\r\n      \"lines\": 374,\r\n      \"definitions\": 12,\r\n      \"loops\": 1\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_validation_modes.py\",\r\n      \"lines\": 476,\r\n      \"definitions\": 14,\r\n      \"loops\": 2\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_agent_output.py\",\r\n      \"lines\": 492,\r\n      \"definitions\": 12,\r\n      \"loops\": 1\r\n    },\r\n    {\r\n      \"path\": \"tests/discovery_runtime/test_mutation_plan.py\",\r\n      \"lines\": 484,\r\n      \"definitions\": 20,\r\n      \"loops\": 1\r\n    },\r\n    {\r\n      \"path\": \"packages/discovery-runtime/src/drm_copilot_discovery/coverage_scope_rules.py\",\r\n      \"lines\": 433,\r\n      \"definitions\": 10,\r\n      \"loops\": 9\r\n    }\r\n  ],\r\n  \"retained_helper_paths\": 5,\r\n  \"no_production_or_test_changes\": true\r\n}\r\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T05-06"
+}

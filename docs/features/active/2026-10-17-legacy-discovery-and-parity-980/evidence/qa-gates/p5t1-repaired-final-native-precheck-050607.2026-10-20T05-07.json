@@ -1,0 +1,38 @@
+{
+  "binding_after": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "binding_before": "60073b1e104c67f4e6d4944652ed2da52c5fdea98cec5ae94db140d5296764c9",
+  "candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-repaired-final-candidate.2026-10-20T05-06.json",
+  "candidate_sha256": "d00072e217a0fbae39a61abf91257847190a623ded7c33344c22b2ad51f017bc",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\issue-980-p5t1-final-native.py SCRATCH\\issue-980-p5t1-repaired-final-050607-native-result.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T05:07:00.896684+00:00",
+  "label": "native-precheck",
+  "last_node": null,
+  "pid": 57736,
+  "raw": [
+    {
+      "bytes": 1843,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.stdout",
+      "sha256": "aa4248f2edda7ed80109617cf045d3429e51b27d07a4b8a7b12feb6c6f66e77f"
+    },
+    {
+      "bytes": 0,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 229,
+      "path": "SCRATCH/issue-980-p5t1-repaired-final-050607-native-precheck.progress.json",
+      "sha256": "7b2d04e91dec0bf8e02d18b5f178b2a0003375dcc68848c900b06809c828db35"
+    }
+  ],
+  "seconds": 36.087,
+  "stage": 5,
+  "started_at": "2026-10-20T05:06:24.809856+00:00",
+  "stderr": "",
+  "stdout": "PASS actual loader retains profile, scope, inventory, ledger and checksummed evidence\r\nPASS materialized complete no-scope graph is structurally valid\r\nPASS confirmed no-scope reports justified discovery completion\r\nPASS empty denominators retain null ratios and explicit zero runtime obligations\r\nPASS producer and authoritative public projection agree exactly\r\nPASS JSON and Markdown render the same detached fields\r\nPASS identical captured input renders deterministically\r\nPASS generation and validation preserve the immutable capture\r\nPASS previous JSON and Markdown outputs do not alter semantic identity or counts\r\nPASS changed authored input invalidates the retained previous report\r\nPASS authored success counts cannot replace recomputation\r\nPASS configured uninventoried input retains actionable failure and unavailable population\r\nPASS malformed scope retains original structural findings and unavailable counts\r\nPASS all read-only operations preserve fixture source, artifacts and Git bytes\r\n{\"passed\": 14, \"elapsed_seconds\": 35.0116312999744, \"operation_seconds\": {\"setup_capture\": 2.0998184999916703, \"setup_report_for_previous_view\": 1.854989099985687, \"capture_complete_graph\": 2.6687425000127405, \"structural_validation\": 1.8580201999866404, \"build_coverage_report\": 1.8512264000019059, \"public_report_projection\": 1.8739479999931064, \"repeated_report\": 1.864473800000269, \"capture_previous_view\": 2.591378499986604, \"report_with_previous_view\": 1.8683327999897301, \"capture_changed_authoring\": 2.7049608000088483, \"validate_stale_report\": 1.8990000000048894, \"capture_forged_report\": 2.574926499975845, \"validate_forged_report\": 1.8438977000187151, \"capture_uninventoried\": 0.9551307000219822, \"report_uninventoried\": 0.378653400024632, \"capture_invalid_scope\": 2.15506920000189, \"report_invalid_scope\": 1.5062527999980375}}\r\n",
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "timestamp": "2026-10-20T05-07"
+}
