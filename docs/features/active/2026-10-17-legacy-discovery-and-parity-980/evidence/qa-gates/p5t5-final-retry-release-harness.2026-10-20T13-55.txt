@@ -1,0 +1,58 @@
+"""Release the already bound RC2 candidate without altering executable readers."""
+
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+from p5t5_prepare_final import records
+
+
+def main():
+    """Add only the checked commit, review receipt and explicit execution authority."""
+    scratch = Path(__file__).resolve().parent
+    qa = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates")
+    route = "inventory_analyzers_p5t5_final_repair_execution_20261020"
+    profile = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+    checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+    matches = [item for item in records(checkpoint)
+               if item.get("delegation_id") == route and item.get("profile_sha256") == profile]
+    assert len(matches) == 1 and matches[0]["phase"] == "S5_P5T5_final_repair_execution"
+    assert hashlib.sha256(Path(matches[0]["profile_path"]).read_bytes()).hexdigest() == profile
+    disabled = qa / "p5t5-final-retry-candidate-disabled.2026-10-20T13-47.json"
+    raw = disabled.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == "7bc11d13d04864528768d69554785518e6cea41e16c1d8f1e5552d583350adfb"
+    candidate = json.loads(raw)
+    review = qa / "p5t5-executor-rc2-ready.2026-10-20T13-51.json"
+    review_sha = hashlib.sha256(review.read_bytes()).hexdigest()
+    assert review_sha == "8eac8d35161b53f246f5d78e1818b9147e6ab88e96b5ac47eccb430a45bef7ca"
+    assert candidate["node_count"] == 119 and candidate["execution_released"] is False
+    # Reuse only existing bindings; the reviewed repair changes one test and one node.
+    for path, digest in candidate["bindings"].items():
+        assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest, path
+    for name, record in candidate["harnesses"].items():
+        assert hashlib.sha256((scratch / name).read_bytes()).hexdigest() == record["sha256"], name
+    candidate.update(execution_released=True, final_review_closed=True, authority_route=route,
+                     candidate_commit="556ccb4bf74a233f7d9dc8214e0cb43d8d83d78e")
+    candidate["retained_proof"]["first_review"] = candidate["retained_proof"]["final_review"]
+    candidate["retained_proof"]["final_review"] = {"path": review.as_posix(), "sha256": review_sha}
+    candidate["disabled_candidate"] = {"path": disabled.as_posix(), "sha256": hashlib.sha256(raw).hexdigest()}
+    candidate["limitations"][0] = "Task verification is released; independent final acceptance remains pending."
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate["released_at"] = stamp
+    output = qa / f"p5t5-final-retry-candidate-released.{stamp}.json"
+    assert not output.exists()
+    output.write_text(json.dumps(candidate, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    local = scratch / "candidate-retry-released.json"
+    assert not local.exists()
+    local.write_bytes(output.read_bytes())
+    snapshot = qa / f"p5t5-final-retry-release-harness.{stamp}.txt"
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({"candidate": output.as_posix(),
+                      "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+                      "node_count": 119, "execution_released": True}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

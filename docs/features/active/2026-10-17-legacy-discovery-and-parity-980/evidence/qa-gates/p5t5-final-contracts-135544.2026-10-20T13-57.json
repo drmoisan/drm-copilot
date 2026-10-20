@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "1c2d83d20f5fd0bfb19538f88a3a34d990c9d2c75e91b71867f357696be6930e"
+  },
+  "candidate": "SCRATCH\\candidate-retry-released.json",
+  "candidate_sha256": "1be8286990a30757fc032bbcda1cc1984a237f1eb732eb92ae6acf7bf979b32d",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m pytest -v -o addopts= -p no:cacheprovider --no-cov tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage",
+  "completed_nodes": 4,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T13:57:24.045668+00:00",
+  "label": "contracts",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-contracts-135544-raw.2026-10-20T13-57.json",
+    "sha256": "17d0589363f825f97a4edc81a360772c1336ad27ef3cd897dda8638dfd0e8f35"
+  },
+  "seconds": 1.017,
+  "stage": 7,
+  "started_at": "2026-10-20T13:57:23.029026+00:00",
+  "stderr": "",
+  "stdout": "============================= test session starts =============================\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\nrootdir: WORKSPACE\nconfigfile: pyproject.toml\nplugins: anyio-4.12.1, cov-7.0.0\ncollecting ... collected 4 items\n\ntests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree PASSED [ 25%]\ntests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers PASSED [ 50%]\ntests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python PASSED [ 75%]\ntests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage PASSED [100%]\n\n============================== 4 passed in 0.12s ==============================\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T13-57"
+}

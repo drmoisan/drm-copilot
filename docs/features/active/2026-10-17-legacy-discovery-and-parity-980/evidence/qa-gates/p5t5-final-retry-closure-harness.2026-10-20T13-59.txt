@@ -1,0 +1,152 @@
+"""Freeze the successful P5-T5 retry using the established raw/readable closure."""
+
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+QA = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates"
+HANDOFF = Path(sys.argv[1])
+CANDIDATE = QA / "p5t5-final-retry-candidate-released.2026-10-20T13-55.json"
+STAGED = set()
+
+
+def sha(data):
+    """Return the original-byte digest."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Describe an existing artifact using its portable identity."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(raw), "bytes": len(raw)}
+
+
+def save(path, value):
+    """Create one immutable LF UTF-8 receipt."""
+    assert not path.exists(), path.name
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    STAGED.add(path)
+    return ref(path)
+
+
+def main():
+    """Close only the successful 119-case run and retain prior failed proof by reference."""
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate, handoff = json.loads(CANDIDATE.read_bytes()), json.loads(HANDOFF.read_bytes())
+    assert sha(CANDIDATE.read_bytes()) == "1be8286990a30757fc032bbcda1cc1984a237f1eb732eb92ae6acf7bf979b32d"
+    assert handoff["status"] == "FINAL_GATES_PASSED_ACCEPTANCE_PENDING"
+    assert handoff["candidate_sha256"] == sha(CANDIDATE.read_bytes())
+    assert handoff["node_count"] == 119 and handoff["bindings"]["changed"] == []
+    assert len(handoff["contracts"]) == 4
+    assert all(sha((ROOT / path).read_bytes()) == digest for path, digest in candidate["bindings"].items())
+    STAGED.update((CANDIDATE, HANDOFF, QA / "p5t5-final-retry-release-harness.2026-10-20T13-55.txt"))
+    archives = []
+    # Each executed stage already retained exact command streams before reporting success.
+    for record in handoff["receipts"]:
+        path = ROOT / record["path"]
+        assert sha(path.read_bytes()) == record["sha256"] and record["exit_code"] == 0
+        payload = json.loads(path.read_bytes())
+        assert payload["binding_before"] == payload["binding_after"]
+        assert payload["binding_before"]["changed"] == [] and not payload["timed_out"]
+        archive = ROOT / payload["raw_archive"]["path"]
+        assert sha(archive.read_bytes()) == payload["raw_archive"]["sha256"]
+        STAGED.update((path, path.with_suffix(".md"), archive))
+        archives.append(payload["raw_archive"])
+    for key in ("coverage_ranges", "current_coverage"):
+        record = handoff["coverage"][key]
+        path = ROOT / record["path"]
+        assert sha(path.read_bytes()) == record["sha256"]
+        STAGED.add(path)
+    run_id = handoff["receipts"][0]["path"].split("-format-", 1)[1].split(".", 1)[0]
+    raw_paths = [SCRATCH / f"p5t5-final-{run_id}-{label}{suffix}"
+                 for label in ("rendering", "combined")
+                 for suffix in (".coverage", "-coverage.json")]
+    raw_paths.append(SCRATCH / f"p5t5-final-{run_id}-coverage-result.json")
+    entries = []
+    # Exact raw databases and JSON preserve original EOF/newline bytes inside the archive.
+    for path in raw_paths:
+        raw = path.read_bytes()
+        entries.append({"path": "SCRATCH/" + path.name, "bytes": len(raw), "sha256": sha(raw),
+                        "crlf_count": raw.count(b"\r\n"), "terminal_lf": raw.endswith(b"\n"),
+                        "base64": base64.b64encode(raw).decode("ascii")})
+    raw_ref = save(QA / f"p5t5-final-retry-remaining-raw.{stamp}.json", {
+        "task": "P5-T5", "timestamp": stamp, "run_id": run_id, "entries": entries,
+        "qualification": "Raw coverage JSON/database endings are retained exactly. "
+                         "Authored receipts and readable views are separate LF UTF-8 streams.",
+    })
+    snapshot = QA / f"p5t5-final-retry-closure-harness.{stamp}.txt"
+    assert not snapshot.exists()
+    snapshot.write_bytes(Path(__file__).read_bytes())
+    STAGED.add(snapshot)
+    ranges = json.loads((ROOT / handoff["coverage"]["coverage_ranges"]["path"]).read_bytes())
+    summary = {
+        "task": "P5-T5", "Timestamp": stamp,
+        "Command": "poetry run python SCRATCH/p5t5_close_retry.py FINAL_HANDOFF", "EXIT_CODE": 0,
+        "state": "FROZEN_FINAL_VERIFICATION_ACCEPTANCE_PENDING", "run_id": run_id,
+        "checked_commit": candidate["candidate_commit"], "candidate": ref(CANDIDATE), "handoff": ref(HANDOFF),
+        "source_test_bindings": {path: candidate["bindings"][path] for path in candidate["files"]},
+        "task_nodes": 119, "contract_nodes": 4, "all_bindings_unchanged": True,
+        "stage_seconds": {record["label"]: record["seconds"] for record in handoff["receipts"]},
+        "composition": handoff["composition"], "coverage": handoff["coverage"],
+        "command_archives": archives, "remaining_raw_archive": raw_ref,
+        "unproved_lines": {item["path"]: item["remaining_unproved_lines"] for item in ranges["modules"]
+                           if item["remaining_unproved_lines"]},
+        "unproved_branches": {item["path"]: item["remaining_unproved_branches"] for item in ranges["modules"]
+                              if item["remaining_unproved_branches"]},
+        "retained_proof": handoff["retained_proof"], "closure_harness": ref(snapshot),
+        "coverage_attribution": "Final unchanged-reader named-body coverage supersedes the earlier "
+                                "declaration-inclusive range interpretation for _trace. Declaration line 157 "
+                                "does not establish runtime body execution. Original raw statistics, "
+                                "first-run failure and narrow guard proof remain separately retained.",
+        "examples": {"bindings": candidate["final_fixture_bindings"],
+                     "qualification": candidate["fixture_output_newline_qualification"]},
+        "limitations": ["Task verification only; independent acceptance remains pending.",
+                        "No publication, CLI migration, step execution, installed-host or feature-completion claim.",
+                        "Scoped coverage is not a newly measured repository-wide result.",
+                        "Accepted generator/model coverage is retained separately without predecessor replay."],
+    }
+    closure = QA / f"p5t5-final-retry-closure.{stamp}.json"
+    closure_ref = save(closure, summary)
+    markdown = closure.with_suffix(".md")
+    markdown.write_text(
+        "# P5-T5 final retry verification\n\n"
+        f"Timestamp: {stamp}\nCommand: poetry run python SCRATCH/p5t5_close_retry.py FINAL_HANDOFF\nEXIT_CODE: 0\n\n"
+        "All prepared stages passed: ordered format, lint, whole Pyright, scoped static checks, one fresh "
+        "reversed 119-node batch, named-body coverage reconciliation and four applicable contracts. "
+        "The seven source/test paths, eight example paths and retained dependency bindings remain exact.\n\n"
+        "The final named-body proof supersedes the earlier declaration-inclusive `_trace` range conclusion. "
+        "The original 118 passes followed by the RC2 coverage failure and separate guard proof remain intact. "
+        "No coverage threshold or reader was changed.\n\n"
+        "Raw command streams and coverage retain exact original bytes; readable receipts use LF UTF-8. "
+        "Generated Markdown examples preserve their qualified terminal blank lines. "
+        "Pure captured generation/rendering and legacy compatibility are verified; independent task acceptance "
+        "is pending. No publication, step execution or installed-host behavior is claimed.\n",
+        encoding="utf-8", newline="\n")
+    STAGED.add(markdown)
+    # Validate readable closure hygiene without normalizing raw streams or generated examples.
+    for path in STAGED:
+        raw = path.read_bytes()
+        text = raw.decode("utf-8")
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n"), path.name
+        assert all(line == line.rstrip() for line in text.splitlines()), path.name
+        assert str(ROOT) not in text and ROOT.as_posix() not in text, path.name
+        assert str(SCRATCH) not in text and SCRATCH.as_posix() not in text, path.name
+    staging = QA / f"p5t5-final-retry-staging.{stamp}.json"
+    staging_ref = save(staging, {
+        "task": "P5-T5", "timestamp": stamp, "closure": closure_ref,
+        "stage_paths": sorted(path.relative_to(ROOT).as_posix() for path in STAGED | {staging}),
+        "bindings": [ref(path) for path in sorted(STAGED)],
+        "self_qualification": "Self is listed; its exact hash is reported externally.",
+    })
+    print(json.dumps({"closure": closure_ref, "staging": staging_ref,
+                      "paths": len(STAGED), "raw_entries": len(entries)}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,127 @@
+"""Apply only the frozen RC2 test/node delta to the disabled P5-T5 candidate."""
+
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+from p5t5_prepare_final import records
+
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+QA, REG = FEATURE / "evidence/qa-gates", FEATURE / "evidence/regression-testing"
+ROUTE = "inventory_analyzers_p5t5_final_repair_gates_20261020"
+PROFILE = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+
+
+def sha(data):
+    """Return the exact raw-byte digest."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def ref(path):
+    """Describe one existing portable evidence reference."""
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def read(path, digest):
+    """Load only an explicitly supplied immutable artifact."""
+    raw = path.read_bytes()
+    assert sha(raw) == digest, path.name
+    return json.loads(raw)
+
+
+def write(path, value):
+    """Create a distinct LF UTF-8 preparation artifact."""
+    assert not path.exists(), path.name
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    return ref(path)
+
+
+def main():
+    """Prepare exactly 119 reversed nodes without executing any gate."""
+    checkpoint = json.loads((ROOT / "artifacts/orchestration/orchestrator-state.json").read_bytes())
+    authority = [item for item in records(checkpoint)
+                 if item.get("delegation_id") == ROUTE and item.get("profile_sha256") == PROFILE]
+    assert len(authority) == 1 and authority[0]["phase"] == "S5_P5T5_final_repair_gates"
+    assert sha((ROOT / authority[0]["profile_path"]).read_bytes()) == PROFILE
+    old_path = QA / "p5t5-final-candidate-released.2026-10-20T13-22.json"
+    candidate = read(old_path, "32141ecd80fc98403d77d8c6fbaaf06ab1edd810bf96cac247c0e7353c6ecd84")
+    freeze_path = REG / "p5t5-renderer-rc2-freeze.2026-10-20T13-44.json"
+    freeze = read(freeze_path, "5d4e2d0667a083ff1f4afa69c92486798a25b34f9997308c774a5daf7b4a79b9")
+    closure = QA / "p5t5-final-first-run-closure.2026-10-20T13-46.json"
+    read(closure, "4853c307b101f85b596585429d24b95646b0f9e230a13ed7f85b2f086d90b743")
+    changed_path = "tests/discovery_runtime/test_acceptance_render_limits.py"
+    assert list(freeze["candidate"]) == [changed_path]
+    old_hash = candidate["bindings"][changed_path]
+    new_hash = freeze["candidate"][changed_path]["sha256"]
+    assert new_hash == "4e596b4a9a1d5f5a050d5ab4f22653d2479318b49fef1fda7d8948e990d38125"
+    added = freeze["preservation"]["added_node"]
+    expected_added = changed_path + "::test_exhausted_trace_bytes_reject_before_serialization_or_partial_bundle"
+    assert added == expected_added and added not in candidate["nodes"]["rendering"]
+    assert candidate["node_count"] == len(candidate["nodes"]["rendering"]) == 118
+    candidate["nodes"]["rendering"].append(added)
+    candidate["bindings"][changed_path] = new_hash
+    assert len(set(candidate["nodes"]["rendering"])) == 119
+    # Verify the existing owner union only; no dependency or source inventory is rediscovered.
+    for path, digest in candidate["bindings"].items():
+        assert sha((ROOT / path).read_bytes()) == digest, path
+    for name, record in candidate["harnesses"].items():
+        assert sha((SCRATCH / name).read_bytes()) == record["sha256"], name
+    candidate.update(node_count=119, execution_released=False, final_review_closed=False,
+                     candidate_commit=None, authority_route=ROUTE)
+    candidate.pop("released_at", None)
+    candidate["prior_released_candidate"] = ref(old_path)
+    candidate["retained_proof"].update(rc2=ref(freeze_path), first_final_run=ref(closure))
+    candidate["population_provenance"]["additive_repair"] = {
+        "freeze": ref(freeze_path), "added_node": added, "original_nodes": 118,
+        "ordering": "Keep the original 118-node list, append the single RC2 node, then reverse the complete union.",
+    }
+    candidate["limitations"][0] = "Retry candidate bound; checked commit and explicit execution release remain required."
+    candidate["limitations"][1] = (
+        "The first reversed 118 cases passed before the RC2 coverage failure. "
+        "The new guard passed separately; the full 119-case aggregate remains unexecuted."
+    )
+    assert candidate["timeouts"]["rendering"] == 300
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    candidate_path = QA / f"p5t5-final-retry-candidate-disabled.{stamp}.json"
+    candidate_ref = write(candidate_path, candidate)
+    local = SCRATCH / "candidate-retry-disabled.json"
+    assert not local.exists()
+    local.write_bytes(candidate_path.read_bytes())
+    harness_path = QA / f"p5t5-final-retry-binding-harness.{stamp}.txt"
+    assert not harness_path.exists()
+    harness_path.write_bytes(Path(__file__).read_bytes())
+    binding_path = QA / f"p5t5-final-retry-binding.{stamp}.json"
+    binding_ref = write(binding_path, {
+        "task": "P5-T5", "Timestamp": stamp, "Command": "poetry run python SCRATCH/p5t5_bind_retry.py",
+        "EXIT_CODE": 0, "state": "PREPARED_AWAITING_CHECKED_COMMIT_RELEASE", "authority": authority[0],
+        "candidate": candidate_ref, "prior_candidate": ref(old_path), "first_run_closure": ref(closure),
+        "repair_freeze": ref(freeze_path), "changed_binding": {"path": changed_path, "old": old_hash, "new": new_hash},
+        "added_node": added, "node_count": 119, "retained_node_count": 118, "contracts": 4,
+        "execution_released": False, "gate_execution": False, "source_test_edits": False,
+        "harnesses_unchanged": candidate["harnesses"], "executed_binding_harness": ref(harness_path),
+        "remaining": ["Checked repair commit/push", "Explicit execution release and final-review binding"],
+        "qualification": "Only the frozen test hash and one node differ in the existing candidate scope. "
+                         "All source, example, dependency, reader, coverage-floor and timeout identities are retained. "
+                         "No collection, test, static gate, source inspection or Git operation was performed.",
+    })
+    paths = [candidate_path, harness_path, binding_path]
+    # Readable receipts use LF UTF-8; exact raw proof remains in the prior retained archives.
+    for path in paths:
+        raw = path.read_bytes()
+        text = raw.decode("utf-8")
+        assert b"\r" not in raw and raw.endswith(b"\n") and not raw.endswith(b"\n\n")
+        assert all(line == line.rstrip() for line in text.splitlines())
+        assert str(ROOT) not in text and str(SCRATCH) not in text
+    staging = write(QA / f"p5t5-final-retry-preparation-staging.{stamp}.json", {
+        "task": "P5-T5", "binding": binding_ref, "paths": [ref(path) for path in paths],
+    })
+    print(json.dumps({"candidate": candidate_ref, "binding": binding_ref, "staging": staging,
+                      "node_count": 119, "execution_released": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()
