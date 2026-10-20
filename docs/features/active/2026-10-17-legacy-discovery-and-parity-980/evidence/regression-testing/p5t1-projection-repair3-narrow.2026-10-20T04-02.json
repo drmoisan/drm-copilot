@@ -1,0 +1,133 @@
+{
+  "stage": "narrow-tests",
+  "label": "p5t1-projection-repair3-narrow",
+  "started": "2026-10-20T04:00:27.993305+00:00",
+  "finished": "2026-10-20T04:02:42.374722+00:00",
+  "command": "poetry run pytest tests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts tests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly tests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results tests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning -o addopts= -v --cov=drm_copilot_discovery.validation --cov-config=SCRATCH/coverage.ini --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/repair-narrow-coverage.json",
+  "exit_code": 0,
+  "duration_seconds": 134.381,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+      "physical_lines": 461
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "b7ca69c95525fb5cc84c58ae4e27f435982c24ce867aed63c625e6a6bc413fe3",
+      "physical_lines": 476
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "425779f32370db9718d1ec354bd5f437192519920eb9b3dcb5ab28728f7fbe40",
+      "physical_lines": 492
+    },
+    "tests/discovery_runtime/test_mutation_plan.py": {
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "physical_lines": 484
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "physical_lines": 411
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "tests/discovery_runtime/mutation_test_support.py": {
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "physical_lines": 294
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+      "physical_lines": 461
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "sha256": "b7ca69c95525fb5cc84c58ae4e27f435982c24ce867aed63c625e6a6bc413fe3",
+      "physical_lines": 476
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "sha256": "425779f32370db9718d1ec354bd5f437192519920eb9b3dcb5ab28728f7fbe40",
+      "physical_lines": 492
+    },
+    "tests/discovery_runtime/test_mutation_plan.py": {
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "physical_lines": 484
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "7038eca16a78043c58a30385721a6b5446e4fd51828720563395782be51a242b",
+      "physical_lines": 340
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": {
+      "sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "physical_lines": 179
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "physical_lines": 411
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "physical_lines": 426
+    },
+    "tests/discovery_runtime/validation_test_support.py": {
+      "sha256": "6f68b99b09df4a48f4a5a5c3d8e644776f14dac414e969921ddba5014aaa17a7",
+      "physical_lines": 324
+    },
+    "tests/discovery_runtime/mutation_test_support.py": {
+      "sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "physical_lines": 294
+    },
+    "pyproject.toml": {
+      "sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "physical_lines": 169
+    }
+  },
+  "streams": {
+    "stdout": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-projection-repair3-narrow-040242.stdout.bin",
+      "raw_sha256": "4a007bb11462247b2a25a5912542ba88d75e96cff7b8d885a784e57f2bd9f64a",
+      "raw_bytes": 3416,
+      "presentation": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- .\\.venv\\Scripts\\python.exe\r\ncachedir: .pytest_cache\r\nrootdir: .\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 13 items\r\n\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[missing-profile] PASSED [  7%]\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_coverage_inputs_retain_original_findings_and_unavailable_counts[loader] PASSED [ 15%]\r\ntests/discovery_runtime/test_validation_modes.py::test_invalid_public_modes_and_unparsed_projection_raise_explicitly PASSED [ 23%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-False] PASSED [ 30%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[structural-True] PASSED [ 38%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-False] PASSED [ 46%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[discovery-complete-True] PASSED [ 53%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-False] PASSED [ 61%]\r\ntests/discovery_runtime/test_validation_modes.py::test_coverage_preserves_requested_mode_and_independent_discovery_results[planning-True] PASSED [ 69%]\r\ntests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[discovery-complete-completion-report] PASSED [ 76%]\r\ntests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[discovery-complete-coverage-report] PASSED [ 84%]\r\ntests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[parity-complete-completion-report] PASSED [ 92%]\r\ntests/discovery_runtime/test_agent_output.py::test_valid_failed_review_can_finish_without_authorizing_planning[parity-complete-coverage-report] PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                 Stmts   Miss Branch BrPart  Cover   Missing\r\n----------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\validation.py     150      9     52      8    92%   185, 187, 329, 354, 362-369, 374, 395, 403\r\n----------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                  150      9     52      8    92%\r\nCoverage JSON written to file SCRATCH/repair-narrow-coverage.json\r\n======================= 13 passed in 132.64s (0:02:12) ========================\r\n"
+    },
+    "stderr": {
+      "scratch_identifier": "SCRATCH/issue-980-p5t1-projection-repair3-narrow-040242.stderr.bin",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "presentation": ""
+    }
+  },
+  "accepted_baseline": "p5t1-shared-baseline.2026-10-19T14-44.json",
+  "scope": "P5-T1 shared report-validator integration subset"
+}

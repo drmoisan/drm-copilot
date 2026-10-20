@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from functools import partial
 from typing import TYPE_CHECKING, cast
 
 import pytest
+from drm_copilot_discovery import validation
 from drm_copilot_discovery.agent_output import (
     required_output_digest,
     validate_agent_output,
@@ -33,8 +35,11 @@ from tests.discovery_runtime.validation_test_support import (
 from tests.schemas.discovery.v2_schema_test_support import as_object, load_fixture
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from drm_copilot_discovery.catalog import SchemaCatalog
     from drm_copilot_discovery.validation import ValidationMode
+    from pytest import MonkeyPatch
 
 
 @pytest.mark.parametrize(
@@ -112,27 +117,53 @@ def test_all_four_roles_validate_only_their_exact_supplied_outputs(
     assert (baseline.sha256, snapshot.sha256) == before
 
 
+@pytest.mark.parametrize("kind", ["completion-report", "coverage-report"])
+@pytest.mark.parametrize("mode", ["discovery-complete", "parity-complete"])
 def test_valid_failed_review_can_finish_without_authorizing_planning(
     snapshot_catalog: SchemaCatalog,
+    kind: str,
+    mode: ValidationMode,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Review output validity is independent from its recomputed completion failure."""
     baseline = captured(mode_profile(snapshot_catalog, draft=True), snapshot_catalog)
     data = report_projection(
         baseline,
-        kind="completion-report",
+        kind=kind,
         identifier="review",
-        mode="discovery-complete",
+        mode=mode,
     )
-    output = document_record(
-        baseline.profile, "completion-report", ROOT + "reports/review.json", data
-    )
+    output = document_record(baseline.profile, kind, ROOT + "reports/review.json", data)
     snapshot, invocation = output_context(
         baseline,
         "migration-coverage-reviewer",
         outputs=(output,),
-        review_mode="discovery-complete",
+        review_mode=mode,
     )
-    result = validate_snapshot(snapshot, mode="agent-output", invocation=invocation)
+    counts: dict[str, int] = dict.fromkeys(
+        ("validate_coverage", "validate_dimensions", "validate_acceptance"), 0
+    )
+
+    def counted(
+        target: Callable[..., object], name: str, *args: object, **kwargs: object
+    ) -> object:
+        """Call target (Callable) with args/kwargs (object) and count name (str).
+
+        Return its object result unchanged; propagate its validation exceptions.
+        """
+        if kwargs.get("complete") is True:
+            counts[name] += 1
+        return target(*args, **kwargs)
+
+    # Count one validation operation, excluding setup and the later planning check.
+    with monkeypatch.context() as scoped:
+        # Every shared complete family must run once despite two report modes.
+        for name in counts:
+            scoped.setattr(
+                validation, name, partial(counted, getattr(validation, name), name)
+            )
+        result = validate_snapshot(snapshot, mode="agent-output", invocation=invocation)
+    assert set(counts.values()) == {1}
     assert (
         result.output_valid is True and result.ok and result.validation_result == "fail"
     )

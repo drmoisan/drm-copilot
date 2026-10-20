@@ -1,0 +1,35 @@
+{
+  "task": "P5-T1",
+  "status": "PRODUCER_SOURCE_REVIEW_CHANGES_REQUIRED",
+  "files": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes.2026-10-20T03-47.json",
+      "sha256": "29ff98234455993fbcdb2242d41929e6c4d05cec09d8854ca3b02edf788ed761",
+      "bytes": 7608
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes-payload.2026-10-20T03-47.json",
+      "sha256": "f2b0f0dba4fec41f83981fc19cfbd3d0e474a073b7cdfe8293d2794013d1a192",
+      "bytes": 56262
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+      "sha256": "9edec6099eb52d7099db75e466bb9cc25e60f21ff0416920ea74266928967dd3",
+      "bytes": 8891
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.md",
+      "sha256": "b38a9df7eb0cb539ff03a7e691bec82a35d86431c04fb0ec3ada05396c0a9642",
+      "bytes": 2225
+    }
+  ],
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes.2026-10-20T03-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-probes-payload.2026-10-20T03-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.md"
+  ],
+  "count_without_self": 4,
+  "include_staging_itself": true,
+  "scope": "Five new verifier-owned evidence files only; no source/test/checkoff changes."
+}

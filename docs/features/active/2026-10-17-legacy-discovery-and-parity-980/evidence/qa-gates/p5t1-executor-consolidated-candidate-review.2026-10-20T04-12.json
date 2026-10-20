@@ -1,0 +1,506 @@
+{
+  "Timestamp": "2026-10-20T04:11:26.602470+00:00",
+  "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-candidate-reconcile.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Current eight-path candidate and retained 49/13-case proof are bound; five repair probes pass.",
+  "status": "CANDIDATE_REVIEW_PASS_READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "task": "P5-T1",
+  "current_scope": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "bytes": 15007,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "3d6f7f020d6fcb8269e3007917f7afb92800d4eb9e4adf4893084bdf8802e28a",
+      "physical_lines": 337
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "bytes": 18385,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10",
+      "physical_lines": 430
+    },
+    "tests/discovery_runtime/test_coverage_report.py": {
+      "path": "tests/discovery_runtime/test_coverage_report.py",
+      "sha256": "b71488600269b2f84820abbee1481b8ee27702592f36161eb6ecb1249f6d4b72",
+      "bytes": 17386,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "b71488600269b2f84820abbee1481b8ee27702592f36161eb6ecb1249f6d4b72",
+      "physical_lines": 477
+    },
+    "tests/discovery_runtime/test_coverage_report_contract.py": {
+      "path": "tests/discovery_runtime/test_coverage_report_contract.py",
+      "sha256": "7540488f38aa576f47f02dad42e8ca389c8c37f6086b8616937c7068c575ee2b",
+      "bytes": 10977,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "7540488f38aa576f47f02dad42e8ca389c8c37f6086b8616937c7068c575ee2b",
+      "physical_lines": 285
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "sha256": "3bf263c82126423b4c3deb62313cc49c2a6820c3534bd7abdd7f04eb6486bce6",
+      "bytes": 19112,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "823e6961d16deb77550f2ec0068952eed864da66c8fd4ed7270de46618e76c82",
+      "physical_lines": 461
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "path": "tests/discovery_runtime/test_validation_modes.py",
+      "sha256": "b7ca69c95525fb5cc84c58ae4e27f435982c24ce867aed63c625e6a6bc413fe3",
+      "bytes": 17896,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "6af3bcef3568d10c6e0546500e1e809103ac83ffc7256681d6825c8bba27933f",
+      "physical_lines": 476
+    },
+    "tests/discovery_runtime/test_agent_output.py": {
+      "path": "tests/discovery_runtime/test_agent_output.py",
+      "sha256": "425779f32370db9718d1ec354bd5f437192519920eb9b3dcb5ab28728f7fbe40",
+      "bytes": 18759,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "078f9d7cbbaeb75f3bc70c68a7d58419318e2bfb263da51967e9b62e34b9f95c",
+      "physical_lines": 492
+    },
+    "tests/discovery_runtime/test_mutation_plan.py": {
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4",
+      "bytes": 19193,
+      "git_attributes": {
+        "text": "auto",
+        "eol": "lf"
+      },
+      "expected_git_lf_sha256": "43a9f074097283f06bc325350266352658c6a170708ddc8dbdcc2072cb45abca",
+      "physical_lines": 484
+    }
+  },
+  "retained_source_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-producer-source-review.2026-10-20T03-47.json",
+    "sha256": "9edec6099eb52d7099db75e466bb9cc25e60f21ff0416920ea74266928967dd3",
+    "bytes": 8891
+  },
+  "graph_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph-freeze.2026-10-20T04-07.json",
+    "sha256": "42e2d4f046db82a9aaf3bf9799ec778cb0e34b013989c25d916f476acf27a8b1",
+    "bytes": 24509
+  },
+  "validator_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair-freeze.2026-10-20T04-03.json",
+    "sha256": "9ab59c5939f4b8fb1f157cfd467bbcb1d01cbd68f017de4ee92d001769fd1841",
+    "bytes": 41813
+  },
+  "stages": [
+    {
+      "scope": "graph",
+      "stage": "format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-format.2026-10-20T04-04.json",
+        "sha256": "df0fd1d44acd8ab20e440eac42365b6d66adfbc22a21d6947c5ac15a59f976a2",
+        "bytes": 3802
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:04:13.806758+00:00",
+      "duration_seconds": 1.48,
+      "raw_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_stderr_sha256": "ce29a48ef7d7d961badb0f7aec2eb4c319c19c85fc5e9b698ba6b9b4bec2d2c7"
+    },
+    {
+      "scope": "graph",
+      "stage": "lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-lint.2026-10-20T04-04.json",
+        "sha256": "f65ca4c27d79a75dc235a9a225b6afdc03ae3c528d381e06613a3ef5354f8c14",
+        "bytes": 3746
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:04:22.427215+00:00",
+      "duration_seconds": 1.197,
+      "raw_stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "graph",
+      "stage": "types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-types.2026-10-20T04-04.json",
+        "sha256": "c2207428f8764dd43835a9e6576ed85e4c51dd5602edf6f21b812a79539d3f91",
+        "bytes": 3969
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:04:30.550939+00:00",
+      "duration_seconds": 2.206,
+      "raw_stdout_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "graph",
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-graph12-tests.2026-10-20T04-05.json",
+        "sha256": "4d6c92c9f33854ca60dc1bb6ffd57b8876b9bc8c9ffd0a9da62f7195207f0279",
+        "bytes": 15048
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:04:39.809602+00:00",
+      "duration_seconds": 36.832,
+      "raw_stdout_sha256": "644264ef69a6f1eed57af0fdb51851294eebb141ada458c69e63c8fbf45b29d5",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "validator",
+      "stage": "p5t1-projection-repair3-format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-format.2026-10-20T03-59.json",
+        "sha256": "8217a2f1deed280d6a30d2bfb7e529d0a69d78ce6e9dcc554819aca18ac47898",
+        "bytes": 6086
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T03:59:45.171920+00:00",
+      "duration_seconds": 1.879,
+      "raw_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_stderr_sha256": "ce29a48ef7d7d961badb0f7aec2eb4c319c19c85fc5e9b698ba6b9b4bec2d2c7"
+    },
+    {
+      "scope": "validator",
+      "stage": "p5t1-projection-repair3-lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-lint.2026-10-20T04-00.json",
+        "sha256": "b06ebf5c676562f534dd0572213de580ab60483d7188b4e9167213f11878ee77",
+        "bytes": 6019
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:00:09.005047+00:00",
+      "duration_seconds": 1.205,
+      "raw_stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "validator",
+      "stage": "p5t1-projection-repair3-types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-types.2026-10-20T04-00.json",
+        "sha256": "eb4e59a4a2a50166fd477b839a66e35c101c0831d6a98519f4d823dcdaef5481",
+        "bytes": 6202
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:00:16.508255+00:00",
+      "duration_seconds": 2.267,
+      "raw_stdout_sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "validator",
+      "stage": "p5t1-projection-repair3-narrow",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-projection-repair3-narrow.2026-10-20T04-02.json",
+        "sha256": "f49c2db307fb821a64eb6c58ee9d5c26e3ea5fd7df46fa6063bc1dd491724364",
+        "bytes": 9786
+      },
+      "exit_code": 0,
+      "started": "2026-10-20T04:00:27.993305+00:00",
+      "duration_seconds": 134.381,
+      "raw_stdout_sha256": "4a007bb11462247b2a25a5912542ba88d75e96cff7b8d885a784e57f2bd9f64a",
+      "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "repair_findings": {
+    "PR1": "closed",
+    "PR2": "closed",
+    "PR3": "closed",
+    "PR4": "closed"
+  },
+  "findings": [],
+  "open_probes": [],
+  "graph_coverage": {
+    "statements": "224/226",
+    "branches": "72/76",
+    "ranges": 17,
+    "all_ranges_at_least_90_percent": true,
+    "uncovered": {
+      "coverage_population.py": {
+        "branch_destinations": {
+          "237->238": "Malformed component identifier branch.",
+          "277->278": "Duplicate source identity branch.",
+          "320->319": "Resolved runtime target outside the required source feature kind/ownership.",
+          "93->92": "Non-error claim/reference finding skip."
+        },
+        "statements": {
+          "238": "Malformed component identifier guard; normal schema-valid rows exclude it.",
+          "278": "Duplicate source feature/scenario identity guard; accepted reference validation remains authoritative."
+        }
+      }
+    }
+  },
+  "validator_coverage": {
+    "statements": "141/150",
+    "branches": "44/52",
+    "qualification": "Narrow diagnostic coverage only; full final reversed caller population remains pending."
+  },
+  "probe_receipt": {
+    "Timestamp": "2026-10-20T04:07:25.196281+00:00",
+    "Command": ".venv/Scripts/python.exe SCRATCH/issue-980-p5t1-repair-probes.py",
+    "EXIT_CODE": 0,
+    "Output Summary": "Five bounded PR1/PR2 reproductions; no test suite replay.",
+    "original_probe_sha256": "bed247d4fdb88dad1417c0a907aa7e6a8871cddf8ca21b898420fe6f9eb7834b",
+    "probe_sha256": "220fdbae86ee7cac090993b9d5b9b05402248659e9ed1533b5d99c292066ed31",
+    "stdout_sha256": "372dd844348f4406d22cc55c4baac06aa47ee8b3d3cf3ac5d627fc319aff553c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "probe_results": [
+    {
+      "probe": "known_scope_inventory_without_ledger",
+      "ledger_present": true,
+      "known_selected_inventory_components": 2,
+      "coverage": {
+        "components": {
+          "blocked": 0,
+          "conflicting_ledger": 0,
+          "dispositioned": 0,
+          "excluded": 0,
+          "excluded_valid": 0,
+          "feature_linked": 0,
+          "inspected": 0,
+          "inspection_blocked": 0,
+          "inventoried": 2,
+          "missing_ledger": 2,
+          "runtime_missing": 0,
+          "runtime_observed": 0,
+          "runtime_required": 0,
+          "runtime_supported": 0,
+          "runtime_undetermined": 2,
+          "runtime_verified": 0,
+          "total": 2,
+          "undispositioned": 2,
+          "uninspected": 0,
+          "unselected": 0,
+          "with_update_evidence": 0
+        },
+        "features": {
+          "confidence_counts": {},
+          "required": 0,
+          "required_client_obligations": 0,
+          "total": 0,
+          "verified_claims": 0,
+          "with_evidence": 0
+        },
+        "known_inventory_refs": [
+          {
+            "id": "inventory",
+            "path": "docs/migration/discovery/inventory/empty.json",
+            "repository": "workspace-example",
+            "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "metrics": {
+          "component_evidence": {
+            "denominator": 2,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "selected component update-proof obligations"
+          },
+          "evidence_completeness": {
+            "denominator": 2,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "source feature or selected component update-proof obligations"
+          },
+          "feature_contract_coverage": {
+            "denominator": 2,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "selected nonexcluded component identities"
+          },
+          "feature_evidence": {
+            "denominator": 0,
+            "numerator": 0,
+            "percentage": null,
+            "unit": "source feature proof obligations"
+          },
+          "inspection": {
+            "denominator": 2,
+            "numerator": 0,
+            "percentage": 0.0,
+            "unit": "selected nonexcluded component identities"
+          },
+          "runtime_characterization": {
+            "denominator": 0,
+            "numerator": 0,
+            "percentage": null,
+            "unit": "selected nonexcluded runtime-required component identities"
+          },
+          "runtime_missing": {
+            "denominator": 0,
+            "numerator": 0,
+            "percentage": null,
+            "unit": "selected nonexcluded runtime-required component identities"
+          },
+          "runtime_verified": {
+            "denominator": 0,
+            "numerator": 0,
+            "percentage": null,
+            "unit": "selected nonexcluded runtime-required component identities"
+          }
+        },
+        "population_state": "available",
+        "runtime": {
+          "denominator": 0,
+          "missing": 0,
+          "observed": 0,
+          "required": 0,
+          "result_counts": {},
+          "source_scenarios": 0,
+          "supported_features": 0,
+          "supported_scenarios": 0,
+          "unit": "selected nonexcluded runtime-required component identities",
+          "verified": 0,
+          "verified_scenarios": 0
+        },
+        "unresolved_behaviors": 0
+      },
+      "accepted_rule_findings": [
+        "COVERAGE_MISSING"
+      ]
+    },
+    {
+      "probe": "known_scope_inventory_without_ledger",
+      "ledger_present": false,
+      "known_selected_inventory_components": 2,
+      "coverage": {
+        "components": null,
+        "features": null,
+        "known_inventory_refs": [
+          {
+            "id": "inventory",
+            "path": "docs/migration/discovery/inventory/empty.json",
+            "repository": "workspace-example",
+            "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "metrics": null,
+        "population_state": "unavailable",
+        "runtime": null,
+        "unresolved_behaviors": null
+      },
+      "accepted_rule_findings": [
+        "COVERAGE_LEDGER"
+      ]
+    },
+    {
+      "probe": "scope_root_comparison_work",
+      "components": 64,
+      "roots": 16,
+      "work_capacity": 32768,
+      "work_before_collect": 32753,
+      "work_charged": 11323,
+      "work_after_collect": 21430,
+      "selected": 64,
+      "root_predicate_calls": 65,
+      "root_comparisons": 1040,
+      "preflight_passed": true,
+      "collect_returned": true,
+      "resource_rejected": false
+    },
+    {
+      "probe": "scope_root_comparison_work",
+      "components": 64,
+      "roots": 128,
+      "work_capacity": 32768,
+      "work_before_collect": 32753,
+      "work_charged": 19499,
+      "work_after_collect": 13254,
+      "selected": 64,
+      "root_predicate_calls": 65,
+      "root_comparisons": 8320,
+      "preflight_passed": true,
+      "collect_returned": true,
+      "resource_rejected": false
+    },
+    {
+      "probe": "scope_root_comparison_work",
+      "components": 64,
+      "roots": 1024,
+      "work_capacity": 32768,
+      "work_before_collect": 32753,
+      "work_charged": 0,
+      "work_after_collect": 32753,
+      "selected": 0,
+      "root_predicate_calls": 0,
+      "root_comparisons": 0,
+      "preflight_passed": true,
+      "collect_returned": false,
+      "resource_rejected": true
+    }
+  ],
+  "raw_archive_unique_payloads_verified": 43,
+  "review_conclusions": [
+    "Unavailable/null selection metrics preserve missing or ambiguous actual ledger authority; known inventory references do not establish selection.",
+    "Root, exclusion, component and diagnostic work is reserved before selector work. The retained 1024-root input rejects before predicate calls or partial selection.",
+    "Runtime required, observed, verified and missing use selected nonexcluded runtime-required component identities; source scenarios, features and authored statuses are separate.",
+    "Valid passed claims require accepted source/runtime proof; confidence, target-owned scenarios and passed text alone cannot promote numerators.",
+    "Coverage-only invalid input projection preserves diagnostics and unavailable metrics; requested modes and other report-kind contracts remain distinct.",
+    "The common complete-source cache belongs to one immutable validation operation; per-mode parity/completion and final ordering remain intact.",
+    "Frozen graph/caller tests preserve in-memory isolation, report recomputation, anti-forgery, digest/nonrecursion and bounded-work assertions."
+  ],
+  "qualifications": [
+    "Candidate review only; no task or AC checkbox change and no final gate claim.",
+    "Reuse accepted helper/legacy 114-case proof and prior cleared source properties; no predecessor suite or broad behavioral replay.",
+    "Original graph 47-pass/2-fixture-failure and validator 135-pass/1-fixture-failure records remain unchanged. Original graph changing-dependency composition is provisional.",
+    "Per-operation family counts fall from 2/2/2 to 1/1/1; this is not a claim that the entire original runtime was caused by repeated assessment.",
+    "Exact raw archives are decoded and hashed separately from portable readable views; current working CRLF and expected Git LF identities are distinct.",
+    "Full final ordered gates, reversed graph/helper/caller populations, applicable contracts and native composition remain required."
+  ],
+  "plan_status": {
+    "checked": 41,
+    "total": 84,
+    "ac_checked": 17,
+    "ac_total": 66
+  },
+  "publication_utc": "2026-10-20T04:12:40.347236+00:00",
+  "route": {
+    "receipt": "atomic_execution_p5t1_consolidated_graph_review_20261020",
+    "phase": "S5_P5T1_consolidated_graph_review",
+    "profile": "atomic-executor-c4",
+    "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "max",
+    "native_routing_launch_provenance": [
+      true,
+      true,
+      true
+    ]
+  },
+  "payload_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t1-executor-candidate-review-payload.2026-10-20T04-12.json",
+    "sha256": "88a030eff9a0c895b9ff203007021453b989f157890d22939ebfebc60023321a",
+    "bytes": 75936
+  },
+  "checker_qualification": {
+    "initial_attempt": "Receipt reader assumed bare SHA strings for both owners. Validator receipts use objects with sha256 and physical_lines.",
+    "correction": "Read sha256 from object bindings; all underlying expected/actual hashes already matched. No owner evidence or implementation changed.",
+    "initial_script_sha256": "82b8d2ac28bf1889fa131523e50f97a416093ff5c893fb38d616eb1b6ec8823f",
+    "initial_stderr_sha256": "726fd001c4045ee01bf8a06f63b82395db46f572c4cec28ccbec285f627e7444",
+    "corrected_script_sha256": "c6fc082e8460a493f0b1a70e5fd5d832b76ed75ccf1a1c388af595f2f3143bb7",
+    "corrected_exit_code": 0
+  }
+}

@@ -1,0 +1,1261 @@
+{
+  "baseline": "Both producer modules are new; no accepted producer coverage is replaced. Committed report_models/helper/legacy and accepted validator baseline proofs remain independently referenced.",
+  "mapping": "AST inclusive ranges; branch destinations mapped by origin line",
+  "producer_repair_deltas": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py": "--- original/coverage_population.py\n+++ repaired/coverage_population.py\n@@ -19,6 +19,7 @@\n     from drm_copilot_discovery.findings import Finding\n     from drm_copilot_discovery.models import JsonObject\n     from drm_copilot_discovery.references import ArtifactRecord, ReferenceIndex\n+    from drm_copilot_discovery.repository_reader import RepositoryIdentity\n     from drm_copilot_discovery.snapshot import DiscoverySnapshot\n \n Identity: TypeAlias = tuple[str, str | None, str]\n@@ -55,8 +56,13 @@\n         claims: ClaimValidation,\n         findings: tuple[Finding, ...],\n     ) -> None:\n-        \"\"\"Retain typed snapshot/index/evidence/claims/findings; return None.\n-\n+        \"\"\"Retain accepted assessments and initialize local counters; return None.\n+\n+        snapshot (DiscoverySnapshot) holds captured inputs; index (ReferenceIndex)\n+        holds resolved records/links. evidence (EvidenceValidation) supplies\n+        usable proof; claims (ClaimValidation) supplies observation failures.\n+        findings (tuple[Finding]) supplies the complete discovery diagnostics.\n+        These assessments come from the validator, not a caller authority token.\n         Reserves indexing work before allocation; raises ReportLimitError on\n         excess. Inputs remain unchanged and no external operations occur.\n         \"\"\"\n@@ -87,14 +93,40 @@\n             if finding.severity == \"error\" and finding.artifact_path is not None:\n                 self.claim_errors.add(finding.artifact_path)\n         self.truncated = any(f.code == \"FINDINGS_LIMIT\" for f in findings)\n-        self.component_rows = 0\n-        # Count row populations once before any repeated accepted scope-selection call.\n+        self.component_rows = self.selector_rows = self.inventory_rows = 0\n+        self.inventory_count = 0\n+        # Count every repeated selector/query population before calling accepted rules.\n         for record in index.records:\n             rows = record.document.get(\"components\")\n             if record.kind in {\"coverage-ledger\", \"inventory-snapshot\"} and isinstance(\n                 rows, tuple\n             ):\n                 self.component_rows += len(rows)\n+            if record.kind == \"scope\":\n+                # Direct immutable pairs avoid repeated linear Mapping lookups.\n+                self.selector_rows += sum(\n+                    len(value)\n+                    for key, value in record.document.members\n+                    if key\n+                    in {\n+                        \"included_roots\",\n+                        \"included_components\",\n+                        \"included_features\",\n+                        \"exclusions\",\n+                    }\n+                    and isinstance(value, tuple)\n+                )\n+            elif record.kind == \"inventory-snapshot\":\n+                self.inventory_count += 1\n+                # File diagnostics and exclusions repeat root/component membership.\n+                self.inventory_rows += sum(\n+                    len(value)\n+                    for key, value in record.document.members\n+                    if key in {\"files\", \"diagnostics\", \"exclusions\"}\n+                    and isinstance(value, tuple)\n+                )\n+        self.accounted_sources: set[RepositoryIdentity] = set()\n+        self.available = bool(self.sources)\n         self.selected: set[Identity] = set()\n         self.inventoried: set[Identity] = set()\n         self.rows: dict[Identity, list[LedgerRow]] = {}\n@@ -157,23 +189,42 @@\n         \"\"\"Reconcile ledger (ArtifactRecord) scope and authored rows; return None.\n \n         Accepted selection retains inventory identities absent from the ledger.\n-        Reserves a conservative node/link/file comparison bound before selection;\n-        ReportLimitError aborts excess. Only local aggregation sets mutate.\n+        Reserves root/component/diagnostic/exclusion comparisons before selection;\n+        each work unit is an upper-bound predicate or row visit. ReportLimitError\n+        aborts excess. Missing selection marks counts unavailable, never zero.\n+        Only local aggregation sets mutate.\n         \"\"\"\n         self.budget.work(\n-            (1 + self.component_rows + len(self.index.records))\n+            (\n+                1\n+                + self.component_rows\n+                + self.inventory_rows\n+                + len(self.snapshot.manifest.files)\n+                + len(self.snapshot.excluded_paths)\n+            )\n             * (\n                 1\n+                + self.component_rows\n+                + self.selector_rows\n+                + self.inventory_rows\n+                + len(self.index.records)\n                 + len(self.index.links)\n                 + len(self.context.evidence.assessments)\n+            )\n+            + self.inventory_count\n+            * (\n+                1\n                 + len(self.snapshot.manifest.files)\n+                + len(self.snapshot.excluded_paths) * (1 + self.inventory_rows)\n             )\n         )\n         selection = select_coverage_scope(\n             self.snapshot, ledger, self.context, complete=True\n         )\n-        if selection is None:\n+        if selection is None or not selection.inventories:\n+            self.available = False\n             return\n+        self.accounted_sources.add(ledger.artifact.repository)\n         # Inventory membership never implies completed inspection or disposition.\n         for identifier in selection.components:\n             self.inventoried.add(record_identity(ledger, identifier))\n@@ -233,16 +284,22 @@\n                 \"status\"\n             ) in (\"open\", \"under-review\"):\n                 self.questions.add(record_identity(record))\n-\n-    def runtime(self) -> tuple[set[Identity], int, dict[str, int]]:\n-        \"\"\"Return supported source feature IDs, scenario count and authored statuses.\n+        self.available = self.available and self.sources <= self.accounted_sources\n+\n+    def runtime(\n+        self,\n+    ) -> tuple[set[Identity], set[Identity], int, int, dict[str, int]]:\n+        \"\"\"Return observed/verified feature sets, scenario counts and authored statuses.\n \n         Count scenarios/features once, never runs or target tests. Claim validity,\n-        source ownership and exact runtime evidence are required. Only local sets\n-        and work counters mutate; ReportLimitError rejects excess without output.\n+        source ownership and exact runtime evidence are required for observations.\n+        Verified additionally requires a valid passed claim with its supported\n+        expected-result basis. Only local sets/work counters mutate;\n+        ReportLimitError rejects excess without output.\n         \"\"\"\n         supported: set[Identity] = set()\n-        count = 0\n+        verified: set[Identity] = set()\n+        count = verified_count = 0\n         statuses: Counter[str] = Counter()\n         self.budget.work(len(self.scenarios))\n         # Multiple repeatability runs never multiply source coverage numerators.\n@@ -257,6 +314,7 @@\n             ):\n                 continue\n             count += 1\n+            verified_count += status == \"passed\"\n             # Exact ownership prevents target scenarios from proving source facts.\n             for feature in self.targets(scenario, \"/feature_refs\"):\n                 if (\n@@ -264,9 +322,16 @@\n                     and feature.artifact.repository == scenario.artifact.repository\n                 ):\n                     identifier = feature.document.get(\"feature_id\")\n-                    supported.add(\n-                        record_identity(\n-                            feature, identifier if isinstance(identifier, str) else None\n-                        )\n+                    identity = record_identity(\n+                        feature, identifier if isinstance(identifier, str) else None\n                     )\n-        return supported, count, dict(sorted(statuses.items()))\n+                    supported.add(identity)\n+                    if status == \"passed\":\n+                        verified.add(identity)\n+        return (\n+            supported,\n+            verified,\n+            count,\n+            verified_count,\n+            dict(sorted(statuses.items())),\n+        )\n",
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": "--- original/coverage_report.py\n+++ repaired/coverage_report.py\n@@ -72,6 +72,7 @@\n             (\"runtime\", None),\n             (\"unresolved_behaviors\", None),\n             (\"metrics\", None),\n+            (\"known_inventory_refs\", None),\n         )\n     )\n \n@@ -93,8 +94,14 @@\n         dimensions: DimensionValidation,\n         findings: tuple[Finding, ...],\n     ) -> None:\n-        \"\"\"Retain typed snapshot/rule results and complete findings; return None.\n-\n+        \"\"\"Retain accepted inputs and initialize the projection; return None.\n+\n+        snapshot (DiscoverySnapshot) holds captured inputs; index (ReferenceIndex)\n+        resolves graph records/links. evidence (EvidenceValidation) supplies\n+        usable proof; claims (ClaimValidation) supplies observation failures.\n+        dimensions (DimensionValidation) supplies feature/client obligations.\n+        findings (tuple[Finding]) contains complete discovery diagnostics.\n+        Assessments are supplied by the validator, not caller authority.\n         Raises ReportLimitError on excess population indexing. No I/O, caller\n         mutation, evidence promotion or approval occurs.\n         \"\"\"\n@@ -104,10 +111,11 @@\n         self.dimensions = dimensions\n \n     def components(\n-        self, runtime_features: set[Identity]\n+        self, runtime_features: set[Identity], verified_features: set[Identity]\n     ) -> tuple[dict[str, int], dict[str, JsonObject]]:\n-        \"\"\"Aggregate runtime_features (set[Identity]) over selected components.\n-\n+        \"\"\"Aggregate source runtime_features and verified_features (set[Identity]).\n+\n+        The first set has observed proof; the second has valid passed proof.\n         Returns (counts, ratios). Status counts are authored; eligible denominator\n         removes only validated exclusions. Missing/conflicting rows cannot prove\n         evidence or runtime. Raises ReportLimitError on prospective work excess.\n@@ -131,6 +139,9 @@\n                 \"runtime_required\",\n                 \"runtime_undetermined\",\n                 \"runtime_supported\",\n+                \"runtime_observed\",\n+                \"runtime_verified\",\n+                \"runtime_missing\",\n                 \"with_update_evidence\",\n             ),\n             0,\n@@ -205,12 +216,18 @@\n                 )\n                 counts[\"runtime_required\"] += requirement == \"required\"\n                 counts[\"runtime_undetermined\"] += requirement == \"undetermined\"\n-                counts[\"runtime_supported\"] += (\n+                observed = (\n                     requirement == \"required\"\n                     and bool(linked)\n                     and linked <= runtime_features\n                     and self.population.clean(ledger, pointer)\n                 )\n+                counts[\"runtime_supported\"] += observed\n+                counts[\"runtime_observed\"] += observed\n+                counts[\"runtime_verified\"] += observed and linked <= verified_features\n+        counts[\"runtime_missing\"] = (\n+            counts[\"runtime_required\"] - counts[\"runtime_observed\"]\n+        )\n         eligible = counts[\"total\"] - counts[\"excluded_valid\"]\n         metrics = {\n             \"inspection\": ratio(\n@@ -233,6 +250,16 @@\n                 counts[\"total\"],\n                 unit=\"selected component update-proof obligations\",\n             ),\n+            \"runtime_verified\": ratio(\n+                counts[\"runtime_verified\"],\n+                counts[\"runtime_required\"],\n+                unit=\"selected nonexcluded runtime-required component identities\",\n+            ),\n+            \"runtime_missing\": ratio(\n+                counts[\"runtime_missing\"],\n+                counts[\"runtime_required\"],\n+                unit=\"selected nonexcluded runtime-required component identities\",\n+            ),\n         }\n         return counts, metrics\n \n@@ -243,8 +270,40 @@\n         obligations, and source evidence eligibility is distinct from confidence.\n         \"\"\"\n         self.population.collect()\n-        runtime_features, supported_scenarios, statuses = self.population.runtime()\n-        components, metrics = self.components(runtime_features)\n+        inventories: list[JsonObject] = []\n+        self.population.budget.work(len(self.population.index.records))\n+        # Captured inventory references remain facts even when selection is unavailable.\n+        for record in self.population.index.records:\n+            if (\n+                record.kind == \"inventory-snapshot\"\n+                and record.artifact.repository in self.population.sources\n+            ):\n+                reference = JsonObject(\n+                    (\n+                        (\"repository\", record.repository),\n+                        (\"revision\", record.artifact.repository.revision),\n+                        (\"id\", record.id),\n+                        (\"path\", record.artifact.path),\n+                    )\n+                )\n+                self.population.budget.check(reference)\n+                inventories.append(reference)\n+        if not self.population.available:\n+            return bounded_object(\n+                {\n+                    **dict(unavailable_coverage_summary().members),\n+                    \"known_inventory_refs\": inventories,\n+                },\n+                limits=self.population.snapshot.profile.limits.parse_limits(),\n+            )\n+        (\n+            runtime_features,\n+            verified_features,\n+            supported_scenarios,\n+            verified_scenarios,\n+            statuses,\n+        ) = self.population.runtime()\n+        components, metrics = self.components(runtime_features, verified_features)\n         required: set[Identity] = set()\n         client_obligations = 0\n         self.population.budget.work(\n@@ -287,6 +346,7 @@\n         )\n         value: dict[str, object] = {\n             \"population_state\": \"available\",\n+            \"known_inventory_refs\": inventories,\n             \"components\": components,\n             \"features\": {\n                 \"total\": len(self.population.features),\n@@ -297,8 +357,15 @@\n                 \"confidence_counts\": dict(sorted(confidence.items())),\n             },\n             \"runtime\": {\n+                \"unit\": \"selected nonexcluded runtime-required component identities\",\n+                \"denominator\": components[\"runtime_required\"],\n+                \"required\": components[\"runtime_required\"],\n+                \"observed\": components[\"runtime_observed\"],\n+                \"verified\": components[\"runtime_verified\"],\n+                \"missing\": components[\"runtime_missing\"],\n                 \"source_scenarios\": len(self.population.scenarios),\n                 \"supported_scenarios\": supported_scenarios,\n+                \"verified_scenarios\": verified_scenarios,\n                 \"supported_features\": len(\n                     runtime_features & self.population.features.keys()\n                 ),\n@@ -321,8 +388,12 @@\n     dimensions: DimensionValidation,\n     findings: tuple[Finding, ...],\n ) -> JsonObject:\n-    \"\"\"Project snapshot and accepted typed assessments into an immutable summary.\n-\n+    \"\"\"Project accepted captured graph assessments into an immutable JsonObject.\n+\n+    snapshot (DiscoverySnapshot) holds captured inputs; index (ReferenceIndex)\n+    resolves records/links. evidence (EvidenceValidation) supplies proof\n+    eligibility; claims (ClaimValidation) supplies observation failures.\n+    dimensions (DimensionValidation) supplies feature/client obligations.\n     findings (tuple[Finding]) carries complete discovery blockers. This internal\n     composition seam grants no validation authority to caller-created assessments.\n     Returns JsonObject; raises ValueError/ReportLimitError on invalid/excess input.\n"
+  },
+  "task": "P5-T1",
+  "uncovered": {
+    "coverage_population.py": {
+      "branch_destinations": {
+        "237->238": "Malformed component identifier branch.",
+        "277->278": "Duplicate source identity branch.",
+        "320->319": "Resolved runtime target outside the required source feature kind/ownership.",
+        "93->92": "Non-error claim/reference finding skip."
+      },
+      "statements": {
+        "238": "Malformed component identifier guard; normal schema-valid rows exclude it.",
+        "278": "Duplicate source feature/scenario identity guard; accepted reference validation remains authoritative."
+      }
+    }
+  },
+  "units": [
+    {
+      "branch_percent": null,
+      "end": 38,
+      "executed_branches": [],
+      "executed_lines": [
+        29,
+        34
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "record_identity",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 29
+    },
+    {
+      "branch_percent": 92.0,
+      "end": 337,
+      "executed_branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          92
+        ],
+        [
+          87,
+          86
+        ],
+        [
+          87,
+          88
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          93,
+          94
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          128
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          101,
+          105
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          105,
+          119
+        ],
+        [
+          119,
+          99
+        ],
+        [
+          119,
+          120
+        ],
+        [
+          224,
+          225
+        ],
+        [
+          224,
+          227
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          232
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          235
+        ],
+        [
+          235,
+          -188
+        ],
+        [
+          235,
+          236
+        ],
+        [
+          237,
+          239
+        ],
+        [
+          241,
+          235
+        ],
+        [
+          241,
+          246
+        ],
+        [
+          255,
+          256
+        ],
+        [
+          255,
+          287
+        ],
+        [
+          256,
+          257
+        ],
+        [
+          256,
+          258
+        ],
+        [
+          258,
+          259
+        ],
+        [
+          258,
+          260
+        ],
+        [
+          260,
+          264
+        ],
+        [
+          260,
+          283
+        ],
+        [
+          277,
+          282
+        ],
+        [
+          283,
+          255
+        ],
+        [
+          283,
+          286
+        ],
+        [
+          306,
+          307
+        ],
+        [
+          306,
+          331
+        ],
+        [
+          309,
+          315
+        ],
+        [
+          309,
+          316
+        ],
+        [
+          319,
+          306
+        ],
+        [
+          319,
+          320
+        ],
+        [
+          320,
+          324
+        ],
+        [
+          329,
+          319
+        ],
+        [
+          329,
+          330
+        ]
+      ],
+      "executed_lines": [
+        41,
+        51,
+        69,
+        70,
+        71,
+        79,
+        82,
+        83,
+        84,
+        86,
+        87,
+        88,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        99,
+        100,
+        101,
+        104,
+        105,
+        107,
+        119,
+        120,
+        122,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        146,
+        149,
+        151,
+        157,
+        158,
+        159,
+        161,
+        170,
+        179,
+        180,
+        181,
+        188,
+        197,
+        221,
+        224,
+        225,
+        226,
+        227,
+        229,
+        230,
+        232,
+        233,
+        235,
+        236,
+        237,
+        239,
+        240,
+        241,
+        246,
+        248,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        264,
+        269,
+        272,
+        277,
+        282,
+        283,
+        286,
+        287,
+        289,
+        300,
+        301,
+        302,
+        303,
+        304,
+        306,
+        307,
+        308,
+        309,
+        315,
+        316,
+        317,
+        319,
+        320,
+        324,
+        325,
+        328,
+        329,
+        330,
+        331
+      ],
+      "kind": "ClassDef",
+      "line_percent": 98.07692307692308,
+      "missing_branches": [
+        [
+          93,
+          92
+        ],
+        [
+          237,
+          238
+        ],
+        [
+          277,
+          278
+        ],
+        [
+          320,
+          319
+        ]
+      ],
+      "missing_lines": [
+        238,
+        278
+      ],
+      "name": "CoveragePopulation",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 41
+    },
+    {
+      "branch_percent": 93.75,
+      "end": 136,
+      "executed_branches": [
+        [
+          86,
+          87
+        ],
+        [
+          86,
+          92
+        ],
+        [
+          87,
+          86
+        ],
+        [
+          87,
+          88
+        ],
+        [
+          92,
+          93
+        ],
+        [
+          92,
+          95
+        ],
+        [
+          93,
+          94
+        ],
+        [
+          99,
+          100
+        ],
+        [
+          99,
+          128
+        ],
+        [
+          101,
+          104
+        ],
+        [
+          101,
+          105
+        ],
+        [
+          105,
+          107
+        ],
+        [
+          105,
+          119
+        ],
+        [
+          119,
+          99
+        ],
+        [
+          119,
+          120
+        ]
+      ],
+      "executed_lines": [
+        51,
+        69,
+        70,
+        71,
+        79,
+        82,
+        83,
+        84,
+        86,
+        87,
+        88,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        99,
+        100,
+        101,
+        104,
+        105,
+        107,
+        119,
+        120,
+        122,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [
+        [
+          93,
+          92
+        ]
+      ],
+      "missing_lines": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 51
+    },
+    {
+      "branch_percent": null,
+      "end": 149,
+      "executed_branches": [],
+      "executed_lines": [
+        138,
+        146,
+        149
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "targets",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 138
+    },
+    {
+      "branch_percent": null,
+      "end": 168,
+      "executed_branches": [],
+      "executed_lines": [
+        151,
+        157,
+        158,
+        159,
+        161
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "clean",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 151
+    },
+    {
+      "branch_percent": null,
+      "end": 186,
+      "executed_branches": [],
+      "executed_lines": [
+        170,
+        179,
+        180,
+        181
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "proof",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 170
+    },
+    {
+      "branch_percent": 91.66666666666667,
+      "end": 246,
+      "executed_branches": [
+        [
+          224,
+          225
+        ],
+        [
+          224,
+          227
+        ],
+        [
+          229,
+          230
+        ],
+        [
+          229,
+          232
+        ],
+        [
+          232,
+          233
+        ],
+        [
+          232,
+          235
+        ],
+        [
+          235,
+          -188
+        ],
+        [
+          235,
+          236
+        ],
+        [
+          237,
+          239
+        ],
+        [
+          241,
+          235
+        ],
+        [
+          241,
+          246
+        ]
+      ],
+      "executed_lines": [
+        188,
+        197,
+        221,
+        224,
+        225,
+        226,
+        227,
+        229,
+        230,
+        232,
+        233,
+        235,
+        236,
+        237,
+        239,
+        240,
+        241,
+        246
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 94.73684210526316,
+      "missing_branches": [
+        [
+          237,
+          238
+        ]
+      ],
+      "missing_lines": [
+        238
+      ],
+      "name": "ledger",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 188
+    },
+    {
+      "branch_percent": 91.66666666666667,
+      "end": 287,
+      "executed_branches": [
+        [
+          255,
+          256
+        ],
+        [
+          255,
+          287
+        ],
+        [
+          256,
+          257
+        ],
+        [
+          256,
+          258
+        ],
+        [
+          258,
+          259
+        ],
+        [
+          258,
+          260
+        ],
+        [
+          260,
+          264
+        ],
+        [
+          260,
+          283
+        ],
+        [
+          277,
+          282
+        ],
+        [
+          283,
+          255
+        ],
+        [
+          283,
+          286
+        ]
+      ],
+      "executed_lines": [
+        248,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        264,
+        269,
+        272,
+        277,
+        282,
+        283,
+        286,
+        287
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 93.75,
+      "missing_branches": [
+        [
+          277,
+          278
+        ]
+      ],
+      "missing_lines": [
+        278
+      ],
+      "name": "collect",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 248
+    },
+    {
+      "branch_percent": 90.0,
+      "end": 337,
+      "executed_branches": [
+        [
+          306,
+          307
+        ],
+        [
+          306,
+          331
+        ],
+        [
+          309,
+          315
+        ],
+        [
+          309,
+          316
+        ],
+        [
+          319,
+          306
+        ],
+        [
+          319,
+          320
+        ],
+        [
+          320,
+          324
+        ],
+        [
+          329,
+          319
+        ],
+        [
+          329,
+          330
+        ]
+      ],
+      "executed_lines": [
+        289,
+        300,
+        301,
+        302,
+        303,
+        304,
+        306,
+        307,
+        308,
+        309,
+        315,
+        316,
+        317,
+        319,
+        320,
+        324,
+        325,
+        328,
+        329,
+        330,
+        331
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [
+        [
+          320,
+          319
+        ]
+      ],
+      "missing_lines": [],
+      "name": "runtime",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_population.py",
+      "start": 289
+    },
+    {
+      "branch_percent": 100.0,
+      "end": 58,
+      "executed_branches": [
+        [
+          42,
+          43
+        ],
+        [
+          42,
+          44
+        ],
+        [
+          52,
+          -35
+        ],
+        [
+          52,
+          53
+        ],
+        [
+          53,
+          52
+        ],
+        [
+          53,
+          58
+        ]
+      ],
+      "executed_lines": [
+        35,
+        42,
+        43,
+        44,
+        45,
+        50,
+        52,
+        53,
+        58
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "coverage_preflight",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 35
+    },
+    {
+      "branch_percent": null,
+      "end": 77,
+      "executed_branches": [],
+      "executed_lines": [
+        61,
+        67
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "unavailable_coverage_summary",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 61
+    },
+    {
+      "branch_percent": 100.0,
+      "end": 379,
+      "executed_branches": [
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          228
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          161,
+          166
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          211,
+          159
+        ],
+        [
+          211,
+          212
+        ],
+        [
+          276,
+          277
+        ],
+        [
+          276,
+          291
+        ],
+        [
+          277,
+          276
+        ],
+        [
+          277,
+          281
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          299
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          313,
+          323
+        ],
+        [
+          315,
+          313
+        ],
+        [
+          315,
+          319
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          337
+        ]
+      ],
+      "executed_lines": [
+        80,
+        88,
+        108,
+        111,
+        113,
+        123,
+        149,
+        152,
+        157,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        183,
+        184,
+        185,
+        186,
+        187,
+        191,
+        192,
+        193,
+        198,
+        200,
+        206,
+        207,
+        208,
+        211,
+        212,
+        217,
+        218,
+        219,
+        225,
+        226,
+        227,
+        228,
+        231,
+        232,
+        264,
+        266,
+        272,
+        273,
+        274,
+        276,
+        277,
+        281,
+        289,
+        290,
+        291,
+        292,
+        299,
+        306,
+        307,
+        308,
+        309,
+        313,
+        314,
+        315,
+        319,
+        322,
+        323,
+        324,
+        326,
+        327,
+        330,
+        331,
+        336,
+        337,
+        342,
+        347,
+        377
+      ],
+      "kind": "ClassDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "_CoverageProjection",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 80
+    },
+    {
+      "branch_percent": null,
+      "end": 405,
+      "executed_branches": [],
+      "executed_lines": [
+        382,
+        402,
+        403
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "coverage_summary",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 382
+    },
+    {
+      "branch_percent": null,
+      "end": 430,
+      "executed_branches": [],
+      "executed_lines": [
+        408,
+        421,
+        423,
+        424,
+        427
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "build_coverage_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 408
+    },
+    {
+      "branch_percent": null,
+      "end": 111,
+      "executed_branches": [],
+      "executed_lines": [
+        88,
+        108,
+        111
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "__init__",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 88
+    },
+    {
+      "branch_percent": 100.0,
+      "end": 264,
+      "executed_branches": [
+        [
+          159,
+          160
+        ],
+        [
+          159,
+          228
+        ],
+        [
+          161,
+          162
+        ],
+        [
+          161,
+          166
+        ],
+        [
+          170,
+          171
+        ],
+        [
+          170,
+          172
+        ],
+        [
+          211,
+          159
+        ],
+        [
+          211,
+          212
+        ]
+      ],
+      "executed_lines": [
+        113,
+        123,
+        149,
+        152,
+        157,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        183,
+        184,
+        185,
+        186,
+        187,
+        191,
+        192,
+        193,
+        198,
+        200,
+        206,
+        207,
+        208,
+        211,
+        212,
+        217,
+        218,
+        219,
+        225,
+        226,
+        227,
+        228,
+        231,
+        232,
+        264
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "components",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 113
+    },
+    {
+      "branch_percent": 100.0,
+      "end": 379,
+      "executed_branches": [
+        [
+          276,
+          277
+        ],
+        [
+          276,
+          291
+        ],
+        [
+          277,
+          276
+        ],
+        [
+          277,
+          281
+        ],
+        [
+          291,
+          292
+        ],
+        [
+          291,
+          299
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          313,
+          323
+        ],
+        [
+          315,
+          313
+        ],
+        [
+          315,
+          319
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          337
+        ]
+      ],
+      "executed_lines": [
+        266,
+        272,
+        273,
+        274,
+        276,
+        277,
+        281,
+        289,
+        290,
+        291,
+        292,
+        299,
+        306,
+        307,
+        308,
+        309,
+        313,
+        314,
+        315,
+        319,
+        322,
+        323,
+        324,
+        326,
+        327,
+        330,
+        331,
+        336,
+        337,
+        342,
+        347,
+        377
+      ],
+      "kind": "FunctionDef",
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "name": "project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py",
+      "start": 266
+    }
+  ]
+}
