@@ -1,0 +1,387 @@
+{
+  "task": "P5-T5",
+  "created_utc": "2026-10-20T12:54:25.230707+00:00",
+  "status": "PASS",
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "lf_sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "sha256": "d74d2d344417cb9d96b3a43074ce388297a019f843c6fdb0f7605f9e469ab84e",
+      "lf_sha256": "d74d2d344417cb9d96b3a43074ce388297a019f843c6fdb0f7605f9e469ab84e",
+      "physical_lines": 171
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "lf_sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "physical_lines": 404
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "lf_sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "physical_lines": 181
+    },
+    "tests/discovery_runtime/test_acceptance_render_limits.py": {
+      "sha256": "95e37ad18050a04e71f01e8203108e4dee6a8b37f0d63a770e8f70d6e654fd07",
+      "lf_sha256": "95e37ad18050a04e71f01e8203108e4dee6a8b37f0d63a770e8f70d6e654fd07",
+      "physical_lines": 228
+    }
+  },
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair1-tests.2026-10-20T12-51.json",
+    "sha256": "ea3c2e48c60cd18941042b626a1318ac0b84fff0a0d23ac6f0568874d50dfa50"
+  },
+  "original_failed_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-focused4-tests.2026-10-20T12-27.json",
+    "sha256": "85fab19ea54306fbbddbc1d384c84e1ba2c58822548fecc8eadab389f74c88e1"
+  },
+  "original_nodes": 62,
+  "current_nodes": [
+    "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[False]",
+    "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps[True]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[plain]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[quote-slash]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[controls]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[del-separators]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[unicode]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[pipe]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[syntax]",
+    "tests/discovery_runtime/test_gherkin.py::test_authored_statements_stay_one_reversible_json_literal[html]",
+    "tests/discovery_runtime/test_gherkin.py::test_empty_given_has_no_synthetic_step",
+    "tests/discovery_runtime/test_gherkin.py::test_ready_pending_withheld_and_actions_remain_distinct",
+    "tests/discovery_runtime/test_gherkin.py::test_empty_and_blocked_generations_emit_markdown_only",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields0]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields1]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields2]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields3]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields4]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields5]",
+    "tests/discovery_runtime/test_gherkin.py::test_malformed_structural_candidates_are_not_executable[fields6]",
+    "tests/discovery_runtime/test_gherkin.py::test_only_exact_generation_carriers_are_accepted[None]",
+    "tests/discovery_runtime/test_gherkin.py::test_only_exact_generation_carriers_are_accepted[value1]",
+    "tests/discovery_runtime/test_gherkin.py::test_only_exact_generation_carriers_are_accepted[value2]",
+    "tests/discovery_runtime/test_gherkin.py::test_only_exact_generation_carriers_are_accepted[ready]",
+    "tests/discovery_runtime/test_gherkin.py::test_public_carriers_are_immutable_sorted_and_encoding_checked",
+    "tests/discovery_runtime/test_gherkin.py::test_portable_output_collisions_are_rejected[paths0]",
+    "tests/discovery_runtime/test_gherkin.py::test_portable_output_collisions_are_rejected[paths1]",
+    "tests/discovery_runtime/test_gherkin.py::test_portable_output_collisions_are_rejected[paths2]",
+    "tests/discovery_runtime/test_gherkin.py::test_portable_output_collisions_are_rejected[paths3]",
+    "tests/discovery_runtime/test_gherkin.py::test_portable_output_collisions_are_rejected[paths4]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[/abs]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[../escape]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[a\\\\b]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[CON]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[a.]",
+    "tests/discovery_runtime/test_gherkin.py::test_unsafe_file_paths_are_rejected[a\\x00b]",
+    "tests/discovery_runtime/test_gherkin.py::test_exact_aggregate_bytes_include_paths_and_all_files",
+    "tests/discovery_runtime/test_gherkin.py::test_escape_and_text_work_are_reserved_before_serialization[bytes]",
+    "tests/discovery_runtime/test_gherkin.py::test_escape_and_text_work_are_reserved_before_serialization[work]",
+    "tests/discovery_runtime/test_gherkin.py::test_public_carrier_hard_limits_reject_before_large_copy",
+    "tests/discovery_runtime/test_gherkin.py::test_json_trace_preserves_scalar_types_and_nested_sequences",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[online-False]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-False]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[mobile-False]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[custom-True]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_exact_generated_tags_survive_without_name_inference[offline-True]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[None]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tag]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags2]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags3]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags4]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags5]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags6]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags7]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags8]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags9]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unsafe_ambiguous_or_unsorted_tags_fail_closed[tags10]",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_shared_tags_across_distinct_scenarios_are_not_collisions",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_distinct_punctuation_is_preserved_in_tags_and_identity",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_empty_tag_tuple_does_not_create_an_inferred_tag",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[ascii]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[two-byte]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[wide]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[ascii]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[two-byte]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[wide]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_path_measurement_rejects_invalid_scalars_and_capacity_types",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[depth]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[nodes]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[records]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[sequence]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_unicode_scalar_guard_precedes_encoding",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_escaped_output_work_is_reserved_before_detachment_and_encoding[False]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_escaped_output_work_is_reserved_before_detachment_and_encoding[True]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_tag_prefix_and_existing_tag_are_reserved_before_joining"
+  ],
+  "added_nodes": [
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[ascii]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[two-byte]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_bundle_capacity_sums_raw_utf8_paths_and_content[wide]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_escaped_output_work_is_reserved_before_detachment_and_encoding[False]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_escaped_output_work_is_reserved_before_detachment_and_encoding[True]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[ascii]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[two-byte]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_file_capacity_counts_raw_utf8_without_phantom_newline[wide]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[depth]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[nodes]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[records]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_container_limits_reject_before_encoder[sequence]",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_json_unicode_scalar_guard_precedes_encoding",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_path_measurement_rejects_invalid_scalars_and_capacity_types",
+    "tests/discovery_runtime/test_acceptance_render_limits.py::test_tag_prefix_and_existing_tag_are_reserved_before_joining"
+  ],
+  "original_assertion_counts_preserved": {
+    "tests/discovery_runtime/test_gherkin.py": 36,
+    "tests/discovery_runtime/test_acceptance_tags.py": 19
+  },
+  "coverage_summary": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "covered_lines": 146,
+      "num_statements": 148,
+      "percent_covered": 98.05825242718447,
+      "percent_covered_display": "98",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 98.64864864864865,
+      "percent_statements_covered_display": "99",
+      "num_branches": 58,
+      "num_partial_branches": 2,
+      "covered_branches": 56,
+      "missing_branches": 2,
+      "percent_branches_covered": 96.55172413793103,
+      "percent_branches_covered_display": "97"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "covered_lines": 90,
+      "num_statements": 94,
+      "percent_covered": 94.44444444444444,
+      "percent_covered_display": "94",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 95.74468085106383,
+      "percent_statements_covered_display": "96",
+      "num_branches": 50,
+      "num_partial_branches": 4,
+      "covered_branches": 46,
+      "missing_branches": 4,
+      "percent_branches_covered": 92.0,
+      "percent_branches_covered_display": "92"
+    }
+  },
+  "raw_ast_ranges": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderedFile",
+      "start": 27,
+      "end": 52,
+      "statements": 14,
+      "covered": 14,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderedFile.__post_init__",
+      "start": 38,
+      "end": 52,
+      "statements": 11,
+      "covered": 11,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_paths",
+      "start": 55,
+      "end": 79,
+      "statements": 15,
+      "covered": 15,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderBundle",
+      "start": 83,
+      "end": 121,
+      "statements": 19,
+      "covered": 19,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "AcceptanceRenderBundle.__post_init__",
+      "start": 94,
+      "end": 121,
+      "statements": 17,
+      "covered": 17,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_fields",
+      "start": 124,
+      "end": 154,
+      "statements": 23,
+      "covered": 23,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_trace",
+      "start": 157,
+      "end": 189,
+      "statements": 10,
+      "covered": 9,
+      "missing": [
+        179
+      ],
+      "percent": 90.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "_feature",
+      "start": 192,
+      "end": 236,
+      "statements": 21,
+      "covered": 21,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "name": "render_acceptance",
+      "start": 239,
+      "end": 329,
+      "statements": 31,
+      "covered": 30,
+      "missing": [
+        257
+      ],
+      "percent": 96.7741935483871
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "utf8_path_size",
+      "start": 13,
+      "end": 33,
+      "statements": 14,
+      "covered": 14,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "_plain",
+      "start": 36,
+      "end": 50,
+      "statements": 8,
+      "covered": 8,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput",
+      "start": 53,
+      "end": 171,
+      "statements": 66,
+      "covered": 62,
+      "missing": [
+        107,
+        135,
+        139,
+        144
+      ],
+      "percent": 93.93939393939394
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.__init__",
+      "start": 62,
+      "end": 69,
+      "statements": 3,
+      "covered": 3,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.fixed",
+      "start": 71,
+      "end": 79,
+      "statements": 4,
+      "covered": 4,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.measure",
+      "start": 81,
+      "end": 144,
+      "statements": 50,
+      "covered": 46,
+      "missing": [
+        107,
+        135,
+        139,
+        144
+      ],
+      "percent": 92.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.json",
+      "start": 146,
+      "end": 162,
+      "statements": 5,
+      "covered": 5,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "name": "AcceptanceTextOutput.block",
+      "start": 164,
+      "end": 171,
+      "statements": 3,
+      "covered": 3,
+      "missing": [],
+      "percent": 100.0
+    }
+  ],
+  "extracted_functions": {
+    "AcceptanceRenderedFile.__post_init__": "AcceptanceRenderedFile.__post_init__",
+    "_paths": "_paths",
+    "AcceptanceRenderBundle.__post_init__": "AcceptanceRenderBundle.__post_init__",
+    "_fields": "_fields",
+    "_trace": "_trace",
+    "_feature": "_feature",
+    "render_acceptance": "render_acceptance",
+    "utf8_path_size": "utf8_path_size",
+    "_plain": "_plain",
+    "AcceptanceTextOutput.__init__": "_Output.__init__",
+    "AcceptanceTextOutput.fixed": "_Output.fixed",
+    "AcceptanceTextOutput.measure": "_Output.measure",
+    "AcceptanceTextOutput.json": "_Output.json",
+    "AcceptanceTextOutput.block": "_Output.block"
+  },
+  "previously_covered_statement_losses": [],
+  "changed_or_new_uncovered_statements": [],
+  "mapping_method": "Qualified raw AST ranges; exact unchanged statement lines matched within each moved/current function. Current raw coverage supplies all ranges; historical executed lines only check no loss.",
+  "raw_coverage": {
+    "scratch_identifier": "p5t5-renderer-repair1-coverage.json",
+    "sha256": "ffff25607912998fbb75c139e860a46bfcf879284c7ce1b33ae42972baeaf9fc",
+    "bytes": 66562,
+    "terminal_lf": false
+  },
+  "presentation": "Exact raw coverage EOF is tool output, not authored receipt normalization; retained unchanged. Working CRLF and Git LF identities are explicitly distinct."
+}

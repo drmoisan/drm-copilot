@@ -1,0 +1,223 @@
+{
+  "task": "P5-T5",
+  "status": "FROZEN_FOCUSED_PASS_PENDING_INDEPENDENT_CONFIRMATION",
+  "created_utc": "2026-10-20T13:07:20.040544+00:00",
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "lf_sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "sha256": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+      "lf_sha256": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+      "physical_lines": 173
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "lf_sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "physical_lines": 404
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "lf_sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "physical_lines": 181
+    },
+    "tests/discovery_runtime/test_acceptance_render_limits.py": {
+      "sha256": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+      "lf_sha256": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+      "physical_lines": 228
+    }
+  },
+  "coverage_and_node_audit": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair-audit.2026-10-20T13-01.json",
+    "sha256": "ebe73fc77b859bf6304bb804407f05f0ee411862aff407eaff2c1afd12d7945f"
+  },
+  "nodes_key": "current_nodes",
+  "nodes": 77,
+  "retained_original_nodes": 62,
+  "added_resource_nodes": 15,
+  "ordered_stages": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-black.2026-10-20T12-59.json",
+      "sha256": "ccf97d6cb0cf58baf1204063a985ebc364dc39eff82dc12fb04a1afa025db24e",
+      "stage": "black",
+      "elapsed_seconds": 2.011396,
+      "completed_nodes": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-ruff.2026-10-20T12-59.json",
+      "sha256": "a1de80c42482fdb335169ece2ff5c2a559f976f2891dba020e7e90530c743d8f",
+      "stage": "ruff",
+      "elapsed_seconds": 1.209822,
+      "completed_nodes": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-pyright.2026-10-20T12-59.json",
+      "sha256": "140f143ccd18fd73a6d9915bb6cbadea8a8623762e2ade52b7f1fed3ad624f47",
+      "stage": "pyright",
+      "elapsed_seconds": 2.413114,
+      "completed_nodes": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-precheck.2026-10-20T12-59.json",
+      "sha256": "025a8bb7e2012f7e9a24be4e79c662704982d5189647241c8257ac6f43119abc",
+      "stage": "precheck",
+      "elapsed_seconds": 2.013413,
+      "completed_nodes": 2
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-precheck-coverage.2026-10-20T12-59.json",
+      "sha256": "1d0d792c57a6006bf577639f6bee225e28652ba50cfc5ad6ac808bd69c222cda",
+      "stage": "precheck-coverage",
+      "elapsed_seconds": 1.610707,
+      "completed_nodes": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-tests.2026-10-20T13-00.json",
+      "sha256": "8f6a32cb446d04e254f4562c4bb2812d9e7e5383737857ea8efae14153628e6c",
+      "stage": "tests",
+      "elapsed_seconds": 29.513151,
+      "completed_nodes": 77
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-coverage.2026-10-20T13-00.json",
+      "sha256": "642b4e35f87350f618b84e8048b3498bd86c7fa566deccb5249ac1e47605f7cc",
+      "stage": "coverage",
+      "elapsed_seconds": 1.610614,
+      "completed_nodes": 0
+    }
+  ],
+  "coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "covered_lines": 146,
+      "num_statements": 148,
+      "percent_covered": 98.05825242718447,
+      "percent_covered_display": "98",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 98.64864864864865,
+      "percent_statements_covered_display": "99",
+      "num_branches": 58,
+      "num_partial_branches": 2,
+      "covered_branches": 56,
+      "missing_branches": 2,
+      "percent_branches_covered": 96.55172413793103,
+      "percent_branches_covered_display": "97"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "covered_lines": 90,
+      "num_statements": 94,
+      "percent_covered": 94.44444444444444,
+      "percent_covered_display": "94",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 95.74468085106383,
+      "percent_statements_covered_display": "96",
+      "num_branches": 50,
+      "num_partial_branches": 4,
+      "covered_branches": 46,
+      "missing_branches": 4,
+      "percent_branches_covered": 92.0,
+      "percent_branches_covered_display": "92"
+    }
+  },
+  "all_17_raw_ranges_at_least_90_percent": true,
+  "previously_covered_statement_losses": [],
+  "changed_uncovered_statements": [],
+  "source_and_assertion_preservation": "The audit binds exact original archive, qualified extracted function mapping, all 62 original node identities and assertion/decorator ASTs. No model/generator or predecessor suite replay.",
+  "rr2_final_delta": {
+    "from": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-repair1-originals.2026-10-20T12-57.json",
+      "sha256": "3eb5d312a030c04d543f49e130a0209fa60fcdcdf8ccc23daee4397338e25517"
+    },
+    "changed_paths": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "tests/discovery_runtime/test_acceptance_render_limits.py"
+    ],
+    "coefficient": 16,
+    "fixed_upper_bound": {
+      "encoder": 2,
+      "block_concatenation": 2,
+      "markdown_concatenation": 7,
+      "final_encoding": 1,
+      "public_file_decoding": 1,
+      "total": 13
+    },
+    "qualification": "Candidate-block joins occur on shorter paths. The 16-unit reservation is independent of input-character traversal and key-sort reserves."
+  },
+  "raw_originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze-originals.2026-10-20T13-07.json",
+    "sha256": "0504bd8ab5f9d641b0f97db29fe0b60fc9372955b16a52089486f4cf7c2cd29e"
+  },
+  "purity": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "forbidden_io_calls": []
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "forbidden_io_calls": []
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "forbidden_io_calls": []
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "forbidden_io_calls": []
+    },
+    "tests/discovery_runtime/test_acceptance_render_limits.py": {
+      "forbidden_io_calls": []
+    }
+  },
+  "examples": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples.2026-10-20T13-03.json",
+    "sha256": "ff326f25b72302405bc69ae5e78b1152f102a93b0085f9b8308888a476a11e14"
+  },
+  "example_authoring": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-examples-authoring.2026-10-20T13-03.json",
+    "sha256": "fbc761181c24cb129e75c186f03892bd724cc3ebdee902d222993bf6d462a3c7"
+  },
+  "example_paths": [
+    "examples/discovery/v2/acceptance/observed-source/acceptance.md",
+    "examples/discovery/v2/acceptance/observed-source/legacy-characterization/scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d.feature",
+    "examples/discovery/v2/acceptance/approved-target/acceptance.md",
+    "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+    "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2.feature",
+    "examples/discovery/v2/acceptance/pending-target/acceptance.md",
+    "examples/discovery/v2/acceptance/pending-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+    "examples/discovery/v2/acceptance/README.md"
+  ],
+  "retained_failure_and_review": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate.2026-10-20T12-30.json",
+      "sha256": "7dafe0d5590cebfb4fac47892c2068f054fbe716e39d3e9bf4cd1135cef7ac40"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+      "sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples-diagnostic.2026-10-20T13-03.json",
+      "sha256": "e3d0c538c58d1ada31694b9982d5c65f97a5d00b310d31910e9f8ce43b61a788"
+    }
+  ],
+  "retained_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+    "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475"
+  },
+  "split_absence": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-renderer-split.2026-10-20T12-44.json",
+    "sha256": "95ae734443bdd7b6dac2ae02ebb7f31bdc35091ded655ad56d9fb41c8f4b6f18"
+  },
+  "public_composition_selectors": [
+    "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+    "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown"
+  ],
+  "presentation": {
+    "authored_receipts": "UTF-8, LF, exactly one final newline; no trailing whitespace.",
+    "raw_coverage": "Exact coverage.py JSON lacks terminal LF and is preserved only in its lossless archive, without rewriting tool output.",
+    "working_vs_git": "Candidate supplies both exact working SHA-256 and CRLF-to-LF SHA-256. Only newline normalization is qualified.",
+    "failure_stream_limit": "The first example authoring error retained its tool-rendered summary, exact script and verified no-write result; it did not capture separate raw subprocess streams."
+  },
+  "scope_limits": "Renderer data only: no step implementation, host execution, grant minting, publication, plan/AC checkoff, or Git/checkpoint mutation.",
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-staging.2026-10-20T13-07.json"
+}

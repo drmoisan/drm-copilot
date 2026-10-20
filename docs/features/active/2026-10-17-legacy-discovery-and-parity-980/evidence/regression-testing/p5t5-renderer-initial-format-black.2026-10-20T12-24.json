@@ -1,0 +1,52 @@
+{
+  "task": "P5-T5",
+  "stage": "black",
+  "command": [
+    "poetry",
+    "run",
+    "black",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+    "tests/discovery_runtime/test_gherkin.py",
+    "tests/discovery_runtime/test_acceptance_tags.py"
+  ],
+  "clean": false,
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 2.010479,
+  "started_utc": "2026-10-20T12:24:00.239570+00:00",
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "cbcb87cf39eb7535f94440c8895632b33efe6966892dd20865fb3268aa83bf34",
+    "tests/discovery_runtime/test_gherkin.py": "209f63c76e77cf8326eb2ab9d8012e0ae4f3c8d049ebf97ff30df53eae860d30",
+    "tests/discovery_runtime/test_acceptance_tags.py": "7da5bf6af43b5f74afdb167d611af620a0114a8497449fbfdbc10ca4b2ca39f2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "3f131c213de5f2484abbe5911d93e11fd2955188f51990c4b5b529217aea83c3",
+    "tests/discovery_runtime/test_gherkin.py": "5ffb3af630e9da90568dd402bc76b62eea1068169a038c8ba5bc3b748c10630b",
+    "tests/discovery_runtime/test_acceptance_tags.py": "0332f84f6b908b6e5e9304880b114932a69107e56982b9b34d8d237be76357de",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac"
+  },
+  "stdout": "",
+  "stderr": "reformatted tests\\discovery_runtime\\test_acceptance_tags.py\nreformatted tests\\discovery_runtime\\test_gherkin.py\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\gherkin.py\n\nAll done! \u2728 \ud83c\udf70 \u2728\n3 files reformatted.",
+  "executed_nodes": [],
+  "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-initial-format-black-raw.2026-10-20T12-24.json",
+  "raw_archive_sha256": "ff386dd89b3dc19995541361dacf2add6795c76c996f791563799cce35bd676b"
+}

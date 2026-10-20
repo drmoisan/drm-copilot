@@ -1,0 +1,230 @@
+{
+  "Command": "poetry run python SCRATCH/p5t5_prepare_final.py",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T12-39",
+  "authority": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p5t5_final_prep_20261020",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P5T5_final_preparation",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "baseline_and_proof": {
+    "baseline": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+      "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475"
+    },
+    "baseline_originals": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline-originals.2026-10-20T12-11.json",
+      "sha256": "1588e9bc3b66c73d204a392b37e3ba79bbd4eae3332b1e89b99071289e0818e3"
+    },
+    "contract": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-rendering-contract-delta.2026-10-20T11-11.json",
+      "sha256": "c2030f0a0e27111ced7bd24ce4f46963bceecf516611d4940c92e208218d0aef"
+    },
+    "preparation_diagnostic": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation-checker-diagnostic.2026-10-20T12-39.json",
+      "sha256": "0ebaea0e2dc3444c6cbc1e5e021bbd05cf1b909efc590943aaea872fc1c3f1b9"
+    },
+    "prior_final_acceptance": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-final-acceptance.2026-10-20T11-57.json",
+      "sha256": "e454e73f509ca24c0f6e6ebb784be9c9c95166740ce9d6e45d5105c257ce1ad6"
+    },
+    "prior_final_handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-final-handoff.2026-10-20T11-46.json",
+      "sha256": "3cd8f6080ee99f629d17831d2f2fce41ecb5794153abcdc764573fc2c6ad3bb9"
+    },
+    "set_e": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+      "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4"
+    },
+    "set_e_review": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-set-e-review.2026-10-20T12-29.json",
+      "sha256": "2b0b489a9806b6c1d6d2124b5e31a9d424a35d5b8fc84c9425d4f693bc42b547"
+    }
+  },
+  "composition": {
+    "assertions": [
+      "ready scenarios retain exact trace and steps",
+      "approved target criteria retain original decision and source owner",
+      "unknown expected behavior remains pending Markdown"
+    ],
+    "extra_behavioral_run": false,
+    "kind": "in-memory captured generation to Gherkin/Markdown rendering",
+    "native_execution": false,
+    "nodes": [],
+    "publication": false,
+    "required_selector_families": [
+      "tests/discovery_runtime/test_gherkin.py::test_public_captured_generation_renders_exact_trace_and_steps",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_approved_target_trace_retains_original_decision_and_owner",
+      "tests/discovery_runtime/test_acceptance_tags.py::test_unknown_expected_behavior_remains_pending_markdown"
+    ]
+  },
+  "execution_released": false,
+  "frozen_bindings_checked": {
+    "examples/discovery/v2/acceptance-specification.example.yaml": "19669dbbceaf429a9c76525201a3d46d6ffdba1a8239f020429fb7c4a678fced",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/rendering.py": "4475449738b7b934500e6860eea0fb121c9ac8517ff75f27cd6c35bc22818f08",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py": "68ec09a2479ecdae556bc9fa817ab535004ba7e71a6aff75112d5eeadcca0ae2",
+    "pyproject.toml": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+    "schemas/discovery/v2/acceptance-specification.schema.json": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+    "schemas/discovery/v2/common.schema.json": "97afdd9c0c89f79eb79fb068f6ce1d3de7c25526142575067c9ac32e3c8055fe",
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_snapshot_io.py": "d72731e42856323b40e6975680bc9c19f52035996d0cf6ea2a35a2404a125fe0",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe"
+  },
+  "harnesses": {
+    "p5t5_final_coverage.py": {
+      "accepted_predecessor_sha256": "0d9e869bf7450535a39d46aa8f218e3c7f5cde0a2dbd1896923bd2efd01db071",
+      "physical_lines": 210,
+      "runtime_path": "SCRATCH/p5t5_final_coverage.py",
+      "sha256": "a8f163389dfaad6acd39d0cbdce954f07a89fd03f3070f793f81fad2c3e4e477",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_coverage.2026-10-20T12-39.txt"
+    },
+    "p5t5_final_gates.py": {
+      "accepted_predecessor_sha256": "49b82d61d9ca580163da854164d9e10c456998e6a7334157eaa15b0aef85577e",
+      "physical_lines": 273,
+      "runtime_path": "SCRATCH/p5t5_final_gates.py",
+      "sha256": "dc92ab67e5cdc6abc0f9548fc53f5eaf8660b0a22b9d243a9ca630cfc82ba8f6",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_gates.2026-10-20T12-39.txt"
+    },
+    "p5t5_final_static.py": {
+      "accepted_predecessor_sha256": "1d1fef1e8f4877d8effde016c06bb92ce16a96cfbc10c6c14bbc3041c6d357e0",
+      "physical_lines": 145,
+      "runtime_path": "SCRATCH/p5t5_final_static.py",
+      "sha256": "dd52c76c58063d0caea6e71c42b82c92357ed7784e77f3f5c7d826167638b964",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_final_static.2026-10-20T12-39.txt"
+    },
+    "p5t5_prepare_final.py": {
+      "physical_lines": 246,
+      "runtime_path": "SCRATCH/p5t5_prepare_final.py",
+      "sha256": "b88cef9cd57402a42749f6f62d7397e5ad6831606b165e11d9af0e8b4f8aea2a",
+      "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-p5t5_prepare_final.2026-10-20T12-39.txt"
+    }
+  },
+  "metadata_read_diagnostic": "A PowerShell metadata read required ConvertFrom-Json -AsHashtable because coverage.py includes an empty-string callable key; no repository gate was run.",
+  "missing_release_bindings": [
+    "Repaired renderer source/test/example/dependency freeze and exact passing nodes",
+    "Renderer focused raw coverage, per-unit ranges, timings and retained failure receipts",
+    "Complete independent repair confirmation and checked candidate commit/push",
+    "Explicit parent release and one exact released candidate manifest"
+  ],
+  "native_execution_released": false,
+  "population": {
+    "binding_rule": "Use repaired renderer and committed Set E node lists only; assert exact disjoint completeness; reverse the union once and compare actual execution order.",
+    "final_exact_count": null,
+    "nominal_total_not_released": 103,
+    "renderer_prerepair_only": {
+      "collected": 62,
+      "fixture_failures": 2,
+      "passed": 60
+    },
+    "set_e_frozen": 41,
+    "set_e_nodes": [
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_raises_naming_convention_when_tree_absent",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_keyword_only_parameters",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_downstream_calls_resolver",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_falls_back_to_convention_when_absent",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_returns_path_when_schema_present",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_feature_contract_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_parity_matrix_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_runtime_characterization_positive",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_non_list_string_field_ignored",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document0-must be an array]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document1-must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document2-must be an array]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document3-must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_adapters_ignore_unknown_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_maps_given_when_then",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_derives_stable_id",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_top_level_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_null_refs_when_none_match",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_byte_identical_repeat",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_invariant_to_input_ordering",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_source_digest_stable",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_domain_neutrality_module_source_and_output_fields",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_file-not found]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_non_object_root-root must be an object]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_parse_error-invalid JSON]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_field-feature_ref]",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_parse_args_defaults_and_flags",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_collect_input_paths_sorted",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_writes_output",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_stdout",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_matches",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_mismatch",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_requires_output",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_target_absent",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_retains_exact_given_when_then[source]",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_retains_exact_given_when_then[approved-decision]",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_preserves_full_linked_scenario_identity",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_uses_closed_document_and_separate_captured_owner",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_withholds_unknown_or_missing_authority[expectation]",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_withholds_unknown_or_missing_authority[evidence-reference]",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py::test_v2_projection_withholds_unknown_or_missing_authority[source-feature]"
+    ]
+  },
+  "preparation_delta": "Reuse accepted P5-T4 runner and coverage reader with task-specific names. Scope coverage to renderer plus unchanged legacy production. Qualify only the exact reviewed documentation-only test body for inherited intent and in-memory Path calls.",
+  "raw_readable_convention": "Exact stdout/stderr/coverage bytes and hashes retained in raw archives; authored receipts/readable views use LF UTF-8. Raw coverage needs no terminal newline. Preserve OBSERVED_PATH_ALIASES for long/short Windows TEMP and workspace roots.",
+  "scope": {
+    "changed_python": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "tests/discovery_runtime/test_gherkin.py",
+      "tests/discovery_runtime/test_acceptance_tags.py",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+    ],
+    "contracts": [
+      "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_matches_live_tree",
+      "tests/scripts/dev_tools/test_quality_tiers_contract_classification.py::test_committed_quality_tiers_yml_assigns_spec_tiers",
+      "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+      "tests/discovery_runtime/test_package_contract.py::test_root_tooling_includes_the_local_runtime_for_types_and_coverage"
+    ],
+    "measured_production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "scripts/dev_tools/generate_acceptance_scenarios.py"
+    ],
+    "synthetic_fixture_prefix": "examples/discovery/v2/acceptance/",
+    "tests": [
+      "tests/discovery_runtime/test_gherkin.py",
+      "tests/discovery_runtime/test_acceptance_tags.py",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+    ]
+  },
+  "set_e_checked_commit": "a6ead9966bcd9e5ce72c41a14c5a9cd884515f58",
+  "source_or_test_mutation": false,
+  "stage_order": [
+    "Black --check",
+    "Ruff check",
+    "whole-repository Pyright",
+    "exact changed-scope architecture/size/intent/purity/isolation",
+    "one fresh Pytest process reversing the exact full changed-task node union",
+    "raw coverage capture and module/class/callable reconciliation",
+    "four applicable quality-tier/package contracts"
+  ],
+  "status": "PREPARATION_READY_EXECUTION_DISABLED",
+  "suites_executed": false,
+  "task": "P5-T5",
+  "template": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-template.2026-10-20T12-39.json",
+    "sha256": "a7a772c63345dbab89ac47221cf21c21dcc0c901e6e304812dafbbcf72246e0d"
+  },
+  "timeout_basis": "300 seconds is provisional, pending complete repaired owner timing. The accepted Set E batch took 50.648 seconds; keep 20-second progress. This is not a host-hook limit."
+}

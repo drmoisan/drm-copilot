@@ -1,0 +1,156 @@
+"""Bind repaired ranges, exact original nodes and extracted statement coverage."""
+import ast
+import base64
+import difflib
+import gzip
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+QA = FEATURE / "evidence/qa-gates"
+REG = FEATURE / "evidence/regression-testing"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+SOURCES = ["packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+           for name in ("gherkin", "acceptance_render_text")]
+TESTS = ["tests/discovery_runtime/" + name + ".py"
+         for name in ("test_gherkin", "test_acceptance_tags", "test_acceptance_render_limits")]
+receipt_path = REG / "p5t5-renderer-repair1-tests.2026-10-20T12-51.json"
+receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+original_path = REG / "p5t5-renderer-focused4-tests.2026-10-20T12-27.json"
+original_receipt = json.loads(original_path.read_text(encoding="utf-8"))
+original_archive = json.loads((QA / "p5t5-renderer-candidate-originals.2026-10-20T12-30.json").read_text(encoding="utf-8"))
+coverage_raw = (SCRATCH / "p5t5-renderer-repair1-coverage.json").read_bytes()
+coverage = json.loads(coverage_raw)
+
+
+def sha(raw):
+    """Return immutable byte identity."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def old_stream(path):
+    """Decode the exact retained original source or coverage stream."""
+    entry = original_archive[path]
+    raw = gzip.decompress(base64.b64decode(entry["data"]))
+    assert sha(raw) == entry["sha256"]
+    return raw
+
+
+def definitions(tree, prefix=""):
+    """Return qualified function/class ranges using the retained raw AST convention."""
+    result = {}
+    for child in ast.iter_child_nodes(tree):
+        if isinstance(child, (ast.ClassDef, ast.FunctionDef)):
+            name = prefix + child.name
+            result[name] = child
+            result.update(definitions(child, name + "."))
+    return result
+
+
+def coverage_for(document, path):
+    """Select the exact measured module without relying on host path separators."""
+    return next(row for name, row in document["files"].items()
+                if name.replace("\\", "/").endswith("/" + Path(path).name))
+
+
+def reference(path):
+    """Return a workspace-relative immutable evidence binding."""
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())}
+
+
+current = {path: (ROOT / path).read_bytes() for path in SOURCES + TESTS}
+assert all(sha(raw) == receipt["before"][path] == receipt["after"][path]
+           for path, raw in current.items())
+assert len(receipt["executed_nodes"]) == len(set(receipt["executed_nodes"])) == 77
+assert set(original_receipt["executed_nodes"]) <= set(receipt["executed_nodes"])
+assert len(original_receipt["executed_nodes"]) == 62
+ranges = []
+summaries = {}
+for path in SOURCES:
+    data = coverage_for(coverage, path)
+    summaries[path] = data["summary"]
+    executed, missing = set(data["executed_lines"]), set(data["missing_lines"])
+    for name, node in definitions(ast.parse(current[path].decode("utf-8"))).items():
+        statements = (executed | missing) & set(range(node.lineno, node.end_lineno + 1))
+        lost = statements & missing
+        ranges.append({"path": path, "name": name, "start": node.lineno,
+                       "end": node.end_lineno, "statements": len(statements),
+                       "covered": len(statements - lost), "missing": sorted(lost),
+                       "percent": 100 * len(statements - lost) / len(statements) if statements else 100})
+assert all(row["percent"] >= 90 for row in ranges), [row for row in ranges if row["percent"] < 90]
+old_source = old_stream(SOURCES[0]).decode("utf-8")
+old_definitions = definitions(ast.parse(old_source))
+old_coverage = coverage_for(json.loads(old_stream("raw-coverage.json")), SOURCES[0])
+old_executed = set(old_coverage["executed_lines"])
+no_loss = []
+changed_missing = []
+move_map = {}
+for path in SOURCES:
+    text = current[path].decode("utf-8")
+    data = coverage_for(coverage, path)
+    missing = set(data["missing_lines"])
+    for name, node in definitions(ast.parse(text)).items():
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        original_name = name.replace("AcceptanceTextOutput", "_Output")
+        move_map[name] = original_name
+        matched_current = set()
+        if original_name in old_definitions:
+            before = old_definitions[original_name]
+            old_lines = old_source.splitlines()[before.lineno - 1:before.end_lineno]
+            new_lines = text.splitlines()[node.lineno - 1:node.end_lineno]
+            for match in difflib.SequenceMatcher(a=old_lines, b=new_lines, autojunk=False).get_matching_blocks():
+                for offset in range(match.size):
+                    old_line = before.lineno + match.a + offset
+                    new_line = node.lineno + match.b + offset
+                    matched_current.add(new_line)
+                    if old_line in old_executed and new_line in missing:
+                        no_loss.append({"path": path, "name": name, "old": old_line, "new": new_line})
+        changed_missing.extend({"path": path, "name": name, "line": line}
+                               for line in missing & set(range(node.lineno, node.end_lineno + 1)) - matched_current)
+assert not no_loss, no_loss
+assert not changed_missing, changed_missing
+assertions = {}
+for path in TESTS[:2]:
+    old = definitions(ast.parse(old_stream(path).decode("utf-8")))
+    new = definitions(ast.parse(current[path].decode("utf-8")))
+    checked = 0
+    for name, node in old.items():
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        old_asserts = [ast.dump(child, include_attributes=False) for child in ast.walk(node) if isinstance(child, ast.Assert)]
+        new_asserts = [ast.dump(child, include_attributes=False) for child in ast.walk(new[name]) if isinstance(child, ast.Assert)]
+        assert old_asserts == new_asserts, (path, name)
+        assert [ast.dump(value) for value in node.decorator_list] == [ast.dump(value) for value in new[name].decorator_list]
+        checked += len(old_asserts)
+    assertions[path] = checked
+bindings = {path: {"sha256": sha(raw), "lf_sha256": sha(raw.replace(b"\r\n", b"\n")),
+                   "physical_lines": len(raw.splitlines())} for path, raw in current.items()}
+assert all(row["physical_lines"] <= 500 for row in bindings.values())
+result = {
+    "task": "P5-T5", "created_utc": datetime.now(timezone.utc).isoformat(),
+    "status": "PASS", "candidate": bindings, "receipt": reference(receipt_path),
+    "original_failed_receipt": reference(original_path),
+    "original_nodes": 62, "current_nodes": receipt["executed_nodes"],
+    "added_nodes": sorted(set(receipt["executed_nodes"]) - set(original_receipt["executed_nodes"])),
+    "original_assertion_counts_preserved": assertions,
+    "coverage_summary": summaries, "raw_ast_ranges": ranges,
+    "extracted_functions": move_map,
+    "previously_covered_statement_losses": no_loss,
+    "changed_or_new_uncovered_statements": changed_missing,
+    "mapping_method": "Qualified raw AST ranges; exact unchanged statement lines matched within each moved/current function. Current raw coverage supplies all ranges; historical executed lines only check no loss.",
+    "raw_coverage": {"scratch_identifier": "p5t5-renderer-repair1-coverage.json",
+                     "sha256": sha(coverage_raw), "bytes": len(coverage_raw),
+                     "terminal_lf": coverage_raw.endswith(b"\n")},
+    "presentation": "Exact raw coverage EOF is tool output, not authored receipt normalization; retained unchanged. Working CRLF and Git LF identities are explicitly distinct.",
+}
+output = QA / f"p5t5-renderer-repair-audit.{STAMP}.json"
+output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
+snapshot = QA / f"p5t5-renderer-repair-audit-harness.{STAMP}.txt"
+snapshot.write_bytes(Path(__file__).read_bytes())
+print(json.dumps({"path": output.relative_to(ROOT).as_posix(), "sha256": sha(output.read_bytes()),
+                  "ranges": len(ranges), "summaries": summaries}))

@@ -1,0 +1,58 @@
+{
+  "Command": "poetry run python SCRATCH/p5t5_rebind_preparation.py",
+  "EXIT_CODE": 0,
+  "Timestamp": "2026-10-20T12-42",
+  "execution_released": false,
+  "final_scope": {
+    "changed_python": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "tests/discovery_runtime/test_gherkin.py",
+      "tests/discovery_runtime/test_acceptance_tags.py",
+      "tests/discovery_runtime/test_acceptance_render_limits.py",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+    ],
+    "coverage_targets": [
+      "drm_copilot_discovery.gherkin",
+      "drm_copilot_discovery.acceptance_render_text",
+      "scripts.dev_tools.generate_acceptance_scenarios"
+    ],
+    "measured_production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+      "scripts/dev_tools/generate_acceptance_scenarios.py"
+    ]
+  },
+  "gates_or_suites_executed": false,
+  "harness": {
+    "runtime_path": "SCRATCH/p5t5_rebind_preparation.py",
+    "sha256": "4743871f9e4c00a17f00ba239baefa51e80eba32e098d40bacd5a27816dbc64f",
+    "snapshot": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-prepared-rebind.2026-10-20T12-42.txt"
+  },
+  "missing_release_bindings": [
+    "Repaired renderer source/test/example/dependency freeze and exact passing nodes",
+    "Renderer focused raw coverage, per-unit ranges, timings and retained failure receipts",
+    "Complete independent repair confirmation and checked candidate commit/push",
+    "Explicit parent release and one exact released candidate manifest"
+  ],
+  "native_execution_released": false,
+  "population": "Original 62 renderer identities and 41 Set E identities are retained; only required repair controls may be added. The repaired freeze supplies exact final IDs/count.",
+  "previous_preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-preparation.2026-10-20T12-41.json",
+    "sha256": "d02f891b238299e5c06237ce936fa79cbcf3ee1a0a9068ceabbce8d0d3e30ba6"
+  },
+  "scope_delta": {
+    "new_production": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py",
+    "new_test": "tests/discovery_runtime/test_acceptance_render_limits.py",
+    "purpose": "Approved _Output/_plain extraction and prospective UTF-8 path accounting; required RR1/RR2/RC1 controls. No additional capability or public API."
+  },
+  "source_or_test_changed": false,
+  "status": "PREPARATION_READY_EXECUTION_DISABLED",
+  "task": "P5-T5",
+  "template": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-split-template.2026-10-20T12-42.json",
+    "sha256": "408bbed973e7ba2db3c7c425c876ab3979643a2514812e50a40a2f8c29dc4cee"
+  },
+  "unchanged": "Three execution readers, order, four contracts, disabled release, baseline qualification, raw/readable conventions and accepted P5-T4 proof are unchanged."
+}

@@ -1,0 +1,226 @@
+"""Bind the reviewed owner scopes without executing gates or repeating their inventories."""
+
+import base64
+import datetime
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+
+from p5t5_prepare_final import records
+
+
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = Path("docs/features/active/2026-10-17-legacy-discovery-and-parity-980")
+QA = FEATURE / "evidence/qa-gates"
+REG = FEATURE / "evidence/regression-testing"
+ROUTE = "inventory_analyzers_p5t5_final_binding_20261020"
+PROFILE_SHA = "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+
+
+def sha(data):
+    """Return the exact raw-byte binding."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def read(path, expected):
+    """Read only an explicitly named owner artifact with its frozen digest."""
+    data = path.read_bytes()
+    assert sha(data) == expected, path
+    return json.loads(data)
+
+
+def ref(path):
+    """Describe an existing stream without changing its bytes."""
+    return {"path": path.as_posix(), "sha256": sha(path.read_bytes())}
+
+
+def write(path, document):
+    """Create one new portable LF UTF-8 receipt."""
+    assert not path.exists(), path
+    path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+    return ref(path)
+
+
+def add_bindings(target, supplied):
+    """Union only owner-supplied repository streams, rejecting conflicting identities."""
+    # Operational scratch paths remain in their owner archive rather than the source manifest.
+    for path, record in supplied.items():
+        if path.startswith("<SCRATCH>/"):
+            continue
+        digest = record["sha256"] if isinstance(record, dict) else record
+        assert path not in target or target[path] == digest, path
+        target[path] = digest
+
+
+def main():
+    """Freeze the exact 118-node candidate while keeping both execution guards false."""
+    checkpoint = json.loads(Path("artifacts/orchestration/orchestrator-state.json").read_bytes())
+    routes = [item for item in records(checkpoint)
+              if item.get("delegation_id") == ROUTE and item.get("profile_sha256") == PROFILE_SHA]
+    assert len(routes) == 1
+    authority = routes[0]
+    assert authority["phase"] == "S5_P5T5_final_binding"
+    assert authority["model"] == "gpt-6-astra" and authority["model_reasoning_effort"] == "max"
+    assert sha(Path(authority["profile_path"]).read_bytes()) == PROFILE_SHA
+    preparation_path = QA / "p5t5-final-preparation-split.2026-10-20T12-42.json"
+    preparation = read(preparation_path, "fb747846db1eea2ffb258f7849dcdeeec99cb3be707830ac7177d4ae81e0a33c")
+    candidate = read(Path(preparation["template"]["path"]), preparation["template"]["sha256"])
+    assert candidate["execution_released"] is False and candidate["final_review_closed"] is False
+    set_e_ref = candidate["retained_proof"]["set_e"]
+    set_e = read(Path(set_e_ref["path"]), set_e_ref["sha256"])
+    freeze_path = REG / "p5t5-renderer-freeze.2026-10-20T13-07.json"
+    freeze = read(freeze_path, "d6fbe1f305a6f4d46771497147cfc3a3f8630b361f3f653d87068bafdaf3047b")
+    staging_path = Path(freeze["staging_manifest"])
+    staging = read(staging_path, "ae8f17ea0152622a260740d52f53dd555da3df024dd327a876088eec8cbcdab9")
+    audit_ref = freeze["coverage_and_node_audit"]
+    audit = read(Path(audit_ref["path"]), audit_ref["sha256"])
+    assert audit["candidate"] == freeze["candidate"]
+    tests_ref = next(item for item in freeze["ordered_stages"] if item["stage"] == "tests")
+    tests = read(Path(tests_ref["path"]), tests_ref["sha256"])
+    assert tests["clean"] is True and tests["exit_code"] == 0 and tests["timeout"] is False
+    assert tests["before"] == tests["after"]
+    renderer_nodes = audit[freeze["nodes_key"]]
+    assert renderer_nodes == tests["executed_nodes"] and len(renderer_nodes) == 77
+    assert freeze["retained_original_nodes"] == 62 and len(audit["added_nodes"]) == 15
+    nodes = renderer_nodes + set_e["nodes"]
+    assert len(set_e["nodes"]) == 41 and len(nodes) == len(set(nodes)) == 118
+    assert {node.split("::")[0] for node in nodes} == {
+        path for path in candidate["files"] if path.startswith("tests/")}
+    bindings = candidate["bindings"]
+    add_bindings(bindings, tests["before"])
+    add_bindings(bindings, freeze["candidate"])
+    examples_ref = freeze["examples"]
+    examples = read(Path(examples_ref["path"]), examples_ref["sha256"])
+    assert examples["stage_paths"] == freeze["example_paths"]
+    example_bindings = {path: staging["working_bindings"][path] for path in freeze["example_paths"]}
+    assert len(example_bindings) == 8
+    add_bindings(bindings, example_bindings)
+    add_bindings(bindings, examples["dependencies"])
+    examples_originals = examples["originals"]
+    assert sha(Path(examples_originals["path"]).read_bytes()) == examples_originals["sha256"]
+    # Verify only the immutable union supplied by owners; do not rediscover dependency scope.
+    for path, digest in bindings.items():
+        assert sha(Path(path).read_bytes()) == digest, path
+    for name, record in candidate["harnesses"].items():
+        assert sha((SCRATCH / name).read_bytes()) == record["sha256"], name
+    assert len(candidate["files"]) == 7 and len(candidate["production"]) == 3
+    archive_ref = freeze["raw_originals"]
+    archive = read(Path(archive_ref["path"]), archive_ref["sha256"])
+    raw_key = "<SCRATCH>/p5t5-renderer-repair2-coverage.json"
+    raw_record = archive[raw_key]
+    assert raw_record["encoding"] == "gzip-base64"
+    compressed = base64.b64decode(raw_record["data"], validate=True)
+    raw = gzip.decompress(compressed)
+    assert sha(raw) == raw_record["sha256"] == audit["raw_coverage"]["sha256"]
+    assert len(raw) == raw_record["bytes"] == audit["raw_coverage"]["bytes"]
+    measured = json.loads(raw)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    coverage_path = QA / ("p5t5-final-focused-coverage-view." + stamp + ".json")
+    coverage_ref = write(coverage_path, measured)
+    assert read(coverage_path, coverage_ref["sha256"]) == measured
+    candidate.update(nodes={"rendering": nodes}, node_count=118, execution_released=False,
+                     final_review_closed=False, candidate_commit=None, authority_route=ROUTE)
+    candidate["final_fixture_bindings"] = example_bindings
+    candidate["composition"]["nodes"] = [
+        node for node in renderer_nodes if any(
+            node == family or node.startswith(family + "[")
+            for family in freeze["public_composition_selectors"])]
+    assert len(candidate["composition"]["nodes"]) == 4
+    candidate["current_coverage_proofs"].append({
+        "source_bindings": {path: record["sha256"] for path, record in freeze["candidate"].items()
+                            if path in candidate["production"]},
+        "coverage": coverage_ref,
+        "qualification": "Exact raw coverage from the complete 77-case repair2 batch; two counted "
+                         "prechecks remain separately referenced and are not additional final nodes.",
+    })
+    candidate["retained_proof"].update(
+        renderer=ref(freeze_path), renderer_staging=ref(staging_path), renderer_ranges=audit_ref,
+        renderer_raw_archive=archive_ref, examples=examples_ref, example_originals=examples_originals)
+    candidate["population_provenance"] = {
+        "renderer": ref(freeze_path), "set_e": set_e_ref, "owner_case_counts": [77, 41],
+        "owner_seconds": [tests["elapsed_seconds"], set_e["harness_seconds"]],
+        "ordering": "Renderer owner list followed by Set E owner list; reverse the entire union once.",
+        "collection_run": False,
+    }
+    candidate["timeouts"]["rendering"] = 300
+    candidate["limitations"] = [
+        "Bound candidate only; final execution and independent-review guards remain false.",
+        "The 77-case renderer and 41-case Set E proofs are retained separately; this 118-node union has not run.",
+        "Pure generation/rendering composition; no publication, CLI migration, step implementation or installed-host proof.",
+        "Accepted generator/model dependency coverage remains separate; no predecessor suite replay.",
+    ]
+    candidate_path = QA / ("p5t5-final-candidate-disabled." + stamp + ".json")
+    candidate_ref = write(candidate_path, candidate)
+    scratch_candidate = SCRATCH / "candidate-disabled.json"
+    assert not scratch_candidate.exists()
+    scratch_candidate.write_bytes(candidate_path.read_bytes())
+    harness_path = QA / ("p5t5-final-bind-harness." + stamp + ".txt")
+    harness_bytes = Path(__file__).read_bytes()
+    assert not harness_path.exists() and len(harness_bytes.splitlines()) <= 500
+    harness_path.write_bytes(harness_bytes)
+    receipt = {
+        "Timestamp": stamp, "Command": "poetry run python SCRATCH/p5t5_bind_final.py", "EXIT_CODE": 0,
+        "task": "P5-T5", "status": "PREPARED_AWAITING_REVIEW_COMMIT_RELEASE", "authority": authority,
+        "candidate": candidate_ref, "prior_preparation": ref(preparation_path),
+        "source_owner_freeze": ref(freeze_path), "source_owner_staging": ref(staging_path),
+        "source_or_test_edits": False, "gate_execution": False, "execution_released": False,
+        "runtime_harnesses_unchanged": candidate["harnesses"],
+        "node_count": 118, "renderer_cases": 77, "set_e_cases": 41,
+        "test_modules": 5, "production_modules": 3, "changed_code_test_paths": 7, "contract_nodes": 4,
+        "composition_nodes": candidate["composition"]["nodes"],
+        "examples": {"provenance": examples_ref, "originals": examples_originals,
+                     "bound_paths": list(example_bindings), "outputs": 7, "readme": 1},
+        "coverage_view": {
+            "reference": coverage_ref, "raw_archive": archive_ref, "member": raw_key,
+            "raw_sha256": sha(raw), "raw_bytes": len(raw), "compressed_sha256": sha(compressed),
+            "raw_crlf_count": raw.count(b"\r\n"), "raw_terminal_lf": raw.endswith(b"\n"),
+            "qualification": "The owner archive retains exact raw JSON. This LF UTF-8 reader view has "
+                             "identical parsed counters, coordinates, filenames and named ranges.",
+        },
+        "coverage_ranges": audit_ref,
+        "remaining_release_fields": ["Independent candidate-ready receipt/hash", "Checked candidate commit/push",
+                                      "execution_released=true", "final_review_closed=true"],
+        "timeout": {"seconds": 300, "progress_seconds": 20,
+                    "basis": "29.513151-second renderer plus 50.64792280000984-second Set E focused runs; "
+                             "finite verification-process bound, not a host-hook limit."},
+        "executed_binding_harness": ref(harness_path),
+        "metadata_read_qualification": "Read-only PowerShell shape probes initially requested absent paths/members "
+                                       "keys; actual owner keys are working_bindings and an identifier-keyed archive. "
+                                       "Those tool diagnostics did not execute gates or write candidate evidence.",
+    }
+    receipt_path = QA / ("p5t5-final-candidate-binding." + stamp + ".json")
+    receipt_ref = write(receipt_path, receipt)
+    markdown = QA / ("p5t5-final-candidate-binding." + stamp + ".md")
+    assert not markdown.exists()
+    markdown.write_text(
+        "# P5-T5 final candidate binding\n\n"
+        f"Timestamp: {stamp}\nCommand: poetry run python SCRATCH/p5t5_bind_final.py\nEXIT_CODE: 0\n"
+        "Output Summary: PREPARED_AWAITING_REVIEW_COMMIT_RELEASE. Exact disjoint 118-node union; "
+        "three measured production modules, five test modules, seven changed Python paths and four contracts. "
+        "No gates or collection executed.\n\n"
+        "The 77-case renderer and committed 41-case Set E populations remain distinct retained proofs. "
+        "The prepared runner reverses their complete union once, with a 300-second bound and 20-second progress. "
+        "Four existing public composition nodes and eight frozen example paths are bound.\n\n"
+        "The three execution readers are unchanged. Raw renderer coverage remains exact in the owner archive; "
+        "an equivalent LF UTF-8 view supplies the existing reader. Accepted generator/model proof is reused "
+        "separately. Review confirmation, checked commit/push and explicit release remain required.\n",
+        encoding="utf-8", newline="\n")
+    paths = [coverage_path, candidate_path, harness_path, receipt_path, markdown]
+    # Authored views remain portable; original output bytes remain in their existing archives.
+    for path in paths:
+        data = path.read_bytes()
+        text = data.decode("utf-8")
+        assert b"\r" not in data and data.endswith(b"\n") and not data.endswith(b"\n\n"), path
+        assert not any(line != line.rstrip() for line in text.splitlines()), path
+        assert not re.search(r"[A-Za-z]:[\\/]", text), path
+    staging_ref = write(QA / ("p5t5-final-candidate-staging." + stamp + ".json"),
+                        {"Timestamp": stamp, "binding": receipt_ref, "paths": [ref(path) for path in paths]})
+    print(json.dumps({"binding": receipt_ref, "candidate": candidate_ref, "staging": staging_ref,
+                      "nodes": 118, "execution_released": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

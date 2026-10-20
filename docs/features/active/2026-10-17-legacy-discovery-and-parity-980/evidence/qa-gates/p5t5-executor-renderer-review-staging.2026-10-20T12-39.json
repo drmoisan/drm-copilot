@@ -1,0 +1,45 @@
+{
+  "Timestamp": "2026-10-20T12-39",
+  "task": "P5-T5",
+  "status": "EVIDENCE_ONLY_NOT_STAGED",
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+    "sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477",
+    "bytes": 17581
+  },
+  "markdown": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.md",
+    "sha256": "da00b3b6a3394be0292e58cb93c85e21fc8c1405515295f7130a397ac25801b4",
+    "bytes": 1899
+  },
+  "candidate_reference": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-renderer-candidate.2026-10-20T12-30.json",
+    "sha256": "7dafe0d5590cebfb4fac47892c2068f054fbe716e39d3e9bf4cd1135cef7ac40",
+    "bytes": 5866
+  },
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-probe.2026-10-20T12-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review-staging.2026-10-20T12-39.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-probe.2026-10-20T12-39.json",
+      "sha256": "55c9ed859bd699539354f06589f71211b15f8ccfa666ca0fa814d51abb3729cb",
+      "bytes": 29332
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+      "sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477",
+      "bytes": 17581
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.md",
+      "sha256": "da00b3b6a3394be0292e58cb93c85e21fc8c1405515295f7130a397ac25801b4",
+      "bytes": 1899
+    }
+  ],
+  "self_qualification": "Self is listed; its SHA is supplied in the terminal handoff.",
+  "scope": "Independent finite findings/probe only. Owner candidate/original archive remain referenced, unchanged and separately owned."
+}

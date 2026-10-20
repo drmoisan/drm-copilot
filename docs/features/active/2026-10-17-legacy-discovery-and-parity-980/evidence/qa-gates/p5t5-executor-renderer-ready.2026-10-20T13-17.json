@@ -1,0 +1,100 @@
+{
+  "Timestamp": "2026-10-20T13-17",
+  "Command": "Reconcile the named frozen renderer repair evidence and publish its checked WIP union.",
+  "EXIT_CODE": 0,
+  "task": "P5-T5",
+  "status": "READY_FOR_CHECKED_RENDERER_WIP",
+  "candidate_head": "a6ead9966bcd9e5ce72c41a14c5a9cd884515f58",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-freeze.2026-10-20T13-07.json",
+    "sha256": "d6fbe1f305a6f4d46771497147cfc3a3f8630b361f3f653d87068bafdaf3047b",
+    "bytes": 11556
+  },
+  "reconciliation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-reconciliation.2026-10-20T13-17.json",
+    "sha256": "4ea66166c5eef2320dfcd4fdf242fd761bf83ba40f42226b50532a114d9c8112",
+    "bytes": 38452
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-executor-renderer-review.2026-10-20T12-39.json",
+    "sha256": "21701357b3dbc458b29f395246ca49cc025422835d39e3afd3ee6215ab3b9477",
+    "bytes": 17581
+  },
+  "closed_findings": {
+    "RR1": "Public file/bundle byte caps use prospective exact UTF-8 counts and no implicit LF.",
+    "RR2": "Prefix/tag reservations precede copies; 16 measured escaped-byte work units bound the documented 13 traversals.",
+    "RT1": "Both fixture repairs preserve original payload and trace assertions.",
+    "RC1": "All 17 actual class/callable ranges meet 90%; no previously covered or changed statement loss.",
+    "PC1": "The enumerated intent contracts/comments are corrected within the approved split and 500-line cap."
+  },
+  "proof": {
+    "ordered_black_ruff_pyright": "PASS",
+    "counted_prechecks": 2,
+    "tests": 77,
+    "retained_original_test_ids": 62,
+    "new_resource_controls": 15,
+    "covered_statements": 236,
+    "statements": 242,
+    "covered_branches": 102,
+    "branches": 108,
+    "ranges": 17,
+    "examples": "Three declared synthetic inputs; seven exact rendered outputs plus README."
+  },
+  "candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": {
+      "sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "lf_sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": {
+      "sha256": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+      "lf_sha256": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+      "physical_lines": 173
+    },
+    "tests/discovery_runtime/test_gherkin.py": {
+      "sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "lf_sha256": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+      "physical_lines": 404
+    },
+    "tests/discovery_runtime/test_acceptance_tags.py": {
+      "sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "lf_sha256": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+      "physical_lines": 181
+    },
+    "tests/discovery_runtime/test_acceptance_render_limits.py": {
+      "sha256": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+      "lf_sha256": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+      "physical_lines": 228
+    }
+  },
+  "retained_set_e": {
+    "commit": "a6ead9966bcd9e5ce72c41a14c5a9cd884515f58",
+    "cases": 41,
+    "review": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-set-e-review.2026-10-20T12-29.json"
+  },
+  "prepared_final_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t5-final-candidate-staging.2026-10-20T13-10.json",
+    "sha256": "fb07b1480f76991dc34d37c349d10f75f155ca7b8ecb6e602632149c34325002",
+    "bytes": 1531
+  },
+  "qualifications": [
+    "Original 60-pass/two-fixture-failure proof and first repaired 77-pass/eight-unit coefficient proof remain historical and unchanged.",
+    "Final raw coverage has no terminal newline; raw byte identities are preserved separately from UTF-8 readable views.",
+    "Readable command streams use the executed harness's observed workspace/scratch replacement, newline normalization and trailing-whitespace removal; exact originals and hashes remain in the named archives.",
+    "The initial checker omitted the documented readable trailing-whitespace removal and stopped on formatter stderr. Its exact script and tool-rendered diagnostic are preserved; only the reader was corrected.",
+    "The second checker treated the audit original_nodes count as a list. The corrected reader uses the original receipt's exact 62 identities and verifies their preservation in the final 77; owner evidence is unchanged.",
+    "First example-authoring failure retains its tool-rendered summary, exact script and verified no-write result; separate raw subprocess streams were not captured.",
+    "Set E at a6ead9966bcd9e5ce72c41a14c5a9cd884515f58 is retained. Prepared 118-node final sequence has not run."
+  ],
+  "findings": [],
+  "open_probes": [],
+  "task_acceptance": "Pending the prepared 118-case combined final sequence and final task reconciliation.",
+  "scope": "Evidence only; no production, test, plan, acceptance criteria, checkpoint, index or commit mutation.",
+  "next_five": [
+    "P5-T5",
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1"
+  ]
+}

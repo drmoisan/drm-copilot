@@ -1,0 +1,247 @@
+{
+  "task": "P5-T5",
+  "created_utc": "2026-10-20T13:03:33.633286+00:00",
+  "status": "PASS",
+  "scope": "Synthetic examples, no unit-suite replay or runtime execution.",
+  "tested_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-renderer-repair2-tests.2026-10-20T13-00.json",
+    "sha256": "8f6a32cb446d04e254f4562c4bb2812d9e7e5383737857ea8efae14153628e6c"
+  },
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_render_text.py": "4dabe498a2cc48a1d96d5839b2247be8734c5b35e9d933fd41855976d08cc6a6",
+    "tests/discovery_runtime/test_gherkin.py": "6f7e71e2a2bde1bc092070d331e407f1e0032906551c6e336e8f71aa0cf0748e",
+    "tests/discovery_runtime/test_acceptance_tags.py": "4f7c815cd378d0a2dd4ab077ab00512f5f06d0be1da2bdd071e6dcdb914c61e5",
+    "tests/discovery_runtime/test_acceptance_render_limits.py": "905b1d285f455b41a20a851cea90fe052a651f9a528b8ae421605b4952b5b3fb",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+    "tests/discovery_runtime/test_acceptance_generation.py": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+    "tests/discovery_runtime/test_acceptance_properties.py": "7c9d8d2f4e4106fe89f863f4742de70a1bc869ab0f421e5ea05fa1460cbb63ac"
+  },
+  "cases": [
+    {
+      "name": "observed-source",
+      "accepted_factory": "generation_snapshot(catalog)",
+      "kind": "legacy-characterization",
+      "ready": 1,
+      "pending": 0,
+      "files": [
+        {
+          "path": "examples/discovery/v2/acceptance/observed-source/acceptance.md",
+          "sha256": "5e00feda4e9b6f9d78c33a6c7c8a4a1937fc7ae79775531ddb9dbfc400c6093a",
+          "bytes": 2171
+        },
+        {
+          "path": "examples/discovery/v2/acceptance/observed-source/legacy-characterization/scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d.feature",
+          "sha256": "94d1edef4dd3c58683805287be6be6228966cc9531bc87a85e06d9ca88ee9b81",
+          "bytes": 2432
+        }
+      ],
+      "specifications": [
+        {
+          "scenario_id": "scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d",
+          "criterion_id": "criterion-alpha",
+          "readiness": "ready",
+          "sha256": "2f25ad3fe5c5d5383d068c2da9610601760c1bab91422ec5eb6319c8f9d94d19"
+        }
+      ],
+      "captured_originals": [
+        {
+          "path": "docs/migration/discovery/domain-profile.yaml",
+          "category": "profile",
+          "sha256": "e9f71246dc123beb6ac540598da89fc5422ec153f42df9f7d4879a287613244f",
+          "bytes": 2578
+        },
+        {
+          "path": "docs/migration/discovery/feature-alpha.json",
+          "category": "artifact",
+          "sha256": "fd26fb72ecb57322e1ed2f8c89ac3d38c0717a6e9d0b1957f0563ff2e3abb119",
+          "bytes": 5390
+        },
+        {
+          "path": "docs/migration/discovery/source-alpha.json",
+          "category": "artifact",
+          "sha256": "4799bc1bb4a75a9b7c285c9f00cf1fd19559a8187aff9c714491915e1d0aec5c",
+          "bytes": 843
+        },
+        {
+          "path": "evidence/capture.bin",
+          "category": "evidence",
+          "sha256": "f119d0afd91f07dbd0136a57344689f760d90f13e54e2ef8b5d2c3b1d2e0b29b",
+          "bytes": 22
+        }
+      ],
+      "findings": []
+    },
+    {
+      "name": "approved-target",
+      "accepted_factory": "policy_snapshot(catalog, status='approved')",
+      "kind": "target-acceptance",
+      "ready": 2,
+      "pending": 0,
+      "files": [
+        {
+          "path": "examples/discovery/v2/acceptance/approved-target/acceptance.md",
+          "sha256": "f57426be2d3631d474bce83434f97b9dcb4d8d12c83d5f716a1d8e2491a7d1c7",
+          "bytes": 4554
+        },
+        {
+          "path": "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+          "sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f",
+          "bytes": 2484
+        },
+        {
+          "path": "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2.feature",
+          "sha256": "3a7fb7a60a8a988d1d46b8b3a5c0daa8cd7173fe727b1d4c041a7b68f25e438b",
+          "bytes": 2781
+        }
+      ],
+      "specifications": [
+        {
+          "scenario_id": "scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a",
+          "criterion_id": "criterion-alpha",
+          "readiness": "ready",
+          "sha256": "60e590baef3c43863e8e9d7aa4f82d96678e5c090731964af9e2c5465b19e043"
+        },
+        {
+          "scenario_id": "scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2",
+          "criterion_id": "target-criterion",
+          "readiness": "ready",
+          "sha256": "5782e8ee46419a6f81cfdbb6a707a5a4ffbfcc3a3bf32eaf8187b05ec137071c"
+        }
+      ],
+      "captured_originals": [
+        {
+          "path": "docs/migration/discovery/decision-alpha.json",
+          "category": "artifact",
+          "sha256": "2537a2853afb2d3b91e5b27cb7b12c417df5d500bd3da37face13d379ed5d418",
+          "bytes": 1585
+        },
+        {
+          "path": "docs/migration/discovery/decision-evidence-alpha.json",
+          "category": "artifact",
+          "sha256": "7666385623e6280d3fe1da43b1fc5066b06694e0a53e70322339afa9aa8fccf5",
+          "bytes": 813
+        },
+        {
+          "path": "docs/migration/discovery/domain-profile.yaml",
+          "category": "profile",
+          "sha256": "4a89fb5f72043cbc43cc8a7a7ffb7b17a62e221774b22ebd2f4265d2c4453a25",
+          "bytes": 2738
+        },
+        {
+          "path": "docs/migration/discovery/feature-alpha.json",
+          "category": "artifact",
+          "sha256": "fd26fb72ecb57322e1ed2f8c89ac3d38c0717a6e9d0b1957f0563ff2e3abb119",
+          "bytes": 5390
+        },
+        {
+          "path": "docs/migration/discovery/source-alpha.json",
+          "category": "artifact",
+          "sha256": "4799bc1bb4a75a9b7c285c9f00cf1fd19559a8187aff9c714491915e1d0aec5c",
+          "bytes": 843
+        },
+        {
+          "path": "evidence/capture.bin",
+          "category": "evidence",
+          "sha256": "f119d0afd91f07dbd0136a57344689f760d90f13e54e2ef8b5d2c3b1d2e0b29b",
+          "bytes": 22
+        }
+      ],
+      "findings": []
+    },
+    {
+      "name": "pending-target",
+      "accepted_factory": "policy_snapshot(catalog, status='proposed')",
+      "kind": "target-acceptance",
+      "ready": 1,
+      "pending": 1,
+      "files": [
+        {
+          "path": "examples/discovery/v2/acceptance/pending-target/acceptance.md",
+          "sha256": "8b6f13b781fa9745873d5b41d6879fc7d9af512437fc20916a65c57956f7b894",
+          "bytes": 4529
+        },
+        {
+          "path": "examples/discovery/v2/acceptance/pending-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+          "sha256": "36bc16e2604ff3a6a56296503bca627e936ffd5d8f6dd28afd5dca8a07bc983f",
+          "bytes": 2484
+        }
+      ],
+      "specifications": [
+        {
+          "scenario_id": "scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a",
+          "criterion_id": "criterion-alpha",
+          "readiness": "ready",
+          "sha256": "60e590baef3c43863e8e9d7aa4f82d96678e5c090731964af9e2c5465b19e043"
+        },
+        {
+          "scenario_id": "scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2",
+          "criterion_id": "target-criterion",
+          "readiness": "pending",
+          "sha256": "d3d634728c7de01c85348ec31b95566794e8151ea66f9394e723648ca9c3ebd6"
+        }
+      ],
+      "captured_originals": [
+        {
+          "path": "docs/migration/discovery/decision-alpha.json",
+          "category": "artifact",
+          "sha256": "80314cbea842ffb03dc75796a2e92fde828c4425eca5b0b6b31f2e197339f2ac",
+          "bytes": 1419
+        },
+        {
+          "path": "docs/migration/discovery/decision-evidence-alpha.json",
+          "category": "artifact",
+          "sha256": "7666385623e6280d3fe1da43b1fc5066b06694e0a53e70322339afa9aa8fccf5",
+          "bytes": 813
+        },
+        {
+          "path": "docs/migration/discovery/domain-profile.yaml",
+          "category": "profile",
+          "sha256": "4a89fb5f72043cbc43cc8a7a7ffb7b17a62e221774b22ebd2f4265d2c4453a25",
+          "bytes": 2738
+        },
+        {
+          "path": "docs/migration/discovery/feature-alpha.json",
+          "category": "artifact",
+          "sha256": "fd26fb72ecb57322e1ed2f8c89ac3d38c0717a6e9d0b1957f0563ff2e3abb119",
+          "bytes": 5390
+        },
+        {
+          "path": "docs/migration/discovery/source-alpha.json",
+          "category": "artifact",
+          "sha256": "4799bc1bb4a75a9b7c285c9f00cf1fd19559a8187aff9c714491915e1d0aec5c",
+          "bytes": 843
+        },
+        {
+          "path": "evidence/capture.bin",
+          "category": "evidence",
+          "sha256": "f119d0afd91f07dbd0136a57344689f760d90f13e54e2ef8b5d2c3b1d2e0b29b",
+          "bytes": 22
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t5-renderer-examples-originals.2026-10-20T13-03.json",
+    "sha256": "3421aee8da364eed44fb0de52417abea9115320c6ae68533fe9a968c3394cf54"
+  },
+  "output_byte_verification": "Every saved rendered file was reread and matched the exact public renderer bytes.",
+  "stage_paths": [
+    "examples/discovery/v2/acceptance/observed-source/acceptance.md",
+    "examples/discovery/v2/acceptance/observed-source/legacy-characterization/scn-1f67726998f52a9c19610fec1527ad56b5272251bcfa11ae78090950c00a368d.feature",
+    "examples/discovery/v2/acceptance/approved-target/acceptance.md",
+    "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+    "examples/discovery/v2/acceptance/approved-target/target-acceptance/scn-38848f66d18952dfe72d4ee067b5503c0956e62677349253806702d4e11261d2.feature",
+    "examples/discovery/v2/acceptance/pending-target/acceptance.md",
+    "examples/discovery/v2/acceptance/pending-target/target-acceptance/scn-1b765bd218f981e7dac57f9fe90916ade9605a67b8e760eb56dacd2dde7f483a.feature",
+    "examples/discovery/v2/acceptance/README.md"
+  ]
+}
