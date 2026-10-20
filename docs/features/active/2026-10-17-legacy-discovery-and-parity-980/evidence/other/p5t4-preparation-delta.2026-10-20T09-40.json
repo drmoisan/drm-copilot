@@ -1,0 +1,105 @@
+{
+  "status": "READ_ONLY_PREPARATION_READY_NOT_IMPLEMENTATION_RELEASE",
+  "candidate": "a00b2b36; P5-T3 final acceptance remains prerequisite",
+  "route": "source_inspection_p5t4_prepare_20261020 / S5_P5T4_preparation_refresh",
+  "retained_authority": "execution_progress.p5_acceptance_preparation.result and identity_resolution; no research or predecessor suites repeated",
+  "plan_scope": {
+    "task": "P5-T4",
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_acceptance_generation.py",
+      "tests/discovery_runtime/test_acceptance_decisions.py",
+      "tests/discovery_runtime/test_acceptance_properties.py"
+    ],
+    "deferred": "P5-T5 owns Gherkin/Markdown views and Set E assertions; P6 owns complete service/CLI and guarded publication. No current legacy adapter mutation is needed merely to introduce v2 authority."
+  },
+  "current_interface_delta": [
+    "acceptance_source_digest(sources: tuple[ArtifactRecord,...], decisions: tuple[ArtifactRecord,...]=())->str is already the public accepted content authority. Reuse it; do not migrate the old three-dictionary compute_source_digest formula into v2.",
+    "validate_acceptance(snapshot, *, complete=False,index=None,evidence=None,decisions=None,dimensions=None)->AcceptanceValidation(ready,findings) still validates prospective specifications. It is not a generator or a criterion eligibility projection. Its private criteria/proof/identity methods are not public APIs.",
+    "ReferenceIndex preserves ArtifactRecord.repository and original path (origin_path or path); validate_revisions and EvidenceValidation.can_prove remain required integrity/proof checks. Resolution alone is not source validity.",
+    "DecisionValidation.approved, ApprovedDecision.scope.covers, decision_scope and criterion_applies supply current scoped eligibility; DimensionValidation.obligations exposes actual configured requirements including custom coordinates.",
+    "ReportBudget.work/check/text and bounded_object(value,*,limits) now provide reusable prospective work/JSON bounds. DiscoveryReport is a report carrier, not an acceptance-readiness carrier. No coverage/parity/completion report_projection integration is required.",
+    "ValidationOperation is now in validation_operation.py, but its constructor performs all base assessments and does not retain the local AcceptanceValidation result. Do not add generator semantics to validation.py or use completion assessment as a readiness shortcut."
+  ],
+  "recommended_contract_to_freeze_before_delegation": {
+    "identity": "Immutable typed key: source_repository_id, kind, feature_id, criterion_id, client_id, platform_id, actual mode coordinate(s), and existing linked scenario identity discriminator(s). Existing scenario identity is an input discriminator, never the newly generated output ID. Structured canonical JSON separates null/empty and boundaries; bound it before UTF-8/SHA-256. Exclude pins, byte hashes, statements, names and unrelated metadata from this key. Detect conflicting equal keys and hash/output collisions explicitly.",
+    "record": "Frozen acceptance value carries a bounded closed-v2 JsonObject and separate captured RepositoryIdentity ownership. The schema has no repository top-level field; source and target ownership must not be lost when returning plain JSON. Use immutable tuples/JsonObject and detached serialization; do not give callers a mutable ready flag.",
+    "result": "Frozen tuple of generated acceptance values plus bounded ordered Finding tuple; no write plans, host authority, implementation-test status or AC checkoff. Public generation accepts DiscoverySnapshot and explicit kind/filter data; settle exact exported names and filter shapes in the implementation contract, because none exists today.",
+    "readiness": "Build bounded candidates, then validate the complete prospective batch through existing schema/revision/reference/evidence/decision/acceptance rules with shared contexts. Only supported ready records remain ready. Unknown/proposed/rejected/superseded expectations have then=null, unresolved basis and nonempty pending reasons; invalid source refs stay blocking, not disguised as pending. No discovery-complete prerequisite and no per-record full graph revalidation.",
+    "content": "Given/action come only from retained contract or selected observation fields. Then is exactly the eligible criterion expected_result. Target approved decisions do not rewrite observed legacy facts. Use acceptance_source_digest over actual linked source/decision records; retain original source paths/raw hashes and pinned revisions in immutable refs.",
+    "bounds": "Reserve aggregate input traversal, selector comparisons, Cartesian coordinate expansion, candidate count, sorting, evidence/reference copying and retained output bytes before allocation. Empty filters must not create fallback scenarios or implicit online/mobile/offline coordinates. Abort exhaustion without partial success."
+  },
+  "disjoint_split": [
+    "Model/identity specialist owns acceptance_models.py and test_acceptance_properties.py: immutable carriers, canonical identity, collision handling, bounded detached serialization. Freeze names/field types and identity bytes first.",
+    "Generation specialist owns acceptance_generation.py and test_acceptance_generation.py,test_acceptance_decisions.py: bounded configured expansion, current decisions, source refs/digest and prospective batch validation. Consume the frozen model only. Keep the reusable semantic test fixture in test_acceptance_generation.py under this owner unless an approved cohesive test-support split becomes necessary.",
+    "Do not split source eligibility and decision eligibility between concurrent writers of acceptance_generation.py. No existing validator edit is currently proven necessary; if public eligibility reuse cannot be achieved with prospective validation, request an exact cohesive helper extraction before editing acceptance_rules.py (489 lines) or decision_rules.py (477 lines)."
+  ],
+  "bounded_test_population": {
+    "generation": "Both kinds; verified source/approved target roundtrip through accepted validators; known explicit action; missing action/unknown expectation pending; structurally invalid source/pin/hash/ambiguous feature remain blocking; no unconditional runtime input; no partial result on bytes/nodes/candidate/product limits; one counted aggregate assessment/selector-work regression.",
+    "decisions": "Current approved exact scope, wrong client/platform/mode, proposed/rejected/superseded, conflicting current approvals, missing/invalid approval evidence; approved target result can coexist with unresolved legacy observation without mutating it.",
+    "properties": "Same feature ID in two repositories; two clients same platform; one client two platforms; distinct original scenario discriminators; actual custom/online/offline mode coordinates; permutation/dedup byte stability; statement/evidence/pin changes preserve ID but update required digest/provenance; display-name/unrelated metadata changes preserve ID; conflicting canonical identity/collision fails.",
+    "reuse": "Use existing test_acceptance_rules.criterion/acceptance_graph plus profile/decision/source snapshot fixtures. Those helpers are semantic fixtures, not automatically proof of schema-valid publication. New generated records must be schema-valid and roundtrip. Do not rerun all 94 accepted rule cases or P5 report suites.",
+    "case_count": "Freeze exact parametrized nodes only after the new tests exist; no fabricated executed count. Limit baseline to changed/new population plus concretely affected callers."
+  },
+  "narrow_spec_replacement": {
+    "location": "spec.md acceptance-generation paragraph at current line441; replace only stable identity/digest/sorting sentences, retain following tags paragraph and all ready/pending/implementation ownership text.",
+    "text": "Stable scenario IDs derive from a specified canonical structured key containing the source repository ID, specification kind, feature ID, criterion ID, client ID, applicable platform ID, actual mode coordinates, and any existing linked scenario identity discriminator. Preserve distinct clients on the same platform and distinct platforms for one client. Use that key and a SHA-256 suffix for identity and deterministic ordering; reject remaining identity collisions. Display names, unrelated metadata, statements, evidence content and pinned revisions do not participate in the identity key. Statement or evidence changes update the content digest and traceability as applicable; pinned revisions remain in source provenance and the source content digest."
+  },
+  "actual_prerequisites": [
+    "P5-T3 accepted commit and narrow routed spec wording update before generation interface freeze.",
+    "Freeze which selected existing scenario identities participate and the canonical key encoding; old derive_scenario_id(feature_ref,parity_ref,characterization_ref) is a legacy compatibility formula, not a sufficient v2 identity.",
+    "Freeze candidate-batch validation/ownership result shape before disjoint model/generator work; accepted ready proof is available but no public pre-generation eligibility carrier exists.",
+    "All five planned P5-T4 files are absent. Existing legacy generator492/test488 and acceptance_rules489 are near the500-line cap; do not append v2 logic or new Set E tests there. No mandatory new production split is established before implementation sizing."
+  ],
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py": {
+      "sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "lines": 489
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py": {
+      "sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+      "lines": 309
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py": {
+      "sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+      "lines": 477
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py": {
+      "sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "lines": 458
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/references.py": {
+      "sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "lines": 436
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": {
+      "sha256": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443",
+      "lines": 310
+    },
+    "schemas/discovery/v2/acceptance-specification.schema.json": {
+      "sha256": "c9c016a78261c0d0d154d9fdc0354499452a00f382ce5e662c21f968d963e888",
+      "lines": 64
+    },
+    "scripts/dev_tools/generate_acceptance_scenarios.py": {
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "lines": 492
+    }
+  },
+  "effects": {
+    "source_tests_spec_plan_checkpoint_git_mutations": false,
+    "suites": false,
+    "external_research": false,
+    "consumer_access": false
+  }
+}
