@@ -1,0 +1,148 @@
+"""Preserve ordered generation gates, byte bindings and observable test progress."""
+from __future__ import annotations
+
+import base64
+import gzip
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+sys.stdout.reconfigure(encoding="utf-8")
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).parent
+OUT = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing"
+ATTEMPT = sys.argv[1]
+PREFIX = "p5t4-generation-" + ATTEMPT
+SOURCES = ["packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+           for name in ("acceptance_generation", "acceptance_generation_context")]
+TESTS = ["tests/discovery_runtime/" + name + ".py"
+         for name in ("test_acceptance_generation", "test_acceptance_decisions",
+                      "test_acceptance_generation_limits")]
+PRECHECKS = [
+    TESTS[2] + "::test_coordinate_comparisons_reserve_text_work_before_matching",
+    TESTS[2] + "::test_empty_actual_population_does_not_create_fallback_scenarios[no-modes]",
+    TESTS[1] + "::test_only_current_approved_scoped_policy_can_supply_target_expectations[approved]",
+    TESTS[1] + "::test_linked_scenarios_discriminate_ids_without_replacing_criterion_expectations",
+    TESTS[1] + "::test_mobile_and_custom_modes_follow_actual_configuration",
+    TESTS[2] + "::test_two_complete_rule_passes_are_independent_of_candidate_count",
+    TESTS[1] + "::test_imported_source_retains_original_provenance_and_distinct_target_owner",
+]
+BORROWED = ["packages/discovery-runtime/src/drm_copilot_discovery/" + name + ".py"
+            for name in ("acceptance_models", "acceptance_rules", "acceptance_scope_rules",
+                         "acceptance_claim_rules", "dimension_rules", "decision_rules",
+                         "evidence_rules", "claim_rules", "report_models", "references",
+                         "revision_rules", "snapshot", "validation_inputs")]
+BORROWED = [path for path in BORROWED if (ROOT / path).exists()]
+ENV = dict(os.environ)
+ENV.update(PYTHONDONTWRITEBYTECODE="1", PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
+           PYTHONUTF8="1", COVERAGE_FILE=str(SCRATCH / (PREFIX + ".coverage")))
+
+
+def digest(raw: bytes) -> str:
+    """Return SHA-256 of exact bytes without changing them."""
+    return hashlib.sha256(raw).hexdigest()
+
+
+def identities() -> dict[str, str]:
+    """Return owned and borrowed working-stream identities."""
+    return {path: digest((ROOT / path).read_bytes()) for path in SOURCES + TESTS + BORROWED}
+
+
+def readable(value: str) -> str:
+    """Normalize only readable host-path/newline presentation."""
+    for path, label in ((str(ROOT), "<WORKSPACE>"), (str(SCRATCH), "<SCRATCH>")):
+        for spelling in (path, path.replace("\\", "/")):
+            value = re.sub(re.escape(spelling), lambda match: label, value, flags=re.I)
+    return "\n".join(line.rstrip() for line in value.replace("\r\n", "\n").replace("\r", "\n").splitlines()).rstrip()
+
+
+def run(stage: str, command: list[str]) -> None:
+    """Execute one bounded stage and preserve exact streams, script and bindings."""
+    before = identities()
+    started = datetime.now(timezone.utc)
+    clock = time.monotonic()
+    streams = {name: SCRATCH / f"{PREFIX}-{stage}.{name}" for name in ("stdout", "stderr")}
+    with streams["stdout"].open("wb") as stdout, streams["stderr"].open("wb") as stderr:
+        process = subprocess.Popen(command, cwd=ROOT, env=ENV, stdout=stdout, stderr=stderr)
+        progress_at = clock
+        timed_out = False
+        while process.poll() is None:
+            time.sleep(0.2)
+            now = time.monotonic()
+            if now - progress_at >= 10:
+                content = streams["stdout"].read_text(encoding="utf-8", errors="replace")
+                nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", content, re.M)
+                progress = {"stage": stage, "elapsed_seconds": round(now - clock, 3),
+                            "completed_nodes": len(nodes), "latest_node": nodes[-1] if nodes else None}
+                (SCRATCH / (PREFIX + "-progress.json")).write_text(
+                    json.dumps(progress, indent=2) + "\n", encoding="utf-8", newline="\n")
+                print(json.dumps(progress), flush=True)
+                progress_at = now
+            if now - clock > 600:
+                process.kill()
+                timed_out = True
+                break
+        code = process.wait()
+    elapsed = time.monotonic() - clock
+    after = identities()
+    raw = {name: path.read_bytes() for name, path in streams.items()}
+    raw["harness"] = Path(__file__).read_bytes()
+    archive = {
+        name: {"encoding": "gzip-base64", "sha256": digest(value), "bytes": len(value),
+               "data": base64.b64encode(gzip.compress(value, mtime=0)).decode("ascii")}
+        for name, value in raw.items()
+    }
+    assert all(gzip.decompress(base64.b64decode(entry["data"])) == raw[name] for name, entry in archive.items())
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+    archive_path = OUT / f"{PREFIX}-{stage}-raw.{stamp}.json"
+    archive_path.write_text(json.dumps(archive, indent=2) + "\n", encoding="utf-8", newline="\n")
+    clean = code == 0 and before == after and not timed_out
+    command_view = [readable(arg) for arg in command]
+    stdout_view = readable(raw["stdout"].decode("utf-8", errors="replace"))
+    stderr_view = readable(raw["stderr"].decode("utf-8", errors="replace"))
+    nodes = re.findall(r"^(tests/.+?) (?:PASSED|FAILED|ERROR)(?:\s|$)", stdout_view, re.M)
+    receipt = {
+        "task": "P5-T4", "stage": stage, "command": command_view, "clean": clean,
+        "exit_code": code, "timeout": timed_out, "elapsed_seconds": round(elapsed, 6),
+        "started_utc": started.isoformat(), "before": before, "after": after,
+        "stdout": stdout_view, "stderr": stderr_view, "executed_nodes": nodes,
+        "raw_archive": archive_path.relative_to(ROOT).as_posix(),
+        "raw_archive_sha256": digest(archive_path.read_bytes()),
+    }
+    base = OUT / f"{PREFIX}-{stage}.{stamp}"
+    Path(str(base) + ".json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+    markdown = (
+        f"# P5-T4 generation {stage}\n\nTimestamp: {started.strftime('%Y-%m-%dT%H-%M')}\n\n"
+        f"Command: `{' '.join(command_view)}`\n\nEXIT_CODE: {code}\n\n"
+        f"Output Summary: {'PASS' if clean else 'FAIL or changed bytes'}; {elapsed:.3f} seconds.\n\n"
+        f"```text\n{stdout_view}\n{stderr_view}\n```\n"
+    )
+    Path(str(base) + ".md").write_text(readable(markdown) + "\n", encoding="utf-8", newline="\n")
+    print(json.dumps({"stage": stage, "clean": clean, "exit_code": code, "elapsed": round(elapsed, 3),
+                      "nodes": len(nodes), "receipt": Path(str(base) + ".json").relative_to(ROOT).as_posix()}), flush=True)
+    if not clean:
+        print(stdout_view[-12000:] + "\n" + stderr_view[-12000:], flush=True)
+        raise SystemExit(1)
+
+
+commands = [
+    ("black", ["poetry", "run", "black", *([] if ATTEMPT.endswith("format") else ["--check"]), *SOURCES, *TESTS]),
+    ("ruff", ["poetry", "run", "ruff", "check", *SOURCES, *TESTS]),
+    ("pyright", ["poetry", "run", "pyright", *SOURCES, *TESTS]),
+    ("precheck", ["poetry", "run", "pytest", "-v", "--tb=short", "--maxfail=3",
+                  "-o", "addopts=", "-p", "no:cacheprovider", *PRECHECKS]),
+    ("tests", ["poetry", "run", "coverage", "run", "--branch",
+               "--source=drm_copilot_discovery.acceptance_generation,drm_copilot_discovery.acceptance_generation_context",
+               "-m", "pytest", "-v", "--tb=short", "--maxfail=3", "-o", "addopts=",
+               "-p", "no:cacheprovider", *TESTS]),
+    ("coverage", ["poetry", "run", "coverage", "json", "--show-contexts",
+                  "-o", str(SCRATCH / f"{PREFIX}-coverage.json")]),
+]
+for stage, command in commands:
+    run(stage, command)

@@ -1,0 +1,51 @@
+{
+  "timestamp_utc": "2026-10-20T11:02:51.445630+00:00",
+  "source_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "b0ffeacb101d240d9c6585f3ae9b4d973ebf75030f0d09a998ed14b6a63287af",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": "0edcab9fd33f17f85127d86aab89ea60868a1cb23d49eee7647418414e1562d0",
+    "tests/discovery_runtime/test_acceptance_generation.py": "85c334d7e66841b1b45f73bc57af517f3b7d8c67187412a572f490b6bee2043f",
+    "tests/discovery_runtime/test_acceptance_decisions.py": "bc7dfa0ff12f5cc68355f35dc60ef575b1d806d7345dc7249aa8b803a99be308"
+  },
+  "observations": [
+    {
+      "identifier_characters": 32,
+      "platform_count": 16,
+      "mode_count": 16,
+      "coordinate_count": 256,
+      "remaining_work_before": 7000,
+      "charged_work": 1314,
+      "equal_calls": 256,
+      "equal_characters": 8192,
+      "hash_calls": 256,
+      "candidate_count": 0,
+      "returned_without_limit_error": true
+    },
+    {
+      "identifier_characters": 4096,
+      "platform_count": 16,
+      "mode_count": 16,
+      "coordinate_count": 256,
+      "remaining_work_before": 7000,
+      "charged_work": 1314,
+      "equal_calls": 256,
+      "equal_characters": 1048576,
+      "hash_calls": 256,
+      "candidate_count": 0,
+      "returned_without_limit_error": true
+    },
+    {
+      "identifier_characters": 4096,
+      "platform_count": 32,
+      "mode_count": 32,
+      "coordinate_count": 1024,
+      "remaining_work_before": 7000,
+      "charged_work": 5186,
+      "equal_calls": 1024,
+      "equal_characters": 4194304,
+      "hash_calls": 1024,
+      "candidate_count": 0,
+      "returned_without_limit_error": true
+    }
+  ],
+  "qualification": "Isolated actual _Generation.expand with real immutable record/criterion/requirements and public criterion_applies. Call-local context/client seams supply already-assessed values; no whole-snapshot or suite execution. CountedIdentifier delegates str equality/hash unchanged. Equal-character counts are the summed lengths of compared equal strings, not elapsed time or a claim about CPU instructions. Input text hashing may be cached; the observed repeated positive equality still compares equal distinct strings. The positive client match is followed by a platform mismatch, so no output copy or serialized-output reservation can cover this repeated text work."
+}

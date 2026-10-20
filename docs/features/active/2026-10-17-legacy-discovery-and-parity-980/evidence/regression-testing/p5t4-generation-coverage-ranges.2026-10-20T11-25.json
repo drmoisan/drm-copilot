@@ -1,0 +1,334 @@
+{
+  "task": "P5-T4",
+  "Timestamp": "2026-10-20T11-25",
+  "source_test_binding": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "bytes": 21193,
+      "physical_lines": 494,
+      "documented_definitions": 7,
+      "commented_loops": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "bytes": 21912,
+      "physical_lines": 488,
+      "documented_definitions": 14,
+      "commented_loops": 14
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "bytes": 18922,
+      "physical_lines": 486,
+      "documented_definitions": 10,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "sha256": "9110510dcd173c19e27323ce165d87b1ece6d3fb232a3d9c349b41e6bef83f10",
+      "bytes": 12885,
+      "physical_lines": 320,
+      "documented_definitions": 7,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "sha256": "ed5c85929028eb52083835bb194ff78b4a506d029689a53230e4abbe92a41023",
+      "bytes": 14260,
+      "physical_lines": 372,
+      "documented_definitions": 17,
+      "commented_loops": 0
+    }
+  ],
+  "tests": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-tests.2026-10-20T11-24.json",
+    "sha256": "131dd81e28f863261a86dc06149f8296a80d2b0e86f3c385e8fd02a1408d928c",
+    "bytes": 19993
+  },
+  "summaries": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": {
+      "covered_lines": 137,
+      "num_statements": 144,
+      "percent_covered": 93.6842105263158,
+      "percent_covered_display": "94",
+      "missing_lines": 7,
+      "excluded_lines": 7,
+      "percent_statements_covered": 95.13888888888889,
+      "percent_statements_covered_display": "95",
+      "num_branches": 46,
+      "num_partial_branches": 5,
+      "covered_branches": 41,
+      "missing_branches": 5,
+      "percent_branches_covered": 89.1304347826087,
+      "percent_branches_covered_display": "89"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": {
+      "covered_lines": 183,
+      "num_statements": 187,
+      "percent_covered": 96.3855421686747,
+      "percent_covered_display": "96",
+      "missing_lines": 4,
+      "excluded_lines": 4,
+      "percent_statements_covered": 97.86096256684492,
+      "percent_statements_covered_display": "98",
+      "num_branches": 62,
+      "num_partial_branches": 5,
+      "covered_branches": 57,
+      "missing_branches": 5,
+      "percent_branches_covered": 91.93548387096774,
+      "percent_branches_covered_display": "92"
+    }
+  },
+  "ranges": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation",
+      "start": 33,
+      "end": 451,
+      "statements": 122,
+      "missing": [
+        99,
+        104,
+        111,
+        114,
+        298,
+        348,
+        353
+      ],
+      "percent": 94.26229508196721
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "generate_acceptance",
+      "start": 454,
+      "end": 494,
+      "statements": 13,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.__init__",
+      "start": 42,
+      "end": 77,
+      "statements": 14,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.scenarios",
+      "start": 79,
+      "end": 120,
+      "statements": 18,
+      "missing": [
+        99,
+        104,
+        111,
+        114
+      ],
+      "percent": 77.77777777777777
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.candidate",
+      "start": 122,
+      "end": 312,
+      "statements": 41,
+      "missing": [
+        298
+      ],
+      "percent": 97.5609756097561
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.expand",
+      "start": 314,
+      "end": 421,
+      "statements": 35,
+      "missing": [
+        348,
+        353
+      ],
+      "percent": 94.28571428571429
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.finish",
+      "start": 423,
+      "end": 451,
+      "statements": 13,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "generation_preflight",
+      "start": 44,
+      "end": 78,
+      "statements": 24,
+      "missing": [
+        53
+      ],
+      "percent": 95.83333333333333
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext",
+      "start": 81,
+      "end": 488,
+      "statements": 143,
+      "missing": [
+        169,
+        287,
+        383
+      ],
+      "percent": 97.9020979020979
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.__init__",
+      "start": 90,
+      "end": 138,
+      "statements": 22,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.blocked",
+      "start": 140,
+      "end": 147,
+      "statements": 4,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.selectors",
+      "start": 149,
+      "end": 177,
+      "statements": 17,
+      "missing": [
+        169
+      ],
+      "percent": 94.11764705882354
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.add_all",
+      "start": 179,
+      "end": 192,
+      "statements": 4,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.problem",
+      "start": 194,
+      "end": 211,
+      "statements": 2,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.linked",
+      "start": 213,
+      "end": 225,
+      "statements": 3,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.links_to",
+      "start": 227,
+      "end": 243,
+      "statements": 4,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.criteria",
+      "start": 245,
+      "end": 277,
+      "statements": 14,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.reference",
+      "start": 279,
+      "end": 309,
+      "statements": 8,
+      "missing": [
+        287
+      ],
+      "percent": 87.5
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.digest",
+      "start": 311,
+      "end": 335,
+      "statements": 10,
+      "missing": [],
+      "percent": 100.0
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.assess",
+      "start": 337,
+      "end": 433,
+      "statements": 34,
+      "missing": [
+        383
+      ],
+      "percent": 97.05882352941177
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.finalize",
+      "start": 435,
+      "end": 488,
+      "statements": 20,
+      "missing": [],
+      "percent": 100.0
+    }
+  ],
+  "convention": "Current raw coverage.py statement sets intersect inclusive qualified AST ranges; declaration/exclusion lines remain as reported.",
+  "failures": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "name": "_Generation.scenarios",
+      "start": 79,
+      "end": 120,
+      "statements": 18,
+      "missing": [
+        99,
+        104,
+        111,
+        114
+      ],
+      "percent": 77.77777777777777
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "name": "GenerationContext.reference",
+      "start": 279,
+      "end": 309,
+      "statements": 8,
+      "missing": [
+        287
+      ],
+      "percent": 87.5
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "Timestamp": "2026-10-20T11:36:08.809938+00:00",
+  "task": "P5-T4",
+  "status": "READY_FOR_CHECKED_WIP_AND_FINAL_GATES",
+  "route": "atomic_execution_p5t4_repair_confirmation_20261020",
+  "profile_sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+  "native_routing_launch_provenance_verified": true,
+  "Command": "poetry run python SCRATCH/issue-980-p5t4-confirm.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "All four findings closed; 49 retained cases plus four authorized controls reconcile across identical production bytes.",
+  "head": "797a24293756fe928ae27e10a7c5061cbefd0921",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-freeze.2026-10-20T11-32.json",
+    "sha256": "503514e75b8e2aab7ec01cb7dff079a553cfb330be8168a42750806e7d7846c1",
+    "bytes": 31498,
+    "git_lf_sha256": "503514e75b8e2aab7ec01cb7dff079a553cfb330be8168a42750806e7d7846c1"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-staging.2026-10-20T11-32.json",
+    "sha256": "84a15f63b9c85de5bf53a2df1a6aa5ece4effdaf519c8ca814fd9691be21937a",
+    "bytes": 61853,
+    "git_lf_sha256": "84a15f63b9c85de5bf53a2df1a6aa5ece4effdaf519c8ca814fd9691be21937a"
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review.2026-10-20T11-06.json",
+    "sha256": "fb4bc7b50176135884fdaf99149716eed9f656ffc3958b098c65bf5355b518fd",
+    "bytes": 19004
+  },
+  "original_review_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-generation-review-staging.2026-10-20T11-06.json",
+    "sha256": "ca59b448d0958d810217620166df0a612ee6c932236686eb2401f3b1e14f51f1",
+    "bytes": 5403,
+    "git_lf_sha256": "ca59b448d0958d810217620166df0a612ee6c932236686eb2401f3b1e14f51f1"
+  },
+  "inspection_payload": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t4-executor-repair-confirmation-payload.2026-10-20T11-36.json",
+    "sha256": "6d46fa0e2aff9844c42ceaa08bd8408af0a5aff55c3a1e9f03ded3508aa5d00b",
+    "bytes": 29375,
+    "git_lf_sha256": "6d46fa0e2aff9844c42ceaa08bd8408af0a5aff55c3a1e9f03ded3508aa5d00b"
+  },
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "bytes": 21193,
+      "physical_lines": 494,
+      "documented_definitions": 7,
+      "commented_loops": 6
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py",
+      "sha256": "06ec5825616c839d373b83a48c93ea1481570ff75a8862f2467c56280e09a44a",
+      "bytes": 21912,
+      "physical_lines": 488,
+      "documented_definitions": 14,
+      "commented_loops": 14
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation.py",
+      "sha256": "af5e6b6795b6ee88a8d221439cff093c8a2b1046a6d49abc9f764f5ef5a75b9f",
+      "bytes": 18922,
+      "physical_lines": 486,
+      "documented_definitions": 10,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+      "sha256": "d05269be42cdf89d6041f1cd99bee971b5a798ba6e37c81490944b517a93c323",
+      "bytes": 16114,
+      "physical_lines": 400,
+      "documented_definitions": 10,
+      "commented_loops": 3
+    },
+    {
+      "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+      "sha256": "132410ef98d30f02f21baf5047a429b75c18d30e0bb7ababd1045f47997419e4",
+      "bytes": 15471,
+      "physical_lines": 401,
+      "documented_definitions": 18,
+      "commented_loops": 0
+    }
+  ],
+  "finding_closure": {
+    "GR1": "Actual selector element and identifier text work is reserved before coordinate enumeration, hashing and equality. Three counted controls reject before work at insufficient capacity and bound observed work with sufficient capacity.",
+    "GT1": "Required modes and criteria retain valid finite dimensions; approval matches configured ownership; observed runs retain coherent evidence/environment bindings. Original assertions and parametrizations are preserved.",
+    "GT2": "The imported source control checks original path, exact raw byte hash and revision against a distinct target owner and actual public ready membership.",
+    "PC1": "The enumerated constructor/method contracts and local loop/decision intent comments are present. The sole executable production delta is _Generation.expand."
+  },
+  "test_preservation": {
+    "original_definitions_checked": 24,
+    "original_case_count": 45,
+    "repair_case_count": 49,
+    "new_coverage_controls": 4,
+    "unique_union": 53,
+    "reconstructed_originals": [
+      {
+        "path": "tests/discovery_runtime/test_acceptance_decisions.py",
+        "repair5_sha256": "9110510dcd173c19e27323ce165d87b1ece6d3fb232a3d9c349b41e6bef83f10",
+        "qualification": "Original bytes reconstructed only by removing the four new test nodes, new Protocol and imports; exact repair5 SHA-256 verified."
+      },
+      {
+        "path": "tests/discovery_runtime/test_acceptance_generation_limits.py",
+        "repair5_sha256": "ed5c85929028eb52083835bb194ff78b4a506d029689a53230e4abbe92a41023",
+        "qualification": "Original bytes reconstructed only by removing the four new test nodes, new Protocol and imports; exact repair5 SHA-256 verified."
+      }
+    ],
+    "qualification": "The 49-case run and four-case extension are separate clean ordered proofs. Reconstructed old test bytes match their original hashes and all previous definitions are AST-identical; this is not a new 53-case execution."
+  },
+  "ordered_repair_proof": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-black.2026-10-20T11-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-ruff.2026-10-20T11-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-pyright.2026-10-20T11-18.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-precheck.2026-10-20T11-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-repair5-tests.2026-10-20T11-24.json"
+  ],
+  "coverage_extension_proof": [
+    {
+      "label": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-black.2026-10-20T11-30.json",
+        "sha256": "9caab5d6b970e250f90a7b9ec47227d1bb8e8332dc3220b67e3ecc633f5a523a",
+        "bytes": 5659
+      },
+      "nodes": [],
+      "elapsed_seconds": 2.011064,
+      "raw_archive_sha256": "597b9eca4d489949dc832f946431f5be16120638bd826ac22d25299d28d69eee"
+    },
+    {
+      "label": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-ruff.2026-10-20T11-30.json",
+        "sha256": "a734d9c67dfb773a2355f3c81fa974c7dfb463c9287613006845eb47f99d6434",
+        "bytes": 5602
+      },
+      "nodes": [],
+      "elapsed_seconds": 1.812976,
+      "raw_archive_sha256": "6972e7b2aefd2a9683a5c3f1f30f82a7177541b4574d59689c3cffd8704cba66"
+    },
+    {
+      "label": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-pyright.2026-10-20T11-30.json",
+        "sha256": "dbd8ffd88f341094b047495a8dc4fef31287580d189c99e9c75a2352fc1d939e",
+        "bytes": 5771
+      },
+      "nodes": [],
+      "elapsed_seconds": 2.814911,
+      "raw_archive_sha256": "c16c330da699fd0fa25117da328d93b06746180b31e0a94fe33cc0844bd26fb0"
+    },
+    {
+      "label": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-tests.2026-10-20T11-30.json",
+        "sha256": "9674ac26e920d2ce64acd027ce817b121bb73a9b44fb6a6b1768519b7e4d1d6c",
+        "bytes": 7210
+      },
+      "nodes": [
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[foreign-owner]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[coordinate]",
+        "tests/discovery_runtime/test_acceptance_decisions.py::test_linked_scenario_selection_preserves_defensive_boundaries[duplicate]",
+        "tests/discovery_runtime/test_acceptance_generation_limits.py::test_missing_reference_revision_rejects_before_output_reservation"
+      ],
+      "elapsed_seconds": 20.662473,
+      "raw_archive_sha256": "d3e96663d7fd8f355e3a980ba1e5ebb09862009d9e3ce9083d8ff3d6515f8048"
+    },
+    {
+      "label": "coverage",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage9-coverage.2026-10-20T11-30.json",
+        "sha256": "fb8843d60caea34fbdf2442a683bc3756b0675fccd20037648c448da8d1aca3e",
+        "bytes": 5390
+      },
+      "nodes": [],
+      "elapsed_seconds": 1.612122,
+      "raw_archive_sha256": "c2242a4ee46601054d8bebeda8b5b1421ae7a9ab48d17d84772aebd7b7702084"
+    }
+  ],
+  "coverage": {
+    "ranges": 21,
+    "summaries": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": {
+        "covered_lines": 141,
+        "num_statements": 144,
+        "percent_covered": 97.36842105263158,
+        "percent_covered_display": "97",
+        "missing_lines": 3,
+        "excluded_lines": 7,
+        "percent_statements_covered": 97.91666666666667,
+        "percent_statements_covered_display": "98",
+        "num_branches": 46,
+        "num_partial_branches": 2,
+        "covered_branches": 44,
+        "missing_branches": 2,
+        "percent_branches_covered": 95.65217391304348,
+        "percent_branches_covered_display": "96"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation_context.py": {
+        "covered_lines": 184,
+        "num_statements": 187,
+        "percent_covered": 97.18875502008032,
+        "percent_covered_display": "97",
+        "missing_lines": 3,
+        "excluded_lines": 4,
+        "percent_statements_covered": 98.39572192513369,
+        "percent_statements_covered_display": "98",
+        "num_branches": 62,
+        "num_partial_branches": 4,
+        "covered_branches": 58,
+        "missing_branches": 4,
+        "percent_branches_covered": 93.54838709677419,
+        "percent_branches_covered_display": "94"
+      }
+    },
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-final-archive.2026-10-20T11-32.json",
+      "sha256": "210b8f575e12a22480631c4dd66d530004460a9c9cc10c9f25fe4a07adb6939b",
+      "bytes": 107127
+    },
+    "range_receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t4-generation-coverage-ranges.2026-10-20T11-32.json",
+      "sha256": "ad45086a640a8fbf1e1ca3272594412c38c3e2dffeb55acb412904ddb1df0cab",
+      "bytes": 9694
+    },
+    "qualification": "The combined executed lines/arcs equal the exact union of both raw reports. Each separate raw report/database remains preserved; no historical proof is injected."
+  },
+  "committed_dependency_closure": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_models.py",
+      "working_sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a",
+      "committed_lf_sha256": "aa3cb9a0f62f45728f3668c57cc978082e8262a6a3484ea79df7b9fef9978d8a"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_rules.py",
+      "working_sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4",
+      "committed_lf_sha256": "fdd797117c162ab90eb3cac5eb4360d0f7031c2e1c519ae7788872acd36bfcc4"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/dimension_rules.py",
+      "working_sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda",
+      "committed_lf_sha256": "6e47a2bff2eb5619b7360af05a069769cbefba5e2bcd8822986252065eedacda"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/decision_rules.py",
+      "working_sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65",
+      "committed_lf_sha256": "618289a9f28eaad58a86148e9a3dba2a9513701fb319900657021c9a71a00c65"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py",
+      "working_sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863",
+      "committed_lf_sha256": "a054292ec3185398d154fd8fde35f4613579acfaaa8fd0b3b31d25a3144fc863"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py",
+      "working_sha256": "a83c85efee3fe54c39b97c8953d554dda96688bdee49fc4321c4e2c559f8fd32",
+      "committed_lf_sha256": "0804a42f5e05201cc17efa98b5e23075fd611b8bb1040b1332150fdbb2ecd2f2"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "committed_lf_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/references.py",
+      "working_sha256": "9a9a53d31366abc67126422cee4e3f0a3a8cd3dc41b7384bf99c7f5ba95e187c",
+      "committed_lf_sha256": "4bc17ac3fe8adc617076a1ed302956f28def4c08eb71e8f08918260287ded122"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py",
+      "working_sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc",
+      "committed_lf_sha256": "13ba39f8684fedad6159b550ba082134e2675beeab55a62feb8105e61cdd6bdc"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "working_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+      "committed_lf_sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "working_sha256": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+      "committed_lf_sha256": "41b941a13e8ec3571ead48e5562282c9080b2b60e41e45c038d9e88cfaefcf4d"
+    }
+  ],
+  "preserved": [
+    "Original 25 passed / 3 failed / 17 unexecuted receipt",
+    "Original counted-work probe and complete finding receipt",
+    "Static restart diagnostics and two initial per-unit coverage gaps",
+    "Exact raw/readable hashes, reconstructed-source qualification and executed harnesses"
+  ],
+  "findings": [],
+  "open_probes": [],
+  "behavioral_replays": 0,
+  "task_acceptance": false,
+  "plan_AC_edits": false,
+  "pending": "P5-T4 final ordered reverse task gates and acceptance; generation remains a pure snapshot transform with publication and installed-host behavior outside this proof."
+}
