@@ -13,6 +13,9 @@ from drm_copilot_discovery.configuration import LOCATOR_PATH
 from drm_copilot_discovery.doctor import inspect_doctor
 from drm_copilot_discovery.gateway_local import LocalServiceIO
 from drm_copilot_discovery.models import ParseLimits
+from drm_copilot_discovery.mutation_io import GuardedMutationWriter
+from drm_copilot_discovery.path_models import PathPolicyError
+from drm_copilot_discovery.path_policy import workspace_identity
 from drm_copilot_discovery.report_models import ReportBudget
 from drm_copilot_discovery.service_contracts import DiscoveryResult
 
@@ -20,6 +23,7 @@ from tests.discovery_runtime.gateway_test_support import (
     MemoryDeadline,
     MemoryProcess,
     invoke,
+    memory_io,
 )
 from tests.discovery_runtime.gateway_test_support import (
     fixed_deadline as fixed_deadline,
@@ -301,4 +305,121 @@ def test_locator_selected_path_is_charged_before_reading(
     result = inspect_doctor(io=ports, request=doctor_request(case), runtime=IDENTITY)
 
     assert result.exit_code == 3 and not case.disk.store.calls
+    assert not case.registry.writes and not case.revocations
+
+
+@pytest.mark.parametrize(
+    "trusted,spelling",
+    [
+        pytest.param("C:/Work/Repo", r"c:\work\REPO", id="windows-drive"),
+        pytest.param("//server/share/Repo", r"\\SERVER\SHARE\repo", id="windows-unc"),
+        pytest.param("/Work/Repo", "/Work/Repo", id="posix-exact"),
+    ],
+)
+def test_local_root_identity_accepts_equivalent_spelling(
+    config_catalog: SchemaCatalog, trusted: str, spelling: str
+) -> None:
+    """Accept one root identity through pre-capture, capture and writer checks.
+
+    config_catalog (SchemaCatalog) supplies schemas; trusted and spelling (str)
+    model equivalent supported roots. Return None; AssertionError reports lost
+    identity or effects. All ports and captures are memory-only.
+    """
+    case, local, baseline = memory_io(config_catalog)
+    local.initialization.workspace_root = trusted
+    request = replace(doctor_request(case), workspace_root=spelling)
+    baseline = replace(baseline, workspace_root=spelling)
+    before = tuple(case.disk.store.calls)
+
+    initial = local.authorize(request, baseline=None)
+    captured = local.authorize(request, baseline=baseline)
+    writer = local.writer(baseline, authority=captured)
+
+    assert workspace_identity(spelling) == workspace_identity(trusted)
+    assert initial == captured and captured.principal == "local-user"
+    assert captured.grants == () and captured.invocation is None
+    assert isinstance(writer, GuardedMutationWriter)
+    assert tuple(case.disk.store.calls) == before
+    assert not case.registry.writes and not case.revocations
+
+
+@pytest.mark.parametrize("boundary", ["request", "baseline", "writer"])
+@pytest.mark.parametrize(
+    "trusted,candidate",
+    [
+        pytest.param("C:/Work/Repo", "C:/Work/Other", id="different-root"),
+        pytest.param("C:/Work/Repo", "D:/Work/Repo", id="different-drive"),
+        pytest.param("C:/Work/Repo", "C:/Work/Repo-sibling", id="sibling-prefix"),
+        pytest.param(
+            "//server/share/Repo", "//server/other/Repo", id="different-share"
+        ),
+        pytest.param(
+            "//server/share/Repo", "//other/share/Repo", id="different-server"
+        ),
+        pytest.param("/Work/Repo", "/work/Repo", id="posix-case"),
+        pytest.param("/Work/Repo", r"/Work\Repo", id="posix-backslash"),
+        pytest.param("C:/Work/Repo", "Work/Repo", id="relative"),
+        pytest.param("C:/Work/Repo", ".", id="current-directory"),
+        pytest.param("C:/Work/Repo", "C:Work/Repo", id="drive-relative"),
+        pytest.param("C:/Work/Repo", r"\Work\Repo", id="root-relative"),
+        pytest.param("C:/Work/Repo", r"\\?\C:\Work\Repo", id="device-extended"),
+        pytest.param("C:/Work/Repo", r"\\.\C:\Work\Repo", id="device-dot"),
+        pytest.param("C:/Work/Repo", "C:/Work/./Repo", id="dot-component"),
+        pytest.param("C:/Work/Repo", "C:/Work/Other/../Repo", id="parent-component"),
+        pytest.param("C:/Work/Repo", "C:/Work/CON", id="reserved-component"),
+        pytest.param("C:/Work/Repo", "C:/Work/Repo.", id="trailing-dot"),
+    ],
+)
+def test_local_root_identity_rejects_nonmatching_roots(
+    config_catalog: SchemaCatalog, trusted: str, candidate: str, boundary: str
+) -> None:
+    """Deny a foreign or unsupported root independently at all three guards.
+
+    config_catalog (SchemaCatalog) supplies schemas; trusted/candidate (str)
+    select the root pair; boundary (str) selects exactly one guard. Return None;
+    assertion failures expose authorization or I/O. No external resources run.
+    """
+    case, local, baseline = memory_io(config_catalog)
+    local.initialization.workspace_root = trusted
+    request = replace(doctor_request(case), workspace_root=trusted)
+    baseline = replace(baseline, workspace_root=trusted)
+    authority = local.authorize(request, baseline=None)
+    before = tuple(case.disk.store.calls)
+
+    with pytest.raises(PermissionError, match="authority"):
+        if boundary == "request":
+            local.authorize(replace(request, workspace_root=candidate), baseline=None)
+        elif boundary == "baseline":
+            local.authorize(
+                request, baseline=replace(baseline, workspace_root=candidate)
+            )
+        else:
+            local.writer(
+                replace(baseline, workspace_root=candidate), authority=authority
+            )
+
+    assert tuple(case.disk.store.calls) == before
+    assert not case.registry.writes and not case.revocations
+
+
+@pytest.mark.parametrize("root", ["relative", r"/Work\Repo", "C:/Work/CON"])
+def test_workspace_identity_rejects_an_invalid_trusted_root(
+    config_catalog: SchemaCatalog, root: str
+) -> None:
+    """Reject invalid trusted configuration through the public API and adapter.
+
+    config_catalog (SchemaCatalog) supplies schemas; root (str) is unsupported.
+    Return None; AssertionError reports accepted invalid identity. All state is
+    isolated in memory and no writer is obtained.
+    """
+    case, local, _ = memory_io(config_catalog)
+    local.initialization.workspace_root = root
+    before = tuple(case.disk.store.calls)
+
+    with pytest.raises(PathPolicyError):
+        workspace_identity(root)
+    with pytest.raises(PermissionError, match="authority"):
+        local.authorize(doctor_request(case), baseline=None)
+
+    assert tuple(case.disk.store.calls) == before
     assert not case.registry.writes and not case.revocations

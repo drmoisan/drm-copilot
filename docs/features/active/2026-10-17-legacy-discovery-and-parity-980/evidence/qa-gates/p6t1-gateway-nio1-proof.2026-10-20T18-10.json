@@ -1,0 +1,2526 @@
+{
+  "Timestamp": "2026-10-20T18-10",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-nio1-proof.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "89 distinct cases pass; unchanged parser/module AST retained; four new/changed bodies satisfy >=90% without coverage loss.",
+  "qualification": "No predecessor replay, new full-file coverage claim, native service execution, or package rebuild.",
+  "input_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-nio1-inputs.2026-10-20T17-59.json",
+    "sha256": "be93a812aad06fe57ba345d498b19b9ae28a401328e23d0aa3cbd2aa97d3c515",
+    "bytes": 26554
+  },
+  "retained_path_policy_audit": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-audit.2026-10-18T23-34.json",
+    "sha256": "fc58c2fdb18bce715d1635b59668d8d80fc037a5e7598f9c4b4b1b68bf657340",
+    "bytes": 58930
+  },
+  "retained_path_policy_raw_coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+    "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc",
+    "bytes": 87689
+  },
+  "retained_gateway_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+    "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1",
+    "bytes": 19332
+  },
+  "retained_gateway_raw_coverage_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-archive.2026-10-20T16-39.json",
+    "sha256": "bbe502a3a661da66a13cd2d4d2158cd316b24ba332212f2f46cb1cec0400b089",
+    "bytes": 51117
+  },
+  "historical_98_collection": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gateway-collection.2026-10-20T17-14.json",
+    "sha256": "f77d042c635596d52da3ad861f86378bbeea756b6d661bee1ec5a86945be87fa",
+    "bytes": 31915
+  },
+  "fresh_behavior_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-new.2026-10-20T18-05.raw.json",
+      "sha256": "c63977d93051b065e0d980ccc92762cd25e0cf38106c8641a5e0ad70473df41a",
+      "bytes": 33314
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-loop2-retained.2026-10-20T18-06.raw.json",
+      "sha256": "404aac457ef7352f18a226abd3c60add1821930b26a557960eda6271148eba56",
+      "bytes": 24706
+    }
+  ],
+  "new_node_ids": [
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_accepts_equivalent_spelling[windows-drive]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_accepts_equivalent_spelling[windows-unc]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_accepts_equivalent_spelling[posix-exact]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-root-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-root-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-root-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-drive-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-drive-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-drive-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[sibling-prefix-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[sibling-prefix-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[sibling-prefix-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-share-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-share-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-share-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-server-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-server-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[different-server-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-case-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-case-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-case-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-backslash-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-backslash-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[posix-backslash-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[relative-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[relative-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[relative-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[current-directory-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[current-directory-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[current-directory-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[drive-relative-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[drive-relative-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[drive-relative-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[root-relative-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[root-relative-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[root-relative-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-extended-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-extended-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-extended-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-dot-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-dot-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[device-dot-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[dot-component-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[dot-component-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[dot-component-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[parent-component-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[parent-component-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[parent-component-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[reserved-component-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[reserved-component-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[reserved-component-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[trailing-dot-request]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[trailing-dot-baseline]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_local_root_identity_rejects_nonmatching_roots[trailing-dot-writer]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_workspace_identity_rejects_an_invalid_trusted_root[relative]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_workspace_identity_rejects_an_invalid_trusted_root[/Work\\\\Repo]",
+    "tests/discovery_runtime/test_gateway_boundaries.py::test_workspace_identity_rejects_an_invalid_trusted_root[C:/Work/CON]"
+  ],
+  "retained_node_ids": [
+    "tests/discovery_runtime/test_gateway_local.py::test_local_ports_share_exact_readers_and_guard",
+    "tests/discovery_runtime/test_gateway_local.py::test_missing_identity_never_fabricates_runtime",
+    "tests/discovery_runtime/test_gateway_local.py::test_host_principal_is_never_converted_to_local_user",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[invocation]",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[authorization]",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[mode]",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[workspace]",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[prepare]",
+    "tests/discovery_runtime/test_gateway_local.py::test_request_markers_cannot_expand_local_authority[finalize]",
+    "tests/discovery_runtime/test_gateway_local.py::test_cross_workspace_baseline_and_writer_are_rejected",
+    "tests/discovery_runtime/test_gateway_local.py::test_writer_recaptures_real_memory_state_and_invalidates",
+    "tests/discovery_runtime/test_gateway_local.py::test_read_selection_is_exact_and_profile_scoped",
+    "tests/discovery_runtime/test_gateway_local.py::test_inventory_writer_preserves_exact_pinned_selection[False]",
+    "tests/discovery_runtime/test_gateway_local.py::test_inventory_writer_preserves_exact_pinned_selection[True]",
+    "tests/discovery_runtime/test_gateway_local.py::test_extra_pins_require_the_bound_repository_reader",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[relative]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[C:relative]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[\\\\root]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[../root]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[/a/../root]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[/a/./root]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[\\\\\\\\?\\\\C:\\\\root]",
+    "tests/discovery_runtime/test_path_policy.py::test_trusted_workspace_still_requires_canonical_absolute_shape[\\\\\\\\.\\\\pipe\\\\root]",
+    "tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case[neighbor/file.cs]",
+    "tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case[src-other/file.cs]",
+    "tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case[Src/file.cs]",
+    "tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case[config/other.json]",
+    "tests/discovery_runtime/test_path_policy.py::test_read_scope_cannot_expand_by_prefix_or_case[Sample.sln/child]",
+    "tests/discovery_runtime/test_path_resolution.py::test_resolve_inputs_and_outputs_independently_of_host[/workspace]",
+    "tests/discovery_runtime/test_path_resolution.py::test_resolve_inputs_and_outputs_independently_of_host[C:/Workspace]",
+    "tests/discovery_runtime/test_path_resolution.py::test_resolve_inputs_and_outputs_independently_of_host[C:\\\\Workspace]",
+    "tests/discovery_runtime/test_path_resolution.py::test_resolve_inputs_and_outputs_independently_of_host[\\\\\\\\server\\\\share\\\\Workspace]"
+  ],
+  "source_mappings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "old_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "new_sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "old_lines": 483,
+      "new_lines": 497,
+      "changed_callables": [],
+      "new_callables": [
+        "workspace_identity"
+      ],
+      "unchanged_callables": [
+        {
+          "name": "PathPolicy.__init__",
+          "body_ast_sha256": "d5963a943494f4293c7d464018aaa405079b64b594857fe8fadcbd228d380461",
+          "old_definition": 153,
+          "new_definition": 167,
+          "old_body_range": [
+            163,
+            182
+          ],
+          "new_body_range": [
+            177,
+            196
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy._inspect",
+          "body_ast_sha256": "c4e76455c3998a8932acb34458f02ffe6681a6f973e28e6b525343f07ab9d235",
+          "old_definition": 239,
+          "new_definition": 253,
+          "old_body_range": [
+            241,
+            279
+          ],
+          "new_body_range": [
+            255,
+            293
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy._validate_layout",
+          "body_ast_sha256": "102276bfdaa7bc78c3eeb1d9099891e608c1b4daa8b18f4280f40fb1fc8df4ce",
+          "old_definition": 184,
+          "new_definition": 198,
+          "old_body_range": [
+            186,
+            237
+          ],
+          "new_body_range": [
+            200,
+            251
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy._walk",
+          "body_ast_sha256": "8175f234420cda4c6349d5dbbd9533fdcfd28675f429b44b9152001da821110f",
+          "old_definition": 281,
+          "new_definition": 295,
+          "old_body_range": [
+            285,
+            362
+          ],
+          "new_body_range": [
+            299,
+            376
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy.resolve_read",
+          "body_ast_sha256": "8e92e2882062b5a36f91c86090bfc785e6d8d56d3f593066c057084c2d116c85",
+          "old_definition": 401,
+          "new_definition": 415,
+          "old_body_range": [
+            403,
+            421
+          ],
+          "new_body_range": [
+            417,
+            435
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy.resolve_write",
+          "body_ast_sha256": "b896531f8777dae92a05af38f9a272551b98fac4ae4e1836577fc4757ab8e962",
+          "old_definition": 423,
+          "new_definition": 437,
+          "old_body_range": [
+            425,
+            463
+          ],
+          "new_body_range": [
+            439,
+            477
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy.revalidate_write",
+          "body_ast_sha256": "9a6d4b25660bc9205db22033c3fc6da15befc2fb4f1ad9c64fb215ac70e5b6e2",
+          "old_definition": 465,
+          "new_definition": 479,
+          "old_body_range": [
+            472,
+            483
+          ],
+          "new_body_range": [
+            486,
+            497
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "PathPolicy.validate_configuration",
+          "body_ast_sha256": "b74bd03d37e28cc38a013a4a86339b17087bd62d74c945fcfec85dcff1a553e4",
+          "old_definition": 364,
+          "new_definition": 378,
+          "old_body_range": [
+            371,
+            399
+          ],
+          "new_body_range": [
+            385,
+            413
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "_absolute",
+          "body_ast_sha256": "7625ca43c773d84e3b473aeb702c22c3d9091a533421eb5c49d9c690783c7321",
+          "old_definition": 85,
+          "new_definition": 85,
+          "old_body_range": [
+            91,
+            113
+          ],
+          "new_body_range": [
+            91,
+            113
+          ],
+          "body_line_offset": 0,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "_overlaps",
+          "body_ast_sha256": "d793d7a2abdc913c1b4c30f4c09e8b32677e22b637eb0177c8b52b2d18f3cd28",
+          "old_definition": 116,
+          "new_definition": 130,
+          "old_body_range": [
+            118,
+            118
+          ],
+          "new_body_range": [
+            132,
+            132
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "_reserved_output",
+          "body_ast_sha256": "1304adb92d19ed9dd9baeff338230afba389f831065ad069e3d46048fb9b7ad5",
+          "old_definition": 121,
+          "new_definition": 135,
+          "old_body_range": [
+            124,
+            139
+          ],
+          "new_body_range": [
+            138,
+            153
+          ],
+          "body_line_offset": 14,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        }
+      ],
+      "retained_line_map": {
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41,
+        "42": 42,
+        "43": 43,
+        "44": 44,
+        "45": 45,
+        "46": 46,
+        "47": 47,
+        "48": 48,
+        "49": 49,
+        "50": 50,
+        "51": 51,
+        "52": 52,
+        "53": 53,
+        "54": 54,
+        "55": 55,
+        "56": 56,
+        "57": 57,
+        "58": 58,
+        "59": 59,
+        "60": 60,
+        "61": 61,
+        "62": 62,
+        "63": 63,
+        "64": 64,
+        "65": 65,
+        "66": 66,
+        "67": 67,
+        "68": 68,
+        "69": 69,
+        "70": 70,
+        "71": 71,
+        "72": 72,
+        "73": 73,
+        "74": 74,
+        "75": 75,
+        "76": 76,
+        "77": 77,
+        "78": 78,
+        "79": 79,
+        "80": 80,
+        "81": 81,
+        "82": 82,
+        "83": 83,
+        "84": 84,
+        "85": 85,
+        "86": 86,
+        "87": 87,
+        "88": 88,
+        "89": 89,
+        "90": 90,
+        "91": 91,
+        "92": 92,
+        "93": 93,
+        "94": 94,
+        "95": 95,
+        "96": 96,
+        "97": 97,
+        "98": 98,
+        "99": 99,
+        "100": 100,
+        "101": 101,
+        "102": 102,
+        "103": 103,
+        "104": 104,
+        "105": 105,
+        "106": 106,
+        "107": 107,
+        "108": 108,
+        "109": 109,
+        "110": 110,
+        "111": 111,
+        "112": 112,
+        "113": 113,
+        "114": 128,
+        "115": 129,
+        "116": 130,
+        "117": 131,
+        "118": 132,
+        "119": 133,
+        "120": 134,
+        "121": 135,
+        "122": 136,
+        "123": 137,
+        "124": 138,
+        "125": 139,
+        "126": 140,
+        "127": 141,
+        "128": 142,
+        "129": 143,
+        "130": 144,
+        "131": 145,
+        "132": 146,
+        "133": 147,
+        "134": 148,
+        "135": 149,
+        "136": 150,
+        "137": 151,
+        "138": 152,
+        "139": 153,
+        "140": 154,
+        "141": 155,
+        "142": 156,
+        "143": 157,
+        "144": 158,
+        "145": 159,
+        "146": 160,
+        "147": 161,
+        "148": 162,
+        "149": 163,
+        "150": 164,
+        "151": 165,
+        "152": 166,
+        "153": 167,
+        "154": 168,
+        "155": 169,
+        "156": 170,
+        "157": 171,
+        "158": 172,
+        "159": 173,
+        "160": 174,
+        "161": 175,
+        "162": 176,
+        "163": 177,
+        "164": 178,
+        "165": 179,
+        "166": 180,
+        "167": 181,
+        "168": 182,
+        "169": 183,
+        "170": 184,
+        "171": 185,
+        "172": 186,
+        "173": 187,
+        "174": 188,
+        "175": 189,
+        "176": 190,
+        "177": 191,
+        "178": 192,
+        "179": 193,
+        "180": 194,
+        "181": 195,
+        "182": 196,
+        "183": 197,
+        "184": 198,
+        "185": 199,
+        "186": 200,
+        "187": 201,
+        "188": 202,
+        "189": 203,
+        "190": 204,
+        "191": 205,
+        "192": 206,
+        "193": 207,
+        "194": 208,
+        "195": 209,
+        "196": 210,
+        "197": 211,
+        "198": 212,
+        "199": 213,
+        "200": 214,
+        "201": 215,
+        "202": 216,
+        "203": 217,
+        "204": 218,
+        "205": 219,
+        "206": 220,
+        "207": 221,
+        "208": 222,
+        "209": 223,
+        "210": 224,
+        "211": 225,
+        "212": 226,
+        "213": 227,
+        "214": 228,
+        "215": 229,
+        "216": 230,
+        "217": 231,
+        "218": 232,
+        "219": 233,
+        "220": 234,
+        "221": 235,
+        "222": 236,
+        "223": 237,
+        "224": 238,
+        "225": 239,
+        "226": 240,
+        "227": 241,
+        "228": 242,
+        "229": 243,
+        "230": 244,
+        "231": 245,
+        "232": 246,
+        "233": 247,
+        "234": 248,
+        "235": 249,
+        "236": 250,
+        "237": 251,
+        "238": 252,
+        "239": 253,
+        "240": 254,
+        "241": 255,
+        "242": 256,
+        "243": 257,
+        "244": 258,
+        "245": 259,
+        "246": 260,
+        "247": 261,
+        "248": 262,
+        "249": 263,
+        "250": 264,
+        "251": 265,
+        "252": 266,
+        "253": 267,
+        "254": 268,
+        "255": 269,
+        "256": 270,
+        "257": 271,
+        "258": 272,
+        "259": 273,
+        "260": 274,
+        "261": 275,
+        "262": 276,
+        "263": 277,
+        "264": 278,
+        "265": 279,
+        "266": 280,
+        "267": 281,
+        "268": 282,
+        "269": 283,
+        "270": 284,
+        "271": 285,
+        "272": 286,
+        "273": 287,
+        "274": 288,
+        "275": 289,
+        "276": 290,
+        "277": 291,
+        "278": 292,
+        "279": 293,
+        "280": 294,
+        "281": 295,
+        "282": 296,
+        "283": 297,
+        "284": 298,
+        "285": 299,
+        "286": 300,
+        "287": 301,
+        "288": 302,
+        "289": 303,
+        "290": 304,
+        "291": 305,
+        "292": 306,
+        "293": 307,
+        "294": 308,
+        "295": 309,
+        "296": 310,
+        "297": 311,
+        "298": 312,
+        "299": 313,
+        "300": 314,
+        "301": 315,
+        "302": 316,
+        "303": 317,
+        "304": 318,
+        "305": 319,
+        "306": 320,
+        "307": 321,
+        "308": 322,
+        "309": 323,
+        "310": 324,
+        "311": 325,
+        "312": 326,
+        "313": 327,
+        "314": 328,
+        "315": 329,
+        "316": 330,
+        "317": 331,
+        "318": 332,
+        "319": 333,
+        "320": 334,
+        "321": 335,
+        "322": 336,
+        "323": 337,
+        "324": 338,
+        "325": 339,
+        "326": 340,
+        "327": 341,
+        "328": 342,
+        "329": 343,
+        "330": 344,
+        "331": 345,
+        "332": 346,
+        "333": 347,
+        "334": 348,
+        "335": 349,
+        "336": 350,
+        "337": 351,
+        "338": 352,
+        "339": 353,
+        "340": 354,
+        "341": 355,
+        "342": 356,
+        "343": 357,
+        "344": 358,
+        "345": 359,
+        "346": 360,
+        "347": 361,
+        "348": 362,
+        "349": 363,
+        "350": 364,
+        "351": 365,
+        "352": 366,
+        "353": 367,
+        "354": 368,
+        "355": 369,
+        "356": 370,
+        "357": 371,
+        "358": 372,
+        "359": 373,
+        "360": 374,
+        "361": 375,
+        "362": 376,
+        "363": 377,
+        "364": 378,
+        "365": 379,
+        "366": 380,
+        "367": 381,
+        "368": 382,
+        "369": 383,
+        "370": 384,
+        "371": 385,
+        "372": 386,
+        "373": 387,
+        "374": 388,
+        "375": 389,
+        "376": 390,
+        "377": 391,
+        "378": 392,
+        "379": 393,
+        "380": 394,
+        "381": 395,
+        "382": 396,
+        "383": 397,
+        "384": 398,
+        "385": 399,
+        "386": 400,
+        "387": 401,
+        "388": 402,
+        "389": 403,
+        "390": 404,
+        "391": 405,
+        "392": 406,
+        "393": 407,
+        "394": 408,
+        "395": 409,
+        "396": 410,
+        "397": 411,
+        "398": 412,
+        "399": 413,
+        "400": 414,
+        "401": 415,
+        "402": 416,
+        "403": 417,
+        "404": 418,
+        "405": 419,
+        "406": 420,
+        "407": 421,
+        "408": 422,
+        "409": 423,
+        "410": 424,
+        "411": 425,
+        "412": 426,
+        "413": 427,
+        "414": 428,
+        "415": 429,
+        "416": 430,
+        "417": 431,
+        "418": 432,
+        "419": 433,
+        "420": 434,
+        "421": 435,
+        "422": 436,
+        "423": 437,
+        "424": 438,
+        "425": 439,
+        "426": 440,
+        "427": 441,
+        "428": 442,
+        "429": 443,
+        "430": 444,
+        "431": 445,
+        "432": 446,
+        "433": 447,
+        "434": 448,
+        "435": 449,
+        "436": 450,
+        "437": 451,
+        "438": 452,
+        "439": 453,
+        "440": 454,
+        "441": 455,
+        "442": 456,
+        "443": 457,
+        "444": 458,
+        "445": 459,
+        "446": 460,
+        "447": 461,
+        "448": 462,
+        "449": 463,
+        "450": 464,
+        "451": 465,
+        "452": 466,
+        "453": 467,
+        "454": 468,
+        "455": 469,
+        "456": 470,
+        "457": 471,
+        "458": 472,
+        "459": 473,
+        "460": 474,
+        "461": 475,
+        "462": 476,
+        "463": 477,
+        "464": 478,
+        "465": 479,
+        "466": 480,
+        "467": 481,
+        "468": 482,
+        "469": 483,
+        "470": 484,
+        "471": 485,
+        "472": 486,
+        "473": 487,
+        "474": 488,
+        "475": 489,
+        "476": 490,
+        "477": 491,
+        "478": 492,
+        "479": 493,
+        "480": 494,
+        "481": 495,
+        "482": 496,
+        "483": 497
+      }
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "old_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "new_sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "old_lines": 388,
+      "new_lines": 403,
+      "changed_callables": [
+        "LocalServiceIO.authorize",
+        "LocalServiceIO.writer"
+      ],
+      "new_callables": [
+        "LocalServiceIO._matches_workspace"
+      ],
+      "unchanged_callables": [
+        {
+          "name": "LocalServiceIO.__init__",
+          "body_ast_sha256": "dc49f8eb817a88701916654d87dca87a0fc2fe2ddd5a5c28fdf158d297c2956f",
+          "old_definition": 45,
+          "new_definition": 46,
+          "old_body_range": [
+            63,
+            82
+          ],
+          "new_body_range": [
+            64,
+            83
+          ],
+          "body_line_offset": 1,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "LocalServiceIO._recapture",
+          "body_ast_sha256": "67bac85c09f454e91c98fcba634776ccd6661764c30129bdc7da880316c2f039",
+          "old_definition": 176,
+          "new_definition": 191,
+          "old_body_range": [
+            184,
+            208
+          ],
+          "new_body_range": [
+            199,
+            223
+          ],
+          "body_line_offset": 15,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "LocalServiceIO.activation",
+          "body_ast_sha256": "23031e59a2befc59e80b36f35afabdd86a5b2d501b057473333b3f789642bcac",
+          "old_definition": 85,
+          "new_definition": 86,
+          "old_body_range": [
+            87,
+            87
+          ],
+          "new_body_range": [
+            88,
+            88
+          ],
+          "body_line_offset": 1,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "LocalServiceIO.initialization",
+          "body_ast_sha256": "d5c297b495d135c0b4e4032d1a2d9e7b27bcc090951269f3bdf4609755d235c6",
+          "old_definition": 90,
+          "new_definition": 91,
+          "old_body_range": [
+            92,
+            92
+          ],
+          "new_body_range": [
+            93,
+            93
+          ],
+          "body_line_offset": 1,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "LocalServiceIO.runtime_identity",
+          "body_ast_sha256": "16278dcbe2d7f90cc3a3e8d6b1de077d3250c7fb7d7384ab3df39b101104f414",
+          "old_definition": 94,
+          "new_definition": 95,
+          "old_body_range": [
+            96,
+            96
+          ],
+          "new_body_range": [
+            97,
+            97
+          ],
+          "body_line_offset": 1,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "_authorize_local_root",
+          "body_ast_sha256": "efce186aa0ae7690ed7e12cf4b511bd96a311b55ef5bb562d1c3d913cbc37aea",
+          "old_definition": 329,
+          "new_definition": 344,
+          "old_body_range": null,
+          "new_body_range": null,
+          "body_line_offset": null,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": true
+        },
+        {
+          "name": "_invalidate_empty_authority",
+          "body_ast_sha256": "e0cbc8e2b547c8c3e66b5c25164db577c2e9b8c957cf0a612336dd09763fa332",
+          "old_definition": 333,
+          "new_definition": 348,
+          "old_body_range": null,
+          "new_body_range": null,
+          "body_line_offset": null,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": true
+        },
+        {
+          "name": "_repository_selection",
+          "body_ast_sha256": "7e9b071e5358416dacd3e397a7ba5e482d94f176b9ac83b06a3356bbb946ff27",
+          "old_definition": 211,
+          "new_definition": 226,
+          "old_body_range": [
+            223,
+            239
+          ],
+          "new_body_range": [
+            238,
+            254
+          ],
+          "body_line_offset": 15,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "installed_local_io",
+          "body_ast_sha256": "ff286614ffabe272bca01a623c0e3f3acc08dcd8b0eafe8a5c975c26d5205449",
+          "old_definition": 344,
+          "new_definition": 359,
+          "old_body_range": [
+            360,
+            388
+          ],
+          "new_body_range": [
+            375,
+            403
+          ],
+          "body_line_offset": 15,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "run_local_git",
+          "body_ast_sha256": "cd1fd67ac05fff406d7a957e675db82a54d85bf3cc3c4d93a7a4a6ede2d67150",
+          "old_definition": 242,
+          "new_definition": 257,
+          "old_body_range": [
+            254,
+            326
+          ],
+          "new_body_range": [
+            269,
+            341
+          ],
+          "body_line_offset": 15,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "run_local_git.expire",
+          "body_ast_sha256": "24fd1fec7aa4a2fd70c89647a0c9daf9bdad81e0c2781737cb5b5292fffd50db",
+          "old_definition": 288,
+          "new_definition": 303,
+          "old_body_range": [
+            296,
+            301
+          ],
+          "new_body_range": [
+            311,
+            316
+          ],
+          "body_line_offset": 15,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        }
+      ],
+      "retained_line_map": {
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "21": 22,
+        "22": 23,
+        "23": 24,
+        "24": 25,
+        "25": 26,
+        "26": 27,
+        "27": 28,
+        "28": 29,
+        "29": 30,
+        "30": 31,
+        "31": 32,
+        "32": 33,
+        "33": 34,
+        "34": 35,
+        "35": 36,
+        "36": 37,
+        "37": 38,
+        "38": 39,
+        "39": 40,
+        "40": 41,
+        "41": 42,
+        "42": 43,
+        "43": 44,
+        "44": 45,
+        "45": 46,
+        "46": 47,
+        "47": 48,
+        "48": 49,
+        "49": 50,
+        "50": 51,
+        "51": 52,
+        "52": 53,
+        "53": 54,
+        "54": 55,
+        "55": 56,
+        "56": 57,
+        "57": 58,
+        "58": 59,
+        "59": 60,
+        "60": 61,
+        "61": 62,
+        "62": 63,
+        "63": 64,
+        "64": 65,
+        "65": 66,
+        "66": 67,
+        "67": 68,
+        "68": 69,
+        "69": 70,
+        "70": 71,
+        "71": 72,
+        "72": 73,
+        "73": 74,
+        "74": 75,
+        "75": 76,
+        "76": 77,
+        "77": 78,
+        "78": 79,
+        "79": 80,
+        "80": 81,
+        "81": 82,
+        "82": 83,
+        "83": 84,
+        "84": 85,
+        "85": 86,
+        "86": 87,
+        "87": 88,
+        "88": 89,
+        "89": 90,
+        "90": 91,
+        "91": 92,
+        "92": 93,
+        "93": 94,
+        "94": 95,
+        "95": 96,
+        "96": 97,
+        "97": 98,
+        "147": 162,
+        "175": 190,
+        "176": 191,
+        "177": 192,
+        "178": 193,
+        "179": 194,
+        "180": 195,
+        "181": 196,
+        "182": 197,
+        "183": 198,
+        "184": 199,
+        "185": 200,
+        "186": 201,
+        "187": 202,
+        "188": 203,
+        "189": 204,
+        "190": 205,
+        "191": 206,
+        "192": 207,
+        "193": 208,
+        "194": 209,
+        "195": 210,
+        "196": 211,
+        "197": 212,
+        "198": 213,
+        "199": 214,
+        "200": 215,
+        "201": 216,
+        "202": 217,
+        "203": 218,
+        "204": 219,
+        "205": 220,
+        "206": 221,
+        "207": 222,
+        "208": 223,
+        "209": 224,
+        "210": 225,
+        "211": 226,
+        "212": 227,
+        "213": 228,
+        "214": 229,
+        "215": 230,
+        "216": 231,
+        "217": 232,
+        "218": 233,
+        "219": 234,
+        "220": 235,
+        "221": 236,
+        "222": 237,
+        "223": 238,
+        "224": 239,
+        "225": 240,
+        "226": 241,
+        "227": 242,
+        "228": 243,
+        "229": 244,
+        "230": 245,
+        "231": 246,
+        "232": 247,
+        "233": 248,
+        "234": 249,
+        "235": 250,
+        "236": 251,
+        "237": 252,
+        "238": 253,
+        "239": 254,
+        "240": 255,
+        "241": 256,
+        "242": 257,
+        "243": 258,
+        "244": 259,
+        "245": 260,
+        "246": 261,
+        "247": 262,
+        "248": 263,
+        "249": 264,
+        "250": 265,
+        "251": 266,
+        "252": 267,
+        "253": 268,
+        "254": 269,
+        "255": 270,
+        "256": 271,
+        "257": 272,
+        "258": 273,
+        "259": 274,
+        "260": 275,
+        "261": 276,
+        "262": 277,
+        "263": 278,
+        "264": 279,
+        "265": 280,
+        "266": 281,
+        "267": 282,
+        "268": 283,
+        "269": 284,
+        "270": 285,
+        "271": 286,
+        "272": 287,
+        "273": 288,
+        "274": 289,
+        "275": 290,
+        "276": 291,
+        "277": 292,
+        "278": 293,
+        "279": 294,
+        "280": 295,
+        "281": 296,
+        "282": 297,
+        "283": 298,
+        "284": 299,
+        "285": 300,
+        "286": 301,
+        "287": 302,
+        "288": 303,
+        "289": 304,
+        "290": 305,
+        "291": 306,
+        "292": 307,
+        "293": 308,
+        "294": 309,
+        "295": 310,
+        "296": 311,
+        "297": 312,
+        "298": 313,
+        "299": 314,
+        "300": 315,
+        "301": 316,
+        "302": 317,
+        "303": 318,
+        "304": 319,
+        "305": 320,
+        "306": 321,
+        "307": 322,
+        "308": 323,
+        "309": 324,
+        "310": 325,
+        "311": 326,
+        "312": 327,
+        "313": 328,
+        "314": 329,
+        "315": 330,
+        "316": 331,
+        "317": 332,
+        "318": 333,
+        "319": 334,
+        "320": 335,
+        "321": 336,
+        "322": 337,
+        "323": 338,
+        "324": 339,
+        "325": 340,
+        "326": 341,
+        "327": 342,
+        "328": 343,
+        "329": 344,
+        "330": 345,
+        "331": 346,
+        "332": 347,
+        "333": 348,
+        "334": 349,
+        "335": 350,
+        "336": 351,
+        "337": 352,
+        "338": 353,
+        "339": 354,
+        "340": 355,
+        "341": 356,
+        "342": 357,
+        "343": 358,
+        "344": 359,
+        "345": 360,
+        "346": 361,
+        "347": 362,
+        "348": 363,
+        "349": 364,
+        "350": 365,
+        "351": 366,
+        "352": 367,
+        "353": 368,
+        "354": 369,
+        "355": 370,
+        "356": 371,
+        "357": 372,
+        "358": 373,
+        "359": 374,
+        "360": 375,
+        "361": 376,
+        "362": 377,
+        "363": 378,
+        "364": 379,
+        "365": 380,
+        "366": 381,
+        "367": 382,
+        "368": 383,
+        "369": 384,
+        "370": 385,
+        "371": 386,
+        "372": 387,
+        "373": 388,
+        "374": 389,
+        "375": 390,
+        "376": 391,
+        "377": 392,
+        "378": 393,
+        "379": 394,
+        "380": 395,
+        "381": 396,
+        "382": 397,
+        "383": 398,
+        "384": 399,
+        "385": 400,
+        "386": 401,
+        "387": 402,
+        "388": 403
+      }
+    },
+    "tests/discovery_runtime/test_gateway_boundaries.py": {
+      "old_sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+      "new_sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "old_lines": 304,
+      "new_lines": 425,
+      "changed_callables": [],
+      "new_callables": [
+        "test_local_root_identity_accepts_equivalent_spelling",
+        "test_local_root_identity_rejects_nonmatching_roots",
+        "test_workspace_identity_rejects_an_invalid_trusted_root"
+      ],
+      "unchanged_callables": [
+        {
+          "name": "test_doctor_reserves_path_text_before_measurement_or_observation",
+          "body_ast_sha256": "bfe0c909c6746894f435d6c73feb12c2b279c0a22597fd84721c4d9b82e74c16",
+          "old_definition": 195,
+          "new_definition": 199,
+          "old_body_range": [
+            208,
+            264
+          ],
+          "new_body_range": [
+            212,
+            268
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_doctor_reserves_path_text_before_measurement_or_observation.measured",
+          "body_ast_sha256": "86c77a0097bb54c29918b5ef9e247fc0b708dcfb72d2c81bc918142e859337dd",
+          "old_definition": 214,
+          "new_definition": 218,
+          "old_body_range": [
+            220,
+            226
+          ],
+          "new_body_range": [
+            224,
+            230
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_git_deadline_cancels_a_pending_bounded_read",
+          "body_ast_sha256": "13d6b2e2c9cdf6630ec1717e85c0ed2fa7c34106453a103accc7df44f56a3db1",
+          "old_definition": 116,
+          "new_definition": 120,
+          "old_body_range": [
+            128,
+            190
+          ],
+          "new_body_range": [
+            132,
+            194
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_git_deadline_cancels_a_pending_bounded_read.PendingPipe.read",
+          "body_ast_sha256": "17aacee58a2bbe47e1cdd24849ad22b313e7cae2b66c51abfc55cbe902dfe1c5",
+          "old_definition": 143,
+          "new_definition": 147,
+          "old_body_range": [
+            149,
+            156
+          ],
+          "new_body_range": [
+            153,
+            160
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_git_deadline_cancels_a_pending_bounded_read.raced_kill",
+          "body_ast_sha256": "61ce61de1b922c816d885c410c63bcc4ca59f9e0f8b3adc946ba0836d98e4717",
+          "old_definition": 131,
+          "new_definition": 135,
+          "old_body_range": [
+            133,
+            134
+          ],
+          "new_body_range": [
+            137,
+            138
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_git_deadline_cancels_a_pending_bounded_read.start",
+          "body_ast_sha256": "e96b3df8ffe4d5d366083b54ad11f9c33c523ee2dbe6dbf938f82a719e9cfa19",
+          "old_definition": 170,
+          "new_definition": 174,
+          "old_body_range": [
+            176,
+            177
+          ],
+          "new_body_range": [
+            180,
+            181
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_git_deadline_cancels_a_pending_bounded_read.which",
+          "body_ast_sha256": "21c2e4e23231d0cce2690b1949bddeb6b051831e52f22256ee3a618a47796cc1",
+          "old_definition": 162,
+          "new_definition": 166,
+          "old_body_range": [
+            167,
+            168
+          ],
+          "new_body_range": [
+            171,
+            172
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_locator_selected_path_is_charged_before_reading",
+          "body_ast_sha256": "e62096a25509ad76b4c5aded1458e0e8d4c8922caf6b09e8f2272e2a8de84655",
+          "old_definition": 267,
+          "new_definition": 271,
+          "old_body_range": [
+            276,
+            304
+          ],
+          "new_body_range": [
+            280,
+            308
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_locator_selected_path_is_charged_before_reading.selected",
+          "body_ast_sha256": "a5dd2f57f4d3d45b54fd258ddece7285fa6ce3c7bdecc27087ee0863082e383a",
+          "old_definition": 280,
+          "new_definition": 284,
+          "old_body_range": [
+            285,
+            286
+          ],
+          "new_body_range": [
+            289,
+            290
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_unexpected_emission_failure_never_retries_json",
+          "body_ast_sha256": "353b102b538c3e52631080de9a4db39e671c1d6215ad9a6964dd649a1c3fe066",
+          "old_definition": 64,
+          "new_definition": 68,
+          "old_body_range": [
+            74,
+            112
+          ],
+          "new_body_range": [
+            78,
+            116
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_unexpected_emission_failure_never_retries_json.FailedStream.flush",
+          "body_ast_sha256": "310da5c633429487708b0c36a9c4eaf427c193d3b58794ae711572e493b85251",
+          "old_definition": 95,
+          "new_definition": 99,
+          "old_body_range": [
+            97,
+            97
+          ],
+          "new_body_range": [
+            101,
+            101
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_unexpected_emission_failure_never_retries_json.FailedStream.write",
+          "body_ast_sha256": "3d5ed3edb11edf871dab6f6a4efaf55c481643be37ded8a5d54fa738892b9784",
+          "old_definition": 83,
+          "new_definition": 87,
+          "old_body_range": [
+            88,
+            93
+          ],
+          "new_body_range": [
+            92,
+            97
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_unexpected_serializer_failure_refuses_replacement",
+          "body_ast_sha256": "e85d21a4ab9f394377c3ebe6be1adfad8dd06f42b9117c6581c7fc7130a4b418",
+          "old_definition": 39,
+          "new_definition": 43,
+          "old_body_range": [
+            49,
+            60
+          ],
+          "new_body_range": [
+            53,
+            64
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        },
+        {
+          "name": "test_unexpected_serializer_failure_refuses_replacement.fail",
+          "body_ast_sha256": "051a2e1c921317eba7b12649cb91c264283f4d8db56c572f9e1e4aa41d5e33b7",
+          "old_definition": 49,
+          "new_definition": 53,
+          "old_body_range": [
+            51,
+            52
+          ],
+          "new_body_range": [
+            55,
+            56
+          ],
+          "body_line_offset": 4,
+          "normalized_source_body_identical": true,
+          "zero_executable_body": false
+        }
+      ],
+      "retained_line_map": {}
+    }
+  },
+  "original_path_policy_module_ast_equal_after_removing_new_helper": true,
+  "named_executable_body_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:workspace_identity": {
+      "body_range": [
+        122,
+        127
+      ],
+      "definition_line": 116,
+      "body_ast_sha256": "c9a627a66709da4f35a1bf2d9347ac70f9437a0f3b3390930dd3900fc407b47d",
+      "fresh": {
+        "covered_lines": 4,
+        "statements": 4,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": null,
+      "executed_body_lines": [
+        122,
+        123,
+        124,
+        127
+      ],
+      "all_executable_body_lines": [
+        122,
+        123,
+        124,
+        127
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO._matches_workspace": {
+      "body_range": [
+        105,
+        110
+      ],
+      "definition_line": 99,
+      "body_ast_sha256": "90b86fa1710cb3a57501aa18afc65cac64881e5f2c15303411de06bce8d559f1",
+      "fresh": {
+        "covered_lines": 4,
+        "statements": 4,
+        "line_percent": 100.0,
+        "covered_branches": 0,
+        "branches": 0,
+        "branch_percent": 100,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": null,
+      "executed_body_lines": [
+        105,
+        106,
+        109,
+        110
+      ],
+      "all_executable_body_lines": [
+        105,
+        106,
+        109,
+        110
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.authorize": {
+      "body_range": [
+        128,
+        161
+      ],
+      "definition_line": 112,
+      "body_ast_sha256": "18ee131a4ace64487af13284c1a2eaf6458a49ba05f56a8f46d83750f4ca9156",
+      "fresh": {
+        "covered_lines": 13,
+        "statements": 14,
+        "line_percent": 92.85714285714286,
+        "covered_branches": 7,
+        "branches": 8,
+        "branch_percent": 87.5,
+        "missing_lines": [
+          145
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ]
+        ]
+      },
+      "historical_changed_body": {
+        "covered_lines": 13,
+        "statements": 14,
+        "line_percent": 92.85714285714286,
+        "covered_branches": 7,
+        "branches": 8,
+        "branch_percent": 87.5,
+        "missing_lines": [
+          130
+        ],
+        "missing_branches": [
+          [
+            129,
+            130
+          ]
+        ]
+      },
+      "executed_body_lines": [
+        128,
+        139,
+        140,
+        142,
+        143,
+        144,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161
+      ],
+      "all_executable_body_lines": [
+        128,
+        139,
+        140,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161
+      ],
+      "declarations_docstrings_excluded": true
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:LocalServiceIO.writer": {
+      "body_range": [
+        178,
+        189
+      ],
+      "definition_line": 163,
+      "body_ast_sha256": "2d0a33fabb539e4adc35221cec5cb7af1e053fa7e0742be75acf3ea8e1594562",
+      "fresh": {
+        "covered_lines": 3,
+        "statements": 3,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "historical_changed_body": {
+        "covered_lines": 3,
+        "statements": 3,
+        "line_percent": 100.0,
+        "covered_branches": 2,
+        "branches": 2,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "executed_body_lines": [
+        178,
+        184,
+        185
+      ],
+      "all_executable_body_lines": [
+        178,
+        184,
+        185
+      ],
+      "declarations_docstrings_excluded": true
+    }
+  },
+  "file_coverage": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "fresh_89_cases": {
+        "covered_lines": 134,
+        "statements": 161,
+        "line_percent": 83.22981366459628,
+        "covered_branches": 61,
+        "branches": 86,
+        "branch_percent": 70.93023255813954,
+        "missing_lines": [
+          178,
+          229,
+          235,
+          247,
+          257,
+          258,
+          264,
+          268,
+          274,
+          281,
+          288,
+          302,
+          321,
+          336,
+          343,
+          350,
+          366,
+          392,
+          400,
+          409,
+          441,
+          451,
+          458,
+          467,
+          474,
+          487,
+          492
+        ],
+        "missing_branches": [
+          [
+            177,
+            178
+          ],
+          [
+            226,
+            229
+          ],
+          [
+            234,
+            235
+          ],
+          [
+            245,
+            247
+          ],
+          [
+            263,
+            264
+          ],
+          [
+            267,
+            268
+          ],
+          [
+            273,
+            274
+          ],
+          [
+            280,
+            281
+          ],
+          [
+            287,
+            288
+          ],
+          [
+            301,
+            302
+          ],
+          [
+            320,
+            321
+          ],
+          [
+            332,
+            336
+          ],
+          [
+            342,
+            343
+          ],
+          [
+            349,
+            350
+          ],
+          [
+            365,
+            366
+          ],
+          [
+            391,
+            392
+          ],
+          [
+            399,
+            400
+          ],
+          [
+            408,
+            409
+          ],
+          [
+            440,
+            441
+          ],
+          [
+            450,
+            451
+          ],
+          [
+            456,
+            458
+          ],
+          [
+            466,
+            467
+          ],
+          [
+            473,
+            474
+          ],
+          [
+            486,
+            487
+          ],
+          [
+            491,
+            492
+          ]
+        ]
+      },
+      "historical_accepted": {
+        "covered_lines": 156,
+        "statements": 156,
+        "line_percent": 100.0,
+        "covered_branches": 84,
+        "branches": 84,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "qualified_fresh_plus_unchanged_history": {
+        "covered_lines": 161,
+        "statements": 161,
+        "line_percent": 100.0,
+        "covered_branches": 86,
+        "branches": 86,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "retained_only_lines": [
+        178,
+        229,
+        235,
+        247,
+        257,
+        258,
+        264,
+        268,
+        274,
+        281,
+        288,
+        302,
+        321,
+        336,
+        343,
+        350,
+        366,
+        392,
+        400,
+        409,
+        441,
+        451,
+        458,
+        467,
+        474,
+        487,
+        492
+      ],
+      "retained_only_branches": [
+        [
+          177,
+          178
+        ],
+        [
+          226,
+          229
+        ],
+        [
+          234,
+          235
+        ],
+        [
+          245,
+          247
+        ],
+        [
+          263,
+          264
+        ],
+        [
+          267,
+          268
+        ],
+        [
+          273,
+          274
+        ],
+        [
+          280,
+          281
+        ],
+        [
+          287,
+          288
+        ],
+        [
+          301,
+          302
+        ],
+        [
+          320,
+          321
+        ],
+        [
+          332,
+          336
+        ],
+        [
+          342,
+          343
+        ],
+        [
+          349,
+          350
+        ],
+        [
+          365,
+          366
+        ],
+        [
+          391,
+          392
+        ],
+        [
+          399,
+          400
+        ],
+        [
+          408,
+          409
+        ],
+        [
+          440,
+          441
+        ],
+        [
+          450,
+          451
+        ],
+        [
+          456,
+          458
+        ],
+        [
+          466,
+          467
+        ],
+        [
+          473,
+          474
+        ],
+        [
+          486,
+          487
+        ],
+        [
+          491,
+          492
+        ]
+      ],
+      "qualification": "Composed evidence coverage, not a new full-file test run. Historical facts apply only through the exact unchanged-body/range mapping."
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "fresh_89_cases": {
+        "covered_lines": 85,
+        "statements": 131,
+        "line_percent": 64.8854961832061,
+        "covered_branches": 19,
+        "branches": 38,
+        "branch_percent": 50.0,
+        "missing_lines": [
+          145,
+          269,
+          270,
+          278,
+          280,
+          285,
+          293,
+          301,
+          303,
+          311,
+          312,
+          313,
+          314,
+          315,
+          316,
+          318,
+          319,
+          321,
+          322,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          330,
+          332,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          375,
+          376,
+          377,
+          378,
+          379,
+          380,
+          385,
+          392,
+          398
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ],
+          [
+            270,
+            278
+          ],
+          [
+            270,
+            280
+          ],
+          [
+            313,
+            -303
+          ],
+          [
+            313,
+            314
+          ],
+          [
+            323,
+            324
+          ],
+          [
+            323,
+            325
+          ],
+          [
+            326,
+            327
+          ],
+          [
+            326,
+            328
+          ],
+          [
+            334,
+            335
+          ],
+          [
+            334,
+            337
+          ],
+          [
+            337,
+            338
+          ],
+          [
+            337,
+            339
+          ],
+          [
+            339,
+            340
+          ],
+          [
+            339,
+            341
+          ],
+          [
+            376,
+            377
+          ],
+          [
+            376,
+            378
+          ],
+          [
+            378,
+            379
+          ],
+          [
+            378,
+            380
+          ]
+        ]
+      },
+      "historical_accepted": {
+        "covered_lines": 124,
+        "statements": 125,
+        "line_percent": 99.2,
+        "covered_branches": 37,
+        "branches": 38,
+        "branch_percent": 97.36842105263158,
+        "missing_lines": [
+          130
+        ],
+        "missing_branches": [
+          [
+            129,
+            130
+          ]
+        ]
+      },
+      "qualified_fresh_plus_unchanged_history": {
+        "covered_lines": 130,
+        "statements": 131,
+        "line_percent": 99.23664122137404,
+        "covered_branches": 37,
+        "branches": 38,
+        "branch_percent": 97.36842105263158,
+        "missing_lines": [
+          145
+        ],
+        "missing_branches": [
+          [
+            144,
+            145
+          ]
+        ]
+      },
+      "retained_only_lines": [
+        269,
+        270,
+        278,
+        280,
+        285,
+        293,
+        301,
+        303,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        318,
+        319,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        385,
+        392,
+        398
+      ],
+      "retained_only_branches": [
+        [
+          270,
+          278
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          313,
+          -303
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          337
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          339
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          341
+        ],
+        [
+          376,
+          377
+        ],
+        [
+          376,
+          378
+        ],
+        [
+          378,
+          379
+        ],
+        [
+          378,
+          380
+        ]
+      ],
+      "qualification": "Composed evidence coverage, not a new full-file test run. Historical facts apply only through the exact unchanged-body/range mapping."
+    }
+  },
+  "source_and_exact_coverage_archives": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052,
+      "gzip_base64": "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"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "bytes": 17604,
+      "gzip_base64": "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"
+    },
+    "tests/discovery_runtime/test_gateway_boundaries.py": {
+      "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "bytes": 17390,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-new-coverage.json": {
+      "sha256": "aff20a55448ebd13652c89f01ef5f1c886dc47a43a5a7ae55c7a8ef11aa30a67",
+      "bytes": 28795,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-retained-coverage.json": {
+      "sha256": "2ba334e9c726b2cfaba6ce72805720cdeaa2fae23825d9bd34b9b7b4b33cca8f",
+      "bytes": 28848,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-inputs.py": {
+      "sha256": "9b717134c5ed49a3af42e3e88645cfab0f5338896726f9db4daee3af633cdc6d",
+      "bytes": 3096,
+      "gzip_base64": "H4sIAAAAAAAC/6VWXW/bNhR9168gCASQ2khyvDZrO+ShyAq0D22HNg8bukKgpWubm0SqJGXHCfLfdy8lSnI+sAEz0EYkLw/vx7mH5Jy/NeVW7oC5Lf0zAOzTh89nrDWQQiUds86AaCzbS7fVnWOmU0qqDRroqiud1IqtYCt2UpuMcx7JptXGsZWwcP4ijDY3sg3fW2G3tVyF4V9Wq2htdMMq4cDJBtiwEsanjP6/0Qp6u1Y4Aghmv+EwiozWjl34QVbuqziJ1iBcZwAn/VrOeKVLmw/TNhfo/A7y5WJ5np4t0rOf0xo2ojyklbSl3oE5pEJVaSuMdIf09asFjzB27+AF460o/xYbhJmsh9XcmjKvTFOUupW1dsVokfPIgXWW9vuPaXMRNvNI7xVUaBJHDH/hyOd0pNsWra5lecjaAz+9v77BfO3Foah1KerJoj/yeX9kEYxWulMVhga2t0wiLKiD0vmzXdfWcN8BJRrwU2tt/IBJNXhJv3C+x/PJdkiJfmDB7GQJw0i3YAQxx05eeoTBrDBAlbXHm4umc7Nd0/wKy4ssFe0TaKVWuFo+wMO/UtTyxoPeWzPwo6N0ma6G+16uOllXhawAE+NCuL44ja6gDsd4fnnswmImQvBWidZukRZS38MVStSHGzC5gY3EgAI0OmN1Z0okWyOUXKNfGXXNfO/MxpZbaMSMW/lumQ9xpWjW1S7rbeYoSZRgiWd1D7T5t6rPWTU4fES0iY3DwowYD7hTeAvbtVT/+aZHuT+d75cpBXU3K+a0VOq6lvaYcRhxZGANBhSmbWw4DjsqbQn5D5GSWzZvz91ZqgTJRSqVdKnUaSk6C1kQj+XiCvXj5XKe0QmItLCWCnoguxUGqjRMHmG8QBl6HAM5gfFRCCmFhQrcow2JSwPJ0zVK+M0x6nn60+v/iSr6W+JJ2CSKKlizlVQVgsSU9ORNrx9ij7mliQwvkqpYHfAklGe/BijFit1O1SQ7/iaY1z7nhdMxSXiSCYscsPI6TuZtvhXLl+e4abhYsn4ixoOTbAvXlUSZdkdbvA+4owblzfqluyiyTjQtuhuunkzpfRxun6xzZZJhY65pJuYnf6QnTXpSXZ28T08+8iRCQSBBxf23d9G8Xbykz9MRD1cSGSQP8zIAfaPl7wQ3uv7sWUjxHGEWGlFqFlpm21o6Pxknczu6kYv+kkbr/iNbnb9AWqCIxbSclbppiR4EdMoaivpikSRZBd5mTBt2dNegz6On/ApNfS4R2/8diHepG5SwCmf518svb68u3+fS2g7oek2PmKekPsNmazs3a1n+7vcPV8Xl51/fIcJimDP4KgFCDBrSC0xBcEXftQUla1Rsul6ENAVx+WyxXATwz53D49jXDn00B0K88u8huMYOePggGlqi+oUpzRTsx2cQG1t77Le+ngg5fA3z45VbDFUlk2/3Kux7yasvfRGdxm3fQwrACTyvKiY9mwOFl9BjWNOOAPajw0txLUt/dVEWvgBKHR5KocmGbuFVDWOQDOtJHul1xj7px56FmEAosUYV5eMucsJsgLgyuTUJksZnqOE4teZP0uHWM+qul56I3qWsx8zwYaFifr3iCROWaV/Pvu3672yPbzmIY9qZVV3T2jhw9xSTQfy4WNI9yP9UPMmGXuCdW6eveEJPJKncfPdtEKzBgf8mWdPvSfEa8SZleELM5mD+BVAECbgl394wjLj5NujC97H2p36eGDBQMqMxHnN3h4H+A4tj2NkYDAAA"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-proof-analysis1.py": {
+      "sha256": "902a1356f532d16aa996a19d3d4ce010fd4b65232f9ca712bccb018d8bbfaca9",
+      "bytes": 14646,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-proof.py": {
+      "sha256": "0c16b21c9921581ae4ee18d7fed09da2f6fb73a55aa8e4396044e6e12041c97b",
+      "bytes": 14960,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-nio1-run.py": {
+      "sha256": "f59381c77f619b6f943b34eff93c11499cd34d205acab66494bc60e97883ef61",
+      "bytes": 3856,
+      "gzip_base64": "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"
+    }
+  },
+  "scoped_unified_diffs": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "--- before/packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py\n+++ after/packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py\n@@ -113,6 +113,20 @@\n     return result\n \n \n+def workspace_identity(path: str) -> PurePath:\n+    \"\"\"Return the lexical identity of absolute path (str), without I/O.\n+\n+    Reuse strict drive/UNC Windows or case-sensitive POSIX identity. POSIX\n+    backslash aliases are unsupported; invalid paths raise PathPolicyError.\n+    \"\"\"\n+    identity = _absolute(path)\n+    if isinstance(identity, PurePosixPath) and \"\\\\\" in path:\n+        raise PathPolicyError(\n+            \"PATH_ABSOLUTE\", path, \"Use a canonical POSIX workspace path.\"\n+        )\n+    return identity\n+\n+\n def _overlaps(left: str, right: str) -> bool:\n     \"\"\"Treat equality and either component-prefix direction as an overlap.\"\"\"\n     return path_contains(left, right) or path_contains(right, left)\n",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "--- before/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n+++ after/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n@@ -17,7 +17,8 @@\n from drm_copilot_discovery.catalog import load_catalog\n from drm_copilot_discovery.init_io import InitializationIO\n from drm_copilot_discovery.mutation_io import GuardedMutationWriter, capture_workspace\n-from drm_copilot_discovery.path_policy import PathPolicy\n+from drm_copilot_discovery.path_models import PathPolicyError\n+from drm_copilot_discovery.path_policy import PathPolicy, workspace_identity\n from drm_copilot_discovery.report_models import ReportBudget\n from drm_copilot_discovery.service_contracts import ServiceAuthority\n from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection\n@@ -95,6 +96,19 @@\n         \"\"\"Return verified installed identity; propagate typed failure unchanged.\"\"\"\n         return self._identity()\n \n+    def _matches_workspace(self, path: str) -> bool:\n+        \"\"\"Compare path (str) to the bound root with strict platform identity.\n+\n+        Return False for an invalid or different root; callers deny authority\n+        with PermissionError. Parsing is lexical and performs no I/O.\n+        \"\"\"\n+        try:\n+            return workspace_identity(path) == workspace_identity(\n+                self.initialization.workspace_root\n+            )\n+        except PathPolicyError:\n+            return False\n+\n     def authorize(\n         self, request: ServiceRequest, *, baseline: CapturedWorkspace | None\n     ) -> ServiceAuthority:\n@@ -107,18 +121,19 @@\n \n         request (ServiceRequest): parsed operation input; no authority is inferred from\n         it. baseline (CapturedWorkspace | None): captured workspace, or None before\n-        capture. Returns ServiceAuthority; invalid identity raises PermissionError and\n-        path failures propagate. Reads metadata only for scoped selection.\n+        capture. Returns ServiceAuthority; invalid or different root identity raises\n+        PermissionError. Scoped-selection path failures propagate; reads metadata only\n+        for scoped selection.\n         \"\"\"\n         if (\n             request.invocation_ref is not None\n             or request.authorization_ref is not None\n             or request.mode == \"agent-output\"\n             or request.operation in (\"prepare-agent\", \"finalize-agent\")\n-            or request.workspace_root not in (\".\", self.initialization.workspace_root)\n+            or not self._matches_workspace(request.workspace_root)\n             or (\n                 baseline is not None\n-                and baseline.workspace_root != self.initialization.workspace_root\n+                and not self._matches_workspace(baseline.workspace_root)\n             )\n         ):\n             raise PermissionError(\"Request has no local-user authority\")\n@@ -157,11 +172,11 @@\n         baseline (CapturedWorkspace): required accepted capture for this same-root\n         guarded writer.\n         authority (ServiceAuthority): authenticated local identity and exact grants.\n-        Returns GuardedMutationWriter; invalid identity raises PermissionError. No\n-        publication occurs until the writer is invoked.\n+        Returns GuardedMutationWriter; invalid or different root identity raises\n+        PermissionError. No publication occurs until the writer is invoked.\n         \"\"\"\n         if (\n-            baseline.workspace_root != self.initialization.workspace_root\n+            not self._matches_workspace(baseline.workspace_root)\n             or authority.principal != self._authority.principal\n             or authority.author_or_agent != self._authority.author_or_agent\n             or authority.invocation is not None\n",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "--- before/tests/discovery_runtime/test_gateway_boundaries.py\n+++ after/tests/discovery_runtime/test_gateway_boundaries.py\n@@ -13,6 +13,9 @@\n from drm_copilot_discovery.doctor import inspect_doctor\n from drm_copilot_discovery.gateway_local import LocalServiceIO\n from drm_copilot_discovery.models import ParseLimits\n+from drm_copilot_discovery.mutation_io import GuardedMutationWriter\n+from drm_copilot_discovery.path_models import PathPolicyError\n+from drm_copilot_discovery.path_policy import workspace_identity\n from drm_copilot_discovery.report_models import ReportBudget\n from drm_copilot_discovery.service_contracts import DiscoveryResult\n \n@@ -20,6 +23,7 @@\n     MemoryDeadline,\n     MemoryProcess,\n     invoke,\n+    memory_io,\n )\n from tests.discovery_runtime.gateway_test_support import (\n     fixed_deadline as fixed_deadline,\n@@ -302,3 +306,120 @@\n \n     assert result.exit_code == 3 and not case.disk.store.calls\n     assert not case.registry.writes and not case.revocations\n+\n+\n+@pytest.mark.parametrize(\n+    \"trusted,spelling\",\n+    [\n+        pytest.param(\"C:/Work/Repo\", r\"c:\\work\\REPO\", id=\"windows-drive\"),\n+        pytest.param(\"//server/share/Repo\", r\"\\\\SERVER\\SHARE\\repo\", id=\"windows-unc\"),\n+        pytest.param(\"/Work/Repo\", \"/Work/Repo\", id=\"posix-exact\"),\n+    ],\n+)\n+def test_local_root_identity_accepts_equivalent_spelling(\n+    config_catalog: SchemaCatalog, trusted: str, spelling: str\n+) -> None:\n+    \"\"\"Accept one root identity through pre-capture, capture and writer checks.\n+\n+    config_catalog (SchemaCatalog) supplies schemas; trusted and spelling (str)\n+    model equivalent supported roots. Return None; AssertionError reports lost\n+    identity or effects. All ports and captures are memory-only.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    local.initialization.workspace_root = trusted\n+    request = replace(doctor_request(case), workspace_root=spelling)\n+    baseline = replace(baseline, workspace_root=spelling)\n+    before = tuple(case.disk.store.calls)\n+\n+    initial = local.authorize(request, baseline=None)\n+    captured = local.authorize(request, baseline=baseline)\n+    writer = local.writer(baseline, authority=captured)\n+\n+    assert workspace_identity(spelling) == workspace_identity(trusted)\n+    assert initial == captured and captured.principal == \"local-user\"\n+    assert captured.grants == () and captured.invocation is None\n+    assert isinstance(writer, GuardedMutationWriter)\n+    assert tuple(case.disk.store.calls) == before\n+    assert not case.registry.writes and not case.revocations\n+\n+\n+@pytest.mark.parametrize(\"boundary\", [\"request\", \"baseline\", \"writer\"])\n+@pytest.mark.parametrize(\n+    \"trusted,candidate\",\n+    [\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/Other\", id=\"different-root\"),\n+        pytest.param(\"C:/Work/Repo\", \"D:/Work/Repo\", id=\"different-drive\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/Repo-sibling\", id=\"sibling-prefix\"),\n+        pytest.param(\n+            \"//server/share/Repo\", \"//server/other/Repo\", id=\"different-share\"\n+        ),\n+        pytest.param(\n+            \"//server/share/Repo\", \"//other/share/Repo\", id=\"different-server\"\n+        ),\n+        pytest.param(\"/Work/Repo\", \"/work/Repo\", id=\"posix-case\"),\n+        pytest.param(\"/Work/Repo\", r\"/Work\\Repo\", id=\"posix-backslash\"),\n+        pytest.param(\"C:/Work/Repo\", \"Work/Repo\", id=\"relative\"),\n+        pytest.param(\"C:/Work/Repo\", \".\", id=\"current-directory\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:Work/Repo\", id=\"drive-relative\"),\n+        pytest.param(\"C:/Work/Repo\", r\"\\Work\\Repo\", id=\"root-relative\"),\n+        pytest.param(\"C:/Work/Repo\", r\"\\\\?\\C:\\Work\\Repo\", id=\"device-extended\"),\n+        pytest.param(\"C:/Work/Repo\", r\"\\\\.\\C:\\Work\\Repo\", id=\"device-dot\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/./Repo\", id=\"dot-component\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/Other/../Repo\", id=\"parent-component\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/CON\", id=\"reserved-component\"),\n+        pytest.param(\"C:/Work/Repo\", \"C:/Work/Repo.\", id=\"trailing-dot\"),\n+    ],\n+)\n+def test_local_root_identity_rejects_nonmatching_roots(\n+    config_catalog: SchemaCatalog, trusted: str, candidate: str, boundary: str\n+) -> None:\n+    \"\"\"Deny a foreign or unsupported root independently at all three guards.\n+\n+    config_catalog (SchemaCatalog) supplies schemas; trusted/candidate (str)\n+    select the root pair; boundary (str) selects exactly one guard. Return None;\n+    assertion failures expose authorization or I/O. No external resources run.\n+    \"\"\"\n+    case, local, baseline = memory_io(config_catalog)\n+    local.initialization.workspace_root = trusted\n+    request = replace(doctor_request(case), workspace_root=trusted)\n+    baseline = replace(baseline, workspace_root=trusted)\n+    authority = local.authorize(request, baseline=None)\n+    before = tuple(case.disk.store.calls)\n+\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        if boundary == \"request\":\n+            local.authorize(replace(request, workspace_root=candidate), baseline=None)\n+        elif boundary == \"baseline\":\n+            local.authorize(\n+                request, baseline=replace(baseline, workspace_root=candidate)\n+            )\n+        else:\n+            local.writer(\n+                replace(baseline, workspace_root=candidate), authority=authority\n+            )\n+\n+    assert tuple(case.disk.store.calls) == before\n+    assert not case.registry.writes and not case.revocations\n+\n+\n+@pytest.mark.parametrize(\"root\", [\"relative\", r\"/Work\\Repo\", \"C:/Work/CON\"])\n+def test_workspace_identity_rejects_an_invalid_trusted_root(\n+    config_catalog: SchemaCatalog, root: str\n+) -> None:\n+    \"\"\"Reject invalid trusted configuration through the public API and adapter.\n+\n+    config_catalog (SchemaCatalog) supplies schemas; root (str) is unsupported.\n+    Return None; AssertionError reports accepted invalid identity. All state is\n+    isolated in memory and no writer is obtained.\n+    \"\"\"\n+    case, local, _ = memory_io(config_catalog)\n+    local.initialization.workspace_root = root\n+    before = tuple(case.disk.store.calls)\n+\n+    with pytest.raises(PathPolicyError):\n+        workspace_identity(root)\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.authorize(doctor_request(case), baseline=None)\n+\n+    assert tuple(case.disk.store.calls) == before\n+    assert not case.registry.writes and not case.revocations\n"
+  },
+  "protected_bindings_unchanged": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "bytes": 14986
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+      "sha256": "344fc1fecdcdefca5ed193d6fbecfc0b9a867143753dfe4d32a5a9ef24a8795d",
+      "bytes": 12590
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "bytes": 12628
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "bytes": 20995
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "bytes": 8966
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+      "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+      "bytes": 10379
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "bytes": 14164
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "bytes": 17125
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "bytes": 16674
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "bytes": 10018
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_models.py",
+      "sha256": "0d78602e3517cd3740050259eb3008cd18301c00a011a5a30a862875710f76ab",
+      "bytes": 8869
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "bytes": 20032
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "sha256": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+      "bytes": 15086
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "bytes": 9683
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "bytes": 7301
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json",
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "bytes": 8893
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway.py",
+      "sha256": "3aa18d3bebef593ff3942a8d0154194e7bec045ab8b49aba26c41e296fdb77b5",
+      "bytes": 17118
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e2c2b77c97c886221690355c835834e13ba04cecb130d52d87baac8d4728e6bb",
+      "bytes": 20246
+    },
+    {
+      "path": "tests/discovery_runtime/test_doctor.py",
+      "sha256": "bc079b2c3f7c4105df1b82ed070e98e43c3f7aa295cd2abf17e7c8b8ba1c9dbf",
+      "bytes": 17639
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+      "bytes": 12799
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_policy.py",
+      "sha256": "b3f072157d04ac6cd08f4b69869160ed5a5546afe2eb503018f4818df4649b49",
+      "bytes": 9448
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_resolution.py",
+      "sha256": "d05b7e713912a1f2ba8dab95c61f9c5e64cfa6517f7b906da710cbd50ce788a3",
+      "bytes": 14883
+    },
+    {
+      "path": "tests/discovery_runtime/test_path_collisions.py",
+      "sha256": "f3ff39910b4cbfdef8d5148bc283978e9bd0eacee0ae6b9a7169f3d5eb935cb4",
+      "bytes": 12794
+    }
+  ],
+  "self_included": false
+}

@@ -1,0 +1,181 @@
+{
+  "Timestamp": "2026-10-20T17-52",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-init-io-finding.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Native init-dry is deterministically rejected by raw-string local root comparison after equivalent Windows path identity has already passed.",
+  "status": "PRODUCTION_CAUSE_ESTABLISHED_PENDING_BOUNDED_REPAIR",
+  "finding_id": "NIO1",
+  "route": "gateway_doctor_p6t1_native_init_io_diagnosis_20261020",
+  "classification": "Production authority path-identity inconsistency; the retained harness request uses valid native Windows spelling.",
+  "native_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nr1.2026-10-20T17-43.json",
+    "sha256": "f08ddaa5bd9477514e3e83def4c213093b7993e431d61ab75d6df2b4e2f1c478"
+  },
+  "native_raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nr1-raw.2026-10-20T17-43.json",
+    "sha256": "70b35b8e993409bf8d41f35ec19331d872f2ce8db0c5ee178c68d8cc38f3e543"
+  },
+  "retained_request": {
+    "sha256": "69a54b251d7ce91fba9f66d1a2589a3c2c1967f6b72c99fa14c9b1df61b9fcde",
+    "bytes": 748,
+    "member": "result.results[label=init-dry].request_raw"
+  },
+  "retained_request_qualification": "Exact original request bytes remain in the referenced native receipt; no request is regenerated or invoked.",
+  "release_member": {
+    "name": "issue-980-p6t1-native-release-20261020T174325.json",
+    "sha256": "5b8a71f5d0e96bb96230941a9676a547d447f150e11d0496f224c644953a9a8e"
+  },
+  "runtime_identity_proof": {
+    "source": "installed-identity result in the retained native receipt",
+    "build_sha256": "c05c22a870a0ae74431ee32f84a89bfddda39230310265dbb0b563e44290978a",
+    "not_revalidated": true
+  },
+  "pure_stdlib_comparison": {
+    "request_uses_native_backslashes": true,
+    "trusted_factory_root_uses_forward_slashes": true,
+    "core_pure_windows_identity_equal": true,
+    "local_raw_string_identity_equal": false,
+    "request_root_sha256": "7db7f40d947ed32a249d21cb9e58dd99997b577522559a08d358a91c137e37f1",
+    "factory_root_sha256": "5eb2a418196023194831b51a1079fec6b91dd28fa39556446adddabcce4b14ac",
+    "other_authority_markers": {
+      "invocation_ref": null,
+      "authorization_ref": null,
+      "mode": "structural",
+      "operation": "init"
+    }
+  },
+  "trace": [
+    "Retained controller request() serializes workspace_root=str(root); bootstrap forwards the same explicit outer workspace.",
+    "installed_local_io and RegistryLocation.for_host retain the trusted workspace through workspace.as_posix(). InitializationIO stores that spelling.",
+    "parse_service_request preserves workspace_root text. service._context compares PureWindowsPath values; the retained two spellings identify the same root.",
+    "LocalServiceIO.authorize then tests raw request.workspace_root membership against the forward-slash bound root and raises fixed PermissionError before clock, SnapshotIO or bootstrap dispatch.",
+    "service.execute catches PermissionError via OSError and returns exit 3/SERVICE_IO with verified runtime, null context/input_manifest, no effects/counts and fixed stderr."
+  ],
+  "bootstrap_not_reached": {
+    "service_bootstrap_import_absent_from_retained_origins": true,
+    "all_retained_runtime_origins_installed": true,
+    "observed_summary": {
+      "counts": [],
+      "invocation_ref": null,
+      "message": "Operation could not start.",
+      "receipt_ref": null,
+      "validation_result": null
+    }
+  },
+  "known_fixture_metadata_read_only": [
+    {
+      "path_under_retained_init_root": ".",
+      "kind": "directory",
+      "reparse": false
+    },
+    {
+      "path_under_retained_init_root": "src",
+      "kind": "directory",
+      "reparse": false
+    },
+    {
+      "path_under_retained_init_root": ".git",
+      "kind": "directory",
+      "reparse": false
+    },
+    {
+      "path_under_retained_init_root": "docs/migration/discovery/domain-profile.yaml",
+      "kind": "missing",
+      "reparse": false
+    }
+  ],
+  "relevant_source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/gateway.py",
+      "installed_source_sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/gateway_local.py",
+      "installed_source_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/service.py",
+      "installed_source_sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/service_contracts.py",
+      "installed_source_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/activation_filesystem.py",
+      "installed_source_sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/init_io.py",
+      "installed_source_sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/service_bootstrap.py",
+      "installed_source_sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "installed_origin": "INSTALLED/drm_copilot_discovery/path_policy.py",
+      "installed_source_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+      "qualification": "Targeted source inspection only; package identity proof was reused, not rerun."
+    }
+  ],
+  "finite_affected_comparisons": [
+    "gateway_local.LocalServiceIO.authorize: request.workspace_root versus initialization.workspace_root.",
+    "gateway_local.LocalServiceIO.authorize: optional baseline.workspace_root versus initialization.workspace_root.",
+    "gateway_local.LocalServiceIO.writer: required baseline.workspace_root versus initialization.workspace_root."
+  ],
+  "existing_primitive_to_reuse": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "definition": "_absolute",
+    "contract": "Existing pure canonical absolute-path parser selects drive/UNC Windows or POSIX identity, rejects device namespaces/dot traversal/nonabsolute anchors and validates ordinary components.",
+    "required_exposure": "Expose a small public root-identity wrapper around the existing parser; do not import the private helper or duplicate its validation. Preserve POSIX case sensitivity and reject backslash-to-slash aliases for POSIX roots.",
+    "size": "Current module is 483 lines; the bounded wrapper must keep the module at or below 500. No new production module is requested."
+  },
+  "minimal_repair_scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+    "tests/discovery_runtime/test_gateway_boundaries.py"
+  ],
+  "required_focused_controls": [
+    "Positive equivalent drive-letter Windows slash/case spellings for the request, baseline authorization and writer checks.",
+    "Positive supported UNC spelling equivalence with the same share and root.",
+    "Positive exact POSIX root; negative POSIX case change and backslash alias.",
+    "Negative genuinely different root/drive/share, sibling-prefix roots, relative roots, dot traversal, device namespaces and other parser-rejected paths.",
+    "Existing host markers, principal/invocation identity, exact grants, bound repository reader and no-effect rejection controls remain unchanged."
+  ],
+  "required_affected_proof": [
+    "After explicit repair release: consolidate intent contracts and controls before ordered Black, Ruff, Pyright and focused path/local-boundary tests.",
+    "Use the existing gateway population and affected path-policy tests with per-file/named-body coverage; add no native/service replay before confirmation.",
+    "Independent confirmation precedes coordinator package rebuild and one bounded native retry. Final combined isolation remains disabled."
+  ],
+  "preserved_failures": "Original NR1 request-format failure remains a separate harness finding. The 17:43 SERVICE_IO result remains the truthful pre-repair production failure.",
+  "limits": [
+    "No production/test/harness/package/fixture/receipt changes.",
+    "No service execution, native replay, package identity revalidation, package rebuild or test collection/execution.",
+    "Only retained archive decoding, exact relevant source reads, standard-library lexical comparison and four known non-following metadata reads.",
+    "No additional instrumented I/O probe is needed to establish this deterministic pre-context rejection."
+  ]
+}
