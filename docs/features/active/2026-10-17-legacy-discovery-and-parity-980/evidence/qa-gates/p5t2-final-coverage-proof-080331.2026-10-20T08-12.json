@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json",
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u SCRATCH\\final_coverage.py WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json SCRATCH\\p5t2-final-080331-combined-coverage.json SCRATCH\\p5t2-final-080331-coverage-result.json",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T08:12:25.482963+00:00",
+  "label": "coverage-proof",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-proof-080331-raw.2026-10-20T08-12.json",
+    "sha256": "c381ba58cac9a8cb39307802babd6a7690b12cf4b6cdf41d145a381bfeec05c4"
+  },
+  "seconds": 2.016,
+  "stage": 6,
+  "started_at": "2026-10-20T08:12:23.466943+00:00",
+  "stderr": "",
+  "stdout": "{\n  \"current_coverage\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-current-coverage.2026-10-20T08-12.json\",\n    \"sha256\": \"5db392065b039ab8247d93211d6696419adcdc9364fae62ef968b0b8d8e16b51\"\n  },\n  \"coverage_ranges\": {\n    \"path\": \"docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-ranges.2026-10-20T08-12.json\",\n    \"sha256\": \"b99e911f9862e40f981166df38233312c8c4ed14ab9a4ac87258f84ad0d86616\"\n  },\n  \"range_count\": 70,\n  \"module_count\": 8,\n  \"qualified_prior_proof_count\": 27,\n  \"current_raw_counters_augmented\": false\n}\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T08-12"
+}

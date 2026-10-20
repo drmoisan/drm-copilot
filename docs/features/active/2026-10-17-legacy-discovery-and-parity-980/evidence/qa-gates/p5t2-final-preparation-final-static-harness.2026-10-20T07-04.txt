@@ -1,0 +1,92 @@
+"""Check the released P5-T2 scope, retaining exact accepted-body qualifications."""
+
+import ast
+import copy
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+
+def executable(node):
+    """Return a location-free AST with documentation removed for equivalence only."""
+    result = copy.deepcopy(node)
+    # Documentation changes must not be confused with executable semantic changes.
+    for item in ast.walk(result):
+        if isinstance(item, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            if item.body and isinstance(item.body[0], ast.Expr) and isinstance(item.body[0].value, ast.Constant):
+                if isinstance(item.body[0].value.value, str):
+                    item.body.pop(0)
+    return ast.dump(result, include_attributes=False)
+
+
+def definitions(tree):
+    """Index nested definitions by their complete lexical qualification."""
+    result = {}
+
+    def visit(body, prefix=""):
+        """Collect one lexical body without importing or executing it."""
+        for node in body:
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                name = prefix + node.name
+                result[name] = node
+                visit(node.body, name + ".")
+
+    visit(tree.body)
+    return result
+
+
+def main():
+    """Run static policy checks only when explicitly invoked as a released gate."""
+    manifest = json.loads(Path(sys.argv[1]).read_bytes())
+    if manifest.get("execution_released") is not True:
+        raise SystemExit("Static final gate requires the final release")
+    checked = []
+    # Exact file scope is supplied only by the independently reviewed final candidate.
+    for relative in manifest["files"]:
+        path = Path(relative)
+        content = path.read_bytes()
+        assert hashlib.sha256(content).hexdigest() == manifest["bindings"][relative], relative
+        lines, tree = content.decode("utf-8").splitlines(), ast.parse(content)
+        assert len(lines) <= 500, relative
+        imports, calls, loops = [], [], []
+        # Mechanical checks complement the retained full intent-contract review.
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imports.extend(item.name for item in node.names)
+            if isinstance(node, ast.ImportFrom) and node.module:
+                imports.append(node.module)
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                assert ast.get_docstring(node), (relative, node.name)
+            if isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+                loops.append(node.lineno)
+                if not lines[node.lineno - 2].lstrip().startswith("#"):
+                    exact = manifest["retained_loop_qualifications"].get(relative, {})
+                    assert exact.get(str(node.lineno)) == hashlib.sha256(ast.dump(node).encode()).hexdigest(), (relative, node.lineno)
+            if isinstance(node, ast.Call):
+                calls.append(ast.unparse(node.func))
+        assert not any(name.split(".")[0] in {"subprocess", "tempfile", "socket", "requests", "http", "urllib"} for name in imports), relative
+        assert not any(name in {"open", "eval", "exec", "compile"} for name in calls), relative
+        assert not any(name.endswith((".write_bytes", ".write_text", ".mkdir", ".unlink")) for name in calls), relative
+        if relative.startswith("packages/"):
+            assert not any(name.startswith("scripts") for name in imports), relative
+            assert not any(name.endswith((".read_bytes", ".read_text", ".glob", ".rglob")) for name in calls), relative
+        if relative.startswith("tests/"):
+            assert not any(isinstance(node, ast.Name) and node.id in {"tmp_path", "tmpdir"} for node in ast.walk(tree)), relative
+        checked.append({"path": relative, "physical_lines": len(lines), "definitions": len(definitions(tree)), "loops": loops})
+    retained = []
+    # Historical coverage is reused only for an exactly equivalent named executable body.
+    for record in manifest["retained_units"]:
+        previous = subprocess.run(["git", "show", record["source_ref"] + ":" + record["path"]],
+                                  capture_output=True, check=True).stdout
+        assert hashlib.sha256(previous).hexdigest() == record["source_sha256"], record["path"]
+        old = definitions(ast.parse(previous))[record["name"]]
+        current = definitions(ast.parse(Path(record["path"]).read_bytes()))[record["name"]]
+        assert executable(old) == executable(current), (record["path"], record["name"])
+        retained.append({"path": record["path"], "name": record["name"], "source_ref": record["source_ref"]})
+    print(json.dumps({"files": checked, "retained_units": retained, "source_or_test_mutation": False}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json",
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m ruff check packages/discovery-runtime/src/drm_copilot_discovery/parity_entry_rules.py packages/discovery-runtime/src/drm_copilot_discovery/parity_metrics.py packages/discovery-runtime/src/drm_copilot_discovery/parity_models.py packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py packages/discovery-runtime/src/drm_copilot_discovery/parity_rules.py packages/discovery-runtime/src/drm_copilot_discovery/report_models.py packages/discovery-runtime/src/drm_copilot_discovery/validation.py scripts/dev_tools/discovery/parity_report.py tests/discovery_runtime/test_parity_axes.py tests/discovery_runtime/test_parity_metrics.py tests/discovery_runtime/test_parity_models.py tests/discovery_runtime/test_parity_report.py tests/discovery_runtime/test_parity_report_projection.py tests/discovery_runtime/test_report_models.py tests/discovery_runtime/test_validation_modes.py tests/scripts/dev_tools/discovery/test_parity_report.py",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T08:03:33.060153+00:00",
+  "label": "lint",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-lint-080331-raw.2026-10-20T08-03.json",
+    "sha256": "27a0c0b23c6a07a81798c18a0ebbb00985dbd0b98e8ebd2233b7094bf3445f0c"
+  },
+  "seconds": 1.012,
+  "stage": 2,
+  "started_at": "2026-10-20T08:03:32.048304+00:00",
+  "stderr": "",
+  "stdout": "All checks passed!\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T08-03"
+}

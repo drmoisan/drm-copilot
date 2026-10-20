@@ -1,0 +1,29 @@
+{
+  "binding_after": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "binding_before": {
+    "changed": [],
+    "sha256": "b4bf3efd3a2c955f1e5399acbca0307ea9781fe81b2da92e802e88fcd9520dda"
+  },
+  "candidate": "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p5t2-final-candidate.2026-10-20T08-03.json",
+  "candidate_sha256": "53643d5bab35298e155d99d8986538f0aa5da1893b033e753022869050d6c073",
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -u -m coverage combine --keep SCRATCH\\p5t2-final-080331-outcomes.coverage SCRATCH\\p5t2-final-080331-graph.coverage SCRATCH\\p5t2-final-080331-integration.coverage",
+  "completed_nodes": 0,
+  "exit_code": 0,
+  "finished_at": "2026-10-20T08:12:22.413207+00:00",
+  "label": "coverage-combine",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-coverage-combine-080331-raw.2026-10-20T08-12.json",
+    "sha256": "2f2cdcc9b86b99c94acab6490f18f8528ea4df1aad5a06fbe97e5dddbf51097a"
+  },
+  "seconds": 1.015,
+  "stage": 6,
+  "started_at": "2026-10-20T08:12:21.398181+00:00",
+  "stderr": "",
+  "stdout": "Combined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t2-parity\\p5t2-final-080331-graph.coverage\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t2-parity\\p5t2-final-080331-integration.coverage\nCombined data file ..\\..\\..\\AppData\\Local\\Temp\\issue-980-p5t2-parity\\p5t2-final-080331-outcomes.coverage\n",
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "timestamp": "2026-10-20T08-12"
+}

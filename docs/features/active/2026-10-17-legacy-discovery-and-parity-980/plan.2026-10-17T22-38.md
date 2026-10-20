@@ -305,7 +305,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Assert all requested component/inspection/disposition/feature/runtime/evidence/unresolved counts, explicit numerators/denominators, null zero-denominator percentages, exclusions, stable ordering, findings and input digest.
   - Acceptance: Coverage JSON and its Markdown view agree exactly and do not treat an empty, invalid, or uninventoried graph as complete.
 
-- [ ] [P5-T2] Compute parity totals per feature and client.
+- [x] [P5-T2] Compute parity totals per feature and client.
   - Files and behavior: Move/rework DT/discovery/parity_report.py into R/parity_report.py with a thin adapter; add PT/test_parity_report.py and update Set D parity tests.
   - Tests and proof: Cover unique features versus feature-client totals, all parity states, required/applicable per-client online/offline/mobile verification, blockers, unresolved decisions, and invalid source references.
   - Acceptance: Parity reports use the canonical entry model, retain every blocking finding, and classify undeclared optional dimensions as not-required rather than passed.

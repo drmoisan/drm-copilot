@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "base64": "",
+      "bytes": 0,
+      "path": "SCRATCH/p5t2-final-format-080331.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base64": "QWxsIGRvbmUhIOKcqCDwn42wIOKcqA0KMTYgZmlsZXMgd291bGQgYmUgbGVmdCB1bmNoYW5nZWQuDQo=",
+      "bytes": 59,
+      "path": "SCRATCH/p5t2-final-format-080331.stderr",
+      "sha256": "24315bea89f680c399aecdf314732fa86f8f9b1e43b91a23310112252efd5bf6"
+    },
+    {
+      "base64": "eyJzdGFnZSI6IDEsICJsYWJlbCI6ICJmb3JtYXQiLCAic3RhdHVzIjogImZpbmlzaGVkIiwgImNvbXBsZXRlZCI6IDAsICJsYXN0X25vZGUiOiBudWxsLCAic3RhcnRlZF9hdCI6ICIyMDI2LTEwLTIwVDA4OjAzOjMxLjAyMDIwMSswMDowMCIsICJ0aW1lb3V0X3NlY29uZHMiOiAzMDAsICJwaWQiOiAzMzUyMCwgImVsYXBzZWRfc2Vjb25kcyI6IDEuMDExLCAiZXhpdF9jb2RlIjogMH0K",
+      "bytes": 219,
+      "path": "SCRATCH/p5t2-final-format-080331.progress.json",
+      "sha256": "16e9cea5635622074e91d27a21cb282434c3b4e5cf6286c5b2c9a0a40118661a"
+    }
+  ],
+  "qualification": "Exact raw streams; base64 retains original path and newline bytes."
+}
