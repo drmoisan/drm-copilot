@@ -1,0 +1,13 @@
+{
+  "timestamp_utc": "2026-10-20T14:36:27.123365+00:00",
+  "approved_path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+  "absent_before_creation": true,
+  "owner": "workspace_operations",
+  "formatted_size_trigger": {
+    "service_contracts.py": 421,
+    "service_serialization.py": 526
+  },
+  "prior_declaration_sha256": "414aece69a6ca96be7c193423b47ba04a9d2042525f3000174b1308a19307fb7",
+  "responsibility": "Move only fixed operation field/mode/flag/conditional checks; serializer imports rules, rules imports models only. Public declarations and wire schema API unchanged.",
+  "baseline": "evidence/baseline/p6t1-shared-baseline.2026-10-20T14-17.json"
+}

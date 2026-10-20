@@ -1,0 +1,20 @@
+{
+  "Timestamp": "2026-10-20T14-41",
+  "status": "failed-harness-output-retained",
+  "command": "poetry run python SCRATCH/issue-980-p6t1-build-gates.py static3",
+  "format_exit_code": 1,
+  "harness_exit_code": 1,
+  "failure": "Printing preserved Black output used cp1252 and raised UnicodeEncodeError for U+1F4A5 before receipt emission. Raw subprocess streams were already preserved. Harness stdout/stderr now explicitly use UTF-8; no behavior tests ran.",
+  "raw": [
+    {
+      "path": "SCRATCH/issue-980-p6t1-build-static3-20261020T144028-format.stderr.bin",
+      "sha256": "f32997bfe6e55c33b37f0ed88b93f1100566abfa9e592bfed8f6767a663d50fe",
+      "bytes": 151
+    },
+    {
+      "path": "SCRATCH/issue-980-p6t1-build-static3-20261020T144028-format.stdout.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ]
+}

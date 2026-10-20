@@ -1,0 +1,142 @@
+{
+  "Timestamp": "2026-10-20T14-39",
+  "label": "static2",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "e88ce506c068044d46e557e0b4d5987092a6dacd613cfd64c09c81f00a5a90af",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "f0efe9fdb75ae796d6e2d6d77722234e674e3e61ff9ca755d01e59898ef64b58",
+    "tests/discovery_runtime/test_build_identity.py": "787005fe2d52b7448d6f23be0cf4e83ae3841420d05230c6645451e574b76e90",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "48dc2e280bb9ffeccc04b133b208fe3a420702f7742386abe98eae108b41a89f",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "c43893fc6e4da232cb57c915cae5ffbbccb0ea2d4f14a6eaf204de410a775db4",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "50149f182174f5bb29c52024ab5a2f717f42f4e77882237d79aa02d6cc074f41",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "159c65c3f5ee5e33a713c242855efe58b5419a963731c1b69ed6d9bf613be66e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "bac2ab2422a86767f4d08f4a78fc710be9f9c973ce277b18505e98ddc59141aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "e88ce506c068044d46e557e0b4d5987092a6dacd613cfd64c09c81f00a5a90af",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "f0efe9fdb75ae796d6e2d6d77722234e674e3e61ff9ca755d01e59898ef64b58",
+    "tests/discovery_runtime/test_build_identity.py": "787005fe2d52b7448d6f23be0cf4e83ae3841420d05230c6645451e574b76e90",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "48dc2e280bb9ffeccc04b133b208fe3a420702f7742386abe98eae108b41a89f",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "c43893fc6e4da232cb57c915cae5ffbbccb0ea2d4f14a6eaf204de410a775db4",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "50149f182174f5bb29c52024ab5a2f717f42f4e77882237d79aa02d6cc074f41",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "159c65c3f5ee5e33a713c242855efe58b5419a963731c1b69ed6d9bf613be66e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "bac2ab2422a86767f4d08f4a78fc710be9f9c973ce277b18505e98ddc59141aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6384624000056647,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-format.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-format.stderr.bin",
+          "sha256": "84b9efe87539186dc93860b3f3a897d1a12d9d88af87ec1dd653ef7f7d1eab58",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n7 files would be left unchanged.\r\n"
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1123070000030566,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-lint.stdout.bin",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+          "readable": "All checks passed!\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-lint.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "types",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 1,
+      "seconds": 1.2508984000014607,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-types.stdout.bin",
+          "sha256": "d34f91e674b1876243b62d122f058974d3236264872940a57154783d5a2b95d9",
+          "readable": "WORKSPACE\\tests\\discovery_runtime\\test_build_identity.py\n  WORKSPACE\\tests\\discovery_runtime\\test_build_identity.py:367:44 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(_: Unknown) -> Path\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\discovery_runtime\\test_build_identity.py:367:51 - error: Type of parameter \"_\" is unknown (reportUnknownLambdaType)\n  WORKSPACE\\tests\\discovery_runtime\\test_build_identity.py:368:45 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(_: Unknown) -> Literal[True]\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\discovery_runtime\\test_build_identity.py:368:52 - error: Type of parameter \"_\" is unknown (reportUnknownLambdaType)\nWORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:154:55 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(_: Unknown) -> tuple[Literal['foreign/source.py']]\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:154:62 - error: Type of parameter \"_\" is unknown (reportUnknownLambdaType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:158:39 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(_: Unknown) -> tuple[LiteralString, ...]\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:158:46 - error: Type of parameter \"_\" is unknown (reportUnknownLambdaType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:174:39 - error: Argument type is partially unknown\n  \u00a0\u00a0Argument corresponds to parameter \"value\" in function \"setattr\"\n  \u00a0\u00a0Argument type is \"(_: Unknown) -> tuple[str, ...]\" (reportUnknownArgumentType)\n  WORKSPACE\\tests\\scripts\\dev_tools\\test_discovery_build_identity.py:174:46 - error: Type of parameter \"_\" is unknown (reportUnknownLambdaType)\n10 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-static2-20261020T143941-types.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "719f48cabbf8ce09fcbde0153c94615bd40ba941f4e5fd5eb0b65675a703059c",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "failed-retained"
+}

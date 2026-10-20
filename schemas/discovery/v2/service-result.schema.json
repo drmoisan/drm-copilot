@@ -19,15 +19,15 @@
   ],
   "properties": {
     "result_version": {"const":"2.0.0"},
-    "operation": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/operation"},
-    "mode": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/mode"},
+    "operation": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/operation"},{"type":"null"}]},
+    "mode": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/mode"},{"type":"null"}]},
     "ok": {"type":"boolean"},
     "exit_code": {"enum":[0,1,2,3]},
     "findings": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/finding"}},
     "artifacts": {"type":"array","uniqueItems":true,"items":{"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/artifact"}},
     "summary": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/summary"},
-    "input_manifest": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/input-manifest"},
-    "runtime": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"}
+    "input_manifest": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-result#/$defs/input-manifest"},{"type":"null"}]},
+    "runtime": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"},{"type":"null"}]}
   },
   "$defs": {
     "finding": {
@@ -120,6 +120,47 @@
       },
       "else": {"properties":{"exit_code":{"enum":[1,2,3]},"findings":{"minItems":1,"contains":{"properties":{"severity":{"const":"error"}},"required":["severity"]}}}}
     },
-    {"if":{"properties":{"exit_code":{"const":0}},"required":["exit_code"]},"then":{"properties":{"ok":{"const":true}}}}
+    {"if":{"properties":{"exit_code":{"const":0}},"required":["exit_code"]},"then":{"properties":{"ok":{"const":true}}}},
+    {
+      "if": {"anyOf":[{"properties":{"operation":{"type":"null"}},"required":["operation"]},{"properties":{"mode":{"type":"null"}},"required":["mode"]}]},
+      "then": {"properties":{"ok":{"const":false},"exit_code":{"const":2}}}
+    },
+    {
+      "if": {"anyOf":[{"properties":{"input_manifest":{"type":"null"}},"required":["input_manifest"]},{"properties":{"runtime":{"type":"null"}},"required":["runtime"]}]},
+      "then": {"properties":{"ok":{"const":false},"exit_code":{"enum":[2,3]}}}
+    },
+    {
+      "if": {
+        "anyOf": [
+          {"properties":{"operation":{"type":"null"}},"required":["operation"]},
+          {"properties":{"mode":{"type":"null"}},"required":["mode"]},
+          {"properties":{"input_manifest":{"type":"null"}},"required":["input_manifest"]},
+          {"properties":{"runtime":{"type":"null"}},"required":["runtime"]}
+        ]
+      },
+      "then": {
+        "properties": {
+          "artifacts": {"maxItems":0},
+          "summary": {
+            "properties": {
+              "counts":{"maxItems":0},
+              "validation_result":{"type":"null"},
+              "receipt_ref":{"type":"null"},
+              "invocation_ref":{"type":"null"}
+            }
+          },
+          "findings": {
+            "contains": {
+              "properties": {
+                "severity":{"const":"error"},
+                "pointer":{"type":"string","minLength":1},
+                "next_action":{"type":"string","minLength":1}
+              },
+              "required":["severity","pointer","next_action"]
+            }
+          }
+        }
+      }
+    }
   ]
 }

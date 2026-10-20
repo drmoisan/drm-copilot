@@ -1,0 +1,152 @@
+{
+  "Timestamp": "2026-10-20T15-07",
+  "status": "REVISIONS_REQUIRED",
+  "task": "P6-T1 bounded independent build-identity review",
+  "reviewer": "01a159d5-e3e2-7c71-a150-0e37df63cf23",
+  "route": "build_identity_review_p6t1_20261020 / S5_P6T1_build_identity_review",
+  "authority": "Coordinator verified native identity and authorized evidence-only mutation",
+  "Command": "Get-FileHash over exact frozen staging entries and dependencies; bounded in-memory/API probes recorded separately",
+  "EXIT_CODE": 0,
+  "Output Summary": "All 27 staging entries and 16 dependency bindings match. Three semantic findings require repair before checked checkpoint clearance. No source, tests, configuration, resources, Git or checkpoint changed.",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-freeze.2026-10-20T14-57.json",
+    "sha256": "7b8f6290276d1d292dfe27f301648257458f249cc9f97c548af95e02656a82e3"
+  },
+  "original_staging_manifest": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-staging-manifest.2026-10-20T14-57.json",
+    "sha256": "338e68105a5f93695c4bad6dd6166ba6ca8706b388848bea022687e4474a1177"
+  },
+  "probes": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-build-independent-review-probes.2026-10-20T15-05.json",
+    "sha256": "682e515c04c3174ee808c2062892d314a8ac2ccab440546247157f625bb19551",
+    "interpretation": "Executed with Python 3.13.12. Compatibility probes simulate missing older-interpreter APIs; no claim of actual Python 3.10/3.11 execution."
+  },
+  "findings": [
+    {
+      "id": "BUILD-R1",
+      "severity": "high",
+      "locations": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py:334",
+        "scripts/dev_tools/discovery_build_identity.py:55"
+      ],
+      "issue": "Directory enumeration allocates the entire directory before enforcing prospective capacity",
+      "evidence": "Inspected installed Python 3.13.12 Path.iterdir: it creates [entry.path for entry in scandir_it] before returning. The in-memory probe with artifact_records=1 consumed all four entries before Package enumeration exceeds limits.",
+      "impact": "Both fixed-package walkers can allocate an arbitrarily large directory listing before their counter/work/text limits reject it. Existing memory filesystem tests do not exercise this eager native adapter behavior.",
+      "repair": "Use a streaming directory metadata boundary and charge each entry before retaining child paths; preserve fixed roots, exact names, link rejection and fail-closed unsupported resource behavior. Test consumption stops at the first excess entry through an in-memory scanner. Correct the associated prospective-bounding docstrings as part of the behavior repair."
+    },
+    {
+      "id": "BUILD-R2",
+      "severity": "high",
+      "locations": [
+        "scripts/dev_tools/discovery_build_identity.py:11"
+      ],
+      "issue": "Unconditional tomllib import breaks the declared Python 3.10 build/test path",
+      "evidence": "Root and runtime pyproject declare >=3.10,<4.0; CI includes 3.10, 3.11, 3.12, 3.13. tomllib was added in 3.11. The simulated missing-module probe raises ModuleNotFoundError while importing the helper.",
+      "impact": "Python 3.10 cannot import the builder or collect the dependent builder tests. Python 3.11 has tomllib and reaches the separate path API defect.",
+      "repair": "Use an already-approved repository-compatible TOML parser or compatibility import without silently increasing the minimum Python version or adding an unapproved dependency. Keep byte/syntax/depth validation and immutable metadata projection. No broader parser inventory was performed.",
+      "reference": "https://docs.python.org/3/library/tomllib.html"
+    },
+    {
+      "id": "BUILD-R3",
+      "severity": "high",
+      "locations": [
+        "scripts/dev_tools/discovery_build_identity.py:48",
+        "scripts/dev_tools/discovery_build_identity.py:63",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py:383",
+        "tests/discovery_runtime/test_build_identity.py:468"
+      ],
+      "issue": "Older supported Python versions either crash on junction checks or omit junction rejection",
+      "evidence": "Path.is_junction was added in 3.12. A Path-shaped 3.11 API probe raises AttributeError at the build root. With runtime version_info=(3,11), is_symlink=False and is_junction=True, _linked returns False. Existing junction test requires rejection unconditionally.",
+      "impact": "On 3.10/3.11 the build helper fails on ordinary directories after import succeeds; runtime reads may follow Windows junctions because rejection is disabled. Existing junction test also fails under those versions. On 3.12/3.13 the API exists, but the eager enumeration defect remains.",
+      "repair": "Use a Python-3.10-compatible non-following metadata check for Windows reparse points/junctions and symlinks, consistently for build/runtime roots, ancestors and members. Do not repair compatibility by suppressing junction checks or weakening the test. Keep metadata failure fail-closed and add in-memory old-version coverage.",
+      "reference": "https://docs.python.org/3/library/pathlib.html#pathlib.Path.is_junction"
+    }
+  ],
+  "verified_scope": [
+    "Manifest is canonical installed-content identity, distinct from wheel archive digest and not interpreter/native attestation.",
+    "Projection covers all selected shipped Python files, py.typed, resources and their resource manifest; rejects stale/incomplete/extra payload, unsafe paths and mismatched resource closure.",
+    "Policy identity has a separate domain and full policy version and includes code plus resources; typing metadata and package requirements remain build-only inputs.",
+    "Manifest itself, bytecode and distribution metadata are excluded. No resource-only or zero-digest fallback is returned.",
+    "ServiceRuntimeError uses fixed codes/findings without raw error text; missing manifest is unavailable and corrupt/mismatched payload is corrupt.",
+    "Build helpers use in-memory boundary tests; original 33 caller assertions are retained."
+  ],
+  "retained_verification": {
+    "python": "Frozen Black, Ruff, Pyright gates passed; 144 focused cases and 144 reverse-order cases passed on Python 3.13.12. Not rerun during review.",
+    "coverage": "558/558 statements and 252/252 branches in three owned production modules; prior 209 builder lines map as 206 unchanged plus 3 fully covered changes.",
+    "scope": "Focused Python proof only; no repository-wide, older-interpreter, installed-package or native-host proof."
+  },
+  "dependencies": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "e842f9bca9ba0f5c095c7c9034ac00e49aeedaa8ea54cf4ca7b918bdb3dc9b26"
+    },
+    {
+      "path": "scripts/dev_tools/discovery_build_identity.py",
+      "sha256": "ac91968106c3a6280e4c8cbfc53ede3f41e703fd4457a588789a3de3133849f6"
+    },
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e"
+    },
+    {
+      "path": "tests/discovery_runtime/test_build_identity.py",
+      "sha256": "192091eb2cafad1424fa37d09811ddc3a96b21faca81ac1739433a3260588558"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_build_identity.py",
+      "sha256": "51338c6e1f74fd3a17ef855057a7f4fd296d0d8d6a6665871da2f042ae18aa5b"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "4d9b4c0d3b7e91d3c103aa1be6eafd1b64ddf8ca0f0a5a2a7a71fbd172491eac"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py",
+      "sha256": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py",
+      "sha256": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/resources.py",
+      "sha256": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086"
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+    }
+  ],
+  "commit_constraint": "Shared service_contracts.py and associated service dependencies are uncommitted dependency work per coordinator. Any proposed commit must include accepted dependency-complete changes or explicitly record dependent WIP status; this review does not authorize staging those files.",
+  "deferred": [
+    "No _build_manifest.json generated; final packaging window remains held until all packaged code/resources freeze.",
+    "No wheel build/install or native invocation.",
+    "No P6-T1 checkoff, AC checkoff or checkpoint/Git action.",
+    "Repaired files and their narrow regressions require a new freeze and bounded confirmation before clearance."
+  ],
+  "ac_status": "Unchanged: 23/66 accepted criteria and 46/84 accepted tasks per coordinator. P6-T1 remains in progress."
+}

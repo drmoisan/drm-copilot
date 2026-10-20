@@ -1,0 +1,86 @@
+{
+  "Timestamp": "2026-10-20T15-15",
+  "label": "lintfixrepair1",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "98ae00f74282ef3946110554f5c37b23062b140ebb1fb55f1dc718cda135d8f0",
+    "scripts/dev_tools/discovery_build_identity.py": "2d0e4ed84b78aeadfd549cd45182aece15e454490a7175ff3548b22db60bf78e",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "704746d146dab142eb0aac79b9879d048a14d599bcf4849a93e7560df48583cd",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "952110be13352d93a9f48177c094304487fb686a625c7dc5210fe0d8547efed4",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "14c1b8b738bbd08da4f0ff504412d11036bbed768c3d0d0e2087452c12b03d79",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "98ae00f74282ef3946110554f5c37b23062b140ebb1fb55f1dc718cda135d8f0",
+    "scripts/dev_tools/discovery_build_identity.py": "2d0e4ed84b78aeadfd549cd45182aece15e454490a7175ff3548b22db60bf78e",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "c118bb4df1a83c791155ec90865736fc197387d55584125a6d92f29e9b088e94",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "313e734a5f002670b2b5f174f40d1462b9ae86404dd873459200c5d9ecba73e9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "14c1b8b738bbd08da4f0ff504412d11036bbed768c3d0d0e2087452c12b03d79",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "lint-fix",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "--fix",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1362612000084482,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-lintfixrepair1-20261020T151549-lint-fix.stdout.bin",
+          "sha256": "43eb303197a763573c9aa287ba1576f8e31051f934f06ddf78f81c19af7ebbc1",
+          "readable": "\nFixed 2 errors:\n- tests\\discovery_runtime\\test_build_identity.py:\n    1 \u00d7 I001 (unsorted-imports)\n- tests\\scripts\\dev_tools\\test_discovery_build_identity.py:\n    1 \u00d7 I001 (unsorted-imports)\n\nFound 2 errors (2 fixed, 0 remaining).\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-lintfixrepair1-20261020T151549-lint-fix.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "143a7a124671f9b3c69f2840d432f3f5171758c80ccf1b12ea1f64d7a3307cac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "focused-pass-not-acceptance"
+}

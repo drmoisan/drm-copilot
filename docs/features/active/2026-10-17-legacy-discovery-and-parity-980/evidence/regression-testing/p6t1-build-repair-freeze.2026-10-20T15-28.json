@@ -1,0 +1,353 @@
+{
+  "timestamp": "2026-10-20T15-28",
+  "status": "PURE_SLICE_READY_FOR_INDEPENDENT_REVIEW",
+  "task": "P6-T1 BUILD-R1/R2/R3 consolidated repair; live generation remains held",
+  "original_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-freeze.2026-10-20T14-57.json",
+    "sha256": "7b8f6290276d1d292dfe27f301648257458f249cc9f97c548af95e02656a82e3",
+    "bytes": 24712
+  },
+  "original_144_nodes_preserved": true,
+  "changed_sources_from_original_freeze": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795,
+      "physical_lines": 455
+    },
+    {
+      "path": "scripts/dev_tools/discovery_build_identity.py",
+      "sha256": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+      "bytes": 8839,
+      "physical_lines": 206
+    },
+    {
+      "path": "tests/discovery_runtime/test_build_identity.py",
+      "sha256": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+      "bytes": 17395,
+      "physical_lines": 479
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_build_identity.py",
+      "sha256": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+      "bytes": 16069,
+      "physical_lines": 411
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+      "bytes": 9156,
+      "physical_lines": 255
+    }
+  ],
+  "unchanged_sources_from_original_freeze": [
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+      "bytes": 18549,
+      "physical_lines": 471
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+      "bytes": 10763,
+      "physical_lines": 286
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "bytes": 653,
+      "physical_lines": 23
+    }
+  ],
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-build-independent-review.2026-10-20T15-07.json",
+    "sha256": "6a91ab45ab55e3667022412c21befe8b06be049aabde0b971dc455cc3eeb467a",
+    "bytes": 10540
+  },
+  "repair": {
+    "BUILD-R1": "One shared streaming os.scandir boundary checks count before retaining child paths/metadata and closes scanners on errors; both installed/build walkers use it.",
+    "BUILD-R2": "Fixed tomllib/tomli compatibility selection preserves the approved dependency convention and typed immutable metadata; no unconditional 3.11-only import.",
+    "BUILD-R3": "Shared non-following lstat checks file mode and Windows reparse bit without newer Path convenience APIs; roots, ancestors and members reject links.",
+    "reproductions": "Eight narrow cases run after ordered statics and before all 152 cases; simulated missing tomllib/unavailable Path convenience APIs, exact early-limit consumption/closure, unsupported stores fail closed.",
+    "interpreter_inventory_command": [
+      "py",
+      "-0p"
+    ],
+    "interpreter_inventory_exit_code": 0,
+    "actual_310_execution": "Unavailable in the narrow installed-launcher inventory, which lists only 3.13; simulated controls are not actual 3.10/3.11 execution."
+  },
+  "sources_and_tests": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795,
+      "physical_lines": 455
+    },
+    {
+      "path": "scripts/dev_tools/discovery_build_identity.py",
+      "sha256": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+      "bytes": 8839,
+      "physical_lines": 206
+    },
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+      "bytes": 18549,
+      "physical_lines": 471
+    },
+    {
+      "path": "tests/discovery_runtime/test_build_identity.py",
+      "sha256": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+      "bytes": 17395,
+      "physical_lines": 479
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_build_identity.py",
+      "sha256": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+      "bytes": 16069,
+      "physical_lines": 411
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+      "bytes": 10763,
+      "physical_lines": 286
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+      "bytes": 9156,
+      "physical_lines": 255
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "bytes": 653,
+      "physical_lines": 23
+    }
+  ],
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "ordered_gates": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair3-gates.2026-10-20T15-26.json",
+    "sha256": "fcb203ae9bff8d4ded21445c092d856838d686a7458a8f2c6d7afda5544e19b9",
+    "bytes": 35074
+  },
+  "reverse_isolation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-reverserepair1-gates.2026-10-20T15-27.json",
+    "sha256": "a88032575b823b2dd7c0ad4015b9926d00a381dc5dc4a22d2dd92728c4a30aa5",
+    "bytes": 26819
+  },
+  "coverage_bindings": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-coverage-bindings.2026-10-20T15-28.json",
+    "sha256": "cd5ddac9d538a8e76e20222ee73cf30898a7eeb2583e4e648e85a545605b639f",
+    "bytes": 22921
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-raw-archive.2026-10-20T15-28.json",
+    "sha256": "0eaf5536fcbfbe0a02a3c5720c5f94dfe1b62106156d3e81e1184b24080c7ce7",
+    "bytes": 34031
+  },
+  "nodes": [
+    "tests/discovery_runtime/test_build_identity.py::test_complete_content_identity_is_deterministic_and_not_wheel_hash",
+    "tests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[source]",
+    "tests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[resource]",
+    "tests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[typing]",
+    "tests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[metadata]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[[]]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{}]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[\\xff]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{\"package\":{},\"package\":{}}]",
+    "tests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[manifest5]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[missing]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[extra]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[modified]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[noncanonical]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[version]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[policy]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[unknown-field]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[../escape.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/deep.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[/absolute.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[C:/source.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[UPPER.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[con.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a//b.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a./b.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[\\xe9.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[data.bin]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[_resources/evil.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[_resources/foreign/data.json]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[helpers.py/child.py]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[duplicate]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[missing-init]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[resource-hash]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[resource-empty]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[excluded]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[mutable]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[bad-pair]",
+    "tests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[mutable-content]",
+    "tests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata0]",
+    "tests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata1]",
+    "tests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata2]",
+    "tests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata3]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits0]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits1]",
+    "tests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits2]",
+    "tests/discovery_runtime/test_build_identity.py::test_installation_generated_members_are_excluded",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[missing-manifest]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[oversized-manifest]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[missing-member]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-member]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-names]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-names-late]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-manifest]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[mutable-listing]",
+    "tests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[mutable-member]",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_installed_adapter_uses_memory_files",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[root]",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[child]",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[junction]",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[other]",
+    "tests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[count]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[installed]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[source]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[enumerate]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[read]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[source]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[enumerate]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[read]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_identity_stage_is_idempotent_and_check_never_writes",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[absent]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[stale]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[changed-code]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[changed-package]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[utf8]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[syntax]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[empty]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[tool]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[poetry]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[name]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[dependencies]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[executable]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[python]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[syntax-limit]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[byte-limit]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_limits_and_exact_declared_requirements",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[foreign-package]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[unknown-dependency]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[url]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_mutation_during_capture_aborts_before_write",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[foreign-path]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[count]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[oversized]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[mutable]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[path-type]",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_undeclared_resource_is_not_refreshed_by_identity_stage",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonboolean_check_is_not_coerced_into_write_authority",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_then_check_is_idempotent_and_reports_closure",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order0]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order1]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order2]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order3]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order4]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order5]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_input_mismatch_rejects_missing_and_extra_files[False]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_input_mismatch_rejects_missing_and_extra_files[True]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[[]]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{\"manifest_version\":true,\"resource_roots\":[],\"resources\":[]}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{\"manifest_version\":1,\"resource_roots\":{},\"resources\":[]}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots0-paths0]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots1-paths1]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots2-paths2]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots3-paths3]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots4-paths4]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots5-paths5]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots6-paths6]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots7-paths7]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[\\xff]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[[]]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{\"$id\":\"urn:example\",\"$ref\":\"https://example.invalid/missing\"}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{\"$id\":\"urn:example\",\"$ref\":\"#/$defs/missing\"}]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_resolves_local_urns_and_ignores_template_payloads",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_duplicate_ids",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_distinguishes_stdlib_declared_and_local_modules",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[import unexpected_library]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[import drm_copilot_discovery.missing]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[from .relative import value]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_check_fails_without_writing_missing_or_stale_resources",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_extra_staged_resource_is_not_silently_packaged",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py::test_missing_runtime_package_blocks_resource_staging",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[valid]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[root-link]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[child-link]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[count]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[depth]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[other]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_disk_boundary_reads_lists_and_writes_only_generated_paths",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_resolved_path_escape_is_rejected",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[success]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[failure]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[missing-wheel]",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_missing_python_prevents_build",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_build_reports_wheel_digest_with_injected_builder",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_stage_and_check_never_build",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_reports_read_failure_and_nonzero_exit",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_default_disk_boundary_is_injected"
+  ],
+  "original_tests": {
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": {
+      "old_assertions": 17,
+      "all_preserved": true
+    },
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": {
+      "old_assertions": 16,
+      "all_preserved": true
+    }
+  },
+  "scope_contract": {
+    "runtime": "load_build_identity(*,store:InstalledBuildStore|None=None,limits:ParseLimits=DEFAULT_LIMITS)->RuntimeIdentity; no-argument default reads fixed installed package",
+    "failures": "ServiceRuntimeError RUNTIME_UNAVAILABLE for unreadable/missing manifest; RUNTIME_CORRUPT for malformed, excessive, stale, incomplete or changing payload; no raw error text or fallback identity",
+    "build": "stage_build_identity(filesystem,*,check=False,limits=DEFAULT_LIMITS) verifies fixed source/dependency/resource closure; writes only exact generated manifest after checks",
+    "ordering": "Resource owner refreshes resources, all packaged sources freeze, coordinator releases one build-manifest generation window",
+    "identity": "Canonical sorted installed-content manifest, not wheel archive; separately domain-labelled full-version policy code/resource closure",
+    "unexecuted": [
+      "live manifest generation",
+      "wheel rebuild/install/native invocation",
+      "full P6 service acceptance",
+      "repository-wide suites"
+    ],
+    "generated_manifest_exists": false
+  },
+  "failures_retained": [
+    "Original 144-case proofs and original archive unchanged",
+    "repair1 import lint diagnostics",
+    "staticrepair1 type-only compatibility-import and contextmanager typing diagnostics",
+    "repair2: five passing repro controls and three fixture setup/undo failures deleting inherited Path methods; replaced only by unavailable-API stubs, production unchanged"
+  ],
+  "evidence_convention": "Original bytes preserved losslessly in gzip-base64 archive and SCRATCH. Readable receipt views replace absolute roots only; original CR/LF bytes are not silently normalized."
+}

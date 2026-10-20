@@ -168,8 +168,8 @@
     },
     {
       "path": "schemas/discovery/v2/service-result.schema.json",
-      "sha256": "26ef1a6f57a3740a68a3718bb7d2fb7eae149fef4c4a8656e7bac4ee4a201a4b",
-      "size": 7181
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "size": 8893
     },
     {
       "path": "schemas/discovery/v2/source-snapshot-manifest.schema.json",

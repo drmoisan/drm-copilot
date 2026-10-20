@@ -1,0 +1,212 @@
+{
+  "Timestamp": "2026-10-20T15-26",
+  "label": "repair3",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+    "scripts/dev_tools/discovery_build_identity.py": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+    "scripts/dev_tools/build_discovery_runtime.py": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+    "tests/discovery_runtime/test_build_identity.py": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6509708999947179,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-format.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-format.stderr.bin",
+          "sha256": "84b9efe87539186dc93860b3f3a897d1a12d9d88af87ec1dd653ef7f7d1eab58",
+          "readable": "All done! \u2728 \ud83c\udf70 \u2728\r\n7 files would be left unchanged.\r\n"
+        }
+      }
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.10827070000232197,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-lint.stdout.bin",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+          "readable": "All checks passed!\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-lint.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "types",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pyright",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3421307999815326,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-types.stdout.bin",
+          "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+          "readable": "0 errors, 0 warnings, 0 informations\nWARNING: there is a new pyright version available (v1.1.409 -> v1.1.414).\r\nPlease install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`\r\n\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-types.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "reproductions",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5647606999846175,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-reproductions.stdout.bin",
+          "sha256": "7bf0ae202d5be6291705284afa83419ae6b5657ab06850a9920f7049b7d9aab4",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 8 items\r\n\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[installed] PASSED [ 12%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[source] PASSED [ 25%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable PASSED [ 37%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[enumerate] PASSED [ 50%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[read] PASSED [ 62%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[source] PASSED [ 75%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[enumerate] PASSED [ 87%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[read] PASSED [100%]\r\n\r\n============================== 8 passed in 0.17s ==============================\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-reproductions.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    },
+    {
+      "stage": "tests",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "-vv",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+        "--cov=drm_copilot_discovery.build_identity",
+        "--cov=scripts.dev_tools.discovery_build_identity",
+        "--cov=scripts.dev_tools.build_discovery_runtime",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p6t1-build-repair3-coverage.json"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4108882000145968,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-tests.stdout.bin",
+          "sha256": "a07bf8aa305217d2c88c8b1233ac538de47ae024668032f4526a2b71d4a67022",
+          "readable": "============================= test session starts =============================\r\nplatform win32 -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- WORKSPACE\\.venv\\Scripts\\python.exe\r\nrootdir: WORKSPACE\r\nconfigfile: pyproject.toml\r\nplugins: anyio-4.12.1, cov-7.0.0\r\ncollecting ... collected 152 items\r\n\r\ntests/discovery_runtime/test_build_identity.py::test_complete_content_identity_is_deterministic_and_not_wheel_hash PASSED [  0%]\r\ntests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[source] PASSED [  1%]\r\ntests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[resource] PASSED [  1%]\r\ntests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[typing] PASSED [  2%]\r\ntests/discovery_runtime/test_build_identity.py::test_identity_invalidates_the_correct_closure[metadata] PASSED [  3%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{] PASSED [  3%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[[]] PASSED [  4%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{}] PASSED [  5%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[\\xff] PASSED [  5%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[{\"package\":{},\"package\":{}}] PASSED [  6%]\r\ntests/discovery_runtime/test_build_identity.py::test_invalid_manifest_has_fixed_redacted_failure[manifest5] PASSED [  7%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[missing] PASSED [  7%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[extra] PASSED [  8%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[modified] PASSED [  9%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[noncanonical] PASSED [  9%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[version] PASSED [ 10%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[policy] PASSED [ 11%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_mismatch_cannot_return_identity[unknown-field] PASSED [ 11%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[../escape.py] PASSED [ 12%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[] PASSED [ 13%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/deep.py] PASSED [ 13%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[/absolute.py] PASSED [ 14%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[C:/source.py] PASSED [ 15%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[UPPER.py] PASSED [ 15%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[con.py] PASSED [ 16%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a//b.py] PASSED [ 17%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[a./b.py] PASSED [ 17%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[\\xe9.py] PASSED [ 18%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[data.bin] PASSED [ 19%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[_resources/evil.py] PASSED [ 19%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[_resources/foreign/data.json] PASSED [ 20%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_paths_fail_before_publication[helpers.py/child.py] PASSED [ 21%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[duplicate] PASSED [ 21%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[missing-init] PASSED [ 22%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[resource-hash] PASSED [ 23%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[resource-empty] PASSED [ 23%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[excluded] PASSED [ 24%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[mutable] PASSED [ 25%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[bad-pair] PASSED [ 25%]\r\ntests/discovery_runtime/test_build_identity.py::test_payload_contract_and_resource_closure_are_required[mutable-content] PASSED [ 26%]\r\ntests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata0] PASSED [ 26%]\r\ntests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata1] PASSED [ 27%]\r\ntests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata2] PASSED [ 28%]\r\ntests/discovery_runtime/test_build_identity.py::test_foreign_metadata_is_not_a_package_selector[metadata3] PASSED [ 28%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits0] PASSED [ 29%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits1] PASSED [ 30%]\r\ntests/discovery_runtime/test_build_identity.py::test_manifest_limits_stop_the_whole_projection[limits2] PASSED [ 30%]\r\ntests/discovery_runtime/test_build_identity.py::test_installation_generated_members_are_excluded PASSED [ 31%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[missing-manifest] PASSED [ 32%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[oversized-manifest] PASSED [ 32%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[missing-member] PASSED [ 33%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-member] PASSED [ 34%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-names] PASSED [ 34%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-names-late] PASSED [ 35%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[changed-manifest] PASSED [ 36%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[mutable-listing] PASSED [ 36%]\r\ntests/discovery_runtime/test_build_identity.py::test_reader_failure_and_mutation_are_distinct[mutable-member] PASSED [ 37%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_installed_adapter_uses_memory_files PASSED [ 38%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[root] PASSED [ 38%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[child] PASSED [ 39%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[junction] PASSED [ 40%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[other] PASSED [ 40%]\r\ntests/discovery_runtime/test_build_identity.py::test_fixed_adapter_rejects_links[count] PASSED [ 41%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[installed] PASSED [ 42%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_streaming_limits_stop_at_first_excess_entry[source] PASSED [ 42%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_uses_approved_parser_when_tomllib_is_unavailable PASSED [ 43%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[enumerate] PASSED [ 44%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[read] PASSED [ 44%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_reparse_rejection_does_not_require_new_path_apis[source] PASSED [ 45%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[enumerate] PASSED [ 46%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonfilesystem_installation_fails_closed[read] PASSED [ 46%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_identity_stage_is_idempotent_and_check_never_writes PASSED [ 47%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[absent] PASSED [ 48%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[stale] PASSED [ 48%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[changed-code] PASSED [ 49%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_check_rejects_unverified_identity_without_writes[changed-package] PASSED [ 50%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[utf8] PASSED [ 50%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[syntax] PASSED [ 51%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[empty] PASSED [ 51%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[tool] PASSED [ 52%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[poetry] PASSED [ 53%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[name] PASSED [ 53%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[dependencies] PASSED [ 54%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[executable] PASSED [ 55%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[python] PASSED [ 55%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[syntax-limit] PASSED [ 56%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_rejects_malformed_or_executable_declarations[byte-limit] PASSED [ 57%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_limits_and_exact_declared_requirements PASSED [ 57%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[foreign-package] PASSED [ 58%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[unknown-dependency] PASSED [ 59%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_stage_rejects_unapproved_package_identity[url] PASSED [ 59%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_metadata_mutation_during_capture_aborts_before_write PASSED [ 60%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[foreign-path] PASSED [ 61%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[count] PASSED [ 61%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[oversized] PASSED [ 62%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[mutable] PASSED [ 63%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_build_boundary_contracts_are_checked[path-type] PASSED [ 63%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_undeclared_resource_is_not_refreshed_by_identity_stage PASSED [ 64%]\r\ntests/scripts/dev_tools/test_discovery_build_identity.py::test_nonboolean_check_is_not_coerced_into_write_authority PASSED [ 65%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_then_check_is_idempotent_and_reports_closure PASSED [ 65%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order0] PASSED [ 66%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order1] PASSED [ 67%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order2] PASSED [ 67%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order3] PASSED [ 68%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order4] PASSED [ 69%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_stage_bytes_are_order_invariant[order5] PASSED [ 69%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_input_mismatch_rejects_missing_and_extra_files[False] PASSED [ 70%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_input_mismatch_rejects_missing_and_extra_files[True] PASSED [ 71%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{] PASSED [ 71%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[[]] PASSED [ 72%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{}] PASSED [ 73%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{\"manifest_version\":true,\"resource_roots\":[],\"resources\":[]}] PASSED [ 73%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_fails_closed[{\"manifest_version\":1,\"resource_roots\":{},\"resources\":[]}] PASSED [ 74%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots0-paths0] PASSED [ 75%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots1-paths1] PASSED [ 75%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots2-paths2] PASSED [ 76%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots3-paths3] PASSED [ 76%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots4-paths4] PASSED [ 77%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots5-paths5] PASSED [ 78%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots6-paths6] PASSED [ 78%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_invalid_allowlist_construction_is_rejected[roots7-paths7] PASSED [ 79%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{] PASSED [ 80%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[\\xff] PASSED [ 80%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[[]] PASSED [ 81%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{}] PASSED [ 82%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{\"$id\":\"urn:example\",\"$ref\":\"https://example.invalid/missing\"}] PASSED [ 82%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_malformed_and_unresolved_schemas[{\"$id\":\"urn:example\",\"$ref\":\"#/$defs/missing\"}] PASSED [ 83%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_resolves_local_urns_and_ignores_template_payloads PASSED [ 84%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_schema_closure_rejects_duplicate_ids PASSED [ 84%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_distinguishes_stdlib_declared_and_local_modules PASSED [ 85%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[import unexpected_library] PASSED [ 86%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[import drm_copilot_discovery.missing] PASSED [ 86%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_import_closure_rejects_unclosed_imports[from .relative import value] PASSED [ 87%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_check_fails_without_writing_missing_or_stale_resources PASSED [ 88%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_extra_staged_resource_is_not_silently_packaged PASSED [ 88%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime.py::test_missing_runtime_package_blocks_resource_staging PASSED [ 89%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[valid] PASSED [ 90%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[root-link] PASSED [ 90%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[child-link] PASSED [ 91%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[count] PASSED [ 92%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[depth] PASSED [ 92%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_build_source_enumeration_is_prospectively_bounded[other] PASSED [ 93%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_disk_boundary_reads_lists_and_writes_only_generated_paths PASSED [ 94%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_resolved_path_escape_is_rejected PASSED [ 94%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[success] PASSED [ 95%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[failure] PASSED [ 96%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_wheel_build_uses_validated_interpreter_and_offline_flags[missing-wheel] PASSED [ 96%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_missing_python_prevents_build PASSED [ 97%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_build_reports_wheel_digest_with_injected_builder PASSED [ 98%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_stage_and_check_never_build PASSED [ 98%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_reports_read_failure_and_nonzero_exit PASSED [ 99%]\r\ntests/scripts/dev_tools/test_build_discovery_runtime_io.py::test_cli_default_disk_boundary_is_injected PASSED [100%]\r\n\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                     Stmts   Miss Branch BrPart  Cover   Missing\r\n--------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\build_identity.py     225      0     96      0   100%\r\nscripts\\dev_tools\\build_discovery_runtime.py                               225      0    102      0   100%\r\nscripts\\dev_tools\\discovery_build_identity.py                              101      0     36      0   100%\r\n--------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                      551      0    234      0   100%\r\nCoverage JSON written to file WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\regression-testing\\p6t1-build-repair3-coverage.json\r\n============================= 152 passed in 0.82s =============================\r\n"
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-repair3-20261020T152648-tests.stderr.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        }
+      }
+    }
+  ],
+  "coverage": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair3-coverage.2026-10-20T15-26.json",
+  "harness_sha256": "143a7a124671f9b3c69f2840d432f3f5171758c80ccf1b12ea1f64d7a3307cac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "focused-pass-not-acceptance"
+}

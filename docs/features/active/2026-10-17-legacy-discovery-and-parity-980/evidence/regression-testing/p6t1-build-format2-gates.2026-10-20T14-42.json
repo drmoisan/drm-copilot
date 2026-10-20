@@ -1,0 +1,82 @@
+{
+  "Timestamp": "2026-10-20T14-42",
+  "label": "format2",
+  "scope": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+    "scripts/dev_tools/discovery_build_identity.py",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "tests/discovery_runtime/test_build_identity.py",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+  ],
+  "before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "204f038a80d149d0a9476b8f7660a3652ef4131f97a7cb24f25866ef0290876d",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "f0efe9fdb75ae796d6e2d6d77722234e674e3e61ff9ca755d01e59898ef64b58",
+    "tests/discovery_runtime/test_build_identity.py": "73584f70ee5f4b7f8cd4fa21100360e98b9c993ab9de57c9c0db0ff66d559577",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "70511be03a330829c259eae0546728a66edaf12c09ded0e958d62d9b499cfdcf",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "c43893fc6e4da232cb57c915cae5ffbbccb0ea2d4f14a6eaf204de410a775db4",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "50149f182174f5bb29c52024ab5a2f717f42f4e77882237d79aa02d6cc074f41",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "159c65c3f5ee5e33a713c242855efe58b5419a963731c1b69ed6d9bf613be66e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "bac2ab2422a86767f4d08f4a78fc710be9f9c973ce277b18505e98ddc59141aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py": "204f038a80d149d0a9476b8f7660a3652ef4131f97a7cb24f25866ef0290876d",
+    "scripts/dev_tools/discovery_build_identity.py": "11191e74b9daf63156df01ab32b04064418e0f28a8a770a1f355695a0a27815e",
+    "scripts/dev_tools/build_discovery_runtime.py": "f0efe9fdb75ae796d6e2d6d77722234e674e3e61ff9ca755d01e59898ef64b58",
+    "tests/discovery_runtime/test_build_identity.py": "7d84508db041bfbd69e3806f2ebe17c703e95dd385cb2291d8558da175f6f10f",
+    "tests/scripts/dev_tools/test_discovery_build_identity.py": "70511be03a330829c259eae0546728a66edaf12c09ded0e958d62d9b499cfdcf",
+    "tests/scripts/dev_tools/test_build_discovery_runtime.py": "c43893fc6e4da232cb57c915cae5ffbbccb0ea2d4f14a6eaf204de410a775db4",
+    "tests/scripts/dev_tools/test_build_discovery_runtime_io.py": "50149f182174f5bb29c52024ab5a2f717f42f4e77882237d79aa02d6cc074f41",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "159c65c3f5ee5e33a713c242855efe58b5419a963731c1b69ed6d9bf613be66e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "bac2ab2422a86767f4d08f4a78fc710be9f9c973ce277b18505e98ddc59141aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parsing.py": "ede17a33a849890b5cfa51949454a9ed6ce65a54be91f89d5c409d0ec206ab9b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/resources.py": "4bded49e492fa2f9a8ab8d6391e200b1870b7db6bf1716624e21c2beb9b46086",
+    "packages/discovery-runtime/pyproject.toml": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b"
+  },
+  "results": [
+    {
+      "stage": "format-write",
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-m",
+        "black",
+        "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+        "scripts/dev_tools/discovery_build_identity.py",
+        "scripts/dev_tools/build_discovery_runtime.py",
+        "tests/discovery_runtime/test_build_identity.py",
+        "tests/scripts/dev_tools/test_discovery_build_identity.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+        "tests/scripts/dev_tools/test_build_discovery_runtime_io.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9362047000031453,
+      "streams": {
+        "stdout": {
+          "path": "SCRATCH/issue-980-p6t1-build-format2-20261020T144208-format-write.stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readable": ""
+        },
+        "stderr": {
+          "path": "SCRATCH/issue-980-p6t1-build-format2-20261020T144208-format-write.stderr.bin",
+          "sha256": "a7e520a4e2c67d4a015d542fc0a641685ff9ea82b70ceee4e6f7a2bafffbd4fe",
+          "readable": "reformatted tests\\discovery_runtime\\test_build_identity.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted, 6 files left unchanged.\r\n"
+        }
+      }
+    }
+  ],
+  "coverage": null,
+  "harness_sha256": "9b0aeaf994b97cd2ec6c7735f74541dcbf9838eb862e0244c2c036fa29e3ddac",
+  "raw_policy": "Exact original stream bytes retained in SCRATCH; readable JSON replaces absolute roots only and retains CR/LF as escaped characters.",
+  "status": "focused-pass-not-acceptance"
+}

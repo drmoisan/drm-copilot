@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-10-20T15-28",
+  "status": "exact proposed paths only; no staging performed",
+  "files": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795,
+      "physical_lines": 455
+    },
+    {
+      "path": "scripts/dev_tools/discovery_build_identity.py",
+      "sha256": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+      "bytes": 8839,
+      "physical_lines": 206
+    },
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+      "bytes": 18549,
+      "physical_lines": 471
+    },
+    {
+      "path": "tests/discovery_runtime/test_build_identity.py",
+      "sha256": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+      "bytes": 17395,
+      "physical_lines": 479
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_build_identity.py",
+      "sha256": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+      "bytes": 16069,
+      "physical_lines": 411
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+      "bytes": 10763,
+      "physical_lines": 286
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+      "bytes": 9156,
+      "physical_lines": 255
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "bytes": 653,
+      "physical_lines": 23
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-formatrepair1-gates.2026-10-20T15-15.json",
+      "sha256": "67b350037ffa6970275041caa97f701cbc7315a14191607d4df8054ff30af6ec",
+      "bytes": 6820
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-lintfixrepair1-gates.2026-10-20T15-15.json",
+      "sha256": "b52458cd40ec0bbb853e00103e1f288de866ab8ca311259fc8e4156e809675ff",
+      "bytes": 6700
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-coverage-bindings.2026-10-20T15-28.json",
+      "sha256": "cd5ddac9d538a8e76e20222ee73cf30898a7eeb2583e4e648e85a545605b639f",
+      "bytes": 22921
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-freeze.2026-10-20T15-28.json",
+      "sha256": "868d9ef1a5fd1433b446712be10f59c57d8747cddc1bbbad391c4346cbdf45b2",
+      "bytes": 29350
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-raw-archive.2026-10-20T15-28.json",
+      "sha256": "0eaf5536fcbfbe0a02a3c5720c5f94dfe1b62106156d3e81e1184b24080c7ce7",
+      "bytes": 34031
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair1-gates.2026-10-20T15-15.json",
+      "sha256": "9704da2397c4288a813952e407f688b796b6a6835fe2e37cf6c85d022fc977e1",
+      "bytes": 10002
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair2-gates.2026-10-20T15-25.json",
+      "sha256": "ceba99628e839c28b2454eef53044abef6cfcb1c360d0541d12e7a2801a7c084",
+      "bytes": 26431
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair3-coverage.2026-10-20T15-26.json",
+      "sha256": "952d33ca649d2edd3bb0e03863b8d8ad6be801cf85a624fc5ce4c635a123d9a1",
+      "bytes": 48599
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair3-gates.2026-10-20T15-26.json",
+      "sha256": "fcb203ae9bff8d4ded21445c092d856838d686a7458a8f2c6d7afda5544e19b9",
+      "bytes": 35074
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-reverserepair1-gates.2026-10-20T15-27.json",
+      "sha256": "a88032575b823b2dd7c0ad4015b9926d00a381dc5dc4a22d2dd92728c4a30aa5",
+      "bytes": 26819
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-staticrepair1-gates.2026-10-20T15-16.json",
+      "sha256": "2ebd24f10a7b3bc50450150aedd8ebe0621bdbfae1247208130133785a064f35",
+      "bytes": 10664
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-staticrepair2-gates.2026-10-20T15-16.json",
+      "sha256": "02331c16238ee6bba8dd7e5026c12919fb15e2f1529bf36dab7457b10c2305f1",
+      "bytes": 9073
+    }
+  ],
+  "changed_source_delta": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/build_identity.py",
+      "sha256": "21baf869e30f067b7b5fb5ea3ea25f6a64beea8c75365a126a0c9c3f59155736",
+      "bytes": 18795,
+      "physical_lines": 455
+    },
+    {
+      "path": "scripts/dev_tools/discovery_build_identity.py",
+      "sha256": "26d9e4e21f92278967e61299a86c4304db46e76985655d3d7d51a8627bf78662",
+      "bytes": 8839,
+      "physical_lines": 206
+    },
+    {
+      "path": "tests/discovery_runtime/test_build_identity.py",
+      "sha256": "5a199912491844f185e44441605e9c82b3f4bffa52d52f598d0f9e6ded6e0a74",
+      "bytes": 17395,
+      "physical_lines": 479
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_build_identity.py",
+      "sha256": "2c4d7fbfb0e1a8130288e081748367e96e84c246d1168efe16b56ecc562380d9",
+      "bytes": 16069,
+      "physical_lines": 411
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime_io.py",
+      "sha256": "82f5e09b541931764331a1e25e6c2c1bf5129be618fd3c3eb473774bae2b5eb6",
+      "bytes": 9156,
+      "physical_lines": 255
+    }
+  ],
+  "unchanged_source_bindings": [
+    {
+      "path": "scripts/dev_tools/build_discovery_runtime.py",
+      "sha256": "b22d093f3b7c6ff24a0b62fa1eed543cc2cbd03824e71fc5a3d6b1c35c62828e",
+      "bytes": 18549,
+      "physical_lines": 471
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_build_discovery_runtime.py",
+      "sha256": "f836f95472334942011eaf904a1199af78762296ddba5b3966cc94fb826c6a9a",
+      "bytes": 10763,
+      "physical_lines": 286
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "bytes": 653,
+      "physical_lines": 23
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-build-repair-freeze.2026-10-20T15-28.json",
+    "sha256": "868d9ef1a5fd1433b446712be10f59c57d8747cddc1bbbad391c4346cbdf45b2",
+    "bytes": 29350
+  },
+  "deferred": "R/_build_manifest.json intentionally absent until authorized final payload freeze"
+}
