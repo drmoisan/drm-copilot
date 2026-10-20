@@ -1,0 +1,150 @@
+{
+  "Timestamp": "2026-10-20T17-15",
+  "Command": "Bounded four-import equivalence and retained ordered proof confirmation",
+  "EXIT_CODE": 0,
+  "status": "READY_FOR_CHECKED_COMMIT",
+  "task": "P6-T1",
+  "task_acceptance": false,
+  "authority": {
+    "delegation_id": "rendering_review_p6t1_package_import_confirmation_20261020",
+    "phase": "S5_P6T1_package_import_confirmation",
+    "agent_type": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_authority_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Persisted resumed route and valid existing native launch attestation verified."
+  },
+  "head": "9ceebcd61c148dc4eba786d4172dfc43ee0c1e3e",
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+    "sha256": "94201847fa0893f091dbca3e5ed5af080676149f3c538b949920814feb84eb2e",
+    "bytes": 20918,
+    "physical_lines": 500
+  },
+  "imports": [
+    {
+      "line": 8,
+      "target": "drm_copilot_discovery.analyzer.dependency_values",
+      "aliases": [
+        [
+          "DependencyValue",
+          "DependencyValue"
+        ]
+      ]
+    },
+    {
+      "line": 11,
+      "target": "drm_copilot_discovery.analyzer.dependency_values",
+      "aliases": [
+        [
+          "Ecosystem",
+          "Ecosystem"
+        ]
+      ]
+    },
+    {
+      "line": 14,
+      "target": "drm_copilot_discovery.analyzer.dependency_values",
+      "aliases": [
+        [
+          "dependency_value",
+          "dependency_value"
+        ]
+      ]
+    },
+    {
+      "line": 17,
+      "target": "drm_copilot_discovery.analyzer.dependency_values",
+      "aliases": [
+        [
+          "safe_identifier",
+          "safe_identifier"
+        ]
+      ]
+    }
+  ],
+  "findings": [],
+  "equivalence": {
+    "exact_byte_substitution_count": 4,
+    "non_import_bytes_unchanged": true,
+    "whole_normalized_ast_sha256": "521d636c04fd63e78b9197cd96121afc869718c4e1e114c41eb7f5aa6084e6b5",
+    "qualification": "Resolve each original .dependency_values against package drm_copilot_discovery.analyzer. It equals the replacement module exactly. Names/asnames are identical. Whole AST equality follows normalization of only those four module/level pairs; all bodies, signatures, constants, decorators and docstrings remain unchanged."
+  },
+  "baseline": {
+    "path": "evidence/baseline/p6t1-package-import-original.2026-10-20T17-12.json",
+    "sha256": "276fa461cf5ec295cb9437d590519f243dd324c96608e818fec2758ca6798318"
+  },
+  "failed_build": {
+    "path": "evidence/qa-gates/p6t1-packaged-build.2026-10-20T17-09.json",
+    "sha256": "dc1740ba72b0ff99d2a724dc785440caf326243e31e6d7486c96d32e50eae6e2",
+    "raw_archive_sha256": "34d6c4242f87bfa206ff9082c998500b147779abf0a0adfd287c0206bf5a5d24",
+    "qualification": "Original 211-binding before/after maps agree. Current comparison differs only at the import-edited source; other 210 captured inputs remain exact. Original explicit-absolute-import failure and three lossless payloads remain retained."
+  },
+  "verification": {
+    "ordered_proofs": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-qualification.2026-10-20T17-12.json",
+        "sha256": "65e3d3fe031bf693dce953a903a700ff354fcb8a67cac85c1abdeb9de0c61600",
+        "tests": 93,
+        "seconds": 0.9307278999476694
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-package-import-qualification-full.2026-10-20T17-13.json",
+        "sha256": "8d3eb51be05ce185d8c503d2a097eaa4339ada1fe0777a769649b323cb2b4036",
+        "tests": 191,
+        "seconds": 1.0263702000374906
+      }
+    ],
+    "sequence": [
+      "format",
+      "lint",
+      "types",
+      "tests"
+    ],
+    "all_exit_codes": 0,
+    "final_population": 191,
+    "predecessor_population_identical": true,
+    "predecessor": "evidence/regression-testing/p4t7-shared-repair-freeze.2026-10-19T10-28.json",
+    "raw_readable_streams": 16,
+    "lossless_focused_payloads": 18,
+    "coverage": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_inputs.py",
+        "statements": [
+          174,
+          174
+        ],
+        "branches": [
+          74,
+          74
+        ]
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/dependency_values.py",
+        "statements": [
+          101,
+          101
+        ],
+        "branches": [
+          68,
+          68
+        ]
+      }
+    ],
+    "no_lost_predecessor_executed_lines_or_arcs": true,
+    "test_and_target_committed": true,
+    "qualification": "Existing explicit UTF-8 raw/readable mappings preserve CR/LF and original bytes. Tests and dependency_values are unchanged and match committed Git. Final 191 nodes equal the retained input-contract population. No predecessor semantic review or behavioral replay."
+  },
+  "reader_diagnostic": {
+    "description": "Initial reader expected the original source digest inside its compressed member; this archive stores it in the sibling source binding. Reader now binds the decoded original bytes to that exact source SHA.",
+    "output": "KeyError: 'sha256'",
+    "source_or_evidence_mutation": false
+  },
+  "effects": {
+    "implementation_test_changes": false,
+    "git_index_checkpoint_changes": false,
+    "tests_executed": false,
+    "package_retry": false,
+    "whole_task_acceptance": false
+  },
+  "next": "Coordinator may commit the exact import-prerequisite union. Package build retry remains a separate authorized action after this confirmation. Current phase P6; upcoming P6-T1, P6-T2, P6-T3, P7-T1, P7-T2."
+}
