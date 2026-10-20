@@ -19,13 +19,12 @@ import * as path from "node:path";
  * Scope note:
  *     Three bundled files (`.claude/agents/pr-author.md`,
  *     `.claude/hooks/enforce-completion-helpers.ps1`,
- *     `.claude/hooks/validate-pr-author-output.ps1`) were already absent from
- *     every pack manifest before issue #279 and are unrelated to the
- *     epic-orchestrate feature (issue #275) this issue addresses. They are
- *     tracked as pre-existing, out-of-scope exceptions below so this test can
- *     assert real completeness without silently absorbing an unrelated
- *     production fix into this change. Do not add further entries here to mask
- *     a new regression; open a follow-up issue instead.
+ *     `.claude/hooks/validate-pr-author-output.ps1`) were formerly absent from
+ *     every pack manifest and were tracked below as pre-existing exceptions
+ *     (issue #279). Issue #984 listed all three in the Claude `core.json`,
+ *     because a core hook dot-sources the helper and core files reference the
+ *     pr-author agent and hook, so the exception set is now empty and must stay
+ *     empty. Fix a new gap in a manifest; do not add an exception here.
  *
  * Issue #462 extension:
  *     The enumeration originally covered only `agents/`, `hooks/`, and
@@ -63,12 +62,45 @@ const CONFIG_ROOT = path.join(BUNDLE_ROOT, "config");
  */
 const MINIMUM_CONFIG_FILE_COUNT = 2;
 
-/** Pre-existing, unrelated manifest gaps out of scope for issue #279. */
-const PRE_EXISTING_UNRELATED_EXCEPTIONS: ReadonlySet<string> = new Set([
-  ".claude/agents/pr-author.md",
+/**
+ * Pre-existing manifest gaps. Issue #984 registered the three former entries
+ * in `core.json`, so the set is empty, matching the Python twin.
+ */
+const PRE_EXISTING_UNRELATED_EXCEPTIONS: ReadonlySet<string> =
+  new Set<string>();
+
+/** Paths issue #984 added to the Claude core pack manifest. */
+const ISSUE_984_CORE_PATHS: readonly string[] = [
   ".claude/hooks/enforce-completion-helpers.ps1",
+  ".claude/agents/pr-author.md",
   ".claude/hooks/validate-pr-author-output.ps1",
-]);
+  ".claude/hooks/check-python-test-purity.ps1",
+  ".claude/hooks/enforce-python-batch-budget.ps1",
+  ".claude/hooks/check-powershell-test-purity.ps1",
+  ".claude/hooks/enforce-powershell-batch-budget.ps1",
+];
+
+/**
+ * Parse the `paths` array of the Claude `core.json` manifest only.
+ *
+ * @returns The set of paths the core pack publishes.
+ */
+function coreManifestPaths(): ReadonlySet<string> {
+  const rawText = fs.readFileSync(path.join(MANIFEST_DIR, "core.json"), "utf8");
+  const parsed: unknown = JSON.parse(rawText);
+  if (parsed === null || typeof parsed !== "object") {
+    return new Set<string>();
+  }
+  const paths = (parsed as Record<string, unknown>)["paths"];
+  if (!Array.isArray(paths)) {
+    return new Set<string>();
+  }
+  return new Set(
+    paths.filter(
+      (candidate): candidate is string => typeof candidate === "string",
+    ),
+  );
+}
 
 /**
  * Enumerate every bundled `.claude`-relative agent, skill, and hook path.
@@ -212,6 +244,22 @@ describe("claude pack manifest completeness (real filesystem)", () => {
     // Assert: no bundled file is silently dropped from every manifest.
     expect(missing).toEqual([]);
   });
+
+  it("keeps the pre-existing exception set empty (issue #984)", () => {
+    // Assert: a new manifest gap is fixed in a manifest, not excepted here.
+    expect(PRE_EXISTING_UNRELATED_EXCEPTIONS.size).toBe(0);
+  });
+
+  it.each(ISSUE_984_CORE_PATHS)(
+    "issue #984: %s is present in the core pack manifest",
+    (expectedPath) => {
+      // Arrange
+      const corePaths = coreManifestPaths();
+
+      // Act / Assert
+      expect(corePaths.has(expectedPath)).toBe(true);
+    },
+  );
 
   it("lists every bundled config/ file in some pack manifest", () => {
     // Arrange: the config tree is a sibling of .claude, so it is enumerated

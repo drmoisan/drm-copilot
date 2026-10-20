@@ -79,6 +79,7 @@
     ".codex/scripts/codex-routing-cli-common.ps1",
     ".codex/scripts/Resolve-CodexDeployment.ps1",
     ".codex/scripts/Resolve-CodexTopology.ps1",
+    ".codex/scripts/post-codex-worktree-session.ps1",
     ".codex/prompts/generate-pr.md",
     ".codex/prompts/orchestrate-work.md",
     ".codex/agents/feature-reviewer.toml",

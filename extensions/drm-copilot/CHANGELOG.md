@@ -32,6 +32,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Test-PoshQCShardTestCount`, `Merge-PoshQCCoverageReport`, and `Get-PoshQCCoverageLineSummary`.
   The merged coverage report carries exact LINE counters and omits METHOD and CLASS figures.
 
+### Fixed
+
+- Claude and Codex core pack contents (issue #984): the Claude core pack now carries
+  `.claude/hooks/enforce-completion-helpers.ps1`, `.claude/agents/pr-author.md`,
+  `.claude/hooks/validate-pr-author-output.ps1`, and the four language hooks registered by
+  `.claude/settings.json` (`check-python-test-purity.ps1`, `enforce-python-batch-budget.ps1`,
+  `check-powershell-test-purity.ps1`, and `enforce-powershell-batch-budget.ps1`). The Codex core
+  pack now carries `.codex/scripts/post-codex-worktree-session.ps1`.
+  `enforce-completion-consistency.ps1` no longer denies edits outside
+  `artifacts/orchestration/orchestrator-state.json` when its helper is absent, and it still
+  denies checkpoint edits in that case. The discovery artifact gate and both batch-budget hooks
+  allow out-of-scope paths when their evaluation-only dependency fails to load, and they still
+  deny in-scope paths. Repositories that received the Claude push-down at 1.1.19, 1.1.20, or
+  1.1.21 must re-run the Claude push-down to receive the missing files.
+
 ## [0.0.1] - 2026-05-02
 
 ### Added
