@@ -1,0 +1,160 @@
+{
+  "Timestamp": "2026-10-21T15:56:18.973770+00:00",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "route": "atomic_execution_p6t2_package_native_20261021T154000",
+  "status": "HARNESS_EXPECTATION_MISMATCH_READY_FOR_OFFLINE_REEVALUATION",
+  "current_head": "fdfdc42027c76673ae08cd487737770909d88982",
+  "native_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-51.json",
+    "working_sha256": "9eb507e6bafc517e1ed4069639bae3c0ed545bb4d0f0364cfc42a3cfb522c70f",
+    "git_lf_sha256": "6c3253202f9d15a1c5cf74429c041e967bb12cface61d9c480fa443242ee91ce",
+    "expected_git_blob": "416001d59c0ee93226f1785400ee8eff0aa4b882",
+    "bytes": 28585,
+    "git_lf_bytes": 28321
+  },
+  "native_raw": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-51.json",
+    "working_sha256": "c1a4d46a8a9a93fe46af91698dcc527e14cd0e06048558235bcd9d910b760fee",
+    "git_lf_sha256": "bdd888f8318e404dc5ae2e921bae460d3afff32bdfe3b5621d33d908f6e6bb46",
+    "expected_git_blob": "1bad0c76de320ecbd8e4150ef1f45cd8cdd4cc35",
+    "bytes": 278380,
+    "git_lf_bytes": 278246
+  },
+  "controller_member": {
+    "name": "SCRATCH\\issue-980-p6t2-console-native-remaining-three.py",
+    "sha256": "adc5d47a01a86124cbeb4fb0ac085249e10f33d4886e100255c8a11014886b9e",
+    "bytes": 15930
+  },
+  "captured_stdout_member": {
+    "name": "SCRATCH\\issue-980-p6t2-native-cli-20261021T155121\\completion-preview.stdout.bin",
+    "sha256": "bfd37e8ad0f6f7bb4f063c05040c0dbcc8d0df9f200c0c68b71b83fe590db3a9",
+    "bytes": 5844
+  },
+  "package_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+    "working_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+    "git_lf_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+    "expected_git_blob": "2f8b98c6f8678d47aff643e8694788e8e134f409",
+    "bytes": 64490,
+    "git_lf_bytes": 64490
+  },
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "working_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "git_lf_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "expected_git_blob": "a5644c09dffd77bc6fef56229cb2841f0abac0f5",
+      "bytes": 8966,
+      "git_lf_bytes": 8966
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "working_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "git_lf_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "expected_git_blob": "1916a4fd2edbe024c0f2f186f9b4f122ec65fd66",
+      "bytes": 20995,
+      "git_lf_bytes": 20995
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "working_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "git_lf_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "expected_git_blob": "d7221711d92cb187ed69b02fc930744c4aaa1549",
+      "bytes": 17292,
+      "git_lf_bytes": 16855
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "working_sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "git_lf_sha256": "26f82511a0ef1ea19d066138e841458a4d607b65cfd0ca627532fde8eb992b8a",
+      "expected_git_blob": "dd9e4f52a4c44187bb53e91ddf3371f50bedf1d3",
+      "bytes": 22266,
+      "git_lf_bytes": 21766
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "working_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "git_lf_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "expected_git_blob": "65c32127f47b9f5a6c907138e5c28f50ece969ee",
+      "bytes": 17125,
+      "git_lf_bytes": 17125
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "working_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "git_lf_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "expected_git_blob": "37e4733a5ff259c3019232a196ae51fc22f7580f",
+      "bytes": 8893,
+      "git_lf_bytes": 8893
+    }
+  ],
+  "classification": "The controller assumed a fresh planned inline-content preview, but the selected --write --dry-run operation is a guarded publication preview against two byte-identical existing reports. The captured skipped digest-bearing rows match that accepted contract. No production defect is established.",
+  "exact_actual_artifacts": [
+    {
+      "kind": "completion-report",
+      "path": "docs/migration/discovery/reports/completion-report.json",
+      "sha256": "ccafa0e9c4c87438a5020828c6dadc343aa3594306643758e36191893c6c3ea6",
+      "status": "skipped"
+    },
+    {
+      "kind": "completion-report",
+      "path": "docs/migration/discovery/reports/completion-report.md",
+      "sha256": "800fc610c73fdfb79e0f3a7fc5e45a05866fd0b56a3fd9f698bf48fee1627040",
+      "status": "skipped"
+    }
+  ],
+  "contract_basis": [
+    {
+      "location": "spec.md:308 and service-result.schema.json:$defs/artifact",
+      "conclusion": "Artifact results require relative path, kind, an allowed status including skipped, and SHA-256. The closed schema permits optional content; it does not require content on every dry-run row."
+    },
+    {
+      "location": "ServiceArtifact:199-211",
+      "conclusion": "Content is optional and missing content is omitted on the wire. File effects are described without granting authority."
+    },
+    {
+      "location": "service_reports._report publication branch",
+      "conclusion": "The explicit write flag selects context.publish even when dry_run is true. The nonpublication preview branch that embeds selected representations is a different existing path; the native invocation did not select it."
+    },
+    {
+      "location": "mutation_plan.plan_mutation and mutation_io.commit_mutation:326-331",
+      "conclusion": "Equal existing/proposed bytes are skipped. Dry-run returns skipped for those already satisfied writes and planned for new changes, after freshness checks and without effects."
+    },
+    {
+      "location": "operations.OperationContext.publish:430-436",
+      "conclusion": "Actual guarded statuses and digests replace the projected rows; optional content is intentionally omitted. This is unchanged accepted service behavior, not new CLI behavior."
+    }
+  ],
+  "all_remaining_postconditions": {
+    "original_failed_predicate": "Controller line 150 requires two rows, every status planned and every content a string. Count is correct; both status and content assumptions are incorrect for this exact existing-pair publication preview.",
+    "minimal_corrected_predicate": "Require exactly the two expected relative report paths, kind completion-report, status skipped, exact retained fixture-before digests, and absent content. Require complete fixture-before == fixture-after. Do not generically accept arbitrary statuses or weaken content checks for other scenarios.",
+    "next_original_predicate": "Controller line 151 requires suffixes {.json,.md}. This independently evaluates true on the original captured artifacts; it was not reached by the failed controller and is qualified as an offline result.",
+    "finalizers_already_passed": [
+      "Final fixture unchanged",
+      "Package/launcher/environment bytes unchanged after observer setup"
+    ],
+    "earlier_checks_retained": "Native framing, raw strict JSON/schema, typed exits, installed origins, package identity, parity-complete failure and per-call no-effects checks were reached and passed. Their original outcomes are preserved, not rerun."
+  },
+  "execution_accounting": {
+    "new_calls_in_retained_continuation": 3,
+    "prior_help_call": 1,
+    "total_actual_console_calls": 4,
+    "unrun_calls": 0,
+    "new_calls_by_reviewer": 0
+  },
+  "verification": "Existing lossless archive reader verifies the captured stdout and controller bytes. Pure offline field/digest comparisons confirm the precise skipped pair and the remaining suffix predicate. No service/factory/projection/native invocation or fixture write occurred.",
+  "limits": "Preserve the original failed receipt and native preparation. The coordinator may authorize an evidence-only reevaluation of the corrected exact assertion over retained bytes; no console retry is needed for this mismatch. This proves idempotent publication preview metadata, not fresh planned inline report content on a different fixture. Final 167-case proof and P6-T2 acceptance remain pending.",
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "47/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

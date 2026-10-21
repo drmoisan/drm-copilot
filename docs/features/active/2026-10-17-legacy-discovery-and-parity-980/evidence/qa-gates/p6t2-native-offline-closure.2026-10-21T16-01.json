@@ -1,0 +1,192 @@
+{
+  "Timestamp": "2026-10-21T16-01",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "route": "build_identity_p6t2_offline_20261021T155800 / S5_P6T2_native_offline_closure",
+  "Command": "Offline validation of four retained original actual console results; no native invocation",
+  "EXIT_CODE": 0,
+  "Output Summary": "All four original consoles confirmed with exact reviewed transport and skipped-existing-report expectations; every remaining postcondition passed.",
+  "status": "ALL_FOUR_ACTUAL_INSTALLED_CONSOLES_CONFIRMED",
+  "actual_invocations_total": 4,
+  "actual_invocations_this_step": 0,
+  "offline_elapsed_seconds": 0.1646142000099644,
+  "outcomes": [
+    {
+      "label": "alias-help",
+      "actual_exit_code": 0,
+      "actual_elapsed_seconds": 0.34353450004709885,
+      "stdout_sha256": "a6663a788df52baca6c17b152431bec480939a7053e65aaa9cb1909439bcab2a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_sha256": "c36fdd0bc387c254561b62e2c1631ffd997266e93d4c96d488a7702450c55228",
+      "postconditions": "PASS_OFFLINE_FROM_RETAINED_INVOCATION"
+    },
+    {
+      "label": "invalid-authority-option",
+      "actual_exit_code": 2,
+      "actual_elapsed_seconds": 0.9441690999665298,
+      "stdout_sha256": "8c4f9e9adfb60e1cfcf969a09b5c7b875a6bdf1ba1fa2ab58a2516d6e2a7c59b",
+      "stderr_sha256": "e91a843fbe39e222a0a5ac0169854dae53f227a8a564d2612cb7dddd9163b15b",
+      "origin_sha256": "49074df32ff2bb11fca27eaef4ac2d0aacca924354f078e58dbb2b57972e9c49",
+      "postconditions": "PASS_OFFLINE_FROM_RETAINED_INVOCATION"
+    },
+    {
+      "label": "doctor",
+      "actual_exit_code": 0,
+      "actual_elapsed_seconds": 4.7236138000153005,
+      "stdout_sha256": "a34d3a87ed785988ac3caf6609d2dad60a42bf86731330df52ee2d453c08cb02",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_sha256": "5ca5a316cd0154da80e154e517dbcd82c0bcaa2c01084efe0247b96f7df99fa9",
+      "postconditions": "PASS_OFFLINE_FROM_RETAINED_INVOCATION"
+    },
+    {
+      "label": "completion-preview",
+      "actual_exit_code": 1,
+      "actual_elapsed_seconds": 29.563594400009606,
+      "stdout_sha256": "bfd37e8ad0f6f7bb4f063c05040c0dbcc8d0df9f200c0c68b71b83fe590db3a9",
+      "stderr_sha256": "e91a843fbe39e222a0a5ac0169854dae53f227a8a564d2612cb7dddd9163b15b",
+      "origin_sha256": "12b7ca3c740da3d75e2299dd358e5df3cfa16ea3ef707e6a5f76c96ed2326a7c",
+      "postconditions": "PASS_OFFLINE_FROM_RETAINED_INVOCATION"
+    }
+  ],
+  "assertions_passed": [
+    "alias-help bounded streams/time",
+    "alias-help actual expected process exit",
+    "alias-help all runtime imports installed",
+    "alias-help actual isolated venv interpreter",
+    "alias-help no user-site or Python path overrides",
+    "alias-help approved dependency path only inside checkout",
+    "alias-help no fixture byte or membership effects",
+    "alias-help exact fixed stderr transport",
+    "alias-help fixed LF or CRLF usage text",
+    "alias-help lazy service unimported",
+    "invalid-authority-option bounded streams/time",
+    "invalid-authority-option actual expected process exit",
+    "invalid-authority-option all runtime imports installed",
+    "invalid-authority-option actual isolated venv interpreter",
+    "invalid-authority-option no user-site or Python path overrides",
+    "invalid-authority-option approved dependency path only inside checkout",
+    "invalid-authority-option no fixture byte or membership effects",
+    "invalid-authority-option exact fixed stderr transport",
+    "invalid-authority-option single terminal LF or CRLF JSON envelope",
+    "invalid-authority-option schema and typed exit agreement",
+    "invalid-authority-option reviewed CC1 context and empty effects",
+    "invalid-authority-option preserved diagnostic plus fixed anchor",
+    "invalid-authority-option caller-controlled tokens redacted",
+    "doctor bounded streams/time",
+    "doctor actual expected process exit",
+    "doctor all runtime imports installed",
+    "doctor actual isolated venv interpreter",
+    "doctor no user-site or Python path overrides",
+    "doctor approved dependency path only inside checkout",
+    "doctor no fixture byte or membership effects",
+    "doctor exact fixed stderr transport",
+    "doctor single terminal LF or CRLF JSON envelope",
+    "doctor schema and typed exit agreement",
+    "doctor actual new package identity and manifest",
+    "doctor structural doctor success",
+    "doctor unavailable native capability remains explicit",
+    "completion-preview bounded streams/time",
+    "completion-preview actual expected process exit",
+    "completion-preview all runtime imports installed",
+    "completion-preview actual isolated venv interpreter",
+    "completion-preview no user-site or Python path overrides",
+    "completion-preview approved dependency path only inside checkout",
+    "completion-preview no fixture byte or membership effects",
+    "completion-preview exact fixed stderr transport",
+    "completion-preview single terminal LF or CRLF JSON envelope",
+    "completion-preview schema and typed exit agreement",
+    "completion-preview actual new package identity and manifest",
+    "completion-preview blocking report remains exit one",
+    "completion-preview exact two existing skipped report rows without inline content",
+    "completion-preview exact JSON and Markdown pair"
+  ],
+  "assertion_count": 50,
+  "remaining_unexecuted_postconditions": [],
+  "original_failures_preserved": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+      "sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108",
+      "bytes": 16043
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-51.json",
+      "sha256": "9eb507e6bafc517e1ed4069639bae3c0ed545bb4d0f0364cfc42a3cfb522c70f",
+      "bytes": 28585
+    }
+  ],
+  "original_raw_archives": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+      "sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc",
+      "bytes": 265367
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-51.json",
+      "sha256": "c1a4d46a8a9a93fe46af91698dcc527e14cd0e06048558235bcd9d910b760fee",
+      "bytes": 278380
+    }
+  ],
+  "independent_confirmations": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+      "sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6",
+      "bytes": 7442
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-preview-confirmation.2026-10-21T15-56.json",
+      "sha256": "0683f8824affbbf70c913e451491fc762531f8630a95e2e3aec318618b825c8b",
+      "bytes": 9140
+    }
+  ],
+  "offline_help_carry": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-offline-carry.2026-10-21T15-50.json",
+    "sha256": "6bcc1f33157e663c5d881c680779b0c7d93ee26e38286330e132b9f0cf1935dc",
+    "bytes": 7502
+  },
+  "finite_correction": {
+    "original_controller_sha256": "adc5d47a01a86124cbeb4fb0ac085249e10f33d4886e100255c8a11014886b9e",
+    "corrected_expectation_only_sha256": "fdfbec127bb997aa34d00d4c47b017b42edb5d2483a84a60217969ff80f83195",
+    "old_predicate": "check(len(document['artifacts'])==2 and all(row['status']=='planned' and isinstance(row.get('content'),str) for row in document['artifacts']),stage+' both report views remain planned within envelope')",
+    "new_predicate": "check(document['artifacts']==expected_artifacts and all('content' not in row and sha((workspace/row['path']).read_bytes())==row['sha256'] for row in document['artifacts']),stage+' exact two existing skipped report rows without inline content')",
+    "other_assertions": "Extracted unchanged from frozen controller after subprocess completion; schema/runtime/exit/origin/no-effects/framing and pair suffix checks all evaluated."
+  },
+  "artifact_pair": [
+    {
+      "kind": "completion-report",
+      "path": "docs/migration/discovery/reports/completion-report.json",
+      "sha256": "ccafa0e9c4c87438a5020828c6dadc343aa3594306643758e36191893c6c3ea6",
+      "status": "skipped"
+    },
+    {
+      "kind": "completion-report",
+      "path": "docs/migration/discovery/reports/completion-report.md",
+      "sha256": "800fc610c73fdfb79e0f3a7fc5e45a05866fd0b56a3fd9f698bf48fee1627040",
+      "status": "skipped"
+    }
+  ],
+  "fixture_map_sha256": "2ab956063d144d72f19b60ca8b4780d21975f41db6dd9d145a72ceecb71f4f4b",
+  "fixture_unchanged": true,
+  "build_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+  "policy_sha256": "bef024420dc551d7eeab7162b8a2c3ed4649f88b3690a57ae44df7a892674564",
+  "wheel_sha256": "670ed87df9ba1050fb9988af1ffbfd9ddd7b7383af0763ead0d13dc4d6f30bcd",
+  "source_inputs_verified_before_after": 216,
+  "payload_members_bound": 172,
+  "launchers_verified": 31,
+  "package_environment_unchanged": true,
+  "package_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+    "sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+    "bytes": 64490
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-offline-closure-raw.2026-10-21T16-01.json",
+    "sha256": "493e643ab31ff7b0aae6473de69b03e07456ac8109bc2bb1925a92e2683e7924",
+    "bytes": 25673
+  },
+  "qualifications": [
+    "Original LF-only help failure and planned-inline-content preview failure are retained; neither establishes a production defect under the independent confirmations.",
+    "No raw bytes, JSON strings, artifact content or fixture were normalized or modified.",
+    "Installed console proof does not establish Codex/Claude/VSCode native-host authority.",
+    "Final167 remains unrun pending coordinator release."
+  ]
+}
