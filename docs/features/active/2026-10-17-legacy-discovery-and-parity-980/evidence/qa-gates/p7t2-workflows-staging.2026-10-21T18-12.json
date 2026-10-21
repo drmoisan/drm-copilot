@@ -1,0 +1,292 @@
+{
+  "Timestamp": "2026-10-21T18-12",
+  "task": "P7-T2",
+  "status": "READY_FOR_REVIEW_NOT_STAGED",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-freeze.2026-10-21T18-12.json",
+    "sha256": "439f33b73a409b43f97813cf87545cc51ca9040cdca93c4dc8fd7499cf37ed49",
+    "bytes": 25379
+  },
+  "stage_paths": [
+    ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+    ".github/skills/characterize-runtime-behavior/SKILL.md",
+    ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+    ".github/skills/discovery-coverage-ledger/SKILL.md",
+    ".github/skills/discovery-parity-matrix/SKILL.md",
+    ".github/skills/discovery-repo-inventory/SKILL.md",
+    ".github/skills/discovery-runtime-characterization/SKILL.md",
+    ".github/skills/discovery-validate-artifacts/SKILL.md",
+    ".github/skills/discovery-workflow/SKILL.md",
+    ".github/skills/extract-feature-contract/SKILL.md",
+    ".github/skills/generate-acceptance-scenarios/SKILL.md",
+    ".github/skills/initialize-discovery-workspace/SKILL.md",
+    ".github/skills/inventory-legacy-system/SKILL.md",
+    ".github/skills/reconcile-parity-matrix/SKILL.md",
+    ".github/skills/review-discovery-coverage/SKILL.md",
+    ".github/skills/validate-discovery-artifacts/SKILL.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t2-workflow-shared-baseline.2026-10-21T17-59.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t2-canonical-skills-source-freeze.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-console-qualification.2026-10-21T18-08.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-freeze.2026-10-21T18-12.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10-raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-source-originals.2026-10-21T18-12.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-staging.2026-10-21T18-12.json",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py"
+  ],
+  "bindings": [
+    {
+      "path": ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+      "sha256": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+      "bytes": 9354
+    },
+    {
+      "path": ".github/skills/characterize-runtime-behavior/SKILL.md",
+      "sha256": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+      "bytes": 8903
+    },
+    {
+      "path": ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+      "sha256": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+      "bytes": 1809
+    },
+    {
+      "path": ".github/skills/discovery-coverage-ledger/SKILL.md",
+      "sha256": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+      "bytes": 2190
+    },
+    {
+      "path": ".github/skills/discovery-parity-matrix/SKILL.md",
+      "sha256": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+      "bytes": 1794
+    },
+    {
+      "path": ".github/skills/discovery-repo-inventory/SKILL.md",
+      "sha256": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+      "bytes": 1770
+    },
+    {
+      "path": ".github/skills/discovery-runtime-characterization/SKILL.md",
+      "sha256": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+      "bytes": 1830
+    },
+    {
+      "path": ".github/skills/discovery-validate-artifacts/SKILL.md",
+      "sha256": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+      "bytes": 1786
+    },
+    {
+      "path": ".github/skills/discovery-workflow/SKILL.md",
+      "sha256": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+      "bytes": 3038
+    },
+    {
+      "path": ".github/skills/extract-feature-contract/SKILL.md",
+      "sha256": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+      "bytes": 8726
+    },
+    {
+      "path": ".github/skills/generate-acceptance-scenarios/SKILL.md",
+      "sha256": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+      "bytes": 8763
+    },
+    {
+      "path": ".github/skills/initialize-discovery-workspace/SKILL.md",
+      "sha256": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+      "bytes": 9240
+    },
+    {
+      "path": ".github/skills/inventory-legacy-system/SKILL.md",
+      "sha256": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+      "bytes": 8532
+    },
+    {
+      "path": ".github/skills/reconcile-parity-matrix/SKILL.md",
+      "sha256": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+      "bytes": 8443
+    },
+    {
+      "path": ".github/skills/review-discovery-coverage/SKILL.md",
+      "sha256": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+      "bytes": 8187
+    },
+    {
+      "path": ".github/skills/validate-discovery-artifacts/SKILL.md",
+      "sha256": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+      "bytes": 8318
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t2-workflow-shared-baseline.2026-10-21T17-59.json",
+      "sha256": "0f7a117f88e82508899f3d83635ea5868bbfd7eb5abd2bb166c51cecbafd54c1",
+      "bytes": 2340
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t2-canonical-skills-source-freeze.2026-10-21T18-09.json",
+      "sha256": "c3fa408a67222c98034d2d149488c6abebecb0fa311f852d595641ef4c807153",
+      "bytes": 6070
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-console-qualification.2026-10-21T18-08.json",
+      "sha256": "8be4022a500dd0f1165824a6517591cd82feb154dbafb7421b21774eb17c2ad6",
+      "bytes": 795
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-freeze.2026-10-21T18-12.json",
+      "sha256": "439f33b73a409b43f97813cf87545cc51ca9040cdca93c4dc8fd7499cf37ed49",
+      "bytes": 25379
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04-raw.json",
+      "sha256": "8de5e2003f77d0b9b8868cc3278e8d820909e295e86ef332d45cf2c6b20aa7ea",
+      "bytes": 3455
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04.json",
+      "sha256": "b3cdf7c704972e90555aea4a04e977520ce32f946dba0a691d5ad88180da4441",
+      "bytes": 6637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09-raw.json",
+      "sha256": "1224ebd09da2ce1ed6a3c1b84c834ec5c7f0b552048d539424793764b3a158cf",
+      "bytes": 3471
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09.json",
+      "sha256": "938f4b852131db43161ccd6a80afaa4138eef00cfa85d7f543d316c9b401d204",
+      "bytes": 7506
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09.json",
+      "sha256": "03a7deab20b489f4ba20bdd257c6741dcccec3ba8abd1c1cb8ba48af5875168d",
+      "bytes": 7424
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "c0335de8029f47e536e44419d667942b8b0cfaddc166c08edb4c96f21569b106",
+      "bytes": 4492
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09.json",
+      "sha256": "b810660d0ce61c774afdf60015fc595bf9b13fab9af842e9d60ec4d3ffd119e0",
+      "bytes": 10425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09.json",
+      "sha256": "f2a3b2e46755c922866ce8b5267a364610e6030c15bba6b0c5a7116bdf39ead3",
+      "bytes": 7425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09-raw.json",
+      "sha256": "c19cc41cd1e4fd293c4e8c68d3ae9a7d1a1a45bc767c2a3aaf4de16eda1983f2",
+      "bytes": 3541
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09.json",
+      "sha256": "61d0e4d4f1d7add6cccd38ad767c0f76832b82e9ab145c8edffaa8bb1604f195",
+      "bytes": 7565
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "374819d9dee523736a49165fb827974c3e0bf7018ed8d7c1f450ed083a8c7673",
+      "bytes": 3362
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09.json",
+      "sha256": "9d3d4287c7962c3d0f9ac536f458ba50b78d1eab88690ec6367f886637c390a0",
+      "bytes": 7382
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09-raw.json",
+      "sha256": "38d4f7d391fb6023f255bb2613801b1ab42ce8c3cb7b3cdcd47e957f8d475375",
+      "bytes": 6868
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09.json",
+      "sha256": "a6b501266e7040f5e1e09382c048d7cb2539dd1a34994d1e8405250a747e8dca",
+      "bytes": 32308
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10.json",
+      "sha256": "ca544aba87346acdcda11252707a52d0db05f67821662c301cd27976706b480a",
+      "bytes": 7425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10-raw.json",
+      "sha256": "c19cc41cd1e4fd293c4e8c68d3ae9a7d1a1a45bc767c2a3aaf4de16eda1983f2",
+      "bytes": 3541
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10.json",
+      "sha256": "d67cccaaeb28d46df9f7bc1d792f2f5318791c65bba185a24c56915a88b9a368",
+      "bytes": 7565
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10-raw.json",
+      "sha256": "374819d9dee523736a49165fb827974c3e0bf7018ed8d7c1f450ed083a8c7673",
+      "bytes": 3362
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10.json",
+      "sha256": "94ae2e1b7e60a1c127d700f563dd496d619411f3ba93d3c17ef2f842b4d5e027",
+      "bytes": 7381
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10-raw.json",
+      "sha256": "8cbde79e87afdc1dee5d4dfe317f972fa4339e780d170cfb2baeec752832757a",
+      "bytes": 5200
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10.json",
+      "sha256": "15b11fd0ece593b2423a5ce1191cc0ac837aeca23b61b2fda9ccc5e119e77522",
+      "bytes": 29084
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-source-originals.2026-10-21T18-12.json",
+      "sha256": "ae701b370d8c1b31647dbe340987c30f92905f3502a086ef5b8da49ce09fe2eb",
+      "bytes": 62061
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_workflow_contracts.py",
+      "sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+      "bytes": 18307
+    }
+  ],
+  "self_inclusion": "stage_paths includes this manifest; its hash is returned externally, not recursively embedded."
+}

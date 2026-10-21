@@ -1,0 +1,32 @@
+{
+  "Timestamp": "2026-10-21T18:15:42.058441+00:00",
+  "issue_number": 980,
+  "task": "P7-T2",
+  "status": "PASS_BY_EXISTING_SINGLE_MODULE_EXECUTION",
+  "policy": ".agents/skills/execution-environment/SKILL.md#test-isolation-checks",
+  "requirement": "a reversed-order run of the new or changed Python test modules in one process",
+  "established_interpretation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p7t1-single-module-isolation-qualification.2026-10-21T17-55.json",
+    "working_sha256": "4a710189eccc8906535c74c23eec18159660c2fab724e7d4080680d41c7c06fa",
+    "git_lf_sha256": "4a710189eccc8906535c74c23eec18159660c2fab724e7d4080680d41c7c06fa",
+    "expected_git_blob": "3dc2ed633946b68941fb96d29f58750e6ac301f8",
+    "bytes": 8953,
+    "git_lf_bytes": 8953
+  },
+  "forward_module_order": [
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py"
+  ],
+  "reversed_module_order": [
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py"
+  ],
+  "test_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10.json",
+    "sha256": "15b11fd0ece593b2423a5ce1191cc0ac837aeca23b61b2fda9ccc5e119e77522"
+  },
+  "command": "WORKSPACE\\.venv\\Scripts\\python.exe -m pytest -v --durations=10 --tb=short -o addopts= -p no:cacheprovider tests/scripts/dev_tools/test_discovery_workflow_contracts.py",
+  "passed": 66,
+  "failed": 0,
+  "single_process": true,
+  "new_execution": false,
+  "qualification": "The one-element changed-module list is identical under reversal. The clean pass5 execution provides that exact isolation scope; individual node reversal and predecessor execution are not claimed or required for this declarative/test-only task."
+}

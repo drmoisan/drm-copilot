@@ -1,0 +1,144 @@
+{
+  "Timestamp": "2026-10-21T18-09",
+  "task": "P7-T2",
+  "status": "SOURCE_FROZEN_FOR_COMBINED_GATE",
+  "authority": "gateway_p7t2_authoring_20261021T175900",
+  "accepted_head": "59b322c528ade7d8a7a1a2d9c748182f290677d1",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t2-workflow-shared-baseline.2026-10-21T17-59.json",
+    "sha256": "0f7a117f88e82508899f3d83635ea5868bbfd7eb5abd2bb166c51cecbafd54c1"
+  },
+  "owned_sources": [
+    {
+      "path": ".github/skills/inventory-legacy-system/SKILL.md",
+      "sha256": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+      "bytes": 8532,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/extract-feature-contract/SKILL.md",
+      "sha256": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+      "bytes": 8726,
+      "lines": 133
+    },
+    {
+      "path": ".github/skills/characterize-runtime-behavior/SKILL.md",
+      "sha256": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+      "bytes": 8903,
+      "lines": 134
+    },
+    {
+      "path": ".github/skills/reconcile-parity-matrix/SKILL.md",
+      "sha256": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+      "bytes": 8443,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/review-discovery-coverage/SKILL.md",
+      "sha256": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+      "bytes": 8187,
+      "lines": 129
+    },
+    {
+      "path": ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+      "sha256": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+      "bytes": 9354,
+      "lines": 135
+    },
+    {
+      "path": ".github/skills/generate-acceptance-scenarios/SKILL.md",
+      "sha256": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+      "bytes": 8763,
+      "lines": 132
+    },
+    {
+      "path": ".github/skills/initialize-discovery-workspace/SKILL.md",
+      "sha256": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+      "bytes": 9240,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/validate-discovery-artifacts/SKILL.md",
+      "sha256": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+      "bytes": 8318,
+      "lines": 127
+    },
+    {
+      "path": ".github/skills/discovery-workflow/SKILL.md",
+      "sha256": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+      "bytes": 3038,
+      "lines": 62
+    },
+    {
+      "path": ".github/skills/discovery-repo-inventory/SKILL.md",
+      "sha256": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+      "bytes": 1770,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-coverage-ledger/SKILL.md",
+      "sha256": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+      "bytes": 2190,
+      "lines": 50
+    },
+    {
+      "path": ".github/skills/discovery-runtime-characterization/SKILL.md",
+      "sha256": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+      "bytes": 1830,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-parity-matrix/SKILL.md",
+      "sha256": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+      "bytes": 1794,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+      "sha256": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+      "bytes": 1809,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-validate-artifacts/SKILL.md",
+      "sha256": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+      "bytes": 1786,
+      "lines": 46
+    }
+  ],
+  "interface": {
+    "frontmatter": [
+      "name",
+      "description"
+    ],
+    "canonical_workflow_count": 9,
+    "dispatch_only_alias_count": 7,
+    "umbrella_selector": "skill_id",
+    "coverage_alias_selector": "action=inventory|extract|review",
+    "selector_qualification": "Human-facing workflow/alias selectors are not additional service-request fields; prepare-agent retains exactly six keys."
+  },
+  "source_checks": "All 16 UTF-8/LF documents have valid closed frontmatter, matching names, WHAT/Use when descriptions, existing local reference targets, no trailing whitespace and fewer than 500 lines.",
+  "gate_ownership": "source_inspection_preparation owns the new test module and combined Black/Ruff/Pyright/focused-test evidence; no independent test execution by this author.",
+  "qualification": "Canonical authoring only; no native derivatives, routing/policy/hooks, semantic validators, Set K, package, Git/index/checkpoint or acceptance changes.",
+  "retained_interface": "evidence/other/p7-service-interface-delta.2026-10-20T17-14.md",
+  "stage_paths": [
+    ".github/skills/inventory-legacy-system/SKILL.md",
+    ".github/skills/extract-feature-contract/SKILL.md",
+    ".github/skills/characterize-runtime-behavior/SKILL.md",
+    ".github/skills/reconcile-parity-matrix/SKILL.md",
+    ".github/skills/review-discovery-coverage/SKILL.md",
+    ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+    ".github/skills/generate-acceptance-scenarios/SKILL.md",
+    ".github/skills/initialize-discovery-workspace/SKILL.md",
+    ".github/skills/validate-discovery-artifacts/SKILL.md",
+    ".github/skills/discovery-workflow/SKILL.md",
+    ".github/skills/discovery-repo-inventory/SKILL.md",
+    ".github/skills/discovery-coverage-ledger/SKILL.md",
+    ".github/skills/discovery-runtime-characterization/SKILL.md",
+    ".github/skills/discovery-parity-matrix/SKILL.md",
+    ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+    ".github/skills/discovery-validate-artifacts/SKILL.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t2-canonical-skills-source-freeze.2026-10-21T18-09.json"
+  ],
+  "self_inclusion": "stage_paths includes this freeze; owned_sources hashes only the sixteen canonical sources."
+}

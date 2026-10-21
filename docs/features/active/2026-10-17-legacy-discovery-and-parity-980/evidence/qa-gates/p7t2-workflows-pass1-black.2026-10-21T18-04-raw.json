@@ -1,0 +1,27 @@
+{
+  "command": [
+    "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-10-17T22-30\\.venv\\Scripts\\python.exe",
+    "-m",
+    "black",
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py"
+  ],
+  "stdout": {
+    "encoding": "gzip-base64",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "data": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+  },
+  "stderr": {
+    "encoding": "gzip-base64",
+    "sha256": "c445846810a8eb3cb959e1eede33a3b36ffb781502af04dc4a99a6cf43fb3d7d",
+    "bytes": 121,
+    "data": "H4sIAAAAAAAC/ytKTcsvyk0sKUlNUShJLS4pjilOLsosANIpqWXxJfn5OcUxIPH4lMzi5Pyy1KLK+PL8ouy0nPzy+OT8vJKixOSSYr2CSl4uXi7HnByFlPy8VEWFR3NWKHyY37sBxODlMlRIy8xJVShCWKXHywUAHhVDbXkAAAA="
+  },
+  "harness": {
+    "encoding": "gzip-base64",
+    "sha256": "47254ac8515fc4557708531ca6a3177528b62b57bd27c9f15908ae1ceb410c64",
+    "bytes": 4373,
+    "data": "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"
+  },
+  "exit_code": 0
+}
