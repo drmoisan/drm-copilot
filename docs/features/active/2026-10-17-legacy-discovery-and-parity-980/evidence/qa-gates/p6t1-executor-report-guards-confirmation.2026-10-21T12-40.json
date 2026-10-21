@@ -1,0 +1,470 @@
+{
+  "Timestamp": "2026-10-21T12:40:58.369866+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "current_head": "7ad4b37244b30a544870556cb0289bea1c5abfd8",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-freeze.2026-10-21T12-35.json",
+    "working_sha256": "c51ecf41fda5d7d026c890597316a2e79ff3f50d493b211ae42acc1120b2c00a",
+    "git_lf_sha256": "c51ecf41fda5d7d026c890597316a2e79ff3f50d493b211ae42acc1120b2c00a",
+    "expected_git_blob": "1fd718405f3e445ac834d2a7c6d868938ed7a90e",
+    "bytes": 28233,
+    "git_lf_bytes": 28233
+  },
+  "owned_test": {
+    "path": "tests/discovery_runtime/test_service_report_guards.py",
+    "working_sha256": "ff867a5265c76535c43817749f3da0ae53a0b16abaf17787301e7ebfc077d0c7",
+    "git_lf_sha256": "ff867a5265c76535c43817749f3da0ae53a0b16abaf17787301e7ebfc077d0c7",
+    "expected_git_blob": "e5e1fc3543410280ad421c838222e2355f9210e3",
+    "bytes": 17156,
+    "git_lf_bytes": 17156
+  },
+  "production_unchanged": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+    "working_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "git_lf_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "expected_git_blob": "a5644c09dffd77bc6fef56229cb2841f0abac0f5",
+    "bytes": 8966,
+    "git_lf_bytes": 8966
+  },
+  "review": {
+    "scope": "RG1-RG10 and the four report BODY coordinates only",
+    "findings": [],
+    "intent_types_size_isolation_clear": true,
+    "controls": [
+      "Malformed finding containers and entries refuse without an empty-success fallback.",
+      "Projection limit/value failures propagate before fallback, planning or publication; malformed validate-all retains real validator findings.",
+      "Invalid projected status refuses; Markdown/Gherkin previews retain exact ready and pending source bytes and selected outputs without writes.",
+      "Actual publication uses one complete prospective plan and guarded writer, preserving originals and checking exact output paths, bytes and digests.",
+      "Wrong operation-family dispatch refuses with unchanged files and no writer calls."
+    ]
+  },
+  "doc_qualification": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-doc-qualification.2026-10-21T12-18.json",
+      "working_sha256": "626a15c4fd579013f5b25b7864d667721976e08e13788614eeb238cf4b593e77",
+      "git_lf_sha256": "626a15c4fd579013f5b25b7864d667721976e08e13788614eeb238cf4b593e77",
+      "expected_git_blob": "520e62493b6e2c0f024cc6550d47dab1add311bb",
+      "bytes": 15917,
+      "git_lf_bytes": 15917
+    },
+    "executable_assertion_decorator_parameter_AST_equal": true,
+    "exact_nodes_unchanged": [
+      "tests/discovery_runtime/test_service_report_guards.py::test_malformed_report_findings_are_not_an_empty_success[RG1]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_malformed_report_findings_are_not_an_empty_success[RG2]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_projection_errors_propagate_without_fallback_or_publication[RG3]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_projection_errors_propagate_without_fallback_or_publication[RG4]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_malformed_validate_all_retains_public_validator_findings",
+      "tests/discovery_runtime/test_service_report_guards.py::test_invalid_projection_validation_status_is_refused",
+      "tests/discovery_runtime/test_service_report_guards.py::test_acceptance_preview_preserves_ready_and_pending_selected_views[RG7]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_acceptance_preview_preserves_ready_and_pending_selected_views[RG8]",
+      "tests/discovery_runtime/test_service_report_guards.py::test_acceptance_write_plans_complete_sources_and_selected_views",
+      "tests/discovery_runtime/test_service_report_guards.py::test_report_dispatch_refuses_another_operation_family"
+    ],
+    "current_test_reexecuted_after_doc_correction": true
+  },
+  "ordered_gates": [
+    {
+      "stage": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-black.2026-10-21T12-20.json",
+        "working_sha256": "bcf152d54f1a18adc6feaa5ff43d7956a19be891334feef502dc7358aa9edcad",
+        "git_lf_sha256": "bcf152d54f1a18adc6feaa5ff43d7956a19be891334feef502dc7358aa9edcad",
+        "expected_git_blob": "389af2b05138d47d17e4bbb33999bdd583347235",
+        "bytes": 4977,
+        "git_lf_bytes": 4977
+      },
+      "started_utc": "2026-10-21T12:20:09.342157+00:00",
+      "elapsed_seconds": 0.407455,
+      "exit_code": 0
+    },
+    {
+      "stage": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-ruff.2026-10-21T12-20.json",
+        "working_sha256": "49857f8860982c8cee1f38bc42d2831fef0032c8eae9aa499fdeaed5c1c6ec92",
+        "git_lf_sha256": "49857f8860982c8cee1f38bc42d2831fef0032c8eae9aa499fdeaed5c1c6ec92",
+        "expected_git_blob": "2ce35181501a65b173cd9dd7edfeb33b6dee95a6",
+        "bytes": 4921,
+        "git_lf_bytes": 4921
+      },
+      "started_utc": "2026-10-21T12:20:09.756723+00:00",
+      "elapsed_seconds": 0.207709,
+      "exit_code": 0
+    },
+    {
+      "stage": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-pyright.2026-10-21T12-20.json",
+        "working_sha256": "74b4c9c901ea975b6758bee01e3000d282a0ba5b7a87d253a3c537ce52ab74e6",
+        "git_lf_sha256": "74b4c9c901ea975b6758bee01e3000d282a0ba5b7a87d253a3c537ce52ab74e6",
+        "expected_git_blob": "d3be17839066762c1fcfea3ab1773b9a2d67a7f1",
+        "bytes": 5092,
+        "git_lf_bytes": 5092
+      },
+      "started_utc": "2026-10-21T12:20:09.971258+00:00",
+      "elapsed_seconds": 1.009356,
+      "exit_code": 0
+    },
+    {
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-tests.2026-10-21T12-27.json",
+        "working_sha256": "6cced9a7b224ebd51a01e91c532994bce8a508d164276cdc86e93bcb9a499a2f",
+        "git_lf_sha256": "6cced9a7b224ebd51a01e91c532994bce8a508d164276cdc86e93bcb9a499a2f",
+        "expected_git_blob": "25a3c11646c1531e2d4bbc0767d707260fbdd901",
+        "bytes": 9338,
+        "git_lf_bytes": 9338
+      },
+      "started_utc": "2026-10-21T12:20:10.986538+00:00",
+      "elapsed_seconds": 438.309371,
+      "exit_code": 0
+    },
+    {
+      "stage": "coverage",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-coverage.2026-10-21T12-27.json",
+        "working_sha256": "11664e4dfd1c357e368ae6aad1ebf15fdfa5c948c5e8d1cb9cf48078a962fdb1",
+        "git_lf_sha256": "11664e4dfd1c357e368ae6aad1ebf15fdfa5c948c5e8d1cb9cf48078a962fdb1",
+        "expected_git_blob": "48ca02558ae999f971d7aa8d83f6b8e29d0750a5",
+        "bytes": 5045,
+        "git_lf_bytes": 5045
+      },
+      "started_utc": "2026-10-21T12:27:29.311231+00:00",
+      "elapsed_seconds": 0.208284,
+      "exit_code": 0
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "errors": 0,
+  "timeout": false,
+  "pytest_seconds": 437.54,
+  "harness_seconds": 438.309371,
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-tests-raw.2026-10-21T12-27.json",
+    "working_sha256": "2883a242ae642cf2b357f16223dc47cc758330eb1fc952fc59506a46cfd071fb",
+    "git_lf_sha256": "2883a242ae642cf2b357f16223dc47cc758330eb1fc952fc59506a46cfd071fb",
+    "expected_git_blob": "595d0e77e8de544bae61b5595213856269c65fe4",
+    "bytes": 19523,
+    "git_lf_bytes": 19523
+  },
+  "raw_coverage_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-coverage-raw.2026-10-21T12-27.json",
+    "working_sha256": "8b7a2ae556d555fcca3af486783de3bef1abf079d07f62783f0a4460a355a378",
+    "git_lf_sha256": "8b7a2ae556d555fcca3af486783de3bef1abf079d07f62783f0a4460a355a378",
+    "expected_git_blob": "9837858201b59127254b8db1add9d2ea872a6012",
+    "bytes": 20824,
+    "git_lf_bytes": 20824
+  },
+  "raw_coverage_sha256": "401fbde308f54a85d80b7859127ca44336c0a00e7d3c5063486464178dcb3ff7",
+  "body_preflight": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-report-guards-body-preflight.2026-10-21T12-34.json",
+    "working_sha256": "419a761a128d2e509ddf0b730b3882e571188aa6d80ee3e2803354a8d68ae504",
+    "git_lf_sha256": "419a761a128d2e509ddf0b730b3882e571188aa6d80ee3e2803354a8d68ae504",
+    "expected_git_blob": "101ce307141768945615a43c84c4f63fd4d69d9e",
+    "bytes": 17879,
+    "git_lf_bytes": 17879
+  },
+  "verified_report_units_and_module": [
+    {
+      "name": "report_findings",
+      "diagnostic_union": {
+        "covered_statements": 10,
+        "statements": 10,
+        "covered_branches": 6,
+        "branches": 6,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "_report",
+      "diagnostic_union": {
+        "covered_statements": 34,
+        "statements": 34,
+        "covered_branches": 10,
+        "branches": 10,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "_acceptance",
+      "diagnostic_union": {
+        "covered_statements": 25,
+        "statements": 25,
+        "covered_branches": 8,
+        "branches": 8,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "project",
+      "diagnostic_union": {
+        "covered_statements": 5,
+        "statements": 5,
+        "covered_branches": 4,
+        "branches": 4,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "MODULE",
+      "diagnostic_union": {
+        "covered_statements": 84,
+        "statements": 84,
+        "covered_branches": 28,
+        "branches": 28,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    }
+  ],
+  "aggregate_diagnostic": {
+    "binding": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-guard-aggregate-body-preflight.2026-10-21T12-34.json",
+      "working_sha256": "50832268912a6b7386bc2d77da4e78f67358ab5e497e8c0464e8a44b8ee2e236",
+      "git_lf_sha256": "50832268912a6b7386bc2d77da4e78f67358ab5e497e8c0464e8a44b8ee2e236",
+      "expected_git_blob": "77c79c90d37fc90506511debb54d520fbbbff9f0",
+      "bytes": 89280,
+      "git_lf_bytes": 89280
+    },
+    "all13_prior_body_failures_close": true,
+    "all6_module_floors_pass": true,
+    "prior_same_source_zero_loss_retained": true,
+    "qualification": "Reuses the three independently reviewed and committed subsets. Raw focused and retained329 counters remain separate; diagnostic addition is not final combined isolation."
+  },
+  "presentation_qualification": {
+    "encoding": "UTF-8 without BOM; LF; no trailing whitespace",
+    "loop1_to_loop4": "Exact stdout/stderr base64, byte lengths, hashes, transform and original OBSERVED_PATH_ALIASES are retained in each .raw.json; paired .md views remain unchanged. Original mappings are referenced, not reconstructed.",
+    "loop5": "Exact stdout/stderr, executed harness, progress support and owned_test are gzip-base64 archived; coverage stage additionally retains coverage_json. Archived readable function replaces observed root spellings, normalizes CRLF/CR to LF and strips trailing whitespace. All five JSON views reproduced from raw bytes; archived byte lengths/hashes verified.",
+    "retained_checks": "All37 owned evidence files decode as UTF-8 without BOM or CR and have no trailing whitespace; old raw stream hashes/lengths and loop5 raw/readable/binding consistency verified."
+  },
+  "retained_attempts": [
+    {
+      "attempt": "loop1 Black",
+      "result": "Formatter changed the owned test; ordered loop restarted."
+    },
+    {
+      "attempt": "loop2 Ruff",
+      "result": "Two findings: type-only MemoryService import and JsonObject default construction. Corrected before restart."
+    },
+    {
+      "attempt": "loop3 Pyright",
+      "result": "Six diagnostics from two missing scenario_id limits arguments. Explicit limits corrected before restart."
+    },
+    {
+      "attempt": "loop4 focused tests",
+      "raw": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop4-focused.2026-10-21T12-14.raw.json",
+        "sha256": "ce4302432cc3e3c8101ab47ac94366fab5862affbb037e37d55d0b5c794c1d8b",
+        "bytes": 9504
+      },
+      "result": "Eight passes, zero assertion failures, RG9 active and RG10 unexecuted at the 300-second operational cap. No saved coverage."
+    },
+    {
+      "attempt": "progress-runner preparation",
+      "result": "An extra generated closing bracket caused compile to fail before helper-file creation or stage launch. Corrected before loop5. Tool output remains in conversation; no separate raw archive is claimed."
+    },
+    {
+      "attempt": "prewrite administrative alias reconciliation",
+      "command": ".venv/Scripts/python.exe -B -",
+      "exit_code": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"<stdin>\", line 27, in <module>\nAssertionError\n",
+      "check": "Current reconstructed alias hashes did not equal the older OBSERVED_PATH_ALIASES spelling hashes. The check stopped before writing this closure. Historical aliases and raw/readable receipts remain unchanged and are referenced directly; no further reconstruction was performed. Exact stdin script remains in the tool transcript, not a claimed scratch source archive."
+    }
+  ],
+  "reader_note": "A guessed .raw.json test-receipt name did not exist; the immutable receipt raw_archive field supplies the exact -raw.json path. No source, behavior or evidence change.",
+  "reader_diagnostic": {
+    "attempt": "Own closure writer before any canonical write",
+    "exit_code": 1,
+    "error": "AssertionError: len(aggregate['modules']) == 6 and len(aggregate['units']) == 14",
+    "resolution": "The retained aggregate contains exactly 13 named entries, as declared, not every independently measured passing range. Corrected only this reader expectation to 13; original aggregate bytes and all measured coordinates remain unchanged."
+  },
+  "readable_reader_diagnostic": {
+    "attempt": "Own closure writer before any canonical write",
+    "exit_code": 1,
+    "error": "AssertionError comparing coverage-stage stdout before supplying its observed SCRATCH prefix.",
+    "resolution": "The exact raw coverage-export prefix is supplied to the existing normalization helper; the fixed output basename and complete readable message match. No alias rederivation, raw-byte rewrite or behavior replay."
+  },
+  "disabled_preparation": {
+    "staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-preparation-staging.2026-10-21T12-36.json",
+      "working_sha256": "c4fa584c261ebf936aa7fec94ce6c6a50243d378475681b23034ba71379b903a",
+      "git_lf_sha256": "c4fa584c261ebf936aa7fec94ce6c6a50243d378475681b23034ba71379b903a",
+      "expected_git_blob": "f12a4312e56bd77b5f5b775e2496133abd0dd3d0",
+      "bytes": 1592,
+      "git_lf_bytes": 1592
+    },
+    "candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-candidate-disabled.2026-10-21T12-36.json",
+      "working_sha256": "95ac1e11df043aea4d2424bdb7910bbc5bb36a3ab520b8c9a730d30fa3a57a02",
+      "git_lf_sha256": "95ac1e11df043aea4d2424bdb7910bbc5bb36a3ab520b8c9a730d30fa3a57a02",
+      "expected_git_blob": "736b1fd7a755c0098258dd390f2800fb9d25fffd",
+      "bytes": 236292,
+      "git_lf_bytes": 236292
+    },
+    "exact_nodes": 370,
+    "added_nodes": 41,
+    "bound_streams": 245,
+    "selection_sha256": "6717b90f658d0713018ca551a2903bae400bb266f92c0876f704e0860dded0e9",
+    "execution_released": false,
+    "qualification": "Finite preparation bindings and node selection verified; inherited package/native and earlier failure qualifications remain historical. No new execution or acceptance."
+  },
+  "committed_dependencies": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+      "working_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "git_lf_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "expected_git_blob": "0bc58a5960d85b0af970c2f0769cf50d685588f0",
+      "bytes": 17120,
+      "git_lf_bytes": 17120
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-diagnosis.2026-10-21T11-47.json",
+      "working_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "git_lf_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "expected_git_blob": "1562bcf4e55de51a52def2159fc19245a8c1ad52",
+      "bytes": 59777,
+      "git_lf_bytes": 59777
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+      "working_sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020",
+      "git_lf_sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020",
+      "expected_git_blob": "8d5f81cae18db4aff72e5df63b7a47d1fd93b1c2",
+      "bytes": 175998,
+      "git_lf_bytes": 175998
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "working_sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "git_lf_sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "expected_git_blob": "be0c1d3dd9496b8045855af64fb7dfd09e34f12e",
+      "bytes": 21193,
+      "git_lf_bytes": 21193
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "working_sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "git_lf_sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "expected_git_blob": "19ba6b46567ad009b625f9ab015cdb832ff28101",
+      "bytes": 13723,
+      "git_lf_bytes": 13723
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py",
+      "working_sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "git_lf_sha256": "09a0c144a9428496aac13d9cbab6da65eb28471f1124cc49570036b4d32f4fa8",
+      "expected_git_blob": "d7221711d92cb187ed69b02fc930744c4aaa1549",
+      "bytes": 17292,
+      "git_lf_bytes": 16855
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "working_sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "git_lf_sha256": "26f82511a0ef1ea19d066138e841458a4d607b65cfd0ca627532fde8eb992b8a",
+      "expected_git_blob": "dd9e4f52a4c44187bb53e91ddf3371f50bedf1d3",
+      "bytes": 22266,
+      "git_lf_bytes": 21766
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "working_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "git_lf_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "expected_git_blob": "1916a4fd2edbe024c0f2f186f9b4f122ec65fd66",
+      "bytes": 20995,
+      "git_lf_bytes": 20995
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "working_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "git_lf_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "expected_git_blob": "908612c6aad30ea9e4b5cb8800d2eb33b0930a3f",
+      "bytes": 14299,
+      "git_lf_bytes": 14299
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "working_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "git_lf_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "expected_git_blob": "65c32127f47b9f5a6c907138e5c28f50ece969ee",
+      "bytes": 17125,
+      "git_lf_bytes": 17125
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "working_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "git_lf_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+      "expected_git_blob": "a5644c09dffd77bc6fef56229cb2841f0abac0f5",
+      "bytes": 8966,
+      "git_lf_bytes": 8966
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_selection.py",
+      "working_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "git_lf_sha256": "d01317f378856bd562aa66c753518c511db8efbb80733423e7a11e66f29e21f6",
+      "expected_git_blob": "01ff17420f1b618def82d480d3501ee613e42809",
+      "bytes": 10075,
+      "git_lf_bytes": 10075
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "working_sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "git_lf_sha256": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+      "expected_git_blob": "d1bbc1d4a18bb028f06a65c4cff4806efeb50042",
+      "bytes": 10479,
+      "git_lf_bytes": 10479
+    },
+    {
+      "path": "tests/discovery_runtime/initialization_test_support.py",
+      "working_sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "git_lf_sha256": "8d5f40967b743de4388fbc8403e42a89631b8e5dd3d46f3c7b458c80793ffafd",
+      "expected_git_blob": "015a920d9cb37f650c6239a0d158907c7834e556",
+      "bytes": 5629,
+      "git_lf_bytes": 5488
+    },
+    {
+      "path": "tests/discovery_runtime/mutation_test_support.py",
+      "working_sha256": "cb930ce0a8ce731a475dedc2e79b6e16a390f61cb28225984af836c6f9f828b2",
+      "git_lf_sha256": "fe2a592f5de48155992ddc77810d31a6a004764935e15cff08ef4eb176a3ff19",
+      "expected_git_blob": "322118bba523350bccd006ae46e66acc756bb14e",
+      "bytes": 11522,
+      "git_lf_bytes": 11228
+    },
+    {
+      "path": "tests/discovery_runtime/test_service.py",
+      "working_sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "git_lf_sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "expected_git_blob": "851ab57a8f36e51809d8859365d2bf1e04b7abde",
+      "bytes": 19962,
+      "git_lf_bytes": 19962
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "working_sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "git_lf_sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "expected_git_blob": "9227e5fe5f16126ec1160a654b842b24b8b58fee",
+      "bytes": 20434,
+      "git_lf_bytes": 20434
+    }
+  ],
+  "staging_union": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-report-guards-staging-union.2026-10-21T12-40.json",
+  "task_acceptance": false,
+  "remaining": "Fresh ordered 370-case aggregate, BODY/zero-regression proof, four contracts and independent task acceptance.",
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

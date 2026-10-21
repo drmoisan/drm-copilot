@@ -1,0 +1,89 @@
+{
+  "added_nodes": 41,
+  "aggregate_diagnostic": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-guard-aggregate-body-preflight.2026-10-21T12-34.json",
+    "sha256": "50832268912a6b7386bc2d77da4e78f67358ab5e497e8c0464e8a44b8ee2e236"
+  },
+  "bound_stream_count": 245,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-candidate-disabled.2026-10-21T12-36.json",
+    "sha256": "95ac1e11df043aea4d2424bdb7910bbc5bb36a3ab520b8c9a730d30fa3a57a02"
+  },
+  "contracts": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "coverage_reader_view": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-guard-coverage-reader-view.2026-10-21T12-36.json",
+    "sha256": "0e34f9f86e0b5c3c5138d7ceccf557b0a484cc16a257d57ce2fe2dfe1f20b951"
+  },
+  "exact_node_count": 370,
+  "execution_released": false,
+  "harnesses": {
+    "p6t1_final_guard_gates.py": {
+      "physical_lines": 261,
+      "runtime_path": "SCRATCH/p6t1_final_guard_gates.py",
+      "sha256": "eb9213887e8f29898288531073fd32d509f3f523795aa517625496986c0e29ef"
+    },
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 216,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9"
+    }
+  },
+  "native_carry": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-capture-postconditions-confirmed.2026-10-21T10-25.json",
+    "sha256": "1ae83dfe30fa879d3e60741ef21b6f5915de5b22399dc16e5213edc427b6ca1b"
+  },
+  "operational_bound": {
+    "automatic_retry": false,
+    "cap_above_observed_sum_seconds": 1648.3730545999933,
+    "observations": [
+      {
+        "elapsed_seconds": 4193.486938,
+        "population": "retained329"
+      },
+      {
+        "elapsed_seconds": 51.706182,
+        "population": "context7"
+      },
+      {
+        "elapsed_seconds": 203.42669940000633,
+        "population": "inspection9"
+      },
+      {
+        "elapsed_seconds": 664.697755,
+        "population": "mutation15"
+      },
+      {
+        "elapsed_seconds": 438.309371,
+        "population": "report10"
+      }
+    ],
+    "progress_seconds": 20,
+    "qualification": "The five measured populations are disjoint. Their elapsed sum supports retaining the finite7200-second operational cap; it is not an ETA, guaranteed upper bound or installed-host timeout claim. One process reverses all17 modules, with exact cleanup and no automatic retry.",
+    "separately_measured_sum_seconds": 5551.626945400007,
+    "tests_seconds": 7200
+  },
+  "original329": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-comment-candidate.2026-10-21T10-32.json",
+    "sha256": "d3383c7dbfd1c854bbf5209ac9c2ad66d8d13ae89938a28ff0cfa1a50b6b587b"
+  },
+  "production_and_package_unchanged": true,
+  "remaining_prerequisites": [
+    "bounded incremental confirmation and checked guard checkpoint",
+    "explicit coordinator execution release"
+  ],
+  "selection_encoding": "UTF-8, LF-joined nodes in reversed module order, one terminal newline",
+  "selection_sha256": "6717b90f658d0713018ca551a2903bae400bb266f92c0876f704e0860dded0e9",
+  "status": "PREPARED_EXECUTION_DISABLED",
+  "task": "P6-T1",
+  "tests_executed_during_preparation": false
+}
