@@ -1,0 +1,235 @@
+{
+  "Timestamp": "2026-10-21T16:46:13.545013+00:00",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+    "sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2"
+  },
+  "body": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-body.2026-10-21T16-46.json",
+    "sha256": "2b52134342e9613c6a5a048d2e547d86ede12c176358922eed1cb7abb3f36d67"
+  },
+  "elapsed_seconds": 7.066744,
+  "evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format-raw.2026-10-21T16-42.json",
+      "sha256": "883f36240cdb5e7bf548be0fe5056675af161b13e5838e7f1c087a1c72c28490"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format.2026-10-21T16-42.json",
+      "sha256": "ecf294d78520ba9c91c2f5cb3df466283d7bd564b6357fe551c7d55dc8f7bf38"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check-raw.2026-10-21T16-42.json",
+      "sha256": "f5036af14001ce69c48aa04021a73f3781c11cc16b48f060d315dafbde74d99f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check.2026-10-21T16-42.json",
+      "sha256": "3970dfc7fbfb5fbe874d9b6d75b272b42f81c4df81a8b6615147d4695a8e6c1e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint-raw.2026-10-21T16-42.json",
+      "sha256": "3370fb9d45b87c53567e236db6b88e3351e52050249c27a4fb06ab7a773f14e6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint.2026-10-21T16-42.json",
+      "sha256": "1b27108f9414d2af6d3b4f45f4c5ebac4f52ba215bf527458d5daaef9cb87874"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check-raw.2026-10-21T16-43.json",
+      "sha256": "1db8030a236f217ac903ee1a4fa03da0b4cc219c2c0075d32af1b005f5389fa2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check.2026-10-21T16-43.json",
+      "sha256": "5b5a9d29766096f55cfb86ddf0528fdc5fce607983d8b27edc060216b60e0c25"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint-raw.2026-10-21T16-43.json",
+      "sha256": "00ec89c42c731a67e45705953599d46ebf6ffb7b9e563873322bda1c71933cf7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint.2026-10-21T16-43.json",
+      "sha256": "17619c1ac4ad551d3bbedd9f95ccd8b621bc0863151c6dcf3de5cce6eae8d552"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check-raw.2026-10-21T16-43.json",
+      "sha256": "e8257b0fd54d45199e8b5122022bb4c2476f1f9595f23fb685847abb572376cd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check.2026-10-21T16-43.json",
+      "sha256": "8dfa97c277bdd1ab4db68846e9f7bdf63b8565540e3016c7494f02d1c386a466"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint-raw.2026-10-21T16-43.json",
+      "sha256": "416f2e737410dcbf4e1d5df8449f16c3995c1ac98d120a3356c57380a68d3bb8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint.2026-10-21T16-43.json",
+      "sha256": "0c5ccc23a6f635eb783492e13014468155872d740db9c87d541295c146ce09b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types-raw.2026-10-21T16-43.json",
+      "sha256": "c2c60121a968bf13e6890a7eb441f32d0393ba407ece2e05c90bd64404ddb6c6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types.2026-10-21T16-43.json",
+      "sha256": "7876fd32e000f8335f9db0654b01873dc0c4f9b45868db39c5679e75048722de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests-raw.2026-10-21T16-44.json",
+      "sha256": "b25afabde16d34821e848ff4ff6240225cb5678f6441935f03c6f7a47a82e57d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.json",
+      "sha256": "ec21553dcb4688e4e0252873f29011f099bb38c60523f1d3c815499602ba998c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-assembly-raw.2026-10-21T16-46.json",
+      "sha256": "499f866c91b3c980f942f2101ef0b99d26f079c48e9ca07f8dced3d3b1745d5e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-body.2026-10-21T16-46.json",
+      "sha256": "2b52134342e9613c6a5a048d2e547d86ede12c176358922eed1cb7abb3f36d67"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format.2026-10-21T16-42.md",
+      "sha256": "731dc50ba34987c44ea6510578c6544d270e3b3c43e797b24f359ac1f47fcd84"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check.2026-10-21T16-42.md",
+      "sha256": "d7b165ac6a5351212adf9dd6fd3b188a0df7699367cd5122dd65509c9c72dff6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint.2026-10-21T16-42.md",
+      "sha256": "c1a405e7e898a762196f80912c9301b8311ae803449e4f018a023c275c675bac"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check.2026-10-21T16-43.md",
+      "sha256": "27b3fe2ce28ad019d0f0020661fd15527e73dd854523f42ee8c989a4268d01a9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint.2026-10-21T16-43.md",
+      "sha256": "2ed94583a4809ba59525cc7dc8b4a9831a6ded832d7b52c19182ad86c69196fc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check.2026-10-21T16-43.md",
+      "sha256": "e79451b08dc89053543086be90a94447c2ca1ade5b5c876c865fab9a4a9f93b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint.2026-10-21T16-43.md",
+      "sha256": "ea827b87e52a513cb79e10911e56b3724c0e44612cd48784b49bcfc4c292b8ff"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types.2026-10-21T16-43.md",
+      "sha256": "4660c7323a5deec1b863420a41dcdaf1df622002010b5851b03d49bedd7f9cf9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.md",
+      "sha256": "591c7820cf41a44f6870f75bf9683b607d96c301e1adab2a353bb876081791a3"
+    }
+  ],
+  "module_order": [
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py"
+  ],
+  "node_count": 38,
+  "nodes": [
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_validate_from_args_returns_unsupported_artifact_type",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_profile_returns_zero_for_conforming_fixture",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_profile_returns_one_for_missing_authoritative_profile_contract",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_feature_contract_returns_zero_for_conforming_fixture",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_feature_contract_returns_one_for_non_conforming_fixture",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_all_refuses_file_probing_before_reading",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_direct_all_dispatch_is_an_actionable_refusal",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_profile-profile]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_feature_contract-feature-contract]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_coverage_ledger-coverage-ledger]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_runtime_scenario-runtime-scenario]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_parity_matrix-parity-matrix]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_unspecified_behavior-unspecified-behavior]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_product_decision-product-decision]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_main_artifact_wrappers_dispatch_with_correct_argv_prefix[main_evidence_reference-evidence-reference]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_canonical_kind_route_forwards_exact_flags[arguments0]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_canonical_kind_route_forwards_exact_flags[arguments1]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_canonical_kind_route_forwards_exact_flags[arguments2]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_legacy_argument_errors_do_not_read[arguments0]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_legacy_argument_errors_do_not_read[arguments1]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_legacy_argument_errors_do_not_read[arguments2]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_malformed_arguments_are_redacted[secret]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_malformed_arguments_are_redacted[42]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_malformed_arguments_are_redacted[arguments2]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_malformed_arguments_are_redacted[arguments3]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_argument_count_refusal_precedes_text_measurement[False]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_argument_count_refusal_precedes_text_measurement[True]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_argument_text_work_is_reserved_before_scan[3]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_argument_text_work_is_reserved_before_scan[4]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_process_arguments_are_captured_without_mutation",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments0-False]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments1-False]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments2-False]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments3-True]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments4-True]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_route_uses_only_explicit_options[arguments5-True]",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_report_mixed_routes_refuse_before_callbacks",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py::test_selected_file_reader_preserves_utf8_and_errors"
+  ],
+  "owned": [
+    {
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "sha256": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "0e8a16f4e26e8c053e5eb763631100b05548ec1bafd995ff66986e7a2a228578"
+    }
+  ],
+  "pending": [
+    "Independent bounded review",
+    "Coordinator checked commit",
+    "Report caller subset",
+    "Final isolation/composition"
+  ],
+  "physical_lines": {
+    "scripts/dev_tools/validate_discovery_artifacts.py": 294,
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": 405
+  },
+  "preimages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+    "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+  },
+  "raw_qualification": "Lossless gzip-base64 streams retain original stdout/stderr/source/coverage. Readable views use recorded WORKSPACE/SCRATCH aliases and LF/trailing-whitespace normalization. Raw coverage missing terminal LF is preserved.",
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.json",
+    "sha256": "ec21553dcb4688e4e0252873f29011f099bb38c60523f1d3c815499602ba998c"
+  },
+  "status": "FOCUSED_PASS_READY_FOR_BOUNDED_CONFIRMATION",
+  "subset": "validation_reports/validator",
+  "task": "P6-T3",
+  "tested_dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+    "scripts/dev_tools/discovery/io.py": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+    "scripts/dev_tools/validate_discovery_artifacts.py": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c",
+    "scripts/dev_tools/validate_discovery_profile.py": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2",
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "tests/discovery_runtime/cli_test_support.py": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+    "tests/discovery_runtime/gateway_test_support.py": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py": "0e8a16f4e26e8c053e5eb763631100b05548ec1bafd995ff66986e7a2a228578",
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py": "6d3319e7344492a4e0f702386158c86b28ce940a11343226667b4ba67832fe7f",
+    "tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py": "81d9ade0bb971e16b923776f3fa661558c1a9267ea00f2f29484520697f1fda8"
+  }
+}

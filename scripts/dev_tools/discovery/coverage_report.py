@@ -1,4 +1,4 @@
-"""Route the legacy coverage CLI through bounded runtime compatibility helpers.
+"""Route explicit legacy files separately from installed workspace coverage.
 
 The public parse/build/render names remain available for existing callers.
 They summarize v1 or safe placeholder entries without establishing v2 graph
@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from drm_copilot_discovery.cli import run_installed_cli
 from drm_copilot_discovery.report_models import (
     build_coverage_rows as build_coverage_rows,
 )
@@ -29,6 +30,7 @@ from scripts.dev_tools.discovery.io import (
     validate_or_raise,
     write_report,
 )
+from scripts.dev_tools.validate_discovery_artifacts import report_arguments
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -73,15 +75,17 @@ def main(
     *,
     validator: ArtifactValidator | None = None,
 ) -> int:
-    """Read, validate and render one legacy ledger through injectable seams.
+    """Forward workspace flags or render an explicitly selected legacy ledger.
 
     Args:
         argv (Sequence[str] | None): CLI arguments; None uses sys.argv.
         validator (ArtifactValidator | None): Injected schema checker or the
-            lazy upstream default. It cannot bypass runtime helper validation.
+            lazy upstream default on the legacy route. Canonical calls refuse
+            injection before callbacks; legacy helpers still enforce version.
 
     Returns:
-        int: Zero after rendering; one for validator or helper rejection.
+        int: Installed exit for workspace calls; legacy 0/1 for render/rejection,
+            or 2 for mixed routes, invalid argv or canonical validator injection.
 
     Raises:
         OSError: Input/output boundary failures propagate unchanged.
@@ -91,9 +95,24 @@ def main(
     Side Effects:
         Reads the input and writes a compatibility report to disk or stdout.
         Validation errors go to stderr; helper failures use a fixed diagnostic
-        so malformed source text is never echoed. No v2 publication occurs.
+        so malformed source text is never echoed. Canonical effects belong solely
+        to the installed service; the legacy route grants no v2 authority.
     """
-    args = parse_args(argv)
+    try:
+        arguments, legacy = report_arguments(argv, input_flags=("--input",))
+    except ValueError:
+        print(
+            "Use separate legacy file or canonical workspace report arguments",
+            file=sys.stderr,
+        )
+        return 2
+    # Canonical execution cannot discard a caller's explicitly injected validator.
+    if not legacy:
+        if validator is not None:
+            print("Injected validators require the legacy file route", file=sys.stderr)
+            return 2
+        return run_installed_cli("coverage-report", arguments)
+    args = parse_args(arguments)
     active_validator = validator or _default_coverage_ledger_validator
 
     text = read_artifact_text(Path(args.input))

@@ -18,6 +18,9 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from typing import NoReturn
+
     from _pytest.monkeypatch import MonkeyPatch
 
 import scripts.dev_tools.discovery.coverage_report as coverage_report
@@ -378,7 +381,11 @@ def test_default_validator_and_sys_argv_remain_injectable(
 def test_missing_input_arguments_fail_before_read(
     arguments: list[str], monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """Reject arguments (list[str]) using argparse before any injected read seam."""
+    """Reject arguments (list[str]) with monkeypatch (MonkeyPatch).
+
+    capsys (CaptureFixture[str]) retains diagnostics. Return None; legacy argparse
+    or canonical injection refusal precedes reads, without physical I/O.
+    """
     reads: list[Path] = []
 
     def read(path: Path) -> str:
@@ -388,11 +395,16 @@ def test_missing_input_arguments_fail_before_read(
 
     monkeypatch.setattr(coverage_report, "read_artifact_text", read)
 
-    with pytest.raises(SystemExit) as failure:
-        coverage_report.main(arguments, validator=_passing_validator)
-
-    assert failure.value.code == 2 and reads == []
-    assert "error:" in capsys.readouterr().err
+    # Empty argv is canonical; explicit legacy options retain argparse's contract.
+    if not arguments:
+        assert coverage_report.main(arguments, validator=_passing_validator) == 2
+        assert "Injected validators" in capsys.readouterr().err
+    else:
+        with pytest.raises(SystemExit) as failure:
+            coverage_report.main(arguments, validator=_passing_validator)
+        assert failure.value.code == 2
+        assert "error:" in capsys.readouterr().err
+    assert reads == []
 
 
 @pytest.mark.parametrize("operation", ["read_artifact_text", "write_report"])
@@ -419,3 +431,59 @@ def test_io_errors_propagate_without_a_success_report(
     assert failure.value is error
     captured = capsys.readouterr()
     assert captured.out == "" and captured.err == ""
+
+
+@pytest.mark.parametrize("process", [False, True])
+def test_workspace_route_forwards_exact_command_and_exit(
+    process: bool, monkeypatch: MonkeyPatch
+) -> None:
+    """Use process (bool), monkeypatch (MonkeyPatch); return None after forwarding.
+
+    Exact Unicode arguments and exit 3 survive; no file or service I/O occurs.
+    """
+    arguments = ["--workspace-root", "folder with spaces/é", "--format", "both"]
+    calls: list[tuple[str, Sequence[str] | None]] = []
+
+    def installed(command: str, argv: Sequence[str] | None = None) -> int:
+        """Record command (str), argv (Sequence[str] | None); return 3 without I/O."""
+        calls.append((command, argv))
+        return 3
+
+    monkeypatch.setattr(coverage_report, "run_installed_cli", installed)
+    monkeypatch.setattr(sys, "argv", ["coverage-report", *arguments])
+    assert coverage_report.main(None if process else arguments) == 3
+    assert calls == [("coverage-report", tuple(arguments))]
+
+
+@pytest.mark.parametrize("route", ["mixed", "injected", "invalid"])
+def test_workspace_refusal_precedes_every_callback(
+    route: str, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Reject route (str) with monkeypatch (MonkeyPatch), capsys (CaptureFixture[str]).
+
+    Return None; mixed, injected and malformed calls have no callbacks or output.
+    """
+
+    def forbidden(text: object, *values: object) -> NoReturn:
+        """Reject text (object), values (object tuple) with AssertionError.
+
+        No value returns, and no I/O or mutation occurs.
+        """
+        raise AssertionError("callback must not run")
+
+    arguments = ["--workspace-root", "repo"]
+    # Each refusal is selected explicitly; no document or external state is read.
+    if route == "mixed":
+        arguments += ["--input", "secret.json"]
+    elif route == "invalid":
+        arguments = ["\ud800"]
+    monkeypatch.setattr(coverage_report, "read_artifact_text", forbidden)
+    monkeypatch.setattr(coverage_report, "run_installed_cli", forbidden)
+    assert (
+        coverage_report.main(
+            arguments, validator=forbidden if route == "injected" else None
+        )
+        == 2
+    )
+    output = capsys.readouterr()
+    assert output.out == "" and "legacy" in output.err and "secret" not in output.err

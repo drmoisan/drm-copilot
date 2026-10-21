@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
+    from typing import NoReturn
 
     from _pytest.monkeypatch import MonkeyPatch
 
@@ -342,3 +343,59 @@ def test_helper_rejection_never_writes_partial_report(
     output = capsys.readouterr()
     assert writes == [] and output.out == ""
     assert "secret" not in output.err
+
+
+@pytest.mark.parametrize("process", [False, True])
+def test_workspace_route_forwards_exact_command_and_exit(
+    process: bool, monkeypatch: MonkeyPatch
+) -> None:
+    """Use process (bool), monkeypatch (MonkeyPatch); return None after forwarding.
+
+    Exact Unicode arguments and exit 3 survive; no file or service I/O occurs.
+    """
+    arguments = ["--workspace-root", "folder with spaces/é", "--format", "both"]
+    calls: list[tuple[str, Sequence[str] | None]] = []
+
+    def installed(command: str, argv: Sequence[str] | None = None) -> int:
+        """Record command (str), argv (Sequence[str] | None); return 3 without I/O."""
+        calls.append((command, argv))
+        return 3
+
+    monkeypatch.setattr(parity_report, "run_installed_cli", installed)
+    monkeypatch.setattr(sys, "argv", ["parity-report", *arguments])
+    assert parity_report.main(None if process else arguments) == 3
+    assert calls == [("parity-report", tuple(arguments))]
+
+
+@pytest.mark.parametrize("route", ["mixed", "injected", "invalid"])
+def test_workspace_refusal_precedes_every_callback(
+    route: str, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Reject route (str) with monkeypatch (MonkeyPatch), capsys (CaptureFixture[str]).
+
+    Return None; mixed, injected and malformed calls have no callbacks or output.
+    """
+
+    def forbidden(text: object, *values: object) -> NoReturn:
+        """Reject text (object), values (object tuple) with AssertionError.
+
+        No value returns, and no I/O or mutation occurs.
+        """
+        raise AssertionError("callback must not run")
+
+    arguments = ["--workspace-root", "repo"]
+    # Each refusal is selected explicitly; no document or external state is read.
+    if route == "mixed":
+        arguments += ["--input", "secret.json"]
+    elif route == "invalid":
+        arguments = ["\ud800"]
+    monkeypatch.setattr(parity_report, "read_artifact_text", forbidden)
+    monkeypatch.setattr(parity_report, "run_installed_cli", forbidden)
+    assert (
+        parity_report.main(
+            arguments, validator=forbidden if route == "injected" else None
+        )
+        == 2
+    )
+    output = capsys.readouterr()
+    assert output.out == "" and "legacy" in output.err and "secret" not in output.err
