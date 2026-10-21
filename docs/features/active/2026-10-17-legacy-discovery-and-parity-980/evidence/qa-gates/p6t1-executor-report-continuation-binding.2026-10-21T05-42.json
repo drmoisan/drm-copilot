@@ -1,0 +1,103 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "Timestamp": "2026-10-21T05:42:53.361207+00:00",
+  "status": "READY_FOR_BOUNDED_FIXTURE_REFRESH",
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-report-fixture-confirmation.2026-10-21T05-41.json",
+      "sha256": "656ddfc71d187922444be2f1fbee0fd8dfc9b807a846f8d62a33150278fd9572",
+      "bytes": 11342
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-continuation-preparation.2026-10-21T05-39.json",
+      "sha256": "084e0fcc9239340ee66ccaf0ed1a09c5ab4bfbb65df75a2d760ee54f405b8e2d",
+      "bytes": 43910
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-continuation-state.2026-10-21T05-39.json",
+      "sha256": "5ddc822154c2ce26775106cc8369a630295ef9c15250624aa3f6fcc0e031b199",
+      "bytes": 13883
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+      "sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b",
+      "bytes": 139058
+    }
+  ],
+  "qualification": "This addendum binds the prepared continuation received after the immutable 05:41 confirmation. It changes no diagnosis, request, allowed mutation, assertion or release condition.",
+  "prepared_adapter": {
+    "path": "SCRATCH/issue-980-p6t1-installed-report-continuation-20261021T0537.py",
+    "sha256": "76138711bdc63ca92fd1f768fbc81349659d0cd35a26f94b37752559a1dec99b",
+    "lines": 465
+  },
+  "disabled_release": {
+    "path": "SCRATCH/issue-980-p6t1-report-continuation-release-disabled-20261021T0537.json",
+    "sha256": "71d73fd7bd1f04a8440fc962d095ae4aed4ebbd3b73a69e4c98b8252c51f9c47"
+  },
+  "native_calls": 12,
+  "sequence": [
+    "installed-identity",
+    "parity-refresh",
+    "report-dry",
+    "report-publish",
+    "report-repeat",
+    "doctor",
+    "malformed",
+    "unknown-operation",
+    "opaque-reference-refusal",
+    "host-refusal",
+    "identity-missing",
+    "identity-corrupt"
+  ],
+  "exact_prepared_checks": {
+    "syntax": "passed",
+    "inverse_transform_restores_original": true,
+    "completion_tail_byte_identical": true,
+    "request_process_helpers_ast_identical": true,
+    "literal_invocations": [
+      "installed-identity",
+      "parity-refresh",
+      "report-dry",
+      "report-publish",
+      "report-repeat",
+      "doctor",
+      "malformed",
+      "unknown-operation",
+      "opaque-reference-refusal",
+      "host-refusal"
+    ],
+    "identity_error_loop_calls": 2,
+    "future_total_invocations": 12,
+    "native_factory_service_test_calls": 0,
+    "fixture_mutations": 0
+  },
+  "state_confirmation": {
+    "workspace": {
+      "file_count": 49,
+      "directory_count": 33,
+      "state_sha256": "bd9ed9b78fb9f7c33aebef03e34c0e9937ed93887f4aaad314c8c7c1004bb5f7"
+    },
+    "initialization": {
+      "file_count": 41,
+      "directory_count": 35,
+      "state_sha256": "eeae9a5571cdf7ba8fd3cfa4224d38690dd2050a82b32cecf78f8ac405dd5c94"
+    },
+    "all_file_hashes_match_retained_native_current_effects": true,
+    "activation_locator_matches_diagnosed_semantic_input": true
+  },
+  "contract_confirmation": "The finite prepared change performs fresh installed identity, the approved public parity pair refresh, and the unchanged ten-call completion/refusal tail. It requires exactly two changed parity paths, the sole JSON input-digest delta and matching Markdown, then resets the completion footprint to the observed post-refresh state. Existing strict refusal and selected-failure controls remain meaningful.",
+  "execution": "Metadata and archived receipt reads only. No service/factory/native, projection, test, build, fixture, source, Git/index or checkpoint operation was executed. Coordinator still owns execution release; no refresh success is claimed.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "Timestamp": "2026-10-21T05:41:20.130533+00:00",
+  "head": "e9d18aca08857fc8c44b3b030fa10349da4cd4f2",
+  "route": "atomic_execution_p6t1_report_fixture_confirmation_20261021T053701",
+  "status": "READY_FOR_BOUNDED_FIXTURE_REFRESH",
+  "findings": [],
+  "open_probes": [],
+  "retained_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis.2026-10-21T05-36.json",
+      "sha256": "faead8cc0aa97faa7625c8397a71503e11977ec79b1d3ad96d0c0f8ab7bb7f9c",
+      "bytes": 10911
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis-originals.2026-10-21T05-36.json",
+      "sha256": "706b833ac54d6f8c4d6db372441537bbb72b8a480ab9e20ee0b44b111877ce22",
+      "bytes": 27163
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+      "sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b",
+      "bytes": 139058
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix-raw.2026-10-21T05-19.json",
+      "sha256": "1e9ac961418684172e4c16d5e364142447e07295f9309610d2e8b63edc7af9dd",
+      "bytes": 96640
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+      "sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29",
+      "bytes": 37027
+    }
+  ],
+  "diagnosis_confirmation": {
+    "classification": "Stale derived-report fixture after successful configure-real activation; strict refusal is preserved.",
+    "sole_json_difference": {
+      "pointer": "/input_sha256",
+      "before": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+      "after": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568"
+    },
+    "all_other_fields_equal": true,
+    "report_identity": {
+      "kind": "parity-report",
+      "id": "parity",
+      "mode": "parity-complete"
+    },
+    "selected_results_remain": {
+      "validation_result": "fail",
+      "parity_result": "fail"
+    },
+    "activation": {
+      "path": "config/discovery.json",
+      "sha256": "5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219"
+    },
+    "decoded_archive_streams": 8,
+    "decoded_captured_files": 14,
+    "pinned_objects": 2,
+    "original_pair": [
+      {
+        "path": "docs/migration/discovery/reports/parity-report.json",
+        "sha256": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+        "bytes": 6791,
+        "archive_member": "p6t1-native-report-comparison-20261021-inputs.json"
+      },
+      {
+        "path": "docs/migration/discovery/reports/parity-report.md",
+        "sha256": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+        "bytes": 9956,
+        "archive_member": "p6t1-native-report-comparison-20261021-inputs.json"
+      }
+    ],
+    "comparison_qualification": "Reused one 6.633-second owner memory-loader/projection comparison and its exact archived operands. This reviewer compared decoded JSON/bytes only; no projection, parsing service or operation was executed."
+  },
+  "public_lifecycle_confirmation": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "lines": [
+        60,
+        103
+      ],
+      "basis": "The parity-report handler uses the default parity identity and paired default paths, computes both views from one authoritative projection and plans publication when write is true."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "lines": [
+        285,
+        445
+      ],
+      "basis": "Each change binds the captured prior byte digest. Local exact grants, plan_mutation, guarded commit and fresh result validation remain in force; a published selected failure retains exit 1 and ok false."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "lines": [
+        354,
+        419
+      ],
+      "basis": "Replacement checks exact prior digest and artifact identity, overlays both proposed files before structural validation, then requires the whole prospective graph to validate. The refreshed parity identity matches the old parity record."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+      "lines": [
+        113,
+        147
+      ],
+      "basis": "Every existing report is still strictly compared with recomputation; the original stale REPORT_RESULT refusal is correct and is not suppressed."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py",
+      "lines": [
+        144,
+        178
+      ],
+      "basis": "Report/control outputs and report-root bytes remain excluded from report_input_digest; activation remains a semantic input. Regeneration does not make the digest recursive."
+    }
+  ],
+  "source_bindings_reused": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443"
+  },
+  "exact_refresh_request": {
+    "base": {
+      "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+      "result_label": "report-dry",
+      "member": "request_raw",
+      "sha256": "26eeefd885ece570aea277524d26a45a97eff2d01492887eaec9674d470ec656",
+      "bytes": 585
+    },
+    "replace_only": {
+      "operation": "parity-report",
+      "dry_run": false
+    },
+    "preserve_all_other_fields": true,
+    "required_preserved_values": {
+      "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
+      "schema_version": "2.0.0",
+      "artifact_kind": "service-request",
+      "id": "native-composition",
+      "request_id": "native-composition",
+      "mode": "parity-complete",
+      "profile_path": "docs/migration/discovery/domain-profile.yaml",
+      "write": true,
+      "format": "both",
+      "inputs": {},
+      "invocation_ref": null,
+      "authorization_ref": null
+    },
+    "workspace_root": "Retain the exact workspace_root value in the bound base request and the same trusted outer local-user/repository binding; no new root or authority.",
+    "expected": {
+      "exit_code": 1,
+      "ok": false,
+      "validation_result": "fail",
+      "actual_artifact_paths": [
+        "docs/migration/discovery/reports/parity-report.json",
+        "docs/migration/discovery/reports/parity-report.md"
+      ],
+      "report_input_sha256": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568"
+    }
+  },
+  "allowed_changes": {
+    "workspace_paths": [
+      "docs/migration/discovery/reports/parity-report.json",
+      "docs/migration/discovery/reports/parity-report.md"
+    ],
+    "all_other_workspace_bytes_and_membership": "unchanged",
+    "json_semantics": "Only /input_sha256 changes from the archived stored parity JSON. Raw serialization may be regenerated by the existing renderer; preserve its actual new digest rather than hand-editing bytes.",
+    "markdown": "The authoritative paired Markdown from the same regenerated report; record exact output bytes/digest.",
+    "prohibited": [
+      "Direct report edits/deletion or digest substitution",
+      "Source, test, package, profile or authority changes",
+      "Weakening structural validation or REPORT_RESULT",
+      "Clone, initialization or six-prefix replay"
+    ]
+  },
+  "continuation": {
+    "before_refresh": "Freshly verify the bound package, retained current workspace/initialization state and original pair bytes against the native receipt and exact input archive; abort on any unrelated drift.",
+    "after_refresh": "Require the expected service exit/result and actual two-path publication, compare the complete before/after footprint, retain actual pair hashes, then capture a fresh post-refresh completion-footprint baseline.",
+    "semantic_digest": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568",
+    "full_capture_qualification": "The report semantic input digest is distinct from the full snapshot/input-manifest digest. A refreshed report pair can change full-capture identity; bind that identity from the new baseline rather than substituting the semantic digest.",
+    "resume_at": "report-dry",
+    "remaining_sequence": [
+      "report-dry",
+      "report-publish",
+      "report-repeat",
+      "doctor",
+      "malformed",
+      "unknown-operation",
+      "opaque-reference-refusal",
+      "host-refusal",
+      "identity-missing",
+      "identity-corrupt"
+    ],
+    "preserve_controls": "Keep exact selected-failure, dry-run no-write, paired publication, repeat/nonrecursion, installed-identity and refusal assertions. Change only fixture-derived digest expectations using the explicit new semantic digest and fresh baseline.",
+    "historical_prefix": [
+      "installed-identity",
+      "configure-dry",
+      "configure-real",
+      "profile",
+      "validate-profile",
+      "inventory"
+    ],
+    "historical_qualification": "The six prefix results remain execution on the same frozen NCF2 package. The original report-dry assertion failure and REPORT_RESULT refusal remain immutable negative evidence; historical initialization retains its separate old-package qualification.",
+    "execution_release": "Coordinator owns release; this receipt does not execute or claim success for refresh or continuation."
+  },
+  "reviewer_execution": "Exact evidence/archived-byte and bounded source reads only. No runtime projection, service/factory/native operation, suite, rebuild, fixture/state mutation, Git/index or checkpoint write.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "Command": "NCF2 metadata-only delta and launcher syntax check; no gate execution.",
+  "EXIT_CODE": 0,
+  "Output Summary": "PREPARED_EXECUTION_DISABLED; 294 exact nodes and four unchanged contracts.",
+  "Timestamp": "2026-10-21T05-18",
+  "added_nodes": 8,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-candidate-disabled.2026-10-21T05-18.json",
+    "sha256": "54ae694727ad42395cc7b374a9b71c46d524e7885d889822bb35937d046c7981"
+  },
+  "collection_tests_native_package_source_test_git_checkpoint_staging_actions": false,
+  "coverage_qualification": "NCF2 raw coverage stays separate from unchanged historical mappings. Every gateway mapped body requires fresh final execution; path-policy retained proof is unchanged. No fresh claim is derived from historical mappings.",
+  "execution_released": false,
+  "four_contracts_unchanged": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf2-freeze.2026-10-21T05-15.json",
+    "sha256": "1dbbe6c61c09e6d1ca11c03b25f65e7406d83e1cb5c594875dfa2d6bcc77b262"
+  },
+  "harnesses": {
+    "p6t1_final_ncf2_gates.py": {
+      "physical_lines": 255,
+      "runtime_path": "SCRATCH/p6t1_final_ncf2_gates.py",
+      "sha256": "d679d6efd91254996251528718ace3bd491b3029d8976811b8f399ed612190b1"
+    },
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 162,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "57eed7a62e335d26c45d7cba556f6e13cf487afae5cd94745b3e2815ca84a415"
+    }
+  },
+  "native_pass_confirmed": false,
+  "new_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-prepared-originals.2026-10-21T05-18.json",
+    "sha256": "7dcbe315a994677f6b0b5473bbd976bdb1b832c6f00d397e4eb89e30f1536fc7"
+  },
+  "original_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-candidate-disabled.2026-10-21T04-52.json",
+    "sha256": "d02b042d6e9d6af05552c0ee23f1085e5a1b5f72272c38a68848568e25ea8ad7"
+  },
+  "original_nodes_preserved": 286,
+  "owner_helper_body": {
+    "_canonical_state_location": {
+      "body_first_line": 369,
+      "body_last_line": 383,
+      "branch_percent": 100.0,
+      "branches": 2,
+      "covered_branches": 2,
+      "covered_lines": 8,
+      "declaration_line": 359,
+      "executable_ast_sha256": "d6231d6e8f3047f414fd802957d7ab21b47dae34c334c752566ab05dfd10608f",
+      "executed_body_branches": [
+        [
+          377,
+          382
+        ],
+        [
+          377,
+          383
+        ]
+      ],
+      "executed_body_lines": [
+        369,
+        371,
+        372,
+        373,
+        374,
+        377,
+        382,
+        383
+      ],
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "statements": 8
+    }
+  },
+  "package": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+    "sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29"
+  },
+  "prior_forward_proof_preserved": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-continuation-retention.2026-10-20T16-58.json",
+      "sha256": "001543dd2ad9f974dc54e06ae1ce2a125fbd1eb658868c4d897e72e7cbf86a09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1"
+    }
+  ],
+  "proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf2-proof.2026-10-21T05-13.json",
+    "sha256": "e76050016e60ff846a91adddc289cdff466e6f9e565ea4e1f4274d249857cde6"
+  },
+  "route": "inventory_analyzers_p6t1_final_ncf2_delta_20261021T051636",
+  "static_and_coverage_readers_unchanged": true,
+  "timeouts": {
+    "progress_interval": 20,
+    "tests": 7200
+  },
+  "unfinished_prerequisites": [
+    "Installed NCF2 native composition must pass on this exact rebuilt package.",
+    "Explicit coordinator execution release and final review closure must be recorded."
+  ]
+}

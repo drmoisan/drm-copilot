@@ -1,0 +1,80 @@
+{
+  "Command": "NCF1 metadata-only delta and launcher syntax check; no gate execution.",
+  "EXIT_CODE": 0,
+  "Output Summary": "PREPARED_EXECUTION_DISABLED; 286 exact nodes and four unchanged contracts.",
+  "Timestamp": "2026-10-21T04-52",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-candidate-disabled.2026-10-21T04-52.json",
+    "sha256": "d02b042d6e9d6af05552c0ee23f1085e5a1b5f72272c38a68848568e25ea8ad7"
+  },
+  "collection_tests_native_package_source_test_git_checkpoint_staging_actions": false,
+  "coverage_qualification": "Raw scoped NCF1 coverage remains separate. Changed factory/new helper require fresh proof; unchanged gateway bodies require fresh mapped reexecution; accepted path-policy bodies retain their existing qualification.",
+  "execution_released": false,
+  "four_contracts_unchanged": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "harnesses": {
+    "p6t1_final_ncf1_gates.py": {
+      "physical_lines": 255,
+      "runtime_path": "SCRATCH/p6t1_final_ncf1_gates.py",
+      "sha256": "0f730c82356356f267e2f005925e59f18dcc32f204b75fcf4927d0e7eb835818"
+    },
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 162,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "57eed7a62e335d26c45d7cba556f6e13cf487afae5cd94745b3e2815ca84a415"
+    }
+  },
+  "native_pass_confirmed": false,
+  "new_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-prepared-originals.2026-10-21T04-52.json",
+    "sha256": "41733ed36d32ba5062e35d9855d7f248a09e66eb7dd1416ffd8d588dfaf6bcac"
+  },
+  "new_nodes": 22,
+  "old_factory_body_qualification_removed": true,
+  "original_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-candidate-disabled.2026-10-21T04-02.json",
+    "sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5"
+  },
+  "original_nodes_preserved": 264,
+  "package": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf1-handoff.2026-10-21T04-39.json",
+    "sha256": "a81b630778de44112ca3682abb1351371116686001454ba7e2fd3f629922205a"
+  },
+  "prior_forward_proof_preserved": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-continuation-retention.2026-10-20T16-58.json",
+      "sha256": "001543dd2ad9f974dc54e06ae1ce2a125fbd1eb658868c4d897e72e7cbf86a09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1"
+    }
+  ],
+  "proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+    "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907"
+  },
+  "route": "inventory_analyzers_p6t1_final_ncf1_delta_20261021T044105",
+  "static_and_coverage_readers_unchanged": true,
+  "timeouts": {
+    "progress_interval": 20,
+    "tests": 7200
+  },
+  "unfinished_prerequisites": [
+    "Installed NCF1 native composition must pass on this exact rebuilt package.",
+    "Explicit coordinator execution release and final review closure must be recorded."
+  ]
+}

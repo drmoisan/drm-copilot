@@ -1,0 +1,96 @@
+{
+  "Command": "Metadata-only NIO1 delta preparation and syntax checks; no gate execution.",
+  "EXIT_CODE": 0,
+  "Output Summary": "264-case candidate prepared; installed native pass and final execution release remain required.",
+  "Timestamp": "2026-10-21T04-02",
+  "added_nodes": 57,
+  "behavioral_bound_seconds": 7200,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-candidate-disabled.2026-10-21T04-02.json",
+    "sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5"
+  },
+  "contracts_unchanged": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "coverage": {
+    "fresh": "All core/gateway units and new path-policy helper are measured in the single final process.",
+    "new_reader_delta": "Decode existing gzip-base64 source/coverage archives; require fresh mapped gateway bodies.",
+    "retained": "Eleven unchanged path-policy bodies use exact archived source/AST and accepted coverage.",
+    "targets": 10,
+    "zero_regression": "Same-byte current proofs and unchanged gateway bodies require fresh execution; no raw counters are augmented."
+  },
+  "execution_released": false,
+  "harnesses": {
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_gates.py": {
+      "physical_lines": 255,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_gates.py",
+      "sha256": "eb049341d3ef9ff341281d0b1f9a47f52d0cde1b5b9bf27b5bc198d125328090"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 162,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "57eed7a62e335d26c45d7cba556f6e13cf487afae5cd94745b3e2815ca84a415"
+    }
+  },
+  "missing_release_dependencies": [
+    "Installed NIO1 native composition must pass on this exact rebuilt package.",
+    "Explicit coordinator execution release and final review closure must be recorded."
+  ],
+  "native_pass_confirmed": false,
+  "new_harness_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-prepared-originals.2026-10-21T04-02.json",
+    "sha256": "4d8ae08045d1edd5cad5cf837602ccfc5eb6e4fe462906f09dd3987cc2cd9521"
+  },
+  "nio1_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-nio1-freeze.2026-10-20T18-12.json",
+    "sha256": "34dbbbe3defe71a31770cbce6331f8733ff5a0e11dc0d38ae9f91a67d3858faa"
+  },
+  "nio1_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+    "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba"
+  },
+  "observation_is_not_eta": true,
+  "observed_added_controls_pytest_seconds": 111.17,
+  "original_52_forward_passes_and_two_timeouts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-continuation-retention.2026-10-20T16-58.json",
+      "sha256": "001543dd2ad9f974dc54e06ae1ce2a125fbd1eb658868c4d897e72e7cbf86a09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1"
+    }
+  ],
+  "original_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-coverage-candidate-disabled.2026-10-20T17-14.json",
+    "sha256": "10c1ccdf0fa24f95072c96378f2be30375c2cd0b98a54c583ae338e2b0946b4d"
+  },
+  "original_harness_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-coverage-prepared-originals.2026-10-20T17-14.json",
+    "sha256": "cd6dac6fb3f0a8291663ea84584f706efa9fa8b919c389351da3364f4aaa4bbc"
+  },
+  "original_nodes_preserved": 207,
+  "package": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-handoff.2026-10-20T18-14.json",
+    "sha256": "0bb7a6b6dc31f34e420821e8c5b19d2b94fdf07724aa1dd7d9a149d0060af482"
+  },
+  "progress_seconds": 20,
+  "route": "inventory_analyzers_p6t1_final_runner_nio1_delta_resume_20261020",
+  "source_test_git_checkpoint_changes": false,
+  "status": "PREPARED_EXECUTION_DISABLED",
+  "tests_collection_native_or_package_execution": false,
+  "total_nodes": 264,
+  "unverified_original_core_nodes_preserved": 57
+}
