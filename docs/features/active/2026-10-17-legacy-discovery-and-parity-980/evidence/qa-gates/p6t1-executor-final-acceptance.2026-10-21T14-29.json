@@ -1,0 +1,570 @@
+{
+  "issue": 980,
+  "created_utc": "2026-10-21T14:29:36.292526+00:00",
+  "status": "P6_T1_ACCEPTED",
+  "commit_readiness": "READY_FOR_ACCEPTANCE_COMMIT",
+  "source_head": "79b708d34acc9dfd59524901a1dea0df20c910fa",
+  "scope": "P6-T1 only; no whole-feature or cross-layer AC acceptance.",
+  "task": {
+    "id": "P6-T1",
+    "title": "Expose the versioned Python service and fixed gateway.",
+    "plan": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "before": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "af8e7eac89a20d084d954a9fdc3bd6d2296a97f2b5f1af2c2cfc06b5aff69b85",
+      "git_lf_sha256": "65522556ced195a46e8f5f33c4f0c6897372ab443cdb967a08a5c485c1774c3d",
+      "expected_git_blob": "4126177a1abaf4506390b623a06f65b5a33a50d4",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "after": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "3cc9e9857d12a0f9f575ff136b68c8e7afe80d20e2dfd5aed748daf6fdbf03ea",
+      "git_lf_sha256": "0949eed76237a2386ff104540c9f8044b1421a2551996c80342dbe8952d8b226",
+      "expected_git_blob": "8d3425dc1bde8e43ecd8d8b34e63d578878b1101",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "only_edit": "P6-T1 checkbox changes from [ ] to [x]."
+  },
+  "criteria_mapping": [
+    {
+      "requirement": "Versioned service with injected collaborators and operation-specific validation.",
+      "proof": "Retained accepted shared/core/capture source reviews and final exact 370-node population."
+    },
+    {
+      "requirement": "Fixed JSON gateway, typed result/exit behavior, safe refusal and partial-effect reporting.",
+      "proof": "Retained gateway review, final guard/service controls and four schema/package contracts."
+    },
+    {
+      "requirement": "Installed runtime identity and actual I/O behavior, with bounded trusted authority.",
+      "proof": "Current package identity and 10:25 installed identity/real-migration confirmation; qualified unchanged-operation native carry."
+    },
+    {
+      "requirement": "Doctor reports runtime/resource/profile status and unavailable native capability.",
+      "proof": "Retained doctor/gateway review and final controls; P8 native host capability remains deferred."
+    }
+  ],
+  "final_evidence": {
+    "freeze": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-370-freeze.2026-10-21T14-20.json",
+      "working_sha256": "a8e47e743913e9742fb57138c94c4456a767d6aca686e8d36dc48c8abc4f1ecc",
+      "git_lf_sha256": "a8e47e743913e9742fb57138c94c4456a767d6aca686e8d36dc48c8abc4f1ecc",
+      "expected_git_blob": "03ca39ef01de3ca144cf52b9e499963ac36496da",
+      "bytes": 17830,
+      "git_lf_bytes": 17830
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-handoff.2026-10-21T14-16.json",
+      "working_sha256": "6392124516a47c4055103501907effab17abaad2ffcd52832a1d4a50fb5425f9",
+      "git_lf_sha256": "6392124516a47c4055103501907effab17abaad2ffcd52832a1d4a50fb5425f9",
+      "expected_git_blob": "24e9e027c007b5f54a77bf5ad8d47838177ffe24",
+      "bytes": 92056,
+      "git_lf_bytes": 92056
+    },
+    "owner_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-370-staging.2026-10-21T14-20.json",
+      "working_sha256": "4e0e5654608b895888a513aa7b8215ee2ebf202b3fe7228eca8d087b8483f0a8",
+      "git_lf_sha256": "4e0e5654608b895888a513aa7b8215ee2ebf202b3fe7228eca8d087b8483f0a8",
+      "expected_git_blob": "accd1c74b696af9ab51ee6e72712326666f259e4",
+      "bytes": 8337,
+      "git_lf_bytes": 8337
+    },
+    "candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-candidate-released.2026-10-21T12-44.json",
+      "working_sha256": "d7fced248f4ca412f21a32c19203f6c854c13ea15e031bad06973e2a95b52716",
+      "git_lf_sha256": "d7fced248f4ca412f21a32c19203f6c854c13ea15e031bad06973e2a95b52716",
+      "expected_git_blob": "f3211432eb69d816d7ef0438c60ee0057a74c349",
+      "bytes": 236898,
+      "git_lf_bytes": 236898
+    }
+  },
+  "ordered_gate_results": [
+    {
+      "stage": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-black.2026-10-21T12-44.json",
+        "working_sha256": "1fefaeb8bd0f8c2058308b32d58b6a6be739f757322ede9f0a9d8fa5d4c058ac",
+        "git_lf_sha256": "1fefaeb8bd0f8c2058308b32d58b6a6be739f757322ede9f0a9d8fa5d4c058ac",
+        "expected_git_blob": "174398f54cdeba5eaa98e43b6b38d9625f6e9dff",
+        "bytes": 75403,
+        "git_lf_bytes": 75403
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+        "tests/discovery_runtime/test_service.py",
+        "tests/discovery_runtime/test_service_publication.py",
+        "tests/discovery_runtime/test_service_boundaries.py",
+        "tests/discovery_runtime/test_gateway.py",
+        "tests/discovery_runtime/test_gateway_local.py",
+        "tests/discovery_runtime/test_doctor.py",
+        "tests/discovery_runtime/test_gateway_boundaries.py",
+        "tests/discovery_runtime/gateway_test_support.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+        "tests/discovery_runtime/test_gateway_factory.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+        "tests/discovery_runtime/test_service_migration.py",
+        "tests/discovery_runtime/test_migration_capture.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+        "tests/discovery_runtime/test_service_context_guards.py",
+        "tests/discovery_runtime/test_service_inspection_guards.py",
+        "tests/discovery_runtime/test_service_mutation_guards.py",
+        "tests/discovery_runtime/test_service_report_guards.py"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T12:44:52.543967+00:00",
+      "elapsed_seconds": 0.408736,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-black-raw.2026-10-21T12-44.json",
+        "sha256": "d4a587d133c577005e91097e50d44287673becb177135851c71b1768fee16a12"
+      }
+    },
+    {
+      "stage": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-ruff.2026-10-21T12-44.json",
+        "working_sha256": "f149ac63d7dffab7284363fa65e5be7ea8a00418a3e2f36916dff48a3445f906",
+        "git_lf_sha256": "f149ac63d7dffab7284363fa65e5be7ea8a00418a3e2f36916dff48a3445f906",
+        "expected_git_blob": "8cca50a5fb3766841cf863fd44b8d110add0c89c",
+        "bytes": 75343,
+        "git_lf_bytes": 75343
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/doctor.py",
+        "tests/discovery_runtime/test_service.py",
+        "tests/discovery_runtime/test_service_publication.py",
+        "tests/discovery_runtime/test_service_boundaries.py",
+        "tests/discovery_runtime/test_gateway.py",
+        "tests/discovery_runtime/test_gateway_local.py",
+        "tests/discovery_runtime/test_doctor.py",
+        "tests/discovery_runtime/test_gateway_boundaries.py",
+        "tests/discovery_runtime/gateway_test_support.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+        "tests/discovery_runtime/test_gateway_factory.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+        "tests/discovery_runtime/test_service_migration.py",
+        "tests/discovery_runtime/test_migration_capture.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+        "tests/discovery_runtime/test_service_context_guards.py",
+        "tests/discovery_runtime/test_service_inspection_guards.py",
+        "tests/discovery_runtime/test_service_mutation_guards.py",
+        "tests/discovery_runtime/test_service_report_guards.py"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T12:44:53.010053+00:00",
+      "elapsed_seconds": 0.2082,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-ruff-raw.2026-10-21T12-44.json",
+        "sha256": "715b01b02310882f1eaef24a131294970416d29a9eb455bc3be20d60d7ad0161"
+      }
+    },
+    {
+      "stage": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-pyright.2026-10-21T12-45.json",
+        "working_sha256": "5200749b904b05e6ab6f07411014ba8d762c14694af30ab7da93ebc7ba319dd5",
+        "git_lf_sha256": "5200749b904b05e6ab6f07411014ba8d762c14694af30ab7da93ebc7ba319dd5",
+        "expected_git_blob": "06809fcf30f8e44001cd9fe71d9a3bc4612b7b13",
+        "bytes": 73671,
+        "git_lf_bytes": 73671
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T12:44:53.274784+00:00",
+      "elapsed_seconds": 16.637334,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-pyright-raw.2026-10-21T12-45.json",
+        "sha256": "557a5ae40022d52cf19cf173136ed9b4dcef7ad64864b97b480db83ef712c048"
+      }
+    },
+    {
+      "stage": "static",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-static.2026-10-21T12-45.json",
+        "working_sha256": "de9bf802d25d42de7443ad4acc71e0143a10977393872a636a01ee2de9182120",
+        "git_lf_sha256": "de9bf802d25d42de7443ad4acc71e0143a10977393872a636a01ee2de9182120",
+        "expected_git_blob": "da781320fe21bd0a8ce940e909a80bc05d5c84c0",
+        "bytes": 112009,
+        "git_lf_bytes": 112009
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "SCRATCH\\p6t1_final_nio1_static.py",
+        "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p6t1-final-guard-candidate-released.2026-10-21T12-44.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T12:45:09.998200+00:00",
+      "elapsed_seconds": 1.411961,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-static-raw.2026-10-21T12-45.json",
+        "sha256": "b9a572f0c13ed454c9826dee691e68e3b900a241a3df1e0d75b6308cb82ef997"
+      }
+    },
+    {
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-tests.2026-10-21T14-16.json",
+        "working_sha256": "e6a8523762af0ffc9cef04aaa0ccc079d223e84bf9d6863727b064f7e8d00c8f",
+        "git_lf_sha256": "e6a8523762af0ffc9cef04aaa0ccc079d223e84bf9d6863727b064f7e8d00c8f",
+        "expected_git_blob": "26d654f1a30dea2d0f9672df797fb36c91caf31c",
+        "bytes": 175832,
+        "git_lf_bytes": 175832
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "coverage",
+        "run",
+        "--branch",
+        "--source=drm_copilot_discovery.service,drm_copilot_discovery.operations,drm_copilot_discovery.service_inspection,drm_copilot_discovery.service_reports,drm_copilot_discovery.service_mutations,drm_copilot_discovery.service_bootstrap,drm_copilot_discovery.gateway,drm_copilot_discovery.gateway_local,drm_copilot_discovery.doctor,drm_copilot_discovery.path_policy,drm_copilot_discovery.migration_capture,drm_copilot_discovery.mutation_plan,drm_copilot_discovery.migration_conversion",
+        "-m",
+        "pytest",
+        "-v",
+        "--tb=short",
+        "--maxfail=1",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "@SCRATCH\\p6t1-final-124452-nodes.txt"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T12:45:11.500627+00:00",
+      "elapsed_seconds": 5503.315647,
+      "passed": 370,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-tests-raw.2026-10-21T14-16.json",
+        "sha256": "8fc0ea9adafa712396807a5f9403cb2a02e845424616ccbbbdf75251fff14381"
+      }
+    },
+    {
+      "stage": "coverage-json",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-coverage-json.2026-10-21T14-16.json",
+        "working_sha256": "0b8d98568bdddb808d34fd27942dace002b4d80b31b5df2c95ff6248b1057576",
+        "git_lf_sha256": "0b8d98568bdddb808d34fd27942dace002b4d80b31b5df2c95ff6248b1057576",
+        "expected_git_blob": "4c481e98a2ef0b6b2caad36f4cf3151bfe8910cf",
+        "bytes": 73644,
+        "git_lf_bytes": 73644
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "coverage",
+        "json",
+        "--show-contexts",
+        "-o",
+        "SCRATCH\\p6t1-final-124452-coverage.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T14:16:54.938969+00:00",
+      "elapsed_seconds": 0.609427,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-coverage-json-raw.2026-10-21T14-16.json",
+        "sha256": "90eccec6e0f775c00a5955b0f29a00fae96a6570a3c392dafaaaf5f326ecabaf"
+      }
+    },
+    {
+      "stage": "coverage-proof",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-coverage-proof.2026-10-21T14-16.json",
+        "working_sha256": "799ed5f52c6ffb54eaaa942160df10e4bfb9817106089bc295b8e818a99f8266",
+        "git_lf_sha256": "799ed5f52c6ffb54eaaa942160df10e4bfb9817106089bc295b8e818a99f8266",
+        "expected_git_blob": "47645507500c3f3d40875c9085f2e720d69a5be3",
+        "bytes": 74455,
+        "git_lf_bytes": 74455
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "SCRATCH\\p6t1_final_nio1_coverage.py",
+        "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p6t1-final-guard-candidate-released.2026-10-21T12-44.json",
+        "SCRATCH\\p6t1-final-124452-coverage.json",
+        "SCRATCH\\p6t1-final-124452-coverage-result.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T14:16:55.670833+00:00",
+      "elapsed_seconds": 1.81185,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-coverage-proof-raw.2026-10-21T14-16.json",
+        "sha256": "5abb1791ef7020250307f15885b8823843a07eada0c8177fcfb0dae53b219618"
+      }
+    },
+    {
+      "stage": "contracts",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-contracts.2026-10-21T14-16.json",
+        "working_sha256": "c1ab280c8bdf05d3d99f90bbc7c440f1e8392173235ff64b846763b4143931aa",
+        "git_lf_sha256": "c1ab280c8bdf05d3d99f90bbc7c440f1e8392173235ff64b846763b4143931aa",
+        "expected_git_blob": "91032d16bd86ca2a0a0919b23f26f7ef729031c8",
+        "bytes": 75470,
+        "git_lf_bytes": 75470
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "pytest",
+        "-v",
+        "--tb=short",
+        "--maxfail=1",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T14:16:57.601385+00:00",
+      "elapsed_seconds": 0.610807,
+      "passed": 4,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-124452-contracts-raw.2026-10-21T14-16.json",
+        "sha256": "492b93c5161032d850143db9560b429c2caf5235fa5c93198542dbcb2d634d20"
+      }
+    }
+  ],
+  "population": {
+    "passed": 370,
+    "failed": 0,
+    "contracts_passed": 4,
+    "retained_nodes": 329,
+    "added_guard_nodes": 41,
+    "one_reversed_module_process": true,
+    "exact_node_order_sha256": "6717b90f658d0713018ca551a2903bae400bb266f92c0876f704e0860dded0e9",
+    "source_test_package_bindings_unchanged": 245,
+    "lossless_raw_members": 70
+  },
+  "coverage": {
+    "current": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-current-coverage.2026-10-21T14-16.json",
+      "working_sha256": "4c85817c522ca117c81f6baafd244d5c8e97e9bbefd4a3343640eaf5e81e4028",
+      "git_lf_sha256": "4c85817c522ca117c81f6baafd244d5c8e97e9bbefd4a3343640eaf5e81e4028",
+      "expected_git_blob": "670631bffe8cad135403e70fc14d90d3c15acbef",
+      "bytes": 2232769,
+      "git_lf_bytes": 2232769
+    },
+    "ranges": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-coverage-ranges.2026-10-21T14-16.json",
+      "working_sha256": "48d01dcc077e4cb90664b107fa965e448b174e5363fbafcb47c0ed77dd45b233",
+      "git_lf_sha256": "48d01dcc077e4cb90664b107fa965e448b174e5363fbafcb47c0ed77dd45b233",
+      "expected_git_blob": "f9a01546e9eb264174db22b938dc81a37df2b56c",
+      "bytes": 309558,
+      "git_lf_bytes": 309558
+    },
+    "modules": 13,
+    "named_ranges": 132,
+    "no_loss_predicates_passed": 13,
+    "raw_covered_statements": 1548,
+    "raw_statements": 1612,
+    "raw_covered_branches": 480,
+    "raw_branches": 542,
+    "raw_counters_augmented": false,
+    "separate_historical_qualifications": 51,
+    "fresh_repaired_body_floors_passed": 13
+  },
+  "reused_review_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-context-guards-confirmation.2026-10-21T12-18.json",
+      "sha256": "3ca99510f901dd87fb0f6bd240086a6b267bb6f3039189bfc2772f8463529f6c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-inspection-guards-confirmation.2026-10-21T12-22.json",
+      "sha256": "c3d94b2dd8eda5e02f9b96b35be932defeb873d3b19639b548a8a7bb275bd148"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-mutation-guards-confirmation.2026-10-21T12-26.json",
+      "sha256": "abd0a2635ecbeb5c64f89dfbb47c4ce512f155425b523b3eca681d7cfc0b7745"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-report-guards-confirmation.2026-10-21T12-40.json",
+      "sha256": "ff81aba9a3c1e8596ebc1d4edb137034ffca4bb5d23db404b470092d3aeecae0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-capture-focused-confirmation.2026-10-21T10-07.json",
+      "sha256": "e700973fd7d5ed6ee6e0b5ed63f15047317add210755ff343ffbed0bcf39c212"
+    }
+  ],
+  "package_native_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-capture-postconditions-confirmed.2026-10-21T10-25.json",
+      "working_sha256": "1ae83dfe30fa879d3e60741ef21b6f5915de5b22399dc16e5213edc427b6ca1b",
+      "git_lf_sha256": "3eb57b2e271511f3984f7d2adffa35501b0b8fa6fe7239f4daef47a00fa6e39a",
+      "expected_git_blob": "bb1bf99bd54c9cd3675025cb94f41950c66f2ab1",
+      "bytes": 16679,
+      "git_lf_bytes": 16530
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-handoff.2026-10-21T10-08.json",
+      "working_sha256": "34b48dca0918f88c6fba9478e75b6331faf6df7c451bdefa6c42bd285504bbb3",
+      "git_lf_sha256": "34b48dca0918f88c6fba9478e75b6331faf6df7c451bdefa6c42bd285504bbb3",
+      "expected_git_blob": "88a7fd5794b42f5f7651b879465f1f05470b4926",
+      "bytes": 38443,
+      "git_lf_bytes": 38443
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-report-continuation.2026-10-21T05-49.json",
+      "working_sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a",
+      "git_lf_sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a",
+      "expected_git_blob": "b1c3c29cb5a936d2b0157a28db32628b1465d53f",
+      "bytes": 229480,
+      "git_lf_bytes": 229480
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+      "working_sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29",
+      "git_lf_sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29",
+      "expected_git_blob": "3f150838c722742763b4ec03c62799ab6bbca519",
+      "bytes": 37027,
+      "git_lf_bytes": 37027
+    }
+  ],
+  "native_qualification": {
+    "current_package": {
+      "build_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+      "policy_sha256": "e524eaae711434f0d31901051b7ad1e1eb91e41f9c3a17d113fae4518c25bbfb",
+      "wheel_sha256": "c2b3be3d6157f9d80e13210de8cca63cb095f1d10fabe7db9dda5e01d81e8889"
+    },
+    "current_installed_identity_and_real_migration": "10:25 confirmation: two actual invocations, migration exit 0, 83/83 postconditions.",
+    "historical_carry": "05:49 unchanged-operation proof and prior initialization remain explicitly historical; they are not re-labelled as execution on the current package.",
+    "native_host_authority_claim": false
+  },
+  "preserved_qualifications": [
+    "The recorded nine-module wording is stale; the explicit current module set and final reader contain 13 modules.",
+    "The candidate native-carry pending sentence is stale; fresh_native_result_pending is false and the 10:25 confirmation proves current installed identity and real migration.",
+    "Historical final-329-plus-four pending wording is superseded by the current 370-plus-four completed proof.",
+    "The raw coverage JSON has no terminal newline. Its exact bytes remain archived; authored/readable records use UTF-8/LF.",
+    "All original failed, partial and stopped runs, native failures, reader diagnostics and established presentation qualifications remain immutable."
+  ],
+  "acceptance_reader_diagnostic": {
+    "initial_exit_code": 1,
+    "comparison": "Direct equality of decoded raw coverage JSON and readable current coverage JSON.",
+    "difference": "Raw files keys use backslashes; readable files keys use forward slashes.",
+    "resolution": "Apply slash normalization to file keys only using the established reader. All metadata, counters and remaining content are identical.",
+    "raw_evidence_rewritten": false,
+    "behavior_replayed": false
+  },
+  "task_counts": {
+    "accepted": 47,
+    "total": 84,
+    "remaining": 37
+  },
+  "acceptance_criteria": {
+    "accepted": 23,
+    "total": 66,
+    "remaining": 43,
+    "edited": false,
+    "sources": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+          "working_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+          "git_lf_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+          "expected_git_blob": "4a24d3c85c739f240cb8f5eaa27ef0df7d82189f",
+          "bytes": 112130,
+          "git_lf_bytes": 112130
+        },
+        "total": 66,
+        "accepted": 23,
+        "explicitly_pending": [
+          {
+            "id": "AC-20",
+            "text": "Individual artifact validators exist."
+          },
+          {
+            "id": "AC-22",
+            "text": "Blocking failures return nonzero exit codes."
+          },
+          {
+            "id": "AC-37",
+            "text": "Python is the authoritative implementation layer."
+          }
+        ]
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+          "working_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+          "git_lf_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+          "expected_git_blob": "1960d61788c9b89e736e7ae3f394a4155358cf3a",
+          "bytes": 11870,
+          "git_lf_bytes": 11870
+        },
+        "total": 66,
+        "accepted": 23,
+        "explicitly_pending": [
+          {
+            "id": "AC-20",
+            "text": "Individual artifact validators exist."
+          },
+          {
+            "id": "AC-22",
+            "text": "Blocking failures return nonzero exit codes."
+          },
+          {
+            "id": "AC-37",
+            "text": "Python is the authoritative implementation layer."
+          }
+        ]
+      }
+    },
+    "cross_layer_pending": [
+      "AC-20",
+      "AC-22",
+      "AC-37"
+    ]
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ],
+  "limitations": "P6-T2/P6-T3, P7-P11, host capability work and feature delivery remain pending. No production/test/package, index, Git or checkpoint mutation was performed by this acceptance worker."
+}

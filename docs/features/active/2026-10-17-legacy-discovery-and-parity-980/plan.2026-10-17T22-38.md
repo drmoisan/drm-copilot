@@ -327,7 +327,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 6 — Authoritative service and complete CLI adapters
 
-- [ ] [P6-T1] Expose the versioned Python service and fixed gateway.
+- [x] [P6-T1] Expose the versioned Python service and fixed gateway.
   - Files and behavior: Create R/{service,operations,gateway,doctor}.py and PT/test_{service,gateway,service_failures,doctor}.py. Implement service.execute with injected I/O/repository/clock/analyzer collaborators and operation-specific request validation; gateway reads one JSON request and emits one versioned result. doctor initially reports installed runtime/resource/profile status and explicit unavailable native capability; P8-T8 adds the protected host-probe result projection.
   - Tests and proof: Exercise every implemented operation through real validators and in-memory snapshots, stable findings/artifact statuses, unsupported requests, dependency/I/O failures, interrupted writes, result/exit consistency, and separation of local-user versus host-granted invocation context. Verify doctor remains read-only and cannot self-assert host capability.
   - Acceptance: The installed module is the sole semantic authority; malformed inputs return exit 2, blocking findings 1, runtime failures 3, and success 0 without arbitrary executable/module dispatch.
