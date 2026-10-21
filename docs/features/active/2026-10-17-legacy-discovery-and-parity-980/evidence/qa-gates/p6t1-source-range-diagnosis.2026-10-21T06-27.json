@@ -1,0 +1,62 @@
+{
+  "Timestamp": "2026-10-21T06-27",
+  "task": "P6-T1",
+  "route": "gateway_doctor_p6t1_source_range_diagnosis_20261021T061600",
+  "status": "TEST_EXPECTATION_OBSOLETE_NO_PRODUCTION_CHANGE",
+  "Command": "Read-only retained-failure and bounded source/schema inspection",
+  "EXIT_CODE": 0,
+  "finding": "The intentionally reversed line range is rejected at the public request boundary. SERVICE_REQUEST is correct; the test incorrectly expects the later SERVICE_SOURCE diagnostic.",
+  "retained_failure": {
+    "passed": 187,
+    "sha256": "18d1c2b45ca6bac071fff354a54823c4bfc322fc117982dd58cc0ca39090bfbd",
+    "timeout": false,
+    "bound_streams_unchanged": 235,
+    "unrun": 106,
+    "failed": 1,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-060944-tests.2026-10-21T06-15.json",
+    "raw_archive_sha256": "ff07879cdc400f55733a55c2c45187399d9716d015fa51ce09f2368d54bcf460"
+  },
+  "failing_test": "tests/discovery_runtime/test_service_boundaries.py::test_reversed_source_line_range_is_rejected_before_inspection",
+  "failing_inputs": {
+    "line_start": 3,
+    "read_operation": "read",
+    "paths": [
+      "application/a.cs"
+    ],
+    "line_end": 2
+  },
+  "validation_path": [
+    "tests/discovery_runtime/test_service.py:228-247 supplies a complete structural/json request with dry_run=false, write=false and null opaque references.",
+    "schemas/discovery/v2/service-request.schema.json:163-168 accepts read and each positive integer separately; line ordering is an operation-combination rule.",
+    "service_serialization.py:240-251 validates the closed schema and then calls check_combinations.",
+    "service_request_rules.py:232-237 rejects line_start greater than line_end with ValueError.",
+    "service_serialization.py:252-259 converts that request-boundary error to SERVICE_REQUEST with pointer /.",
+    "service_contracts.py:393-413 raises ServiceRequestError while retaining recognized operation/mode.",
+    "service.py:255-284 parses before runtime_identity and returns exit 2 with null runtime/input_manifest.",
+    "service_inspection.py:180-196 maps later SourceReadRequest/inspect ValueError to SERVICE_SOURCE; this request cannot reach that stage."
+  ],
+  "spec_reference": "spec.md:300-308 defines authoritative service parsing and exit 2 for invalid invocation; no requirement moves reversed bounds past the request boundary.",
+  "source_identity_authority": "The existing final060944 before/after bindings and committed candidate remain authoritative; no new predecessor inventory or source hash manifest was generated.",
+  "test_module_sha256": "380bb0bef28e759aac7929a61a5467ce1bda51e9cbc5cb5ff7e6990d183c4c89",
+  "related_fixture_review": {
+    "result": "No additional request-shape finding. Each uses read_operation=read and a valid path. max_bytes=1 is explicitly schema-valid and allowed by SourceReadLimits; those fixtures exercise later selected-read/encoding/capacity behavior. Static review does not claim their execution passed.",
+    "existing_parser_controls": "test_service_request_rules.py:178 and 197-212 already reject reversed bounds; :257-294 includes ordered bounds as a valid control. No parser test was rerun.",
+    "scope": [
+      "test_source_failures_do_not_return_partial_rows[selection|encoding|capacity]",
+      "test_source_first_page_exposes_exact_truncation"
+    ]
+  },
+  "minimal_repair": {
+    "preserve": "Strict request parsing and SERVICE_SOURCE classification for valid requests that fail during later inspection remain unchanged.",
+    "narrow_controls": [
+      "The corrected reversed-range test.",
+      "The three existing source failure cases and existing first-page success case, only as released by the coordinator."
+    ],
+    "path": "tests/discovery_runtime/test_service_boundaries.py",
+    "edit": "Change the expected diagnostic from SERVICE_SOURCE to SERVICE_REQUEST; keep exit 2 and counted no-inspection/no-artifact/no-writer assertions. Add explicit pointer / and null runtime/input_manifest assertions, and clarify the docstring to name the public request boundary. Preserve the deliberately reversed request and existing test identity.",
+    "size_constraint": "The module is 495 lines; keep the correction within 500 lines.",
+    "function": "test_reversed_source_line_range_is_rejected_before_inspection",
+    "production_changes": []
+  },
+  "limitations": "Read-only diagnosis only: no test/service/native execution, source/test/schema/package changes, staging/Git/checkpoint edits, or acceptance claim."
+}

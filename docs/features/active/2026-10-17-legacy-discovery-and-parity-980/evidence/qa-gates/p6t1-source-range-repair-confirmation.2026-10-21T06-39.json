@@ -1,0 +1,132 @@
+{
+  "Timestamp": "2026-10-21T06-39",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "route": "build_identity_review_p6t1_source_range_confirmation_20261021T063600",
+  "current_head_reported": "2a57c2b",
+  "scope": {
+    "path": "tests/discovery_runtime/test_service_boundaries.py",
+    "function": "test_reversed_source_line_range_is_rejected_before_inspection",
+    "before_lines": 495,
+    "after_lines": 499,
+    "before_range": [
+      97,
+      119
+    ],
+    "after_range": [
+      97,
+      123
+    ]
+  },
+  "test_sha256": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-source-range-repair-freeze.2026-10-21T06-35.json",
+    "sha256": "40a7350d334dc31bbb93acca3994b611ec2f23169285b25fbc257946cd64ad96"
+  },
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-source-range-diagnosis.2026-10-21T06-27.json",
+    "sha256": "513b6d1da1846e6f31d99c7ac9b857f19ad79edcf287fdecfa1b23b74ea96a76"
+  },
+  "verdict": "Correct the obsolete expectation at public request parsing: reversed bounds produce SERVICE_REQUEST at / before runtime identity or inspection. No production contract change.",
+  "delta_verification": {
+    "exact_minimal_text_transform": true,
+    "outside_function_bytes_identical": true,
+    "outside_function_ast_identical": true,
+    "reversed_request_preserved": true,
+    "exit2_preserved": true,
+    "no_inspection_artifacts_writer_assertion_preserved": true,
+    "added_pointer_and_null_runtime_manifest_assertions": true,
+    "lines": 499
+  },
+  "ordered_gate_reconciliation": [
+    {
+      "stage": "black",
+      "exit_code": 0,
+      "elapsed_seconds": 0.325001,
+      "passed_nodes": 0,
+      "raw_sha256": "1b8c1b8b163e578336822e6768fcaccbe8185238b8a79d0127f3b60363b7e039",
+      "readable_sha256": "4b42ed81d7c99e330c0eab670767c5b4108a2747012dd43886c3e72284bd2989"
+    },
+    {
+      "stage": "ruff",
+      "exit_code": 0,
+      "elapsed_seconds": 0.122251,
+      "passed_nodes": 0,
+      "raw_sha256": "34ce512d54658210baa8edd4168aee4d7bdcd1b8c287e78803ef501cb00ecc79",
+      "readable_sha256": "2b20437f2de75ae9cf494bef0f69bfec600114223adf2aedbe647b89e8e03596"
+    },
+    {
+      "stage": "pyright",
+      "exit_code": 0,
+      "elapsed_seconds": 0.972678,
+      "passed_nodes": 0,
+      "raw_sha256": "9f4fd472dc80cd6b2fc26e14622894bd977a4dd79f91f429cf4e252160e1770e",
+      "readable_sha256": "9a63acbef065113d40816428760d26bab1d81d8bbdd21ecb00ab40075332f369"
+    },
+    {
+      "stage": "corrected",
+      "exit_code": 0,
+      "elapsed_seconds": 7.186387,
+      "passed_nodes": 1,
+      "raw_sha256": "74eb6bafd94328ae197f1c84e2ff46fe5334f84d7f2dfaec05e3e8323b5301da",
+      "readable_sha256": "908f9fad21216bd616b5644a3a2ad7b97774ba2641dd2f4214c9b295287f4d35"
+    },
+    {
+      "stage": "related",
+      "exit_code": 0,
+      "elapsed_seconds": 27.941208,
+      "passed_nodes": 4,
+      "raw_sha256": "7b61d012f2ba1ca73f3bb0888dde35c7a34aa18e5ff1a6f18f783a631be2dc08",
+      "readable_sha256": "6ef49a17684e8ec7171ac107478aeab01a92012457230c2b5415dcbe54163d13"
+    }
+  ],
+  "raw_readable_reconciliation": "All five raw UTF-8 stream hashes and before/after test hashes verified; exact readable view regenerated in memory from the documented alias/newline/whitespace transform.",
+  "focused_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_reversed_source_line_range_is_rejected_before_inspection",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[selection]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[encoding]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[capacity]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_first_page_exposes_exact_truncation",
+      "outcome": "PASSED"
+    }
+  ],
+  "historical_failed_run": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-060944-tests.2026-10-21T06-15.json",
+      "sha256": "18d1c2b45ca6bac071fff354a54823c4bfc322fc117982dd58cc0ca39090bfbd",
+      "qualification": "Original 187 passes, failure, 106 unrun and partial coverage remain historical; no predecessor replay."
+    },
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-060944-tests-raw.2026-10-21T06-15.json",
+      "sha256": "ff07879cdc400f55733a55c2c45187399d9716d015fa51ce09f2368d54bcf460"
+    },
+    "stopped_handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-16.json",
+      "sha256": "f9bb1f9fcac9f677470dfe8e838ccf0a64fe02481e48df0b4cb9118666325900"
+    },
+    "passed": 187,
+    "failed": 1,
+    "unrun": 106,
+    "contracts_unrun": 4,
+    "coverage": "Partial historical binary only; no final merged coverage, floors or full-population success claimed."
+  },
+  "findings": [],
+  "reviewer_execution": "Read-only exact delta/AST and retained receipt reconciliation; no tests, probes, production inspection, native/package execution, source/test/Git/index/checkpoint mutation.",
+  "reader_diagnostic": "An initial read-only readable-view command omitted UTF-8 encoding and stopped on a UnicodeDecodeError. Retried reader used explicit UTF-8; no artifact or behavioral change.",
+  "task_acceptance": false,
+  "completion_population_owner": "atomic_execution; no population decision or rerun performed here."
+}
