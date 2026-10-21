@@ -1,0 +1,110 @@
+{
+  "count": 23,
+  "entries": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-candidate-draft.2026-10-21T17-05.json",
+      "sha256": "b1ae8c25e40cc72f6b216a62d72aeab7866a2dc097770068f02f65f8f228b81b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-candidate-formatted.2026-10-21T17-06.json",
+      "sha256": "fa3ba925bb0c225b5e7904e263d6982e1571e478c4f9e0e224023e91ed0f4c84"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-freeze.2026-10-21T17-08.json",
+      "sha256": "4168e7b413b413e9f88152ba1fda809ce2bdc08f9af5b47061debe3f98bedf70"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-originals.2026-10-21T17-08.json",
+      "sha256": "f38862c106169a21ec8217eae32f2a3dafa5d169448b1b332bf30d6683d1ecc2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass1-format-black-raw.2026-10-21T17-06.json",
+      "sha256": "fdeab4f58b235e5f61a997752738ce4d64197b859ede86a096fcf716af654d85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass1-format-black.2026-10-21T17-06.json",
+      "sha256": "60dcf7ec39b8c3004634a8b562b8faa99d4e601551424b1a7eab8cf5d6da6eb7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass1-format-black.2026-10-21T17-06.md",
+      "sha256": "19142fba08cdc74bdcc00159ea745965d485de67ce51bab42a023015f58b11f1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black-raw.2026-10-21T17-06.json",
+      "sha256": "50dddffa3c74c2d15434bb624ead84c99cceac671e866af92d81271beae19117"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black.2026-10-21T17-06.json",
+      "sha256": "f5b14701c2b6b23535bc6ad9f273f02cfd9a67336a13dbf72dc58ac08459cd5b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black.2026-10-21T17-06.md",
+      "sha256": "73577b33c7a6e236815ffc6210e029ab32763cb3e0faaf762e3ac56354f37741"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage-raw.2026-10-21T17-06.json",
+      "sha256": "20ba29b215d13600f1e34d85a9fd9133d624ed7e59014afeba46598686d28840"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage.2026-10-21T17-06.json",
+      "sha256": "2a95b2c2618ae41e061681fe7a9408c5c005aed9bbb1be06b2fcdaca7b11539d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage.2026-10-21T17-06.md",
+      "sha256": "e248c437c4ef88081ed1ed077060ead715ac6cea6aa2fd5f152cecf7995862ec"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright-raw.2026-10-21T17-06.json",
+      "sha256": "e624a4a3847e729d28582e5b67ae31f026064bbed7924b0c6e9bfeb911ca09d4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright.2026-10-21T17-06.json",
+      "sha256": "530bb028de5ddccf27c8511d60919a5b50dfd3923e34c6479e2be47e33e234e7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright.2026-10-21T17-06.md",
+      "sha256": "4ee8c4eb44c692cc5ea1ff799587ee2169d3e9cd93e2aadeb9922f19e17af447"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff-raw.2026-10-21T17-06.json",
+      "sha256": "454f6d9e1763719e097692003ecf57ba28e2afeb9a6127bd42a7405214c0d870"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff.2026-10-21T17-06.json",
+      "sha256": "868b98d73c136553384bc93454b3019be8e480feaf5602e457785e66210e99c0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff.2026-10-21T17-06.md",
+      "sha256": "a68762279dfbcac9c7d54c2ef8b70ccca7181ac6b02e5703e8d3b59acbd6aeb7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests-raw.2026-10-21T17-06.json",
+      "sha256": "70356527f78ff3367c4bf8b6b816102119033d52fde4eb8b7e271ea698ff33bc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests.2026-10-21T17-06.json",
+      "sha256": "da23c555add91baacc26949ec26d5e7a4221b23beb8d4c8fe6041e0f67fd2d2f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests.2026-10-21T17-06.md",
+      "sha256": "bc40c47f216bf7672aee98b8d654e51606acb2002114ac3ca208f6ff0a28e99f"
+    },
+    {
+      "path": "tests/discovery_runtime/test_legacy_adapters.py",
+      "sha256": "cad3cb12e171f938b8b91860d9f1f3e0700d6a0568a2570ce8f00773c67944ea"
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-freeze.2026-10-21T17-08.json",
+    "sha256": "4168e7b413b413e9f88152ba1fda809ce2bdc08f9af5b47061debe3f98bedf70"
+  },
+  "manifest_self_excluded": true,
+  "remaining_gates": [
+    "independent subset confirmation",
+    "checked test checkpoint",
+    "final reversed union and four contracts",
+    "independent task acceptance"
+  ],
+  "scope": "One test-only composed-route subset; no production or package writes",
+  "task": "P6-T3"
+}

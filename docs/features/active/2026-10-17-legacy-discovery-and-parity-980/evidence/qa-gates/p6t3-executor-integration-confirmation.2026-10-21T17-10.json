@@ -1,0 +1,259 @@
+{
+  "Timestamp": "2026-10-21T17:10:44.694506+00:00",
+  "issue_number": 980,
+  "task": "P6-T3",
+  "status": "READY_FOR_CHECKED_TEST_CHECKPOINT",
+  "route": "atomic_execution_p6t3_final_20261021T170400",
+  "current_head": "134ea37860b54614c77aa55ba9d9273e3b62a743",
+  "scope": "Only the 17 composed-route additions and exact focused evidence; all accepted production reviews are reused.",
+  "test": {
+    "path": "tests/discovery_runtime/test_legacy_adapters.py",
+    "working_sha256": "cad3cb12e171f938b8b91860d9f1f3e0700d6a0568a2570ce8f00773c67944ea",
+    "git_lf_sha256": "cad3cb12e171f938b8b91860d9f1f3e0700d6a0568a2570ce8f00773c67944ea",
+    "expected_git_blob": "4fafecf004237e267f78f40526e0711afda57474",
+    "bytes": 15511,
+    "git_lf_bytes": 15511
+  },
+  "physical_lines": 384,
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-freeze.2026-10-21T17-08.json",
+    "working_sha256": "4168e7b413b413e9f88152ba1fda809ce2bdc08f9af5b47061debe3f98bedf70",
+    "git_lf_sha256": "4168e7b413b413e9f88152ba1fda809ce2bdc08f9af5b47061debe3f98bedf70",
+    "expected_git_blob": "69e82dca1e1ad539e7a993fb106197a017b02598",
+    "bytes": 19450,
+    "git_lf_bytes": 19450
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-staging.2026-10-21T17-08.json",
+    "working_sha256": "423ec997fd9e7a34d11f1f3ac6bf01e071016ab72c11dbd0dc63ae5bdfdb6b24",
+    "git_lf_sha256": "423ec997fd9e7a34d11f1f3ac6bf01e071016ab72c11dbd0dc63ae5bdfdb6b24",
+    "expected_git_blob": "1631fcb06e78854477f585e17caf2bae6a5228a0",
+    "bytes": 6398,
+    "git_lf_bytes": 6398
+  },
+  "findings": [],
+  "test_confirmation": {
+    "preserved": "Exact original fixture and four test-function ASTs, including decorators/assertions/docstrings, preserve all five original nodes.",
+    "six_direct_routes": "Actual profile/init/analyzer/dotnet/vsto/acceptance entries traverse real run_installed_cli. Tests assert exact fixed command, original explicit argv identity, unchanged caller, exact exit 3, one final dispatch, zero forbidden provider calls and empty output streams.",
+    "three_report_routes": "Actual report adapters traverse bounded capture and public entry. Tests assert the exact tuple type/tokens, unchanged caller, fixed report command, exact exit and absent provider/output effects.",
+    "eight_fixed_validators": "Actual zero-argument wrappers retain exact process-selected tokens, fixed command, exit 3, one dispatch, original sys.argv object and unchanged contents; provider/output effects remain absent.",
+    "interception": "Only cli.run_cli is replaced at the final composition seam. Existing provider traps record calls even if a CLI boundary catches their exception. No adapter or run_installed_cli is replaced.",
+    "policy": "All added test/helper contracts describe typed inputs, observations, effects and failures. Memory-only fixtures use monkeypatch restoration; no temporary files, subprocesses, timing assertions or production edits. Test file remains within 500 lines."
+  },
+  "proof": {
+    "passed": 22,
+    "failed": 0,
+    "retained_nodes": 5,
+    "added_nodes": 17,
+    "harness_seconds": 4.41624,
+    "ordered_gates": [
+      {
+        "stage": "black",
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-black.2026-10-21T17-06.json",
+          "working_sha256": "f5b14701c2b6b23535bc6ad9f273f02cfd9a67336a13dbf72dc58ac08459cd5b",
+          "git_lf_sha256": "f5b14701c2b6b23535bc6ad9f273f02cfd9a67336a13dbf72dc58ac08459cd5b",
+          "expected_git_blob": "6d4ed921c6ef79ec9d71729edb6f82c9a32bc815",
+          "bytes": 77187,
+          "git_lf_bytes": 77187
+        },
+        "elapsed_seconds": 0.408047,
+        "started_utc": "2026-10-21T17:06:19.408107+00:00",
+        "exit_code": 0
+      },
+      {
+        "stage": "ruff",
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-ruff.2026-10-21T17-06.json",
+          "working_sha256": "868b98d73c136553384bc93454b3019be8e480feaf5602e457785e66210e99c0",
+          "git_lf_sha256": "868b98d73c136553384bc93454b3019be8e480feaf5602e457785e66210e99c0",
+          "expected_git_blob": "dcc834aeece0b58a415dc5d1bcbc217c4c95c4dd",
+          "bytes": 77131,
+          "git_lf_bytes": 77131
+        },
+        "elapsed_seconds": 0.207233,
+        "started_utc": "2026-10-21T17:06:19.854793+00:00",
+        "exit_code": 0
+      },
+      {
+        "stage": "pyright",
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-pyright.2026-10-21T17-06.json",
+          "working_sha256": "530bb028de5ddccf27c8511d60919a5b50dfd3923e34c6479e2be47e33e234e7",
+          "git_lf_sha256": "530bb028de5ddccf27c8511d60919a5b50dfd3923e34c6479e2be47e33e234e7",
+          "expected_git_blob": "f88b41330503e6481ed2a97081129ee91f58b2bb",
+          "bytes": 77302,
+          "git_lf_bytes": 77302
+        },
+        "elapsed_seconds": 1.008888,
+        "started_utc": "2026-10-21T17:06:20.101973+00:00",
+        "exit_code": 0
+      },
+      {
+        "stage": "tests",
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-tests.2026-10-21T17-06.json",
+          "working_sha256": "da23c555add91baacc26949ec26d5e7a4221b23beb8d4c8fe6041e0f67fd2d2f",
+          "git_lf_sha256": "da23c555add91baacc26949ec26d5e7a4221b23beb8d4c8fe6041e0f67fd2d2f",
+          "expected_git_blob": "918482f45eec8e6b8618d57b5d069b9cca7c26c8",
+          "bytes": 83623,
+          "git_lf_bytes": 83623
+        },
+        "elapsed_seconds": 4.41624,
+        "started_utc": "2026-10-21T17:06:21.148368+00:00",
+        "exit_code": 0
+      },
+      {
+        "stage": "coverage",
+        "binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-integration-pass2-coverage.2026-10-21T17-06.json",
+          "working_sha256": "2a95b2c2618ae41e061681fe7a9408c5c005aed9bbb1be06b2fcdaca7b11539d",
+          "git_lf_sha256": "2a95b2c2618ae41e061681fe7a9408c5c005aed9bbb1be06b2fcdaca7b11539d",
+          "expected_git_blob": "72895da0756fc465ceb2452f4c8e3d85b4f235fe",
+          "bytes": 77221,
+          "git_lf_bytes": 77221
+        },
+        "elapsed_seconds": 0.409891,
+        "started_utc": "2026-10-21T17:06:25.630088+00:00",
+        "exit_code": 0
+      }
+    ],
+    "current_and_before_after_bindings": 260,
+    "exact_executed_order": [
+      "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[False]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_preserves_explicit_arguments_and_process_state[True]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_default_arguments_preserve_process_vector",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_installed_entry_rejects_explicit_count_before_argument_access",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_unknown_installed_command_refuses_before_provider_access",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[profile]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[init]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[inventory]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[dotnet]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[vsto]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_direct_legacy_routes_reach_installed_dispatch_with_original_arguments[acceptance]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[coverage]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[parity]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_report_legacy_routes_retain_bounded_captured_arguments[completion]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[profile]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[feature]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[coverage]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[runtime]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[parity]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[unknown]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[decision]",
+      "tests/discovery_runtime/test_legacy_adapters.py::test_fixed_validator_routes_select_process_tokens_without_mutation[evidence]"
+    ],
+    "raw_module_statements": [
+      82,
+      147
+    ],
+    "raw_module_branches": [
+      7,
+      12
+    ],
+    "fresh_public_body_statements": [
+      5,
+      5
+    ],
+    "fresh_public_body_branches": [
+      2,
+      2
+    ],
+    "declaration_excluded": true,
+    "raw_counters_augmented": false,
+    "qualification": "The narrow 22-case run is not whole-module or task proof. Accepted 40-case entry proof and its 41 unchanged-definition mapping remain separately referenced; final isolation/module/BODY/no-loss gates are pending."
+  },
+  "evidence": {
+    "lossless_members_verified": 26,
+    "normalization": "Existing explicit observed_path_aliases plus the unchanged UTF-8 CR/LF and terminal-blank-line reader reproduce each ordered stream view. Original raw coverage has no terminal newline and remains byte-exact.",
+    "retained_attempt": "The pass1 formatter changed only the owned test; its original receipt/raw streams remain. Pass2 is the complete clean ordered pass.",
+    "owner_metadata_diagnostic": {
+      "correction": "Iterate the existing source_and_caller_bindings list rows; same path/hash content. No test or runtime operation had started.",
+      "error": "AttributeError: 'list' object has no attribute 'items'",
+      "origin": "Retained tool output; diagnostic wording, not a claimed raw subprocess archive.",
+      "stage": "pre-run metadata only"
+    },
+    "reader_diagnostic": "A read-only PowerShell metadata listing placed a pipe after a foreach statement and failed with 'An empty pipe element is not allowed.' The same existing fields were then read through an array expression; no evidence, source, test, or behavioral result changed."
+  },
+  "reused_dependencies": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-entry-confirmation.2026-10-21T16-48.json",
+      "working_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+      "git_lf_sha256": "6328290067f055a3acea0378d5673f7e78be10fbb790b27c7db313acb035ada7",
+      "expected_git_blob": "c04283d99ddc5fe54900b8f7ce384df52875f2f5",
+      "bytes": 19465,
+      "git_lf_bytes": 19465
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-executor-package-confirmation.2026-10-21T16-53.json",
+      "working_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "git_lf_sha256": "15cb990a8412270b37106c68d30b9997930250c9828571444367808e1851f86f",
+      "expected_git_blob": "51db9a356a8bc302616b3452e4512bcac6cf7210",
+      "bytes": 7449,
+      "git_lf_bytes": 7449
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-integration-final-preparation.2026-10-21T16-50.json",
+      "working_sha256": "860f116f0eb1305b23566aa0ab5bccd5a18ede71cd0f90a2ee516354fc817223",
+      "git_lf_sha256": "860f116f0eb1305b23566aa0ab5bccd5a18ede71cd0f90a2ee516354fc817223",
+      "expected_git_blob": "0aa430b36827c394c5d808fc1f6987f948664493",
+      "bytes": 40498,
+      "git_lf_bytes": 40498
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-freeze.2026-10-21T16-56.json",
+      "working_sha256": "cfba9282e13c9446c3844f1680ef7d18da6f788747eaad7076ce5c630c3ff489",
+      "git_lf_sha256": "cfba9282e13c9446c3844f1680ef7d18da6f788747eaad7076ce5c630c3ff489",
+      "expected_git_blob": "3af6333dbc42173ef14a9ebb939dd0a554304317",
+      "bytes": 30446,
+      "git_lf_bytes": 30446
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-repair-freeze.2026-10-21T16-56.json",
+      "working_sha256": "b18627cc3904429c65a4e789a395b1091d47c3158c81720120f177b6506af02f",
+      "git_lf_sha256": "b18627cc3904429c65a4e789a395b1091d47c3158c81720120f177b6506af02f",
+      "expected_git_blob": "29eb2c8faaa0f421150397fd25ff41c527a3fd9e",
+      "bytes": 24507,
+      "git_lf_bytes": 24507
+    }
+  ],
+  "final_selection_preparation": {
+    "prior_unique": 253,
+    "validator_repair_additions": 1,
+    "report_nodes": 97,
+    "composed_additions": 17,
+    "deduplicated_total": 368,
+    "node_set_sha256_newline_joined_sorted": "21643f733a3e721e400cf3a63143aebe34f7762306b1438850f9c8bf09404cc1",
+    "contracts": [
+      "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+      "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+    ],
+    "execution_released": false,
+    "order": "One process reversing the exact module blocks; final disabled preparation binds the precise node order before coordinator release.",
+    "excluded_replay": "46 unchanged domain-profile cases and prior service/native chains remain qualified historical proof.",
+    "coverage_scope": "Use established adapter BODY/module/no-loss populations and public run_installed_cli/_main fresh scopes. Keep accepted unchanged CLI definitions and other retained AST mappings explicit, separate from raw counters; exclude declaration-only lines and zero-executable bodies consistently."
+  },
+  "acceptance_mapping_preparation": {
+    "P6-T3": "Task acceptance requires final ordered 368 cases, current affected coverage/no-loss and four contracts; currently pending.",
+    "AC-20": "Prospective candidate after final legacy/public validator and authoritative-service proof closes.",
+    "AC-22": "Pending MCP/wrapper/host blocking mappings.",
+    "AC-37": "Pending cross-layer authority/native-host composition.",
+    "AC-38": "Pending complete consumer CLI reference/documentation in P10-T4."
+  },
+  "package_native_qualification": "The regenerated installed package/import/signature/origin proof is reused. Its observer invoked no operation; accepted P6-T2 native outcomes remain historical and are not relabeled as new execution. This composed in-memory proof adds no coding-agent-host capability claim.",
+  "task_accepted": false,
+  "counts_unchanged": {
+    "tasks": "48/84",
+    "acceptance_criteria": "25/66"
+  },
+  "next_five": [
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3",
+    "P8-T1"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-integration-checked-staging-union.2026-10-21T17-10.json"
+}
