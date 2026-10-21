@@ -1,0 +1,156 @@
+{
+  "issue": 980,
+  "task": "P6-T1",
+  "timestamp_utc": "2026-10-21T09:36:38.288657+00:00",
+  "status": "READY_FOR_CHECKED_WIP",
+  "head": "3ba2063649ae7112db056ef04255232ffbb47a17",
+  "authority_route": "atomic_execution_p6t1_trusted_revision_confirmation_20261021T093000",
+  "scope": "Exact trusted revision correction and two-original fixture, completed evidence only; no task acceptance.",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-trusted-revision-wip-freeze.2026-10-21T09-34.json",
+    "working_sha256": "683d4d4c315a95730d1395d8c71be8133aebb6f29efa4203b9dcfa6f1923feac",
+    "git_lf_sha256": "683d4d4c315a95730d1395d8c71be8133aebb6f29efa4203b9dcfa6f1923feac",
+    "expected_git_blob": "4deb8e5210f33c1d8e342f372510d0386591b070",
+    "bytes": 12319,
+    "git_lf_bytes": 12319
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-trusted-revision-wip-staging.2026-10-21T09-34.json",
+    "working_sha256": "d88ac26d5fe70ec0bfa3617f4a35e1d3a1feb5f3b589e5f8f626529c809596d9",
+    "git_lf_sha256": "d88ac26d5fe70ec0bfa3617f4a35e1d3a1feb5f3b589e5f8f626529c809596d9",
+    "expected_git_blob": "d457304976c48e259eea6418a9e0e0ff371ae455",
+    "bytes": 19071,
+    "git_lf_bytes": 19071
+  },
+  "cause_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-migration-revision-confirmation.2026-10-21T09-21.json",
+    "working_sha256": "aee29e20fbcab4a11146117ff7512523aeef53edc6c331303413631537ad7c10",
+    "git_lf_sha256": "aee29e20fbcab4a11146117ff7512523aeef53edc6c331303413631537ad7c10",
+    "expected_git_blob": "4af994c496af47fa79e8f6670f888c6829e853e1",
+    "bytes": 6433,
+    "git_lf_bytes": 6433
+  },
+  "source_confirmation": {
+    "source": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "working_sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1",
+      "git_lf_sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1",
+      "expected_git_blob": "7c66a61c68aed7d7d08f5ad08d48ccf386083f62",
+      "bytes": 12914,
+      "git_lf_bytes": 12914
+    },
+    "lines": 326,
+    "exact_only_change": "Remove revision=None from the coverage-ledger fields.update call.",
+    "template_ownership": "Retains the trusted initialized current target revision.",
+    "legacy_provenance": "Original document/path/hash, draft disposition and open unresolved obligations are unchanged. No legacy revision, row, coverage, approval or completion claim is promoted.",
+    "strict_refusal": "coverage_scope_rules and all validators are unchanged.",
+    "default_null": "An initialized null template stays null.",
+    "intent_and_size": "Existing intent contract remains accurate; no new helper or API; 326 lines."
+  },
+  "fixture_confirmation": {
+    "source": {
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "working_sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "git_lf_sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "expected_git_blob": "c75fa55fad92bff6c11a4afabdebd99ee0ea441b",
+      "bytes": 20056,
+      "git_lf_bytes": 20056
+    },
+    "lines": 497,
+    "scope": "One helper import and the existing two-parameter migration test only.",
+    "exact_selected_inputs": [
+      "legacy/coverage-ledger.json",
+      "legacy/feature-contract.json"
+    ],
+    "original_assertions_preserved": true,
+    "one_added_assertion": "Both original paths map to their exact authored bytes.",
+    "decorators_parameters_other_asts_preserved": true,
+    "intent_complete": true
+  },
+  "completed_ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092448-format-check.2026-10-21T09-24.json",
+      "sha256": "e322f94c9623ffb83e376112326738393cbba6fa5ac380bae3465c3a7df8d470",
+      "stage": "format-check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.82511,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092448-format-check-raw.2026-10-21T09-24.json",
+        "sha256": "4a46f82b9c593dc89746d259b1f73cf3fa5c0ec27953c451bf46f9a6adf7edaa"
+      },
+      "passed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092458-lint.2026-10-21T09-24.json",
+      "sha256": "39bda63735d978db174bffc01fa4e0b05a98cf7018f6407af855c457e4733afe",
+      "stage": "lint",
+      "exit_code": 0,
+      "elapsed_seconds": 0.22215,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092458-lint-raw.2026-10-21T09-24.json",
+        "sha256": "08366703454bc7e68eb60be11ed2d98d9054a6d8ec74d839ccbf8651152ecec1"
+      },
+      "passed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092502-types.2026-10-21T09-25.json",
+      "sha256": "491744b51833585507a4d844f759d723b418a751ce7ff2adab7884edd81f65e3",
+      "stage": "types",
+      "exit_code": 0,
+      "elapsed_seconds": 1.423274,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092502-types-raw.2026-10-21T09-25.json",
+        "sha256": "a550d3e13ac57d5eb5ee62bec60ca2b316ce551b6ebb4820d49d81c84f16d8b9"
+      },
+      "passed_nodes": []
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+      "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0",
+      "stage": "revision-precheck",
+      "exit_code": 0,
+      "elapsed_seconds": 495.998109,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck-raw.2026-10-21T09-33.json",
+        "sha256": "80342f17ed9fc1aa9d154b70ba202aac3bccd228d5eeccd849e2168d9d906b27"
+      },
+      "passed_nodes": [
+        "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+        "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+        "tests/discovery_runtime/test_migration_unknowns.py::test_every_original_field_remains_untrusted_metadata[coverage-ledger]",
+        "tests/discovery_runtime/test_migration_unknowns.py::test_legacy_claims_do_not_become_verified_target_state[coverage-ledger-fields4]",
+        "tests/discovery_runtime/test_coverage_scope.py::test_trusted_pin_mismatch_is_rejected_even_when_documents_agree[coverage-ledger]"
+      ]
+    }
+  ],
+  "five_control_count": 5,
+  "harness_seconds": 495.998109,
+  "reconciliation": {
+    "owner_stage_paths_verified": 32,
+    "current_candidate_and_direct_test_bindings_equal": true,
+    "gate_before_after_equal": true,
+    "decoded_archive_members_verified": 51,
+    "archive_member_hashes_and_lengths_verified": true,
+    "raw_readable_convention": "Reused existing UTF-8 decoder, OBSERVED_PATH_ALIASES replacement, CRLF/CR-to-LF conversion, per-line rstrip and final rstrip. Raw bytes remain unchanged.",
+    "working_git_lf_and_blob_bindings": true,
+    "source_and_fixture_preimage_ast_qualification": true
+  },
+  "historical_failures": "Retains the original missing-feature-context failure, subsequent coverage-identity failures and prior committed partial/stopped runs without relabeling them as passing.",
+  "coverage_qualification": "Exact raw coverage remains in the five-control archive; full focused named-body/changed-line audit and separately retained unchanged-body proof are pending.",
+  "pending": [
+    "Active 40-case focused run and named-body/changed-line coverage reconciliation",
+    "Package identity regeneration for changed runtime",
+    "Final population deduplication and execution, four contracts and P6-T1 acceptance"
+  ],
+  "excluded": "Active 40-case output/coverage, unrelated preparation, package regeneration and any task/checkpoint/Git/index changes.",
+  "task_accepted": false,
+  "task_ac_counts_unchanged": true,
+  "reviewer_execution": "Read-only source/diff/archive reconciliation and new evidence authoring only; no test/runtime/native invocation or source/test/staging/Git mutation.",
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}
