@@ -1,0 +1,97 @@
+{
+  "Timestamp": "2026-10-21T11:12:18.601154+00:00",
+  "binding_check": {
+    "all_match": true,
+    "completed_utc": "2026-10-21T11:12:18.635867+00:00",
+    "count": 241,
+    "scope": "Existing effective candidate source/test/package/harness closure only; no new inventory."
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-comment-candidate.2026-10-21T10-32.json",
+    "sha256": "d3383c7dbfd1c854bbf5209ac9c2ad66d8d13ae89938a28ff0cfa1a50b6b587b"
+  },
+  "completed_static_stages": [
+    {
+      "elapsed_seconds": 0.608318,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-black.2026-10-21T10-32.json",
+        "sha256": "3929f423e4d07bca146524f1edbb0c9d142b3337a7183c71cecbcc143c1a24bc"
+      },
+      "stage": "black",
+      "status": "PASS"
+    },
+    {
+      "elapsed_seconds": 0.207833,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-ruff.2026-10-21T10-32.json",
+        "sha256": "d31d9747aa08c4e35ad6efd025ef55f159f30903f27d1a3ddf5e85e18b70d8c6"
+      },
+      "stage": "ruff",
+      "status": "PASS"
+    },
+    {
+      "elapsed_seconds": 14.231142,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-pyright.2026-10-21T10-33.json",
+        "sha256": "1a0ab02d31ee832f0878ac6d3460430b8518a10570983aad1a90893cd5b7e8c4"
+      },
+      "stage": "pyright",
+      "status": "PASS"
+    },
+    {
+      "elapsed_seconds": 1.611533,
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-static.2026-10-21T10-33.json",
+        "sha256": "0adf27b24a0b792becc6a6b3e4fad1750182496f070cbfa6d361b9d621f5e62a"
+      },
+      "stage": "static",
+      "status": "PASS"
+    }
+  ],
+  "current_node": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[wrong-kind]",
+  "expected_nodes": 329,
+  "last_progress_event": {
+    "completed_nodes": 281,
+    "current_node": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[wrong-kind]",
+    "elapsed_seconds": 2344.796,
+    "latest_node": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[outside]",
+    "stage": "tests"
+  },
+  "mutations": "No active process, source, tests, package, fixtures, candidate or harness changed.",
+  "observed_completed_nodes": 281,
+  "observed_status_counts": {
+    "ERROR": 0,
+    "FAILED": 0,
+    "PASSED": 281,
+    "SKIPPED": 0
+  },
+  "operational_bound_seconds": 7200,
+  "package_identity": {
+    "build_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+    "input_count": 212,
+    "payload_members": 169,
+    "policy_sha256": "e524eaae711434f0d31901051b7ad1e1eb91e41f9c3a17d113fae4518c25bbfb",
+    "wheel_sha256": "c2b3be3d6157f9d80e13210de8cca63cb095f1d10fabe7db9dda5e01d81e8889"
+  },
+  "pending": {
+    "coverage_json_and_named_body_zero_loss": "pending",
+    "independent_task_acceptance": "pending",
+    "package_contracts": {
+      "executed": 0,
+      "expected": 4,
+      "status": "pending"
+    },
+    "remaining_test_nodes": 48
+  },
+  "process_active": true,
+  "process_active_basis": "Existing runner session remained active at the preceding output boundary; stdout snapshot contains an unfinished test node.",
+  "progress_interval_seconds": 20,
+  "raw_snapshot": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-progress-raw.2026-10-21T11-12.json",
+    "sha256": "1fee663431857857cbb113bea2b7e22c3ea2493d6b2f15489c8a1d017a7f2df6"
+  },
+  "run": "p6t1-final-103256",
+  "snapshot_qualification": "Exact available bytes captured once from each existing live output stream; cross-stream reads are sequential, not an atomic process snapshot. Later output is excluded and will be retained separately. Raw CR/LF and incomplete final lines are preserved exactly; this authored receipt is UTF-8 with LF and one terminal newline.",
+  "status": "ACTIVE_WIP_NOT_ACCEPTED",
+  "task": "P6-T1"
+}

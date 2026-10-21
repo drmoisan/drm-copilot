@@ -1,0 +1,37 @@
+{
+  "bound_streams": 241,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-candidate-disabled.2026-10-21T10-22.json",
+    "sha256": "2ab7045642aeaaa21ea1a176d1418d2a3c9bbdc320bbcf4d8ae58a6d388f5295"
+  },
+  "contract_count": 4,
+  "coverage_reader_unchanged": {
+    "physical_lines": 234,
+    "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+    "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+  },
+  "current_proof_modules_added": [
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py"
+  ],
+  "execution_released": false,
+  "native_pass_confirmed": false,
+  "node_count": 329,
+  "remaining": [
+    "Successful exact current-package installed identity and real migration result",
+    "Explicit coordinator final ordered-gate release"
+  ],
+  "retained_units": 51,
+  "runner": {
+    "physical_lines": 261,
+    "runtime_path": "SCRATCH/p6t1_final_capture_gates_0940.py",
+    "sha256": "ee72229733b1df1fb15fe36d0e8c1e17d9662760d32145fdad3ed2a3a23d05bf"
+  },
+  "static_reader": {
+    "physical_lines": 216,
+    "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+    "sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9"
+  }
+}

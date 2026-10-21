@@ -1,0 +1,85 @@
+{
+  "Timestamp": "2026-10-20T15-59",
+  "status": "SHARED_FINAL_FREEZE_REVERSED_ORDER_PROOF_NOT_ESTABLISHED",
+  "route": "build_review_p6t1_isolation_preparation_20261020 / S5_P6T1_isolation_preparation_clarification",
+  "Command": "Read exact final shared freeze, seven bound stage commands, staging inventory and confirmation; Get-FileHash verifies all seven stage receipt bindings",
+  "EXIT_CODE": 0,
+  "Output Summary": "Final retained shared proof has one complete 145-case module order and a 23-case partial precheck; neither provides the full reversed order. Add only the four frozen shared modules in reverse order to final isolation gates.",
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-freeze.2026-10-20T15-34.json",
+      "sha256": "fa15d9c6baa761682075afa49181bf54684ba489a5ce2e24599489f0fb1a2536"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+      "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-precheck.2026-10-20T15-24.json",
+      "sha256": "b4999734b2613a3a1aa95045fe685cf923cb729dd38a0d37a8ba3b16ffb3432a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-staging.2026-10-20T15-34.json",
+      "sha256": "60110d6bed1fdc0cb280fd89ab6029394d510692318e87aada7354d43c7eb2db"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-repair-confirmation.2026-10-20T15-35.json",
+      "sha256": "120b295e58c869bec8a20225548b3cd03bfec511351e02d5b4f07248ce80d2b8"
+    }
+  ],
+  "SearchScope": "Only the final shared 15:34 freeze, its seven ordered_stages receipts, 15:34 staging paths and 15:35 confirmation. No broader repository search.",
+  "SearchPatterns": [
+    "ordered_stages[*].command",
+    "stage names reverse/isolation",
+    "staging paths matching reverse|isolation",
+    "executed_nodes grouped by module"
+  ],
+  "SearchResult": "Seven verified stage receipts: black, ruff, pyright, reprobe, precheck, tests, coverage. One full pytest order; precheck runs all result_limits plus one request_rules node. No reverse/isolation receipt in the bound staging paths.",
+  "forward_order": [
+    "tests/discovery_runtime/test_service_request_rules.py",
+    "tests/discovery_runtime/test_service_failures.py",
+    "tests/discovery_runtime/test_service_result_limits.py",
+    "tests/schemas/discovery/test_v2_service_result_failures.py"
+  ],
+  "forward_counts": [
+    {
+      "module": "tests/discovery_runtime/test_service_failures.py",
+      "cases": 36
+    },
+    {
+      "module": "tests/discovery_runtime/test_service_request_rules.py",
+      "cases": 64
+    },
+    {
+      "module": "tests/discovery_runtime/test_service_result_limits.py",
+      "cases": 22
+    },
+    {
+      "module": "tests/schemas/discovery/test_v2_service_result_failures.py",
+      "cases": 23
+    }
+  ],
+  "forward_total": 145,
+  "minimal_missing_reverse_argv": [
+    "poetry",
+    "run",
+    "python",
+    "-m",
+    "pytest",
+    "-v",
+    "--tb=short",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "tests/schemas/discovery/test_v2_service_result_failures.py",
+    "tests/discovery_runtime/test_service_result_limits.py",
+    "tests/discovery_runtime/test_service_failures.py",
+    "tests/discovery_runtime/test_service_request_rules.py"
+  ],
+  "integration": "Run this four-module order in one process after final caller/native gates, or include these four paths in this relative reverse order in the final one-process reverse population. No forward rerun or coverage rerun is required solely to close this isolation gap. Retain exact nodes, before/after frozen bindings and raw output.",
+  "qualification": "This conclusion is limited to the exact retained final shared proof. Accepted statement/branch/callable coverage and semantic confirmation remain valid. The 145-node receipt is 64 request-rule + 36 failure + 22 result-limit + 23 failure-schema cases; it does not by itself establish any additional 29-case or reverse execution.",
+  "amends": "Final-gate interface handoff 15:56 and subsequent profile qualification: append shared reversed module order, without expanding source review or predecessor suites.",
+  "performed": "No behavioral execution, source review, source/test changes, Git or checkpoint action.",
+  "ac_status": "P6-T1 remains in progress; final shared Python isolation gate remains to be run by the authorized executor."
+}

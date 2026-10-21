@@ -1,0 +1,342 @@
+{
+  "Timestamp": "2026-10-21T09:49:32.020125+00:00",
+  "actions_not_performed": [
+    "No test/static/collection/native/service/package execution.",
+    "No production/test/package/fixture/checkpoint/staging/Git edits.",
+    "No active owner scratch/output inspection or new source review."
+  ],
+  "automatic_retry": false,
+  "capture_delta": {
+    "added_nodes": [
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[coverage-ledger]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[evidence-reference]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[feature-contract]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[parity-matrix]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[product-decision]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[runtime-characterization-scenario]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[unspecified-behavior]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[unknown]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[body-mismatch]",
+      "tests/discovery_runtime/test_service_publication.py::test_clean_snapshot_export_publishes_exact_files",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_empty_selection_preserves_original_io",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[duplicate]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[traversal]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[link]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[changed]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[missing]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_conflicting_observations",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[file-count]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[work]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[bytes]",
+      "tests/discovery_runtime/test_mutation_plan.py::test_values_reject_mutability_and_metadata_ambiguity",
+      "tests/discovery_runtime/test_mutation_plan.py::test_planner_projects_complete_valid_graph_and_preserves_originals",
+      "tests/discovery_runtime/test_mutation_plan.py::test_projection_refuses_uncaptured_profile_bytes",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[coalesced]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[count-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[read-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[byte-conflict]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-short]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-short]",
+      "tests/discovery_runtime/test_migration_unknowns.py::test_every_original_field_remains_untrusted_metadata[coverage-ledger]",
+      "tests/discovery_runtime/test_migration_unknowns.py::test_legacy_claims_do_not_become_verified_target_state[coverage-ledger-fields4]",
+      "tests/discovery_runtime/test_coverage_scope.py::test_trusted_pin_mismatch_is_rejected_even_when_documents_agree[coverage-ledger]"
+    ],
+    "all_moved_targets_present_once": true,
+    "categories": {
+      "guard_additions": 8,
+      "moved_capture_controls": 11,
+      "original_additions": 10,
+      "retained_mutation_plan_controls": 3,
+      "retained_revision_controls": 3
+    },
+    "five_deduplicated_existing_nodes": [
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest"
+    ],
+    "moved_count": 11,
+    "moved_node_mapping_ref": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-capture-test-split.2026-10-21T08-33.json",
+      "sha256": "d78b777524e7905195b2fbf408681ac5856c43264c5b9008211863c5c61c8c3e"
+    },
+    "old_moved_paths_absent": true,
+    "original_candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+      "sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a"
+    }
+  },
+  "contracts": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "coverage_preparation": {
+    "additional_targets": [
+      "drm_copilot_discovery.migration_capture",
+      "drm_copilot_discovery.mutation_plan",
+      "drm_copilot_discovery.migration_conversion"
+    ],
+    "current_body_and_changed_line_audit_pending": "Owner full40 result and named BODY/unchanged-range qualification; five-control proof is not full40 coverage.",
+    "current_raw_and_retained_proof_separate": true,
+    "existing_final_mutation_plan_retained_unit_lookup": {
+      "SearchPatterns": [
+        "path endswith /mutation_plan.py"
+      ],
+      "SearchResult": "none; only gateway_local and path_policy retained units are in that existing candidate",
+      "SearchScope": [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json#/retained_units"
+      ]
+    },
+    "existing_ten_targets_unchanged": [
+      "drm_copilot_discovery.service",
+      "drm_copilot_discovery.operations",
+      "drm_copilot_discovery.service_inspection",
+      "drm_copilot_discovery.service_reports",
+      "drm_copilot_discovery.service_mutations",
+      "drm_copilot_discovery.service_bootstrap",
+      "drm_copilot_discovery.gateway",
+      "drm_copilot_discovery.gateway_local",
+      "drm_copilot_discovery.doctor",
+      "drm_copilot_discovery.path_policy"
+    ],
+    "parent_supplied_reference_reused_by_owner": {
+      "coverage": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-final-raw-coverage.2026-10-18T23-34.json",
+        "sha256": "80803d7c9376fc3419bfc5c7c0293a3c2a07c5185401115e90cd65ae4c7cc9cc"
+      },
+      "qualification": "References supplied by owner; no predecessor measurement or new mapping performed in this preparation.",
+      "source_binding": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p3t6-pass3-coverage-audit.2026-10-18T19-09.json",
+        "sha256": "f985aefe8f0518c6186308b4b5dabc1b2d2307323c1fc08376bf4e8ef337940b"
+      }
+    }
+  },
+  "execution_released": false,
+  "final_review_closed": false,
+  "metadata_only": true,
+  "native_pass_confirmed": false,
+  "observed_timing": {
+    "five_control_seconds": 495.998,
+    "includes_real_write": true,
+    "qualification": "Observation only, not ETA;7200-second final cap retained."
+  },
+  "operational_bound_seconds": 7200,
+  "ordered_stages": [
+    "Black",
+    "Ruff",
+    "whole Pyright",
+    "scoped static",
+    "one reversed full-population coverage process",
+    "BODY and zero-regression proof",
+    "four contracts"
+  ],
+  "package_identity": null,
+  "parent_reported_source_commit": "4e19411b9f55bcddaca2a2b3f286c5a3364d410a",
+  "pending_inputs": [
+    "Owner active40 completion, exact current BODY/unchanged-body mapping and final source/test freeze.",
+    "Designated packaging owner regenerated package/input identity and explicit unchanged-route native-carry qualification.",
+    "Coordinator final candidate/review and explicit execution release; all execution/native-pass flags remain false."
+  ],
+  "prepared_runner": {
+    "exact_bytes": {
+      "bytes": 15309,
+      "data": "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",
+      "encoding": "gzip-base64",
+      "sha256": "ee72229733b1df1fb15fe36d0e8c1e17d9662760d32145fdad3ed2a3a23d05bf"
+    },
+    "not_executed": true,
+    "original": {
+      "physical_lines": 255,
+      "runtime_path": "SCRATCH/p6t1_final_ncf2_gates.py",
+      "sha256": "d679d6efd91254996251528718ace3bd491b3029d8976811b8f399ed612190b1"
+    },
+    "physical_lines": 261,
+    "qualification": "Only the cardinality and exact original294-plus-added35 verification block changed. All other bytes, release checks, ordered stages, polling, watchdog, cleanup, raw archive, normalization and BODY/contract invocations are identical.",
+    "runtime_path": "SCRATCH/p6t1_final_capture_gates_0940.py",
+    "sha256": "ee72229733b1df1fb15fe36d0e8c1e17d9662760d32145fdad3ed2a3a23d05bf"
+  },
+  "preservation": {
+    "historical_still_unverified_nodes_field": "The original57 forward-unverified IDs remain historical metadata; the final process must execute all329.",
+    "old_candidates_readers_raw_streams_unchanged": true,
+    "original_binding_count": 235,
+    "original_forward_relative_order_preserved": true,
+    "original_node_count": 294,
+    "retained_failures_and_diagnostic": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-16.json",
+        "sha256": "f9bb1f9fcac9f677470dfe8e838ccf0a64fe02481e48df0b4cb9118666325900"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+        "sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-handoff.2026-10-21T07-13.json",
+        "sha256": "d600b11962ac26b29dca954ee84430a89e2d3a6204ddadeeca3c1238162486d4"
+      }
+    ]
+  },
+  "preserved_readers": {
+    "p6t1_final_nio1_coverage.py": {
+      "physical_lines": 234,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_coverage.py",
+      "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+    },
+    "p6t1_final_nio1_static.py": {
+      "physical_lines": 209,
+      "runtime_path": "SCRATCH/p6t1_final_nio1_static.py",
+      "sha256": "6220ec9b754ce290bfd783b6ca2ecbe4bb6b42873fee1b2944752929902d7dc4"
+    }
+  },
+  "progress_seconds": 20,
+  "references": {
+    "base_candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+      "sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a"
+    },
+    "moved_node_mapping": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-capture-test-split.2026-10-21T08-33.json",
+      "sha256": "d78b777524e7905195b2fbf408681ac5856c43264c5b9008211863c5c61c8c3e"
+    },
+    "owner_population": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-trusted-revision-wip-freeze.2026-10-21T09-34.json",
+      "sha256": "683d4d4c315a95730d1395d8c71be8133aebb6f29efa4203b9dcfa6f1923feac"
+    },
+    "prior_preparation": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-capture-delta-preparation.2026-10-21T08-06.json",
+      "sha256": "dbc4a706f4266e21b2e8c873f29ee29b5b290aaad43b04ee308ef3a7e72d5a2c"
+    },
+    "revision_controls": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-migration-revision-confirmation.2026-10-21T09-21.json",
+      "sha256": "aee29e20fbcab4a11146117ff7512523aeef53edc6c331303413631537ad7c10"
+    }
+  },
+  "route": "inventory_analyzers_p6t1_final_capture_delta_20261021T094000",
+  "scope_qualification": "This is a finite preparation delta, not a second235-stream inventory or an executable release candidate. Materialization reuses the original closure and owner final references after the pending inputs arrive.",
+  "selection": {
+    "contract_count": 4,
+    "forward_module_order": [
+      "tests/discovery_runtime/test_service.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service_migration.py",
+      "tests/discovery_runtime/test_migration_capture.py",
+      "tests/discovery_runtime/test_mutation_plan.py",
+      "tests/discovery_runtime/test_migration_unknowns.py",
+      "tests/discovery_runtime/test_coverage_scope.py",
+      "tests/discovery_runtime/test_service_boundaries.py",
+      "tests/discovery_runtime/test_gateway.py",
+      "tests/discovery_runtime/test_gateway_local.py",
+      "tests/discovery_runtime/test_doctor.py",
+      "tests/discovery_runtime/test_gateway_boundaries.py",
+      "tests/discovery_runtime/test_gateway_factory.py"
+    ],
+    "full_identity_source": "Preserved294 nodes_by_module plus exact35 capture_delta.added_nodes; no collection or inferred parameter IDs.",
+    "module_order": [
+      "tests/discovery_runtime/test_gateway_factory.py",
+      "tests/discovery_runtime/test_gateway_boundaries.py",
+      "tests/discovery_runtime/test_doctor.py",
+      "tests/discovery_runtime/test_gateway_local.py",
+      "tests/discovery_runtime/test_gateway.py",
+      "tests/discovery_runtime/test_service_boundaries.py",
+      "tests/discovery_runtime/test_coverage_scope.py",
+      "tests/discovery_runtime/test_migration_unknowns.py",
+      "tests/discovery_runtime/test_mutation_plan.py",
+      "tests/discovery_runtime/test_migration_capture.py",
+      "tests/discovery_runtime/test_service_migration.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service.py"
+    ],
+    "node_count": 329,
+    "nodes_per_module": {
+      "tests/discovery_runtime/test_coverage_scope.py": 1,
+      "tests/discovery_runtime/test_doctor.py": 17,
+      "tests/discovery_runtime/test_gateway.py": 41,
+      "tests/discovery_runtime/test_gateway_boundaries.py": 69,
+      "tests/discovery_runtime/test_gateway_factory.py": 30,
+      "tests/discovery_runtime/test_gateway_local.py": 28,
+      "tests/discovery_runtime/test_migration_capture.py": 19,
+      "tests/discovery_runtime/test_migration_unknowns.py": 2,
+      "tests/discovery_runtime/test_mutation_plan.py": 3,
+      "tests/discovery_runtime/test_service.py": 34,
+      "tests/discovery_runtime/test_service_boundaries.py": 41,
+      "tests/discovery_runtime/test_service_migration.py": 9,
+      "tests/discovery_runtime/test_service_publication.py": 35
+    },
+    "one_fresh_process_required": true,
+    "reversed_selection_sha256": "5afa272290c9bc63b21e7ca17ed83741aa399bed4495c1d0287108c5d168ed48",
+    "selection_encoding": "UTF-8 node IDs joined by LF with one terminal LF"
+  },
+  "source_test_binding_delta_from_committed_owner_receipt": [
+    {
+      "bytes": 15075,
+      "lines": 354,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    {
+      "bytes": 13127,
+      "lines": 287,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+    },
+    {
+      "bytes": 22266,
+      "lines": 500,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043"
+    },
+    {
+      "bytes": 20056,
+      "lines": 497,
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0"
+    },
+    {
+      "bytes": 7308,
+      "lines": 168,
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165"
+    },
+    {
+      "bytes": 19857,
+      "lines": 480,
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f"
+    },
+    {
+      "bytes": 12914,
+      "lines": 326,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1"
+    },
+    {
+      "bytes": 19193,
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4"
+    },
+    {
+      "bytes": 17429,
+      "path": "tests/discovery_runtime/test_migration_unknowns.py",
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e"
+    },
+    {
+      "bytes": 17403,
+      "path": "tests/discovery_runtime/test_coverage_scope.py",
+      "sha256": "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3"
+    },
+    {
+      "kind": "Accepted boundary fixture repair; no identity added",
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "qualified_commit": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396"
+    }
+  ],
+  "status": "PREPARED_DISABLED_EXACT_329",
+  "task": "P6-T1"
+}

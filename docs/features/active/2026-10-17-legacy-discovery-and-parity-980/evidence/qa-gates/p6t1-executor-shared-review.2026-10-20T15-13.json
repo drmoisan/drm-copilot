@@ -1,0 +1,281 @@
+{
+  "task": "P6-T1",
+  "timestamp": "2026-10-20T15-13",
+  "status": "SCOPED_FINDINGS_COMPLETE",
+  "routing": "atomic_execution_p6t1_shared_contract_review_20261020 / S5_P6T1_shared_contract_review",
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-candidate.2026-10-20T14-58.json",
+    "sha256": "1081c36750ce9cce889436fe6b5c2a90acb6845d8ffd2c995ebf723c5e04c934",
+    "bytes": 19394
+  },
+  "source_hashes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "16518e8b0391469b75265a9f9e6f78a233fe6c9fc821a27cdf71fd43be035cde",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "9e337c4d68db54830b48ecc17c415c85d10b4650471988014d1c9cff97e431fa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015"
+  },
+  "retained": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-focused3-tests.2026-10-20T14-54.json",
+      "sha256": "fb823c4b50ae7447be1e6f4f2737e9ee6271f1bd32ff6740a323abe37ed1ca3a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-candidate-originals.2026-10-20T14-58.json",
+      "sha256": "98dfe291145470972659de5c71d54266624a9e0daf9e1913517d81a5a72f2ac8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-focused3-coverage.2026-10-20T14-56.json",
+      "sha256": "b7eb18c38b1edfb8afc1373269a7ceb14106fa80f66f8c9641d31bfd87dd6590"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575",
+      "bytes": 34097
+    }
+  ],
+  "probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-probe.2026-10-20T15-13.json",
+    "sha256": "ca11517c8d775d10c3b8938701c4c1c3f9d027357f7ee890dde6b8c08297b4cc",
+    "bytes": 12496
+  },
+  "existing_result": {
+    "passed": 115,
+    "failed": 1,
+    "collected": 116,
+    "unexecuted": 0,
+    "rerun": false
+  },
+  "reviewed_conclusions": [
+    "All 30 operation names and applicable/required input sets match the approved composition matrix; mode, format, flags and conditional branches were inspected within this fixed scope.",
+    "The nullable failure-envelope schema retains required keys and restricts null context to explicit pre-execution failures. Canonical and packaged schema bytes match the frozen resource binding.",
+    "Wire parsing uses bounded immutable data and the injected trusted catalog; result to_json uses the installed catalog seam. Neither injected catalog data nor constructor consistency authenticates request/native/publication authority.",
+    "ServiceIO remains a typed declaration. Moving gateway/core implementations and accepted predecessor semantics are outside this review.",
+    "The three frozen production files are within the 500-line cap. Repair comments/contracts must explain the exact type and aggregate-work invariants without changing public signatures."
+  ],
+  "findings": [
+    {
+      "id": "SR1",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Reject non-string enum values before equality dispatch",
+      "locations": [
+        "service_contracts.py:124 ServiceRuntimeError.__init__",
+        "service_contracts.py:185-186 ServiceRequestError.__init__",
+        "service_contracts.py:236-237 DiscoveryResult.__post_init__",
+        "service_contracts.py:299 ServiceAuthority.__post_init__"
+      ],
+      "observed": [
+        {
+          "field": "ServiceAuthority.principal",
+          "equality_calls": 1,
+          "accepted": true,
+          "retains_nonstring": true,
+          "error_type": null
+        },
+        {
+          "field": "ServiceRuntimeError.code",
+          "equality_calls": 1,
+          "accepted": false,
+          "retains_nonstring": false,
+          "error_type": "TypeError"
+        },
+        {
+          "field": "ServiceRequestError.operation",
+          "equality_calls": 1,
+          "accepted": true,
+          "retains_nonstring": true,
+          "error_type": null
+        },
+        {
+          "field": "ServiceRequestError.mode",
+          "equality_calls": 1,
+          "accepted": true,
+          "retains_nonstring": true,
+          "error_type": null
+        },
+        {
+          "field": "DiscoveryResult.operation",
+          "equality_calls": 1,
+          "accepted": false,
+          "retains_nonstring": false,
+          "error_type": "ValueError"
+        },
+        {
+          "field": "DiscoveryResult.mode",
+          "equality_calls": 1,
+          "accepted": false,
+          "retains_nonstring": false,
+          "error_type": "ValueError"
+        }
+      ],
+      "impact": "The authority carrier and request-error context retain a non-string object; other constructors execute its equality before later rejection. These are constructor consistency and callback-ordering defects. No actual authentication, execution, grant, or publication bypass was demonstrated.",
+      "repair": "Require exact str before all enum membership checks. Preserve permitted None in result context; redact malformed request-error context to None. Reject invalid runtime-error/authority/result values with fixed errors before custom equality. Preserve signatures and recognized values.",
+      "regressions": "Use local counted equality objects and str subclasses at these exact fields. Require zero callbacks and correct rejection/redaction; retain valid enums and nullable result context."
+    },
+    {
+      "id": "SR2",
+      "classification": "source",
+      "severity": "blocking",
+      "title": "Reserve aggregate manifest/result work before variable text scans and projection",
+      "locations": [
+        "service_serialization.py:273-286 _manifest",
+        "service_serialization.py:298-300,337-341 result_document"
+      ],
+      "observed": {
+        "path_characters": 4096,
+        "content_bytes": 1,
+        "work_capacity": 2048,
+        "calls": [
+          "InputManifest.to_dict",
+          "snapshot._digest"
+        ],
+        "budget_observations": [
+          {
+            "path_characters": 4096,
+            "work_left_before_text_scan": 1982
+          }
+        ],
+        "returned": false,
+        "error_type": "ReportLimitError"
+      },
+      "impact": "The retained valid 4,096-character path is scanned with only 1,982 work units remaining, then to_dict and manifest digest serialization execute. The later wire_object raises ReportLimitError and returns no partial output, but that later rejection does not make the prior work prospective.",
+      "repair": "Before measuring/copying/hashing the result, reserve its actual aggregate text, structural, sorting and fixed serialization/hash traversal work, including file paths/categories, missing paths, both role-pin sets, summary/finding/artifact values and captured-content hashing. Carry one cumulative reservation through the preflight/projection, or explicitly reserve each subsequent bounded pass before it occurs. Retain accepted manifest bytes/digest semantics and no predecessor edits.",
+      "regressions": "Add a valid small-manifest positive control and a tight-work long-path rejection that observes zero projection/hash/encoding calls. Cover missing paths, both role pins, aggregate capacity, exact byte/structural limits, and content hashing without timing assertions.",
+      "qualification": "The 20-character observation also rejects under the deliberately tiny overall work limit; it is not a passing positive control. The 4,096-character observation alone proves text work beyond the entire 2,048-unit budget before projection."
+    },
+    {
+      "id": "ST1",
+      "classification": "fixture",
+      "severity": "required",
+      "locations": [
+        "test_service_request_rules.py:188",
+        "test_service_request_rules.py:277"
+      ],
+      "title": "Use schema-shaped approval evidence in positive and wrong-kind controls",
+      "repair": "Replace each ['proof'] with a valid structured evidence-reference (artifact_kind/id), retaining the distinct positive approval and negative wrong-kind intents. Keep all existing assertions and do not relax the schema or operation conditions.",
+      "evidence": "The retained 115-pass/1-failure run fails the positive conditional loop at its approval request. service-request routes approval_evidence_refs to common evidence-references; a string cannot reach the intended conditional branch."
+    },
+    {
+      "id": "SC1",
+      "classification": "coverage",
+      "severity": "required",
+      "title": "Close the six measured new named-body gaps",
+      "ranges": [
+        {
+          "module": "service_contracts.py",
+          "qualified_name": "DiscoveryResult.__post_init__",
+          "covered_statements": 6,
+          "total_statements": 8,
+          "missing_lines": [
+            248,
+            250
+          ],
+          "missing_branches": [
+            [
+              247,
+              248
+            ],
+            [
+              249,
+              250
+            ]
+          ]
+        },
+        {
+          "module": "service_contracts.py",
+          "qualified_name": "validate_service_result",
+          "covered_statements": 2,
+          "total_statements": 3,
+          "missing_lines": [
+            421
+          ],
+          "missing_branches": [
+            [
+              420,
+              421
+            ]
+          ]
+        },
+        {
+          "module": "service_serialization.py",
+          "qualified_name": "normalize_findings",
+          "covered_statements": 12,
+          "total_statements": 15,
+          "missing_lines": [
+            133,
+            135,
+            140
+          ],
+          "missing_branches": [
+            [
+              132,
+              133
+            ],
+            [
+              134,
+              135
+            ],
+            [
+              139,
+              140
+            ]
+          ]
+        },
+        {
+          "module": "service_serialization.py",
+          "qualified_name": "check_request",
+          "covered_statements": 4,
+          "total_statements": 5,
+          "missing_lines": [
+            227
+          ],
+          "missing_branches": [
+            [
+              213,
+              227
+            ]
+          ]
+        },
+        {
+          "module": "service_serialization.py",
+          "qualified_name": "_manifest",
+          "covered_statements": 11,
+          "total_statements": 13,
+          "missing_lines": [
+            281,
+            285
+          ],
+          "missing_branches": [
+            [
+              280,
+              281
+            ],
+            [
+              284,
+              285
+            ]
+          ]
+        },
+        {
+          "module": "service_serialization.py",
+          "qualified_name": "checked_result_document",
+          "covered_statements": 5,
+          "total_statements": 6,
+          "missing_lines": [
+            392
+          ],
+          "missing_branches": [
+            [
+              391,
+              392
+            ]
+          ]
+        }
+      ],
+      "repair": "Add only controls for public tuple/element/count/type rejection, direct request type rejection, actual missing-path and both role-pin preservation, and schema-invalid result rejection. Keep raw named-body counters and declaration exclusions; measure repaired units against the unchanged >=90% floor.",
+      "qualification": "Current coverage is diagnostic, not accepted. Reuse successful cases only with exact source/test bindings; final changed candidate still needs its approved ordered verification."
+    }
+  ],
+  "open_probes": [],
+  "scope_qualification": "Complete finite shared-source finding set; no task acceptance or final combined service review. Hold repairs until the coordinator releases the shared dependency window.",
+  "preservation": "Owner candidate, original 115/116 proof, six raw named-body gaps and raw coverage EOF convention are unchanged. No source/test/schema/Git/checkpoint/plan/AC edit."
+}

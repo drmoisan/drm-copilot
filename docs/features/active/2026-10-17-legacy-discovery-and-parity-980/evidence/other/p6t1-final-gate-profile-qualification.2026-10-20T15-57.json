@@ -1,0 +1,24 @@
+{
+  "Timestamp": "2026-10-20T15-57",
+  "status": "MANDATORY_PREPARATION_QUALIFICATION_NOT_EXECUTED",
+  "route": "build_review_p6t1_final_preparation_20261020 / S5_P6T1_final_gate_preparation",
+  "Command": "Reconcile coordinator-reported PROFILE_DRAFT prerequisite with prepared installed composition sequence",
+  "EXIT_CODE": 0,
+  "Output Summary": "Preserve intentional draft initialization; configure/validate a real supported profile and analyzer selection before native configured-operation checks.",
+  "amends": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gate-interface-handoff.2026-10-20T15-56.json",
+    "sha256": "9abf96d494f336ca7717219a2afb0fd15c13c634e68247a2d081fecd1142c242"
+  },
+  "authority": "Coordinator observed PROFILE_DRAFT before dispatch in core run; source remained frozen while fixture was corrected.",
+  "native_init": "Keep init dry-run/real initialization in an isolated fresh workspace. Assert actual draft-profile behavior; never interpret initialization as configured or complete. Profile/validation results immediately after init must preserve draft diagnostics rather than forcing exit0.",
+  "configured_fixture": "Before inventory, reports or any configured operation, use the approved configure path with an independently valid profile and explicit analyzer selection, or revalidate the precise retained P5 fixture setup. Inspect its profile state and activation binding as preparation for the released native run. A shared draft fixture is not a valid success fixture for all routes.",
+  "execution_order": [
+    "Actual installed identity/resource/provenance check.",
+    "Fresh-workspace init dry-run/real behavior with explicit draft qualification.",
+    "Establish valid configured profile/analyzer selection via approved configure path or exact retained fixture; validate configuration readiness before dispatch.",
+    "Run profile/inventory/report/doctor and exit/host-refusal controls against the correct independently stated fixture state."
+  ],
+  "moving_dependencies": "Doctor and Git transport remain in active three-finding repair. Interface-only owner statements are provisional until final accepted freeze; do not hash or execute their moving implementations. Use final accepted interfaces and source bindings at release.",
+  "unchanged": "Seven caller modules, four contract selectors, one serialized packaging window, retained stable proofs, no native host authority and actual Python3.10 unavailability remain as stated in the amended handoff.",
+  "ac_status": "P6-T1 remains in progress; P6-T2/P6-T3 deferred."
+}

@@ -1,0 +1,149 @@
+{
+  "Command": "poetry run python SCRATCH/issue-980-p5t3-native-prepare.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Syntax, <=500 lines, preserved fixture bytes and observed short/long alias mapping verified. Runtime/native/publication execution not run.",
+  "Timestamp": "2026-10-20T08-50",
+  "accepted_predecessor": "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+  "contract": {
+    "bytes": 14662,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p5t3-interface-contract.2026-10-20T08-23.json",
+    "sha256": "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61"
+  },
+  "execution_released": false,
+  "expected_contract": {
+    "both": {
+      "counts": {
+        "coverage-ledger": 1,
+        "evidence-reference": 2,
+        "feature-contract": 1,
+        "inventory-snapshot": 1,
+        "parity-matrix": 1,
+        "scope": 1
+      },
+      "findings_complete": true,
+      "planning_prerequisite": null
+    },
+    "creation": {
+      "assessment_state": "available",
+      "blocking_findings": [],
+      "findings": [],
+      "mode": "structural",
+      "mode_label": "Structural validation",
+      "validation_result": "pass",
+      "warning_findings": []
+    },
+    "malformed": {
+      "assessment_state": "unavailable",
+      "counts": null,
+      "planning_error": "MUTATION_INVALID",
+      "planning_prerequisite": null,
+      "validation_result": "fail"
+    },
+    "replacement": {
+      "assessment_state": "available",
+      "blocking_findings": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "codes": [
+        "ACCEPTANCE_CRITERIA",
+        "DIMENSION_UNSPECIFIED",
+        "DIMENSION_MISSING",
+        "DIMENSION_UNSPECIFIED",
+        "PARITY_INCOMPLETE"
+      ],
+      "mode": "parity-complete",
+      "mode_label": "Parity completion",
+      "retained_finding_counts": {
+        "error": 5,
+        "info": 0,
+        "warning": 0
+      },
+      "validation_result": "fail",
+      "warning_findings": []
+    },
+    "wrong_grants": "MUTATION_GRANT"
+  },
+  "fixture": {
+    "bytes": 7110,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-fixture.2026-10-20T08-50.json",
+    "sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355"
+  },
+  "fixture_writes": 0,
+  "harness_runtime_path": "SCRATCH/issue-980-p5t3-native-composition.py",
+  "harnesses": [
+    {
+      "bytes": 12322,
+      "label": "preparation",
+      "lines": 188,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-preparation-harness.2026-10-20T08-50.txt",
+      "sha256": "4d5b27cbea827e9b83ad06df608eeccde7dc9b9595e4508bbcb9ca3b17952fe8"
+    },
+    {
+      "bytes": 18311,
+      "label": "composition",
+      "lines": 297,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-composition-harness.2026-10-20T08-50.txt",
+      "sha256": "b3d6e78f5f7af0c9d10cb9f6f6f91c16f0fbc754e44e3a0c41abcda65206c1f3"
+    }
+  ],
+  "later_release": {
+    "capture": "Reuse existing20s live progress and lossless raw stdout/stderr/result archives; readable views normalize both observed short/long Windows TEMP spellings.",
+    "fixture_receipt_sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355",
+    "harness_sha256": "b3d6e78f5f7af0c9d10cb9f6f6f91c16f0fbc754e44e3a0c41abcda65206c1f3",
+    "invocation": "WORKSPACE/.venv/Scripts/python.exe SCRATCH/issue-980-p5t3-native-composition.py SCRATCH/issue-980-p5t3-native-fixture.2026-10-20T08-50.json SCRATCH/<new-result>.json --release SCRATCH/<final-release>.json",
+    "node_population": "Await exact final owner node manifests; no discovery or expansion during preparation.",
+    "order": "Final format -> lint -> types -> static -> this native composition -> exact reversed frozen task nodes -> existing per-unit coverage/retained-AST reconciliation and affected contracts.",
+    "required_flags": {
+      "execution_released": true,
+      "independent_review_closed": true,
+      "ordered_static_passed": true,
+      "task": "P5-T3"
+    },
+    "source_bindings": "Required final owner-frozen source/test/dependency hash mapping; currently absent, not guessed.",
+    "suggested_timeout_seconds": 660,
+    "timeout_basis": "Prior one-publication native loop took151.326s; this approved bounded sequence performs two guarded publications."
+  },
+  "limitations": [
+    "Preparation only; no P5-T3 behavior, publication result or acceptance is claimed.",
+    "The malformed control is an in-memory loader overlay of real captured bytes; authored disk input remains unchanged.",
+    "Native invalidation callback instrumentation does not establish installed host-hook authority or non-Windows behavior.",
+    "All predecessor raw proof remains immutable; fresh final coverage must remain separate from qualified unchanged-body proof."
+  ],
+  "path_alias_raw": {
+    "bytes": 1267,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-path-aliases-raw.2026-10-20T08-50.json",
+    "sha256": "d1f0658d82b3b7882f0e39be2f1e113d60aae8df3bfd49b358bcd3529edebd7f"
+  },
+  "previous_native_proof": {
+    "bytes": 64104,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-handoff.2026-10-20T08-12.json",
+    "sha256": "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347"
+  },
+  "previous_raw_archive": {
+    "bytes": 1017629,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-remaining-raw.2026-10-20T08-15.json",
+    "sha256": "1be9623f14f5f6565e6faadc3a4c4125ef1e401f16a09869811fb218848111f8"
+  },
+  "publication_executed": false,
+  "runtime_fixture_receipt": "SCRATCH/issue-980-p5t3-native-fixture.2026-10-20T08-50.json",
+  "runtime_imports_executed": false,
+  "scope": [
+    "Actual capture/local Git/source pin identity against the preserved P5-T2 result, without setup replay.",
+    "Structural/pass creation and parity-complete/available/fail replacement through plan_completion_report and the existing guarded writer.",
+    "One immutable projection per paired JSON/Markdown view; exact mode labels, retained findings/actions and current semantic input digest.",
+    "Wrong-kind, missing and authored-path grants; malformed byte overlay cannot become a valid structural plan.",
+    "Dry-run/no-write, exact original digest replacement, recapture/recomputation, idempotence and stale-plan rejection."
+  ],
+  "shared_baseline": {
+    "bytes": 94246,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json",
+    "sha256": "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d"
+  },
+  "state": "PREPARATION_READY",
+  "task": "P5-T3",
+  "tests_executed": 0
+}
