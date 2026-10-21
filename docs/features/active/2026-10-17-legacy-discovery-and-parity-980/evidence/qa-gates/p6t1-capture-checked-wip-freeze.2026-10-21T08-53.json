@@ -1,0 +1,201 @@
+{
+  "Timestamp": "2026-10-21T08:53:34.077616+00:00",
+  "assembly_archive": {
+    "bytes": 5600,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-checked-wip-assembly-raw.2026-10-21T08-53.json",
+    "sha256": "b601ed7fa5f62a843dad0819d5d41afc4f01be5cf3477a854de6298a0efaea08"
+  },
+  "coverage": "The nine-control raw coverage is retained in its archive; full37 named-body, changed-line and zero-regression reconciliation remain pending. Unchanged predecessor proof is not replayed.",
+  "dependency_binding": {
+    "before_after_equal": true,
+    "existing_mutation_test": {
+      "bytes": 19193,
+      "path": "tests/discovery_runtime/test_mutation_plan.py",
+      "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4"
+    },
+    "init_io": {
+      "bytes": 16547,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+      "sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853"
+    },
+    "receipt": {
+      "bytes": 71385,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085123-types.2026-10-21T08-51.json",
+      "sha256": "d9b65898302f7d4ab8c739ec470332595135ae196311dda9cd419bf2f291e04f"
+    }
+  },
+  "documentation_qualification": {
+    "after_sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165",
+    "assertion_decorator_parameter_ast_identical": true,
+    "before_sha256": "256615207045d5b43ff76a4b4503acb437f768aa458c24dc694bc84727d45efb",
+    "delta": "configured_capture parameter/result/error contract plus exactly three intent comments",
+    "executable_ast_identical": true,
+    "path": "tests/discovery_runtime/test_service_migration.py"
+  },
+  "excluded": [
+    "Active diagnostic outputs",
+    "Other owners' source/test/evidence",
+    "Git/index/checkpoint/plan/AC mutations",
+    "Package generation"
+  ],
+  "future_focused_population": {
+    "count": 37,
+    "nodes": [
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[coverage-ledger]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[evidence-reference]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[feature-contract]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[parity-matrix]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[product-decision]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[runtime-characterization-scenario]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[unspecified-behavior]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[unknown]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[body-mismatch]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_clean_snapshot_export_publishes_exact_files",
+      "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_empty_selection_preserves_original_io",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[duplicate]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[traversal]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[link]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[changed]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[missing]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_conflicting_observations",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[file-count]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[work]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[bytes]",
+      "tests/discovery_runtime/test_mutation_plan.py::test_values_reject_mutability_and_metadata_ambiguity",
+      "tests/discovery_runtime/test_mutation_plan.py::test_planner_projects_complete_valid_graph_and_preserves_originals",
+      "tests/discovery_runtime/test_mutation_plan.py::test_projection_refuses_uncaptured_profile_bytes",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[coalesced]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[count-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[read-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[byte-conflict]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-short]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-short]"
+    ],
+    "qualification": "37 identities only; no aggregate passing or coverage claim"
+  },
+  "nine_control_pass": {
+    "bytes": 76645,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck.2026-10-21T08-47.json",
+    "sha256": "f15d9ad127806d39dc061ba218c4af45a100b2adefde3e45f60c3e9993706ded"
+  },
+  "owned": [
+    {
+      "bytes": 15075,
+      "lines": 354,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    {
+      "bytes": 13127,
+      "lines": 287,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+    },
+    {
+      "bytes": 22266,
+      "lines": 500,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043"
+    },
+    {
+      "bytes": 19576,
+      "lines": 497,
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "9d1beb4dcaee6fb5b4fcdcc422a9d5776dfa768206c0305fb8894fcc2dcba22f"
+    },
+    {
+      "bytes": 7308,
+      "lines": 168,
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165"
+    },
+    {
+      "bytes": 19857,
+      "lines": 480,
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f"
+    }
+  ],
+  "pending": [
+    "Two-node migration diagnosis",
+    "Any authorized correction for the concrete failure",
+    "Full37 focused body coverage",
+    "Package identity regeneration by designated owner",
+    "Final326 and independent acceptance"
+  ],
+  "raw_readable_convention": "Existing gate receipts bind lossless gzip-base64 stdout/stderr/source/harness/coverage streams and their observed WORKSPACE/SCRATCH alias normalization. Raw coverage EOF and original CR/LF are preserved inside archives; authored receipts end in one LF.",
+  "references": [
+    {
+      "bytes": 10686,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-failure-diagnosis.2026-10-21T07-22.json",
+      "sha256": "9471ffb7813d52daabd5db0ba1c85b55a2627ea3fc7527c5175ba3a003ff846a"
+    },
+    {
+      "bytes": 8672,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-capture-supplement.2026-10-21T07-55.json",
+      "sha256": "df19757a72db2a607cbac1a1a69368ca6fe90b83d442558a36005845ba993fde"
+    },
+    {
+      "bytes": 4018,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-migration-projection-prerequisite.2026-10-21T08-07.json",
+      "sha256": "5f410e9bd88a2f56530f28a684abca6aca6080975e37b1d20e8cd7389143e012"
+    },
+    {
+      "bytes": 12103,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-capture-review.2026-10-21T08-31.json",
+      "sha256": "320d0bb4294c8e47baa378508b4011782866cce480ad852aa6dd71ee3a6271c8"
+    },
+    {
+      "bytes": 3773,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-capture-test-split.2026-10-21T08-33.json",
+      "sha256": "d78b777524e7905195b2fbf408681ac5856c43264c5b9008211863c5c61c8c3e"
+    }
+  ],
+  "route": "workspace_operations_p6t1_capture_review_repair_20261021T083300",
+  "statics": [
+    {
+      "bytes": 71289,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085108-format-check.2026-10-21T08-51.json",
+      "sha256": "a6b34207de84041d97fa393d56fde9d8fea0a1a08c9be1f930a2fc45908be7b9"
+    },
+    {
+      "bytes": 71218,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085116-lint.2026-10-21T08-51.json",
+      "sha256": "13d91bc40f983751a1571ed22181bbfdd8ba6af0f0792d46ffeff01ebfa88f2a"
+    },
+    {
+      "bytes": 71385,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085123-types.2026-10-21T08-51.json",
+      "sha256": "d9b65898302f7d4ab8c739ec470332595135ae196311dda9cd419bf2f291e04f"
+    }
+  ],
+  "status": "READY_FOR_WIP_WITH_KNOWN_FAILURES",
+  "stopped_attempt": {
+    "completed": 11,
+    "elapsed_seconds": 67.17898,
+    "failed": 2,
+    "failed_nodes": [
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]"
+    ],
+    "interrupted": "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+    "passed": 9,
+    "reason": "Coordinator-directed stop for the finite documentation residue; actual two migration failure tracebacks had not yet been printed. No failure cause is inferred.",
+    "receipt": {
+      "bytes": 78931,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084811-tests.2026-10-21T08-49.json",
+      "sha256": "d7966bbd8a0dcf3fa5a261f58110693b437492b98a70039606d8751847931357"
+    },
+    "unstarted": 25
+  },
+  "task": "P6-T1",
+  "task_acceptance": false
+}

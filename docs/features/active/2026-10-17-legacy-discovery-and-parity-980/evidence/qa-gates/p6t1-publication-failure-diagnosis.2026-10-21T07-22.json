@@ -1,0 +1,121 @@
+{
+  "task": "P6-T1",
+  "status": "READ_ONLY_DIAGNOSIS_COMPLETE_REPAIR_NOT_RELEASED",
+  "recorded_utc": "2026-10-21T07:22:17Z",
+  "head": "6b8703459489cfc33e211b6290edacadaaf03e24",
+  "authority": {
+    "route": "workspace_operations_p6t1_publication_diagnosis_20261021T071300",
+    "phase": "S5_P6T1_publication_failure_diagnosis",
+    "profile": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "aliases": {
+    "FEATURE": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980",
+    "R": "packages/discovery-runtime/src/drm_copilot_discovery",
+    "PT": "tests/discovery_runtime"
+  },
+  "retained_evidence": {
+    "diagnostic": {
+      "path": "FEATURE/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+      "sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+      "population": 83,
+      "passed": 78,
+      "failed": 5,
+      "elapsed_seconds": 1133.678388,
+      "coverage_enabled": false,
+      "qualification": "Retained collect-all diagnostic, not a passing final gate. Its clean and population_matches fields are false."
+    },
+    "raw_archive": {
+      "path": "FEATURE/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests-raw.2026-10-21T07-12.json",
+      "sha256": "0219279e1c726504112b1edb007e5a58b7632917270b8d4ec0096ba3f67a4569"
+    },
+    "status_and_candidate_binding": {
+      "path": "FEATURE/evidence/qa-gates/p6t1-remaining83-handoff.2026-10-21T07-13.json",
+      "sha256": "d600b11962ac26b29dca954ee84430a89e2d3a6204ddadeeca3c1238162486d4",
+      "reuse": "Exact 83 statuses and original 235 before/after bindings; no replacement inventory or archive."
+    },
+    "approved_operation_matrix": {
+      "path": "FEATURE/evidence/other/p6t1-core-composition-preparation.2026-10-20T14-30.json",
+      "sha256": "afa9611038e4981c166eb4b712d86277cd2b23c45900d4a82f4c305995c2c575"
+    },
+    "spec": {
+      "path": "FEATURE/spec.md",
+      "sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+      "relevant_lines": [322, 339, 342, 435, 447, 455, 459, 461]
+    }
+  },
+  "rechecked_proposed_edit_bindings": [
+    {
+      "path": "R/service_bootstrap.py",
+      "sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "lines": 337,
+      "matches_retained_before_and_after": true
+    },
+    {
+      "path": "PT/test_service_publication.py",
+      "sha256": "bf5b712119e569acb8b90c329a7f0e62bdc7f7449bcfeb9e0ba74963bc7928d0",
+      "lines": 455,
+      "matches_retained_before_and_after": true
+    }
+  ],
+  "decisions": [
+    {
+      "nodes": ["PT/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]"],
+      "observed": "Exit 1, REPORT_RESULT at docs/migration/discovery/reports/validation-report.json; no artifacts.",
+      "classification": "test_expectation",
+      "cause": "The with_report parameter selects report presence. Both original parameter cases use dry_run=True. Export adds transport inputs outside the derived-report exclusion. The complete prospective snapshot still contains the original report, whose recomputed fields no longer match. Accepted mutation planning rejects that stale report.",
+      "authority": ["R/service_mutations.py::_authored/_transport", "R/operations.py::OperationContext.plan", "R/mutation_plan.py::plan_mutation", "R/validation.py::validate_snapshot", "R/validation_inputs.py::report_input_digest", "R/source_snapshots.py::prepare_snapshot_export"],
+      "repair": "Make the with_report=True refusal explicit: REPORT_RESULT at the retained report path, no planned artifacts or new writer acquisition, unchanged memory files, and original report bytes retained in the input manifest. Preserve the with_report=False successful dry-run assertions and the separate authored-invalid-reference negative control.",
+      "positive_coverage": "The same diagnostic passed with_report=False, which proves dry-run success only. No clean service-level export write-success control exists in the scoped service tests. Add one clean-fixture real-write control asserting actual export files, exact digest/content provenance, preserved original bytes and one writer invocation.",
+      "production_change": false
+    },
+    {
+      "nodes": ["PT/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]", "PT/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]"],
+      "observed": "Both exit 2 with SERVICE_KIND at /inputs before conversion.",
+      "classification": "production_service_adapter",
+      "cause": "service_bootstrap._migrate requires artifact_kind. The accepted source_for('coverage-ledger') supplies a valid closed v1 document with registered $schema and schema_version but no artifact_kind; adding that v2 field would violate the frozen v1 schema.",
+      "authority": ["R/service_bootstrap.py:253", "R/catalog.py::V1_KINDS/schema_aliases", "schemas/discovery/v1/coverage-ledger.schema.json", "PT/test_migration_v1.py::source_for", "R/migration_v1.py::_sources/plan_migration"],
+      "repair": "Resolve the kind through an exact bounded match of the document's v1 $schema against registered aliases for the seven V1_KINDS. Retain accepted v1 version/body validation in plan_migration. Never read a schema named by the request, guess from filenames, add legacy fields, or choose the first permissive validator.",
+      "direct_capture_prerequisite": {
+        "basis": "Static inspection of the same invoked path; not a separately executed failure.",
+        "finding": "The current InitializationRequest does not carry the explicit source paths into its documentation_roots. The new-root initialization capture therefore omits legacy/coverage-ledger.json, while accepted migration requires exact source bytes in that capture.",
+        "adaptation": "Pass only the already selected explicit legacy file paths as documentation_roots for migration initialization. InitializationRequest normalizes relative paths, SnapshotIO.enumerate accepts exact file roots, and migration retains its original-byte and freshness checks. Do not broaden to parent directories or change accepted capture/migration APIs.",
+        "authority": ["R/service_bootstrap.py::_initialization/_migrate", "R/init_projection.py::InitializationRequest/profile_proposal", "R/snapshot_io.py::SnapshotIO.enumerate", "R/migration_v1.py::_sources", "PT/test_migration_v1.py::migration_request"]
+      },
+      "focused_controls": "Retain both existing dry_run=True/False end-to-end migration cases. Add seven fixed kind-dispatch cases with actual accepted v1 documents, one unknown-schema refusal and one registered-schema/body-mismatch refusal. Preserve exact original source bytes, new-root effects and no writes on refusal.",
+      "production_change": true
+    },
+    {
+      "nodes": ["PT/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest"],
+      "observed": "Exit 2, SNAPSHOT_UNRECOGNIZED at docs/migration/discovery/evidence/capture.txt; no artifacts.",
+      "classification": "test_fixture",
+      "cause": "The helper proposes a new payload and descriptor together. This service fixture instead prewrites its opaque payload inside the structured artifact evidence directory while leaving the proposed descriptor under proposals/. The loader correctly sees an unrecognized artifact-root file before evidence linking.",
+      "authority": ["PT/evidence_test_support.py::request_for", "PT/test_service.py::service_plan", "R/snapshot_loading.py::_classify/load_snapshot", "R/evidence_linking.py::evidence_changes", "R/revision_rules.py::RevisionInputs.content"],
+      "repair": "Capture the unchanged payload bytes at proposals/capture.txt, within the fixture's existing configured documentation root. Update both the evidence record path and runtime_artifact.path to that exact captured path before serializing the proposed descriptor. Preserve checksum, owner/revision, target identity and expected target digest; keep real path/schema validation and successful publication assertions.",
+      "production_change": false
+    }
+  ],
+  "proposed_repair_scope": {
+    "production": ["R/service_bootstrap.py"],
+    "existing_test": ["PT/test_service_publication.py"],
+    "test_only_size_prerequisite": {
+      "path": "PT/test_service_migration.py",
+      "observed_absent": true,
+      "approval": "Coordinator approved this exact test-only path during receipt assembly. Place only the nine new migration dispatch/refusal controls here because the existing publication module is 455 lines. Preserve all existing test node identities; no existing test moves. Implementation awaits the consolidated repair release."
+    },
+    "minimum_added_nodes": 10,
+    "focused_population": "Five existing publication nodes (two report-presence variants, two migration dry-run variants, one evidence link), one new clean export write control, and nine new migration dispatch/refusal controls: 15 total. The separately owned bootstrap-interruption case is excluded from this diagnosis.",
+    "sequence_after_release": "Consolidate the finite changes, run ordered format/lint/types, then these bounded controls before the coordinator's existing full affected coverage/isolation sequence. Do not replay accepted source-snapshot, migration, report, model or schema suites."
+  },
+  "downstream_impact": {
+    "build": "The production service_bootstrap.py change invalidates the existing build-manifest and wheel payload identity. The designated build owner must regenerate/rebind actual build identity and package artifacts after source freeze; unchanged build algorithms and their tests remain reusable. No canonical schema, generated schema resource or resource-content change is proposed.",
+    "native": "Any later installed/native proof must consume the repaired package identity. Preserve previous diagnostic and successful receipts as historical; do not claim they bind changed production. This diagnosis performs no native run or package generation."
+  },
+  "limits_of_this_receipt": {
+    "source_or_test_edits": false,
+    "new_tests_or_probes_executed": 0,
+    "new_coverage_claim": false,
+    "qa_status": "Diagnosis only; all retained failing and successful proof remains immutable. No post-repair QA result or acceptance is claimed.",
+    "excluded": "The fifth bootstrap interruption failure belongs to gateway_doctor. No report lifecycle, accepted migration validator, source-snapshot implementation or loader repair is proposed."
+  }
+}

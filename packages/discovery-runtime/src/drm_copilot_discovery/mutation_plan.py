@@ -21,6 +21,7 @@ from drm_copilot_discovery.path_models import (
     relative_path,
 )
 from drm_copilot_discovery.path_policy import PathPolicy
+from drm_copilot_discovery.report_models import ReportBudget, ReportLimitError
 from drm_copilot_discovery.snapshot_io import SnapshotIO
 from drm_copilot_discovery.snapshot_loading import load_snapshot
 from drm_copilot_discovery.validation import validate_snapshot
@@ -83,16 +84,21 @@ class MutationChange:
 class CapturedWorkspace:
     """Bind a complete snapshot to non-following metadata captured during its load.
 
-    Construct with capture_workspace. Complete child lists allow absent proposed
-    paths to be resolved without new reads. No persisted cache or authority exists.
+    Construct through trusted capture. Complete metadata resolves proposed absence;
+    supplemental_paths names only retained originals. No cache/authority is created.
     """
 
     workspace_root: str
     snapshot: DiscoverySnapshot
     metadata: tuple[tuple[str, PathMetadata], ...]
+    supplemental_paths: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Detach metadata and reject ambiguous capture keys or an absent root."""
+        """Validate typed metadata/selected originals; return None without I/O.
+
+        ValueError rejects ambiguity; ReportLimitError rejects excess. Only this
+        frozen value's normalized tuple fields change, never input collections.
+        """
         entries = tuple(sorted(self.metadata))
         # A complete capture has one authoritative observation for each path.
         if len({path for path, _ in entries}) != len(entries) or not any(
@@ -102,6 +108,32 @@ class CapturedWorkspace:
                 "Captured metadata requires unique paths and a workspace root"
             )
         object.__setattr__(self, "metadata", entries)
+        if type(self.supplemental_paths) is not tuple:
+            raise ValueError("Supplemental originals require an immutable selection")
+        # Explicit originals supplement captures without becoming profile roots.
+        if self.supplemental_paths:
+            limits = self.snapshot.profile.limits
+            budget = ReportBudget(limits.parse_limits())
+            if len(self.supplemental_paths) > limits.source_files:
+                raise ReportLimitError()
+            budget.work(len(self.snapshot.manifest.files) + len(entries))
+            files = {}
+            # Prepay each path before indexing it for exact original selection.
+            for file in self.snapshot.manifest.files:
+                budget.work((len(file.path) + 1) * (32 + 4 * limits.nesting_depth))
+                files[file.path] = file
+            metadata = dict(entries)
+            # Every marker names an already captured ordinary original, never absence.
+            for path in self.supplemental_paths:
+                if type(path) is not str:
+                    raise ValueError("Supplemental original requires an exact path")
+                budget.work((len(path) + 1) * (32 + 4 * limits.nesting_depth))
+                if path not in files or path not in metadata:
+                    raise ValueError("Supplemental original is not captured")
+                if metadata[path].kind != "file":
+                    raise ValueError("Supplemental original must be an ordinary file")
+            paths = check_path_collisions(self.supplemental_paths)
+            object.__setattr__(self, "supplemental_paths", paths)
 
     def inspect(self, path: str) -> PathMetadata:
         """Read captured metadata or prove absence from its complete parent listing.
@@ -240,14 +272,15 @@ def project_snapshot(
 ) -> DiscoverySnapshot:
     """Load complete proposed inputs from memory with the authoritative classifier.
 
-    No disk, process or network access occurs. Loader errors propagate; findings
-    remain in the result for validation. This helper does not authorize changes.
+    baseline (CapturedWorkspace) and changes (tuple[MutationChange, ...]) produce
+    DiscoverySnapshot with exact marked originals. ValueError/OSError propagate;
+    no I/O, input mutation or authority occurs. Empty selection keeps loader behavior.
     """
     overlay = _Overlay(baseline, changes)
     original = baseline.snapshot
     # Rebuild extension bindings through the accepted loader while replaying pinned
     # bytes.
-    return load_snapshot(
+    projected = load_snapshot(
         io=SnapshotIO(
             workspace_root=baseline.workspace_root,
             metadata=overlay.inspect,
@@ -266,6 +299,47 @@ def project_snapshot(
             if original.catalog.extensions
             else original.catalog
         ),
+    )
+    if not baseline.supplemental_paths:
+        return projected
+    limits = original.profile.limits
+    budget = ReportBudget(limits.parse_limits())
+    loaded = projected.manifest.files
+    budget.work(len(original.manifest.files) + len(loaded) + len(changes))
+    count = len(loaded)
+    remaining = limits.document_bytes - sum(len(file.content) for file in loaded)
+    # Reserve complete retained-byte/hash and path/index/sort work before merging.
+    for file in (*original.manifest.files, *loaded):
+        budget.work(
+            8 * len(file.content)
+            + (len(file.path) + 1) * (32 + 4 * limits.nesting_depth)
+        )
+    files = {file.path: file for file in loaded}
+    originals = {file.path: file for file in original.manifest.files}
+    writes = {change.path for change in changes}
+    absent = set(projected.manifest.missing_paths)
+    # Loader classifications win on identical overlap; marked originals never change.
+    for path in baseline.supplemental_paths:
+        old = originals[path]
+        if (
+            path in writes
+            or path in absent
+            or path in files
+            and files[path].content != old.content
+        ):
+            raise MutationError(
+                "MUTATION_ORIGINAL", "Selected migration original changed"
+            )
+        if path not in files:
+            count += 1
+            remaining -= len(old.content)
+    if count > min(limits.source_files, limits.artifact_records) or remaining < 0:
+        raise ReportLimitError()
+    # Retain only after exact merged capacity passes; overlaps consume one slot.
+    for path in baseline.supplemental_paths:
+        files.setdefault(path, originals[path])
+    return replace(
+        projected, manifest=replace(projected.manifest, files=tuple(files.values()))
     )
 
 
