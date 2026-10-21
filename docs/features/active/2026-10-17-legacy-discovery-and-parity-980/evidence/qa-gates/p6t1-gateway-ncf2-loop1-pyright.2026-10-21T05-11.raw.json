@@ -1,0 +1,68 @@
+{
+  "Timestamp": "2026-10-21T05-11",
+  "Command": ".venv/Scripts/python.exe -m pyright packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py tests/discovery_runtime/test_gateway_factory.py",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pyright",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+    "tests/discovery_runtime/test_gateway_factory.py"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 1.025722,
+  "input_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+    "tests/discovery_runtime/test_gateway_factory.py": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "tests/discovery_runtime/test_activation_filesystem.py": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+    "tests/discovery_runtime/test_gateway_local.py": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+  },
+  "input_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+    "tests/discovery_runtime/test_gateway_factory.py": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "tests/discovery_runtime/test_activation_filesystem.py": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+    "tests/discovery_runtime/test_gateway_local.py": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [],
+  "streams": {
+    "stdout": {
+      "base64": "MCBlcnJvcnMsIDAgd2FybmluZ3MsIDAgaW5mb3JtYXRpb25zCldBUk5JTkc6IHRoZXJlIGlzIGEgbmV3IHB5cmlnaHQgdmVyc2lvbiBhdmFpbGFibGUgKHYxLjEuNDA5IC0+IHYxLjEuNDE0KS4NClBsZWFzZSBpbnN0YWxsIHRoZSBuZXcgdmVyc2lvbiBvciBzZXQgUFlSSUdIVF9QWVRIT05fRk9SQ0VfVkVSU0lPTiB0byBgbGF0ZXN0YA0KDQo=",
+      "sha256": "d35dc6c0bd667393ee5e93e3995ce863d835b31148234b2dfcdee35614740e41",
+      "bytes": 194
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

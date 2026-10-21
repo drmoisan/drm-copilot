@@ -361,18 +361,26 @@ def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:
 
     location (RegistryLocation): output of for_host after its absolute, platform,
     parent-component and external-root checks. Return a location with the same
-    workspace identity and fixed layout under the resolved host base. Reads path
-    metadata only; an absent leaf is permitted. Resolution errors propagate;
-    ValueError rejects a derived path redirected outside that exact layout.
+    workspace identity and fixed suffix beneath the resolved host base. Host
+    resolution may insert intermediate components. Read metadata only; absent
+    leaves are permitted. Resolution errors propagate; ValueError rejects a
+    relative result, escaped base or changed contract suffix/workspace digest.
     """
     state = Path(location.directory)
     # The accepted builder appends drm-copilot/discovery/workspaces/workspace-digest.
-    # Resolve its trusted base, then verify the complete path against that layout.
     base = state.parents[3]
-    expected = base.resolve() / state.relative_to(base)
-    if state.resolve() != expected:
+    suffix = state.relative_to(base)
+    resolved_base = base.resolve()
+    canonical = state.resolve()
+    # Complete-path resolution can differ from resolving its parent and joining.
+    # Retain the contract suffix and containment; the store rechecks canonicality.
+    if (
+        not canonical.is_absolute()
+        or not canonical.is_relative_to(resolved_base)
+        or Path(*canonical.parts[-len(suffix.parts) :]) != suffix
+    ):
         raise ValueError("Host state must retain its fixed workspace partition")
-    return replace(location, directory=expected.as_posix())
+    return replace(location, directory=canonical.as_posix())
 
 
 def installed_local_io(

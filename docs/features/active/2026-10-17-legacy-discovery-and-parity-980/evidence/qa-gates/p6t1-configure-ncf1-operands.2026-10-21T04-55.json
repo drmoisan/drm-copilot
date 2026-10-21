@@ -1,0 +1,141 @@
+{
+  "Timestamp": "2026-10-21T04-55",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -I -S -B SCRATCH/issue-980-p6t1-gateway-configure-ncf1-operands.py SCRATCH/issue-980-p6t1-gateway-configure-factory-2026-10-21T04-51.json",
+  "EXIT_CODE": 0,
+  "Output Summary": "One installed RegistryLocation contract derivation and exact frozen helper operand comparison; no factory or operation calls.",
+  "first_probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-51.json",
+    "sha256": "75cb02331a7d7960f5c16fe70bfc03cae6ade0f8f5c6985ff1226a4e66dc6da7"
+  },
+  "request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+  "execution_count": 1,
+  "elapsed_seconds": 0.20903659996110946,
+  "timeout": false,
+  "overflow": false,
+  "watchdog_seconds": 30,
+  "stream_limit": 65536,
+  "bindings_unchanged": true,
+  "result": {
+    "actual_components": 13,
+    "actual_inside_workspace": false,
+    "actual_length": 183,
+    "actual_relative_to_resolved_base": "Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+    "actual_within_resolved_base": true,
+    "base_absolute": true,
+    "base_resolves_equal": true,
+    "blocked_events": [],
+    "calls": {
+      "for_host": 1,
+      "forbidden_port": 0
+    },
+    "component_differences": [
+      {
+        "actual": "Packages",
+        "actual_length": 8,
+        "component_index": 5,
+        "expected": "drm-copilot",
+        "expected_length": 11,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "OpenAI.Codex_2p2nqsd0c76g0",
+        "actual_length": 26,
+        "component_index": 6,
+        "expected": "discovery",
+        "expected_length": 9,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "LocalCache",
+        "actual_length": 10,
+        "component_index": 7,
+        "expected": "workspaces",
+        "expected_length": 10,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "Local",
+        "actual_length": 5,
+        "component_index": 8,
+        "expected": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+        "expected_length": 64,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "drm-copilot",
+        "actual_length": 11,
+        "component_index": 9,
+        "expected": null,
+        "expected_length": null,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "discovery",
+        "actual_length": 9,
+        "component_index": 10,
+        "expected": null,
+        "expected_length": null,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "workspaces",
+        "actual_length": 10,
+        "component_index": 11,
+        "expected": null,
+        "expected_length": null,
+        "zone": "fixed-suffix"
+      },
+      {
+        "actual": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+        "actual_length": 64,
+        "component_index": 12,
+        "expected": null,
+        "expected_length": null,
+        "zone": "fixed-suffix"
+      }
+    ],
+    "contract_module": "drm_copilot_discovery.activation_filesystem",
+    "dont_write_bytecode": true,
+    "expected_components": 9,
+    "expected_length": 130,
+    "factory_calls": 0,
+    "fixed_suffix": "drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+    "guard_operands_equal": false,
+    "isolated": 1,
+    "no_site": 1,
+    "resolved_base_components": 5,
+    "service_imported": false,
+    "state_absolute": true,
+    "workspace_digest": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+    "workspace_identity_retained": true
+  },
+  "lexical_expression_sources": [
+    "gateway_local.py:368-373",
+    "gateway_local.py:405-411",
+    "activation_filesystem.py:37-75"
+  ],
+  "qualification": "The installed RegistryLocation.for_host derives the layout and identity. Only the frozen helper path expressions are evaluated; no factory, service, Git, test or writer call. Exact host operands are preserved only in the raw stdout member.",
+  "raw_encoding": "gzip-base64 exact bytes; original path aliases remain in the first probe archive",
+  "raw": {
+    "issue-980-p6t1-gateway-configure-ncf1-operands.py": {
+      "sha256": "df56d07df08e72c1ac9d2102efd4dc7eec02410ab90828c17dd9a9db64ff2551",
+      "bytes": 5275,
+      "gzip_base64": "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"
+    },
+    "issue-980-p6t1-gateway-configure-ncf1-operands-controller.py": {
+      "sha256": "ee8822cf3f444911ca5a3897f17ff12798e28f634e4064bd1446128f52933449",
+      "bytes": 5050,
+      "gzip_base64": "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"
+    },
+    "stdout.bin": {
+      "sha256": "4c694be475d13acad3854a47d7130562d0bacb6cf813875ed8185b384136236c",
+      "bytes": 3322,
+      "gzip_base64": "H4sIAAAAAAAC/82WS2/bMAzH7/sURc5z/Uji2L0V7WXAhu3QneZBkCU6EepIriTnsaLffZLrd1wgBbJiN0cSmR/Jv0g9z+CAiUaiAIk5VSgTEkm8R1iSDdvB7ObqeWYOlDg3n7O7myT5qUCqJLnH/JtgCvMkuS2Ke6xxknwVBOdJ8gOTR7wGc+h7Afz2y/WdoHBAQRHwJ0U9sgrXXn34DpMNtIZUbh0iCpYLbX4wRcQO5DFJ9kI+qgIT6zLw/RCH1F/4i0UYegHMvXSxxFm69L04Wi0WaUphHtEsjH0aL4MgXJElhVVKV6GXxvHs89UsxQrODceeJ4JradNEmQSihTy+WruVsdvaurWpW1m6vXDcNhq3C8a9RCwtW+v3LLYH2BZ9QAcOQEoTmuP52F/GdOkypUpw4sjrvpwi1L7DsTbScAIvCH0v8B78yI+8qAvMYsGhMJkCer5qPqr4EvKK35J93H8qke+AovcqT2ms4T/L4Yvlwlm/NyAitoXgwLUyq/7cnKg3GFeMwkCcGc4VdCdy4Gu9sWZRz66pEtICnWSvaTDu2/3F7drLR97Gmn7P9IbxE3AtS6jbD8Kp2Sv1eLk2UQieXntus5kL8mg8wa5O8q/f9vLjPFdVHWzf3gilbR7NhvmZMkqBo0JIu+i9VL2irpJpZFkGEriJ2/rq9/gmubOJEkUDJ4ybtJvV5ei+9zLdbwW9SlvEP8aJPZ2xA1BHlZn5sNrqs7xd3ym6IJzEC8d4TfGn4eIz2TqBTbH43iTLasTSye+NTHnvoZkCWU5yRCOOS2j/lD5cnEk/UsxJMv3JIOJhELzM80mMeuMskL42xhjxJEVVogtjDGVxpraqLF0Y5II9caiKCfzgEvi/+0+iraBl3gx6VAsMtTW+NmfYzowZwVHGclBHpWFrkanxgPaSaUDpUQMx/adrxS3RYOjF0/d3bmuV4erRiJp2Xa1ZbFRjD6/AvxtP6xJL2j32mxnTTGRmZg9+zb7VEhdIsWpC+eM3zDB222PM22THCCC2tROn8tG4rR4xEwOvDc6UxAwcfSnBdX7N04Nrpo9mrGrMeEVl//zl5dNfftuVV/oMAAA="
+    },
+    "stderr.bin": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+    }
+  }
+}

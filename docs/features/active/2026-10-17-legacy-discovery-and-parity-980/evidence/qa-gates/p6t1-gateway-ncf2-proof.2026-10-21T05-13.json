@@ -1,0 +1,1189 @@
+{
+  "Timestamp": "2026-10-21T05-13",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-ncf2-proof.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "34 focused controls passed; changed helper BODY is fully covered; unchanged AST/range proof preserves file coverage.",
+  "input_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-ncf2-inputs.2026-10-21T05-08.json",
+    "sha256": "4252a3140aa1c2231d4a004433c5f29fbfc22f5fadc6b6d1a79cd32a58389bc2",
+    "bytes": 18103
+  },
+  "retained_coverage_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+    "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+    "bytes": 158561
+  },
+  "fresh_behavior": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf2-loop1-focused.2026-10-21T05-11.raw.json",
+    "sha256": "199643da7377f15651cc40d8d2525326c03cf4e688289d106de19d5b797f006d",
+    "bytes": 20209
+  },
+  "preserved_fail_before": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf2-reproducer2-test.2026-10-21T05-10.raw.json",
+    "sha256": "42b389ce188c3b27db202e1040400229a9d95ef66cf97fa2fdaa9c8c576117cb",
+    "bytes": 8328
+  },
+  "new_node_ids": [
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[one-component-existing]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[one-component-missing-leaf]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[three-components-existing]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[three-components-missing-leaf]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[relative]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[outside-base]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[layout]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[partition]"
+  ],
+  "retained_node_ids": [
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-canonical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-alias]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-canonical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-alias]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[relative]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[../state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[C:state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[\\\\state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[parent]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[lexical]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[resolved]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[layout]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[partition]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[store-race]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[base]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[state]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[noncanonical-workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[missing-workspace]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[host]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[invocation]",
+    "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[authorization]",
+    "tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[canonical]",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[alias]",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[internal]"
+  ],
+  "changed_existing_callables": [
+    "_canonical_state_location"
+  ],
+  "new_callables": [],
+  "unchanged_callable_mapping": {
+    "LocalServiceIO.__init__": {
+      "old_range": [
+        46,
+        83
+      ],
+      "new_range": [
+        46,
+        83
+      ],
+      "executable_ast_sha256": "dc49f8eb817a88701916654d87dca87a0fc2fe2ddd5a5c28fdf158d297c2956f"
+    },
+    "LocalServiceIO.activation": {
+      "old_range": [
+        86,
+        88
+      ],
+      "new_range": [
+        86,
+        88
+      ],
+      "executable_ast_sha256": "23031e59a2befc59e80b36f35afabdd86a5b2d501b057473333b3f789642bcac"
+    },
+    "LocalServiceIO.initialization": {
+      "old_range": [
+        91,
+        93
+      ],
+      "new_range": [
+        91,
+        93
+      ],
+      "executable_ast_sha256": "d5c297b495d135c0b4e4032d1a2d9e7b27bcc090951269f3bdf4609755d235c6"
+    },
+    "LocalServiceIO.runtime_identity": {
+      "old_range": [
+        95,
+        97
+      ],
+      "new_range": [
+        95,
+        97
+      ],
+      "executable_ast_sha256": "16278dcbe2d7f90cc3a3e8d6b1de077d3250c7fb7d7384ab3df39b101104f414"
+    },
+    "LocalServiceIO._matches_workspace": {
+      "old_range": [
+        99,
+        110
+      ],
+      "new_range": [
+        99,
+        110
+      ],
+      "executable_ast_sha256": "90b86fa1710cb3a57501aa18afc65cac64881e5f2c15303411de06bce8d559f1"
+    },
+    "LocalServiceIO.authorize": {
+      "old_range": [
+        112,
+        161
+      ],
+      "new_range": [
+        112,
+        161
+      ],
+      "executable_ast_sha256": "18ee131a4ace64487af13284c1a2eaf6458a49ba05f56a8f46d83750f4ca9156"
+    },
+    "LocalServiceIO.writer": {
+      "old_range": [
+        163,
+        189
+      ],
+      "new_range": [
+        163,
+        189
+      ],
+      "executable_ast_sha256": "2d0a33fabb539e4adc35221cec5cb7af1e053fa7e0742be75acf3ea8e1594562"
+    },
+    "LocalServiceIO._recapture": {
+      "old_range": [
+        191,
+        223
+      ],
+      "new_range": [
+        191,
+        223
+      ],
+      "executable_ast_sha256": "67bac85c09f454e91c98fcba634776ccd6661764c30129bdc7da880316c2f039"
+    },
+    "_repository_selection": {
+      "old_range": [
+        226,
+        254
+      ],
+      "new_range": [
+        226,
+        254
+      ],
+      "executable_ast_sha256": "7e9b071e5358416dacd3e397a7ba5e482d94f176b9ac83b06a3356bbb946ff27"
+    },
+    "run_local_git": {
+      "old_range": [
+        257,
+        341
+      ],
+      "new_range": [
+        257,
+        341
+      ],
+      "executable_ast_sha256": "cd1fd67ac05fff406d7a957e675db82a54d85bf3cc3c4d93a7a4a6ede2d67150"
+    },
+    "run_local_git.expire": {
+      "old_range": [
+        303,
+        316
+      ],
+      "new_range": [
+        303,
+        316
+      ],
+      "executable_ast_sha256": "24fd1fec7aa4a2fd70c89647a0c9daf9bdad81e0c2781737cb5b5292fffd50db"
+    },
+    "_authorize_local_root": {
+      "old_range": [
+        344,
+        345
+      ],
+      "new_range": [
+        344,
+        345
+      ],
+      "executable_ast_sha256": "efce186aa0ae7690ed7e12cf4b511bd96a311b55ef5bb562d1c3d913cbc37aea"
+    },
+    "_invalidate_empty_authority": {
+      "old_range": [
+        348,
+        356
+      ],
+      "new_range": [
+        348,
+        356
+      ],
+      "executable_ast_sha256": "e0cbc8e2b547c8c3e66b5c25164db577c2e9b8c957cf0a612336dd09763fa332"
+    },
+    "installed_local_io": {
+      "old_range": [
+        378,
+        423
+      ],
+      "new_range": [
+        386,
+        431
+      ],
+      "executable_ast_sha256": "2b06807bec7f03997d783264e2f00342ef4733d1b21aa6037b73a785e0f8ea46"
+    }
+  },
+  "declaration_exclusive_named_body_coverage": {
+    "_canonical_state_location": {
+      "declaration_line": 359,
+      "body_first_line": 369,
+      "body_last_line": 383,
+      "executable_ast_sha256": "d6231d6e8f3047f414fd802957d7ab21b47dae34c334c752566ab05dfd10608f",
+      "covered_lines": 8,
+      "statements": 8,
+      "line_percent": 100.0,
+      "covered_branches": 2,
+      "branches": 2,
+      "branch_percent": 100.0,
+      "missing_lines": [],
+      "missing_branches": [],
+      "executed_body_lines": [
+        369,
+        371,
+        372,
+        373,
+        374,
+        377,
+        382,
+        383
+      ],
+      "executed_body_branches": [
+        [
+          377,
+          382
+        ],
+        [
+          377,
+          383
+        ]
+      ]
+    }
+  },
+  "file_coverage": {
+    "fresh_34_controls": {
+      "covered_lines": 62,
+      "statements": 140,
+      "line_percent": 44.285714285714285,
+      "covered_branches": 8,
+      "branches": 40,
+      "branch_percent": 20.0,
+      "missing_lines": [
+        65,
+        97,
+        105,
+        106,
+        109,
+        110,
+        140,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161,
+        178,
+        184,
+        185,
+        199,
+        200,
+        208,
+        212,
+        213,
+        214,
+        215,
+        219,
+        220,
+        221,
+        222,
+        223,
+        238,
+        239,
+        240,
+        241,
+        243,
+        244,
+        252,
+        253,
+        254,
+        269,
+        270,
+        278,
+        280,
+        285,
+        293,
+        301,
+        303,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        318,
+        319,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341
+      ],
+      "missing_branches": [
+        [
+          64,
+          65
+        ],
+        [
+          128,
+          140
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          142,
+          161
+        ],
+        [
+          144,
+          145
+        ],
+        [
+          144,
+          146
+        ],
+        [
+          153,
+          154
+        ],
+        [
+          153,
+          160
+        ],
+        [
+          178,
+          184
+        ],
+        [
+          178,
+          185
+        ],
+        [
+          212,
+          213
+        ],
+        [
+          212,
+          221
+        ],
+        [
+          213,
+          214
+        ],
+        [
+          213,
+          215
+        ],
+        [
+          221,
+          222
+        ],
+        [
+          221,
+          223
+        ],
+        [
+          243,
+          244
+        ],
+        [
+          243,
+          254
+        ],
+        [
+          270,
+          278
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          313,
+          -303
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          337
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          339
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          341
+        ]
+      ]
+    },
+    "retained_baseline": {
+      "covered_lines": 137,
+      "statements": 138,
+      "line_percent": 99.27536231884058,
+      "covered_branches": 39,
+      "branches": 40,
+      "branch_percent": 97.5,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "qualified_fresh_plus_unchanged_history": {
+      "covered_lines": 139,
+      "statements": 140,
+      "line_percent": 99.28571428571429,
+      "covered_branches": 39,
+      "branches": 40,
+      "branch_percent": 97.5,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "retained_only_lines": [
+      65,
+      97,
+      105,
+      106,
+      109,
+      110,
+      140,
+      142,
+      143,
+      144,
+      146,
+      151,
+      153,
+      154,
+      155,
+      160,
+      161,
+      178,
+      184,
+      185,
+      199,
+      200,
+      208,
+      212,
+      213,
+      214,
+      215,
+      219,
+      220,
+      221,
+      222,
+      223,
+      238,
+      239,
+      240,
+      241,
+      243,
+      244,
+      252,
+      253,
+      254,
+      269,
+      270,
+      278,
+      280,
+      285,
+      293,
+      301,
+      303,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      318,
+      319,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341
+    ],
+    "retained_only_branches": [
+      [
+        64,
+        65
+      ],
+      [
+        128,
+        140
+      ],
+      [
+        142,
+        143
+      ],
+      [
+        142,
+        161
+      ],
+      [
+        144,
+        146
+      ],
+      [
+        153,
+        154
+      ],
+      [
+        153,
+        160
+      ],
+      [
+        178,
+        184
+      ],
+      [
+        178,
+        185
+      ],
+      [
+        212,
+        213
+      ],
+      [
+        212,
+        221
+      ],
+      [
+        213,
+        214
+      ],
+      [
+        213,
+        215
+      ],
+      [
+        221,
+        222
+      ],
+      [
+        221,
+        223
+      ],
+      [
+        243,
+        244
+      ],
+      [
+        243,
+        254
+      ],
+      [
+        270,
+        278
+      ],
+      [
+        270,
+        280
+      ],
+      [
+        313,
+        -303
+      ],
+      [
+        313,
+        314
+      ],
+      [
+        323,
+        324
+      ],
+      [
+        323,
+        325
+      ],
+      [
+        326,
+        327
+      ],
+      [
+        326,
+        328
+      ],
+      [
+        334,
+        335
+      ],
+      [
+        334,
+        337
+      ],
+      [
+        337,
+        338
+      ],
+      [
+        337,
+        339
+      ],
+      [
+        339,
+        340
+      ],
+      [
+        339,
+        341
+      ]
+    ]
+  },
+  "exact_old_to_new_retained_line_map": {
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9,
+    "10": 10,
+    "11": 11,
+    "12": 12,
+    "13": 13,
+    "14": 14,
+    "15": 15,
+    "16": 16,
+    "17": 17,
+    "18": 18,
+    "19": 19,
+    "20": 20,
+    "21": 21,
+    "22": 22,
+    "23": 23,
+    "24": 24,
+    "25": 25,
+    "26": 26,
+    "27": 27,
+    "28": 28,
+    "29": 29,
+    "30": 30,
+    "31": 31,
+    "32": 32,
+    "33": 33,
+    "34": 34,
+    "35": 35,
+    "36": 36,
+    "37": 37,
+    "38": 38,
+    "39": 39,
+    "40": 40,
+    "41": 41,
+    "42": 42,
+    "43": 43,
+    "44": 44,
+    "45": 45,
+    "46": 46,
+    "47": 47,
+    "48": 48,
+    "49": 49,
+    "50": 50,
+    "51": 51,
+    "52": 52,
+    "53": 53,
+    "54": 54,
+    "55": 55,
+    "56": 56,
+    "57": 57,
+    "58": 58,
+    "59": 59,
+    "60": 60,
+    "61": 61,
+    "62": 62,
+    "63": 63,
+    "64": 64,
+    "65": 65,
+    "66": 66,
+    "67": 67,
+    "68": 68,
+    "69": 69,
+    "70": 70,
+    "71": 71,
+    "72": 72,
+    "73": 73,
+    "74": 74,
+    "75": 75,
+    "76": 76,
+    "77": 77,
+    "78": 78,
+    "79": 79,
+    "80": 80,
+    "81": 81,
+    "82": 82,
+    "83": 83,
+    "84": 84,
+    "85": 85,
+    "86": 86,
+    "87": 87,
+    "88": 88,
+    "89": 89,
+    "90": 90,
+    "91": 91,
+    "92": 92,
+    "93": 93,
+    "94": 94,
+    "95": 95,
+    "96": 96,
+    "97": 97,
+    "98": 98,
+    "99": 99,
+    "100": 100,
+    "101": 101,
+    "102": 102,
+    "103": 103,
+    "104": 104,
+    "105": 105,
+    "106": 106,
+    "107": 107,
+    "108": 108,
+    "109": 109,
+    "110": 110,
+    "111": 111,
+    "112": 112,
+    "113": 113,
+    "114": 114,
+    "115": 115,
+    "116": 116,
+    "117": 117,
+    "118": 118,
+    "119": 119,
+    "120": 120,
+    "121": 121,
+    "122": 122,
+    "123": 123,
+    "124": 124,
+    "125": 125,
+    "126": 126,
+    "127": 127,
+    "128": 128,
+    "129": 129,
+    "130": 130,
+    "131": 131,
+    "132": 132,
+    "133": 133,
+    "134": 134,
+    "135": 135,
+    "136": 136,
+    "137": 137,
+    "138": 138,
+    "139": 139,
+    "140": 140,
+    "141": 141,
+    "142": 142,
+    "143": 143,
+    "144": 144,
+    "145": 145,
+    "146": 146,
+    "147": 147,
+    "148": 148,
+    "149": 149,
+    "150": 150,
+    "151": 151,
+    "152": 152,
+    "153": 153,
+    "154": 154,
+    "155": 155,
+    "156": 156,
+    "157": 157,
+    "158": 158,
+    "159": 159,
+    "160": 160,
+    "161": 161,
+    "162": 162,
+    "163": 163,
+    "164": 164,
+    "165": 165,
+    "166": 166,
+    "167": 167,
+    "168": 168,
+    "169": 169,
+    "170": 170,
+    "171": 171,
+    "172": 172,
+    "173": 173,
+    "174": 174,
+    "175": 175,
+    "176": 176,
+    "177": 177,
+    "178": 178,
+    "179": 179,
+    "180": 180,
+    "181": 181,
+    "182": 182,
+    "183": 183,
+    "184": 184,
+    "185": 185,
+    "186": 186,
+    "187": 187,
+    "188": 188,
+    "189": 189,
+    "190": 190,
+    "191": 191,
+    "192": 192,
+    "193": 193,
+    "194": 194,
+    "195": 195,
+    "196": 196,
+    "197": 197,
+    "198": 198,
+    "199": 199,
+    "200": 200,
+    "201": 201,
+    "202": 202,
+    "203": 203,
+    "204": 204,
+    "205": 205,
+    "206": 206,
+    "207": 207,
+    "208": 208,
+    "209": 209,
+    "210": 210,
+    "211": 211,
+    "212": 212,
+    "213": 213,
+    "214": 214,
+    "215": 215,
+    "216": 216,
+    "217": 217,
+    "218": 218,
+    "219": 219,
+    "220": 220,
+    "221": 221,
+    "222": 222,
+    "223": 223,
+    "224": 224,
+    "225": 225,
+    "226": 226,
+    "227": 227,
+    "228": 228,
+    "229": 229,
+    "230": 230,
+    "231": 231,
+    "232": 232,
+    "233": 233,
+    "234": 234,
+    "235": 235,
+    "236": 236,
+    "237": 237,
+    "238": 238,
+    "239": 239,
+    "240": 240,
+    "241": 241,
+    "242": 242,
+    "243": 243,
+    "244": 244,
+    "245": 245,
+    "246": 246,
+    "247": 247,
+    "248": 248,
+    "249": 249,
+    "250": 250,
+    "251": 251,
+    "252": 252,
+    "253": 253,
+    "254": 254,
+    "255": 255,
+    "256": 256,
+    "257": 257,
+    "258": 258,
+    "259": 259,
+    "260": 260,
+    "261": 261,
+    "262": 262,
+    "263": 263,
+    "264": 264,
+    "265": 265,
+    "266": 266,
+    "267": 267,
+    "268": 268,
+    "269": 269,
+    "270": 270,
+    "271": 271,
+    "272": 272,
+    "273": 273,
+    "274": 274,
+    "275": 275,
+    "276": 276,
+    "277": 277,
+    "278": 278,
+    "279": 279,
+    "280": 280,
+    "281": 281,
+    "282": 282,
+    "283": 283,
+    "284": 284,
+    "285": 285,
+    "286": 286,
+    "287": 287,
+    "288": 288,
+    "289": 289,
+    "290": 290,
+    "291": 291,
+    "292": 292,
+    "293": 293,
+    "294": 294,
+    "295": 295,
+    "296": 296,
+    "297": 297,
+    "298": 298,
+    "299": 299,
+    "300": 300,
+    "301": 301,
+    "302": 302,
+    "303": 303,
+    "304": 304,
+    "305": 305,
+    "306": 306,
+    "307": 307,
+    "308": 308,
+    "309": 309,
+    "310": 310,
+    "311": 311,
+    "312": 312,
+    "313": 313,
+    "314": 314,
+    "315": 315,
+    "316": 316,
+    "317": 317,
+    "318": 318,
+    "319": 319,
+    "320": 320,
+    "321": 321,
+    "322": 322,
+    "323": 323,
+    "324": 324,
+    "325": 325,
+    "326": 326,
+    "327": 327,
+    "328": 328,
+    "329": 329,
+    "330": 330,
+    "331": 331,
+    "332": 332,
+    "333": 333,
+    "334": 334,
+    "335": 335,
+    "336": 336,
+    "337": 337,
+    "338": 338,
+    "339": 339,
+    "340": 340,
+    "341": 341,
+    "342": 342,
+    "343": 343,
+    "344": 344,
+    "345": 345,
+    "346": 346,
+    "347": 347,
+    "348": 348,
+    "349": 349,
+    "350": 350,
+    "351": 351,
+    "352": 352,
+    "353": 353,
+    "354": 354,
+    "355": 355,
+    "356": 356,
+    "357": 357,
+    "358": 358,
+    "376": 384,
+    "377": 385,
+    "378": 386,
+    "379": 387,
+    "380": 388,
+    "381": 389,
+    "382": 390,
+    "383": 391,
+    "384": 392,
+    "385": 393,
+    "386": 394,
+    "387": 395,
+    "388": 396,
+    "389": 397,
+    "390": 398,
+    "391": 399,
+    "392": 400,
+    "393": 401,
+    "394": 402,
+    "395": 403,
+    "396": 404,
+    "397": 405,
+    "398": 406,
+    "399": 407,
+    "400": 408,
+    "401": 409,
+    "402": 410,
+    "403": 411,
+    "404": 412,
+    "405": 413,
+    "406": 414,
+    "407": 415,
+    "408": 416,
+    "409": 417,
+    "410": 418,
+    "411": 419,
+    "412": 420,
+    "413": 421,
+    "414": 422,
+    "415": 423,
+    "416": 424,
+    "417": 425,
+    "418": 426,
+    "419": 427,
+    "420": 428,
+    "421": 429,
+    "422": 430,
+    "423": 431
+  },
+  "coverage_qualification": "The changed helper claims fresh declaration-exclusive BODY coverage. Qualified whole-file coverage composes exact AST-identical unchanged ranges with retained NCF1 proof; this is not a new whole-module run. No previous helper coverage is carried into the changed body.",
+  "test_delta": {
+    "new_functions": [
+      "test_intermediate_state_components_preserve_partition",
+      "test_intermediate_state_resolution_rejects_invalid_identity"
+    ],
+    "all_original_callable_asts_equal": true,
+    "all_26_original_node_ids_retained": true,
+    "all_original_assertions_preserved": true
+  },
+  "normalized_scoped_unified_diffs": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "--- before/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n+++ after/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n@@ -361,18 +361,26 @@\n \n     location (RegistryLocation): output of for_host after its absolute, platform,\n     parent-component and external-root checks. Return a location with the same\n-    workspace identity and fixed layout under the resolved host base. Reads path\n-    metadata only; an absent leaf is permitted. Resolution errors propagate;\n-    ValueError rejects a derived path redirected outside that exact layout.\n+    workspace identity and fixed suffix beneath the resolved host base. Host\n+    resolution may insert intermediate components. Read metadata only; absent\n+    leaves are permitted. Resolution errors propagate; ValueError rejects a\n+    relative result, escaped base or changed contract suffix/workspace digest.\n     \"\"\"\n     state = Path(location.directory)\n     # The accepted builder appends drm-copilot/discovery/workspaces/workspace-digest.\n-    # Resolve its trusted base, then verify the complete path against that layout.\n     base = state.parents[3]\n-    expected = base.resolve() / state.relative_to(base)\n-    if state.resolve() != expected:\n+    suffix = state.relative_to(base)\n+    resolved_base = base.resolve()\n+    canonical = state.resolve()\n+    # Complete-path resolution can differ from resolving its parent and joining.\n+    # Retain the contract suffix and containment; the store rechecks canonicality.\n+    if (\n+        not canonical.is_absolute()\n+        or not canonical.is_relative_to(resolved_base)\n+        or Path(*canonical.parts[-len(suffix.parts) :]) != suffix\n+    ):\n         raise ValueError(\"Host state must retain its fixed workspace partition\")\n-    return replace(location, directory=expected.as_posix())\n+    return replace(location, directory=canonical.as_posix())\n \n \n def installed_local_io(\n",
+    "tests/discovery_runtime/test_gateway_factory.py": "--- before/tests/discovery_runtime/test_gateway_factory.py\n+++ after/tests/discovery_runtime/test_gateway_factory.py\n@@ -343,3 +343,68 @@\n         local.authorize(request, baseline=None)\n \n     assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\"missing\", [False, True], ids=[\"existing\", \"missing-leaf\"])\n+@pytest.mark.parametrize(\n+    \"intermediate\",\n+    [(\"cache\",), (\"tenant\", \"session\", \"state\")],\n+    ids=[\"one-component\", \"three-components\"],\n+)\n+def test_intermediate_state_components_preserve_partition(\n+    factory_case: FactoryCase, intermediate: tuple[str, ...], missing: bool\n+) -> None:\n+    \"\"\"Accept complete-path resolution that adds contained host components.\n+\n+    factory_case (FactoryCase) owns memory seams; intermediate (tuple[str, ...])\n+    selects generic host components and missing (bool) permits absent storage.\n+    Return None; assertions preserve the contract suffix, workspace identity and\n+    real store's canonical recheck without native effects.\n+    \"\"\"\n+    case = factory_case\n+    suffix = case.state.relative_to(case.base)\n+    expected = case.base.joinpath(*intermediate) / suffix\n+    # Only the complete state moves; resolving its trusted base remains unchanged.\n+    case.aliases[case.state] = expected\n+    if missing:\n+        case.missing.update((case.state, expected))\n+\n+    local = case.compose()\n+\n+    assert isinstance(local.activation, activation_store.ActivationStore)\n+    assert local.activation.location.directory == expected.as_posix()\n+    assert local.activation.location.workspace == case.location.workspace\n+    assert local.activation.location.workspace_sha256 == case.location.workspace_sha256\n+    assert (case.base, False) in case.resolutions\n+    assert (expected, False) in case.resolutions\n+    assert local.initialization.primitives is local.activation.primitives\n+    assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\n+    \"redirect\", [\"relative\", \"outside-base\", \"layout\", \"partition\"]\n+)\n+def test_intermediate_state_resolution_rejects_invalid_identity(\n+    factory_case: FactoryCase, redirect: str\n+) -> None:\n+    \"\"\"Reject resolution that loses containment, layout or workspace partition.\n+\n+    factory_case (FactoryCase) supplies memory paths; redirect (str) selects the\n+    violated invariant. Return None; ValueError and absent native effects prove\n+    no alternate storage or authority is substituted.\n+    \"\"\"\n+    case = factory_case\n+    suffix = case.state.relative_to(case.base)\n+    contained = case.base / \"cache\" / suffix\n+    candidates = {\n+        \"relative\": Path(\"relative\") / suffix,\n+        \"outside-base\": case.base.with_name(\"other-state\") / suffix,\n+        \"layout\": contained.parent.with_name(\"unexpected\") / contained.name,\n+        \"partition\": contained.with_name(\"other-workspace\"),\n+    }\n+    case.aliases[case.state] = candidates[redirect]\n+\n+    with pytest.raises(ValueError, match=\"partition\"):\n+        case.compose()\n+\n+    assert not case.effects\n"
+  },
+  "source_and_raw_coverage_archives": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "sha256": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+      "bytes": 19117,
+      "gzip_base64": "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"
+    },
+    "tests/discovery_runtime/test_gateway_factory.py": {
+      "sha256": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+      "bytes": 16888,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf2-coverage.json": {
+      "sha256": "32b06fe5e510eaefeb2f5ae614f1284d068e8e7923e2d0982a452691382791aa",
+      "bytes": 14847,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf2-inputs.py": {
+      "sha256": "2e9e89f3cf7465e0210001d8a129cacf8b9ae5050aaea69024c2748bb1a83399",
+      "bytes": 2636,
+      "gzip_base64": "H4sIAAAAAAAC/5VW227jNhB911cQBAJIu6Yku7nsBXko0i22D+0uun5okQQCLY1stpKoJak4TpB/7wwl+bbZoOsHW+IMz5BnzsyYc/7ZgAVzB+yPq19nTDVt55h1BmRtmWwKpuq6c3JRATPgpGqgYK3RumRr5VYanRfSQoXraG8ruYk554GqW2160/lpUBpds0I6cKoGNtjG9wmj7wfdwLhr+aDa8Xkl7apSi/H1H6ubHq6Vjgwj2md8DQI8l2OX/iXO10UYBSVI1xkYFkNe6Nwmw6JNZO7UHSSzdHYupqmYXogKljLfiELZXN+B2QikQLTSKLcRb9+kPApM1/hrXDLeyvxfuUScnftgTazJk8LUWa5bVWmXbT0SHug1kXjJrkeo14wvkY213GSVzmUVtxs+YdyBdXvY2YhN69m4ocQ7aLOhLbdBA+uMiKHD/ejuQFrUgWOhJzFhI1YUw71CKCQzKKBkC901Regt7wKGHyPXGG/c1m9B+RTZYoOxcJt3AmS8YY+c7Pydd8Mr2pWcnZ3j+5DnuF8IETOKV3BfKKTXhRG6ejT0rKDx5qcggMYZBRajPz4FpTYeFSXMPMM/cLoB6JrMtwT36tXeNTE46XsveGzbSjm/GEbRxGN88+Gk46wvAdzaP8SL81Nocl1ASOY413WLSrSEOmE1ZegyjaK4AO/Dpc2V4nhZrDkHuTsWTiPxh67uH/DqYdDH7hM8KMnrXDqlm6xUFdiNdVB/a7OoBRiWqeif29DDEy9ZqyuVjyGoh6gcUPDIJWLao3X8VbJSDx70yGbga0eqNB2G2ouCBqs7k2OF1bJRJfrE1AF4dLvHx2sk5Ltq5y9w5CvhJWq8A16oVMvO7B/8oIa8UiTp5znrtqDxzAZKMJh9L9lrbLLh2J4SfzZSJrbQHPN+c0NICY+eOzjcqYJgkrH1Ju25mwqsHQOFGBfjsa3N0vn0FJtbz93kCOOrFHRW22MMxxZNXk6F7/M7mOk8PRU/vX0exsCSdIwcCbq/apbPAJYG4AGOEE9n/+dgcA95h/okoJnIZWdB+NSYus/MPuiZSM+2SrFO1i0SPg6cuNHrcJw5cefyKMZUlLQS8pO/xUktTor5yUdx8ju1eyxEQ0X3yOfo4cGwmv0vZuhK1yjNAlf4l6s/f55fffSS88Mm84rKsiim/KHzh79+m2dXn375gO7pftfgnzpHc/dLh2hmQ2jztWbaqKVqZLWdx+MEfs8aTQ2a9eXhe7rvbe9xNitqhJQ58keaiu9P6oMzGHQBCj1KF2clEp4R/RmxjuXYSmUyYnqaep7Ti+nFIcrQShFneMJ70yjxVMiFpdSi8fHpYNe2mrOFagoUDwFc7/Vgtt/et963hxcY2Ml2dfYSys7rFttrPzV39bjToXYrMByXQn6s6Jnw/5dsTDnvdYazfFBeMIweeouLrm6xyXsxTTA6QrvLWUTuN+gbDzOBd64Ub3AvpexoaukWhw+/X2BPkHaQRD/j+ud4jf9SwM9G7I6qcfuRDwZvLC02b6vu/WD9gRlMiewll/kmR2DEcfoURcF/4Jw0e0wKAAA="
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf2-run.py": {
+      "sha256": "be3a85bb390e77ba115539a2df8e0a85dbe4de3cc192baa47535f9a162dc4dc7",
+      "bytes": 3891,
+      "gzip_base64": "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"
+    },
+    "SCRATCH/issue-980-p6t1-gateway-ncf2-proof.py": {
+      "sha256": "ac742d4b7b2de05cb6ee7cc984f3424c6dc12523c96194a27d3d71ad5bffc0ad",
+      "bytes": 12437,
+      "gzip_base64": "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"
+    }
+  },
+  "protected_bindings_unchanged": true,
+  "source_scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+      "bytes": 19117
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+      "bytes": 16888
+    }
+  ],
+  "reader_provenance": "Declaration-exclusive AST, line and branch readers are reused from the retained NCF1 proof helper. Input schema and sole changed-function selection are adapted to NCF2.",
+  "separate_diagnosis": "The seven-path NCF2 cause evidence and prior NCF1 proof remain immutable and outside this repair-only enumeration.",
+  "self_included": false
+}
