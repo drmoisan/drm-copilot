@@ -1,0 +1,36 @@
+{
+  "harnesses": {
+    "issue-980-inspection-gates-initial.py": {
+      "bytes": 3210,
+      "sha256": "2d1387dfc52c85a992177310d3f523ae5f08dbefaedbe87bcd158b2c72fcd316",
+      "encoding": "gzip-base64",
+      "data": "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",
+      "crlf_count": 1,
+      "terminal_blank_line": false
+    },
+    "issue-980-inspection-gates.py": {
+      "bytes": 3190,
+      "sha256": "122a2691e07d8f8e21c13d6e9f0445c4dd0a33ad1bff0b343e600f827dc5e21e",
+      "encoding": "gzip-base64",
+      "data": "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",
+      "crlf_count": 2,
+      "terminal_blank_line": true
+    },
+    "issue-980-inspection-tests.py": {
+      "bytes": 1034,
+      "sha256": "d7979e9ceaf9d0b9a30d7401a1823e43176f654741262f0271018254f8354843",
+      "encoding": "gzip-base64",
+      "data": "H4sIAAAAAAAC/4VTwY7cIAy9R+o/cCNoSabqqcoox96rznE7QmxwMlQJUEN2Jqr23wsJmaq7K+0hgA1+tt9zerQTcTJcRv1E9OQsBvI9mkU+//LWcL/4In51eldr4wFD+Zn7gGV6WndXVTLG9hC3BPChOLXpshSi1yMIwWI0gglFN0rvyQ/oLCrApiAKeiKENjoIUXoYe9aQtNXGKvDt4/m4WggJPdlbyJZGdHYcoQvaGjFZpftFB5j8isPX4yu023rQivQWyY1oQ9ZXOYkD9NqHkv2XA2ez7qMdtio2+O284+f6aukcGFX+oVse2mwXOS2n1wuYuzMZnNo5dHaCuzfbnKoZZWrtfrM7Xtj79WYzs1ieDtRhKtr7OilJWX3F2K8IcAtl8kTEyflcrafNP6o4zR1lZ7ZeuDYq6th+YQ/0p6EcTBd5N0NL59BXXykrsN3VjXVJHCLrNPHnD0r7zj4DLiuleoLDymscqGfdQZwB77KWwyxRxYlbKKfV77TYuEilrIszUKFMriqCtQqnOAROjzaIO379FnIPqJ5Qmu5yN7e+2gA4VZP2Prby+i4R1dCHNPCR0TWDHCAzei5i/9Buo1JPUpsy9czdOA8xe/uIZ3ZMcSurH8mQQmmzAuyS4Bs9cBeDU7jp9A+oODxp/VidI0rtgZwWH8f+W4wuUxz7VPwFEgP9twoEAAA=",
+      "crlf_count": 1,
+      "terminal_blank_line": false
+    }
+  },
+  "initial_harness_diagnostic": {
+    "tool_chunk": "21aa8a",
+    "stage": "dependency binding before child execution",
+    "error": "FileNotFoundError: mutation_validation.py does not exist",
+    "correction": "Remove nonexistent dependency entry; all real mutation dependencies remain bound.",
+    "rerun": false
+  },
+  "raw_policy": "Harness bytes are lossless gzip-base64; stage stdout/stderr remain raw-base64 in immutable ordered receipts. Readable presentation uses OBSERVED_PATH_ALIASES and does not replace raw bytes."
+}

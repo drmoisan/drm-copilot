@@ -1,0 +1,61 @@
+{
+  "status": "OWNER_FILES_ONLY_NOT_STAGED",
+  "paths": [
+    {
+      "path": "tests/discovery_runtime/test_service_inspection_guards.py",
+      "sha256": "79da7a7479dbeea9ae5ff1a00ad91baca8af99752972d9d32219c38b4ea5dcbf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-consolidate-format.2026-10-21T12-06.json",
+      "sha256": "02758bf3ef61e81cc72ec76fb60003dab2f7189991ddb8ff655d2029647e744e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-consolidate-lint.2026-10-21T12-06.json",
+      "sha256": "7759420724bfc11a02ff7c1c414eafb39fcc92b5ee63523eb539a4906d6e9fe5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-format.2026-10-21T12-06.json",
+      "sha256": "f62a2e6f520bb0d5994a7c553792aa350dd9080ec7642305bf649841e6af2482"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-lint.2026-10-21T12-06.json",
+      "sha256": "7fa52612c5b16dad8fb9ff6373a23ac466618b18fdec1cbcc87eb3d107f1113b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.json",
+      "sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-types.2026-10-21T12-06.json",
+      "sha256": "d27b6f7dbff06fbaba64a0bd7cbac3077251440122c561345f3a375d4058ce2e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-format.2026-10-21T12-11.json",
+      "sha256": "eae376db6cd7cb3bab47f56927b1be93a346a39f984bc4c2c05b546b8531c6c3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-lint.2026-10-21T12-11.json",
+      "sha256": "16f7588d93f3f14bc42f0f5cba9fb5c5733e03b1ad984be9c025c9c0bd481b8c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.json",
+      "sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-types.2026-10-21T12-11.json",
+      "sha256": "c7f4003f502980837f31e1bb66432859a40f978ac345669bba4a178e89222141"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-harness-archive.2026-10-21T12-15.json",
+      "sha256": "9376f51bd67b826efce0d0752ace3f9ac4ac2367496bcf4664da5d0238be93f5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-freeze.2026-10-21T12-15.json",
+      "sha256": "57062d43acaed919d7589d9a56248b93c022c5ed074c24202e9f3a859ba80deb"
+    }
+  ],
+  "existing_prerequisites": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json"
+  ]
+}

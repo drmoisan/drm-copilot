@@ -1,0 +1,1368 @@
+{
+  "Timestamp": "2026-10-21T12-10",
+  "Command": "poetry run python SCRATCH\\issue-980-inspection-tests.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "tests exit 1",
+  "started": "2026-10-21T12:06:55.608818+00:00",
+  "finished": "2026-10-21T12:10:28.680262+00:00",
+  "duration_seconds": 213.0715611000196,
+  "source_before": {
+    "tests/discovery_runtime/test_service_inspection_guards.py": {
+      "sha256": "32b2edeba960be2047fc88ba9ca607968a0068fbe4987e2a16e66a96f4ff2213",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": {
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": {
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "physical_lines": 334
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": {
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "physical_lines": 278
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "physical_lines": 437
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    },
+    "tests/discovery_runtime/test_service.py": {
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_service_boundaries.py": {
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "physical_lines": 500
+    },
+    "tests/discovery_runtime/test_service_publication.py": {
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "physical_lines": 497
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    },
+    "tests/discovery_runtime/test_activation_store.py": {
+      "sha256": "8cc5f600177fa2ae5d3e51c3250e265780d41074bd521b9250f7f9a698ab58cd",
+      "physical_lines": 465
+    }
+  },
+  "source_after": {
+    "tests/discovery_runtime/test_service_inspection_guards.py": {
+      "sha256": "32b2edeba960be2047fc88ba9ca607968a0068fbe4987e2a16e66a96f4ff2213",
+      "physical_lines": 312
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": {
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": {
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "physical_lines": 334
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": {
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "physical_lines": 278
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "physical_lines": 437
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    },
+    "tests/discovery_runtime/test_service.py": {
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_service_boundaries.py": {
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "physical_lines": 500
+    },
+    "tests/discovery_runtime/test_service_publication.py": {
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "physical_lines": 497
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    },
+    "tests/discovery_runtime/test_activation_store.py": {
+      "sha256": "8cc5f600177fa2ae5d3e51c3250e265780d41074bd521b9250f7f9a698ab58cd",
+      "physical_lines": 465
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "91008c435b08617210174a74cc6e3f20dee7c1bff019692e057d25ea002f29f9",
+      "raw_base64": "Li4uRi4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fXyB0ZXN0X2lnNF9zZWxlY3Rvcl9wcm9maWxlX2Vycm9yX3N1cnZpdmVzX2JlZm9yZV9hbmFseXNpcyBfX19fX19fX19fXw0KDQpjb250ZXh0ID0gPGRybV9jb3BpbG90X2Rpc2NvdmVyeS5vcGVyYXRpb25zLk9wZXJhdGlvbkNvbnRleHQgb2JqZWN0IGF0IDB4MDAwMDAxRjg2QUFFMDE4MD4NCnNlcnZpY2VfaW8gPSA8dGVzdHMuZGlzY292ZXJ5X3J1bnRpbWUudGVzdF9zZXJ2aWNlLk1lbW9yeVNlcnZpY2Ugb2JqZWN0IGF0IDB4MDAwMDAxRjg2QUE4QUZEMD4NCm1vbmtleXBhdGNoID0gPF9weXRlc3QubW9ua2V5cGF0Y2guTW9ua2V5UGF0Y2ggb2JqZWN0IGF0IDB4MDAwMDAxRjg2QTk2Qjc5MD4NCg0KICAgIGRlZiB0ZXN0X2lnNF9zZWxlY3Rvcl9wcm9maWxlX2Vycm9yX3N1cnZpdmVzX2JlZm9yZV9hbmFseXNpcygNCiAgICAgICAgY29udGV4dDogT3BlcmF0aW9uQ29udGV4dCwNCiAgICAgICAgc2VydmljZV9pbzogTWVtb3J5U2VydmljZSwNCiAgICAgICAgbW9ua2V5cGF0Y2g6IHB5dGVzdC5Nb25rZXlQYXRjaCwNCiAgICApIC0+IE5vbmU6DQogICAgICAgICIiIlVzZSBtZW1vcnkgY29udGV4dC9pbyBhbmQgcGF0Y2ggc2VhbSB0byByZXRhaW4gUHJvZmlsZUVycm9yOyByZXR1cm4gTm9uZS4iIiINCiAgICAgICAgc2VsZWN0ZWQgPSBjYXB0dXJlZF9zb3VyY2UoY29udGV4dCwgc2VydmljZV9pbykNCj4gICAgICAgc2VsZWN0ZWQucmVxdWVzdCA9IHJlcGxhY2Uoc2VsZWN0ZWQucmVxdWVzdCwgb3BlcmF0aW9uPSJpbnZlbnRvcnkiKQ0KICAgICAgICAgICAgICAgICAgICAgICAgICAgXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eDQoNCnRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3Rfc2VydmljZV9pbnNwZWN0aW9uX2d1YXJkcy5weToxMzc6IA0KXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXw0KLi5cLi5cLi5cQXBwRGF0YVxMb2NhbFxQcm9ncmFtc1xQeXRob25cUHl0aG9uMzEzXExpYlxkYXRhY2xhc3Nlcy5weToxNTk2OiBpbiByZXBsYWNlDQogICAgcmV0dXJuIF9yZXBsYWNlKG9iaiwgKipjaGFuZ2VzKQ0KICAgICAgICAgICBeXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl4NCi4uXC4uXC4uXEFwcERhdGFcTG9jYWxcUHJvZ3JhbXNcUHl0aG9uXFB5dGhvbjMxM1xMaWJcZGF0YWNsYXNzZXMucHk6MTYzMDogaW4gX3JlcGxhY2UNCiAgICByZXR1cm4gc2VsZi5fX2NsYXNzX18oKipjaGFuZ2VzKQ0KICAgICAgICAgICBeXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eDQo8c3RyaW5nPjoxNTogaW4gX19pbml0X18NCiAgICA/Pz8NCnBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3Zlcnlcc2VydmljZV9jb250cmFjdHMucHk6MTY2OiBpbiBfX3Bvc3RfaW5pdF9fDQogICAgY2hlY2tfcmVxdWVzdChzZWxmKQ0KcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxzZXJ2aWNlX3NlcmlhbGl6YXRpb24ucHk6MjI4OiBpbiBjaGVja19yZXF1ZXN0DQogICAgY2hlY2tfY29tYmluYXRpb25zKGZpZWxkcykNCl8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8gXyBfIF8NCg0KZmllbGRzID0geyckc2NoZW1hJzogJ3Vybjpkcm0tY29waWxvdDpkaXNjb3Zlcnk6Mi4wLjA6c2VydmljZS1yZXF1ZXN0JywgJ2FydGlmYWN0X2tpbmQnOiAnc2VydmljZS1yZXF1ZXN0JywgJ2F1dGhvcml6YXRpb25fcmVmJzogTm9uZSwgJ2RyeV9ydW4nOiBGYWxzZSwgLi4ufQ0KDQogICAgZGVmIGNoZWNrX2NvbWJpbmF0aW9ucyhmaWVsZHM6IGRpY3Rbc3RyLCBvYmplY3RdKSAtPiBOb25lOg0KICAgICAgICAiIiJDaGVjayBib3VuZGVkIHNjaGVtYS1zaGFwZWQgZmllbGRzIGFnYWluc3QgdGhlIGZpeGVkIG9wZXJhdGlvbiBtYXRyaXguDQogICAgDQogICAgICAgIFJldHVybiBOb25lIG9yIHJhaXNlIGZpeGVkIFZhbHVlRXJyb3IgZm9yIGZvcmVpZ24vbWlzc2luZyBpbnB1dHMgb3IgaW52YWxpZA0KICAgICAgICBtb2RlL2Zvcm1hdC9mbGFnL2NvbmRpdGlvbmFsIGNvbWJpbmF0aW9ucy4gVGhlIGNhbGxlciByZXNlcnZlcyBmbGF0LWZpZWxkDQogICAgICAgIHRyYXZlcnNhbCBiZWZvcmUgdGhpcyBmdW5jdGlvbi4gTm8gY2FsbGJhY2tzLCBtb2R1bGVzLCBhdXRob3JpdHksIGdyYXBoDQogICAgICAgIGFzc2Vzc21lbnQgb3IgZmlsZXN5c3RlbSBvcGVyYXRpb25zIGFyZSBzZWxlY3RlZCBvciBleGVjdXRlZC4NCiAgICAgICAgIiIiDQogICAgICAgIG9wZXJhdGlvbiA9IGNhc3QoInN0ciIsIGZpZWxkc1sib3BlcmF0aW9uIl0pDQogICAgICAgIG1vZGUgPSBmaWVsZHNbIm1vZGUiXQ0KICAgICAgICBpbnB1dHMgPSBjYXN0KCJKc29uT2JqZWN0IiwgZmllbGRzWyJpbnB1dHMiXSkNCiAgICAgICAgaWYgdHlwZShvcGVyYXRpb24pIGlzIG5vdCBzdHIgb3Igb3BlcmF0aW9uIG5vdCBpbiBfSU5QVVRTOg0KICAgICAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiU2VydmljZSBvcGVyYXRpb24gaXMgdW5zdXBwb3J0ZWQiKQ0KICAgICAgICBtb2RlcyA9ICgic3RydWN0dXJhbCIsKQ0KICAgICAgICAjIFJvb3QgcmVwb3J0cyBhbmQgcHJvdGVjdGVkIHJvbGUtYXdhcmUgb3BlcmF0aW9ucyBoYXZlIGRpc3RpbmN0IG1vZGUgc2V0cy4NCiAgICAgICAgaWYgb3BlcmF0aW9uIGluICgqX1JFUE9SVFMsICJwcmVwYXJlLWFnZW50Iik6DQogICAgICAgICAgICBtb2RlcyA9IF9ST09UX01PREVTDQogICAgICAgIGVsaWYgb3BlcmF0aW9uIGluIF9ST0xFX0FXQVJFOg0KICAgICAgICAgICAgbW9kZXMgPSAoInN0cnVjdHVyYWwiLCAiYWdlbnQtb3V0cHV0IikNCiAgICAgICAgZWxpZiBvcGVyYXRpb24gPT0gImZpbmFsaXplLWFnZW50IjoNCiAgICAgICAgICAgIG1vZGVzID0gKCJhZ2VudC1vdXRwdXQiLCkNCiAgICAgICAgaWYgbW9kZSBub3QgaW4gbW9kZXMgb3IgKA0KICAgICAgICAgICAgbW9kZSA9PSAiYWdlbnQtb3V0cHV0IiBhbmQgZmllbGRzWyJpbnZvY2F0aW9uX3JlZiJdIGlzIE5vbmUNCiAgICAgICAgKToNCiAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoIlNlcnZpY2Ugb3BlcmF0aW9uIGRvZXMgbm90IGFjY2VwdCB0aGUgc2VsZWN0ZWQgbW9kZSIpDQogICAgICAgIGlmIG9wZXJhdGlvbiBub3QgaW4gX1JFUE9SVFMgYW5kIGZpZWxkc1siZm9ybWF0Il0gIT0gImpzb24iOg0KICAgICAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiVGhpcyBvcGVyYXRpb24gcmVxdWlyZXMgSlNPTiByZXByZXNlbnRhdGlvbiIpDQogICAgICAgIGlmIG9wZXJhdGlvbiBub3QgaW4gX1BMQU5OQUJMRSBhbmQgKGZpZWxkc1siZHJ5X3J1biJdIG9yIGZpZWxkc1sid3JpdGUiXSk6DQogICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJUaGlzIG9wZXJhdGlvbiBkb2VzIG5vdCBzdXBwb3J0IGEgcHVibGljYXRpb24gcGxhbiIpDQogICAgICAgIGFsbG93ZWQgPSBfSU5QVVRTW29wZXJhdGlvbl0NCiAgICAgICAgIyBTbWFsbCBmaXhlZCBhbGxvd2xpc3RzIGJvdW5kIGV4YWN0IGNvbXBhcmlzb25zIGJlZm9yZSB0aGUgc2luZ2xlIGluZGV4IGNvcHkuDQogICAgICAgIGlmIGFueShrZXkgbm90IGluIGFsbG93ZWQgZm9yIGtleSwgXyBpbiBpbnB1dHMubWVtYmVycyk6DQo+ICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJTZXJ2aWNlIG9wZXJhdGlvbiBjb250YWlucyBpbmFwcGxpY2FibGUgaW5wdXQgZmllbGRzIikNCkUgICAgICAgICAgIFZhbHVlRXJyb3I6IFNlcnZpY2Ugb3BlcmF0aW9uIGNvbnRhaW5zIGluYXBwbGljYWJsZSBpbnB1dCBmaWVsZHMNCg0KcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxzZXJ2aWNlX3JlcXVlc3RfcnVsZXMucHk6MjcyOiBWYWx1ZUVycm9yDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09IHRlc3RzIGNvdmVyYWdlID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpfX19fX19fX19fX19fXyBjb3ZlcmFnZTogcGxhdGZvcm0gd2luMzIsIHB5dGhvbiAzLjEzLjEyLWZpbmFsLTAgX19fX19fX19fX19fX19fDQoNCk5hbWUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU3RtdHMgICBNaXNzIEJyYW5jaCBCclBhcnQgIENvdmVyICAgTWlzc2luZw0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XHNlcnZpY2VfaW5zcGVjdGlvbi5weSAgICAgMTE0ICAgICAyNiAgICAgMzAgICAgICA3ICAgIDc2JSAgIDQ4LCA1OC01OSwgOTEtOTQsIDExMywgMTUyLCAxNjksIDE5Ni0yMTYsIDI0NC0yNDYsIDI2MC0yNzAsIDI3My0yNzQNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KVE9UQUwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDExNCAgICAgMjYgICAgIDMwICAgICAgNyAgICA3NiUNCkNvdmVyYWdlIEpTT04gd3JpdHRlbiB0byBmaWxlIEM6XFVzZXJzXERBTk1PSX4xXEFwcERhdGFcTG9jYWxcVGVtcFxpc3N1ZS05ODAtcDZ0MS1pbnNwZWN0aW9uLWd1YXJkc1xjb3ZlcmFnZS5qc29uDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT0gc2hvcnQgdGVzdCBzdW1tYXJ5IGluZm8gPT09PT09PT09PT09PT09PT09PT09PT09PT09DQpGQUlMRUQgdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9zZXJ2aWNlX2luc3BlY3Rpb25fZ3VhcmRzLnB5Ojp0ZXN0X2lnNF9zZWxlY3Rvcl9wcm9maWxlX2Vycm9yX3N1cnZpdmVzX2JlZm9yZV9hbmFseXNpcw0KMSBmYWlsZWQsIDggcGFzc2VkIGluIDIxMS4yMXMgKDA6MDM6MzEpDQo=",
+      "presentation": "...F.....                                                                [100%]\r\n================================== FAILURES ===================================\r\n__________ test_ig4_selector_profile_error_survives_before_analysis ___________\r\n\r\ncontext = <drm_copilot_discovery.operations.OperationContext object at 0x000001F86AAE0180>\r\nservice_io = <tests.discovery_runtime.test_service.MemoryService object at 0x000001F86AA8AFD0>\r\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001F86A96B790>\r\n\r\n    def test_ig4_selector_profile_error_survives_before_analysis(\r\n        context: OperationContext,\r\n        service_io: MemoryService,\r\n        monkeypatch: pytest.MonkeyPatch,\r\n    ) -> None:\r\n        \"\"\"Use memory context/io and patch seam to retain ProfileError; return None.\"\"\"\r\n        selected = captured_source(context, service_io)\r\n>       selected.request = replace(selected.request, operation=\"inventory\")\r\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n\r\ntests\\discovery_runtime\\test_service_inspection_guards.py:137: \r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n..\\..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\dataclasses.py:1596: in replace\r\n    return _replace(obj, **changes)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^\r\n..\\..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\dataclasses.py:1630: in _replace\r\n    return self.__class__(**changes)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n<string>:15: in __init__\r\n    ???\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\service_contracts.py:166: in __post_init__\r\n    check_request(self)\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\service_serialization.py:228: in check_request\r\n    check_combinations(fields)\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\r\n\r\nfields = {'$schema': 'urn:drm-copilot:discovery:2.0.0:service-request', 'artifact_kind': 'service-request', 'authorization_ref': None, 'dry_run': False, ...}\r\n\r\n    def check_combinations(fields: dict[str, object]) -> None:\r\n        \"\"\"Check bounded schema-shaped fields against the fixed operation matrix.\r\n    \r\n        Return None or raise fixed ValueError for foreign/missing inputs or invalid\r\n        mode/format/flag/conditional combinations. The caller reserves flat-field\r\n        traversal before this function. No callbacks, modules, authority, graph\r\n        assessment or filesystem operations are selected or executed.\r\n        \"\"\"\r\n        operation = cast(\"str\", fields[\"operation\"])\r\n        mode = fields[\"mode\"]\r\n        inputs = cast(\"JsonObject\", fields[\"inputs\"])\r\n        if type(operation) is not str or operation not in _INPUTS:\r\n            raise ValueError(\"Service operation is unsupported\")\r\n        modes = (\"structural\",)\r\n        # Root reports and protected role-aware operations have distinct mode sets.\r\n        if operation in (*_REPORTS, \"prepare-agent\"):\r\n            modes = _ROOT_MODES\r\n        elif operation in _ROLE_AWARE:\r\n            modes = (\"structural\", \"agent-output\")\r\n        elif operation == \"finalize-agent\":\r\n            modes = (\"agent-output\",)\r\n        if mode not in modes or (\r\n            mode == \"agent-output\" and fields[\"invocation_ref\"] is None\r\n        ):\r\n            raise ValueError(\"Service operation does not accept the selected mode\")\r\n        if operation not in _REPORTS and fields[\"format\"] != \"json\":\r\n            raise ValueError(\"This operation requires JSON representation\")\r\n        if operation not in _PLANNABLE and (fields[\"dry_run\"] or fields[\"write\"]):\r\n            raise ValueError(\"This operation does not support a publication plan\")\r\n        allowed = _INPUTS[operation]\r\n        # Small fixed allowlists bound exact comparisons before the single index copy.\r\n        if any(key not in allowed for key, _ in inputs.members):\r\n>           raise ValueError(\"Service operation contains inapplicable input fields\")\r\nE           ValueError: Service operation contains inapplicable input fields\r\n\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\service_request_rules.py:272: ValueError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                         Stmts   Miss Branch BrPart  Cover   Missing\r\n------------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\service_inspection.py     114     26     30      7    76%   48, 58-59, 91-94, 113, 152, 169, 196-216, 244-246, 260-270, 273-274\r\n------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                          114     26     30      7    76%\r\nCoverage JSON written to file SCRATCH\\coverage.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis\r\n1 failed, 8 passed in 211.21s (0:03:31)\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ],
+  "nodes.json": {
+    "args": [
+      "-ra",
+      "tests/discovery_runtime/test_service_inspection_guards.py",
+      "-q",
+      "-o",
+      "addopts=-ra",
+      "--cov=drm_copilot_discovery.service_inspection",
+      "--cov-branch",
+      "--cov-report=term-missing",
+      "--cov-report=json:SCRATCH\\coverage.json"
+    ],
+    "nodes": [
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+      "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment"
+    ],
+    "reports": [
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 16.785847300023306
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 3.6737097000004724
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00040329998591914773
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.002848299976903945
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.002822799957357347
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002487999736331403
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.002745300007518381
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.007393400010187179
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002642000326886773
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0027974999975413084
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+        "when": "call",
+        "outcome": "failed",
+        "duration": 7.483728600025643
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004961999948136508
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.002574700047262013
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 160.17872999998508
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00031839997973293066
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0029974000062793493
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 7.6542514999746345
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003223000094294548
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00272609997773543
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 7.428496399952564
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003358999965712428
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.002917399979196489
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 7.4112522000214085
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003228000132367015
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0027805999852716923
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0007547999848611653
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004254999803379178
+      }
+    ],
+    "exit_code": 1
+  },
+  "coverage.json": {
+    "meta": {
+      "format": 3,
+      "version": "7.13.2",
+      "timestamp": "2026-10-21T08:10:28.486288",
+      "branch_coverage": true,
+      "show_contexts": false
+    },
+    "files": {
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\service_inspection.py": {
+        "executed_lines": [
+          3,
+          5,
+          7,
+          8,
+          9,
+          14,
+          21,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          50,
+          56,
+          57,
+          60,
+          61,
+          62,
+          65,
+          72,
+          80,
+          81,
+          82,
+          84,
+          87,
+          88,
+          95,
+          103,
+          104,
+          105,
+          111,
+          112,
+          114,
+          122,
+          123,
+          124,
+          125,
+          126,
+          133,
+          141,
+          143,
+          144,
+          148,
+          150,
+          151,
+          153,
+          154,
+          155,
+          157,
+          163,
+          164,
+          168,
+          171,
+          180,
+          181,
+          191,
+          192,
+          193,
+          194,
+          195,
+          226,
+          233,
+          234,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          249,
+          258,
+          259,
+          271,
+          272
+        ],
+        "summary": {
+          "covered_lines": 88,
+          "num_statements": 114,
+          "percent_covered": 75.69444444444444,
+          "percent_covered_display": "76",
+          "missing_lines": 26,
+          "excluded_lines": 3,
+          "percent_statements_covered": 77.19298245614036,
+          "percent_statements_covered_display": "77",
+          "num_branches": 30,
+          "num_partial_branches": 7,
+          "covered_branches": 21,
+          "missing_branches": 9,
+          "percent_branches_covered": 70.0,
+          "percent_branches_covered_display": "70"
+        },
+        "missing_lines": [
+          48,
+          58,
+          59,
+          91,
+          92,
+          93,
+          94,
+          113,
+          152,
+          169,
+          196,
+          197,
+          198,
+          200,
+          201,
+          202,
+          214,
+          215,
+          216,
+          244,
+          246,
+          260,
+          261,
+          270,
+          273,
+          274
+        ],
+        "excluded_lines": [
+          16,
+          17,
+          18
+        ],
+        "executed_branches": [
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            38
+          ],
+          [
+            43,
+            44
+          ],
+          [
+            43,
+            45
+          ],
+          [
+            47,
+            50
+          ],
+          [
+            61,
+            62
+          ],
+          [
+            61,
+            65
+          ],
+          [
+            111,
+            112
+          ],
+          [
+            111,
+            122
+          ],
+          [
+            112,
+            114
+          ],
+          [
+            151,
+            153
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            237,
+            238
+          ],
+          [
+            237,
+            239
+          ],
+          [
+            239,
+            240
+          ],
+          [
+            239,
+            241
+          ],
+          [
+            241,
+            242
+          ],
+          [
+            241,
+            243
+          ],
+          [
+            243,
+            249
+          ],
+          [
+            259,
+            271
+          ],
+          [
+            271,
+            272
+          ]
+        ],
+        "missing_branches": [
+          [
+            47,
+            48
+          ],
+          [
+            112,
+            113
+          ],
+          [
+            151,
+            152
+          ],
+          [
+            164,
+            169
+          ],
+          [
+            200,
+            201
+          ],
+          [
+            200,
+            216
+          ],
+          [
+            243,
+            244
+          ],
+          [
+            259,
+            260
+          ],
+          [
+            271,
+            273
+          ]
+        ],
+        "functions": {
+          "_profile": {
+            "executed_lines": [
+              29,
+              30,
+              31,
+              33,
+              34,
+              35,
+              36,
+              38,
+              39,
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47,
+              50,
+              56,
+              57,
+              60,
+              61,
+              62,
+              65
+            ],
+            "summary": {
+              "covered_lines": 24,
+              "num_statements": 27,
+              "percent_covered": 88.57142857142857,
+              "percent_covered_display": "89",
+              "missing_lines": 3,
+              "excluded_lines": 0,
+              "percent_statements_covered": 88.88888888888889,
+              "percent_statements_covered_display": "89",
+              "num_branches": 8,
+              "num_partial_branches": 1,
+              "covered_branches": 7,
+              "missing_branches": 1,
+              "percent_branches_covered": 87.5,
+              "percent_branches_covered_display": "88"
+            },
+            "missing_lines": [
+              48,
+              58,
+              59
+            ],
+            "excluded_lines": [],
+            "start_line": 21,
+            "executed_branches": [
+              [
+                34,
+                35
+              ],
+              [
+                34,
+                38
+              ],
+              [
+                43,
+                44
+              ],
+              [
+                43,
+                45
+              ],
+              [
+                47,
+                50
+              ],
+              [
+                61,
+                62
+              ],
+              [
+                61,
+                65
+              ]
+            ],
+            "missing_branches": [
+              [
+                47,
+                48
+              ]
+            ]
+          },
+          "_inventory": {
+            "executed_lines": [
+              80,
+              81,
+              82,
+              84,
+              87,
+              88,
+              95,
+              103,
+              104,
+              105,
+              111,
+              112,
+              114,
+              122,
+              123,
+              124,
+              125,
+              126
+            ],
+            "summary": {
+              "covered_lines": 18,
+              "num_statements": 23,
+              "percent_covered": 77.77777777777777,
+              "percent_covered_display": "78",
+              "missing_lines": 5,
+              "excluded_lines": 0,
+              "percent_statements_covered": 78.26086956521739,
+              "percent_statements_covered_display": "78",
+              "num_branches": 4,
+              "num_partial_branches": 1,
+              "covered_branches": 3,
+              "missing_branches": 1,
+              "percent_branches_covered": 75.0,
+              "percent_branches_covered_display": "75"
+            },
+            "missing_lines": [
+              91,
+              92,
+              93,
+              94,
+              113
+            ],
+            "excluded_lines": [],
+            "start_line": 72,
+            "executed_branches": [
+              [
+                111,
+                112
+              ],
+              [
+                111,
+                122
+              ],
+              [
+                112,
+                114
+              ]
+            ],
+            "missing_branches": [
+              [
+                112,
+                113
+              ]
+            ]
+          },
+          "_source": {
+            "executed_lines": [
+              141,
+              143,
+              144,
+              148,
+              150,
+              151,
+              153,
+              154,
+              155,
+              157,
+              171,
+              180,
+              181,
+              191,
+              192,
+              193,
+              194,
+              195
+            ],
+            "summary": {
+              "covered_lines": 18,
+              "num_statements": 28,
+              "percent_covered": 59.375,
+              "percent_covered_display": "59",
+              "missing_lines": 10,
+              "excluded_lines": 0,
+              "percent_statements_covered": 64.28571428571429,
+              "percent_statements_covered_display": "64",
+              "num_branches": 4,
+              "num_partial_branches": 1,
+              "covered_branches": 1,
+              "missing_branches": 3,
+              "percent_branches_covered": 25.0,
+              "percent_branches_covered_display": "25"
+            },
+            "missing_lines": [
+              152,
+              196,
+              197,
+              198,
+              200,
+              201,
+              202,
+              214,
+              215,
+              216
+            ],
+            "excluded_lines": [],
+            "start_line": 133,
+            "executed_branches": [
+              [
+                151,
+                153
+              ]
+            ],
+            "missing_branches": [
+              [
+                151,
+                152
+              ],
+              [
+                200,
+                201
+              ],
+              [
+                200,
+                216
+              ]
+            ]
+          },
+          "_source.read": {
+            "executed_lines": [
+              163,
+              164,
+              168
+            ],
+            "summary": {
+              "covered_lines": 3,
+              "num_statements": 4,
+              "percent_covered": 66.66666666666667,
+              "percent_covered_display": "67",
+              "missing_lines": 1,
+              "excluded_lines": 0,
+              "percent_statements_covered": 75.0,
+              "percent_statements_covered_display": "75",
+              "num_branches": 2,
+              "num_partial_branches": 1,
+              "covered_branches": 1,
+              "missing_branches": 1,
+              "percent_branches_covered": 50.0,
+              "percent_branches_covered_display": "50"
+            },
+            "missing_lines": [
+              169
+            ],
+            "excluded_lines": [],
+            "start_line": 157,
+            "executed_branches": [
+              [
+                164,
+                168
+              ]
+            ],
+            "missing_branches": [
+              [
+                164,
+                169
+              ]
+            ]
+          },
+          "inspect_request": {
+            "executed_lines": [
+              233,
+              234,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              243,
+              249,
+              258,
+              259,
+              271,
+              272
+            ],
+            "summary": {
+              "covered_lines": 15,
+              "num_statements": 22,
+              "percent_covered": 70.58823529411765,
+              "percent_covered_display": "71",
+              "missing_lines": 7,
+              "excluded_lines": 0,
+              "percent_statements_covered": 68.18181818181819,
+              "percent_statements_covered_display": "68",
+              "num_branches": 12,
+              "num_partial_branches": 3,
+              "covered_branches": 9,
+              "missing_branches": 3,
+              "percent_branches_covered": 75.0,
+              "percent_branches_covered_display": "75"
+            },
+            "missing_lines": [
+              244,
+              246,
+              260,
+              261,
+              270,
+              273,
+              274
+            ],
+            "excluded_lines": [],
+            "start_line": 226,
+            "executed_branches": [
+              [
+                237,
+                238
+              ],
+              [
+                237,
+                239
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                241
+              ],
+              [
+                241,
+                242
+              ],
+              [
+                241,
+                243
+              ],
+              [
+                243,
+                249
+              ],
+              [
+                259,
+                271
+              ],
+              [
+                271,
+                272
+              ]
+            ],
+            "missing_branches": [
+              [
+                243,
+                244
+              ],
+              [
+                259,
+                260
+              ],
+              [
+                271,
+                273
+              ]
+            ]
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              7,
+              8,
+              9,
+              14,
+              21,
+              72,
+              133,
+              226
+            ],
+            "summary": {
+              "covered_lines": 10,
+              "num_statements": 10,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 3,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              16,
+              17,
+              18
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              7,
+              8,
+              9,
+              14,
+              21,
+              29,
+              30,
+              31,
+              33,
+              34,
+              35,
+              36,
+              38,
+              39,
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47,
+              50,
+              56,
+              57,
+              60,
+              61,
+              62,
+              65,
+              72,
+              80,
+              81,
+              82,
+              84,
+              87,
+              88,
+              95,
+              103,
+              104,
+              105,
+              111,
+              112,
+              114,
+              122,
+              123,
+              124,
+              125,
+              126,
+              133,
+              141,
+              143,
+              144,
+              148,
+              150,
+              151,
+              153,
+              154,
+              155,
+              157,
+              163,
+              164,
+              168,
+              171,
+              180,
+              181,
+              191,
+              192,
+              193,
+              194,
+              195,
+              226,
+              233,
+              234,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              243,
+              249,
+              258,
+              259,
+              271,
+              272
+            ],
+            "summary": {
+              "covered_lines": 88,
+              "num_statements": 114,
+              "percent_covered": 75.69444444444444,
+              "percent_covered_display": "76",
+              "missing_lines": 26,
+              "excluded_lines": 3,
+              "percent_statements_covered": 77.19298245614036,
+              "percent_statements_covered_display": "77",
+              "num_branches": 30,
+              "num_partial_branches": 7,
+              "covered_branches": 21,
+              "missing_branches": 9,
+              "percent_branches_covered": 70.0,
+              "percent_branches_covered_display": "70"
+            },
+            "missing_lines": [
+              48,
+              58,
+              59,
+              91,
+              92,
+              93,
+              94,
+              113,
+              152,
+              169,
+              196,
+              197,
+              198,
+              200,
+              201,
+              202,
+              214,
+              215,
+              216,
+              244,
+              246,
+              260,
+              261,
+              270,
+              273,
+              274
+            ],
+            "excluded_lines": [
+              16,
+              17,
+              18
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                34,
+                35
+              ],
+              [
+                34,
+                38
+              ],
+              [
+                43,
+                44
+              ],
+              [
+                43,
+                45
+              ],
+              [
+                47,
+                50
+              ],
+              [
+                61,
+                62
+              ],
+              [
+                61,
+                65
+              ],
+              [
+                111,
+                112
+              ],
+              [
+                111,
+                122
+              ],
+              [
+                112,
+                114
+              ],
+              [
+                151,
+                153
+              ],
+              [
+                164,
+                168
+              ],
+              [
+                237,
+                238
+              ],
+              [
+                237,
+                239
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                241
+              ],
+              [
+                241,
+                242
+              ],
+              [
+                241,
+                243
+              ],
+              [
+                243,
+                249
+              ],
+              [
+                259,
+                271
+              ],
+              [
+                271,
+                272
+              ]
+            ],
+            "missing_branches": [
+              [
+                47,
+                48
+              ],
+              [
+                112,
+                113
+              ],
+              [
+                151,
+                152
+              ],
+              [
+                164,
+                169
+              ],
+              [
+                200,
+                201
+              ],
+              [
+                200,
+                216
+              ],
+              [
+                243,
+                244
+              ],
+              [
+                259,
+                260
+              ],
+              [
+                271,
+                273
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "totals": {
+      "covered_lines": 88,
+      "num_statements": 114,
+      "percent_covered": 75.69444444444444,
+      "percent_covered_display": "76",
+      "missing_lines": 26,
+      "excluded_lines": 3,
+      "percent_statements_covered": 77.19298245614036,
+      "percent_statements_covered_display": "77",
+      "num_branches": 30,
+      "num_partial_branches": 7,
+      "covered_branches": 21,
+      "missing_branches": 9,
+      "percent_branches_covered": 70.0,
+      "percent_branches_covered_display": "70"
+    }
+  },
+  "EVIDENCE_VIEW_QUALIFICATION": {
+    "original_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.json",
+    "original_sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710",
+    "lossless_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-inspection-guards-receipt-originals.2026-10-21T12-22.json",
+    "changed_fields": [
+      "nodes.json.args[8]"
+    ],
+    "scope": "One scratch coverage locator only; raw streams and measured coverage unchanged."
+  }
+}
