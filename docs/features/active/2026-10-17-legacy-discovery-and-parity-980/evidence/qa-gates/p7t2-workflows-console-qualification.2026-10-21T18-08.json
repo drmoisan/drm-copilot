@@ -1,0 +1,12 @@
+{
+  "raw_receipt": "evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04-raw.json",
+  "kind": "captured-harness-console-qualification",
+  "observed_black_exit": 0,
+  "failure_site": "print(normalize(stdout+stderr), flush=True), after both Black receipts were durably written",
+  "Timestamp": "2026-10-21T18-08",
+  "behavioral_tests_run": false,
+  "observed_runner_exit": 1,
+  "raw_preservation": "Original executed harness and complete Black stdout/stderr bytes are embedded losslessly in the unchanged raw receipt",
+  "diagnostic": "UnicodeEncodeError: 'charmap' codec can't encode character '\\u2728' in position 88: character maps to <undefined>",
+  "correction": "Scratch runner explicitly configures stdout as UTF-8; no source/test assertion or behavioral correction"
+}

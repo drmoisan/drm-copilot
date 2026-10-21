@@ -1,0 +1,410 @@
+{
+  "Timestamp": "2026-10-21T18:15:42.058441+00:00",
+  "issue_number": 980,
+  "task": "P7-T2",
+  "status": "READY_FOR_ACCEPTANCE_COMMIT",
+  "task_accepted": true,
+  "route": "atomic_p7t2_review_20261021T180900",
+  "current_head": "59b322c528ade7d8a7a1a2d9c748182f290677d1",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-freeze.2026-10-21T18-12.json",
+    "working_sha256": "439f33b73a409b43f97813cf87545cc51ca9040cdca93c4dc8fd7499cf37ed49",
+    "git_lf_sha256": "439f33b73a409b43f97813cf87545cc51ca9040cdca93c4dc8fd7499cf37ed49",
+    "expected_git_blob": "11ecdb74418499068b04abb6bf4c5c08cbebeea2",
+    "bytes": 25379,
+    "git_lf_bytes": 25379
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-staging.2026-10-21T18-12.json",
+    "working_sha256": "d6c38573bb1e1e9d5fe6bc0b3fdf0931f8c61473e376d509ca39a428b5215a84",
+    "git_lf_sha256": "d6c38573bb1e1e9d5fe6bc0b3fdf0931f8c61473e376d509ca39a428b5215a84",
+    "expected_git_blob": "375ef5e2a31cfaf7371becc1d0ca5cce03fb73dd",
+    "bytes": 16659,
+    "git_lf_bytes": 16659
+  },
+  "source_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t2-canonical-skills-source-freeze.2026-10-21T18-09.json",
+    "sha256": "c3fa408a67222c98034d2d149488c6abebecb0fa311f852d595641ef4c807153",
+    "bytes": 6070
+  },
+  "owned_sources": [
+    {
+      "path": ".github/skills/inventory-legacy-system/SKILL.md",
+      "sha256": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+      "bytes": 8532,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/extract-feature-contract/SKILL.md",
+      "sha256": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+      "bytes": 8726,
+      "lines": 133
+    },
+    {
+      "path": ".github/skills/characterize-runtime-behavior/SKILL.md",
+      "sha256": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+      "bytes": 8903,
+      "lines": 134
+    },
+    {
+      "path": ".github/skills/reconcile-parity-matrix/SKILL.md",
+      "sha256": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+      "bytes": 8443,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/review-discovery-coverage/SKILL.md",
+      "sha256": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+      "bytes": 8187,
+      "lines": 129
+    },
+    {
+      "path": ".github/skills/adjudicate-unspecified-behavior/SKILL.md",
+      "sha256": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+      "bytes": 9354,
+      "lines": 135
+    },
+    {
+      "path": ".github/skills/generate-acceptance-scenarios/SKILL.md",
+      "sha256": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+      "bytes": 8763,
+      "lines": 132
+    },
+    {
+      "path": ".github/skills/initialize-discovery-workspace/SKILL.md",
+      "sha256": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+      "bytes": 9240,
+      "lines": 131
+    },
+    {
+      "path": ".github/skills/validate-discovery-artifacts/SKILL.md",
+      "sha256": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+      "bytes": 8318,
+      "lines": 127
+    },
+    {
+      "path": ".github/skills/discovery-workflow/SKILL.md",
+      "sha256": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+      "bytes": 3038,
+      "lines": 62
+    },
+    {
+      "path": ".github/skills/discovery-repo-inventory/SKILL.md",
+      "sha256": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+      "bytes": 1770,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-coverage-ledger/SKILL.md",
+      "sha256": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+      "bytes": 2190,
+      "lines": 50
+    },
+    {
+      "path": ".github/skills/discovery-runtime-characterization/SKILL.md",
+      "sha256": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+      "bytes": 1830,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-parity-matrix/SKILL.md",
+      "sha256": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+      "bytes": 1794,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-behavior-reconciliation/SKILL.md",
+      "sha256": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+      "bytes": 1809,
+      "lines": 46
+    },
+    {
+      "path": ".github/skills/discovery-validate-artifacts/SKILL.md",
+      "sha256": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+      "bytes": 1786,
+      "lines": 46
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_workflow_contracts.py",
+      "sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+      "bytes": 18307,
+      "lines": 467
+    }
+  ],
+  "test_source": {
+    "path": "tests/scripts/dev_tools/test_discovery_workflow_contracts.py",
+    "working_sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+    "git_lf_sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+    "expected_git_blob": "f5552ab1bc9bba85eacb05bb1538332a4e38f5db",
+    "bytes": 18307,
+    "git_lf_bytes": 18307
+  },
+  "findings": [],
+  "review": {
+    "workflows": "All nine invoked workflows have explicit input tables, fixed accepted roles and exact profile/output caps. Prepared rows bind kind/ID/path/format/expected hash; configured roots and manifests do not enlarge grants.",
+    "authority": "The six-key root prepare, exact resolver deployment, native start, granted operations, agent-output finalization with non-null invocation and empty inputs, native stop and explicit root result are ordered. Missing configuration blocks except root bootstrap; missing native capability never falls back to local-user authority.",
+    "role_precision": "Non-reviewer reports are restricted to the exact output manifest. Reconciler-derived acceptance does not authorize feature-contract writes. Source facts, unknown expectations, implementation evidence, incremental structural validity and completion authority remain distinct; valid reviewer FAIL is output-valid/result-fail.",
+    "root_operations": "Initialization/configuration and approval are separate root-only operations. The reviewer receives only exact reports after valid projected/resulting context. Decision proposals do not approve/reject/supersede history; separate root approval requires owner, explicit evidence, current expected hash and fresh later validation.",
+    "aliases": "Seven aliases dispatch directly to closed canonical targets with no independent tools, outputs, scheduler or business rules. Umbrella skill_id and coverage action=inventory|extract|review are human authoring selectors, not extra service wire fields. Parity ownership is Requirements Reconciler; review never grants ledger writes.",
+    "test_contract": "The 467-line test module uses checked-in static fixtures only and asserts closed metadata/input/output maps, accepted-role subsets, lifecycle ordering, denial/memory/freshness rules, all role-specific distinctions and exact alias dispatch. The corrected initializer literal preserves the actual frozen no-configuration-write boundary."
+  },
+  "ordered_clean_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10.json",
+      "sha256": "ca544aba87346acdcda11252707a52d0db05f67821662c301cd27976706b480a",
+      "stage": "black",
+      "exit_code": 0,
+      "stable": true,
+      "started_utc": "2026-10-21T18:10:26.178604+00:00",
+      "elapsed_seconds": 0.33728189999237657,
+      "raw": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-black.2026-10-21T18-10-raw.json",
+        "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10.json",
+      "sha256": "94ae2e1b7e60a1c127d700f563dd496d619411f3ba93d3c17ef2f842b4d5e027",
+      "stage": "ruff",
+      "exit_code": 0,
+      "stable": true,
+      "started_utc": "2026-10-21T18:10:26.521108+00:00",
+      "elapsed_seconds": 0.1074384999810718,
+      "raw": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-ruff.2026-10-21T18-10-raw.json",
+        "sha256": "374819d9dee523736a49165fb827974c3e0bf7018ed8d7c1f450ed083a8c7673"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10.json",
+      "sha256": "d67cccaaeb28d46df9f7bc1d792f2f5318791c65bba185a24c56915a88b9a368",
+      "stage": "pyright",
+      "exit_code": 0,
+      "stable": true,
+      "started_utc": "2026-10-21T18:10:26.633517+00:00",
+      "elapsed_seconds": 0.8292143999715336,
+      "raw": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-pyright.2026-10-21T18-10-raw.json",
+        "sha256": "c19cc41cd1e4fd293c4e8c68d3ae9a7d1a1a45bc767c2a3aaf4de16eda1983f2"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10.json",
+      "sha256": "15b11fd0ece593b2423a5ce1191cc0ac837aeca23b61b2fda9ccc5e119e77522",
+      "stage": "tests",
+      "exit_code": 0,
+      "stable": true,
+      "started_utc": "2026-10-21T18:10:27.468193+00:00",
+      "elapsed_seconds": 0.5403358999756165,
+      "raw": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass5-tests.2026-10-21T18-10-raw.json",
+        "sha256": "8cbde79e87afdc1dee5d4dfe317f972fa4339e780d170cfb2baeec752832757a"
+      }
+    }
+  ],
+  "passed": 66,
+  "failed": 0,
+  "isolation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p7t2-single-module-isolation-qualification.2026-10-21T18-15.json",
+    "working_sha256": "036cda8ca635a096318d413f4cf05b8f94e0482951aabef3364077cbaee41099",
+    "git_lf_sha256": "036cda8ca635a096318d413f4cf05b8f94e0482951aabef3364077cbaee41099",
+    "expected_git_blob": "4b48345d01d9352dd1cafac1681abc9d47c0787b",
+    "bytes": 1824,
+    "git_lf_bytes": 1824
+  },
+  "archive_reconciliation": {
+    "stage_archives": 12,
+    "lossless_stage_members": 36,
+    "raw_readable_streams": 24,
+    "exact_current_source_members": 17,
+    "bound_inputs_unchanged": 25,
+    "source_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-source-originals.2026-10-21T18-12.json",
+      "sha256": "ae701b370d8c1b31647dbe340987c30f92905f3502a086ef5b8da49ce09fe2eb",
+      "bytes": 62061
+    },
+    "mapping": "The exact archived harness normalize function replaces only observed Windows/POSIX WORKSPACE and SCRATCH prefixes. Embedded CR/LF and payload terminal newlines are preserved; no new source/artifact normalization was applied.",
+    "presentation_qualification": "The owner's LF-authored wording applies to Python-authored receipts/archives/freezes. The PowerShell-authored shared baseline and console-qualification retain their original CRLF separators; both are explicitly listed below and remain unchanged.",
+    "crlf_readable_views_preserved": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p7t2-workflow-shared-baseline.2026-10-21T17-59.json": 78,
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-console-qualification.2026-10-21T18-08.json": 11
+    }
+  },
+  "retained_diagnostics": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04-raw.json",
+      "sha256": "8de5e2003f77d0b9b8868cc3278e8d820909e295e86ef332d45cf2c6b20aa7ea",
+      "bytes": 3455
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass1-black.2026-10-21T18-04.json",
+      "sha256": "b3cdf7c704972e90555aea4a04e977520ce32f946dba0a691d5ad88180da4441",
+      "bytes": 6637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09-raw.json",
+      "sha256": "1224ebd09da2ce1ed6a3c1b84c834ec5c7f0b552048d539424793764b3a158cf",
+      "bytes": 3471
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass2-black.2026-10-21T18-09.json",
+      "sha256": "938f4b852131db43161ccd6a80afaa4138eef00cfa85d7f543d316c9b401d204",
+      "bytes": 7506
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-black.2026-10-21T18-09.json",
+      "sha256": "03a7deab20b489f4ba20bdd257c6741dcccec3ba8abd1c1cb8ba48af5875168d",
+      "bytes": 7424
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "c0335de8029f47e536e44419d667942b8b0cfaddc166c08edb4c96f21569b106",
+      "bytes": 4492
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass3-ruff.2026-10-21T18-09.json",
+      "sha256": "b810660d0ce61c774afdf60015fc595bf9b13fab9af842e9d60ec4d3ffd119e0",
+      "bytes": 10425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09-raw.json",
+      "sha256": "be7426be83b00d3cd427b3ed74f8b4640b16cbe49ca66d132b5240409701857d",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-black.2026-10-21T18-09.json",
+      "sha256": "f2a3b2e46755c922866ce8b5267a364610e6030c15bba6b0c5a7116bdf39ead3",
+      "bytes": 7425
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09-raw.json",
+      "sha256": "c19cc41cd1e4fd293c4e8c68d3ae9a7d1a1a45bc767c2a3aaf4de16eda1983f2",
+      "bytes": 3541
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-pyright.2026-10-21T18-09.json",
+      "sha256": "61d0e4d4f1d7add6cccd38ad767c0f76832b82e9ab145c8edffaa8bb1604f195",
+      "bytes": 7565
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09-raw.json",
+      "sha256": "374819d9dee523736a49165fb827974c3e0bf7018ed8d7c1f450ed083a8c7673",
+      "bytes": 3362
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-ruff.2026-10-21T18-09.json",
+      "sha256": "9d3d4287c7962c3d0f9ac536f458ba50b78d1eab88690ec6367f886637c390a0",
+      "bytes": 7382
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09-raw.json",
+      "sha256": "38d4f7d391fb6023f255bb2613801b1ab42ce8c3cb7b3cdcd47e957f8d475375",
+      "bytes": 6868
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-pass4-tests.2026-10-21T18-09.json",
+      "sha256": "a6b501266e7040f5e1e09382c048d7cb2539dd1a34994d1e8405250a747e8dca",
+      "bytes": 32308
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-workflows-console-qualification.2026-10-21T18-08.json",
+      "sha256": "8be4022a500dd0f1165824a6517591cd82feb154dbafb7421b21774eb17c2ad6",
+      "bytes": 795
+    }
+  ],
+  "diagnostic_resolution": [
+    "Black autoformat required restart; Ruff five overlong test string literals were split without changing values.",
+    "Scratch console output explicitly configured as UTF-8 after cp1252 printing failure; exact original harness and Black streams preserved.",
+    "First behavioral result 65/66: initialization test expected earlier equivalent wording. Only the literal was aligned to the unchanged frozen exact report-only/no-config statement; same 66 nodes then passed."
+  ],
+  "coverage_scope": "No executable production code changed. Markdown is declarative and test code is excluded from production coverage; no counter augmentation, predecessor semantic suite replay, native operation or Set K proof is claimed.",
+  "reused_P7T1": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-executor-acceptance.2026-10-21T17-55.json",
+    "working_sha256": "a53300571889f634830985d297eb1ebc53c4f521ff33a1c9d9db93a6368fb08d",
+    "git_lf_sha256": "a53300571889f634830985d297eb1ebc53c4f521ff33a1c9d9db93a6368fb08d",
+    "expected_git_blob": "fcaf53e39a66a069b7f9a48416f70d12ffc22290",
+    "bytes": 15036,
+    "git_lf_bytes": 15036
+  },
+  "acceptance_mapping": {
+    "satisfied": "P7-T2: all nine canonical workflows route to the specified role and scoped output contract; all seven aliases contain dispatch only and no stale or duplicate semantic workflow.",
+    "new_acceptance_criteria": [],
+    "pending": {
+      "AC-05/06/09": "Canonical roles/workflows are authored and tested, but generated families, publication and supported-ecosystem validation remain pending P7-T3 and later delivery tasks.",
+      "AC-07/08": "Declared capability/stop requirements do not establish native enforcement or installed hooks; P8/P9 remain pending.",
+      "AC-22/37/38": "Existing cross-layer and documentation criteria remain pending."
+    }
+  },
+  "checkoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "task": "P7-T2",
+    "before": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "f13dca223e52cd1cd805a456af2b7b03640b4f51dbc12d69ed527fcee82f48c4",
+      "git_lf_sha256": "970041c57a2a4a7f608ca4efb4aee5beb807efdd2daee6275baaab2f22ee9e2d",
+      "expected_git_blob": "1a3bf6157ed4eeee8480d501ec7ea9b5f4918d8e",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "after": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "8c294bcd8767928e7706d84d9c6dc777e2bde1b4e0d28daaf6a93252c12b021e",
+      "git_lf_sha256": "a8b0b3ff7b53bc50c2821004e994691e40d4e97753fd9f40fa4d519df7772451",
+      "expected_git_blob": "762a57c5e89bd133ea205d947d27cf79e4c98ddd",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "accepted": 51,
+    "total": 84,
+    "remaining": 33
+  },
+  "acceptance_criteria": {
+    "sources_unchanged": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "working_sha256": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+        "git_lf_sha256": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+        "expected_git_blob": "95f6b07781a281842396d2d539d8b01b9bd9cc0a",
+        "bytes": 112130,
+        "git_lf_bytes": 112130
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+        "working_sha256": "a98d0ef01b16a1529912f2b03e580ea0516e2a356cb608cfc04127928f160c9c",
+        "git_lf_sha256": "a98d0ef01b16a1529912f2b03e580ea0516e2a356cb608cfc04127928f160c9c",
+        "expected_git_blob": "350276685406153925eaf04ed4e99d9da18949c4",
+        "bytes": 11870,
+        "git_lf_bytes": 11870
+      }
+    ],
+    "issue_unchanged": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/issue.md",
+      "working_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "git_lf_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "expected_git_blob": "1e70a8917895d77c46a9b91c35eb815ea9fff4a0",
+      "bytes": 25717,
+      "git_lf_bytes": 25717
+    },
+    "accepted": 26,
+    "total": 66,
+    "remaining": 40
+  },
+  "limitations": [
+    "P7-T3 owns generated/native variants, deterministic routing, mirrors and Set K.",
+    "P8/P9 own native capability delivery and enforcement; no actual coding-agent-host enforcement claim.",
+    "Only P7-T2 is accepted here; the complete feature remains unfinished."
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t2-acceptance-staging-union.2026-10-21T18-15.json",
+  "next_five": [
+    "P7-T3",
+    "P8-T1",
+    "P8-T2",
+    "P8-T3",
+    "P8-T4"
+  ]
+}
