@@ -1,0 +1,165 @@
+{
+  "Timestamp": "2026-10-21T16-56",
+  "status": "SOURCE_AND_FOCUSED_PROOF_CLEAR",
+  "findings": [],
+  "head": "e926b481d9958b174a4012fb3bb268a390fa8fc2",
+  "authority": {
+    "delegation_id": "rendering_p6t3_profile_init_20261021T165400",
+    "phase": "S5_P6T3_profile_init_review",
+    "profile": "atomic-executor-c3-elevated",
+    "profile_sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+    "native_attestation_sha256": "f4016ebdabcd36d1e5aac5c6dde6e1ebdb558bec770792f5c188710d8c621bf5",
+    "qualification": "Persisted exact resume route and existing native launch authority verified."
+  },
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-freeze.2026-10-21T16-46.json",
+    "sha256": "8341779604c6e089f9945d414e5032a7863ed4956979caa83123680c997cc7a5"
+  },
+  "body_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-body-proof.2026-10-21T16-45.json",
+    "sha256": "d5e12978b9bfc7f392dd5073309b89cff3fd1386847d2491acbb82bd751fa9a9"
+  },
+  "scope": "Only profile_cli.py, init_cli.py and their two frozen test modules, plus existing scoped proof. Runtime CLI review/package verification is separately owned.",
+  "source_review": {
+    "forwarding": "Both main(argv: Sequence[str] | None = None) -> int functions delegate once to fixed installed profile/init command with original argv object, retaining None versus explicit empty. No legacy parser, ancestor lookup, local rendering or error/exit reinterpretation participates in main.",
+    "legacy": "Six pure v1 formatter/renderer executable AST bodies retain exact signatures/constants/operations after documentation exclusion. Existing installed v1 readers and all47 retained domain-profile controls are unchanged. Historical parsers produce syntax namespaces only.",
+    "refusal": "Tests invoke actual installed parsing for positional/mixed/template-root/force/identity ambiguity and help. Provider and legacy I/O callbacks are patched to reject unexpected access; typed refusal/null-context/no-artifact assertions hold. Legacy memory-file preservation control remains.",
+    "policy": "Four files are 128/65/251/265 lines. Typed parameters/results and intent/effect docstrings are present; changes introduce no suppression, dependency, process/network/tempfile use. Existing registration test's entire AST including docstring/assertion matches its accepted predecessor; its existing repository read is retained, not newly added.",
+    "isolation": "Monkeypatch restores installed callbacks and module-cache entries; new refusal/forwarding tests operate in memory. Full P6-T3 isolation remains pending."
+  },
+  "reconciliation": {
+    "stage_bindings": 24,
+    "stage_paths_including_freeze": 25,
+    "archived_members": 49,
+    "readable_receipts": 6,
+    "normalization": "Decoded gzip/base64 bytes match exact lengths/SHA256. Six stdout/stderr views reproduce via archived observed long/short path aliases, case-insensitive substitution, CRLF/CR-to-LF and retained whitespace rules. Originals remain unchanged.",
+    "ordered_stages": [
+      [
+        "black",
+        "2026-10-21T16:42:44.971542+00:00"
+      ],
+      [
+        "ruff",
+        "2026-10-21T16:42:45.391582+00:00"
+      ],
+      [
+        "pyright",
+        "2026-10-21T16:42:45.606648+00:00"
+      ],
+      [
+        "tests",
+        "2026-10-21T16:42:46.623846+00:00"
+      ],
+      [
+        "coverage",
+        "2026-10-21T16:43:01.672792+00:00"
+      ]
+    ],
+    "tests": "86/86 pass:20 profile,19 init,47 unchanged domain-profile; exact executed nodes and stable before/after input maps reconcile.",
+    "coverage": "Current raw profile36/36 statements6/6 branches; init13/13 statements0 branches. All10 named BODY rows exactly match raw coverage and source AST definition/end coordinates; declarations excluded from body lines, no missing lines/arcs, no copied predecessor counters.",
+    "preservation": "Six pure executable ASTs and full registration AST independently compared with retained pre-edit archive; all four pre-edit byte streams equal accepted Git blobs under CRLF-to-LF normalization.",
+    "history": "Initial Black formatting changed tests and required restart. Loop2 Black/Ruff/Pyright/tests/coverage passed in order without edits. All original history and preparation diagnostics remain in owner freeze.",
+    "replay": "No tests, builds or behavioral probes run by reviewer."
+  },
+  "dependency_bindings": [
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "sha256": "846b5342c3364f41d4f92d935641a6eb6bffb7f948c9360e9d3e6b7a5dc44cf9",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_flow.py",
+      "sha256": "b845883a2b27135551ee3dcf6a088ab2f845f80d0e1f3ad147cc32e57a589f2a",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/domain_profile.py",
+      "sha256": "2a5478e307a1fd059d0b949d1c68116d57d30ba61997706105355e5901d446e8",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_flow.py",
+      "sha256": "8b0f3edd7a15393629bb91a676691ef64c886ef432d41e16f22cc1df5f77234e",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_models.py",
+      "sha256": "a3c7d9861a9ad04dd7d9a9cec15f939be1b521d54042aeb6fae08fa97bb0a003",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "committed_normalized_equal": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "tests/discovery_runtime/test_configuration.py",
+      "sha256": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "committed_normalized_equal": true
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+      "committed_normalized_equal": true
+    }
+  ],
+  "commit_condition": "READY_FOR_CHECKED_COMMIT only when coordinator combines this finite slice union with separately reviewed runtime cli.py c7273db5 dependency and its proof. That source differs from HEAD; no standalone dependency-complete commit is claimed.",
+  "acceptance": "Full P6-T3 isolation and acceptance remain pending. No plan/AC/checkpoint/index/source/test edits; prior P8 preparation untouched.",
+  "upcoming_tasks": [
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P8-T1",
+    "P8-T2"
+  ]
+}

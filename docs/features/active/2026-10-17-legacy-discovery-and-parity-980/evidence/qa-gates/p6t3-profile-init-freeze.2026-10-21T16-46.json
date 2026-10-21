@@ -1,0 +1,409 @@
+{
+  "Timestamp": "2026-10-21T16-46",
+  "created_utc": "2026-10-21T16:46:52.786653+00:00",
+  "task": "P6-T3 profile/init compatibility slice",
+  "status": "FOCUSED_CHECKED_SUBSET_FROZEN",
+  "route": "gateway_doctor_p6t3_profile_init_20261021T162800",
+  "phase": "S5_P6T3_profile_init",
+  "accepted_predecessor_head": "e926b481d9958b174a4012fb3bb268a390fa8fc2",
+  "shared_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+    "sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2",
+    "reuse": "Existing source/caller/dependency bindings and accepted P6-T2 proof; no new shared baseline or predecessor suite."
+  },
+  "public_entry_dependency": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "freeze": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-source-freeze.2026-10-21T16-35.json",
+    "freeze_sha256": "a6040de0de31179f687d448402868ca89cb356f94d818ee0ca80c19cb95218b3",
+    "owner": "inventory_analyzers",
+    "staging": "Dependency-only reference; coordinator merges its separately owned checked subset."
+  },
+  "owned_files": [
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "sha256": "f047501fb7052ccb745e33f26f8e2a111a8a918bb70fe7d0f90d19f8a3f6a7da",
+      "bytes": 4993,
+      "lines": 128
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_cli.py",
+      "sha256": "831992ee8bb0ac182ac12c34ac9ca772b1a46353785f8c6bcb01577b63eafe86",
+      "bytes": 2300,
+      "lines": 65
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_profile_cli.py",
+      "sha256": "c6ce9c01b2c73cf998e80e41a7619e6b3cdb0d37fd1bf34aaa17432ba57cb900",
+      "bytes": 9522,
+      "lines": 251
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "sha256": "73e8a98e2a6aba915b83519add5bb7406fe4eaa8ab3c384db71cc2569bff9436",
+      "bytes": 10132,
+      "lines": 265
+    }
+  ],
+  "behavior": {
+    "entry_signatures": "main(argv: Sequence[str] | None = None) -> int",
+    "forwarding": "Exact argv object to run_installed_cli with fixed profile/init command; None retains installed bounded process arguments and typed exit 0/1/2/3.",
+    "legacy_helpers": "parse_args remains nonauthoritative. Profile render_text/render_json and six pure helper bodies preserve v1 behavior; actual v1 readers remain unchanged.",
+    "refusal": "Positional, template-root and force vectors are refused by the installed parser before providers. No template lookup, overwrite permission, source identity or ancestor search is added.",
+    "entry_module": "Both module guards return the installed exit through SystemExit; in-process controls pass.",
+    "console_registration": "Existing accepted init registration function AST, including its docstring/assertion, is unchanged."
+  },
+  "caller_disposition": {
+    "profile": "Two legacy parsing controls retain their names. Former CLI display checks are explicit pure v1 renderer controls; malformed v1 diagnostics remain direct reader assertions. Old positional/default-file CLI assumptions are replaced by fixed forwarding, None/empty identity and no-effect refusal controls.",
+    "init": "Three legacy parser controls, the accepted registration control and migration/no-write control retain their names. Old create-workspace/template override/fail-fast dispatch expectations become installed forwarding/typed exits and unsupported-authority refusal checks. Existing memory file bytes remain unchanged under template/force refusal.",
+    "retained_domain_profile": "All47 controls in the unchanged test_domain_profile.py pass; no test body or node changed."
+  },
+  "ordered_loop": [
+    {
+      "stage": "black",
+      "clean": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.40784,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black-raw.2026-10-21T16-42.json",
+      "raw_archive_sha256": "3523cdd125e388bd96063928e52ea6d7eb6c1328b5ea53b62e52fb3a0a37b875"
+    },
+    {
+      "stage": "ruff",
+      "clean": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.207294,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff-raw.2026-10-21T16-42.json",
+      "raw_archive_sha256": "b737d3781919cecdb9f753f7b2572afc1992415a87358b84ca05595a52c1c29c"
+    },
+    {
+      "stage": "pyright",
+      "clean": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.008405,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright-raw.2026-10-21T16-42.json",
+      "raw_archive_sha256": "17ce7e1522923ba2cda85101fb5f4c56f60a5309bad6276f806cfafc569a46b5"
+    },
+    {
+      "stage": "tests",
+      "clean": true,
+      "exit_code": 0,
+      "elapsed_seconds": 15.030277,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests-raw.2026-10-21T16-43.json",
+      "raw_archive_sha256": "5309fc14ced6fe36a84b9ceb15d6cccfd987436c656d085e2000ec753a327f2b"
+    },
+    {
+      "stage": "coverage",
+      "clean": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.208111,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage-raw.2026-10-21T16-43.json",
+      "raw_archive_sha256": "2aae063c4aec11f77cd1f528eee57ea31f592a4f08f7dab0be7b64aaf949f1ef"
+    }
+  ],
+  "test_result": {
+    "passed": 86,
+    "failed": 0,
+    "profile_callers": 20,
+    "init_callers": 19,
+    "retained_domain_profile": 47,
+    "pytest_seconds": 14.38,
+    "controller_seconds": 15.030277,
+    "timeout": false,
+    "operational_cap_seconds": 300,
+    "cap_is_eta": false,
+    "executed_nodes": [
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_parse_args_defaults_to_documented_filename",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_parse_args_accepts_explicit_path_and_json_flag",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_render_text_preserves_resolved_v1_values",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_render_json_preserves_resolved_v1_structure",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_render_minimal_profile_preserves_applied_defaults",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_v1_reader_preserves_invalid_profile_diagnostics",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_forwards_profile_selection_and_typed_exit[0]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_forwards_profile_selection_and_typed_exit[1]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_forwards_profile_selection_and_typed_exit[2]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_forwards_profile_selection_and_typed_exit[3]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_retains_installed_argument_selection[process]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_main_retains_installed_argument_selection[explicit-empty]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[missing-positional]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[invalid-positional]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[json]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[mixed]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[template]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_legacy_profile_inputs_refuse_before_effects[force]",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_help_uses_installed_profile_options_without_providers",
+      "tests/scripts/dev_tools/discovery/test_profile_cli.py::test_module_entry_returns_installed_exit",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_parse_args_requires_target_dir",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_parse_args_defaults_template_root_and_force",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_parse_args_parses_template_root_and_force",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_forwards_explicit_context_and_typed_exit[0]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_forwards_explicit_context_and_typed_exit[1]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_forwards_explicit_context_and_typed_exit[2]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_forwards_explicit_context_and_typed_exit[3]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_retains_installed_argument_selection[process]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_main_retains_installed_argument_selection[explicit-empty]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[positional]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[template]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[force]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[canonical-template]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[canonical-force]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_ambiguous_init_inputs_refuse_before_effects[identity]",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_help_uses_installed_options_without_providers",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_module_entry_returns_installed_exit",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_console_script_registered_in_pyproject",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py::test_legacy_cli_reports_explicit_v2_migration_without_writes",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_default_profile_filename_constant",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_domain_profile_error_is_value_error",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_full_profile_populates_every_field",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_minimal_profile_applies_every_default",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_records_source_label_in_error",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_profile_version]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_legacy_source]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_legacy_source_root]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_target_root]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_technology_stack_legacy]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[missing_artifacts_root]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[include_string_where_list]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[root_list_where_string]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[profile_version_string]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[non_mapping_section]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[empty_string_root]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[empty_legacy_list]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unsupported_profile_version]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unknown_top_level_key]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unknown_key_legacy_source]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unknown_key_target]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unknown_key_technology_stack]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[unknown_key_artifacts]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[convention_non_string_value]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[non_mapping_document]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[optional_field_wrong_type]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[list_element_wrong_type]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[non_string_section_key]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[convention_non_string_key]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[non_string_top_level_key]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[convention_empty_key]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_invalid_profile_raises[conventions_non_mapping]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_malformed_yaml_syntax_reports_source_label",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_empty_document_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_parse_collects_multiple_defects_in_single_error",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_legacy_source_empty_root_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_target_empty_root_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_technology_stack_empty_legacy_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_artifacts_empty_root_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_artifacts_empty_convention_key_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_construct_domain_profile_wrong_version_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_load_domain_profile_happy_path",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_load_domain_profile_missing_file_names_path",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_load_domain_profile_unreadable_path_raises",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_production_modules_are_domain_neutral[domain_profile]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_production_modules_are_domain_neutral[domain_profile_models]",
+      "tests/scripts/dev_tools/discovery/test_domain_profile.py::test_production_modules_are_domain_neutral[profile_cli]"
+    ]
+  },
+  "coverage": {
+    "body_proof": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-body-proof.2026-10-21T16-45.json",
+      "sha256": "d5e12978b9bfc7f392dd5073309b89cff3fd1386847d2491acbb82bd751fa9a9",
+      "bytes": 14587
+    },
+    "profile": "36/36 measured statements; 6/6 branches; all8 named callable bodies100%",
+    "init": "13/13 measured statements; no measured branches; both2 named callable bodies100%",
+    "no_loss": "Fresh complete coverage covers every current measured line and branch. Six unchanged pure bodies have explicit old/new AST/range mappings; no retained raw counters were copied. Global repository/final integration coverage is outside this scoped proof."
+  },
+  "frozen_inputs": {
+    "scripts/dev_tools/discovery/profile_cli.py": "f047501fb7052ccb745e33f26f8e2a111a8a918bb70fe7d0f90d19f8a3f6a7da",
+    "scripts/dev_tools/discovery/init_cli.py": "831992ee8bb0ac182ac12c34ac9ca772b1a46353785f8c6bcb01577b63eafe86",
+    "tests/scripts/dev_tools/discovery/test_profile_cli.py": "c6ce9c01b2c73cf998e80e41a7619e6b3cdb0d37fd1bf34aaa17432ba57cb900",
+    "tests/scripts/dev_tools/discovery/test_init_cli.py": "73e8a98e2a6aba915b83519add5bb7406fe4eaa8ab3c384db71cc2569bff9436",
+    "tests/scripts/dev_tools/discovery/test_domain_profile.py": "846b5342c3364f41d4f92d935641a6eb6bffb7f948c9360e9d3e6b7a5dc44cf9",
+    "tests/scripts/dev_tools/discovery/test_init_flow.py": "b845883a2b27135551ee3dcf6a088ab2f845f80d0e1f3ad147cc32e57a589f2a",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "scripts/dev_tools/discovery/domain_profile.py": "2a5478e307a1fd059d0b949d1c68116d57d30ba61997706105355e5901d446e8",
+    "scripts/dev_tools/discovery/init_flow.py": "8b0f3edd7a15393629bb91a676691ef64c886ef432d41e16f22cc1df5f77234e",
+    "scripts/dev_tools/discovery/init_models.py": "a3c7d9861a9ad04dd7d9a9cec15f939be1b521d54042aeb6fae08fa97bb0a003",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "tests/discovery_runtime/gateway_test_support.py": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "pyproject.toml": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d"
+  },
+  "retained_attempts": {
+    "loop1format": "Black reformatted both owned tests and left production unchanged; exit0 but changed bytes required the retained ordered restart. Loop2 passed without edits.",
+    "preparation": "An initial pre-edit archive script stopped on an absent-row KeyError before writing; the successful archive selects the exact four existing rows. A delete/add same-path patch was rejected without application; full owned test replacements were then written. A runner-preparation existence check caught an incorrect dependency filename before any gate launch; corrected to existing service_request_rules.py and _resources/manifest.json. These tool-only preparation diagnostics are not test failures or separate raw archives."
+  },
+  "normalization": {
+    "format": "UTF-8 without BOM; LF; no trailing whitespace. Exact raw streams/scripts/owned bytes use gzip-base64 with SHA256 and length in every raw stage archive.",
+    "readable_transform": "Archived helper replaces observed long/short WORKSPACE/SCRATCH aliases; CRLF/CR become LF; trailing line/end whitespace is stripped. All six readable JSON stream views reproduce from raw archives.",
+    "OBSERVED_PATH_ALIASES": {
+      "encoding": "gzip-base64",
+      "sha256": "3f8fad3b0cc11f239cde0a8d2b02c1fe851615806bb7583117bc0dfa93346416",
+      "bytes": 607,
+      "data": "H4sIAAAAAAAC/43QwWrCQBAG4HfJ2WF2V7TaW9gVlJqmJJEeHA+rLiWg7pJNkV7y7CVp0mIxkvMw3/zzb7eBfCbaeFN4IqUvkc29vhCFzildaqK1PegTUWbOjuhYnOFgXX6yJXzo0lz1FzCu+WS+3xPl3n8amM9YMApSmYSZXAa7UX0BmwP462PLY6NjjeMjG/vpe+EL46y/TXstiQQTU+AM+FMmBIxr6z1OXtK3UC76gjYU3ko4APqLFb5G8arifZWqRM2YqOerNN0soOK97bXSvfI6BQcjP4+pJAIZV6J9qRLDXmkL7ra7av+v774B+RyTVl8CAAA=",
+      "qualification": "Observed at freeze using the unchanged archived helper; exact mappings reproduce retained stage output."
+    },
+    "whitespace_issues": 0
+  },
+  "stage_paths": [
+    "scripts/dev_tools/discovery/profile_cli.py",
+    "scripts/dev_tools/discovery/init_cli.py",
+    "tests/scripts/dev_tools/discovery/test_profile_cli.py",
+    "tests/scripts/dev_tools/discovery/test_init_cli.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-body-proof.2026-10-21T16-45.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black-raw.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black.2026-10-21T16-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black-raw.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black.2026-10-21T16-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage-raw.2026-10-21T16-43.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage.2026-10-21T16-43.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage.2026-10-21T16-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright-raw.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright.2026-10-21T16-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff-raw.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff.2026-10-21T16-42.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff.2026-10-21T16-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests-raw.2026-10-21T16-43.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests.2026-10-21T16-43.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests.2026-10-21T16-43.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-preedit.2026-10-21T16-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-freeze.2026-10-21T16-46.json"
+  ],
+  "stage_bindings": [
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "sha256": "f047501fb7052ccb745e33f26f8e2a111a8a918bb70fe7d0f90d19f8a3f6a7da",
+      "bytes": 4993
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_cli.py",
+      "sha256": "831992ee8bb0ac182ac12c34ac9ca772b1a46353785f8c6bcb01577b63eafe86",
+      "bytes": 2300
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_profile_cli.py",
+      "sha256": "c6ce9c01b2c73cf998e80e41a7619e6b3cdb0d37fd1bf34aaa17432ba57cb900",
+      "bytes": 9522
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "sha256": "73e8a98e2a6aba915b83519add5bb7406fe4eaa8ab3c384db71cc2569bff9436",
+      "bytes": 10132
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-body-proof.2026-10-21T16-45.json",
+      "sha256": "d5e12978b9bfc7f392dd5073309b89cff3fd1386847d2491acbb82bd751fa9a9",
+      "bytes": 14587
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black-raw.2026-10-21T16-42.json",
+      "sha256": "8a7e97145e7d35dde840c56db591f272b88fd42660799ce689506b6dbea08acf",
+      "bytes": 24684
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black.2026-10-21T16-42.json",
+      "sha256": "6b6beae668079ab9c3042a1c958083d6a4bfb78e1bb465b9286d7f95cef46846",
+      "bytes": 6845
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop1format-black.2026-10-21T16-42.md",
+      "sha256": "5f0ad590ead3b729b35108a3e4770b7b405e6b6cc8cd29165f2dcb3a94222cc8",
+      "bytes": 581
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black-raw.2026-10-21T16-42.json",
+      "sha256": "3523cdd125e388bd96063928e52ea6d7eb6c1328b5ea53b62e52fb3a0a37b875",
+      "bytes": 24591
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black.2026-10-21T16-42.json",
+      "sha256": "adefe3f93fefffc54637da84297e1c76b00490b35604c04d59e8e374c544cff2",
+      "bytes": 6699
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-black.2026-10-21T16-42.md",
+      "sha256": "6fd40b54aa1286063cc3efe0ba51eed94e1d76d48df21a98c84e1434d208c564",
+      "bytes": 430
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage-raw.2026-10-21T16-43.json",
+      "sha256": "2aae063c4aec11f77cd1f528eee57ea31f592a4f08f7dab0be7b64aaf949f1ef",
+      "bytes": 26450
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage.2026-10-21T16-43.json",
+      "sha256": "1fe39caa8ce3862659ad3ba763a71bec97846ac15c9d84f201aebdbbffe6b570",
+      "bytes": 6620
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage.2026-10-21T16-43.md",
+      "sha256": "0e202549ad6672ca00fb337ffa932da70d8f079aae1fb5b65041adc7913ad90d",
+      "bytes": 367
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright-raw.2026-10-21T16-42.json",
+      "sha256": "17ce7e1522923ba2cda85101fb5f4c56f60a5309bad6276f806cfafc569a46b5",
+      "bytes": 24728
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright.2026-10-21T16-42.json",
+      "sha256": "ad82e755b40ef9f6e467f8e2bb209864677600022d709d53d41c28b78cec8bc6",
+      "bytes": 6814
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-pyright.2026-10-21T16-42.md",
+      "sha256": "a6410987daf6caa70d3b7895d10f41a7cf23776fcf8ba9dc270bc88b08499e2c",
+      "bytes": 561
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff-raw.2026-10-21T16-42.json",
+      "sha256": "b737d3781919cecdb9f753f7b2572afc1992415a87358b84ca05595a52c1c29c",
+      "bytes": 24539
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff.2026-10-21T16-42.json",
+      "sha256": "f97860796686ff7643ff4879ec4c2bf51beebb81de7674af03493e9f6c0303b1",
+      "bytes": 6643
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-ruff.2026-10-21T16-42.md",
+      "sha256": "29988dd9636ee54d9a717f936c7958e6c1f89da1458188c9276b165e5bc245e9",
+      "bytes": 389
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests-raw.2026-10-21T16-43.json",
+      "sha256": "5309fc14ced6fe36a84b9ceb15d6cccfd987436c656d085e2000ec753a327f2b",
+      "bytes": 26722
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests.2026-10-21T16-43.json",
+      "sha256": "750c1103537195cfd973395ea2a260947ac1714b29ee530e2959e713ba49061f",
+      "bytes": 29434
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-tests.2026-10-21T16-43.md",
+      "sha256": "84f1e724724194b4f701c532a7e71ce86d8647652b88b460f27a26c60efa838d",
+      "bytes": 12896
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-preedit.2026-10-21T16-33.json",
+      "sha256": "5aaab0783b23996a366e34b7c07500d8356411bc4753c3c8640d9f54543fc332",
+      "bytes": 9903
+    }
+  ],
+  "self_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-freeze.2026-10-21T16-46.json",
+    "included_in_stage_paths": true,
+    "hash_returned_externally": true
+  },
+  "stage_count": 25,
+  "handoff": "Independent confirmation and dependency-complete commit remain coordinator-owned. No Git/staging/checkpoint/package/native action was performed. This is not final P6-T3 acceptance."
+}
