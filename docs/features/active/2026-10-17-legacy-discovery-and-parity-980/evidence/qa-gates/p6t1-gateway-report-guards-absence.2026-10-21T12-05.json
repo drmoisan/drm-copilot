@@ -1,0 +1,13 @@
+{
+  "Timestamp": "2026-10-21T12-05",
+  "route": "gateway_doctor_p6t1_report_guards_20261021T115400",
+  "status": "PRE_EDIT_ABSENCE_BOUND",
+  "owned_path": "tests/discovery_runtime/test_service_report_guards.py",
+  "absent": true,
+  "retained_baseline_head": "77d9c7e464f4516765c9697e18909d927ab036d5",
+  "control_map": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+  "control_map_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+  "production": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+  "production_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+  "qualification": "Existing329 pass and exact source coverage are retained by reference; no new baseline or behavioral execution."
+}

@@ -1,0 +1,30 @@
+{
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-candidate-disabled.2026-10-21T12-36.json",
+      "sha256": "95ac1e11df043aea4d2424bdb7910bbc5bb36a3ab520b8c9a730d30fa3a57a02"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-preparation.2026-10-21T12-36.json",
+      "sha256": "40670e1c06befcaa169ea0b76561b6419962f3e2990349881f073d1f0c87ad85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-guard-coverage-reader-view.2026-10-21T12-36.json",
+      "sha256": "0e34f9f86e0b5c3c5138d7ceccf557b0a484cc16a257d57ce2fe2dfe1f20b951"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-guard-preparation-originals.2026-10-21T12-36.json",
+      "sha256": "b845660f5bee126e61b099d4ba5767d333593150927fd85a6ea8a09735c4ee4d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-guard-aggregate-body-preflight.2026-10-21T12-34.json",
+      "sha256": "50832268912a6b7386bc2d77da4e78f67358ab5e497e8c0464e8a44b8ee2e236"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-report-guards-body-preflight.2026-10-21T12-34.json",
+      "sha256": "419a761a128d2e509ddf0b730b3882e571188aa6d80ee3e2803354a8d68ae504"
+    }
+  ],
+  "status": "PREPARATION_ONLY_NO_EXECUTION",
+  "task": "P6-T1"
+}

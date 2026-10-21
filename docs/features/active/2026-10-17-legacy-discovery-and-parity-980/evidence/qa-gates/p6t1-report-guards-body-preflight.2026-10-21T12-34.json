@@ -1,0 +1,988 @@
+{
+  "behavior_reexecuted": false,
+  "final_acceptance": false,
+  "focused": {
+    "member": "coverage_json",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-report-guards-loop5-coverage-raw.2026-10-21T12-27.json",
+    "raw_bytes": 15443,
+    "raw_counters_augmented": false,
+    "raw_sha256": "401fbde308f54a85d80b7859127ca44336c0a00e7d3c5063486464178dcb3ff7",
+    "sha256": "8b7a2ae556d555fcca3af486783de3bef1abf079d07f62783f0a4460a355a378"
+  },
+  "modules": [
+    {
+      "diagnostic_union": {
+        "branches": 28,
+        "covered_branches": 28,
+        "covered_statements": 84,
+        "line_floor_pass": true,
+        "missing_branches": [],
+        "missing_lines": [],
+        "module_branch_floor_pass": true,
+        "statements": 84
+      },
+      "focused": {
+        "report10": {
+          "executed_branches": [
+            [
+              30,
+              31
+            ],
+            [
+              30,
+              32
+            ],
+            [
+              34,
+              35
+            ],
+            [
+              34,
+              50
+            ],
+            [
+              35,
+              36
+            ],
+            [
+              77,
+              78
+            ],
+            [
+              77,
+              79
+            ],
+            [
+              86,
+              87
+            ],
+            [
+              160,
+              161
+            ],
+            [
+              160,
+              170
+            ],
+            [
+              172,
+              173
+            ],
+            [
+              172,
+              188
+            ],
+            [
+              173,
+              179
+            ],
+            [
+              173,
+              180
+            ],
+            [
+              189,
+              190
+            ],
+            [
+              189,
+              191
+            ],
+            [
+              208,
+              209
+            ],
+            [
+              208,
+              210
+            ],
+            [
+              210,
+              216
+            ],
+            [
+              210,
+              217
+            ]
+          ],
+          "executed_lines": [
+            3,
+            5,
+            7,
+            8,
+            9,
+            10,
+            21,
+            29,
+            30,
+            31,
+            32,
+            34,
+            35,
+            36,
+            50,
+            53,
+            62,
+            64,
+            65,
+            66,
+            67,
+            68,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            84,
+            85,
+            86,
+            87,
+            122,
+            130,
+            131,
+            132,
+            137,
+            142,
+            152,
+            155,
+            156,
+            157,
+            158,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            170,
+            172,
+            173,
+            179,
+            180,
+            188,
+            189,
+            190,
+            191,
+            201,
+            208,
+            209,
+            210,
+            216,
+            217
+          ],
+          "missing_branches": [
+            [
+              35,
+              37
+            ],
+            [
+              86,
+              88
+            ],
+            [
+              91,
+              92
+            ],
+            [
+              91,
+              93
+            ],
+            [
+              96,
+              97
+            ],
+            [
+              96,
+              101
+            ],
+            [
+              102,
+              103
+            ],
+            [
+              102,
+              106
+            ]
+          ],
+          "missing_lines": [
+            37,
+            38,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            96,
+            97,
+            98,
+            101,
+            102,
+            103,
+            106,
+            108,
+            114
+          ]
+        }
+      },
+      "lost_retained_branches": [],
+      "lost_retained_lines": [],
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            30,
+            32
+          ],
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            50
+          ],
+          [
+            35,
+            37
+          ],
+          [
+            86,
+            88
+          ],
+          [
+            91,
+            92
+          ],
+          [
+            91,
+            93
+          ],
+          [
+            96,
+            97
+          ],
+          [
+            96,
+            101
+          ],
+          [
+            102,
+            103
+          ],
+          [
+            102,
+            106
+          ],
+          [
+            160,
+            170
+          ],
+          [
+            172,
+            173
+          ],
+          [
+            172,
+            188
+          ],
+          [
+            173,
+            180
+          ],
+          [
+            189,
+            191
+          ],
+          [
+            208,
+            209
+          ],
+          [
+            208,
+            210
+          ],
+          [
+            210,
+            216
+          ]
+        ],
+        "executed_lines": [
+          3,
+          5,
+          7,
+          8,
+          9,
+          10,
+          21,
+          29,
+          30,
+          32,
+          34,
+          35,
+          37,
+          38,
+          50,
+          53,
+          62,
+          64,
+          65,
+          66,
+          67,
+          68,
+          81,
+          84,
+          85,
+          86,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          101,
+          102,
+          103,
+          106,
+          108,
+          114,
+          122,
+          130,
+          131,
+          132,
+          137,
+          142,
+          152,
+          155,
+          156,
+          157,
+          158,
+          160,
+          170,
+          172,
+          173,
+          180,
+          188,
+          189,
+          191,
+          201,
+          208,
+          209,
+          210,
+          216
+        ],
+        "missing_branches": [
+          [
+            30,
+            31
+          ],
+          [
+            35,
+            36
+          ],
+          [
+            77,
+            78
+          ],
+          [
+            77,
+            79
+          ],
+          [
+            86,
+            87
+          ],
+          [
+            160,
+            161
+          ],
+          [
+            173,
+            179
+          ],
+          [
+            189,
+            190
+          ],
+          [
+            210,
+            217
+          ]
+        ],
+        "missing_lines": [
+          31,
+          36,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          87,
+          161,
+          162,
+          163,
+          164,
+          165,
+          179,
+          190,
+          217
+        ]
+      }
+    }
+  ],
+  "raw_counters_augmented": false,
+  "reader": {
+    "convention": "covered_file and coverage.py named executable BODY coordinates; no declaration-inclusive denominator",
+    "path": "SCRATCH/p6t1_final_nio1_coverage.py",
+    "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92"
+  },
+  "retained329": {
+    "member": "coverage_json",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+    "raw_bytes": 602272,
+    "raw_counters_augmented": false,
+    "raw_sha256": "2aba1fdd995dfdd75a2ab4280f62b5aae645de099aa977ac8459f0d2d6878103",
+    "sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020"
+  },
+  "source_path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+  "source_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+  "status": "DIAGNOSTIC_UNION_ONLY",
+  "task": "P6-T1",
+  "units": [
+    {
+      "diagnostic_union": {
+        "branches": 6,
+        "covered_branches": 6,
+        "covered_statements": 10,
+        "line_floor_pass": true,
+        "missing_branches": [],
+        "missing_lines": [],
+        "module_branch_floor_pass": true,
+        "statements": 10
+      },
+      "focused": {
+        "report10": {
+          "executed_branches": [
+            [
+              30,
+              31
+            ],
+            [
+              30,
+              32
+            ],
+            [
+              34,
+              35
+            ],
+            [
+              34,
+              50
+            ],
+            [
+              35,
+              36
+            ]
+          ],
+          "executed_lines": [
+            29,
+            30,
+            31,
+            32,
+            34,
+            35,
+            36,
+            50
+          ],
+          "missing_branches": [
+            [
+              35,
+              37
+            ]
+          ],
+          "missing_lines": [
+            37,
+            38
+          ]
+        }
+      },
+      "lost_retained_branches": [],
+      "lost_retained_lines": [],
+      "name": "report_findings",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            30,
+            32
+          ],
+          [
+            34,
+            35
+          ],
+          [
+            34,
+            50
+          ],
+          [
+            35,
+            37
+          ]
+        ],
+        "executed_lines": [
+          29,
+          30,
+          32,
+          34,
+          35,
+          37,
+          38,
+          50
+        ],
+        "missing_branches": [
+          [
+            30,
+            31
+          ],
+          [
+            35,
+            36
+          ]
+        ],
+        "missing_lines": [
+          31,
+          36
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 10,
+        "covered_branches": 10,
+        "covered_statements": 34,
+        "line_floor_pass": true,
+        "missing_branches": [],
+        "missing_lines": [],
+        "module_branch_floor_pass": true,
+        "statements": 34
+      },
+      "focused": {
+        "report10": {
+          "executed_branches": [
+            [
+              77,
+              78
+            ],
+            [
+              77,
+              79
+            ],
+            [
+              86,
+              87
+            ]
+          ],
+          "executed_lines": [
+            62,
+            64,
+            65,
+            66,
+            67,
+            68,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            84,
+            85,
+            86,
+            87
+          ],
+          "missing_branches": [
+            [
+              86,
+              88
+            ],
+            [
+              91,
+              92
+            ],
+            [
+              91,
+              93
+            ],
+            [
+              96,
+              97
+            ],
+            [
+              96,
+              101
+            ],
+            [
+              102,
+              103
+            ],
+            [
+              102,
+              106
+            ]
+          ],
+          "missing_lines": [
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            96,
+            97,
+            98,
+            101,
+            102,
+            103,
+            106,
+            108,
+            114
+          ]
+        }
+      },
+      "lost_retained_branches": [],
+      "lost_retained_lines": [],
+      "name": "_report",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            86,
+            88
+          ],
+          [
+            91,
+            92
+          ],
+          [
+            91,
+            93
+          ],
+          [
+            96,
+            97
+          ],
+          [
+            96,
+            101
+          ],
+          [
+            102,
+            103
+          ],
+          [
+            102,
+            106
+          ]
+        ],
+        "executed_lines": [
+          62,
+          64,
+          65,
+          66,
+          67,
+          68,
+          81,
+          84,
+          85,
+          86,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          101,
+          102,
+          103,
+          106,
+          108,
+          114
+        ],
+        "missing_branches": [
+          [
+            77,
+            78
+          ],
+          [
+            77,
+            79
+          ],
+          [
+            86,
+            87
+          ]
+        ],
+        "missing_lines": [
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          87
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 8,
+        "covered_branches": 8,
+        "covered_statements": 25,
+        "line_floor_pass": true,
+        "missing_branches": [],
+        "missing_lines": [],
+        "module_branch_floor_pass": true,
+        "statements": 25
+      },
+      "focused": {
+        "report10": {
+          "executed_branches": [
+            [
+              160,
+              161
+            ],
+            [
+              160,
+              170
+            ],
+            [
+              172,
+              173
+            ],
+            [
+              172,
+              188
+            ],
+            [
+              173,
+              179
+            ],
+            [
+              173,
+              180
+            ],
+            [
+              189,
+              190
+            ],
+            [
+              189,
+              191
+            ]
+          ],
+          "executed_lines": [
+            130,
+            131,
+            132,
+            137,
+            142,
+            152,
+            155,
+            156,
+            157,
+            158,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            170,
+            172,
+            173,
+            179,
+            180,
+            188,
+            189,
+            190,
+            191
+          ],
+          "missing_branches": [],
+          "missing_lines": []
+        }
+      },
+      "lost_retained_branches": [],
+      "lost_retained_lines": [],
+      "name": "_acceptance",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            160,
+            170
+          ],
+          [
+            172,
+            173
+          ],
+          [
+            172,
+            188
+          ],
+          [
+            173,
+            180
+          ],
+          [
+            189,
+            191
+          ]
+        ],
+        "executed_lines": [
+          130,
+          131,
+          132,
+          137,
+          142,
+          152,
+          155,
+          156,
+          157,
+          158,
+          160,
+          170,
+          172,
+          173,
+          180,
+          188,
+          189,
+          191
+        ],
+        "missing_branches": [
+          [
+            160,
+            161
+          ],
+          [
+            173,
+            179
+          ],
+          [
+            189,
+            190
+          ]
+        ],
+        "missing_lines": [
+          161,
+          162,
+          163,
+          164,
+          165,
+          179,
+          190
+        ]
+      }
+    },
+    {
+      "diagnostic_union": {
+        "branches": 4,
+        "covered_branches": 4,
+        "covered_statements": 5,
+        "line_floor_pass": true,
+        "missing_branches": [],
+        "missing_lines": [],
+        "module_branch_floor_pass": true,
+        "statements": 5
+      },
+      "focused": {
+        "report10": {
+          "executed_branches": [
+            [
+              208,
+              209
+            ],
+            [
+              208,
+              210
+            ],
+            [
+              210,
+              216
+            ],
+            [
+              210,
+              217
+            ]
+          ],
+          "executed_lines": [
+            208,
+            209,
+            210,
+            216,
+            217
+          ],
+          "missing_branches": [],
+          "missing_lines": []
+        }
+      },
+      "lost_retained_branches": [],
+      "lost_retained_lines": [],
+      "name": "project",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py",
+      "raw_counters_augmented": false,
+      "retained329": {
+        "executed_branches": [
+          [
+            208,
+            209
+          ],
+          [
+            208,
+            210
+          ],
+          [
+            210,
+            216
+          ]
+        ],
+        "executed_lines": [
+          208,
+          209,
+          210,
+          216
+        ],
+        "missing_branches": [
+          [
+            210,
+            217
+          ]
+        ],
+        "missing_lines": [
+          217
+        ]
+      }
+    }
+  ]
+}
