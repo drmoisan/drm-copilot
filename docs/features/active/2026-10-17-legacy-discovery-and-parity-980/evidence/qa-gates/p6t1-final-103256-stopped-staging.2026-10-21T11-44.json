@@ -1,0 +1,57 @@
+{
+  "Timestamp": "2026-10-21T11:44:51.083218+00:00",
+  "exclusions": "No mutable scratch files or source changes; four contracts remain unexecuted; task is unaccepted.",
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-stopped-handoff.2026-10-21T11-44.json",
+    "sha256": "48dfc038b543a07175ead8f10aa00a22eae878190b7f913d07d2dc9c2d783c23"
+  },
+  "path_count": 10,
+  "paths": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-tests.2026-10-21T11-43.json",
+      "sha256": "1903c76500b8cd738707bf8a007b89ff97082ca9634fee7ffd7ad03ffeca0884"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-tests.2026-10-21T11-43.md",
+      "sha256": "8f83ff870b536d8f18f0ae1998f63ee3051ed774a18bc4ca01f63d76d44b0ac0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-tests-raw.2026-10-21T11-43.json",
+      "sha256": "1867c800df66e01b637a61b15dc640e3c9a6834d11d0aeb568cce43710f797fa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json.2026-10-21T11-43.json",
+      "sha256": "05a3b3b8fcdbfe351f9d2833ffe0dd64b68c78378e5cbc732f364f3fbd4f42f0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json.2026-10-21T11-43.md",
+      "sha256": "74f867fd597f330fef1db6e60713b8b4c622d18b93b2c83af9cd30b9b05b1309"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+      "sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof.2026-10-21T11-43.json",
+      "sha256": "7420094ca714edebf9cf3e3de449cf05867bf43bd1ccef0c762d86dc3ea38b46"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof.2026-10-21T11-43.md",
+      "sha256": "26c1f7934eeca5024cfdf27406f82d23d46188a04ab9ace578e00c47aef91e85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-proof-raw.2026-10-21T11-43.json",
+      "sha256": "79e2916f486035174fe46459bb4175e8efca20ebc9ec99b460bef0f0c702290e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-stopped-handoff.2026-10-21T11-44.json",
+      "sha256": "48dfc038b543a07175ead8f10aa00a22eae878190b7f913d07d2dc9c2d783c23"
+    }
+  ],
+  "previous_static_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-wip-staging.2026-10-21T11-12.json",
+    "sha256": "ed04041516296666af8f0a181b73ed6ee8f47db0fad283abc94d34d5ca3111e3"
+  },
+  "status": "IMMUTABLE_STOPPED_RUN_PRESERVATION_ONLY",
+  "task": "P6-T1"
+}
