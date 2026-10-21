@@ -1,0 +1,245 @@
+{
+  "Timestamp": "2026-10-21T07:56:07.843355+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "route": "atomic_execution_p6t1_consolidated_review_20261021T072800",
+  "status": "READY_FOR_CHECKED_WIP",
+  "task_acceptance": false,
+  "current_head": "6b8703459489cfc33e211b6290edacadaaf03e24",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-repair-freeze.2026-10-21T07-45.json",
+    "working_sha256": "ef0a8dda1838d5ce6efc3447ead09738ea00f6b81491083ffcab278546f8ce0f",
+    "git_lf_sha256": "ef0a8dda1838d5ce6efc3447ead09738ea00f6b81491083ffcab278546f8ce0f",
+    "expected_git_blob": "4c21878b61591c04b2149c4c562cf8dc3cfca61a",
+    "bytes": 50654,
+    "git_lf_bytes": 50654
+  },
+  "review_scope": "Only the two approved test_service_boundaries functions and their frozen receipts; no production change or task acceptance.",
+  "reconciliation": {
+    "owner_stage_paths": 20,
+    "gate_pairs": 9,
+    "verified_archived_or_raw_streams": 22,
+    "working_test_sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "test_lines": 500,
+    "changed_functions": [
+      "test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "test_context_invalid_or_unavailable_inputs_fail_explicitly"
+    ],
+    "preservation": "Archived original, failed and corrected test streams decode to their exact hashes. HEAD test equals archived original after Git LF normalization. All other function ASTs, action branches and parameter identities are unchanged. Loop2 differs from loop1 only by adding conflict to the required status set.",
+    "raw_readable": "Exact stdout/stderr bytes verified independently; the established observed-path aliases, CR/LF and trailing-SP/TAB view normalization match all nine readable views. No raw bytes or owner evidence were rewritten.",
+    "ordered_gates": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.341063
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.106495
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.981413
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.raw.json",
+        "exit_code": 1,
+        "nodes": 7,
+        "elapsed_seconds": 24.069167
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.37197
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.152803
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.raw.json",
+        "exit_code": 0,
+        "nodes": 0,
+        "elapsed_seconds": 0.991
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.raw.json",
+        "exit_code": 0,
+        "nodes": 1,
+        "elapsed_seconds": 16.260292
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.raw.json",
+        "exit_code": 0,
+        "nodes": 7,
+        "elapsed_seconds": 22.815567
+      }
+    ],
+    "passing_scope": "Clean loop2 Black, Ruff and Pyright; interruption-only pass followed by all seven existing affected cases in 22.815567 harness seconds. No new test identities or reviewer behavior run."
+  },
+  "committed_dependency_qualification": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+    "committed_git_sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+    "tested_working_sha256": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807",
+    "unchanged_definitions": [
+      "_configure",
+      "_failure_paths",
+      "_init",
+      "_initialization",
+      "_remember",
+      "bootstrap"
+    ],
+    "only_changed_definition": "_migrate",
+    "stage_source": false,
+    "committed_original_working_sha256": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+    "basis": "The tested source differs from committed service_bootstrap only in the uncalled _migrate body and its fixed registered-schema alias import/table. The two boundary tests exercise OperationContext failures and initialization; all invoked bootstrap definitions listed here are AST-identical. No migration body, publication test, package manifest or production source is included in this checkpoint.",
+    "limit": "This is an independent test/proof subset over committed unchanged called behavior. It does not accept the unfinished migration capture repair or imply the seven cases ran again on HEAD."
+  },
+  "failure_qualification": {
+    "retained": "The original missing-read failure, partial final run, 78-pass/5-failure diagnostic and first boundary loop remain unchanged and separately identified by their existing receipts.",
+    "superseded_inference": "The earlier all-planned interruption proposal and preliminary source assessment were too restrictive. The exact required status set is planned plus conflict; the active profile attempt is conflict and the other five rows remain planned.",
+    "verified_after_correction": "The isolated pass and seven-case pass actually reach and verify no published memory files, a non-null remembered manifest and positive created-directory effects. No created/updated/skipped status is accepted."
+  },
+  "historical_recovery_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-063910-tests-raw.2026-10-21T06-45.json",
+      "working_sha256": "e9ee5aeefa6d9f989f46a75916d88235f2a93208923c123028a6f7a286ad30d8",
+      "git_lf_sha256": "e9ee5aeefa6d9f989f46a75916d88235f2a93208923c123028a6f7a286ad30d8",
+      "expected_git_blob": "8fe3fb8f24e9b3ad53dfa0c86ae4b92f81b9c2c8",
+      "bytes": 104069,
+      "git_lf_bytes": 104069
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-063910-tests.2026-10-21T06-45.json",
+      "working_sha256": "d3b92cb9fb6018dcf65020e41b7bb087ee107f5f389c98058451fe09365f11c7",
+      "git_lf_sha256": "d3b92cb9fb6018dcf65020e41b7bb087ee107f5f389c98058451fe09365f11c7",
+      "expected_git_blob": "83adef1ae78219013b1b18e233df49597887f611",
+      "bytes": 133258,
+      "git_lf_bytes": 133258
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+      "working_sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab",
+      "git_lf_sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab",
+      "expected_git_blob": "28b51bb1a2c394a0bbcfeda065b99d9019a13e1e",
+      "bytes": 45574,
+      "git_lf_bytes": 45574
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+      "working_sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a",
+      "git_lf_sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a",
+      "expected_git_blob": "97f764336c5f304396400d1dc6d51186eefe0e52",
+      "bytes": 171307,
+      "git_lf_bytes": 171307
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-missing-read-diagnosis.2026-10-21T06-52.json",
+      "working_sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a",
+      "git_lf_sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a",
+      "expected_git_blob": "35d01e4524b90d7e93a4f123dd2f6b7f9a971677",
+      "bytes": 6530,
+      "git_lf_bytes": 6530
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-boundary-consolidated-diagnosis.2026-10-21T07-17.json",
+      "working_sha256": "851934069b666c8d9f4361b678ca1f4c3e6b6565e0f9e3f09688ee8350d04f04",
+      "git_lf_sha256": "851934069b666c8d9f4361b678ca1f4c3e6b6565e0f9e3f09688ee8350d04f04",
+      "expected_git_blob": "56d4c3a4535c737940cb006854e4f39fc5bc859e",
+      "bytes": 8484,
+      "git_lf_bytes": 8484
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+      "working_sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+      "git_lf_sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+      "expected_git_blob": "506c7af9d907ef3efe576589eecb4f993d81face",
+      "bytes": 105324,
+      "git_lf_bytes": 105324
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests-raw.2026-10-21T07-12.json",
+      "working_sha256": "0219279e1c726504112b1edb007e5a58b7632917270b8d4ec0096ba3f67a4569",
+      "git_lf_sha256": "0219279e1c726504112b1edb007e5a58b7632917270b8d4ec0096ba3f67a4569",
+      "expected_git_blob": "8eaf889e4d5e7f36ba5c63ca14944f149dff0e8e",
+      "bytes": 70136,
+      "git_lf_bytes": 70136
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-handoff.2026-10-21T07-13.json",
+      "working_sha256": "d600b11962ac26b29dca954ee84430a89e2d3a6204ddadeeca3c1238162486d4",
+      "git_lf_sha256": "d600b11962ac26b29dca954ee84430a89e2d3a6204ddadeeca3c1238162486d4",
+      "expected_git_blob": "a2a28280a5fdc184dea048e9f7fbd90f9631df53",
+      "bytes": 18618,
+      "git_lf_bytes": 18618
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-released.2026-10-21T06-53.json",
+      "working_sha256": "60fb4624d52fb0ce73df96502b96961ea303dcc93c9edde5eecbeb48a17c122d",
+      "git_lf_sha256": "60fb4624d52fb0ce73df96502b96961ea303dcc93c9edde5eecbeb48a17c122d",
+      "expected_git_blob": "9aaff5b01d15bd882dae0999bfe5bf4ea7e1aa0b",
+      "bytes": 2468,
+      "git_lf_bytes": 2468
+    }
+  ],
+  "retained_existing_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-missing-read-diagnosis.2026-10-21T06-52.json",
+      "working_sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a",
+      "git_lf_sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a",
+      "expected_git_blob": "35d01e4524b90d7e93a4f123dd2f6b7f9a971677",
+      "bytes": 6530,
+      "git_lf_bytes": 6530
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-boundary-consolidated-diagnosis.2026-10-21T07-17.json",
+      "working_sha256": "851934069b666c8d9f4361b678ca1f4c3e6b6565e0f9e3f09688ee8350d04f04",
+      "git_lf_sha256": "851934069b666c8d9f4361b678ca1f4c3e6b6565e0f9e3f09688ee8350d04f04",
+      "expected_git_blob": "56d4c3a4535c737940cb006854e4f39fc5bc859e",
+      "bytes": 8484,
+      "git_lf_bytes": 8484
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-source-range-repair-freeze.2026-10-21T06-35.json",
+      "working_sha256": "40a7350d334dc31bbb93acca3994b611ec2f23169285b25fbc257946cd64ad96",
+      "git_lf_sha256": "40a7350d334dc31bbb93acca3994b611ec2f23169285b25fbc257946cd64ad96",
+      "expected_git_blob": "8e6d701c5f81c0f6c70d5243e82f221cef9e6791",
+      "bytes": 31292,
+      "git_lf_bytes": 31292
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+      "working_sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+      "git_lf_sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+      "expected_git_blob": "506c7af9d907ef3efe576589eecb4f993d81face",
+      "bytes": 105324,
+      "git_lf_bytes": 105324
+    }
+  ],
+  "pending": [
+    "Migration/publication capture repair and its finite focused proof",
+    "One reversed final affected coverage process, BODY/no-loss proof and four contracts",
+    "Fresh package identity for any accepted runtime delta and the exact qualified native impact disposition",
+    "P6-T1 task and acceptance-criteria checkoff"
+  ],
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "source_acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-boundary-checked-wip-staging-union.2026-10-21T07-56.json"
+}

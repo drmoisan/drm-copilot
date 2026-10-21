@@ -1,0 +1,42 @@
+{
+  "Timestamp": "2026-10-21T07-35",
+  "Command": ".venv/Scripts/python.exe -m black --check tests/discovery_runtime/test_service_boundaries.py",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "black",
+    "--check",
+    "tests/discovery_runtime/test_service_boundaries.py"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 0.341063,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "e16d8f8a17fe20c04630d8dd76ca230f773bb6014eb9276471b6c724cb9cdb38",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "e16d8f8a17fe20c04630d8dd76ca230f773bb6014eb9276471b6c724cb9cdb38",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [],
+  "streams": {
+    "stdout": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "base64": "QWxsIGRvbmUhIOKcqCDwn42wIOKcqA0KMSBmaWxlIHdvdWxkIGJlIGxlZnQgdW5jaGFuZ2VkLg0K",
+      "sha256": "b746261942fbf2a3759f07dc70d3825a6fc444269a620032fadcdd3ac05eb2e4",
+      "bytes": 57
+    }
+  }
+}

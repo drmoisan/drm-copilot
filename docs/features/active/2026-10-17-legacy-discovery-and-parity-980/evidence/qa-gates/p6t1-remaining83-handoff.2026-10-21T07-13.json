@@ -1,0 +1,413 @@
+{
+  "all237_bindings_unchanged": true,
+  "automatic_retry": false,
+  "counts": {
+    "errors": 0,
+    "failed": 5,
+    "passed": 78,
+    "selected": 83,
+    "skipped": 0,
+    "unexecuted": 0
+  },
+  "coverage_enabled": false,
+  "diagnosis_or_source_changes_performed": false,
+  "diagnostic_only": true,
+  "diagnostic_runner_and_selection_bindings_unchanged": true,
+  "elapsed_seconds": 1133.678388,
+  "failed_nodes": [
+    "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+    "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]",
+    "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+    "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+    "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest"
+  ],
+  "full294_single_process_coverage_and_isolation_still_required": true,
+  "operational_bound_seconds": 3600,
+  "ordered_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_direct_publication_context_cannot_derive_host_grants[host]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_direct_publication_context_cannot_derive_host_grants[invocation_ref]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_direct_publication_context_cannot_derive_host_grants[authorization_ref]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_interrupted_publication_preserves_actual_conflict_and_failure",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "status": "FAILED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_native_operations_remain_unavailable_without_a_verified_provider[prepare-agent]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_native_operations_remain_unavailable_without_a_verified_provider[finalize-agent]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_failed_freshness_preserves_observation_without_second_read",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_projection_prepays_work_before_hashing_and_carrier_construction[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_projection_prepays_work_before_hashing_and_carrier_construction[True]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_result_prepays_incremental_comparison_work_and_preserves_findings[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_result_prepays_incremental_comparison_work_and_preserves_findings[True]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_new_contract_uses_real_plan_and_honest_file_effects[True]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_new_contract_uses_real_plan_and_honest_file_effects[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_nonempty_provider_grants_are_never_expanded[extra]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_nonempty_provider_grants_are_never_expanded[wrong-id]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_nonempty_provider_grants_are_never_expanded[wrong-path]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_report_preview_and_failed_gate_publication_keep_selected_status[coverage-report]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_report_preview_and_failed_gate_publication_keep_selected_status[parity-report]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_report_preview_and_failed_gate_publication_keep_selected_status[completion-report]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_pure_report_format_does_not_publish[json]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_pure_report_format_does_not_publish[markdown]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_pure_report_format_does_not_publish[both]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_validate_all_defaults_to_paired_reports_and_rejects_outside_root",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_malformed_core_cannot_publish_a_diagnostic_report",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_explicit_bootstrap_preserves_actual_directory_and_file_units[True]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_explicit_bootstrap_preserves_actual_directory_and_file_units[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_configuration_preserves_protected_effect_accounting[activate]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_configuration_preserves_protected_effect_accounting[deactivate]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_scenario_creation_keeps_unknown_expectation_and_unexecuted_state",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[None]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[stale]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[outside]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[wrong-kind]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_exact_replacement_requires_identity_cas_path_and_explicit_approval[approval]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_acceptance_preview_retains_structured_sources_and_pending_views[legacy-characterization]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_acceptance_preview_retains_structured_sources_and_pending_views[target-acceptance]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]",
+      "status": "FAILED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_malformed_captured_transport_never_becomes_publication_authority[snapshot-import]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_malformed_captured_transport_never_becomes_publication_authority[import-inventory]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_failed_initialization_retains_conflicting_path_without_fake_digest",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "status": "FAILED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+      "status": "FAILED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest",
+      "status": "FAILED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_publication.py::test_report_index_view_cannot_hide_an_authored_invalid_reference",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_malformed_request_stops_before_authority[fields0]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_malformed_request_stops_before_authority[fields1]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_malformed_request_stops_before_authority[fields2]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_malformed_request_stops_before_authority[fields3]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_malformed_request_stops_before_authority[fields4]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_explicit_host_or_spoofed_reference_never_falls_back[host]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_explicit_host_or_spoofed_reference_never_falls_back[invocation_ref]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_explicit_host_or_spoofed_reference_never_falls_back[authorization_ref]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_installed_identity_failure_is_not_a_resource_only_success",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_profile_operations_preserve_v2_and_actual_manifest[profile]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_profile_operations_preserve_v2_and_actual_manifest[validate-profile]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_true_v1_profile_uses_legacy_parser_without_inventing_v2_capture[True]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_true_v1_profile_uses_legacy_parser_without_inventing_v2_capture[False]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_source_page_preserves_authorized_bytes_and_line_identity[list]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_source_page_preserves_authorized_bytes_and_line_identity[read]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_source_page_preserves_authorized_bytes_and_line_identity[search]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-feature-contract]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-coverage-ledger]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-runtime-scenario]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-parity-matrix]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-unspecified-behavior]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-product-decision]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_individual_kind_failure_does_not_hide_graph_wide_blockers[validate-evidence-reference]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_inventory_selection_retains_captured_source_hash[None]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_inventory_selection_retains_captured_source_hash[selector1]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_source_without_independent_selection_is_unavailable",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_doctor_uses_verified_runtime_without_claiming_native_capability",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_decision_validation_preserves_complete_graph_result",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_catalog_failure_keeps_only_bounded_recognized_context[fields0]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_catalog_failure_keeps_only_bounded_recognized_context[fields1]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_catalog_failure_keeps_only_bounded_recognized_context[fields2]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_catalog_failure_keeps_only_bounded_recognized_context[fields3]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_catalog_failure_keeps_only_bounded_recognized_context[fields4]",
+      "status": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service.py::test_provider_mismatch_has_actionable_unavailable_context",
+      "status": "PASSED"
+    }
+  ],
+  "original235_bindings_unchanged": true,
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests-raw.2026-10-21T07-12.json",
+    "sha256": "0219279e1c726504112b1edb007e5a58b7632917270b8d4ec0096ba3f67a4569"
+  },
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+    "sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4"
+  },
+  "release": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-released.2026-10-21T06-53.json",
+    "sha256": "60fb4624d52fb0ce73df96502b96961ea303dcc93c9edde5eecbeb48a17c122d"
+  },
+  "retained_prior_partial_final": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+    "sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab"
+  },
+  "scope_qualification": "This collect-all uninstrumented diagnostic does not replace the required ordered294-case coverage/isolation and four contracts.",
+  "selection": {
+    "bytes": 9904,
+    "path": "SCRATCH/p6t1-remaining83-nodes.txt",
+    "sha256": "7c2bb3481298e87676ea5608c31d14b6dd6df7a2e1098f730556e9b15d8a0c90"
+  },
+  "status": "DIAGNOSTIC_COMPLETE_FIVE_FAILURES",
+  "task": "P6-T1",
+  "timeout": false,
+  "traceback_observations": [
+    {
+      "nodes": [
+        "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest"
+      ],
+      "observed": "Expected empty artifact tuple; actual contains six planned file artifacts."
+    },
+    {
+      "nodes": [
+        "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]"
+      ],
+      "observed": "REPORT_RESULT for reports/validation-report.json, exit1."
+    },
+    {
+      "nodes": [
+        "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+        "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]"
+      ],
+      "observed": "SERVICE_KIND at /inputs, exit2 for both migration variants."
+    },
+    {
+      "nodes": [
+        "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest"
+      ],
+      "observed": "SNAPSHOT_UNRECOGNIZED for evidence/capture.txt, exit2."
+    }
+  ]
+}
