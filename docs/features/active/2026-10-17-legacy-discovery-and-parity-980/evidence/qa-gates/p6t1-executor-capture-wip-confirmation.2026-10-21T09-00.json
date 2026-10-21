@@ -1,0 +1,233 @@
+{
+  "Timestamp": "2026-10-21T09:00:22.183107+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_WIP_WITH_KNOWN_FAILURES",
+  "route": "atomic_execution_p6t1_capture_confirmation_20261021T084000",
+  "current_head": "29183ab407b06143226f1fc1ecc8e1533e63dabd",
+  "source_integration_acceptance": false,
+  "task_acceptance": false,
+  "purpose": "Root-authorized recoverable preservation of six frozen WIP sources/tests and completed evidence; known migration failures remain open. This is not source/integration/task acceptance.",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-checked-wip-freeze.2026-10-21T08-53.json",
+    "working_sha256": "0edbedb11c8237558b0afe2fb38a5c8540aa9103175f5c67a53483c9d467317c",
+    "git_lf_sha256": "0edbedb11c8237558b0afe2fb38a5c8540aa9103175f5c67a53483c9d467317c",
+    "expected_git_blob": "595ba7da74b086e6e012aaf662c5462f528c726a",
+    "bytes": 12351,
+    "git_lf_bytes": 12351
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-checked-wip-staging.2026-10-21T08-53.json",
+    "working_sha256": "48ce8c8b393a0564c2ba38907085d78ed6483681cc4489805f3aff1f6c203059",
+    "git_lf_sha256": "48ce8c8b393a0564c2ba38907085d78ed6483681cc4489805f3aff1f6c203059",
+    "expected_git_blob": "ec78f994d2176e2b8d1163809d6df7ae3a8f2b01",
+    "bytes": 84714,
+    "git_lf_bytes": 84714
+  },
+  "prior_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-capture-review.2026-10-21T08-31.json",
+    "working_sha256": "320d0bb4294c8e47baa378508b4011782866cce480ad852aa6dd71ee3a6271c8",
+    "git_lf_sha256": "320d0bb4294c8e47baa378508b4011782866cce480ad852aa6dd71ee3a6271c8",
+    "expected_git_blob": "b69e6914a028e65c7afd959011c1250fa1a69f02",
+    "bytes": 12103,
+    "git_lf_bytes": 12103
+  },
+  "owned": [
+    {
+      "bytes": 15075,
+      "lines": 354,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    {
+      "bytes": 13127,
+      "lines": 287,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+    },
+    {
+      "bytes": 22266,
+      "lines": 500,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043"
+    },
+    {
+      "bytes": 19576,
+      "lines": 497,
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "9d1beb4dcaee6fb5b4fcdcc422a9d5776dfa768206c0305fb8894fcc2dcba22f"
+    },
+    {
+      "bytes": 7308,
+      "lines": 168,
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165"
+    },
+    {
+      "bytes": 19857,
+      "lines": 480,
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f"
+    }
+  ],
+  "bounded_confirmation": {
+    "MC2_R1": "The changed project_snapshot counts exact net-new selected files and raw bytes before any supplemental setdefault or manifest reconstruction. Overlap is counted once and keeps loader classification. Existing prepaid path/index/comparison work covers the bounded counting and retention passes. Archived AST is identical outside project_snapshot; the default loader return and immutable-original guards remain unchanged.",
+    "MT1": "The comparison now recomputes both default projections under the same memory fixture. It passed in the corrected nine-control batch.",
+    "MC2_C1": "Exactly four capture guards and four projection exact/short count/byte controls passed, together with MT1. The projection controls observe actual setdefault/reconstruction calls and require zero before short-capacity refusal. This does not claim complete BODY coverage or successful real migration.",
+    "split": "All ten original top-level function/helper ASTs, assertions and decorators are preserved between archived old and split modules except the one authorized MT1 operand. The eleven old-to-new case identities are one-to-one; nine schema cases stay in test_service_migration.py. The three direct mutation_plan test source bindings remain exact.",
+    "fixture_correction": "The two new fixtures use the public ProfileV2 content constructor with coherent encoded profile bytes, physical metadata and a bounded byte-limit fixed point. Their former dataclasses.replace setup failures remain retained.",
+    "documentation": {
+      "after_sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165",
+      "assertion_decorator_parameter_ast_identical": true,
+      "before_sha256": "256615207045d5b43ff76a4b4503acb437f768aa458c24dc694bc84727d45efb",
+      "delta": "configured_capture parameter/result/error contract plus exactly three intent comments",
+      "executable_ast_identical": true,
+      "path": "tests/discovery_runtime/test_service_migration.py"
+    },
+    "documentation_independent_check": "Exactly configured_capture's docstring and three adjacent intent comments changed after the nine-pass archive. Executable, assertion and decorator ASTs are identical. Fresh Black/Ruff/Pyright passed; the nine controls were not replayed solely for prose.",
+    "limits": "All six owned files are at most 500 physical lines. No source/test changes were made by the reviewer."
+  },
+  "completed_gate_reconciliation": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085108-format-check.2026-10-21T08-51.json",
+      "sha256": "a6b34207de84041d97fa393d56fde9d8fea0a1a08c9be1f930a2fc45908be7b9",
+      "stage": "format-check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.865557,
+      "passed_nodes": [],
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085108-format-check-raw.2026-10-21T08-51.json",
+        "sha256": "6162a1aa1de5fba2beb0ac92d54a91fdc1e322d3419274529a9e34cee0902e81"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085116-lint.2026-10-21T08-51.json",
+      "sha256": "13d91bc40f983751a1571ed22181bbfdd8ba6af0f0792d46ffeff01ebfa88f2a",
+      "stage": "lint",
+      "exit_code": 0,
+      "elapsed_seconds": 0.222094,
+      "passed_nodes": [],
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085116-lint-raw.2026-10-21T08-51.json",
+        "sha256": "cfc3c49e605fe28b4d1e994e52d653c20982fc990fa13a802afdcce798f56aea"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085123-types.2026-10-21T08-51.json",
+      "sha256": "d9b65898302f7d4ab8c739ec470332595135ae196311dda9cd419bf2f291e04f",
+      "stage": "types",
+      "exit_code": 0,
+      "elapsed_seconds": 1.424748,
+      "passed_nodes": [],
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085123-types-raw.2026-10-21T08-51.json",
+        "sha256": "3b468ebdfbae3672a479da70a13c6a8301ca07df1923be0580ff5d4aae34b5df"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck.2026-10-21T08-47.json",
+      "sha256": "f15d9ad127806d39dc061ba218c4af45a100b2adefde3e45f60c3e9993706ded",
+      "stage": "precheck",
+      "exit_code": 0,
+      "elapsed_seconds": 46.362154,
+      "passed_nodes": [
+        "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+        "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[coalesced]",
+        "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[count-exhausted]",
+        "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[read-exhausted]",
+        "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[byte-conflict]",
+        "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-exact]",
+        "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-short]",
+        "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-exact]",
+        "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-short]"
+      ],
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084657-precheck-raw.2026-10-21T08-47.json",
+        "sha256": "fafd55b58d1f8039e342e7fb48c965e0f45202287459b3f96a9b84ad081564f1"
+      }
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084811-tests.2026-10-21T08-49.json",
+      "sha256": "d7966bbd8a0dcf3fa5a261f58110693b437492b98a70039606d8751847931357",
+      "stage": "tests",
+      "exit_code": 1,
+      "elapsed_seconds": 67.17898,
+      "passed_nodes": [
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[coverage-ledger]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[evidence-reference]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[feature-contract]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[parity-matrix]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[product-decision]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[runtime-characterization-scenario]",
+        "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[unspecified-behavior]",
+        "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[unknown]",
+        "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[body-mismatch]"
+      ],
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084811-tests-raw.2026-10-21T08-49.json",
+        "sha256": "ad5f320151b34beccab4cea3654c8892cff659f61d3475f7bbf34b8a56c28db5"
+      }
+    }
+  ],
+  "archive_reconciliation": {
+    "new_gate_archives": 5,
+    "verified_lossless_members": 54,
+    "raw_readable": "Explicit UTF-8; exact gzip-base64 member hash/length verification; archived OBSERVED_PATH_ALIASES and the retained CR/LF/trailing-SP-TAB presentation mapping match stdout/stderr. Raw sources, coverage EOF and diagnostics are unchanged.",
+    "owner_path_bindings": 137,
+    "formatter_presentation_qualification": {
+      "kind": "Evidence reader presentation mismatch, not a test/toolchain failure",
+      "diagnostic": "AssertionError: ('docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-085108-format-check.2026-10-21T08-51.json', 'stderr')",
+      "failed_reader": {
+        "logical_path": "SCRATCH/issue-980-publish-capture-wip.py",
+        "encoding": "gzip-base64",
+        "sha256": "f038b34617602a01359a818ce5f6c9807a1dc0afcfd425d61cfd8e00ab0dbf39",
+        "bytes": 13188,
+        "data": "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"
+      },
+      "raw_formatter_stderr_sha256": "33134de81cb2a35fae1c21de114f0957b6db24a486951201856e5a221ed0d408",
+      "difference": "Exact formatter stderr ends in LF; the existing owner readable() deliberately strips terminal whitespace. Raw bytes remain unchanged.",
+      "correction": "Use the exact archived runner readable() at lines 53-57: recorded alias replacements, CRLF/CR to LF, splitlines plus per-line rstrip, then terminal rstrip. No behavior, source or owner artifact changes."
+    },
+    "reader_shape_qualification": "An initial metadata-only inspection indexed an absent optional array and reported 'Cannot index into a null array.' The actual staging shape is bindings_excluding_self plus stage_paths; it was read directly. No artifact, source, raw stream or behavioral result changed."
+  },
+  "known_failed_attempt": {
+    "completed": 11,
+    "elapsed_seconds": 67.17898,
+    "failed": 2,
+    "failed_nodes": [
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]"
+    ],
+    "interrupted": "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+    "passed": 9,
+    "reason": "Coordinator-directed stop for the finite documentation residue; actual two migration failure tracebacks had not yet been printed. No failure cause is inferred.",
+    "receipt": {
+      "bytes": 78931,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-084811-tests.2026-10-21T08-49.json",
+      "sha256": "d7966bbd8a0dcf3fa5a261f58110693b437492b98a70039606d8751847931357"
+    },
+    "unstarted": 25
+  },
+  "failure_limits": "The stopped 37-case attempt contains nine passes, two actual migration failures, one interrupted export and 25 unstarted cases. Tracebacks were absent in that stopped receipt; no cause is inferred from it. The later separate two-node diagnostic and any subsequent repair are excluded from this immutable preservation union.",
+  "retained_proof_limit": "The nine-control pass ran on test_service_migration SHA 25661520; current e7fac4f9 differs only in the qualified documentation. It is retained historical execution on executable-identical bytes, not a new run. Preliminary raw coverage is not augmented and complete 37-case BODY/no-loss proof remains pending.",
+  "pending": [
+    "Resolve the two real migration failures from the separately owned diagnosis",
+    "Complete focused behavior and declaration-exclusive BODY/changed-line/no-loss coverage",
+    "Regenerate package identity and bind a fresh installed identity after runtime acceptance",
+    "One complete reversed final affected population and four contracts",
+    "P6-T1 task and AC acceptance/checkoff"
+  ],
+  "package_native": "Current package manifest/native receipts belong to the prior package. Neither regenerated package outputs nor a new native claim is part of this preservation checkpoint. Unaffected historical native proof remains separately qualified by unchanged behavior and default-empty selection.",
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-wip-staging-union.2026-10-21T09-00.json",
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "source_acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

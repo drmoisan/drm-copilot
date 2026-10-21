@@ -6,6 +6,7 @@ from dataclasses import replace
 from hashlib import sha256
 from typing import TYPE_CHECKING, Literal, cast
 
+from drm_copilot_discovery.catalog import V1_KINDS, schema_aliases
 from drm_copilot_discovery.findings import Finding
 from drm_copilot_discovery.init_projection import InitializationRequest
 from drm_copilot_discovery.mutation_plan import MutationChange
@@ -16,6 +17,11 @@ from drm_copilot_discovery.snapshot import InputManifest, SnapshotFile
 if TYPE_CHECKING:
     from drm_copilot_discovery.init_projection import InitializationCapture
     from drm_copilot_discovery.service_contracts import DiscoveryResult
+
+# Registered aliases are opaque identities, never caller-selected read locations.
+_V1_IDENTITIES = tuple(
+    (alias, kind) for kind in V1_KINDS for alias in schema_aliases(kind, "1.0.0")
+)
 
 
 def _failure_paths(paths: tuple[str, ...], code: str) -> tuple[Finding, ...]:
@@ -239,10 +245,12 @@ def _migrate(context: OperationContext) -> DiscoveryResult:
     """Plan a v1 conversion into an explicit new root and retain partial effects.
 
     context (OperationContext) supplies exact captured legacy paths and identities.
+    Return DiscoveryResult using registered v1 kinds and exact selected originals.
     Existing migration services own conversion and unresolved metadata. No
     feature binding, environment, source pin or execution claim is invented.
     Resource/planning errors propagate; dry-run never publishes.
     """
+    from drm_copilot_discovery.migration_capture import bind_migration_inputs
     from drm_copilot_discovery.migration_models import MigrationRequest, MigrationSource
     from drm_copilot_discovery.migration_v1 import commit_migration, plan_migration
 
@@ -252,12 +260,23 @@ def _migrate(context: OperationContext) -> DiscoveryResult:
     # Parse only explicit inputs; the accepted migration validates each actual v1 kind.
     for path in paths:
         document = context.document(path)
-        kind = document.get("artifact_kind")
-        if type(kind) is not str:
+        schema = document.get("$schema")
+        if type(schema) is not str:
+            raise OperationFailure("SERVICE_KIND")
+        # Prepay all fixed alias visits and worst-case character comparisons.
+        context.budget.work(
+            sum(len(schema) + len(alias) + 1 for alias, _ in _V1_IDENTITIES)
+        )
+        # Only a registered v1 identity selects the accepted migration validator.
+        kind = next((kind for alias, kind in _V1_IDENTITIES if schema == alias), None)
+        if kind is None:
             raise OperationFailure("SERVICE_KIND")
         sources.append(
             MigrationSource(path=path, kind=kind, content=context.read(path))
         )
+    io = bind_migration_inputs(
+        context.io.initialization, paths=paths, limits=context.budget.limits
+    )
     plan = plan_migration(
         MigrationRequest(
             initialization=_initialization(context, migration=True),
@@ -265,7 +284,7 @@ def _migrate(context: OperationContext) -> DiscoveryResult:
             from_version=cast("int", context.inputs["from_version"]),
             to_version=cast("int", context.inputs["to_version"]),
         ),
-        io=context.io.initialization,
+        io=io,
     )
     _remember(context, plan.initialization.capture)
     context.budget.work(len(plan.mutation.writes))
@@ -282,9 +301,7 @@ def _migrate(context: OperationContext) -> DiscoveryResult:
     context.grants(changes + (profile_change,))
     projected = context.projected(changes)
     context.result(artifacts=projected)
-    result = commit_migration(
-        plan, io=context.io.initialization, dry_run=context.request.dry_run
-    )
+    result = commit_migration(plan, io=io, dry_run=context.request.dry_run)
     artifacts = projected if context.request.dry_run and result.ok else ()
     if result.publication is not None:
         # Bounded planned identities provide exact content provenance for actual

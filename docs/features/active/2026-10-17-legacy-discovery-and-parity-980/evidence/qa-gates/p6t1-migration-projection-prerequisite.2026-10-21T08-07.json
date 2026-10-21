@@ -1,0 +1,39 @@
+{
+  "task": "P6-T1",
+  "recorded_utc": "2026-10-21T08:07:16Z",
+  "status": "finite prerequisite proposal; no additional production edit or behavioral probe",
+  "parent_supplement": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-capture-supplement.2026-10-21T07-55.json",
+    "sha256": "df19757a72db2a607cbac1a1a69368ca6fe90b83d442558a36005845ba993fde"
+  },
+  "finding": {
+    "id": "MC2",
+    "basis": "Direct source contract comparison; no new execution",
+    "projection": "mutation_plan.project_snapshot:238 reloads the profile-configured graph from _Overlay, dropping otherwise unconfigured selected originals.",
+    "postcondition": "mutation_io._after_write:259 compares the exact recaptured snapshot hash with project_snapshot(expected, (write.change,)).sha256. Retaining selected originals only in the capture adapter would fail this unchanged postcondition.",
+    "required": "Retain the same immutable exact selected originals through logical, physical, prospective and post-write views without changing profile roots or relaxing hash equality."
+  },
+  "additional_scope": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+    "sha256_before": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "lines_before": 426,
+    "functions": ["CapturedWorkspace.__post_init__", "project_snapshot"],
+    "projected_lines": "at most 500; request another cohesive decision before exceeding this ceiling"
+  },
+  "contract": {
+    "carrier": "Add keyword-only supplemental_paths: tuple[str, ...] = () to CapturedWorkspace. Validate bounded exact unique safe paths against captured original files and ordinary physical metadata. It is a trusted operation-local selection, not a request/schema-derived root or independent authority.",
+    "capture": "migration_capture binds the same validated tuple on proposal and physical captures. Original bytes and physical observations remain separately retained by InitializationCapture and the accepted require_same algorithm.",
+    "projection": "After the unchanged loader, prospectively reserve selected-file/path/comparison/copy/sort/byte work, then retain only marked original paths. Refuse a marked path changed by proposed output or conflicting with loaded bytes; never preserve arbitrary unconfigured manifest entries.",
+    "default": "An empty tuple executes the existing projection with no supplemental retention. init_io.py, PathPolicy, profile fields, mutation_io._after_write and all schema validation remain unchanged.",
+    "publication": "The same bound adapter supplies the accepted guarded writer. Prospective and recaptured manifests contain identical selected originals, so existing hash equality/freshness/CAS guards remain authoritative."
+  },
+  "controls": {
+    "population": "The already approved eleven added nodes plus retained fifteen nodes; no extra node proposed",
+    "selection_and_default": "Extend the agreed exact-files/default tests to assert the immutable marker and unchanged empty projection.",
+    "semantic": "Within the exact-files test, compare projected and recaptured selected originals and prove unmarked outside-root bytes are excluded. Retain unchanged profile bytes and sibling-read isolation.",
+    "resource": "Within the agreed count/work/byte controls, verify prospective failure before selected retention/encoding using local counters, without timing assertions.",
+    "publication": "The existing real migration-write test must complete with the actual guarded writer, directly exercising _after_write projected-versus-recaptured equality."
+  },
+  "retained_result": "The prior 11-pass/four-failure fifteen-case receipt 91b48b08 remains unchanged. This finding does not claim a new executed failure.",
+  "execution": "No dependent behavior has started. Consolidate the approved delta, eleven controls and intent/type/size checks before ordered gates. Use the established body-only coverage reader."
+}

@@ -1,0 +1,92 @@
+{
+  "task": "P6-T1",
+  "recorded_utc": "2026-10-21T07:55:10Z",
+  "status": "finite findings and proposed prerequisite; implementation pending coordinator release",
+  "prior_diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-failure-diagnosis.2026-10-21T07-22.json",
+    "sha256": "9471ffb7813d52daabd5db0ba1c85b55a2627ea3fc7527c5175ba3a003ff846a"
+  },
+  "current_candidate": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807",
+    "tests/discovery_runtime/test_service_publication.py": "5efcfd6e47e8b8a577be9d2c40abcb03bfc92ac2a5f2e5995c365315d1ba5d49",
+    "tests/discovery_runtime/test_service_migration.py": "e8e26e2504d28ecb8a94f4501ec28ef9649adff3514643d27c5ef2e84508a049"
+  },
+  "current_collect_all": {
+    "receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-repair-074132-tests.2026-10-21T07-52.json",
+    "sha256": "91b48b088def6fe727bee6e12be85bd92f740855779c1f422f03a80feff66ebc",
+    "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-publication-repair-074132-tests-raw.2026-10-21T07-52.json",
+    "raw_archive_sha256": "a561c39e48361e795a4ac96ddd63aa0dad1ef294b5b574059b8bfaa2e51dde9e",
+    "passed": 11,
+    "failed": 4,
+    "pytest_seconds": 674.30,
+    "harness_seconds": 674.993119,
+    "timed_out": false,
+    "all_bound_inputs_unchanged": true,
+    "qualification": "The seven registered-kind controls stop after dispatch and do not claim migration conversion. Both original snapshot export parameters are report-presence values with dry_run=true. The separate new clean-export control performed and verified actual memory-file publication."
+  },
+  "findings": [
+    {
+      "id": "MC1",
+      "kind": "production capture adaptation",
+      "actual": "INITIALIZATION_CONFLICT at legacy/coverage-ledger.json in body-mismatch and both end-to-end migration cases",
+      "cause": "service_bootstrap placed selected file paths in documentation_roots. PathPolicy.validate_configuration requires directory metadata for those roots, before v1 schema validation is reached.",
+      "references": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:385",
+        "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py:408",
+        "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py:74"
+      ],
+      "required": "Keep the schema-body refusal assertion. Capture selected original files independently of persisted profile roots; retain registered schema identity, original bytes, metadata and freshness."
+    },
+    {
+      "id": "MF1",
+      "kind": "test fixture provenance",
+      "actual": "CLAIM_RUNTIME_EVIDENCE at the feature-contract /runtime_evidence_refs",
+      "cause": "The reused runtime evidence fixture declares revision=null, while the feature belongs to the configured immutable repository revision. The accepted claim rule passes that revision to EvidenceAssessment.can_prove, which requires exact matching provenance.",
+      "references": [
+        "tests/discovery_runtime/evidence_test_support.py:54",
+        "packages/discovery-runtime/src/drm_copilot_discovery/claim_rules.py:120",
+        "packages/discovery-runtime/src/drm_copilot_discovery/evidence_rules.py:55",
+        "packages/discovery-runtime/src/drm_copilot_discovery/revision_rules.py:77"
+      ],
+      "required": "Set only the fixture's revision to baseline.snapshot.profile.repository.revision. Preserve payload bytes, checksum, both proposals/capture.txt fields, repository ownership, target ID and target expected_sha256. Local runtime bytes do not require a Git-object lookup."
+    }
+  ],
+  "rejected_workaround": "project_entry_points is solution/project metadata, classifies files as source and persists into InitializationPlan.profile_bytes. It is not capture-only metadata and will not be used for legacy artifact JSON.",
+  "scope": {
+    "existing_owned": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "tests/discovery_runtime/test_service_publication.py",
+      "tests/discovery_runtime/test_service_migration.py"
+    ],
+    "proposed_new": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+    "new_path_absent_at_recording": true,
+    "size_basis": "init_io.py is 401 lines; a complete inline supplemental read/merge/clone implementation would exceed 500. The cohesive migration-only adapter leaves that accepted module unchanged and is projected below 300 lines.",
+    "unchanged_init_io_sha256": "e4d5d048d2b39d93983003703d10146859b7b031cc0e4754cf44c0b1b7dfd853",
+    "no_other_production_or_schema_change": true
+  },
+  "public_contract": {
+    "signature": "bind_migration_inputs(io: InitializationIO, *, paths: tuple[str, ...], limits: ParseLimits) -> InitializationIO",
+    "effects": "Binding is pure. Empty paths returns the original I/O object. Nonempty paths returns a fresh typed adapter preserving every existing public trusted reader, writer, guard, repository, catalog, root and authority-invalidation port; it never mutates the original I/O object.",
+    "selection": "Validate exact tuple/string types, finite count, canonical safe paths, collisions and duplicates before reads or selection retention. Retain one immutable exact selection for the entire operation.",
+    "capture": "Ordinary configured capture remains authoritative. The adapter reads only selected ordinary supplemental files through the existing bounded SnapshotIO metadata/byte seam and retains original bytes as documentation. Identical already-captured paths are coalesced without losing their existing category; conflicting bytes or physical observations fail rather than overwrite prior observations.",
+    "freshness": "Proposal captures include supplemental originals in both CapturedWorkspace and InitializationCapture physical files/metadata. physical_capture and inherited bootstrap/writer/require_same reconstruction use the same adapter and selection. Changes, missing files, links, unsafe paths and conflicting observations are rejected before publication.",
+    "bounds": "Reserve selected-file, path-text, comparison/sort, metadata/retention and aggregate raw-byte/hash-copy work before the relevant traversal, read or allocation. Each bounded read allowance fits the unspent aggregate byte allowance and prepaid byte work. Apply the tighter supplied/profile limits. No sibling-file enumeration or reads and no partial successful capture on exhaustion.",
+    "profile": "No field, template, root, project entry point, ownership or pin in the emitted profile is modified by supplemental capture.",
+    "caller": "service_bootstrap._migrate binds the existing trusted InitializationIO once and passes that same adapter to plan_migration and commit_migration. Its closed v1 schema dispatch and exact-source validation remain unchanged."
+  },
+  "proposed_new_controls": [
+    "test_migration_capture_empty_selection_preserves_original_io",
+    "test_migration_capture_retains_exact_files_and_trusted_ports",
+    "test_migration_capture_rejects_invalid_selection[duplicate]",
+    "test_migration_capture_rejects_invalid_selection[traversal]",
+    "test_migration_capture_rejects_invalid_selection[link]",
+    "test_migration_capture_rejects_changed_originals[changed]",
+    "test_migration_capture_rejects_changed_originals[missing]",
+    "test_migration_capture_rejects_conflicting_observations",
+    "test_migration_capture_reserves_before_reads[file-count]",
+    "test_migration_capture_reserves_before_reads[work]",
+    "test_migration_capture_reserves_before_reads[bytes]"
+  ],
+  "verification_plan": "Preserve the existing 15 nodes and all failure archives. After approved implementation and consolidated intent/type/size checks, run ordered Black/Ruff/Pyright, narrow supplemental/body-mismatch/evidence controls, then the finite combined 26-node population with collect-all failure capture. Bind production before dependent runs. The unchanged 11-pass subset and original 83-node diagnostic remain retained references, not new acceptance claims. No predecessor migration/report suite replay.",
+  "downstream": "The additional runtime module requires designated-owner package/build-manifest regeneration after source freeze. No native/publication acceptance claim is made by this supplement. Final task population increases by exactly the approved new nodes if this prerequisite is released; coordinator owns final union and acceptance."
+}

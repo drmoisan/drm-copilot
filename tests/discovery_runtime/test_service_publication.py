@@ -321,22 +321,57 @@ def test_snapshot_export_uses_authored_identity_and_complete_original_capture(
     service_io: MemoryService,
     with_report: bool,
 ) -> None:
-    """Export a contract with optional derived report; return None after dry-run
-    only.
+    """Dry-run export in memory service_io with boolean report presence.
+
+    Return None; assert full-graph refusal for a stale report and no file changes.
     """
     seed_contract(service_io)
     if with_report:
         assert invoke(service_io, "validate-all").ok
     before = dict(service_io.disk.store.files)
+    writers = service_io.writer_calls
     result = invoke(
         service_io, "snapshot-export", {"selected_ids": ["feature"]}, dry_run=True
     )
-    assert result.ok and result.artifacts, result.findings
+    # The full prospective graph retains reports; only the clean case can be planned.
+    if with_report:
+        assert result.exit_code == 1 and not result.artifacts
+        # The retained report must identify the actual prospective graph blocker.
+        assert any(f.code == "REPORT_RESULT" for f in result.findings)
+        assert service_io.writer_calls == writers
+    else:
+        assert result.ok and result.artifacts, result.findings
     assert service_io.disk.store.files == before and result.input_manifest is not None
+    # Confirm the original report population remains visible in the full capture.
     report_paths = [
         file.path for file in result.input_manifest.files if "/reports/" in file.path
     ]
     assert bool(report_paths) is with_report
+    # Keep the original report bytes in the complete input manifest on refusal.
+    assert all(
+        file.content == before[file.path]
+        for file in result.input_manifest.files
+        if file.path in report_paths
+    )
+
+
+def test_clean_snapshot_export_publishes_exact_files(service_io: MemoryService) -> None:
+    """Publish a clean export through memory service_io; return None.
+
+    Assert real file effects/digests and preserved originals; unexpected errors fail.
+    """
+    seed_contract(service_io)
+    before = dict(service_io.disk.store.files)
+    result = invoke(service_io, "snapshot-export", {"selected_ids": ["feature"]})
+    assert result.ok and result.artifacts, result.findings
+    assert service_io.writer_calls == 1
+    # Transport publication must include its real manifest, not just copied members.
+    assert any(row.kind == "source-snapshot-manifest" for row in result.artifacts)
+    # Every reported effect must identify actual bytes without replacing inputs.
+    for row in result.artifacts:
+        assert row.status == "created"
+        assert sha256(service_io.disk.store.files[row.path]).hexdigest() == row.sha256
+    assert before.items() <= service_io.disk.store.files.items()
 
 
 @pytest.mark.parametrize("operation", ["snapshot-import", "import-inventory"])
@@ -420,10 +455,17 @@ def test_link_evidence_uses_captured_payload_and_exact_target_digest(
         catalog=service_io.initialization.catalog,
         repository=service_io.repository,
     )
-    link = request_for(baseline)
-    # Capture each exact payload independently of the proposed evidence descriptor.
-    for payload in link.payloads:
-        service_io.disk.store.put(payload.path, payload.content)
+    payload_path = "proposals/capture.txt"
+    link = request_for(
+        baseline,
+        updates={
+            "path": payload_path,
+            "revision": baseline.snapshot.profile.repository.revision,
+            "runtime_artifact": {"path": payload_path, "capture_method": "manual"},
+        },
+    )
+    # Capture the original opaque bytes in an already configured documentation root.
+    service_io.disk.store.put(payload_path, link.payloads[0].content)
     service_io.disk.store.put("proposals/evidence.json", canonical_json(link.record))
     result = invoke(
         service_io,
