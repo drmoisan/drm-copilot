@@ -1,0 +1,84 @@
+{
+  "Timestamp": "2026-10-21T04-40",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-ncf1-source-confirmation.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "NCF1 source repair clear; historical initialization carry approved as old-package setup evidence with fresh retained-state and rebuilt-identity checks.",
+  "task": "P6-T1",
+  "route": "atomic_execution_p6t1_ncf1_repair_confirmation_20261021T043642",
+  "phase": "S5_P6T1_ncf1_repair_confirmation",
+  "head": "bb249a0751b8e74d2e42a1e6ee1b4fca2dcf2e17",
+  "status": "SOURCE_CLEAR_HISTORICAL_INIT_CARRY_APPROVED",
+  "bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.raw.json",
+      "sha256": "962a5dafae80036e43cd1d685f32d4244e1623ecfa60f1ab62f625e0ac4bac97"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf1-handoff.2026-10-21T04-39.json",
+      "sha256": "a81b630778de44112ca3682abb1351371116686001454ba7e2fd3f629922205a"
+    }
+  ],
+  "source_verdict": {
+    "finding": "NCF1 closed at the source boundary; no additional source finding or probe remains.",
+    "delta": "Only _canonical_state_location and its installed_local_io call are added. RegistryLocation validation precedes resolution. The helper resolves the trusted base, retains the original fixed suffix/workspace digest and rejects any resolved complete path differing from that expected partition.",
+    "guards": "ActivationStore.local is byte-identical. Its canonical and external-location guards still execute. Workspace canonical validation, explicit local-user authority and host-marker refusals remain intact.",
+    "effects": "The new helper performs path metadata reads only, permits an absent state leaf, propagates resolution errors and introduces no directory creation, alternate location or fallback authority.",
+    "tests": "Twenty-two new cases use real factory/store constructors with memory-only metadata and denied native ports. The existing factory test changes only its affected resolver strictness assertion and corresponding docstring. The three retained direct store cases remain unchanged.",
+    "coverage_status": "The owner has supplied fresh BODY evidence separately; final receipt/archive/coverage reconciliation and staging union are not claimed by this source-only record."
+  },
+  "focused_gate_reference": "Clean ordered loop 3: Black, Ruff, scoped Pyright, then 26 passed cases in 2.47 seconds. No reviewer rerun.",
+  "package": {
+    "handoff": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf1-handoff.2026-10-21T04-39.json",
+    "build_sha256": "c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3",
+    "status": "Existing owner build/check/install proof bound; no reviewer rebuild or native execution. Fresh installed identity remains a suffix prerequisite."
+  },
+  "historical_initialization_carry": {
+    "decision": "APPROVED_AS_HISTORICAL_SETUP_EVIDENCE_FOR_PREPARED_SUFFIX",
+    "historical_receipt": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nio1.2026-10-20T18-20.json",
+    "historical_receipt_sha256": "17e09426abfa61fc9470b9550f1f157f82a54c90f3976874fcf3632a0c465be5",
+    "historical_build_sha256": "2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66",
+    "basis": "The exact delta changes trusted state canonicalization before the existing constructor. Initialization, capture, mutation/publication and authority implementations are unchanged. Real-constructor tests preserve the initialization workspace and shared primitive object and reject construction effects.",
+    "fresh_preconditions": [
+      "Match the two retained fixture-state bindings immediately before suffix invocation, including existing link rejection.",
+      "Verify actual installed identity against the rebuilt package before the first service invocation.",
+      "Use the already prepared 15-call suffix without replaying fixture creation or initialization, and retain its unchanged requests and assertions."
+    ],
+    "state_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-suffix-preparation.2026-10-21T04-13.json",
+      "sha256": "88bb68a61f10b7a84c00867737113fa9ee93f319c4077e3f8e1aae5101c94916",
+      "workspace_state_sha256": "52f99088744bb2c3ae03cef075f801419377f61827afdf11445731aa656eee77",
+      "initialization_state_sha256": "eeae9a5571cdf7ba8fd3cfa4224d38690dd2050a82b32cecf78f8ac405dd5c94"
+    },
+    "qualification": "Old identity/init-dry/init-real successes remain explicitly historical. They were not executed on the rebuilt package. No init replay is required by this reviewed delta; a failed fresh precondition stops continuation. Coordinator owns execution release."
+  },
+  "reviewer_execution": "Read-only diff, source/test inspection and SHA binding only. No service/factory/native/test/build execution, implementation edits, staging or checkpoint/Git mutation.",
+  "read_only_command_diagnostic": "The first PowerShell hash-list command failed to parse because foreach was piped directly. Assigning its output to a local list corrected the reader; no source, test, proof or behavior changed.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

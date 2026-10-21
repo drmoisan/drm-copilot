@@ -1,0 +1,992 @@
+{
+  "Timestamp": "2026-10-21T04-42",
+  "Command": "SCRATCH/issue-980-p6t1-gateway-ncf1-freeze.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "NCF1 three-path subset is checked and frozen; 26 focused controls, both fresh bodies 100%, no dependency drift.",
+  "status": "CHECKED_REPAIR_SUBSET_FROZEN_PENDING_FINAL_ACCEPTANCE",
+  "route": "gateway_doctor_p6t1_ncf1_trusted_state_repair_20261021T042526",
+  "scope": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191
+    }
+  ],
+  "line_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": 423,
+    "tests/discovery_runtime/test_gateway_local.py": 494,
+    "tests/discovery_runtime/test_gateway_factory.py": 345
+  },
+  "input_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-ncf1-inputs.2026-10-21T04-30.json",
+    "sha256": "9873fb731c0e4f3ac8e69fef36bd048d831db6fc59cf81a88d7547a44d771fe0",
+    "bytes": 18045
+  },
+  "body_and_ast_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+    "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+    "bytes": 158561
+  },
+  "ordered_gates_and_preserved_attempts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.raw.json",
+      "sha256": "9265aaf99c03c25a1ed3d709c889fa9d40f3d5037b6e6f6b4b5c9467b6d4176f",
+      "bytes": 5861,
+      "stage": "loop1-black",
+      "exit_code": 0,
+      "input_hashes_unchanged": false,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.raw.json",
+      "sha256": "85a9eedf36ec78cc3a88cbe08422d7f88ac87562caa416512ac101d4c5e761a6",
+      "bytes": 5786,
+      "stage": "loop2-black",
+      "exit_code": 0,
+      "input_hashes_unchanged": true,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "4c5d7164863569b672ff2d36a0528dac946745ef3efc49d4b91a71163ec03138",
+      "bytes": 6725,
+      "stage": "loop2-ruff",
+      "exit_code": 1,
+      "input_hashes_unchanged": true,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.raw.json",
+      "sha256": "3d3a239347b44858c4057db74d30bee3e2d68953e070a0250cf954c19e311414",
+      "bytes": 5786,
+      "stage": "loop3-black",
+      "exit_code": 0,
+      "input_hashes_unchanged": true,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "b8be1820abbbf33c4c67ee18d39d36f0e5750566efac761fa9835c359c26ee6e",
+      "bytes": 5728,
+      "stage": "loop3-ruff",
+      "exit_code": 0,
+      "input_hashes_unchanged": true,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.raw.json",
+      "sha256": "7ad06ce3633ed8fe9f7ab95775b3b7829e58c56b103bbe7ff1ae1cbfe94ffb65",
+      "bytes": 5948,
+      "stage": "loop3-pyright",
+      "exit_code": 0,
+      "input_hashes_unchanged": true,
+      "test_count": 0
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.raw.json",
+      "sha256": "962a5dafae80036e43cd1d685f32d4244e1623ecfa60f1ab62f625e0ac4bac97",
+      "bytes": 17242,
+      "stage": "loop3-focused",
+      "exit_code": 0,
+      "input_hashes_unchanged": true,
+      "test_count": 26
+    }
+  ],
+  "body_coverage": {
+    "_canonical_state_location": {
+      "declaration_line": 359,
+      "body_first_line": 368,
+      "body_last_line": 375,
+      "executable_ast_sha256": "430948c1436e8e65267cd0905758be49724b9f83bd6b9e6b51894c2a36942a5e",
+      "covered_lines": 6,
+      "statements": 6,
+      "line_percent": 100.0,
+      "covered_branches": 2,
+      "branches": 2,
+      "branch_percent": 100.0,
+      "missing_lines": [],
+      "missing_branches": [],
+      "executed_body_lines": [
+        368,
+        371,
+        372,
+        373,
+        374,
+        375
+      ],
+      "executed_body_branches": [
+        [
+          373,
+          374
+        ],
+        [
+          373,
+          375
+        ]
+      ]
+    },
+    "installed_local_io": {
+      "declaration_line": 378,
+      "body_first_line": 395,
+      "body_last_line": 423,
+      "executable_ast_sha256": "2b06807bec7f03997d783264e2f00342ef4733d1b21aa6037b73a785e0f8ea46",
+      "covered_lines": 9,
+      "statements": 9,
+      "line_percent": 100.0,
+      "covered_branches": 4,
+      "branches": 4,
+      "branch_percent": 100.0,
+      "missing_lines": [],
+      "missing_branches": [],
+      "executed_body_lines": [
+        395,
+        396,
+        397,
+        398,
+        399,
+        400,
+        405,
+        412,
+        418
+      ],
+      "executed_body_branches": [
+        [
+          396,
+          397
+        ],
+        [
+          396,
+          398
+        ],
+        [
+          398,
+          399
+        ],
+        [
+          398,
+          400
+        ]
+      ]
+    }
+  },
+  "file_coverage": {
+    "fresh_26_controls": {
+      "covered_lines": 60,
+      "statements": 138,
+      "line_percent": 43.47826086956522,
+      "covered_branches": 8,
+      "branches": 40,
+      "branch_percent": 20.0,
+      "missing_lines": [
+        65,
+        97,
+        105,
+        106,
+        109,
+        110,
+        140,
+        142,
+        143,
+        144,
+        145,
+        146,
+        151,
+        153,
+        154,
+        155,
+        160,
+        161,
+        178,
+        184,
+        185,
+        199,
+        200,
+        208,
+        212,
+        213,
+        214,
+        215,
+        219,
+        220,
+        221,
+        222,
+        223,
+        238,
+        239,
+        240,
+        241,
+        243,
+        244,
+        252,
+        253,
+        254,
+        269,
+        270,
+        278,
+        280,
+        285,
+        293,
+        301,
+        303,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        318,
+        319,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341
+      ],
+      "missing_branches": [
+        [
+          64,
+          65
+        ],
+        [
+          128,
+          140
+        ],
+        [
+          142,
+          143
+        ],
+        [
+          142,
+          161
+        ],
+        [
+          144,
+          145
+        ],
+        [
+          144,
+          146
+        ],
+        [
+          153,
+          154
+        ],
+        [
+          153,
+          160
+        ],
+        [
+          178,
+          184
+        ],
+        [
+          178,
+          185
+        ],
+        [
+          212,
+          213
+        ],
+        [
+          212,
+          221
+        ],
+        [
+          213,
+          214
+        ],
+        [
+          213,
+          215
+        ],
+        [
+          221,
+          222
+        ],
+        [
+          221,
+          223
+        ],
+        [
+          243,
+          244
+        ],
+        [
+          243,
+          254
+        ],
+        [
+          270,
+          278
+        ],
+        [
+          270,
+          280
+        ],
+        [
+          313,
+          -303
+        ],
+        [
+          313,
+          314
+        ],
+        [
+          323,
+          324
+        ],
+        [
+          323,
+          325
+        ],
+        [
+          326,
+          327
+        ],
+        [
+          326,
+          328
+        ],
+        [
+          334,
+          335
+        ],
+        [
+          334,
+          337
+        ],
+        [
+          337,
+          338
+        ],
+        [
+          337,
+          339
+        ],
+        [
+          339,
+          340
+        ],
+        [
+          339,
+          341
+        ]
+      ]
+    },
+    "retained_baseline": {
+      "covered_lines": 130,
+      "statements": 131,
+      "line_percent": 99.23664122137404,
+      "covered_branches": 37,
+      "branches": 38,
+      "branch_percent": 97.36842105263158,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "qualified_fresh_plus_unchanged_history": {
+      "covered_lines": 137,
+      "statements": 138,
+      "line_percent": 99.27536231884058,
+      "covered_branches": 39,
+      "branches": 40,
+      "branch_percent": 97.5,
+      "missing_lines": [
+        145
+      ],
+      "missing_branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "retained_only_lines": [
+      65,
+      97,
+      105,
+      106,
+      109,
+      110,
+      140,
+      142,
+      143,
+      144,
+      146,
+      151,
+      153,
+      154,
+      155,
+      160,
+      161,
+      178,
+      184,
+      185,
+      199,
+      200,
+      208,
+      212,
+      213,
+      214,
+      215,
+      219,
+      220,
+      221,
+      222,
+      223,
+      238,
+      239,
+      240,
+      241,
+      243,
+      244,
+      252,
+      253,
+      254,
+      269,
+      270,
+      278,
+      280,
+      285,
+      293,
+      301,
+      303,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      318,
+      319,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341
+    ],
+    "retained_only_branches": [
+      [
+        64,
+        65
+      ],
+      [
+        128,
+        140
+      ],
+      [
+        142,
+        143
+      ],
+      [
+        142,
+        161
+      ],
+      [
+        144,
+        146
+      ],
+      [
+        153,
+        154
+      ],
+      [
+        153,
+        160
+      ],
+      [
+        178,
+        184
+      ],
+      [
+        178,
+        185
+      ],
+      [
+        212,
+        213
+      ],
+      [
+        212,
+        221
+      ],
+      [
+        213,
+        214
+      ],
+      [
+        213,
+        215
+      ],
+      [
+        221,
+        222
+      ],
+      [
+        221,
+        223
+      ],
+      [
+        243,
+        244
+      ],
+      [
+        243,
+        254
+      ],
+      [
+        270,
+        278
+      ],
+      [
+        270,
+        280
+      ],
+      [
+        313,
+        -303
+      ],
+      [
+        313,
+        314
+      ],
+      [
+        323,
+        324
+      ],
+      [
+        323,
+        325
+      ],
+      [
+        326,
+        327
+      ],
+      [
+        326,
+        328
+      ],
+      [
+        334,
+        335
+      ],
+      [
+        334,
+        337
+      ],
+      [
+        337,
+        338
+      ],
+      [
+        337,
+        339
+      ],
+      [
+        339,
+        340
+      ],
+      [
+        339,
+        341
+      ]
+    ]
+  },
+  "new_test_count": 22,
+  "retained_test_count": 4,
+  "protected_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "bytes": 14986
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "bytes": 7626
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "bytes": 20032
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "bytes": 18537
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+      "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+      "bytes": 20052
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "bytes": 17125
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "bytes": 16674
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "bytes": 10018
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json",
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "bytes": 7301
+    },
+    {
+      "path": "tests/discovery_runtime/test_activation_filesystem.py",
+      "sha256": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+      "bytes": 12817
+    },
+    {
+      "path": "tests/discovery_runtime/test_configuration.py",
+      "sha256": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+      "bytes": 11113
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+      "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+      "bytes": 17390
+    }
+  ],
+  "protected_bindings_unchanged": true,
+  "normalized_scoped_unified_diffs": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "--- before/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n+++ after/packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py\n@@ -356,14 +356,34 @@\n     \"\"\"\n \n \n+def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:\n+    \"\"\"Resolve validated host storage while preserving its workspace partition.\n+\n+    location (RegistryLocation): output of for_host after its absolute, platform,\n+    parent-component and external-root checks. Return a location with the same\n+    workspace identity and fixed layout under the resolved host base. Reads path\n+    metadata only; an absent leaf is permitted. Resolution errors propagate;\n+    ValueError rejects a derived path redirected outside that exact layout.\n+    \"\"\"\n+    state = Path(location.directory)\n+    # The accepted builder appends drm-copilot/discovery/workspaces/workspace-digest.\n+    # Resolve its trusted base, then verify the complete path against that layout.\n+    base = state.parents[3]\n+    expected = base.resolve() / state.relative_to(base)\n+    if state.resolve() != expected:\n+        raise ValueError(\"Host state must retain its fixed workspace partition\")\n+    return replace(location, directory=expected.as_posix())\n+\n+\n def installed_local_io(\n     root: str, repository: RepositoryReader | None, principal: str, author_id: str\n ) -> LocalServiceIO:\n     \"\"\"Compose fixed installed ports from trusted outer host values; create no files.\n \n     Root must already be absolute/canonical. Host state paths come from platform\n-    settings, never request JSON. Invalid paths/principals raise fixed errors; catalog\n-    and runtime-provider failures retain their existing typed boundaries.\n+    settings, never request JSON. Validate their spelling before resolving aliases,\n+    preserving the fixed state partition and strict store guard. Invalid paths or\n+    principals raise fixed errors; resolution and catalog failures propagate.\n \n     root (str): trusted absolute canonical workspace. repository (RepositoryReader |\n     None): exact optional repository reader. principal (str): explicit outer principal;\n@@ -390,7 +410,7 @@\n         xdg_state_home=os.environ.get(\"XDG_STATE_HOME\"),\n     )\n     activation = ActivationStore.local(\n-        location=location,\n+        location=_canonical_state_location(location),\n         catalog=load_catalog(),\n         authorize_root=_authorize_local_root,\n         invalidate_authority=_invalidate_empty_authority,\n",
+    "tests/discovery_runtime/test_gateway_local.py": "--- before/tests/discovery_runtime/test_gateway_local.py\n+++ after/tests/discovery_runtime/test_gateway_local.py\n@@ -443,11 +443,11 @@\n     case = ConfigurationCase(config_catalog)\n \n     def resolve(self: Path, strict: bool = False) -> Path:\n-        \"\"\"Retain the fake trusted absolute root without touching disk. strict (bool):\n-        whether canonical resolution must require existence. Returns Path; memory-only\n-        effects; AssertionError on mismatch.\n-        \"\"\"\n-        assert strict\n+        \"\"\"Preserve synthetic paths without I/O. strict (bool) requires the workspace\n+        to exist while state may be absent. Return Path; AssertionError on the wrong\n+        existence policy; memory-only effects.\n+        \"\"\"\n+        assert strict == (self == Path(case.disk.root))\n         return self\n \n     def home(cls: type[Path]) -> Path:\n",
+    "tests/discovery_runtime/test_gateway_factory.py": "--- before/tests/discovery_runtime/test_gateway_factory.py\n+++ after/tests/discovery_runtime/test_gateway_factory.py\n@@ -0,0 +1,345 @@\n+\"\"\"Exercise trusted state canonicalization through the real store constructor.\"\"\"\n+\n+from __future__ import annotations\n+\n+from pathlib import Path\n+from types import SimpleNamespace\n+from typing import TYPE_CHECKING, NoReturn\n+\n+import pytest\n+from drm_copilot_discovery import activation_store, gateway_local, mutation_filesystem\n+from drm_copilot_discovery.activation_filesystem import NativeRegistry, RegistryLocation\n+from drm_copilot_discovery.models import JsonObject\n+from drm_copilot_discovery.service_contracts import ServiceRequest\n+\n+from tests.discovery_runtime.test_configuration import config_catalog as config_catalog\n+\n+if TYPE_CHECKING:\n+    from drm_copilot_discovery.catalog import SchemaCatalog\n+    from drm_copilot_discovery.gateway_local import LocalServiceIO\n+\n+\n+class FactoryCase:\n+    \"\"\"Model native path resolution for one isolated factory invocation.\n+\n+    Tests populate aliases, missing paths or errors, then compose the real local\n+    store. Resolution records distinguish required workspace existence from absent\n+    state support. No filesystem is consulted; denied ports fail before effects.\n+    Mutable mappings and observation lists belong only to this test instance.\n+    \"\"\"\n+\n+    def __init__(self) -> None:\n+        \"\"\"Create fixed native-flavor paths and empty observations; return None.\n+\n+        Pure lexical Path operations select the current platform flavor. No host\n+        environment, current directory, filesystem or external process is read.\n+        \"\"\"\n+        windows = Path(\"C:/\").is_absolute()\n+        anchor = Path(\"C:/\") if windows else Path(\"/\")\n+        self.platform = \"windows\" if windows else \"linux\"\n+        self.root, self.home, self.base = (\n+            anchor / \"workspace\",\n+            anchor / \"user\",\n+            anchor / \"state\",\n+        )\n+        self.canonical_base = anchor / \"canonical-state\"\n+        self.location = RegistryLocation.for_host(\n+            workspace_root=self.root.as_posix(),\n+            platform=\"windows\" if windows else \"linux\",\n+            user_home=self.home.as_posix(),\n+            local_app_data=self.base.as_posix(),\n+            xdg_state_home=self.base.as_posix(),\n+        )\n+        self.state = Path(self.location.directory)\n+        self.aliases: dict[Path, Path] = {}\n+        self.errors: dict[Path, OSError] = {}\n+        self.missing: set[Path] = set()\n+        self.answers: dict[Path, list[Path]] = {}\n+        self.resolutions: list[tuple[Path, bool]] = []\n+        self.effects: list[str] = []\n+\n+    def resolve(self, path: Path, *, strict: bool) -> Path:\n+        \"\"\"Resolve path (Path) through test-local metadata; strict requires presence.\n+\n+        Return the configured canonical Path and record the read. OSError entries\n+        and strict missing paths raise unchanged; no actual filesystem is touched.\n+        \"\"\"\n+        self.resolutions.append((path, strict))\n+        if path in self.errors:\n+            raise self.errors[path]\n+        if strict and path in self.missing:\n+            raise FileNotFoundError(\"Synthetic missing path\")\n+        if self.answers.get(path):\n+            return self.answers[path].pop(0)\n+        # Prefer the most specific alias so tests can model a redirected partition.\n+        for source in sorted(\n+            self.aliases, key=lambda item: len(item.parts), reverse=True\n+        ):\n+            if path == source or source in path.parents:\n+                return self.aliases[source] / path.relative_to(source)\n+        return path\n+\n+    def deny(self, *_args: object, **_kwargs: object) -> NoReturn:\n+        \"\"\"Reject any native port call; object arguments are deliberately ignored.\n+\n+        Record the attempted effect and raise AssertionError; no I/O is performed\n+        and no value is returned. Construction may retain these ports but not call.\n+        \"\"\"\n+        self.effects.append(\"forbidden-port\")\n+        raise AssertionError(\"Construction must not invoke a native port\")\n+\n+    def compose(self, *, principal: str = \"local-user\") -> LocalServiceIO:\n+        \"\"\"Construct installed ports for this root and principal (str).\n+\n+        Return LocalServiceIO from the real factory/store composition; propagate\n+        its validation/resolution errors. Only injected memory reads may occur.\n+        \"\"\"\n+        return gateway_local.installed_local_io(\n+            self.root.as_posix(), None, principal, \"test-user\"\n+        )\n+\n+\n+@pytest.fixture\n+def factory_case(\n+    config_catalog: SchemaCatalog, monkeypatch: pytest.MonkeyPatch\n+) -> FactoryCase:\n+    \"\"\"Bind real constructors to memory-only native seams for one test.\n+\n+    config_catalog (SchemaCatalog) supplies immutable schemas; monkeypatch\n+    (pytest.MonkeyPatch) restores every seam. Return FactoryCase; assertions\n+    reject unexpected native calls. No service/store constructor is replaced.\n+    \"\"\"\n+    case = FactoryCase()\n+\n+    def resolve(path: Path, strict: bool = False) -> Path:\n+        \"\"\"Read fake metadata for path (Path), honoring strict (bool); return Path.\n+\n+        Propagate modeled resolution errors; only case observations are mutated.\n+        \"\"\"\n+        return case.resolve(path, strict=strict)\n+\n+    def home(cls: type[Path]) -> Path:\n+        \"\"\"Return a fixed home as cls (type[Path]); no environment or I/O access.\"\"\"\n+        return cls(case.home)\n+\n+    def catalog() -> SchemaCatalog:\n+        \"\"\"Return the exact immutable schema fixture without installed I/O.\"\"\"\n+        return config_catalog\n+\n+    monkeypatch.setattr(Path, \"resolve\", resolve)\n+    monkeypatch.setattr(Path, \"home\", classmethod(home))\n+    monkeypatch.setattr(gateway_local, \"load_catalog\", catalog)\n+    monkeypatch.setattr(gateway_local, \"sys\", SimpleNamespace(platform=\"linux\"))\n+    monkeypatch.setenv(\"LOCALAPPDATA\", case.base.as_posix())\n+    monkeypatch.setenv(\"XDG_STATE_HOME\", case.base.as_posix())\n+    # Reject effects at the native ports while keeping all constructors real.\n+    monkeypatch.setattr(activation_store, \"open_local_directory\", case.deny)\n+    monkeypatch.setattr(mutation_filesystem, \"open_local_directory\", case.deny)\n+    monkeypatch.setattr(mutation_filesystem, \"exclusive_workspace_lock\", case.deny)\n+    monkeypatch.setattr(NativeRegistry, \"guard\", case.deny)\n+    monkeypatch.setattr(NativeRegistry, \"write\", case.deny)\n+    monkeypatch.setattr(\n+        mutation_filesystem.LocalMutationPrimitives, \"create_exclusive\", case.deny\n+    )\n+    monkeypatch.setattr(\n+        mutation_filesystem.LocalMutationPrimitives, \"replace_if_digest\", case.deny\n+    )\n+    return case\n+\n+\n+@pytest.mark.parametrize(\"alias\", [False, True], ids=[\"canonical\", \"alias\"])\n+@pytest.mark.parametrize(\"missing\", [False, True], ids=[\"existing\", \"missing-leaf\"])\n+def test_factory_preserves_partition_through_real_store(\n+    factory_case: FactoryCase, alias: bool, missing: bool\n+) -> None:\n+    \"\"\"Compose canonical/aliased state and optional absence without write effects.\n+\n+    factory_case (FactoryCase) owns memory seams; alias/missing (bool) select the\n+    state shape. Return None; assertions require exact identity and native wiring.\n+    \"\"\"\n+    case = factory_case\n+    if alias:\n+        case.aliases[case.base] = case.canonical_base\n+    expected = (case.canonical_base if alias else case.base) / case.state.relative_to(\n+        case.base\n+    )\n+    if missing:\n+        case.missing.update((case.state, expected))\n+\n+    local = case.compose()\n+\n+    assert isinstance(local.activation, activation_store.ActivationStore)\n+    assert isinstance(local.activation.registry, NativeRegistry)\n+    assert local.activation.location.directory == expected.as_posix()\n+    assert local.activation.location.workspace == case.location.workspace\n+    assert local.activation.location.workspace_sha256 == case.location.workspace_sha256\n+    assert local.initialization.primitives is local.activation.primitives\n+    assert local.initialization.workspace_root == case.location.workspace\n+    assert (case.root, True) in case.resolutions and (\n+        expected,\n+        False,\n+    ) in case.resolutions\n+    # Missing state may be observed without requiring or creating its leaf.\n+    assert not case.effects and not any(\n+        strict for path, strict in case.resolutions if path in case.missing\n+    )\n+\n+\n+@pytest.mark.parametrize(\n+    \"spelling\", [\"relative\", \"../state\", \"C:state\", \"\\\\state\", \"parent\"]\n+)\n+def test_invalid_state_spelling_is_rejected_before_resolution(\n+    factory_case: FactoryCase, monkeypatch: pytest.MonkeyPatch, spelling: str\n+) -> None:\n+    \"\"\"Reject unsupported/relative/parent spelling before normalization erases it.\n+\n+    factory_case (FactoryCase), monkeypatch (pytest.MonkeyPatch) and spelling (str)\n+    supply one host input. Return None; ValueError and absence of state reads are\n+    asserted. Only memory environment seams and observations change.\n+    \"\"\"\n+    value = (\n+        (factory_case.base / \"..\" / \"state\").as_posix()\n+        if spelling == \"parent\"\n+        else spelling\n+    )\n+    monkeypatch.setenv(\"LOCALAPPDATA\", value)\n+    monkeypatch.setenv(\"XDG_STATE_HOME\", value)\n+\n+    with pytest.raises(ValueError, match=\"absolute and canonical\"):\n+        factory_case.compose()\n+\n+    assert factory_case.resolutions == [(factory_case.root, True)]\n+    assert not factory_case.effects\n+\n+\n+@pytest.mark.parametrize(\"internal\", [\"lexical\", \"resolved\"])\n+def test_internal_state_cannot_become_trusted_storage(\n+    factory_case: FactoryCase, monkeypatch: pytest.MonkeyPatch, internal: str\n+) -> None:\n+    \"\"\"Retain external-location checks before and after canonicalization.\n+\n+    factory_case (FactoryCase) and monkeypatch (pytest.MonkeyPatch) supply memory\n+    paths; internal (str) chooses lexical/resolved input. Return None; assertions\n+    require ValueError and no effects, including no alternate storage fallback.\n+    \"\"\"\n+    case = factory_case\n+    # Raw internal input fails before normalization; an alias is checked afterward.\n+    if internal == \"lexical\":\n+        monkeypatch.setenv(\"LOCALAPPDATA\", case.root.as_posix())\n+        monkeypatch.setenv(\"XDG_STATE_HOME\", case.root.as_posix())\n+    else:\n+        case.aliases[case.base] = case.root\n+\n+    with pytest.raises(ValueError, match=\"outside|external\"):\n+        case.compose()\n+\n+    assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\"redirect\", [\"layout\", \"partition\", \"store-race\"])\n+def test_distinct_or_changing_derived_state_is_refused(\n+    factory_case: FactoryCase, redirect: str\n+) -> None:\n+    \"\"\"Reject redirection that changes fixed layout or the final canonical guard.\n+\n+    factory_case (FactoryCase) supplies memory resolution; redirect (str) selects\n+    the differing component or between-check change. Return None; assertions\n+    require ValueError without native calls or replacement authority.\n+    \"\"\"\n+    case = factory_case\n+    # Layout/digest redirections violate derivation; a later change reaches the store.\n+    if redirect == \"layout\":\n+        case.aliases[case.state.parent] = case.base / \"unexpected\"\n+    elif redirect == \"partition\":\n+        case.aliases[case.state] = case.state.with_name(\"other-workspace\")\n+    else:\n+        case.answers[case.state] = [case.state, case.state.with_name(\"changed\")]\n+\n+    with pytest.raises(ValueError, match=\"partition|canonical\"):\n+        case.compose()\n+\n+    assert not case.effects\n+\n+\n+@pytest.mark.parametrize(\"target\", [\"workspace\", \"base\", \"state\"])\n+def test_resolution_errors_propagate_without_fallback(\n+    factory_case: FactoryCase, target: str\n+) -> None:\n+    \"\"\"Preserve the exact I/O failure for one resolution target (str).\n+\n+    factory_case (FactoryCase) binds the synthetic OSError. Return None;\n+    assertions require that same exception and no effects or alternate location.\n+    \"\"\"\n+    case = factory_case\n+    path = {\"workspace\": case.root, \"base\": case.base, \"state\": case.state}[target]\n+    error = OSError(\"Synthetic resolution failure\")\n+    case.errors[path] = error\n+\n+    with pytest.raises(OSError) as caught:\n+        case.compose()\n+\n+    assert caught.value is error and not case.effects\n+\n+\n+@pytest.mark.parametrize(\n+    \"condition\", [\"noncanonical-workspace\", \"missing-workspace\", \"host\"]\n+)\n+def test_factory_rejects_invalid_outer_authority(\n+    factory_case: FactoryCase, condition: str\n+) -> None:\n+    \"\"\"Refuse changed/missing workspace identity or host principal before state I/O.\n+\n+    factory_case (FactoryCase) supplies memory observations; condition (str)\n+    selects the denied authority. Return None; assertions require the applicable\n+    fixed exception without state reads or effects.\n+    \"\"\"\n+    case = factory_case\n+    # Workspace guards precede host authorization and state-location derivation.\n+    if condition == \"noncanonical-workspace\":\n+        case.aliases[case.root] = case.root.with_name(\"different-workspace\")\n+        exception = ValueError\n+    elif condition == \"missing-workspace\":\n+        case.missing.add(case.root)\n+        exception = FileNotFoundError\n+    else:\n+        exception = PermissionError\n+\n+    with pytest.raises(exception):\n+        case.compose(principal=\"host\" if condition == \"host\" else \"local-user\")\n+\n+    assert case.resolutions == [(case.root, True)] and not case.effects\n+\n+\n+@pytest.mark.parametrize(\"marker\", [\"invocation\", \"authorization\"])\n+def test_composed_ports_reject_host_references(\n+    factory_case: FactoryCase, marker: str\n+) -> None:\n+    \"\"\"Preserve host-reference refusal after real trusted-state composition.\n+\n+    factory_case (FactoryCase) provides memory ports; marker (str) selects the\n+    opaque reference. Return None; assertions require PermissionError and no\n+    native reads/writes. Request data never supplies the host storage location.\n+    \"\"\"\n+    case = factory_case\n+    local = case.compose()\n+    request = ServiceRequest(\n+        id=\"doctor\",\n+        request_id=\"request\",\n+        operation=\"doctor\",\n+        mode=\"structural\",\n+        workspace_root=case.root.as_posix(),\n+        profile_path=None,\n+        dry_run=False,\n+        write=False,\n+        format=\"json\",\n+        inputs=JsonObject(()),\n+        invocation_ref=\"opaque-invocation-0001\" if marker == \"invocation\" else None,\n+        authorization_ref=(\n+            \"opaque-authorization-0001\" if marker == \"authorization\" else None\n+        ),\n+    )\n+\n+    with pytest.raises(PermissionError, match=\"authority\"):\n+        local.authorize(request, baseline=None)\n+\n+    assert not case.effects\n"
+  },
+  "raw_source_newline_counts": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+      "old_crlf": 403,
+      "new_crlf": 423,
+      "old_lf": 403,
+      "new_lf": 423
+    },
+    "tests/discovery_runtime/test_gateway_local.py": {
+      "old_crlf": 494,
+      "new_crlf": 494,
+      "old_lf": 494,
+      "new_lf": 494
+    },
+    "tests/discovery_runtime/test_gateway_factory.py": {
+      "old_crlf": 0,
+      "new_crlf": 0,
+      "old_lf": 0,
+      "new_lf": 345
+    }
+  },
+  "diff_presentation_qualification": "The immutable proof's diff field used raw old lines and universal-newline after lines. This view normalizes both sides to LF; original/current exact bytes remain in the bound input/proof archives. No source/evidence original was rewritten.",
+  "readable_checks": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.md",
+      "utf8_lf_no_trailing_whitespace": true
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf1-freeze.2026-10-21T04-42.md",
+      "utf8_lf_no_trailing_whitespace": true
+    }
+  ],
+  "new_repair_artifacts_excluding_this_manifest": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-ncf1-inputs.2026-10-21T04-30.json",
+      "sha256": "9873fb731c0e4f3ac8e69fef36bd048d831db6fc59cf81a88d7547a44d771fe0",
+      "bytes": 18045
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+      "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+      "bytes": 158561
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.md",
+      "sha256": "d707bfbf6ea61a64ab3d74fa7421cca67bd577d228db82aed4601b15f36fa169",
+      "bytes": 8016
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.raw.json",
+      "sha256": "9265aaf99c03c25a1ed3d709c889fa9d40f3d5037b6e6f6b4b5c9467b6d4176f",
+      "bytes": 5861
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.md",
+      "sha256": "31bec9f6c5b53e4fab4ce4f9b22cdb2473f1d3caf6d0457811e4d11dbe4e4058",
+      "bytes": 470
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.raw.json",
+      "sha256": "85a9eedf36ec78cc3a88cbe08422d7f88ac87562caa416512ac101d4c5e761a6",
+      "bytes": 5786
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.md",
+      "sha256": "ed4f199777c95ff6b99a8663169e6a99d6073188246e4c4f84e2573a71856e96",
+      "bytes": 406
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "4c5d7164863569b672ff2d36a0528dac946745ef3efc49d4b91a71163ec03138",
+      "bytes": 6725
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.md",
+      "sha256": "456b7db329b6866ce50c5a8378aa9ce1ee03902419fbc26c432d13b0204f24da",
+      "bytes": 1112
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.raw.json",
+      "sha256": "3d3a239347b44858c4057db74d30bee3e2d68953e070a0250cf954c19e311414",
+      "bytes": 5786
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.md",
+      "sha256": "e20bdee603620413585730c736e791c4ed7e9544e8cd125087895076816ad5dc",
+      "bytes": 406
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "b8be1820abbbf33c4c67ee18d39d36f0e5750566efac761fa9835c359c26ee6e",
+      "bytes": 5728
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.md",
+      "sha256": "8d8bac9d63d51371552e2aae1f639df188fc284ad713676dc5911cf427bf45f7",
+      "bytes": 365
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.raw.json",
+      "sha256": "7ad06ce3633ed8fe9f7ab95775b3b7829e58c56b103bbe7ff1ae1cbfe94ffb65",
+      "bytes": 5948
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.md",
+      "sha256": "7af4c28454cfc204201a26584b19e6765ffa88098c0b3d1d475f74577e33fad8",
+      "bytes": 537
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.raw.json",
+      "sha256": "962a5dafae80036e43cd1d685f32d4244e1623ecfa60f1ab62f625e0ac4bac97",
+      "bytes": 17242
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.md",
+      "sha256": "1f10c5904808b1fee80e029b499e8db4413706b356e48069fd8f257d7ddb8d51",
+      "bytes": 5217
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf1-freeze.2026-10-21T04-42.md",
+      "sha256": "4c03888b307a8e2d48e52ef62a6c71c1a085d7f00ce2d4b40dc105199a874fbe",
+      "bytes": 2494
+    }
+  ],
+  "stageable_bindings_excluding_this_manifest": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-gateway-ncf1-inputs.2026-10-21T04-30.json",
+      "sha256": "9873fb731c0e4f3ac8e69fef36bd048d831db6fc59cf81a88d7547a44d771fe0",
+      "bytes": 18045
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+      "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+      "bytes": 158561
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.md",
+      "sha256": "d707bfbf6ea61a64ab3d74fa7421cca67bd577d228db82aed4601b15f36fa169",
+      "bytes": 8016
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.raw.json",
+      "sha256": "9265aaf99c03c25a1ed3d709c889fa9d40f3d5037b6e6f6b4b5c9467b6d4176f",
+      "bytes": 5861
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop1-black.2026-10-21T04-35.md",
+      "sha256": "31bec9f6c5b53e4fab4ce4f9b22cdb2473f1d3caf6d0457811e4d11dbe4e4058",
+      "bytes": 470
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.raw.json",
+      "sha256": "85a9eedf36ec78cc3a88cbe08422d7f88ac87562caa416512ac101d4c5e761a6",
+      "bytes": 5786
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-black.2026-10-21T04-35.md",
+      "sha256": "ed4f199777c95ff6b99a8663169e6a99d6073188246e4c4f84e2573a71856e96",
+      "bytes": 406
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "4c5d7164863569b672ff2d36a0528dac946745ef3efc49d4b91a71163ec03138",
+      "bytes": 6725
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop2-ruff.2026-10-21T04-35.md",
+      "sha256": "456b7db329b6866ce50c5a8378aa9ce1ee03902419fbc26c432d13b0204f24da",
+      "bytes": 1112
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.raw.json",
+      "sha256": "3d3a239347b44858c4057db74d30bee3e2d68953e070a0250cf954c19e311414",
+      "bytes": 5786
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-black.2026-10-21T04-35.md",
+      "sha256": "e20bdee603620413585730c736e791c4ed7e9544e8cd125087895076816ad5dc",
+      "bytes": 406
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.raw.json",
+      "sha256": "b8be1820abbbf33c4c67ee18d39d36f0e5750566efac761fa9835c359c26ee6e",
+      "bytes": 5728
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-ruff.2026-10-21T04-35.md",
+      "sha256": "8d8bac9d63d51371552e2aae1f639df188fc284ad713676dc5911cf427bf45f7",
+      "bytes": 365
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.raw.json",
+      "sha256": "7ad06ce3633ed8fe9f7ab95775b3b7829e58c56b103bbe7ff1ae1cbfe94ffb65",
+      "bytes": 5948
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-pyright.2026-10-21T04-35.md",
+      "sha256": "7af4c28454cfc204201a26584b19e6765ffa88098c0b3d1d475f74577e33fad8",
+      "bytes": 537
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.raw.json",
+      "sha256": "962a5dafae80036e43cd1d685f32d4244e1623ecfa60f1ab62f625e0ac4bac97",
+      "bytes": 17242
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-loop3-focused.2026-10-21T04-36.md",
+      "sha256": "1f10c5904808b1fee80e029b499e8db4413706b356e48069fd8f257d7ddb8d51",
+      "bytes": 5217
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf1-freeze.2026-10-21T04-42.md",
+      "sha256": "4c03888b307a8e2d48e52ef62a6c71c1a085d7f00ce2d4b40dc105199a874fbe",
+      "bytes": 2494
+    }
+  ],
+  "external_self_binding": "Add this JSON path/hash returned to coordinator: 22 total paths, three source/test and nineteen evidence. No self hash is embedded.",
+  "separate_retained_diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-construction-finding.2026-10-21T04-20.json",
+    "sha256": "377f297c36e1d24ffaae84ea351fa2e10c99867c91fa18ad43e1cca9c5330c50",
+    "bytes": 10210
+  },
+  "independent_contract_release": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-configure-cause-confirmation.2026-10-21T04-22.json",
+    "sha256": "e0ebd97d2b2e6437d729c1d1dea9d6f6445bcb9285f82a705ec38a082b3b5fac",
+    "bytes": 7143
+  },
+  "pending": [
+    "coordinator packaging identity",
+    "authorized native suffix",
+    "combined isolation/final acceptance"
+  ],
+  "no_changes": [
+    "low-level canonical/external guard",
+    "profile/path policy",
+    "initialization/capture/publication implementation",
+    "checkpoint/Git/staging/AC",
+    "prior raw evidence or native fixtures"
+  ]
+}
