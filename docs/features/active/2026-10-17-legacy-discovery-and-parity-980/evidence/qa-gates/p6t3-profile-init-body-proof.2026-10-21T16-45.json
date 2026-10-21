@@ -1,0 +1,468 @@
+{
+  "Timestamp": "2026-10-21T16-45",
+  "status": "PASS_FRESH_BODY_AND_RETAINED_EXECUTABLE_IDENTITY",
+  "reader": {
+    "locator": "SCRATCH/p6t1_final_nio1_coverage.py",
+    "sha256": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92",
+    "static_dependency_sha256": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9",
+    "used_api": "covered_file, definitions, executable; no CLI main or tests executed"
+  },
+  "preedit": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-preedit.2026-10-21T16-33.json",
+    "sha256": "5aaab0783b23996a366e34b7c07500d8356411bc4753c3c8640d9f54543fc332"
+  },
+  "coverage": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-loop2-coverage-raw.2026-10-21T16-43.json",
+    "sha256": "2aae063c4aec11f77cd1f528eee57ea31f592a4f08f7dab0be7b64aaf949f1ef",
+    "member": "coverage_json",
+    "decoded_sha256": "b63e53ed5b3e78b20f8e864756c9ff6250c12ef893597f0470d223e44c45d007",
+    "decoded_bytes": 20699
+  },
+  "measurements": {
+    "scripts/dev_tools/discovery/profile_cli.py": {
+      "source_sha256": "f047501fb7052ccb745e33f26f8e2a111a8a918bb70fe7d0f90d19f8a3f6a7da",
+      "summary": {
+        "covered_lines": 36,
+        "num_statements": 36,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 5,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 6,
+        "num_partial_branches": 0,
+        "covered_branches": 6,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "parse_args": {
+          "definition_line": 27,
+          "end_line": 52,
+          "summary": {
+            "covered_lines": 4,
+            "num_statements": 4,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            35,
+            39,
+            47,
+            52
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_format_scalar": {
+          "definition_line": 55,
+          "end_line": 59,
+          "summary": {
+            "covered_lines": 3,
+            "num_statements": 3,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            57,
+            58,
+            59
+          ],
+          "executed_branches": [
+            [
+              57,
+              58
+            ],
+            [
+              57,
+              59
+            ]
+          ],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_format_sequence": {
+          "definition_line": 62,
+          "end_line": 66,
+          "summary": {
+            "covered_lines": 3,
+            "num_statements": 3,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            64,
+            65,
+            66
+          ],
+          "executed_branches": [
+            [
+              64,
+              65
+            ],
+            [
+              64,
+              66
+            ]
+          ],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_format_conventions": {
+          "definition_line": 69,
+          "end_line": 75,
+          "summary": {
+            "covered_lines": 4,
+            "num_statements": 4,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 2,
+            "num_partial_branches": 0,
+            "covered_branches": 2,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            71,
+            72,
+            73,
+            75
+          ],
+          "executed_branches": [
+            [
+              72,
+              73
+            ],
+            [
+              72,
+              75
+            ]
+          ],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "_resolved_rows": {
+          "definition_line": 78,
+          "end_line": 99,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            83
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "render_text": {
+          "definition_line": 102,
+          "end_line": 108,
+          "summary": {
+            "covered_lines": 3,
+            "num_statements": 3,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            104,
+            106,
+            108
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "render_json": {
+          "definition_line": 111,
+          "end_line": 113,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            113
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "main": {
+          "definition_line": 116,
+          "end_line": 124,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            124
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      }
+    },
+    "scripts/dev_tools/discovery/init_cli.py": {
+      "source_sha256": "831992ee8bb0ac182ac12c34ac9ca772b1a46353785f8c6bcb01577b63eafe86",
+      "summary": {
+        "covered_lines": 13,
+        "num_statements": 13,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 4,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 0,
+        "num_partial_branches": 0,
+        "covered_branches": 0,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "functions": {
+        "parse_args": {
+          "definition_line": 19,
+          "end_line": 50,
+          "summary": {
+            "covered_lines": 5,
+            "num_statements": 5,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            27,
+            33,
+            38,
+            45,
+            50
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        },
+        "main": {
+          "definition_line": 53,
+          "end_line": 61,
+          "summary": {
+            "covered_lines": 1,
+            "num_statements": 1,
+            "percent_covered": 100.0,
+            "percent_covered_display": "100",
+            "missing_lines": 0,
+            "excluded_lines": 0,
+            "percent_statements_covered": 100.0,
+            "percent_statements_covered_display": "100",
+            "num_branches": 0,
+            "num_partial_branches": 0,
+            "covered_branches": 0,
+            "missing_branches": 0,
+            "percent_branches_covered": 100.0,
+            "percent_branches_covered_display": "100"
+          },
+          "executed_lines": [
+            61
+          ],
+          "executed_branches": [],
+          "missing_lines": [],
+          "missing_branches": []
+        }
+      }
+    }
+  },
+  "unchanged_pure_bodies": [
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "_format_scalar",
+      "before_range": [
+        77,
+        81
+      ],
+      "after_range": [
+        55,
+        59
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "_format_sequence",
+      "before_range": [
+        84,
+        88
+      ],
+      "after_range": [
+        62,
+        66
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "_format_conventions",
+      "before_range": [
+        91,
+        96
+      ],
+      "after_range": [
+        69,
+        75
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "_resolved_rows",
+      "before_range": [
+        99,
+        117
+      ],
+      "after_range": [
+        78,
+        99
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "render_text",
+      "before_range": [
+        120,
+        124
+      ],
+      "after_range": [
+        102,
+        108
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "name": "render_json",
+      "before_range": [
+        127,
+        129
+      ],
+      "after_range": [
+        111,
+        113
+      ],
+      "executable_ast_unchanged": true,
+      "fresh_body_coverage": "100% measured statements and branches; prior counters not copied"
+    }
+  ],
+  "registration": {
+    "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+    "name": "test_console_script_registered_in_pyproject",
+    "before_range": [
+      124,
+      130
+    ],
+    "after_range": [
+      230,
+      236
+    ],
+    "complete_function_ast_including_docstring_unchanged": true
+  },
+  "no_loss": "Every measured line and branch in both current production files and all10 named callable bodies executed. The six retained pure renderer/helper bodies have unchanged executable AST and fresh complete coverage. No historical raw counters were augmented. The47 unchanged domain-profile cases also passed. Global repository/final integration coverage is not claimed by this scoped proof."
+}
