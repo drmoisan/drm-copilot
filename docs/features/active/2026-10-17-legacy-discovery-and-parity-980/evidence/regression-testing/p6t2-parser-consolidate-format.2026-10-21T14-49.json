@@ -1,0 +1,157 @@
+{
+  "Timestamp": "2026-10-21T14-49",
+  "Command": "poetry run black packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py tests/discovery_runtime/test_cli_commands.py tests/discovery_runtime/test_cli_errors.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "format exit 0",
+  "started": "2026-10-21T14:49:18.076923+00:00",
+  "finished": "2026-10-21T14:49:20.013636+00:00",
+  "duration_seconds": 1.9368199000018649,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "626bebda72aa6cccac1e75e597b9fc1dc25778672b602b630a4c352a9c4f6fb9",
+      "physical_lines": 329
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "18a573a815973ab1ec702649d5628e36b4cfd035e01e8371a275018b4f47df06",
+      "physical_lines": 171
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "ea962fc53b39816cf5df1e9ae7ef0daf842ec46ab95588ae64a5198442986d53",
+      "physical_lines": 198
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "aab8ed14156dccc9929e3aa38295b6e88db2e8c78ecfd86b13972b98103192d0",
+      "physical_lines": 235
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "3cfaed91f4c66d010c253609561013d99d19e87c8db2674e280aab99e26ae69e",
+      "physical_lines": 363
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "9b9af55ee4ecfa5280c127e7d4ac46a80eaddeabed99e24b2a5d24906818313e",
+      "physical_lines": 240
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "195620bc53413b3481f38c2c53c7f65d252aabf5c0804adb490e4310d407ab2b",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "19d74c0329558cc788ab11f2c0feb5e6d8922d41a27ed1fbdd611617ca4774e7",
+      "physical_lines": 263
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    },
+    "stderr": {
+      "raw_sha256": "4c56a8d3a6af3f99eb155333ffeaf1db0f6cee6997ae0999c9679abbed8fb20a",
+      "raw_base64": "cmVmb3JtYXR0ZWQgcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxjbGlfY29tbWFuZHMucHkNCnJlZm9ybWF0dGVkIHBhY2thZ2VzXGRpc2NvdmVyeS1ydW50aW1lXHNyY1xkcm1fY29waWxvdF9kaXNjb3ZlcnlcY2xpX2FyZ3VtZW50cy5weQ0KcmVmb3JtYXR0ZWQgdGVzdHNcZGlzY292ZXJ5X3J1bnRpbWVcdGVzdF9jbGlfY29tbWFuZHMucHkNCnJlZm9ybWF0dGVkIHRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfY2xpX2Vycm9ycy5weQ0KDQpBbGwgZG9uZSEgXHUyNzI4IFxVMDAwMWYzNzAgXHUyNzI4DQo0IGZpbGVzIHJlZm9ybWF0dGVkLg0K",
+      "presentation": "reformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_commands.py\r\nreformatted packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py\r\nreformatted tests\\discovery_runtime\\test_cli_commands.py\r\nreformatted tests\\discovery_runtime\\test_cli_errors.py\r\n\r\nAll done! \\u2728 \\U0001f370 \\u2728\r\n4 files reformatted.\r\n"
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ]
+}

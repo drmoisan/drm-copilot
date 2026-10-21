@@ -1,0 +1,4224 @@
+{
+  "Timestamp": "2026-10-21T14-51",
+  "Command": "poetry run python SCRATCH\\issue-980-parser-tests.py",
+  "EXIT_CODE": 1,
+  "Output Summary": "tests exit 1",
+  "started": "2026-10-21T14:50:30.739905+00:00",
+  "finished": "2026-10-21T14:51:01.656682+00:00",
+  "duration_seconds": 30.91688710002927,
+  "source_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b",
+      "physical_lines": 366
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "e24fd8e565a145bc34d09051d445bc78371b62cf68fd072cf9704fd09adc4323",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2",
+      "physical_lines": 265
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "source_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b",
+      "physical_lines": 366
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "e24fd8e565a145bc34d09051d445bc78371b62cf68fd072cf9704fd09adc4323",
+      "physical_lines": 365
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2",
+      "physical_lines": 265
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "streams": {
+    "stdout": {
+      "raw_sha256": "40de409698e90b0e5a3ef3ccb5551ae2fbb5136b818f6c6c1c8c3191c54e4859",
+      "raw_base64": "Li4uLi4uLkYuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNjclXQ0KLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSBGQUlMVVJFUyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KXyB0ZXN0X2FsbF9maXhlZF9jb21tYW5kc19idWlsZF9zY2hlbWFfdmFsaWRfY2xvc2VkX3JlcXVlc3RzW25ldy1zY2VuYXJpby1uZXctc2NlbmFyaW8tYXJndjddIF8NCg0KbmFtZSA9ICduZXctc2NlbmFyaW8nLCBvcGVyYXRpb24gPSAnbmV3LXNjZW5hcmlvJw0KYXJndiA9ICgnLS1zY2VuYXJpby1pZCcsICdzY2VuYXJpbycsICctLWZlYXR1cmUtaWQnLCAnZmVhdHVyZScpDQppbml0aWFsaXphdGlvbl9jYXRhbG9nID0gU2NoZW1hQ2F0YWxvZyhkb2N1bWVudHM9KCgnc2NoZW1hcy9kaXNjb3ZlcnkvdjEvY292ZXJhZ2UtbGVkZ2VyLnNjaGVtYS5qc29uJywgSnNvbk9iamVjdChtZW1iZXJzPSgoJyRkZWZzJywgSnNvbk9iamVjdC4uLidpc3N1ZWRfYXQnLCAnd3JpdGVyJykpLCAoJ3RpdGxlJywgJ0Rpc2NvdmVyeSB2MiBwcm90ZWN0ZWQgdmFsaWRhdGlvbiByZWNlaXB0JyksICgndHlwZScsICdvYmplY3QnKSkpKSksIGV4dGVuc2lvbnM9KCkpDQoNCiAgICBAcHl0ZXN0Lm1hcmsucGFyYW1ldHJpemUoIm5hbWUsb3BlcmF0aW9uLGFyZ3YiLCBDQVNFUykNCiAgICBkZWYgdGVzdF9hbGxfZml4ZWRfY29tbWFuZHNfYnVpbGRfc2NoZW1hX3ZhbGlkX2Nsb3NlZF9yZXF1ZXN0cygNCiAgICAgICAgbmFtZTogc3RyLA0KICAgICAgICBvcGVyYXRpb246IHN0ciwNCiAgICAgICAgYXJndjogdHVwbGVbc3RyLCAuLi5dLA0KICAgICAgICBpbml0aWFsaXphdGlvbl9jYXRhbG9nOiBTY2hlbWFDYXRhbG9nLA0KICAgICkgLT4gTm9uZToNCiAgICAgICAgIiIiTWFwIG5hbWUvb3BlcmF0aW9uIChzdHIpLCBhcmd2IChzdHIgdHVwbGUpIHVzaW5nIHRydXN0ZWQgU2NoZW1hQ2F0YWxvZy4NCiAgICANCiAgICAgICAgUmV0dXJuIE5vbmU7IHB1YmxpYyBzZXJ2aWNlIHBhcnNpbmcgbXVzdCBhY2NlcHQgZWFjaCBleGFjdCByZXF1ZXN0IHNoYXBlLg0KICAgICAgICBObyB3b3Jrc3BhY2UvcHJvdmlkZXIvZ3JhcGggb3BlcmF0aW9uIG9yIG11dGF0aW9uIGlzIGV4ZWN1dGVkLg0KICAgICAgICAiIiINCiAgICAgICAgcGFyc2VkID0gcGFyc2VfY2xpX2FyZ3VtZW50cyhuYW1lLCBhcmd2LCBsaW1pdHM9TElNSVRTKQ0KPiAgICAgICBhc3NlcnQgaXNpbnN0YW5jZShwYXJzZWQsIENsaUludm9jYXRpb24pLCBwYXJzZWQNCkUgICAgICAgQXNzZXJ0aW9uRXJyb3I6IENsaUVycm9yKG9wZXJhdGlvbj0nbmV3LXNjZW5hcmlvJywgbW9kZT1Ob25lLCBmaW5kaW5ncz0oRmluZGluZyhjb2RlPSdDTElfQVJHVU1FTlRTJywgbWVzc2FnZT0nRGlzY292ZXJ5IGNvbW1hbmQgYXJndW0uLi52aWRlIGJvdW5kZWQgZXhwbGljaXQgb3B0aW9ucy4nLCBzZXZlcml0eT0nZXJyb3InLCBhcnRpZmFjdF9wYXRoPU5vbmUsIHBvaW50ZXI9JycsIHJlbGF0ZWRfaWRzPSgpLCByZWxhdGVkX3BhdGhzPSgpKSwpKQ0KRSAgICAgICBhc3NlcnQgRmFsc2UNCkUgICAgICAgICsgIHdoZXJlIEZhbHNlID0gaXNpbnN0YW5jZShDbGlFcnJvcihvcGVyYXRpb249J25ldy1zY2VuYXJpbycsIG1vZGU9Tm9uZSwgZmluZGluZ3M9KEZpbmRpbmcoY29kZT0nQ0xJX0FSR1VNRU5UUycsIG1lc3NhZ2U9J0Rpc2NvdmVyeSBjb21tYW5kIGFyZ3VtLi4udmlkZSBib3VuZGVkIGV4cGxpY2l0IG9wdGlvbnMuJywgc2V2ZXJpdHk9J2Vycm9yJywgYXJ0aWZhY3RfcGF0aD1Ob25lLCBwb2ludGVyPScnLCByZWxhdGVkX2lkcz0oKSwgcmVsYXRlZF9wYXRocz0oKSksKSksIENsaUludm9jYXRpb24pDQoNCnRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3RfY2xpX2NvbW1hbmRzLnB5OjE2MDogQXNzZXJ0aW9uRXJyb3INCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdHMgY292ZXJhZ2UgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCl9fX19fX19fX19fX19fIGNvdmVyYWdlOiBwbGF0Zm9ybSB3aW4zMiwgcHl0aG9uIDMuMTMuMTItZmluYWwtMCBfX19fX19fX19fX19fX18NCg0KTmFtZSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU3RtdHMgICBNaXNzIEJyYW5jaCBCclBhcnQgIENvdmVyICAgTWlzc2luZw0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KcGFja2FnZXNcZGlzY292ZXJ5LXJ1bnRpbWVcc3JjXGRybV9jb3BpbG90X2Rpc2NvdmVyeVxjbGlfYXJndW1lbnRzLnB5ICAgICAxNjIgICAgICAwICAgICA1NiAgICAgIDAgICAxMDAlDQpwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XGNsaV9jb21tYW5kcy5weSAgICAgICA0MSAgICAgIDAgICAgIDEwICAgICAgMCAgIDEwMCUNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClRPVEFMICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMjAzICAgICAgMCAgICAgNjYgICAgICAwICAgMTAwJQ0KQ292ZXJhZ2UgSlNPTiB3cml0dGVuIHRvIGZpbGUgQzpcVXNlcnNcREFOTU9JfjFcQXBwRGF0YVxMb2NhbFxUZW1wXGlzc3VlLTk4MC1wNnQyLXBhcnNlclxjb3ZlcmFnZS5qc29uDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT0gc2hvcnQgdGVzdCBzdW1tYXJ5IGluZm8gPT09PT09PT09PT09PT09PT09PT09PT09PT09DQpGQUlMRUQgdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9jbGlfY29tbWFuZHMucHk6OnRlc3RfYWxsX2ZpeGVkX2NvbW1hbmRzX2J1aWxkX3NjaGVtYV92YWxpZF9jbG9zZWRfcmVxdWVzdHNbbmV3LXNjZW5hcmlvLW5ldy1zY2VuYXJpby1hcmd2N10NCjEgZmFpbGVkLCAxMDUgcGFzc2VkIGluIDI4Ljkwcw0K",
+      "presentation": ".......F................................................................ [ 67%]\r\n..................................                                       [100%]\r\n================================== FAILURES ===================================\r\n_ test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7] _\r\n\r\nname = 'new-scenario', operation = 'new-scenario'\r\nargv = ('--scenario-id', 'scenario', '--feature-id', 'feature')\r\ninitialization_catalog = SchemaCatalog(documents=(('schemas/discovery/v1/coverage-ledger.schema.json', JsonObject(members=(('$defs', JsonObject...'issued_at', 'writer')), ('title', 'Discovery v2 protected validation receipt'), ('type', 'object'))))), extensions=())\r\n\r\n    @pytest.mark.parametrize(\"name,operation,argv\", CASES)\r\n    def test_all_fixed_commands_build_schema_valid_closed_requests(\r\n        name: str,\r\n        operation: str,\r\n        argv: tuple[str, ...],\r\n        initialization_catalog: SchemaCatalog,\r\n    ) -> None:\r\n        \"\"\"Map name/operation (str), argv (str tuple) using trusted SchemaCatalog.\r\n    \r\n        Return None; public service parsing must accept each exact request shape.\r\n        No workspace/provider/graph operation or mutation is executed.\r\n        \"\"\"\r\n        parsed = parse_cli_arguments(name, argv, limits=LIMITS)\r\n>       assert isinstance(parsed, CliInvocation), parsed\r\nE       AssertionError: CliError(operation='new-scenario', mode=None, findings=(Finding(code='CLI_ARGUMENTS', message='Discovery command argum...vide bounded explicit options.', severity='error', artifact_path=None, pointer='', related_ids=(), related_paths=()),))\r\nE       assert False\r\nE        +  where False = isinstance(CliError(operation='new-scenario', mode=None, findings=(Finding(code='CLI_ARGUMENTS', message='Discovery command argum...vide bounded explicit options.', severity='error', artifact_path=None, pointer='', related_ids=(), related_paths=()),)), CliInvocation)\r\n\r\ntests\\discovery_runtime\\test_cli_commands.py:160: AssertionError\r\n=============================== tests coverage ================================\r\n______________ coverage: platform win32, python 3.13.12-final-0 _______________\r\n\r\nName                                                                    Stmts   Miss Branch BrPart  Cover   Missing\r\n-------------------------------------------------------------------------------------------------------------------\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py     162      0     56      0   100%\r\npackages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_commands.py       41      0     10      0   100%\r\n-------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                                                     203      0     66      0   100%\r\nCoverage JSON written to file SCRATCH\\coverage.json\r\n=========================== short test summary info ===========================\r\nFAILED tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]\r\n1 failed, 105 passed in 28.90s\r\n"
+    },
+    "stderr": {
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_base64": "",
+      "presentation": ""
+    }
+  },
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ],
+  "nodes.json": {
+    "args": [
+      "-ra",
+      "tests/discovery_runtime/test_cli_commands.py",
+      "tests/discovery_runtime/test_cli_errors.py",
+      "-q",
+      "-o",
+      "addopts=-ra",
+      "--cov=drm_copilot_discovery.cli_arguments",
+      "--cov=drm_copilot_discovery.cli_commands",
+      "--cov-branch",
+      "--cov-report=term-missing",
+      "--cov-report=json:SCRATCH\\coverage.json"
+    ],
+    "nodes": [
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[init-init-argv0]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[configure-configure-argv1]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[profile-profile-argv2]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[inventory-inventory-argv3]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[dotnet-inventory-argv4]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[vsto-inventory-argv5]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-contract-new-contract-argv6]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[update-artifact-update-artifact-argv8]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[link-evidence-link-evidence-argv9]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-profile-validate-profile-argv10]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-feature-contract-validate-feature-contract-argv11]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-coverage-ledger-validate-coverage-ledger-argv12]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-runtime-scenario-validate-runtime-scenario-argv13]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-parity-matrix-validate-parity-matrix-argv14]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-unspecified-behavior-validate-unspecified-behavior-argv15]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-product-decision-validate-product-decision-argv16]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-evidence-reference-validate-evidence-reference-argv17]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-decisions-validate-decisions-argv18]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-all-validate-all-argv19]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-validate-all-argv20]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[coverage-report-coverage-report-argv21]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[parity-report-parity-report-argv22]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[completion-report-completion-report-argv23]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-generate-acceptance-argv24]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-scenarios-generate-acceptance-argv25]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-export-snapshot-export-argv26]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-import-snapshot-import-argv27]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[import-inventory-import-inventory-argv28]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[migrate-migrate-argv29]",
+      "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[doctor-doctor-argv30]",
+      "tests/discovery_runtime/test_cli_commands.py::test_exact_command_population_and_alias_semantics",
+      "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[init]",
+      "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[inventory]",
+      "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[validate-all]",
+      "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[doctor]",
+      "tests/discovery_runtime/test_cli_commands.py::test_reordered_selection_and_option_spelling_preserve_identity",
+      "tests/discovery_runtime/test_cli_commands.py::test_repository_binding_is_outer_data_except_explicit_service_inputs",
+      "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[structural]",
+      "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[discovery-complete]",
+      "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[parity-complete]",
+      "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[planning]",
+      "tests/discovery_runtime/test_cli_commands.py::test_optional_fields_switches_and_literal_paths_are_retained",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[unknown-secret-argv0]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dev.discovery.doctor-argv1]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[read-source-argv2]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[prepare-agent-argv3]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[finalize-agent-argv4]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv5]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv6]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv7]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv8]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv9]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv10]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv11]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv12]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv13]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv14]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv15]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv16]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv17]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv18]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv19]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv20]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv21]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv22]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv23]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv24]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv25]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dotnet-argv26]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[vsto-argv27]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv28]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv29]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv30]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[profile-argv31]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-argv32]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv33]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv34]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv35]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv36]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-contract-argv37]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-scenario-argv38]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[snapshot-export-argv39]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv40]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv41]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv42]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv43]",
+      "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[init-argv44]",
+      "tests/discovery_runtime/test_cli_errors.py::test_argument_count_reservation_precedes_any_sequence_access",
+      "tests/discovery_runtime/test_cli_errors.py::test_character_work_reservation_precedes_token_retention",
+      "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9]",
+      "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680]",
+      "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\x01\\x01\\x01\\x01\\x01]",
+      "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help0]",
+      "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help1]",
+      "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv2]",
+      "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv3]",
+      "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[None]",
+      "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[True]",
+      "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[limits2]",
+      "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[1]",
+      "tests/discovery_runtime/test_cli_errors.py::test_limits_are_revalidated_and_help_reserves_output_capacity",
+      "tests/discovery_runtime/test_cli_errors.py::test_help_and_argument_errors_never_construct_or_execute_providers",
+      "tests/discovery_runtime/test_cli_errors.py::test_direct_carrier_and_builder_misuse_is_rejected",
+      "tests/discovery_runtime/test_cli_errors.py::test_unknown_context_and_metadata_refusal_preserve_safe_values",
+      "tests/discovery_runtime/test_cli_errors.py::test_builder_reuses_public_combination_checks_for_direct_invocations"
+    ],
+    "reports": [
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[init-init-argv0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.7090467000380158
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[init-init-argv0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.6552146000321954
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[init-init-argv0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00029419997008517385
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[configure-configure-argv1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00048160000005736947
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[configure-configure-argv1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.6556490999646485
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[configure-configure-argv1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00023830001009628177
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[profile-profile-argv2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005339999916031957
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[profile-profile-argv2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.8885236000060104
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[profile-profile-argv2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00035149999894201756
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[inventory-inventory-argv3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006690000300295651
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[inventory-inventory-argv3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9095312000135891
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[inventory-inventory-argv3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032210000790655613
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[dotnet-inventory-argv4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006821000133641064
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[dotnet-inventory-argv4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9092490000184625
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[dotnet-inventory-argv4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003304999554529786
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[vsto-inventory-argv5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006626000395044684
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[vsto-inventory-argv5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9770186999812722
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[vsto-inventory-argv5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00038270000368356705
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-contract-new-contract-argv6]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008399999933317304
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-contract-new-contract-argv6]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9408415000070818
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-contract-new-contract-argv6]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003393999650143087
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006491999956779182
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]",
+        "when": "call",
+        "outcome": "failed",
+        "duration": 0.002066300017759204
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003501999890431762
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[update-artifact-update-artifact-argv8]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006821000133641064
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[update-artifact-update-artifact-argv8]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9460009999456815
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[update-artifact-update-artifact-argv8]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033579999580979347
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[link-evidence-link-evidence-argv9]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006671999581158161
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[link-evidence-link-evidence-argv9]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9191711000166833
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[link-evidence-link-evidence-argv9]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003453000099398196
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-profile-validate-profile-argv10]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.000672499998472631
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-profile-validate-profile-argv10]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9222211000160314
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-profile-validate-profile-argv10]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032110000029206276
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-feature-contract-validate-feature-contract-argv11]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006563999922946095
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-feature-contract-validate-feature-contract-argv11]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9229479000205174
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-feature-contract-validate-feature-contract-argv11]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00031460000900551677
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-coverage-ledger-validate-coverage-ledger-argv12]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006438000127673149
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-coverage-ledger-validate-coverage-ledger-argv12]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9089527999749407
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-coverage-ledger-validate-coverage-ledger-argv12]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033250002888962626
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-runtime-scenario-validate-runtime-scenario-argv13]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006442000158131123
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-runtime-scenario-validate-runtime-scenario-argv13]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9121679000090808
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-runtime-scenario-validate-runtime-scenario-argv13]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033919996349141
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-parity-matrix-validate-parity-matrix-argv14]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006393999792635441
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-parity-matrix-validate-parity-matrix-argv14]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.916087299992796
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-parity-matrix-validate-parity-matrix-argv14]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003226000117138028
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-unspecified-behavior-validate-unspecified-behavior-argv15]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006896000122651458
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-unspecified-behavior-validate-unspecified-behavior-argv15]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9174636999960057
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-unspecified-behavior-validate-unspecified-behavior-argv15]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003179000341333449
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-product-decision-validate-product-decision-argv16]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006576000014320016
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-product-decision-validate-product-decision-argv16]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9210466999793425
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-product-decision-validate-product-decision-argv16]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00033030001213774085
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-evidence-reference-validate-evidence-reference-argv17]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006625000387430191
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-evidence-reference-validate-evidence-reference-argv17]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9417266999953426
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-evidence-reference-validate-evidence-reference-argv17]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003133999998681247
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-decisions-validate-decisions-argv18]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006619000341743231
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-decisions-validate-decisions-argv18]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9407789999968372
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-decisions-validate-decisions-argv18]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032590003684163094
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-all-validate-all-argv19]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006563000497408211
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-all-validate-all-argv19]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9112156999763101
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-all-validate-all-argv19]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00031180004589259624
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-validate-all-argv20]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006579000037163496
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-validate-all-argv20]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9161668000160716
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-validate-all-argv20]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00032679998548701406
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[coverage-report-coverage-report-argv21]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006483999895863235
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[coverage-report-coverage-report-argv21]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9171032999875024
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[coverage-report-coverage-report-argv21]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003192999865859747
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[parity-report-parity-report-argv22]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006498000002466142
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[parity-report-parity-report-argv22]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9179195000324398
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[parity-report-parity-report-argv22]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000333900039549917
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[completion-report-completion-report-argv23]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006785999867133796
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[completion-report-completion-report-argv23]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9235593999619596
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[completion-report-completion-report-argv23]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00031759997364133596
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-generate-acceptance-argv24]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006399999838322401
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-generate-acceptance-argv24]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 1.019590199983213
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-generate-acceptance-argv24]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0004469000268727541
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-scenarios-generate-acceptance-argv25]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0008896999643184245
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-scenarios-generate-acceptance-argv25]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9706138999899849
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-scenarios-generate-acceptance-argv25]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003803999861702323
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-export-snapshot-export-argv26]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006712000467814505
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-export-snapshot-export-argv26]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9286342999548651
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-export-snapshot-export-argv26]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00036210002144798636
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-import-snapshot-import-argv27]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006823000148870051
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-import-snapshot-import-argv27]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9323759999824688
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-import-snapshot-import-argv27]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003497999859973788
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[import-inventory-import-inventory-argv28]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006917999708093703
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[import-inventory-import-inventory-argv28]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9201763999881223
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[import-inventory-import-inventory-argv28]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003238999634049833
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[migrate-migrate-argv29]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006485999911092222
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[migrate-migrate-argv29]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9186715999967419
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[migrate-migrate-argv29]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003142000059597194
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[doctor-doctor-argv30]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0006533999694511294
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[doctor-doctor-argv30]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.9201990999863483
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[doctor-doctor-argv30]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003250000299885869
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_exact_command_population_and_alias_semantics",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004305999609641731
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_exact_command_population_and_alias_semantics",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.003749399969819933
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_exact_command_population_and_alias_semantics",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002169000217691064
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[init]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047209998592734337
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[init]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0007289999630302191
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[init]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002142000012099743
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[inventory]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00042310002027079463
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[inventory]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003233000170439482
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[inventory]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002011999604292214
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[validate-all]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00041310000233352184
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[validate-all]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00032699998700991273
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[validate-all]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002004000125452876
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[doctor]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00040770001942291856
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[doctor]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0002901999978348613
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[doctor]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00019950000569224358
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_reordered_selection_and_option_spelling_preserve_identity",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003342999843880534
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_reordered_selection_and_option_spelling_preserve_identity",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.004076899960637093
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_reordered_selection_and_option_spelling_preserve_identity",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001946999691426754
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_repository_binding_is_outer_data_except_explicit_service_inputs",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00033650000113993883
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_repository_binding_is_outer_data_except_explicit_service_inputs",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.002015999983996153
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_repository_binding_is_outer_data_except_explicit_service_inputs",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021989998640492558
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[structural]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00042150000808760524
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[structural]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008167999912984669
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[structural]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002041999832727015
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[discovery-complete]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00040520000038668513
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[discovery-complete]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008284000214189291
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[discovery-complete]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002183000324293971
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[parity-complete]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00040749995969235897
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[parity-complete]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008099999977275729
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[parity-complete]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002019999665208161
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[planning]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004026000387966633
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[planning]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0007978000212460756
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[planning]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001973999897018075
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_optional_fields_switches_and_literal_paths_are_retained",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003421000437811017
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_optional_fields_switches_and_literal_paths_are_retained",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0025594999897293746
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_commands.py::test_optional_fields_switches_and_literal_paths_are_retained",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0005412000464275479
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[unknown-secret-argv0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004859999753534794
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[unknown-secret-argv0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00043320003896951675
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[unknown-secret-argv0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00022170000011101365
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dev.discovery.doctor-argv1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046930002281442285
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dev.discovery.doctor-argv1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00040580000495538116
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dev.discovery.doctor-argv1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021060003200545907
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[read-source-argv2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046369998017326
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[read-source-argv2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003825000021606684
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[read-source-argv2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020830001449212432
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[prepare-agent-argv3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046199996722862124
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[prepare-agent-argv3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00039220001781359315
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[prepare-agent-argv3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021089997608214617
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[finalize-agent-argv4]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004653999931178987
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[finalize-agent-argv4]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00037589995190501213
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[finalize-agent-argv4]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021109997760504484
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv5]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005005999701097608
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv5]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00041229999624192715
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv5]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021849997574463487
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv6]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046469998778775334
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv6]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00040660001104697585
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv6]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021010002819821239
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv7]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004658999969251454
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv7]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004007000243291259
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv7]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000208800018299371
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv8]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046690000453963876
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv8]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000403400044888258
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv8]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020840001525357366
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv9]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047040003119036555
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv9]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004130000015720725
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv9]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021739996736869216
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv10]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004799999878741801
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv10]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000401599972974509
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv10]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020839995704591274
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv11]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004702000296674669
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv11]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00040710001485422254
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv11]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020670000230893493
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv12]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004675000091083348
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv12]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004173999768681824
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv12]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002066000015474856
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv13]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004857999738305807
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv13]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00041829998372122645
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv13]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020900001982226968
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv14]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047019997145980597
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv14]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0009079000446945429
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv14]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002190999803133309
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv15]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004684000159613788
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv15]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0009464999893680215
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv15]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021730002481490374
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv16]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046309997560456395
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv16]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00041229999624192715
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv16]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002112000365741551
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv17]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004681999562308192
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv17]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00042719999328255653
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv17]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002237000153400004
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv18]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00048290000995621085
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv18]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004138000076636672
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv18]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002145000034943223
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv19]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004856999730691314
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv19]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004078000201843679
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv19]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002077000099234283
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv20]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004658999969251454
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv20]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00039379997178912163
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv20]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002082999562844634
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv21]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004890999989584088
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv21]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005238999729044735
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv21]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002090999623760581
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv22]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004697999684140086
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv22]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004000000189989805
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv22]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002080000122077763
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv23]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047880003694444895
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv23]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004268999909982085
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv23]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002209999947808683
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv24]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004697000258602202
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv24]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003996999585069716
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv24]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000208500016015023
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv25]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004699999699369073
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv25]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004160000244155526
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv25]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002104000304825604
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dotnet-argv26]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00048179994337260723
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dotnet-argv26]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00040149997221305966
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dotnet-argv26]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020820001373067498
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[vsto-argv27]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004678000113926828
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[vsto-argv27]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004065000102855265
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[vsto-argv27]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020520004909485579
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv28]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004846000229008496
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv28]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00040600000647827983
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv28]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021010002819821239
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv29]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004673000075854361
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv29]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000986600003670901
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv29]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020890001906082034
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv30]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046249997103586793
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv30]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0010732000228017569
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv30]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021680002100765705
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[profile-argv31]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004808999947272241
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[profile-argv31]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000980100012384355
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[profile-argv31]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021470000501722097
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-argv32]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00047699996503069997
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-argv32]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004078000201843679
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-argv32]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002128999913111329
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv33]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004786999779753387
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv33]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00041290000081062317
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv33]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002128999913111329
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv34]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004749000072479248
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv34]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004068000125698745
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv34]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002077000099234283
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv35]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046959996689110994
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv35]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004073000163771212
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv35]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020890001906082034
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv36]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004676000098697841
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv36]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000407799961976707
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv36]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020900001982226968
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-contract-argv37]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004683000151999295
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-contract-argv37]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0008989999769255519
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-contract-argv37]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021119997836649418
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-scenario-argv38]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046989996917545795
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-scenario-argv38]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0009623999940231442
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-scenario-argv38]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020919996313750744
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[snapshot-export-argv39]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046989996917545795
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[snapshot-export-argv39]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0009073999826796353
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[snapshot-export-argv39]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020890001906082034
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv40]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046629999997094274
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv40]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.000408699968829751
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv40]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020949996542185545
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv41]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004762999597005546
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv41]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004220000118948519
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv41]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020950002362951636
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv42]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046740000834688544
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv42]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004141000099480152
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv42]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00024510000366717577
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv43]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046770001063123345
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv43]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004062000080011785
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv43]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020970002515241504
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[init-argv44]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00046389998169615865
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[init-argv44]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00041290000081062317
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[init-argv44]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020899996161460876
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_argument_count_reservation_precedes_any_sequence_access",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003325999714434147
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_argument_count_reservation_precedes_any_sequence_access",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003988999524153769
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_argument_count_reservation_precedes_any_sequence_access",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0001925000105984509
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_character_work_reservation_precedes_token_retention",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003445000038482249
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_character_work_reservation_precedes_token_retention",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004083000239916146
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_character_work_reservation_precedes_token_retention",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021520000882446766
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004151000175625086
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0004010000266134739
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002030999748967588
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00040249997982755303
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003907000063918531
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020429998403415084
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\x01\\x01\\x01\\x01\\x01]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004029000410810113
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\x01\\x01\\x01\\x01\\x01]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00038129999302327633
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\x01\\x01\\x01\\x01\\x01]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020220002625137568
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help0]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00041149999015033245
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help0]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00038869999116286635
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help0]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002022999688051641
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004054000019095838
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003869999782182276
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002014999627135694
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004036999889649451
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003792999777942896
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020089995814487338
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv3]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004028999828733504
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv3]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.00038570002652704716
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv3]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002012000186368823
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[None]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0004010999691672623
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[None]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003697999636642635
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[None]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020190002396702766
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[True]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00041229999624192715
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[True]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003636000328697264
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[True]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020549999317154288
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[limits2]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00043670000741258264
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[limits2]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003929000231437385
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[limits2]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00021379999816417694
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[1]",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00041849998524412513
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[1]",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003717000363394618
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[1]",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020180002320557833
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_limits_are_revalidated_and_help_reserves_output_capacity",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00034120003692805767
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_limits_are_revalidated_and_help_reserves_output_capacity",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0007883000071160495
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_limits_are_revalidated_and_help_reserves_output_capacity",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.000354600022546947
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_help_and_argument_errors_never_construct_or_execute_providers",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.00035260000731796026
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_help_and_argument_errors_never_construct_or_execute_providers",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0005581000004895031
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_help_and_argument_errors_never_construct_or_execute_providers",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0003352999920025468
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_direct_carrier_and_builder_misuse_is_rejected",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0005472999764606357
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_direct_carrier_and_builder_misuse_is_rejected",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.001164900022558868
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_direct_carrier_and_builder_misuse_is_rejected",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020209996728226542
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unknown_context_and_metadata_refusal_preserve_safe_values",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003428999916650355
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unknown_context_and_metadata_refusal_preserve_safe_values",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.0003712000325322151
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_unknown_context_and_metadata_refusal_preserve_safe_values",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.00020460004452615976
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_builder_reuses_public_combination_checks_for_direct_invocations",
+        "when": "setup",
+        "outcome": "passed",
+        "duration": 0.0003491000388748944
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_builder_reuses_public_combination_checks_for_direct_invocations",
+        "when": "call",
+        "outcome": "passed",
+        "duration": 0.001324299955740571
+      },
+      {
+        "nodeid": "tests/discovery_runtime/test_cli_errors.py::test_builder_reuses_public_combination_checks_for_direct_invocations",
+        "when": "teardown",
+        "outcome": "passed",
+        "duration": 0.0002087999600917101
+      }
+    ],
+    "exit_code": 1
+  },
+  "coverage.json": {
+    "meta": {
+      "format": 3,
+      "version": "7.13.2",
+      "timestamp": "2026-10-21T10:51:01.436722",
+      "branch_coverage": true,
+      "show_contexts": false
+    },
+    "files": {
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py": {
+        "executed_lines": [
+          3,
+          5,
+          6,
+          7,
+          8,
+          10,
+          15,
+          16,
+          17,
+          22,
+          23,
+          31,
+          43,
+          48,
+          49,
+          58,
+          59,
+          61,
+          63,
+          66,
+          67,
+          68,
+          69,
+          70,
+          73,
+          74,
+          81,
+          83,
+          85,
+          86,
+          87,
+          90,
+          91,
+          99,
+          100,
+          101,
+          103,
+          108,
+          111,
+          112,
+          113,
+          116,
+          122,
+          123,
+          124,
+          130,
+          133,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          159,
+          165,
+          166,
+          168,
+          169,
+          170,
+          171,
+          173,
+          174,
+          182,
+          192,
+          193,
+          202,
+          203,
+          204,
+          205,
+          206,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          216,
+          217,
+          218,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          230,
+          231,
+          232,
+          233,
+          234,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          246,
+          248,
+          249,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          259,
+          265,
+          266,
+          267,
+          268,
+          284,
+          294,
+          295,
+          296,
+          297,
+          298,
+          299,
+          300,
+          301,
+          302,
+          303,
+          304,
+          305,
+          306,
+          307,
+          308,
+          309,
+          310,
+          311,
+          313,
+          314,
+          327,
+          338,
+          339,
+          344,
+          345,
+          346,
+          347,
+          348,
+          349,
+          350,
+          351,
+          353,
+          354,
+          355,
+          366
+        ],
+        "summary": {
+          "covered_lines": 162,
+          "num_statements": 162,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 56,
+          "num_partial_branches": 0,
+          "covered_branches": 56,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [],
+        "executed_branches": [
+          [
+            63,
+            66
+          ],
+          [
+            63,
+            67
+          ],
+          [
+            67,
+            -61
+          ],
+          [
+            67,
+            68
+          ],
+          [
+            68,
+            69
+          ],
+          [
+            68,
+            70
+          ],
+          [
+            85,
+            86
+          ],
+          [
+            85,
+            87
+          ],
+          [
+            122,
+            123
+          ],
+          [
+            122,
+            124
+          ],
+          [
+            141,
+            142
+          ],
+          [
+            141,
+            143
+          ],
+          [
+            144,
+            145
+          ],
+          [
+            144,
+            146
+          ],
+          [
+            149,
+            150
+          ],
+          [
+            149,
+            156
+          ],
+          [
+            151,
+            152
+          ],
+          [
+            151,
+            153
+          ],
+          [
+            168,
+            169
+          ],
+          [
+            168,
+            170
+          ],
+          [
+            208,
+            209
+          ],
+          [
+            208,
+            248
+          ],
+          [
+            211,
+            212
+          ],
+          [
+            211,
+            213
+          ],
+          [
+            216,
+            217
+          ],
+          [
+            216,
+            220
+          ],
+          [
+            217,
+            218
+          ],
+          [
+            217,
+            228
+          ],
+          [
+            220,
+            221
+          ],
+          [
+            220,
+            225
+          ],
+          [
+            221,
+            222
+          ],
+          [
+            221,
+            223
+          ],
+          [
+            225,
+            226
+          ],
+          [
+            225,
+            227
+          ],
+          [
+            230,
+            231
+          ],
+          [
+            230,
+            236
+          ],
+          [
+            232,
+            233
+          ],
+          [
+            232,
+            234
+          ],
+          [
+            236,
+            237
+          ],
+          [
+            236,
+            238
+          ],
+          [
+            239,
+            240
+          ],
+          [
+            239,
+            243
+          ],
+          [
+            241,
+            208
+          ],
+          [
+            241,
+            242
+          ],
+          [
+            243,
+            244
+          ],
+          [
+            243,
+            246
+          ],
+          [
+            248,
+            249
+          ],
+          [
+            248,
+            254
+          ],
+          [
+            266,
+            267
+          ],
+          [
+            266,
+            268
+          ],
+          [
+            300,
+            301
+          ],
+          [
+            300,
+            302
+          ],
+          [
+            303,
+            304
+          ],
+          [
+            303,
+            305
+          ],
+          [
+            339,
+            344
+          ],
+          [
+            339,
+            345
+          ]
+        ],
+        "missing_branches": [],
+        "functions": {
+          "CliInvocation.__post_init__": {
+            "executed_lines": [
+              63,
+              66,
+              67,
+              68,
+              69,
+              70
+            ],
+            "summary": {
+              "covered_lines": 6,
+              "num_statements": 6,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 6,
+              "num_partial_branches": 0,
+              "covered_branches": 6,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 61,
+            "executed_branches": [
+              [
+                63,
+                66
+              ],
+              [
+                63,
+                67
+              ],
+              [
+                67,
+                -61
+              ],
+              [
+                67,
+                68
+              ],
+              [
+                68,
+                69
+              ],
+              [
+                68,
+                70
+              ]
+            ],
+            "missing_branches": []
+          },
+          "CliHelp.__post_init__": {
+            "executed_lines": [
+              85,
+              86,
+              87
+            ],
+            "summary": {
+              "covered_lines": 3,
+              "num_statements": 3,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 83,
+            "executed_branches": [
+              [
+                85,
+                86
+              ],
+              [
+                85,
+                87
+              ]
+            ],
+            "missing_branches": []
+          },
+          "CliError.__post_init__": {
+            "executed_lines": [
+              108,
+              111,
+              112,
+              113
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 103,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "_budget": {
+            "executed_lines": [
+              122,
+              123,
+              124,
+              130
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 116,
+            "executed_branches": [
+              [
+                122,
+                123
+              ],
+              [
+                122,
+                124
+              ]
+            ],
+            "missing_branches": []
+          },
+          "_tokens": {
+            "executed_lines": [
+              141,
+              142,
+              143,
+              144,
+              145,
+              146,
+              147,
+              149,
+              150,
+              151,
+              152,
+              153,
+              154,
+              155,
+              156
+            ],
+            "summary": {
+              "covered_lines": 15,
+              "num_statements": 15,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 8,
+              "num_partial_branches": 0,
+              "covered_branches": 8,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 133,
+            "executed_branches": [
+              [
+                141,
+                142
+              ],
+              [
+                141,
+                143
+              ],
+              [
+                144,
+                145
+              ],
+              [
+                144,
+                146
+              ],
+              [
+                149,
+                150
+              ],
+              [
+                149,
+                156
+              ],
+              [
+                151,
+                152
+              ],
+              [
+                151,
+                153
+              ]
+            ],
+            "missing_branches": []
+          },
+          "_help": {
+            "executed_lines": [
+              165,
+              166,
+              168,
+              169,
+              170,
+              171,
+              173,
+              174
+            ],
+            "summary": {
+              "covered_lines": 8,
+              "num_statements": 8,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 159,
+            "executed_branches": [
+              [
+                168,
+                169
+              ],
+              [
+                168,
+                170
+              ]
+            ],
+            "missing_branches": []
+          },
+          "_fields": {
+            "executed_lines": [
+              192,
+              193,
+              202,
+              203,
+              204,
+              205,
+              206,
+              208,
+              209,
+              210,
+              211,
+              212,
+              213,
+              214,
+              216,
+              217,
+              218,
+              220,
+              221,
+              222,
+              223,
+              224,
+              225,
+              226,
+              227,
+              228,
+              230,
+              231,
+              232,
+              233,
+              234,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              243,
+              244,
+              246,
+              248,
+              249,
+              251,
+              252,
+              253,
+              254,
+              255,
+              256
+            ],
+            "summary": {
+              "covered_lines": 49,
+              "num_statements": 49,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 28,
+              "num_partial_branches": 0,
+              "covered_branches": 28,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 182,
+            "executed_branches": [
+              [
+                208,
+                209
+              ],
+              [
+                208,
+                248
+              ],
+              [
+                211,
+                212
+              ],
+              [
+                211,
+                213
+              ],
+              [
+                216,
+                217
+              ],
+              [
+                216,
+                220
+              ],
+              [
+                217,
+                218
+              ],
+              [
+                217,
+                228
+              ],
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                225
+              ],
+              [
+                221,
+                222
+              ],
+              [
+                221,
+                223
+              ],
+              [
+                225,
+                226
+              ],
+              [
+                225,
+                227
+              ],
+              [
+                230,
+                231
+              ],
+              [
+                230,
+                236
+              ],
+              [
+                232,
+                233
+              ],
+              [
+                232,
+                234
+              ],
+              [
+                236,
+                237
+              ],
+              [
+                236,
+                238
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                243
+              ],
+              [
+                241,
+                208
+              ],
+              [
+                241,
+                242
+              ],
+              [
+                243,
+                244
+              ],
+              [
+                243,
+                246
+              ],
+              [
+                248,
+                249
+              ],
+              [
+                248,
+                254
+              ]
+            ],
+            "missing_branches": []
+          },
+          "_request": {
+            "executed_lines": [
+              265,
+              266,
+              267,
+              268
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 259,
+            "executed_branches": [
+              [
+                266,
+                267
+              ],
+              [
+                266,
+                268
+              ]
+            ],
+            "missing_branches": []
+          },
+          "parse_cli_arguments": {
+            "executed_lines": [
+              294,
+              295,
+              296,
+              297,
+              298,
+              299,
+              300,
+              301,
+              302,
+              303,
+              304,
+              305,
+              306,
+              307,
+              308,
+              309,
+              310,
+              311,
+              313,
+              314
+            ],
+            "summary": {
+              "covered_lines": 20,
+              "num_statements": 20,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 284,
+            "executed_branches": [
+              [
+                300,
+                301
+              ],
+              [
+                300,
+                302
+              ],
+              [
+                303,
+                304
+              ],
+              [
+                303,
+                305
+              ]
+            ],
+            "missing_branches": []
+          },
+          "build_cli_request": {
+            "executed_lines": [
+              338,
+              339,
+              344,
+              345,
+              346,
+              347,
+              348,
+              349,
+              350,
+              351,
+              353,
+              354,
+              355,
+              366
+            ],
+            "summary": {
+              "covered_lines": 14,
+              "num_statements": 14,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 327,
+            "executed_branches": [
+              [
+                339,
+                344
+              ],
+              [
+                339,
+                345
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              7,
+              8,
+              10,
+              15,
+              16,
+              17,
+              22,
+              23,
+              31,
+              43,
+              48,
+              49,
+              58,
+              59,
+              61,
+              73,
+              74,
+              81,
+              83,
+              90,
+              91,
+              99,
+              100,
+              101,
+              103,
+              116,
+              133,
+              159,
+              182,
+              259,
+              284,
+              327
+            ],
+            "summary": {
+              "covered_lines": 35,
+              "num_statements": 35,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "CliInvocation": {
+            "executed_lines": [
+              63,
+              66,
+              67,
+              68,
+              69,
+              70
+            ],
+            "summary": {
+              "covered_lines": 6,
+              "num_statements": 6,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 6,
+              "num_partial_branches": 0,
+              "covered_branches": 6,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 49,
+            "executed_branches": [
+              [
+                63,
+                66
+              ],
+              [
+                63,
+                67
+              ],
+              [
+                67,
+                -61
+              ],
+              [
+                67,
+                68
+              ],
+              [
+                68,
+                69
+              ],
+              [
+                68,
+                70
+              ]
+            ],
+            "missing_branches": []
+          },
+          "CliHelp": {
+            "executed_lines": [
+              85,
+              86,
+              87
+            ],
+            "summary": {
+              "covered_lines": 3,
+              "num_statements": 3,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 2,
+              "num_partial_branches": 0,
+              "covered_branches": 2,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 74,
+            "executed_branches": [
+              [
+                85,
+                86
+              ],
+              [
+                85,
+                87
+              ]
+            ],
+            "missing_branches": []
+          },
+          "CliError": {
+            "executed_lines": [
+              108,
+              111,
+              112,
+              113
+            ],
+            "summary": {
+              "covered_lines": 4,
+              "num_statements": 4,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 91,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              7,
+              8,
+              10,
+              15,
+              16,
+              17,
+              22,
+              23,
+              31,
+              43,
+              48,
+              49,
+              58,
+              59,
+              61,
+              73,
+              74,
+              81,
+              83,
+              90,
+              91,
+              99,
+              100,
+              101,
+              103,
+              116,
+              122,
+              123,
+              124,
+              130,
+              133,
+              141,
+              142,
+              143,
+              144,
+              145,
+              146,
+              147,
+              149,
+              150,
+              151,
+              152,
+              153,
+              154,
+              155,
+              156,
+              159,
+              165,
+              166,
+              168,
+              169,
+              170,
+              171,
+              173,
+              174,
+              182,
+              192,
+              193,
+              202,
+              203,
+              204,
+              205,
+              206,
+              208,
+              209,
+              210,
+              211,
+              212,
+              213,
+              214,
+              216,
+              217,
+              218,
+              220,
+              221,
+              222,
+              223,
+              224,
+              225,
+              226,
+              227,
+              228,
+              230,
+              231,
+              232,
+              233,
+              234,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241,
+              242,
+              243,
+              244,
+              246,
+              248,
+              249,
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              259,
+              265,
+              266,
+              267,
+              268,
+              284,
+              294,
+              295,
+              296,
+              297,
+              298,
+              299,
+              300,
+              301,
+              302,
+              303,
+              304,
+              305,
+              306,
+              307,
+              308,
+              309,
+              310,
+              311,
+              313,
+              314,
+              327,
+              338,
+              339,
+              344,
+              345,
+              346,
+              347,
+              348,
+              349,
+              350,
+              351,
+              353,
+              354,
+              355,
+              366
+            ],
+            "summary": {
+              "covered_lines": 149,
+              "num_statements": 149,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 48,
+              "num_partial_branches": 0,
+              "covered_branches": 48,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                122,
+                123
+              ],
+              [
+                122,
+                124
+              ],
+              [
+                141,
+                142
+              ],
+              [
+                141,
+                143
+              ],
+              [
+                144,
+                145
+              ],
+              [
+                144,
+                146
+              ],
+              [
+                149,
+                150
+              ],
+              [
+                149,
+                156
+              ],
+              [
+                151,
+                152
+              ],
+              [
+                151,
+                153
+              ],
+              [
+                168,
+                169
+              ],
+              [
+                168,
+                170
+              ],
+              [
+                208,
+                209
+              ],
+              [
+                208,
+                248
+              ],
+              [
+                211,
+                212
+              ],
+              [
+                211,
+                213
+              ],
+              [
+                216,
+                217
+              ],
+              [
+                216,
+                220
+              ],
+              [
+                217,
+                218
+              ],
+              [
+                217,
+                228
+              ],
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                225
+              ],
+              [
+                221,
+                222
+              ],
+              [
+                221,
+                223
+              ],
+              [
+                225,
+                226
+              ],
+              [
+                225,
+                227
+              ],
+              [
+                230,
+                231
+              ],
+              [
+                230,
+                236
+              ],
+              [
+                232,
+                233
+              ],
+              [
+                232,
+                234
+              ],
+              [
+                236,
+                237
+              ],
+              [
+                236,
+                238
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                243
+              ],
+              [
+                241,
+                208
+              ],
+              [
+                241,
+                242
+              ],
+              [
+                243,
+                244
+              ],
+              [
+                243,
+                246
+              ],
+              [
+                248,
+                249
+              ],
+              [
+                248,
+                254
+              ],
+              [
+                266,
+                267
+              ],
+              [
+                266,
+                268
+              ],
+              [
+                300,
+                301
+              ],
+              [
+                300,
+                302
+              ],
+              [
+                303,
+                304
+              ],
+              [
+                303,
+                305
+              ],
+              [
+                339,
+                344
+              ],
+              [
+                339,
+                345
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      },
+      "packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_commands.py": {
+        "executed_lines": [
+          3,
+          5,
+          6,
+          12,
+          13,
+          22,
+          23,
+          24,
+          25,
+          26,
+          29,
+          30,
+          38,
+          39,
+          40,
+          41,
+          44,
+          49,
+          57,
+          69,
+          83,
+          84,
+          85,
+          86,
+          87,
+          192,
+          200,
+          214,
+          220,
+          221,
+          223,
+          224,
+          225,
+          226,
+          229,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241
+        ],
+        "summary": {
+          "covered_lines": 41,
+          "num_statements": 41,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 2,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 10,
+          "num_partial_branches": 0,
+          "covered_branches": 10,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "missing_lines": [],
+        "excluded_lines": [
+          8,
+          9
+        ],
+        "executed_branches": [
+          [
+            220,
+            221
+          ],
+          [
+            220,
+            223
+          ],
+          [
+            223,
+            224
+          ],
+          [
+            223,
+            226
+          ],
+          [
+            224,
+            223
+          ],
+          [
+            224,
+            225
+          ],
+          [
+            237,
+            238
+          ],
+          [
+            237,
+            239
+          ],
+          [
+            239,
+            240
+          ],
+          [
+            239,
+            241
+          ]
+        ],
+        "missing_branches": [],
+        "functions": {
+          "command_definition": {
+            "executed_lines": [
+              220,
+              221,
+              223,
+              224,
+              225,
+              226
+            ],
+            "summary": {
+              "covered_lines": 6,
+              "num_statements": 6,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 6,
+              "num_partial_branches": 0,
+              "covered_branches": 6,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 214,
+            "executed_branches": [
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                223
+              ],
+              [
+                223,
+                224
+              ],
+              [
+                223,
+                226
+              ],
+              [
+                224,
+                223
+              ],
+              [
+                224,
+                225
+              ]
+            ],
+            "missing_branches": []
+          },
+          "command_options": {
+            "executed_lines": [
+              236,
+              237,
+              238,
+              239,
+              240,
+              241
+            ],
+            "summary": {
+              "covered_lines": 6,
+              "num_statements": 6,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 4,
+              "num_partial_branches": 0,
+              "covered_branches": 4,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 229,
+            "executed_branches": [
+              [
+                237,
+                238
+              ],
+              [
+                237,
+                239
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                241
+              ]
+            ],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              12,
+              13,
+              22,
+              23,
+              24,
+              25,
+              26,
+              29,
+              30,
+              38,
+              39,
+              40,
+              41,
+              44,
+              49,
+              57,
+              69,
+              83,
+              84,
+              85,
+              86,
+              87,
+              192,
+              200,
+              214,
+              229
+            ],
+            "summary": {
+              "covered_lines": 29,
+              "num_statements": 29,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 2,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              8,
+              9
+            ],
+            "start_line": 1,
+            "executed_branches": [],
+            "missing_branches": []
+          }
+        },
+        "classes": {
+          "CliOption": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 13,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "CliCommand": {
+            "executed_lines": [],
+            "summary": {
+              "covered_lines": 0,
+              "num_statements": 0,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 0,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 0,
+              "num_partial_branches": 0,
+              "covered_branches": 0,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [],
+            "start_line": 30,
+            "executed_branches": [],
+            "missing_branches": []
+          },
+          "": {
+            "executed_lines": [
+              3,
+              5,
+              6,
+              12,
+              13,
+              22,
+              23,
+              24,
+              25,
+              26,
+              29,
+              30,
+              38,
+              39,
+              40,
+              41,
+              44,
+              49,
+              57,
+              69,
+              83,
+              84,
+              85,
+              86,
+              87,
+              192,
+              200,
+              214,
+              220,
+              221,
+              223,
+              224,
+              225,
+              226,
+              229,
+              236,
+              237,
+              238,
+              239,
+              240,
+              241
+            ],
+            "summary": {
+              "covered_lines": 41,
+              "num_statements": 41,
+              "percent_covered": 100.0,
+              "percent_covered_display": "100",
+              "missing_lines": 0,
+              "excluded_lines": 2,
+              "percent_statements_covered": 100.0,
+              "percent_statements_covered_display": "100",
+              "num_branches": 10,
+              "num_partial_branches": 0,
+              "covered_branches": 10,
+              "missing_branches": 0,
+              "percent_branches_covered": 100.0,
+              "percent_branches_covered_display": "100"
+            },
+            "missing_lines": [],
+            "excluded_lines": [
+              8,
+              9
+            ],
+            "start_line": 1,
+            "executed_branches": [
+              [
+                220,
+                221
+              ],
+              [
+                220,
+                223
+              ],
+              [
+                223,
+                224
+              ],
+              [
+                223,
+                226
+              ],
+              [
+                224,
+                223
+              ],
+              [
+                224,
+                225
+              ],
+              [
+                237,
+                238
+              ],
+              [
+                237,
+                239
+              ],
+              [
+                239,
+                240
+              ],
+              [
+                239,
+                241
+              ]
+            ],
+            "missing_branches": []
+          }
+        }
+      }
+    },
+    "totals": {
+      "covered_lines": 203,
+      "num_statements": 203,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 2,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 66,
+      "num_partial_branches": 0,
+      "covered_branches": 66,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    }
+  }
+}
