@@ -1,0 +1,94 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "timestamp": "2026-10-21T05:17:08.723646+00:00",
+  "head": "429ed4b7695077b165cc5c160f456e5114e8ca5d",
+  "status": "SOURCE_CLEAR_HISTORICAL_INIT_CARRY_APPROVED",
+  "route": "atomic_execution_p6t1_ncf2_repair_confirmation_20261021T051148",
+  "source_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+      "bytes": 19117
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+      "bytes": 16888
+    }
+  ],
+  "unchanged_store_guard": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+    "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "bytes": 20032
+  },
+  "retained_contract": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf2-cause-confirmation.2026-10-21T05-05.json",
+    "sha256": "2620044d89059b8a2d3b5b64c41789c56080d06342b0bd44327cdd0e904a7949",
+    "bytes": 6504
+  },
+  "retained_finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-post-ncf1-finding.2026-10-21T04-57.json",
+    "sha256": "0557e506eccdefc307c59ba8b7b6a9c97ddd57f3d170b7bf7fb1cb28a4221016",
+    "bytes": 26045
+  },
+  "findings": [],
+  "source_confirmation": [
+    "Only _canonical_state_location changes in production. RegistryLocation.for_host still validates platform, absolute spelling, parent components and external storage before resolution.",
+    "The complete state is resolved and must remain absolute, beneath the resolved trusted base, and end in the exact contract-derived layout and workspace-digest suffix. No host name or intermediate-component count is hardcoded.",
+    "The same workspace and digest are retained. ActivationStore.local remains unchanged and repeats canonicality and external-workspace checks before constructing ports.",
+    "Resolution errors propagate. No construction write, alternate-location fallback, authority change or service/native invocation is introduced.",
+    "Eight additive controls cover one or three generic inserted components with present or missing leaves, and rejection of relative, escaped-base, changed-layout or changed-partition results. Existing tests are retained for final owner-proof reconciliation."
+  ],
+  "package_binding": {
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+      "sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29",
+      "bytes": 37027
+    },
+    "manifest": {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "sha256": "bf4ba791fb68329eca134a4ad108dd69703f8c220dbe4b9b50ee8cc47b51998e",
+      "bytes": 22217
+    },
+    "status": "PACKAGE_BUILD_CHECK_INSTALL_PASSED_NATIVE_NOT_RUN",
+    "qualification": "Build/check/install identity is reported by the bound owner receipt; no native success is inferred. Detailed archive/staging reconciliation remains separate."
+  },
+  "historical_initialization_carry": {
+    "decision": "APPROVED_AS_HISTORICAL_SETUP_EVIDENCE_FOR_PREPARED_SUFFIX",
+    "historical_receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nio1.2026-10-20T18-20.json",
+      "sha256": "17e09426abfa61fc9470b9550f1f157f82a54c90f3976874fcf3632a0c465be5",
+      "bytes": 64004
+    },
+    "historical_build_sha256": "2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66",
+    "basis": "The exact production delta affects trusted activation-state location composition only. Initialization, workspace capture, mutation/publication and authority implementations are unchanged. The additive real-constructor controls retain initialization primitive identity and workspace/digest and reject effects.",
+    "state_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-suffix-preparation.2026-10-21T04-13.json",
+      "sha256": "88bb68a61f10b7a84c00867737113fa9ee93f319c4077e3f8e1aae5101c94916",
+      "bytes": 20479
+    },
+    "workspace_state_sha256": "52f99088744bb2c3ae03cef075f801419377f61827afdf11445731aa656eee77",
+    "initialization_state_sha256": "eeae9a5571cdf7ba8fd3cfa4224d38690dd2050a82b32cecf78f8ac405dd5c94",
+    "fresh_preconditions": [
+      "Match both retained fixture-state bindings and link guards immediately before suffix invocation.",
+      "Verify actual installed identity against build bf4ba791fb68329eca134a4ad108dd69703f8c220dbe4b9b50ee8cc47b51998e before any service invocation.",
+      "Retain the prepared suffix requests/assertions and stop if either fresh precondition fails; the coordinator owns execution release."
+    ],
+    "qualification": "The earlier identity/init-dry/init-real successes remain old-package evidence. They were not executed on this package. This finite change does not require initialization replay; no configure or native suffix success is claimed."
+  },
+  "verification_boundary": "Read-only source/test delta and exact artifact hashes. No factory, service, native, test, rebuild or new probe execution by this reviewer. Owner BODY/archive and complete staging reconciliation follow separately.",
+  "reader_diagnostic": "An initial read-only PowerShell hash command had a foreach pipeline syntax error and read no data; assigning the foreach output before ConvertTo-Json corrected the command. No source/evidence mutation or behavioral execution resulted.",
+  "task_acceptance": false,
+  "current_counts": {
+    "tasks": "46/84",
+    "source_acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

@@ -1,0 +1,405 @@
+{
+  "Timestamp": "2026-10-21T04-57",
+  "task": "P6-T1",
+  "finding_id": "NCF2",
+  "route": "gateway_doctor_p6t1_ncf1_post_repair_factory_diagnosis_20261021T044618",
+  "status": "CAUSE_ESTABLISHED_BOUNDED_REPAIR_PROPOSED",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -I -S -B SCRATCH/issue-980-p6t1-gateway-configure-factory-probe.py SCRATCH/issue-980-p6t1-gateway-configure-factory-2026-10-21T04-51.json",
+  "EXIT_CODE": 0,
+  "Output Summary": "The helper rejects contract-derived host state because full-path resolution inserts a package-cache prefix that base-only resolution omits; exact operands and unchanged suffix are verified.",
+  "package_build_sha256": "c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3",
+  "request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+  "observation": {
+    "all_runtime_imports_installed": true,
+    "blocked_events": [],
+    "calls": {
+      "forbidden_port": 0,
+      "git_runner": 0,
+      "installed_local_io": 1
+    },
+    "constructed": false,
+    "dont_write_bytecode": true,
+    "failure": {
+      "frames": [
+        {
+          "function": "<module>",
+          "line": 80,
+          "module": "__main__"
+        },
+        {
+          "function": "installed_local_io",
+          "line": 413,
+          "module": "drm_copilot_discovery.gateway_local"
+        },
+        {
+          "function": "_canonical_state_location",
+          "line": 374,
+          "module": "drm_copilot_discovery.gateway_local"
+        }
+      ],
+      "type": "ValueError"
+    },
+    "isolated": 1,
+    "no_site": 1,
+    "service_imported": false,
+    "stage": "factory-construction"
+  },
+  "execution": {
+    "execution_count": 1,
+    "timeout_seconds": 30,
+    "output_limit_each": 65536,
+    "elapsed_seconds": 0.3094571999972686,
+    "timeout": false,
+    "overflow": false,
+    "bindings_unchanged": true
+  },
+  "established_facts": [
+    "The same factory probe bytes ran once with the new verified installation and unchanged retained request/trusted principal/repository inputs.",
+    "The exception is ValueError at gateway_local._canonical_state_location:374, called by installed_local_io:413; ActivationStore.local was not reached.",
+    "The exact predicate at gateway_local.py:373 compares resolved full state against resolved base joined with the original fixed suffix.",
+    "The package and exact source bytes agree; no request parser, runtime identity, service, Git or writer operation was called by the probe.",
+    "The initial NCF1 source/tests and prior diagnostic artifacts remain unchanged.",
+    "The authorized operand comparison derives the actual layout from installed RegistryLocation.for_host, not a duplicated layout implementation.",
+    "The resolved full state inserts four components beneath the unchanged resolved trusted base, retains the exact fixed suffix/digest, and remains outside the workspace."
+  ],
+  "classification": {
+    "proven": "Production trusted-host composition defect: base-only canonicalization assumes path resolution commutes with suffix joining, but this host resolves the complete contract-derived state beneath an additional package-cache prefix.",
+    "not_claimed": "The observation establishes exact host resolution behavior, not the underlying operating-system mechanism or behavior of every host. No request-selected path, arbitrary alias or unchecked redirect is accepted by this diagnosis.",
+    "repair_status": "The existing NCF1 source/tests remain checked WIP. A narrowly guarded complete-path canonicalization and composition control are proposed; native completion remains false."
+  },
+  "source_references": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "lines": [
+        359,
+        368,
+        371,
+        372,
+        373,
+        374,
+        375,
+        412,
+        413
+      ]
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "lines": [
+        24,
+        25,
+        27,
+        37,
+        62,
+        67,
+        70,
+        75
+      ]
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "lines": [
+        61,
+        74,
+        75,
+        78,
+        79,
+        150,
+        152,
+        161,
+        163,
+        169
+      ]
+    }
+  ],
+  "operand_comparison": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-ncf1-operands.2026-10-21T04-55.json",
+      "sha256": "33e3b1ba10b80930f82e0a4ff14455af3c11876d626f0d055fe9114e162aab6c"
+    },
+    "exact_operands_member": "raw/stdout.bin -> exact_operands_for_raw_archive",
+    "safe_result": {
+      "actual_components": 13,
+      "actual_inside_workspace": false,
+      "actual_length": 183,
+      "actual_relative_to_resolved_base": "Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+      "actual_within_resolved_base": true,
+      "base_absolute": true,
+      "base_resolves_equal": true,
+      "blocked_events": [],
+      "calls": {
+        "for_host": 1,
+        "forbidden_port": 0
+      },
+      "component_differences": [
+        {
+          "actual": "Packages",
+          "actual_length": 8,
+          "component_index": 5,
+          "expected": "drm-copilot",
+          "expected_length": 11,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "OpenAI.Codex_2p2nqsd0c76g0",
+          "actual_length": 26,
+          "component_index": 6,
+          "expected": "discovery",
+          "expected_length": 9,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "LocalCache",
+          "actual_length": 10,
+          "component_index": 7,
+          "expected": "workspaces",
+          "expected_length": 10,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "Local",
+          "actual_length": 5,
+          "component_index": 8,
+          "expected": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+          "expected_length": 64,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "drm-copilot",
+          "actual_length": 11,
+          "component_index": 9,
+          "expected": null,
+          "expected_length": null,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "discovery",
+          "actual_length": 9,
+          "component_index": 10,
+          "expected": null,
+          "expected_length": null,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "workspaces",
+          "actual_length": 10,
+          "component_index": 11,
+          "expected": null,
+          "expected_length": null,
+          "zone": "fixed-suffix"
+        },
+        {
+          "actual": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+          "actual_length": 64,
+          "component_index": 12,
+          "expected": null,
+          "expected_length": null,
+          "zone": "fixed-suffix"
+        }
+      ],
+      "contract_module": "drm_copilot_discovery.activation_filesystem",
+      "dont_write_bytecode": true,
+      "expected_components": 9,
+      "expected_length": 130,
+      "factory_calls": 0,
+      "fixed_suffix": "drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+      "guard_operands_equal": false,
+      "isolated": 1,
+      "no_site": 1,
+      "resolved_base_components": 5,
+      "service_imported": false,
+      "state_absolute": true,
+      "workspace_digest": "2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+      "workspace_identity_retained": true
+    },
+    "inserted_relative_components": [
+      "Packages",
+      "OpenAI.Codex_2p2nqsd0c76g0",
+      "LocalCache",
+      "Local"
+    ],
+    "exact_fixed_suffix_preserved": true,
+    "expected_normalized": "HOST_STATE/drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+    "actual_normalized": "HOST_STATE/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/drm-copilot/discovery/workspaces/2116a6d141446602e30b45afb51098744bbde38df691d952267c5de7bd760b99",
+    "execution_count": 1,
+    "watchdog_seconds": 30,
+    "stream_limit": 65536,
+    "elapsed_seconds": 0.20903659996110946,
+    "timeout": false,
+    "overflow": false,
+    "bindings_unchanged": true
+  },
+  "remaining_diagnostic_gap": null,
+  "conditional_minimal_repair_scope": {
+    "paths": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "tests/discovery_runtime/test_gateway_factory.py"
+    ],
+    "precondition": "Coordinator release and independent contract confirmation; no repair is implemented by this finding.",
+    "proposed_change": "Resolve the validated complete RegistryLocation state path. Accept only a canonical result beneath the resolved trusted base with the exact contract-derived fixed suffix and same workspace digest. Pass that canonical directory to the unchanged strict store constructor; do not hardcode package-prefix values or normalize text/case manually.",
+    "constraints": "Preserve absolute/platform/parent validation before resolution, workspace identity, resolved-base containment, external location, fixed workspace partition, strict ActivationStore.local guard, no construction writes, resolution-error propagation and local-user-only authority.",
+    "required_control": "Add a deterministic in-memory parent/subtree resolution control matching the observed inserted-prefix shape; retain canonical/base-alias/missing-leaf success and distinct-layout/partition/out-of-base/internal/state-race rejection controls. Preserve the failing current-implementation observation."
+  },
+  "controller_delta": {
+    "original_sha256": "38ff70cb1cbdf3a81f7b4c4f4fd78ce8636d11f00c8702526ddb96d8f5275c52",
+    "current_sha256": "1d789192c87e8242e2a5151cf746c42bbeedf7dcfc8c437f90bf05888a4da500",
+    "substitutions": [
+      [
+        "issue-980-p6t1-native-release-20261020T181808.json",
+        "issue-980-p6t1-native-release-suffix-ncf1-20261021T044424.json"
+      ],
+      [
+        "p6t1-installed-native-nio1.2026-10-20T18-20.json",
+        "p6t1-installed-native-ncf1-suffix.2026-10-21T04-44.json"
+      ],
+      [
+        "issue-980-p6t1-native-20261020T181808/configure-dry.origins.json",
+        "issue-980-p6t1-native-suffix-ncf1-20261021T044424/configure-dry.origins.json"
+      ],
+      [
+        "17e09426abfa61fc9470b9550f1f157f82a54c90f3976874fcf3632a0c465be5",
+        "76d6df6cd6d221bbb089e2d8e8224674bc008a4c0a1aac044d9cd5e0c2be4666"
+      ],
+      [
+        "308901ab7fb83ce1ec86bae1d2de1a84baf6ed903c114c3f63909b6814805c19",
+        "1c6ae3a52afb2b32cc158c20147eb76b4b691d8c3b0d81ddacb2d4edc19a6521"
+      ],
+      [
+        "e7d3bc0101768ce1bb79be183d663511038466444dceb0c57f81caeff9dd17bc",
+        "60bed3bf062f893a8bee19c3b2b7e62aec1efadf4ec8203c1cd7f7ba66a6b629"
+      ],
+      [
+        "runner_bytes = checked(runner, release[\"harness_sha256\"])",
+        "runner_bytes = checked(runner, \"b40099e50b3779ff50a3ee98e7f801033bb53984aa3f33edb96c3697898d1264\")"
+      ],
+      [
+        "gateway_doctor_p6t1_configure_native_diagnosis_resume_20261021T040049",
+        "gateway_doctor_p6t1_ncf1_post_repair_factory_diagnosis_20261021T044618"
+      ]
+    ],
+    "exact_substitution_only": true,
+    "unchanged_probe_sha256": "8cc768917a45dce6680a06604d19ac286a9c967e7074573b0af9d75441cc8b96",
+    "unchanged_process_helper_sha256": "b40099e50b3779ff50a3ee98e7f801033bb53984aa3f33edb96c3697898d1264",
+    "qualification": "The suffix release binds its native adapter. This diagnostic retains the original bounded process helper explicitly; its implementation and 30-second/65,536-byte diagnostic limits are unchanged."
+  },
+  "source_and_installed_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "installed_relative": "drm_copilot_discovery/gateway.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "installed_relative": "drm_copilot_discovery/gateway_local.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "installed_relative": "drm_copilot_discovery/activation_filesystem.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "installed_relative": "drm_copilot_discovery/activation_store.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "installed_relative": "drm_copilot_discovery/mutation_filesystem.py"
+    }
+  ],
+  "frozen_repair_source_test_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191
+    }
+  ],
+  "retained_evidence_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf1-suffix.2026-10-21T04-44.json",
+      "sha256": "76d6df6cd6d221bbb089e2d8e8224674bc008a4c0a1aac044d9cd5e0c2be4666",
+      "bytes": 26120
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf1-handoff.2026-10-21T04-39.json",
+      "sha256": "a81b630778de44112ca3682abb1351371116686001454ba7e2fd3f629922205a",
+      "bytes": 36339
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-13.json",
+      "sha256": "377b357d9c36807671dcd33f94a3628fa8d46525a4ad3d3795cfa098ab8f193b",
+      "bytes": 3836
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe-raw.2026-10-21T04-13.json",
+      "sha256": "4a5f875bc5c55ca55d69b8f6fd56ff83f477874e601a4a65c2d361132d075909",
+      "bytes": 9297
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-construction-finding.2026-10-21T04-20.json",
+      "sha256": "377f297c36e1d24ffaae84ea351fa2e10c99867c91fa18ad43e1cca9c5330c50",
+      "bytes": 10210
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+      "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+      "bytes": 158561
+    }
+  ],
+  "new_evidence_bindings_excluding_this_manifest": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-51.json",
+      "sha256": "75cb02331a7d7960f5c16fe70bfc03cae6ade0f8f5c6985ff1226a4e66dc6da7",
+      "bytes": 3861
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-51.md",
+      "sha256": "bb72498c9b48b7bf10c73712340661d11ca9a7900d0d0732dfb492274f80a750",
+      "bytes": 1560
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe-raw.2026-10-21T04-51.json",
+      "sha256": "550fc0a5066891edb3b9eb6623fa08eb765893f0bfc33a5ef408769aa17db75d",
+      "bytes": 9378
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-ncf1-operands.2026-10-21T04-55.json",
+      "sha256": "33e3b1ba10b80930f82e0a4ff14455af3c11876d626f0d055fe9114e162aab6c",
+      "bytes": 11507
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-ncf1-operands.2026-10-21T04-55.md",
+      "sha256": "bb838156a35c0ee55c213a734c623e8ad8847d50e2a4e79b2218ccca503e491a",
+      "bytes": 3330
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-post-ncf1-finding.2026-10-21T04-57.md",
+      "sha256": "b02b63355976c2e756cefd100c7ef6f78787a6be8ea4d0a124f2397724106ed2",
+      "bytes": 2316
+    }
+  ],
+  "manifest_includes_itself": false,
+  "finite_new_path_count_including_this_manifest": 7,
+  "evidence_writer_raw": {
+    "sha256": "72785a8e53e3dfcfe41efd893801782de3ca395913c0e901ad85eb0d54abcb59",
+    "bytes": 15566,
+    "gzip_base64": "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"
+  },
+  "normalization": "Readable Markdown uses UTF-8 without BOM and LF only; raw archive members preserve original executed bytes and OBSERVED_PATH_ALIASES. No historical receipt or raw stream was rewritten.",
+  "limitations": [
+    "Current inherited host settings are not claimed identical to unrecorded historical values.",
+    "No source/test/package/fixture/staging/checkpoint/Git mutation or new behavioral suite execution.",
+    "Initialization successes and both historical configure failures remain retained; native completion and final acceptance remain pending."
+  ]
+}

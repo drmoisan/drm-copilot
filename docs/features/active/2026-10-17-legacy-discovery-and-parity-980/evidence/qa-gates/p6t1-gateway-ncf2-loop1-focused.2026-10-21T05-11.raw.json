@@ -1,0 +1,217 @@
+{
+  "Timestamp": "2026-10-21T05-11",
+  "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --cov=drm_copilot_discovery.gateway_local --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH\\issue-980-p6t1-gateway-ncf2-coverage.json tests/discovery_runtime/test_gateway_factory.py tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "--tb=short",
+    "--cov=drm_copilot_discovery.gateway_local",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-report=json:SCRATCH\\issue-980-p6t1-gateway-ncf2-coverage.json",
+    "tests/discovery_runtime/test_gateway_factory.py",
+    "tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values",
+    "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 3.011764,
+  "input_hashes_before": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+    "tests/discovery_runtime/test_gateway_factory.py": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "tests/discovery_runtime/test_activation_filesystem.py": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+    "tests/discovery_runtime/test_gateway_local.py": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+  },
+  "input_hashes_after": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+    "tests/discovery_runtime/test_gateway_factory.py": "ad13cedf22ef78d4ae4dfe75c3e3f020115c6b3ba0909c89dad3369c3d9d3286",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+    "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "tests/discovery_runtime/test_activation_filesystem.py": "3d1ade9a26bba3755b7399922937c8ec7f35c06b46e033be1636fe2379f7a134",
+    "tests/discovery_runtime/test_configuration.py": "e4d9c7549e8868e209c3df8df9e35fa77bc92a3330ec3f9c44be9a02f3acf425",
+    "tests/discovery_runtime/test_gateway_boundaries.py": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+    "tests/discovery_runtime/test_gateway_local.py": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-canonical]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[existing-alias]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-canonical]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_preserves_partition_through_real_store[missing-leaf-alias]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[relative]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[../state]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[C:state]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[\\\\state]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_invalid_state_spelling_is_rejected_before_resolution[parent]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[lexical]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_internal_state_cannot_become_trusted_storage[resolved]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[layout]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[partition]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_distinct_or_changing_derived_state_is_refused[store-race]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[workspace]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[base]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_resolution_errors_propagate_without_fallback[state]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[noncanonical-workspace]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[missing-workspace]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority[host]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[invocation]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_composed_ports_reject_host_references[authorization]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[one-component-existing]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[one-component-missing-leaf]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[three-components-existing]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_components_preserve_partition[three-components-missing-leaf]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[relative]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[outside-base]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[layout]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_factory.py::test_intermediate_state_resolution_rejects_invalid_identity[partition]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[canonical]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[alias]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations[internal]",
+      "outcome": "PASSED"
+    }
+  ],
+  "streams": {
+    "stdout": {
+      "base64": "PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdCBzZXNzaW9uIHN0YXJ0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KcGxhdGZvcm0gd2luMzIgLS0gUHl0aG9uIDMuMTMuMTIsIHB5dGVzdC05LjAuMiwgcGx1Z2d5LTEuNi4wIC0tIEM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXC52ZW52XFNjcmlwdHNccHl0aG9uLmV4ZQ0Kcm9vdGRpcjogQzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzANCmNvbmZpZ2ZpbGU6IHB5cHJvamVjdC50b21sDQpwbHVnaW5zOiBhbnlpby00LjEyLjEsIGNvdi03LjAuMA0KY29sbGVjdGluZyAuLi4gY29sbGVjdGVkIDM0IGl0ZW1zDQoNCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ZhY3RvcnlfcHJlc2VydmVzX3BhcnRpdGlvbl90aHJvdWdoX3JlYWxfc3RvcmVbZXhpc3RpbmctY2Fub25pY2FsXSBQQVNTRUQgWyAgMiVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9mYWN0b3J5X3ByZXNlcnZlc19wYXJ0aXRpb25fdGhyb3VnaF9yZWFsX3N0b3JlW2V4aXN0aW5nLWFsaWFzXSBQQVNTRUQgWyAgNSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9mYWN0b3J5X3ByZXNlcnZlc19wYXJ0aXRpb25fdGhyb3VnaF9yZWFsX3N0b3JlW21pc3NpbmctbGVhZi1jYW5vbmljYWxdIFBBU1NFRCBbICA4JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ZhY3RvcnlfcHJlc2VydmVzX3BhcnRpdGlvbl90aHJvdWdoX3JlYWxfc3RvcmVbbWlzc2luZy1sZWFmLWFsaWFzXSBQQVNTRUQgWyAxMSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnZhbGlkX3N0YXRlX3NwZWxsaW5nX2lzX3JlamVjdGVkX2JlZm9yZV9yZXNvbHV0aW9uW3JlbGF0aXZlXSBQQVNTRUQgWyAxNCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnZhbGlkX3N0YXRlX3NwZWxsaW5nX2lzX3JlamVjdGVkX2JlZm9yZV9yZXNvbHV0aW9uWy4uL3N0YXRlXSBQQVNTRUQgWyAxNyVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnZhbGlkX3N0YXRlX3NwZWxsaW5nX2lzX3JlamVjdGVkX2JlZm9yZV9yZXNvbHV0aW9uW0M6c3RhdGVdIFBBU1NFRCBbIDIwJV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludmFsaWRfc3RhdGVfc3BlbGxpbmdfaXNfcmVqZWN0ZWRfYmVmb3JlX3Jlc29sdXRpb25bXFxzdGF0ZV0gUEFTU0VEIFsgMjMlXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfaW52YWxpZF9zdGF0ZV9zcGVsbGluZ19pc19yZWplY3RlZF9iZWZvcmVfcmVzb2x1dGlvbltwYXJlbnRdIFBBU1NFRCBbIDI2JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludGVybmFsX3N0YXRlX2Nhbm5vdF9iZWNvbWVfdHJ1c3RlZF9zdG9yYWdlW2xleGljYWxdIFBBU1NFRCBbIDI5JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludGVybmFsX3N0YXRlX2Nhbm5vdF9iZWNvbWVfdHJ1c3RlZF9zdG9yYWdlW3Jlc29sdmVkXSBQQVNTRUQgWyAzMiVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9kaXN0aW5jdF9vcl9jaGFuZ2luZ19kZXJpdmVkX3N0YXRlX2lzX3JlZnVzZWRbbGF5b3V0XSBQQVNTRUQgWyAzNSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9kaXN0aW5jdF9vcl9jaGFuZ2luZ19kZXJpdmVkX3N0YXRlX2lzX3JlZnVzZWRbcGFydGl0aW9uXSBQQVNTRUQgWyAzOCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9kaXN0aW5jdF9vcl9jaGFuZ2luZ19kZXJpdmVkX3N0YXRlX2lzX3JlZnVzZWRbc3RvcmUtcmFjZV0gUEFTU0VEIFsgNDElXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfcmVzb2x1dGlvbl9lcnJvcnNfcHJvcGFnYXRlX3dpdGhvdXRfZmFsbGJhY2tbd29ya3NwYWNlXSBQQVNTRUQgWyA0NCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9yZXNvbHV0aW9uX2Vycm9yc19wcm9wYWdhdGVfd2l0aG91dF9mYWxsYmFja1tiYXNlXSBQQVNTRUQgWyA0NyVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9yZXNvbHV0aW9uX2Vycm9yc19wcm9wYWdhdGVfd2l0aG91dF9mYWxsYmFja1tzdGF0ZV0gUEFTU0VEIFsgNTAlXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfZmFjdG9yeV9yZWplY3RzX2ludmFsaWRfb3V0ZXJfYXV0aG9yaXR5W25vbmNhbm9uaWNhbC13b3Jrc3BhY2VdIFBBU1NFRCBbIDUyJV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ZhY3RvcnlfcmVqZWN0c19pbnZhbGlkX291dGVyX2F1dGhvcml0eVttaXNzaW5nLXdvcmtzcGFjZV0gUEFTU0VEIFsgNTUlXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfZmFjdG9yeV9yZWplY3RzX2ludmFsaWRfb3V0ZXJfYXV0aG9yaXR5W2hvc3RdIFBBU1NFRCBbIDU4JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2NvbXBvc2VkX3BvcnRzX3JlamVjdF9ob3N0X3JlZmVyZW5jZXNbaW52b2NhdGlvbl0gUEFTU0VEIFsgNjElXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfY29tcG9zZWRfcG9ydHNfcmVqZWN0X2hvc3RfcmVmZXJlbmNlc1thdXRob3JpemF0aW9uXSBQQVNTRUQgWyA2NCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnRlcm1lZGlhdGVfc3RhdGVfY29tcG9uZW50c19wcmVzZXJ2ZV9wYXJ0aXRpb25bb25lLWNvbXBvbmVudC1leGlzdGluZ10gUEFTU0VEIFsgNjclXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfaW50ZXJtZWRpYXRlX3N0YXRlX2NvbXBvbmVudHNfcHJlc2VydmVfcGFydGl0aW9uW29uZS1jb21wb25lbnQtbWlzc2luZy1sZWFmXSBQQVNTRUQgWyA3MCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnRlcm1lZGlhdGVfc3RhdGVfY29tcG9uZW50c19wcmVzZXJ2ZV9wYXJ0aXRpb25bdGhyZWUtY29tcG9uZW50cy1leGlzdGluZ10gUEFTU0VEIFsgNzMlXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9nYXRld2F5X2ZhY3RvcnkucHk6OnRlc3RfaW50ZXJtZWRpYXRlX3N0YXRlX2NvbXBvbmVudHNfcHJlc2VydmVfcGFydGl0aW9uW3RocmVlLWNvbXBvbmVudHMtbWlzc2luZy1sZWFmXSBQQVNTRUQgWyA3NiVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2dhdGV3YXlfZmFjdG9yeS5weTo6dGVzdF9pbnRlcm1lZGlhdGVfc3RhdGVfcmVzb2x1dGlvbl9yZWplY3RzX2ludmFsaWRfaWRlbnRpdHlbcmVsYXRpdmVdIFBBU1NFRCBbIDc5JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludGVybWVkaWF0ZV9zdGF0ZV9yZXNvbHV0aW9uX3JlamVjdHNfaW52YWxpZF9pZGVudGl0eVtvdXRzaWRlLWJhc2VdIFBBU1NFRCBbIDgyJV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludGVybWVkaWF0ZV9zdGF0ZV9yZXNvbHV0aW9uX3JlamVjdHNfaW52YWxpZF9pZGVudGl0eVtsYXlvdXRdIFBBU1NFRCBbIDg1JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9mYWN0b3J5LnB5Ojp0ZXN0X2ludGVybWVkaWF0ZV9zdGF0ZV9yZXNvbHV0aW9uX3JlamVjdHNfaW52YWxpZF9pZGVudGl0eVtwYXJ0aXRpb25dIFBBU1NFRCBbIDg4JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3RfZ2F0ZXdheV9sb2NhbC5weTo6dGVzdF9pbnN0YWxsZWRfZmFjdG9yeV93aXJlc19vbmx5X3RydXN0ZWRfb3V0ZXJfaG9zdF92YWx1ZXMgUEFTU0VEIFsgOTElXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9hY3RpdmF0aW9uX2ZpbGVzeXN0ZW0ucHk6OnRlc3RfbG9jYWxfZmFjdG9yeV9yZXF1aXJlc19jYW5vbmljYWxfZXh0ZXJuYWxfaG9zdF9sb2NhdGlvbnNbY2Fub25pY2FsXSBQQVNTRUQgWyA5NCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X2FjdGl2YXRpb25fZmlsZXN5c3RlbS5weTo6dGVzdF9sb2NhbF9mYWN0b3J5X3JlcXVpcmVzX2Nhbm9uaWNhbF9leHRlcm5hbF9ob3N0X2xvY2F0aW9uc1thbGlhc10gUEFTU0VEIFsgOTclXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9hY3RpdmF0aW9uX2ZpbGVzeXN0ZW0ucHk6OnRlc3RfbG9jYWxfZmFjdG9yeV9yZXF1aXJlc19jYW5vbmljYWxfZXh0ZXJuYWxfaG9zdF9sb2NhdGlvbnNbaW50ZXJuYWxdIFBBU1NFRCBbMTAwJV0NCg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSB0ZXN0cyBjb3ZlcmFnZSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KX19fX19fX19fX19fX18gY292ZXJhZ2U6IHBsYXRmb3JtIHdpbjMyLCBweXRob24gMy4xMy4xMi1maW5hbC0wIF9fX19fX19fX19fX19fXw0KDQpOYW1lICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTdG10cyAgIE1pc3MgQnJhbmNoIEJyUGFydCAgQ292ZXIgICBNaXNzaW5nDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpwYWNrYWdlc1xkaXNjb3ZlcnktcnVudGltZVxzcmNcZHJtX2NvcGlsb3RfZGlzY292ZXJ5XGdhdGV3YXlfbG9jYWwucHkgICAgIDE0MCAgICAgNzggICAgIDQwICAgICAgMiAgICAzOSUgICA2NSwgOTcsIDEwNS0xMTAsIDE0MC0xNjEsIDE3OC0xODUsIDE5OS0yMjMsIDIzOC0yNTQsIDI2OS0zNDENCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClRPVEFMICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMTQwICAgICA3OCAgICAgNDAgICAgICAyICAgIDM5JQ0KQ292ZXJhZ2UgSlNPTiB3cml0dGVuIHRvIGZpbGUgQzpcVXNlcnNcRGFuTW9pc2FuXEFwcERhdGFcTG9jYWxcVGVtcFxkcm0tY29waWxvdC1nYXRld2F5LTAxYTE1OWJiXGlzc3VlLTk4MFxpc3N1ZS05ODAtcDZ0MS1nYXRld2F5LW5jZjItY292ZXJhZ2UuanNvbg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gMzQgcGFzc2VkIGluIDIuNDZzID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0K",
+      "sha256": "eb9d072737ab3ac4beaba048c8fb5112a4fcc0dc89b53ba6ab53d518919f8267",
+      "bytes": 5892
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "Timestamp": "2026-10-21T05-05",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-ncf2-cause-confirmation.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "NCF2 is confirmed from retained exact operands; guarded complete-state canonicalization is valid within the two-file repair boundary.",
+  "issue": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_BOUNDED_REPAIR",
+  "route": "atomic_execution_p6t1_ncf2_cause_confirmation_20261021T050307",
+  "phase": "S5_P6T1_ncf2_cause_confirmation",
+  "head": "429ed4b7695077b165cc5c160f456e5114e8ca5d",
+  "owner_finding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-post-ncf1-finding.2026-10-21T04-57.json",
+    "sha256": "0557e506eccdefc307c59ba8b7b6a9c97ddd57f3d170b7bf7fb1cb28a4221016"
+  },
+  "operand_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-ncf1-operands.2026-10-21T04-55.json",
+    "sha256": "33e3b1ba10b80930f82e0a4ff14455af3c11876d626f0d055fe9114e162aab6c"
+  },
+  "verified_evidence": "Owner manifest and all six enumerated bindings; five source bindings and the three frozen repair/test bindings; current package manifest; four retained operand raw streams decoded and hash/length checked. Exact path relations were checked with pure path objects only.",
+  "source_test_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "bytes": 18766
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_local.py",
+      "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693",
+      "bytes": 20279
+    },
+    {
+      "path": "tests/discovery_runtime/test_gateway_factory.py",
+      "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3",
+      "bytes": 14191
+    }
+  ],
+  "package_build_sha256": "c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3",
+  "finding": {
+    "id": "NCF2",
+    "classification": "PRODUCTION_TRUSTED_HOST_COMPOSITION_DEFECT",
+    "location": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py:372-374",
+    "cause": "The helper requires resolve(complete state) to equal resolve(base) joined with the fixed suffix. The retained operands disprove that equality: the complete state gains four intermediate host components inside the unchanged resolved base while preserving the exact RegistryLocation-derived suffix and workspace digest.",
+    "effect": "The new helper rejects before ActivationStore.local. The retained installed configure-dry fails; subsequent native operations remain unexecuted.",
+    "mechanism_qualification": "Observed path-resolution behavior is established; no underlying OS mechanism or universal host behavior is claimed. The literal observed host/package components are evidence, not an allowlist or implementation rule.",
+    "prior_proof": "NCF1 source review, 26 focused passes, exact-body coverage, package proof and earlier diagnostics remain immutable historical evidence. They do not establish native success for this additional resolution shape."
+  },
+  "approved_finite_contract": {
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_gateway_factory.py"
+    ],
+    "change": "Derive the fixed suffix/workspace partition from the already validated RegistryLocation contract. Resolve the complete state path and resolved trusted base. Accept only an absolute canonical result contained beneath that base and ending in the exact contract-derived suffix/digest; pass it to the unchanged strict store constructor.",
+    "required_boundaries": [
+      "Keep lexical absolute/platform/parent-component validation before resolution; do not normalize request roots or invalid input into acceptance.",
+      "Use component-aware native path containment and suffix identity, not string prefix/suffix matching or manual case rewriting.",
+      "Reject out-of-base resolution even when its final suffix matches, and reject altered layout or another workspace digest even when it remains inside the base.",
+      "Retain external-to-workspace validation and unchanged ActivationStore.local canonical recheck, including a changed result between checks.",
+      "Preserve the workspace identity/digest, explicit local-user authority, host-marker refusal, error propagation, absent-leaf support and no construction writes/fallback.",
+      "Do not hardcode an application, package, user, host-cache name or observed intermediate-component count."
+    ],
+    "required_controls": [
+      "A deterministic real-constructor composition whose complete state resolves beneath extra generic intermediate components while base.resolve is unchanged; the exact suffix/digest and external location must survive. This must fail under the preserved current helper and pass after the repair.",
+      "Retain canonical/base-alias and absent-leaf positives and all existing 26 focused node identities/assertions unless an exact changed expectation is explicitly justified.",
+      "Reject an actual path outside the resolved base with an otherwise matching suffix; reject altered fixed suffix or workspace partition inside the base.",
+      "Retain resolved internal-state, strict store recanonicalization/race, invalid lexical input, resolution-error, workspace-identity and host-authority negatives with no write/fallback effects."
+    ],
+    "not_required": "No further environmental probe, host-specific branch, schema change, low-level guard change or predecessor suite."
+  },
+  "native_and_init_disposition": "Native/task acceptance remains pending. The prior carry decision remains old-package setup evidence only; apply it to a later package only after the exact repair-impact confirmation and fresh retained-state/installed-identity checks. No rebuild or native invocation was performed or released by this diagnosis.",
+  "review_execution": {
+    "new_factory_service_native_or_test_runs": 0,
+    "source_test_package_fixture_state_edits": 0,
+    "checkpoint_git_staging_edits": 0,
+    "open_diagnostics": [],
+    "additional_contract_findings": []
+  },
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

@@ -343,3 +343,68 @@ def test_composed_ports_reject_host_references(
         local.authorize(request, baseline=None)
 
     assert not case.effects
+
+
+@pytest.mark.parametrize("missing", [False, True], ids=["existing", "missing-leaf"])
+@pytest.mark.parametrize(
+    "intermediate",
+    [("cache",), ("tenant", "session", "state")],
+    ids=["one-component", "three-components"],
+)
+def test_intermediate_state_components_preserve_partition(
+    factory_case: FactoryCase, intermediate: tuple[str, ...], missing: bool
+) -> None:
+    """Accept complete-path resolution that adds contained host components.
+
+    factory_case (FactoryCase) owns memory seams; intermediate (tuple[str, ...])
+    selects generic host components and missing (bool) permits absent storage.
+    Return None; assertions preserve the contract suffix, workspace identity and
+    real store's canonical recheck without native effects.
+    """
+    case = factory_case
+    suffix = case.state.relative_to(case.base)
+    expected = case.base.joinpath(*intermediate) / suffix
+    # Only the complete state moves; resolving its trusted base remains unchanged.
+    case.aliases[case.state] = expected
+    if missing:
+        case.missing.update((case.state, expected))
+
+    local = case.compose()
+
+    assert isinstance(local.activation, activation_store.ActivationStore)
+    assert local.activation.location.directory == expected.as_posix()
+    assert local.activation.location.workspace == case.location.workspace
+    assert local.activation.location.workspace_sha256 == case.location.workspace_sha256
+    assert (case.base, False) in case.resolutions
+    assert (expected, False) in case.resolutions
+    assert local.initialization.primitives is local.activation.primitives
+    assert not case.effects
+
+
+@pytest.mark.parametrize(
+    "redirect", ["relative", "outside-base", "layout", "partition"]
+)
+def test_intermediate_state_resolution_rejects_invalid_identity(
+    factory_case: FactoryCase, redirect: str
+) -> None:
+    """Reject resolution that loses containment, layout or workspace partition.
+
+    factory_case (FactoryCase) supplies memory paths; redirect (str) selects the
+    violated invariant. Return None; ValueError and absent native effects prove
+    no alternate storage or authority is substituted.
+    """
+    case = factory_case
+    suffix = case.state.relative_to(case.base)
+    contained = case.base / "cache" / suffix
+    candidates = {
+        "relative": Path("relative") / suffix,
+        "outside-base": case.base.with_name("other-state") / suffix,
+        "layout": contained.parent.with_name("unexpected") / contained.name,
+        "partition": contained.with_name("other-workspace"),
+    }
+    case.aliases[case.state] = candidates[redirect]
+
+    with pytest.raises(ValueError, match="partition"):
+        case.compose()
+
+    assert not case.effects

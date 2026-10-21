@@ -1,0 +1,89 @@
+{
+  "Timestamp": "2026-10-21T04-51",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -I -S -B SCRATCH/issue-980-p6t1-gateway-configure-factory-probe.py SCRATCH/issue-980-p6t1-gateway-configure-factory-2026-10-21T04-51.json",
+  "EXIT_CODE": 0,
+  "Output Summary": "One read-only installed_local_io construction; no service/native operation replay.",
+  "route": "gateway_doctor_p6t1_ncf1_post_repair_factory_diagnosis_20261021T044618",
+  "retained_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf1-suffix.2026-10-21T04-44.json",
+    "sha256": "76d6df6cd6d221bbb089e2d8e8224674bc008a4c0a1aac044d9cd5e0c2be4666"
+  },
+  "retained_release_sha256": "1c6ae3a52afb2b32cc158c20147eb76b4b691d8c3b0d81ddacb2d4edc19a6521",
+  "retained_origins_sha256": "60bed3bf062f893a8bee19c3b2b7e62aec1efadf4ec8203c1cd7f7ba66a6b629",
+  "request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+  "controller_sha256": "b40099e50b3779ff50a3ee98e7f801033bb53984aa3f33edb96c3697898d1264",
+  "execution_count": 1,
+  "timeout_seconds": 30,
+  "output_limit_each": 65536,
+  "elapsed_seconds": 0.3094571999972686,
+  "timeout": false,
+  "overflow": false,
+  "result": {
+    "all_runtime_imports_installed": true,
+    "blocked_events": [],
+    "calls": {
+      "forbidden_port": 0,
+      "git_runner": 0,
+      "installed_local_io": 1
+    },
+    "constructed": false,
+    "dont_write_bytecode": true,
+    "failure": {
+      "frames": [
+        {
+          "function": "<module>",
+          "line": 80,
+          "module": "__main__"
+        },
+        {
+          "function": "installed_local_io",
+          "line": 413,
+          "module": "drm_copilot_discovery.gateway_local"
+        },
+        {
+          "function": "_canonical_state_location",
+          "line": 374,
+          "module": "drm_copilot_discovery.gateway_local"
+        }
+      ],
+      "type": "ValueError"
+    },
+    "isolated": 1,
+    "no_site": 1,
+    "service_imported": false,
+    "stage": "factory-construction"
+  },
+  "source_and_installed_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "installed_relative": "drm_copilot_discovery/gateway.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d",
+      "installed_relative": "drm_copilot_discovery/gateway_local.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "installed_relative": "drm_copilot_discovery/activation_filesystem.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "installed_relative": "drm_copilot_discovery/activation_store.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "installed_relative": "drm_copilot_discovery/mutation_filesystem.py"
+    }
+  ],
+  "bindings_unchanged": true,
+  "archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe-raw.2026-10-21T04-51.json",
+    "sha256": "550fc0a5066891edb3b9eb6623fa08eb765893f0bfc33a5ef408769aa17db75d"
+  },
+  "qualification": "Constructor-only diagnostic. Current host settings are inherited by the retained controller; no claim that unrecorded historical host settings are identical."
+}
