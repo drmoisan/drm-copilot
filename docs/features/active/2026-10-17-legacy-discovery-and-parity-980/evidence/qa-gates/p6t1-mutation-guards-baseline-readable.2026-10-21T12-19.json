@@ -1,0 +1,33 @@
+{
+  "Timestamp": "2026-10-21T12:01:55.5181476Z",
+  "absent": [
+    "tests/discovery_runtime/test_service_mutation_guards.py"
+  ],
+  "baseline": "Retain accepted 329-node static/behavioral proof and its diagnosed raw BODY gaps; no predecessor execution. Production and existing tests remain frozen.",
+  "control_map": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+    "sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705"
+  },
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/extension_results.py": "ae4465a8884d561536c55b8aed14345044dd3b57e06fe535303770159ddac31d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_snapshots.py": "729569bca5a65cb44e7911aef6d794b89d4d60603c5a5ef335b39d7ab06167bd",
+    "tests/discovery_runtime/test_decision_rules.py": "2ee1a59597f0b657629605ec2b75cc03b1cd6f8abee5835b64b14f87e719bf12",
+    "tests/discovery_runtime/test_references.py": "83aec225a50ca1778d2bf94eda6d12569b1a1c9f5783ed773487d5a416a3aa9d",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/discovery_runtime/test_service_boundaries.py": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "tests/discovery_runtime/test_service_publication.py": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0"
+  },
+  "expected_nodes": 15,
+  "retained_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-capture-comment-candidate.2026-10-21T10-32.json",
+    "sha256": "d3383c7dbfd1c854bbf5209ac9c2ad66d8d13ae89938a28ff0cfa1a50b6b587b"
+  },
+  "route": "workspace_operations_p6t1_guard_tests_20261021T115400",
+  "scope": [
+    "tests/discovery_runtime/test_service_mutation_guards.py"
+  ],
+  "status": "TEST_ONLY_BASELINE",
+  "task": "P6-T1"
+}

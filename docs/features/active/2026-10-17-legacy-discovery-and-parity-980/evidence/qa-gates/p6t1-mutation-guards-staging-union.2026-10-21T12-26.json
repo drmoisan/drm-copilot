@@ -1,0 +1,353 @@
+{
+  "Timestamp": "2026-10-21T12:26:17.577064+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "current_head": "55223d57effb8090ed2940786df0902d1ed9b145",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-mutation-guards.2026-10-21T12-01.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-mutation-guards-confirmation.2026-10-21T12-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format-raw.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check-raw.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint-raw.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check-raw.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint-raw.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types-raw.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests-raw.2026-10-21T12-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check-raw.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint-raw.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types-raw.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-baseline-readable.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-body.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-freeze.2026-10-21T12-19.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-staging-union.2026-10-21T12-26.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-staging.2026-10-21T12-19.json",
+    "tests/discovery_runtime/test_service_mutation_guards.py"
+  ],
+  "path_count": 38,
+  "bindings_excluding_self": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-mutation-guards.2026-10-21T12-01.json",
+      "working_sha256": "e080c0dfd95d33318a972a3d2623e098a2fd12af104b922d8cc7905dc3bcf8a7",
+      "git_lf_sha256": "149f44502ecb743c16567f5651fcf58a0ca04676f69034e1843386c116264ddb",
+      "expected_git_blob": "67ec74bdca25441c586fc777665e4aaab569b0a2",
+      "bytes": 2309,
+      "git_lf_bytes": 2277
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-mutation-guards-confirmation.2026-10-21T12-26.json",
+      "working_sha256": "abd0a2635ecbeb5c64f89dfbb47c4ce512f155425b523b3eca681d7cfc0b7745",
+      "git_lf_sha256": "abd0a2635ecbeb5c64f89dfbb47c4ce512f155425b523b3eca681d7cfc0b7745",
+      "expected_git_blob": "ec3436d021b0caffceadfc851e1bc70dd4977644",
+      "bytes": 15215,
+      "git_lf_bytes": 15215
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format-raw.2026-10-21T12-05.json",
+      "working_sha256": "b22c01455808e688d594ceba0619bf93ff16811f9bd6f1cadd6f85af3b032e29",
+      "git_lf_sha256": "b22c01455808e688d594ceba0619bf93ff16811f9bd6f1cadd6f85af3b032e29",
+      "expected_git_blob": "e7232dec96abf2e18350142d9f0f1948b1bff661",
+      "bytes": 12714,
+      "git_lf_bytes": 12714
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.json",
+      "working_sha256": "5d8734a600913650fc0ed1dcfeed0f9063f27721e18f4f3f351bf1e715d67fe4",
+      "git_lf_sha256": "5d8734a600913650fc0ed1dcfeed0f9063f27721e18f4f3f351bf1e715d67fe4",
+      "expected_git_blob": "e7dd45be19babc04e0dc2027c9f327ae0f9fdbec",
+      "bytes": 72209,
+      "git_lf_bytes": 72209
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.md",
+      "working_sha256": "3ca6b8e068deebfebab180680be17e72fba6bb73266e60190f7351be8161d617",
+      "git_lf_sha256": "3ca6b8e068deebfebab180680be17e72fba6bb73266e60190f7351be8161d617",
+      "expected_git_blob": "4642a08380338713c9f41fdd363ab4a9dda3a68d",
+      "bytes": 369,
+      "git_lf_bytes": 369
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check-raw.2026-10-21T12-05.json",
+      "working_sha256": "515ba083e030d5fca3d6ee38aa7c6043376f9237b2107f9cae31f327abca8461",
+      "git_lf_sha256": "515ba083e030d5fca3d6ee38aa7c6043376f9237b2107f9cae31f327abca8461",
+      "expected_git_blob": "dc960a64b70e0d0e3423f75c8b9e8d9b97905305",
+      "bytes": 12637,
+      "git_lf_bytes": 12637
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.json",
+      "working_sha256": "a0fe580b0f840a5cc7062134740c4455eed343e3c9155bb48e69b389043d14ea",
+      "git_lf_sha256": "a0fe580b0f840a5cc7062134740c4455eed343e3c9155bb48e69b389043d14ea",
+      "expected_git_blob": "5c358a7d261ca4d94350283bf80d077700ba8892",
+      "bytes": 72174,
+      "git_lf_bytes": 72174
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.md",
+      "working_sha256": "08f42c275eff6094ac32afb9390310347392e56d924ccd16b568728d4fd76a38",
+      "git_lf_sha256": "08f42c275eff6094ac32afb9390310347392e56d924ccd16b568728d4fd76a38",
+      "expected_git_blob": "ed6a06f2d9e218c7b87219263abf2f913ae2a0b9",
+      "bytes": 326,
+      "git_lf_bytes": 326
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint-raw.2026-10-21T12-05.json",
+      "working_sha256": "a1f2df88eedcd8055bb0bd93879904627c1c73d454c7af3d797e43eb1ce67a1c",
+      "git_lf_sha256": "a1f2df88eedcd8055bb0bd93879904627c1c73d454c7af3d797e43eb1ce67a1c",
+      "expected_git_blob": "61f03dbb577728338c0d5d62dc1421dd3a0a6b7a",
+      "bytes": 13423,
+      "git_lf_bytes": 13423
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.json",
+      "working_sha256": "464422f4d96afaab1e104fccca7ae53b7164adbd49e3f2ee6a15175e1c2cf54a",
+      "git_lf_sha256": "464422f4d96afaab1e104fccca7ae53b7164adbd49e3f2ee6a15175e1c2cf54a",
+      "expected_git_blob": "d3daec7b768104b038a8efb7694e926e94b904a9",
+      "bytes": 74317,
+      "git_lf_bytes": 74317
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.md",
+      "working_sha256": "298e82dd8d129f53991711cf29e017ec084e56b16a61822dd5835a4c43fe52c1",
+      "git_lf_sha256": "298e82dd8d129f53991711cf29e017ec084e56b16a61822dd5835a4c43fe52c1",
+      "expected_git_blob": "b4d4df52cfc4f0f62d5721ad2fe961e0e98d1e48",
+      "bytes": 2421,
+      "git_lf_bytes": 2421
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check-raw.2026-10-21T12-06.json",
+      "working_sha256": "38f1d1b76e2a39dce2a9b61b69e3d51c2ca00e317d8beb99b9dbc490b330fb1d",
+      "git_lf_sha256": "38f1d1b76e2a39dce2a9b61b69e3d51c2ca00e317d8beb99b9dbc490b330fb1d",
+      "expected_git_blob": "27e86c708021cf193d4f8291397dc6278e69f18a",
+      "bytes": 12649,
+      "git_lf_bytes": 12649
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.json",
+      "working_sha256": "03833c8ff2812a4a82c89621e6e2a6cacd585bffde99f0c92f6a927ae7fc5fa5",
+      "git_lf_sha256": "03833c8ff2812a4a82c89621e6e2a6cacd585bffde99f0c92f6a927ae7fc5fa5",
+      "expected_git_blob": "df1ba40ae56a0d60dbcfcb56a938f91ef5830c44",
+      "bytes": 72174,
+      "git_lf_bytes": 72174
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.md",
+      "working_sha256": "39ac3762861c3a9944273f3b2e8f1e6f007d932fa685f99e30e74ff7949ceedd",
+      "git_lf_sha256": "39ac3762861c3a9944273f3b2e8f1e6f007d932fa685f99e30e74ff7949ceedd",
+      "expected_git_blob": "2737456b96faba73b0fb19c62796d99742c1399c",
+      "bytes": 326,
+      "git_lf_bytes": 326
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint-raw.2026-10-21T12-06.json",
+      "working_sha256": "7e71a7d82517028aaed3fa88ac2a01df1078571631e3f486e37112cd33d0d6fd",
+      "git_lf_sha256": "7e71a7d82517028aaed3fa88ac2a01df1078571631e3f486e37112cd33d0d6fd",
+      "expected_git_blob": "8c187b038892ac2b9826558d25e31916d7285c25",
+      "bytes": 12593,
+      "git_lf_bytes": 12593
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.json",
+      "working_sha256": "2d3b32332e84cf78832d0ed1d7f013a7a31d1eb84986e1639cd26d6739beb756",
+      "git_lf_sha256": "2d3b32332e84cf78832d0ed1d7f013a7a31d1eb84986e1639cd26d6739beb756",
+      "expected_git_blob": "b2cacecb1825fa0694a0e93d3a772e285c99ec45",
+      "bytes": 72104,
+      "git_lf_bytes": 72104
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.md",
+      "working_sha256": "c3253208a27e8f290ecd33eab1bbd5952c1c32f83bf04675b4fe75b08fcd07dd",
+      "git_lf_sha256": "c3253208a27e8f290ecd33eab1bbd5952c1c32f83bf04675b4fe75b08fcd07dd",
+      "expected_git_blob": "7cdf71bb637979d4b87308d7854ffb8bfb0a09a8",
+      "bytes": 279,
+      "git_lf_bytes": 279
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types-raw.2026-10-21T12-06.json",
+      "working_sha256": "c956dba1a5aff79f78ddc9a98214c512f62c3d319ff2a8058615d9412ee54524",
+      "git_lf_sha256": "c956dba1a5aff79f78ddc9a98214c512f62c3d319ff2a8058615d9412ee54524",
+      "expected_git_blob": "9eef6a86f89a64046b3d225d31febca6ed664cbd",
+      "bytes": 12790,
+      "git_lf_bytes": 12790
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.json",
+      "working_sha256": "333098dec221af0a6114edc3beb3357614a40ef859bcf7fa6f6e4d0944706457",
+      "git_lf_sha256": "333098dec221af0a6114edc3beb3357614a40ef859bcf7fa6f6e4d0944706457",
+      "expected_git_blob": "31ea45dcb1e3891a0572c8914b07cb309a348eb2",
+      "bytes": 72271,
+      "git_lf_bytes": 72271
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.md",
+      "working_sha256": "39effa6bef22bd2bc62560176c9990a59b7d8b79c007829c984e9cd594a2a7f8",
+      "git_lf_sha256": "39effa6bef22bd2bc62560176c9990a59b7d8b79c007829c984e9cd594a2a7f8",
+      "expected_git_blob": "e8acc7189f7aff0164657fc35599bd78b6dad03e",
+      "bytes": 449,
+      "git_lf_bytes": 449
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests-raw.2026-10-21T12-17.json",
+      "working_sha256": "619935c353a228bb1f96a52d7fc7e76022374a9fd46c4a1949f099f4fdcd7beb",
+      "git_lf_sha256": "619935c353a228bb1f96a52d7fc7e76022374a9fd46c4a1949f099f4fdcd7beb",
+      "expected_git_blob": "3ed2e2c45ebe43c9a1046492b4c0d846e1d24034",
+      "bytes": 22867,
+      "git_lf_bytes": 22867
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.json",
+      "working_sha256": "0040cc599f2ccb9bec90c0b79e9d70972b14e5ec34de716edbf7f6c1be760d49",
+      "git_lf_sha256": "0040cc599f2ccb9bec90c0b79e9d70972b14e5ec34de716edbf7f6c1be760d49",
+      "expected_git_blob": "79647f8c30d3ae9ac4df6bca6024e195d95767ae",
+      "bytes": 79284,
+      "git_lf_bytes": 79284
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.md",
+      "working_sha256": "9acc471ec577abc3b87295d5855db5ac589344ae150f7bc9c21c88d678e827a1",
+      "git_lf_sha256": "9acc471ec577abc3b87295d5855db5ac589344ae150f7bc9c21c88d678e827a1",
+      "expected_git_blob": "79ed3e1ad7c8ec01a1ac978adbced90da2f8dc4b",
+      "bytes": 5379,
+      "git_lf_bytes": 5379
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check-raw.2026-10-21T12-19.json",
+      "working_sha256": "a9ab2b8953b5008ea49fe224a2865fbb4b5efbc49ecd49de18be3031ead5d6e4",
+      "git_lf_sha256": "a9ab2b8953b5008ea49fe224a2865fbb4b5efbc49ecd49de18be3031ead5d6e4",
+      "expected_git_blob": "860ad41cbc737d41b3ddda81dc364ff551f8a38c",
+      "bytes": 13033,
+      "git_lf_bytes": 13033
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.json",
+      "working_sha256": "44b95e8601bd65407ba42088613fac20e2185b18ed7820f988e3bf29127b8812",
+      "git_lf_sha256": "44b95e8601bd65407ba42088613fac20e2185b18ed7820f988e3bf29127b8812",
+      "expected_git_blob": "53f345da3498f5fa2915c9a60d624ace7d04a21d",
+      "bytes": 72174,
+      "git_lf_bytes": 72174
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.md",
+      "working_sha256": "740e7fc6e5a7c2984a51dc3bf74d6abd2bc5bdc3969c4f1624ad567dab5a806a",
+      "git_lf_sha256": "740e7fc6e5a7c2984a51dc3bf74d6abd2bc5bdc3969c4f1624ad567dab5a806a",
+      "expected_git_blob": "14a40bb34f5b16a6175531b47ba9c9611612c86c",
+      "bytes": 326,
+      "git_lf_bytes": 326
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint-raw.2026-10-21T12-19.json",
+      "working_sha256": "c48efbfad3abb910ef750138f0f73c4e64de425d000284c5e1da7e3cba96200d",
+      "git_lf_sha256": "c48efbfad3abb910ef750138f0f73c4e64de425d000284c5e1da7e3cba96200d",
+      "expected_git_blob": "68c8ff6346f84d2e62858a9c5f254384e99db483",
+      "bytes": 12977,
+      "git_lf_bytes": 12977
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.json",
+      "working_sha256": "d79b1aafa9b6581a3147a2d46405afba9e351bbbdfaca1cff41c30943ae61bd7",
+      "git_lf_sha256": "d79b1aafa9b6581a3147a2d46405afba9e351bbbdfaca1cff41c30943ae61bd7",
+      "expected_git_blob": "5d138f8444e5d21ba2ac4160fa952747287e0c46",
+      "bytes": 72104,
+      "git_lf_bytes": 72104
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.md",
+      "working_sha256": "844f98e6a8b7096417370af879fb5fb94865093a354f0a456e666c8f119589e0",
+      "git_lf_sha256": "844f98e6a8b7096417370af879fb5fb94865093a354f0a456e666c8f119589e0",
+      "expected_git_blob": "d1ba3279e68fa24ed805cf589ca696fc47c1c374",
+      "bytes": 279,
+      "git_lf_bytes": 279
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types-raw.2026-10-21T12-19.json",
+      "working_sha256": "222d8022d67f86fa614c6e9e2c6ac40af4c29784c229df8c87115d4737a31f04",
+      "git_lf_sha256": "222d8022d67f86fa614c6e9e2c6ac40af4c29784c229df8c87115d4737a31f04",
+      "expected_git_blob": "38c17a55b8e566dd7a81c76bdc1f60171ef6f4a0",
+      "bytes": 13174,
+      "git_lf_bytes": 13174
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.json",
+      "working_sha256": "d58d80598e9efe3e5600818630405e76384c30bc10b67a36f80f47da3a2b3217",
+      "git_lf_sha256": "d58d80598e9efe3e5600818630405e76384c30bc10b67a36f80f47da3a2b3217",
+      "expected_git_blob": "a64019a9004841e54efe9255f60ab34d6c82fb34",
+      "bytes": 72271,
+      "git_lf_bytes": 72271
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.md",
+      "working_sha256": "c8f112e8348a905b82f2d9931c4e63c065f7e0c3ca9c5d9c2e2cb4e413bcf6fc",
+      "git_lf_sha256": "c8f112e8348a905b82f2d9931c4e63c065f7e0c3ca9c5d9c2e2cb4e413bcf6fc",
+      "expected_git_blob": "54281aee9f6877881465a15278d80c5d5f3b9786",
+      "bytes": 449,
+      "git_lf_bytes": 449
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-baseline-readable.2026-10-21T12-19.json",
+      "working_sha256": "9aac4eb3aaf35c6f53747e9e4f3839cfa2c92577071528a82a688e2389311167",
+      "git_lf_sha256": "9aac4eb3aaf35c6f53747e9e4f3839cfa2c92577071528a82a688e2389311167",
+      "expected_git_blob": "e573da82c32c10d448a0359d5b9645cf5d98b879",
+      "bytes": 2277,
+      "git_lf_bytes": 2277
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-body.2026-10-21T12-19.json",
+      "working_sha256": "e8d013636e119f064cb5150e7257749be610522118dc43bd9ee0337687715d9e",
+      "git_lf_sha256": "e8d013636e119f064cb5150e7257749be610522118dc43bd9ee0337687715d9e",
+      "expected_git_blob": "28ac919f82318ecb0fbbeedb67c85dc60ed78480",
+      "bytes": 7839,
+      "git_lf_bytes": 7839
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-freeze.2026-10-21T12-19.json",
+      "working_sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2",
+      "git_lf_sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2",
+      "expected_git_blob": "61adff5048c9ac8856d0a096d26b322052284ada",
+      "bytes": 47825,
+      "git_lf_bytes": 47825
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-staging.2026-10-21T12-19.json",
+      "working_sha256": "accf1cc8f16c3616ed29b7d5c30ef50962e2dca9adf4faf2e9fae9339c1f52c4",
+      "git_lf_sha256": "accf1cc8f16c3616ed29b7d5c30ef50962e2dca9adf4faf2e9fae9339c1f52c4",
+      "expected_git_blob": "6cb78986c5958bc4717eedaef4ca4ff19a0a8be5",
+      "bytes": 9276,
+      "git_lf_bytes": 9276
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_mutation_guards.py",
+      "working_sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4",
+      "git_lf_sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4",
+      "expected_git_blob": "b341064e4c3a82508a9001dc81cd85dcce0532f4",
+      "bytes": 20110,
+      "git_lf_bytes": 20110
+    }
+  ],
+  "committed_dependencies": [],
+  "self_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-staging-union.2026-10-21T12-26.json",
+    "included_in_stage_paths": true,
+    "sha256": "External returned hash; no recursive self-hash"
+  },
+  "qualification": "stage_paths contains actual deltas only; unchanged committed dependencies are separate. No report subset or active evidence included."
+}
