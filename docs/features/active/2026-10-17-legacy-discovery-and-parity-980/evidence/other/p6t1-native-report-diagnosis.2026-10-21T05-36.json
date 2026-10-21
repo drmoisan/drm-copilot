@@ -1,0 +1,188 @@
+{
+  "Timestamp": "2026-10-21T05-36",
+  "cause": {
+    "all_other_parity_fields_equal": true,
+    "changed_semantic_input": {
+      "after_sha256": "5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219",
+      "before": "Recorded absence in accepted P5 fixture",
+      "category": "activation",
+      "path": "config/discovery.json"
+    },
+    "classification": "Intentionally strict stale-view refusal; no production recomputation or regeneration defect established.",
+    "exact_field": "/input_sha256",
+    "mechanism": "configure-real creates the activation locator, which report_input_digest correctly retains as semantic input. The copied P5 parity view still binds the pre-activation digest. Completion-report builds a new pair, but plan_mutation validates the whole prospective graph and correctly rejects that separate stale parity report. Reports and control outputs remain excluded from recursive report hashing.",
+    "production_repair_required_by_this_finding": false,
+    "strict_recomputation_must_remain": true
+  },
+  "comparison": {
+    "captured_bytes_unchanged": true,
+    "captured_files": 14,
+    "construction_qualification": "Existing loader consumes exact captured bytes and retained directory membership through memory-only ports. Synthetic stable metadata identities are explicitly not physical identity claims. Both inventory-declared objects use the retained actual-Git provenance; no Git process ran.",
+    "controller": {
+      "cap_seconds": 60,
+      "elapsed_seconds": 6.632885799976066,
+      "exit_code": 0,
+      "script_sha256": "443739a9bf7e0b941d4a4659af9c623e7114fdfb76327126f89914defe10e118",
+      "stream_cap_bytes": 1048576,
+      "stream_cap_exceeded": false,
+      "streams": {
+        "stderr": {
+          "bytes": 0,
+          "path": "SCRATCH/p6t1-native-report-comparison-20261021.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "bytes": 432,
+          "path": "SCRATCH/p6t1-native-report-comparison-20261021.stdout",
+          "sha256": "e468adfb9b1035a5ecd7af550b3b89815df937825b720a3d62f40898e85b8d5d"
+        }
+      },
+      "timed_out": false
+    },
+    "differences": [
+      {
+        "pointer": "/input_sha256",
+        "recomputed": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568",
+        "stored": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075"
+      }
+    ],
+    "exact_archived_manifest_reconstructed": true,
+    "inputs_member": "p6t1-native-report-comparison-20261021-inputs.json",
+    "pinned_objects": [
+      {
+        "bytes": 68,
+        "path": "docs/authored.md",
+        "repository": {
+          "id": "workspace-example",
+          "revision": "00367d1c6b0af4630878401524aae631b36bcd0a"
+        },
+        "sha256": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918"
+      },
+      {
+        "bytes": 64,
+        "path": "src/Feature.cs",
+        "repository": {
+          "id": "workspace-example",
+          "revision": "00367d1c6b0af4630878401524aae631b36bcd0a"
+        },
+        "sha256": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+      }
+    ],
+    "prior_activation_absence_digest": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+    "public_projection_calls": 1,
+    "recomputed_operand": {
+      "bytes": 9917,
+      "path": "SCRATCH/p6t1-native-report-comparison-20261021-recomputed-report.json",
+      "sha256": "be2bde2fcc8175c75ecf249c1940f25643511194f8c3714bb62cf90e7338c5dc"
+    },
+    "result_member": "p6t1-native-report-comparison-20261021-result.json",
+    "snapshot_sha256": "17f2d854b1544d9cf839cc7699b501adc6df2fdcfb70b8974d05bcd23bf59526",
+    "source_bindings_211_unchanged": true,
+    "stored_operand": {
+      "bytes": 6791,
+      "path": "SCRATCH/p6t1-native-report-comparison-20261021-stored-report.json",
+      "sha256": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b"
+    }
+  },
+  "comparison_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis-originals.2026-10-21T05-36.json",
+    "sha256": "706b833ac54d6f8c4d6db372441537bbb72b8a480ab9e20ee0b44b111877ce22"
+  },
+  "execution_released": false,
+  "native_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+    "sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b"
+  },
+  "native_pass_confirmed": false,
+  "native_raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix-raw.2026-10-21T05-19.json",
+    "sha256": "1e9ac961418684172e4c16d5e364142447e07295f9309610d2e8b63edc7af9dd"
+  },
+  "package_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf2-handoff.2026-10-21T05-12.json",
+    "sha256": "2166b4dc1d187b951139391a45144bfdde84690371245a07ee2e0795019aaf29"
+  },
+  "proposed_native_setup_correction": {
+    "continuation": "After explicit coordinator release, run this one setup regeneration on the retained activated workspace; verify only the parity pair changes and retain its new output hashes. Start the existing completion tail at report-dry, with a new completion-footprint baseline after parity refresh. Keep the original report-dry REPORT_RESULT refusal as an expected stale-view negative. Do not replay the successful six-step prefix.",
+    "expected_changed_paths": [
+      "docs/migration/discovery/reports/parity-report.json",
+      "docs/migration/discovery/reports/parity-report.md"
+    ],
+    "expected_exit": 1,
+    "expected_json_semantic_delta": [
+      {
+        "pointer": "/input_sha256",
+        "recomputed": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568",
+        "stored": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075"
+      }
+    ],
+    "expected_ok": false,
+    "expected_other_workspace_changes": [],
+    "expected_semantic_digest": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568",
+    "expected_validation_result": "fail",
+    "publication_contract": "Use the existing authoritative parity-report operation, exact existing identity and paired format. Its bounded MutationChange tuple replaces the stale view in the prospective graph before strict structural validation; accepted grant/CAS/freshness checks remain unchanged. No direct fixture writes/deletes or stale-report suppression.",
+    "release_delta": "Version the native release and result paths; bind the unchanged package, current input state and literal 0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568. The existing report-selected-failure assertion remains exact; its former pre-activation expected digest is retained in prior evidence.",
+    "request": {
+      "authorization_ref": null,
+      "dry_run": false,
+      "format": "both",
+      "id": "native-composition",
+      "inputs": {},
+      "invocation_ref": null,
+      "mode": "parity-complete",
+      "operation": "parity-report",
+      "profile_path": "docs/migration/discovery/domain-profile.yaml",
+      "request_id": "native-composition",
+      "workspace_root": "Same retained NCF2 workspace; trusted local-user provider unchanged",
+      "write": true
+    },
+    "state": "PROPOSED_ONLY_NOT_EXECUTED"
+  },
+  "provisional_metadata_diagnostic": {
+    "reason": "The first stdlib-only descriptor omitted docs/authored.md from pinned objects. Correcting that finite dependency closure reproduced the stored digest. This was not a public projection invocation.",
+    "retention": "Values retained from tool-returned metadata diagnostics; not represented as raw process-byte archives.",
+    "single_object_candidates": [
+      "f977f6285b0eda061a98b99a2caf6edc190b5f056c64df9acd5d6af2a50077ff",
+      "44e10e39a24261058728cc83cbaec6f6b4a851bfc73fb7c66eb0f497ea999fe6",
+      "c59cbb81841e1be85e862ebe0fa004c38b3e6e326a6447b2e9e4ca3dbfa2d3c4"
+    ],
+    "status": "Superseded by exact memory-loader comparison"
+  },
+  "qa_scope": {
+    "comparison_only": true,
+    "final_population": "294 cases plus four contracts remain disabled; no acceptance claim.",
+    "native_replayed": false,
+    "production_changed": false,
+    "static_gates_run": false,
+    "tests_run": false
+  },
+  "qualifications": [
+    "Raw stdout/stderr and original report/input bytes retain exact newline/EOF form. The readable receipt is UTF-8 LF with one terminal newline.",
+    "The reconstructed expected JSON is diagnostic serialization of the public projection, not a published artifact.",
+    "No installed coding-agent-host capability is claimed."
+  ],
+  "reusability_qualification": "Those six operations passed on the same frozen NCF2 package before the report failure; the proposed regeneration changes generated report bytes only. Historical init remains separately qualified. No new native pass is claimed.",
+  "reusable_native_prefix": [
+    "installed-identity",
+    "configure-dry",
+    "configure-real",
+    "profile",
+    "validate-profile",
+    "inventory"
+  ],
+  "route": "inventory_analyzers_p6t1_native_report_diagnosis_20261021T052032",
+  "scope": "Read-only retained data/source analysis and one authorized memory-loader/public-parity-projection comparison; no production/test/fixture/package/Git/checkpoint edits.",
+  "source_references": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot.py": "9432285586bc4a76d2cc7d437cb804eeedec52f818ba731024e016aec440b230",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py": "c48071e64cd70a727868771e9195b2e982571c4943904ca95314341f414b4452",
+    "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_loading.py": "1cd711de4802e01cfa97529a29bc7d81dfc463056f58e9582bb83705c69cc89a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": "e20b53fc5e674d36a8b6dcc81da4d9a7df0e468f47737d7ecc0ddb6afd046391",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_inputs.py": "147b363fbf5f1041ce79dc40e3b9c10d1ba3aab41be007a9b06cce8df8b4cda2",
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py": "aefd2a8ac1848194e33f7914657b0b57a780e18e3bfce72eda031ffc2e059443"
+  },
+  "status": "DIAGNOSED_STALE_DERIVED_REPORT_FIXTURE",
+  "task": "P6-T1"
+}

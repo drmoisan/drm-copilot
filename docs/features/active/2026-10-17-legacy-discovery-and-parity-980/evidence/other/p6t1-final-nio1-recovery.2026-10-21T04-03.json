@@ -1,0 +1,78 @@
+{
+  "Command": "Resume the saved metadata preparer only; no final gate invoked.",
+  "EXIT_CODE": 0,
+  "Output Summary": "PREPARED_EXECUTION_DISABLED; 264 exact nodes and four unchanged contracts bound.",
+  "Timestamp": "2026-10-21T04-03",
+  "added_nodes": 57,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-candidate-disabled.2026-10-21T04-02.json",
+    "sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5"
+  },
+  "checks_this_recovery": "Bound receipt identities and prepared-script syntax only; no collection, static toolchain, tests, native execution, package execution, source edits, staging or Git operations.",
+  "contracts": [
+    "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+    "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+  ],
+  "exact_script_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-prepared-originals.2026-10-21T04-02.json",
+    "sha256": "4d8ae08045d1edd5cad5cf837602ccfc5eb6e4fe462906f09dd3987cc2cd9521"
+  },
+  "execution_released": false,
+  "historical_preparation_route_qualification": "The unchanged preparer records its original 2026-10-20 route; this addendum records the freshly attested recovery authority.",
+  "native_pass_confirmed": false,
+  "node_count": 264,
+  "original_nodes_preserved": 207,
+  "package_identity": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-nio1-handoff.2026-10-20T18-14.json",
+    "sha256": "0bb7a6b6dc31f34e420821e8c5b19d2b94fdf07724aa1dd7d9a149d0060af482"
+  },
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-preparation.2026-10-21T04-02.json",
+    "sha256": "8ffe6017a2b1d5150f27e47a7cdff80723f4065e8e69f5e1d1747ed840638d0d"
+  },
+  "recovery_route": {
+    "c3_overlay_applied": false,
+    "c3_overlay_reason": null,
+    "complexity_band": "C4",
+    "delegation_id": "inventory_analyzers_p6t1_final_runner_nio1_recovery_20261021T040049",
+    "deployment_agent": "python-typed-engineer-c4",
+    "execution_context": "standalone",
+    "logical_agent": "python-typed-engineer",
+    "model": "gpt-6-astra",
+    "model_reasoning_effort": "max",
+    "orchestration_complexity_ceiling": "C4",
+    "phase": "S5_P6T1_final_runner_nio1_delta_preparation",
+    "profile_path": ".codex/agents/python-typed-engineer-c4.toml",
+    "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6"
+  },
+  "retained_prior_proof": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-timeout-retention.2026-10-20T16-27.json",
+      "sha256": "bd13ebc323667490d3bca81eee1623b01a0f8c363b2fdf3605cdcb2586bd1653"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-core-continuation-retention.2026-10-20T16-58.json",
+      "sha256": "001543dd2ad9f974dc54e06ae1ce2a125fbd1eb658868c4d897e72e7cbf86a09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-contract-freeze.2026-10-20T16-39.json",
+      "sha256": "a9ebf41912ba496600fd3a70d2d854bcd67a345893f7c84753e50765ea768ca1"
+    }
+  ],
+  "runner": {
+    "physical_lines": 255,
+    "runtime_path": "SCRATCH/p6t1_final_nio1_gates.py",
+    "sha256": "eb049341d3ef9ff341281d0b1f9a47f52d0cde1b5b9bf27b5bc198d125328090"
+  },
+  "source_cause_assumed": false,
+  "unchanged_preparer": {
+    "path": "SCRATCH/p6t1_prepare_nio1_delta.py",
+    "sha256": "da33ff81cadff045211f42754c23be5f3b4be74e12a636bd8c8a6d8d28b76233"
+  },
+  "unfinished_prerequisites": [
+    "Native configure diagnosis and successful installed native composition remain with their assigned owners.",
+    "An explicit coordinator final execution release is required."
+  ]
+}

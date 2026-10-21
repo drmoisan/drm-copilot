@@ -1,0 +1,473 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "Timestamp": "2026-10-21T06:02:42.648726+00:00",
+  "status": "READY_FOR_CHECKED_WIP",
+  "source_head": "e9d18aca08857fc8c44b3b030fa10349da4cd4f2",
+  "route": "atomic_execution_p6t1_native_evidence_preservation_20261021T055129",
+  "findings": [],
+  "open_probes": [],
+  "evidence_bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-report-continuation.2026-10-21T05-49.json",
+      "sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a",
+      "git_lf_sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a",
+      "bytes": 229480
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-report-continuation-raw.2026-10-21T05-49.json",
+      "sha256": "94179d86a2b1ce911ce98056ba0cb48a5744de2b775bf7844f2a76ad1e2b34b4",
+      "git_lf_sha256": "94179d86a2b1ce911ce98056ba0cb48a5744de2b775bf7844f2a76ad1e2b34b4",
+      "bytes": 133679
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+      "sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b",
+      "git_lf_sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b",
+      "bytes": 139058
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix-raw.2026-10-21T05-19.json",
+      "sha256": "1e9ac961418684172e4c16d5e364142447e07295f9309610d2e8b63edc7af9dd",
+      "git_lf_sha256": "1e9ac961418684172e4c16d5e364142447e07295f9309610d2e8b63edc7af9dd",
+      "bytes": 96640
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-continuation-state.2026-10-21T05-39.json",
+      "sha256": "5ddc822154c2ce26775106cc8369a630295ef9c15250624aa3f6fcc0e031b199",
+      "git_lf_sha256": "5ddc822154c2ce26775106cc8369a630295ef9c15250624aa3f6fcc0e031b199",
+      "bytes": 13883
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-continuation-preparation.2026-10-21T05-39.json",
+      "sha256": "084e0fcc9239340ee66ccaf0ed1a09c5ab4bfbb65df75a2d760ee54f405b8e2d",
+      "git_lf_sha256": "084e0fcc9239340ee66ccaf0ed1a09c5ab4bfbb65df75a2d760ee54f405b8e2d",
+      "bytes": 43910
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-ncf2-disabled-release.2026-10-21T05-15.json",
+      "sha256": "26ddf0f4b8bcddc906b3238fb58bf1f80422677765fac7b476616cc11912d06d",
+      "git_lf_sha256": "26ddf0f4b8bcddc906b3238fb58bf1f80422677765fac7b476616cc11912d06d",
+      "bytes": 24813
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis.2026-10-21T05-36.json",
+      "sha256": "faead8cc0aa97faa7625c8397a71503e11977ec79b1d3ad96d0c0f8ab7bb7f9c",
+      "git_lf_sha256": "faead8cc0aa97faa7625c8397a71503e11977ec79b1d3ad96d0c0f8ab7bb7f9c",
+      "bytes": 10911
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis.2026-10-21T05-36.md",
+      "sha256": "0ce8d48e74b0f256d431922a924a633f9a809736ccf44731aae9d3e9e68c5582",
+      "git_lf_sha256": "0ce8d48e74b0f256d431922a924a633f9a809736ccf44731aae9d3e9e68c5582",
+      "bytes": 2278
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-report-diagnosis-originals.2026-10-21T05-36.json",
+      "sha256": "706b833ac54d6f8c4d6db372441537bbb72b8a480ab9e20ee0b44b111877ce22",
+      "git_lf_sha256": "706b833ac54d6f8c4d6db372441537bbb72b8a480ab9e20ee0b44b111877ce22",
+      "bytes": 27163
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-report-fixture-confirmation.2026-10-21T05-41.json",
+      "sha256": "656ddfc71d187922444be2f1fbee0fd8dfc9b807a846f8d62a33150278fd9572",
+      "git_lf_sha256": "656ddfc71d187922444be2f1fbee0fd8dfc9b807a846f8d62a33150278fd9572",
+      "bytes": 11342
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-report-fixture-confirmation.2026-10-21T05-41.md",
+      "sha256": "21bb26677f5cff611eab075a8d2820fa7ec9388015740257e7b30783ba6b5c69",
+      "git_lf_sha256": "21bb26677f5cff611eab075a8d2820fa7ec9388015740257e7b30783ba6b5c69",
+      "bytes": 1988
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-report-continuation-binding.2026-10-21T05-42.json",
+      "sha256": "0be1d3fbeff5176877fc9a661c9e0618bf71d6ea6ed8978cda1769f86671f554",
+      "git_lf_sha256": "0be1d3fbeff5176877fc9a661c9e0618bf71d6ea6ed8978cda1769f86671f554",
+      "bytes": 4190
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-coverage-candidate-disabled.2026-10-20T17-14.json",
+      "sha256": "10c1ccdf0fa24f95072c96378f2be30375c2cd0b98a54c583ae338e2b0946b4d",
+      "git_lf_sha256": "10c1ccdf0fa24f95072c96378f2be30375c2cd0b98a54c583ae338e2b0946b4d",
+      "bytes": 61680
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-coverage-prepared-originals.2026-10-20T17-14.json",
+      "sha256": "cd6dac6fb3f0a8291663ea84584f706efa9fa8b919c389351da3364f4aaa4bbc",
+      "git_lf_sha256": "cd6dac6fb3f0a8291663ea84584f706efa9fa8b919c389351da3364f4aaa4bbc",
+      "bytes": 67769
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-gateway-collection.2026-10-20T17-14.json",
+      "sha256": "f77d042c635596d52da3ad861f86378bbeea756b6d661bee1ec5a86945be87fa",
+      "git_lf_sha256": "f77d042c635596d52da3ad861f86378bbeea756b6d661bee1ec5a86945be87fa",
+      "bytes": 31915
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-candidate-disabled.2026-10-21T04-02.json",
+      "sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5",
+      "git_lf_sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5",
+      "bytes": 146865
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-preparation.2026-10-21T04-02.json",
+      "sha256": "8ffe6017a2b1d5150f27e47a7cdff80723f4065e8e69f5e1d1747ed840638d0d",
+      "git_lf_sha256": "8ffe6017a2b1d5150f27e47a7cdff80723f4065e8e69f5e1d1747ed840638d0d",
+      "bytes": 5383
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-prepared-originals.2026-10-21T04-02.json",
+      "sha256": "4d8ae08045d1edd5cad5cf837602ccfc5eb6e4fe462906f09dd3987cc2cd9521",
+      "git_lf_sha256": "4d8ae08045d1edd5cad5cf837602ccfc5eb6e4fe462906f09dd3987cc2cd9521",
+      "bytes": 23180
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-candidate-disabled.2026-10-21T04-52.json",
+      "sha256": "d02b042d6e9d6af05552c0ee23f1085e5a1b5f72272c38a68848568e25ea8ad7",
+      "git_lf_sha256": "d02b042d6e9d6af05552c0ee23f1085e5a1b5f72272c38a68848568e25ea8ad7",
+      "bytes": 162130
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-preparation.2026-10-21T04-52.json",
+      "sha256": "5bad293a57fd40a92db818933454a2f58e88d739dbda9f973b39037100d09e07",
+      "git_lf_sha256": "5bad293a57fd40a92db818933454a2f58e88d739dbda9f973b39037100d09e07",
+      "bytes": 4411
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-prepared-originals.2026-10-21T04-52.json",
+      "sha256": "41733ed36d32ba5062e35d9855d7f248a09e66eb7dd1416ffd8d588dfaf6bcac",
+      "git_lf_sha256": "41733ed36d32ba5062e35d9855d7f248a09e66eb7dd1416ffd8d588dfaf6bcac",
+      "bytes": 12135
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-candidate-disabled.2026-10-21T05-18.json",
+      "sha256": "54ae694727ad42395cc7b374a9b71c46d524e7885d889822bb35937d046c7981",
+      "git_lf_sha256": "54ae694727ad42395cc7b374a9b71c46d524e7885d889822bb35937d046c7981",
+      "bytes": 168143
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-preparation.2026-10-21T05-18.json",
+      "sha256": "58004438f60722e7c723ad277e8efdd25a6e3499a8d54816773ae5611281795b",
+      "git_lf_sha256": "58004438f60722e7c723ad277e8efdd25a6e3499a8d54816773ae5611281795b",
+      "bytes": 5381
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-prepared-originals.2026-10-21T05-18.json",
+      "sha256": "7dcbe315a994677f6b0b5473bbd976bdb1b832c6f00d397e4eb89e30f1536fc7",
+      "git_lf_sha256": "7dcbe315a994677f6b0b5473bbd976bdb1b832c6f00d397e4eb89e30f1536fc7",
+      "bytes": 12031
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-recovery.2026-10-21T04-03.json",
+      "sha256": "ccd4f0d815559f638e1c349cc0115a209dc64f1e5295c71dcab73a977e23e2a2",
+      "git_lf_sha256": "ccd4f0d815559f638e1c349cc0115a209dc64f1e5295c71dcab73a977e23e2a2",
+      "bytes": 4382
+    }
+  ],
+  "native_proof": {
+    "invocations": [
+      {
+        "label": "installed-identity",
+        "exit_code": 0,
+        "elapsed_seconds": 1.3128757000085898,
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "3bddee9663fe4c5312faf1c724415b8d300f69578be65ee8d521c2ea7618209d",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "parity-refresh",
+        "exit_code": 1,
+        "elapsed_seconds": 97.46136670000851,
+        "request_sha256": "fd3d651d579a808b92abe3dd13a4bda60f231e8cc6f0f01e14e7d4faf412763e",
+        "stdout_sha256": "5ef1633dd10dc34bc0ba365fef300b8db7597b018f960c7c4d294fe003e6e610",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "report-dry",
+        "exit_code": 1,
+        "elapsed_seconds": 29.109639500034973,
+        "request_sha256": "26eeefd885ece570aea277524d26a45a97eff2d01492887eaec9674d470ec656",
+        "stdout_sha256": "5e6a3050d305859d78cd81ac3e4d9344a37a5a432abb62d2c1581416d2565ac9",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "report-publish",
+        "exit_code": 1,
+        "elapsed_seconds": 97.35739000001922,
+        "request_sha256": "15a5452fc475d0a9ef022b3165f174e918449a25b04b124143641a5835ac53c7",
+        "stdout_sha256": "8c8f00cf81e3407a8a1d5ba74330f9fa03c19468fd77380a188289a67b9baa32",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "report-repeat",
+        "exit_code": 1,
+        "elapsed_seconds": 45.978697299957275,
+        "request_sha256": "15a5452fc475d0a9ef022b3165f174e918449a25b04b124143641a5835ac53c7",
+        "stdout_sha256": "597f428e34193c3062bbc7e42c4c298b28c1cecd73da489d0b726f6a23a21693",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "doctor",
+        "exit_code": 0,
+        "elapsed_seconds": 4.529261499992572,
+        "request_sha256": "7bf4a3ab2564ac3766a1bfa11d583e3cee069c11ce9589409404a781217fedf9",
+        "stdout_sha256": "8814027ff507870e2dd4227f043be5d804da7100bf260365722b1c17ef1532a7",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "label": "malformed",
+        "exit_code": 2,
+        "elapsed_seconds": 0.9131125999847427,
+        "request_sha256": "021fb596db81e6d02bf3d2586ee3981fe519f275c0ac9ca76bbcf2ebb4097d96",
+        "stdout_sha256": "1490024d8b3cc5c43253f022a19dfba58405e6a83b5388234a079cc47fc16f07",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "unknown-operation",
+        "exit_code": 2,
+        "elapsed_seconds": 1.5154125000117347,
+        "request_sha256": "32e531a4ea35c56539b83d1956cf0ca3e62556e27d23461c3c81f78066028a3d",
+        "stdout_sha256": "f76254e1e17f3a2a85f7ae2a8d8cf89f3e82716a8f2a6588496b26d6adb7de48",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "opaque-reference-refusal",
+        "exit_code": 3,
+        "elapsed_seconds": 2.2181382999988273,
+        "request_sha256": "11b3995b525bcaaa61ac1a74ba4125a35b34b44ffbdaa3b87cf5fae2596775a4",
+        "stdout_sha256": "e7c733970e158dbd655a7f3336e49fc9b06721850f9babbcb518c795e81fa73e",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "host-refusal",
+        "exit_code": 3,
+        "elapsed_seconds": 0.9132117999834009,
+        "request_sha256": "11b3995b525bcaaa61ac1a74ba4125a35b34b44ffbdaa3b87cf5fae2596775a4",
+        "stdout_sha256": "5d6f56e5c2c6642994ffd91bbcc54700710a25aba834fc7e6b74491d53a97523",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "identity-missing",
+        "exit_code": 3,
+        "elapsed_seconds": 1.6152973000425845,
+        "request_sha256": "7bf4a3ab2564ac3766a1bfa11d583e3cee069c11ce9589409404a781217fedf9",
+        "stdout_sha256": "b776526c9ee99c90727897535a2782d4217784cd3f14d29f3175cafd0f87ad6c",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      },
+      {
+        "label": "identity-corrupt",
+        "exit_code": 3,
+        "elapsed_seconds": 3.020734000019729,
+        "request_sha256": "7bf4a3ab2564ac3766a1bfa11d583e3cee069c11ce9589409404a781217fedf9",
+        "stdout_sha256": "3c279cd2b2457d8f097c0f139cf55dc626347ebf267fba03e6a48a4b4dada3d2",
+        "stderr_sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151"
+      }
+    ],
+    "assertions_passed": 96,
+    "assertions_total": 96,
+    "controller_elapsed_seconds": 288.4053972000256,
+    "inner_elapsed_seconds": 286.92557930003386,
+    "raw_streams_decoded_and_hash_verified": 50,
+    "prefix_archive_streams_verified": 29,
+    "source_inputs_unchanged": 211,
+    "package": {
+      "descriptor_sha256": "8fe818436d6322a29148b941c64cfb8f00161a83bd5ce97c4adb523c3bfbf1d2",
+      "wheel_sha256": "68232d61a71d13354a4fce93a64c31c47fd369f507120a717abdc9f33706111a",
+      "runtime": {
+        "package_version": "2.0.0",
+        "schema_version": "2.0.0",
+        "build_sha256": "bf4ba791fb68329eca134a4ad108dd69703f8c220dbe4b9b50ee8cc47b51998e",
+        "policy_version": 2,
+        "policy_sha256": "280a4831379f28e82958c4e3fdf416a99ddafe55a479aed86e4ca4e77de10495"
+      },
+      "payload_members": 168
+    },
+    "stable_after": {
+      "workspace_directory_membership": true,
+      "sources211": true,
+      "original50": true,
+      "base_fixture48": true,
+      "historical_initialized_state": true,
+      "installed_package": true
+    }
+  },
+  "effects": {
+    "refresh_changed_only": [
+      "docs/migration/discovery/reports/parity-report.json",
+      "docs/migration/discovery/reports/parity-report.md"
+    ],
+    "completion_publication_changed_only": [
+      "docs/migration/discovery/reports/completion-report.json",
+      "docs/migration/discovery/reports/completion-report.md"
+    ],
+    "outputs": [
+      {
+        "path": "docs/migration/discovery/reports/parity-report.json",
+        "sha256": "0b1c905806faf202ed651d77e99396d89228509c854bb14366d741fd38b22781",
+        "bytes": 6791,
+        "archive_member": "effects/workspace/docs/migration/discovery/reports/parity-report.json"
+      },
+      {
+        "path": "docs/migration/discovery/reports/parity-report.md",
+        "sha256": "b49fd5c2463060b98311545cac1ae387d80c346d461befe07c44d8891d63cc91",
+        "bytes": 9956,
+        "archive_member": "effects/workspace/docs/migration/discovery/reports/parity-report.md"
+      },
+      {
+        "path": "docs/migration/discovery/reports/completion-report.json",
+        "sha256": "ccafa0e9c4c87438a5020828c6dadc343aa3594306643758e36191893c6c3ea6",
+        "bytes": 2406,
+        "archive_member": "effects/workspace/docs/migration/discovery/reports/completion-report.json"
+      },
+      {
+        "path": "docs/migration/discovery/reports/completion-report.md",
+        "sha256": "800fc610c73fdfb79e0f3a7fc5e45a05866fd0b56a3fd9f698bf48fee1627040",
+        "bytes": 3121,
+        "archive_member": "effects/workspace/docs/migration/discovery/reports/completion-report.md"
+      }
+    ],
+    "parity_json_only_semantic_change": {
+      "pointer": "/input_sha256",
+      "before": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+      "after": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568"
+    },
+    "parity_markdown_exact_digest_substitution_matches_public_renderer_output": true,
+    "semantic_input_sha256": "0247c8253e090ee06d0ff70e4fcf3fcbeb374069ccf597e1f3c39347fee3a568",
+    "post_refresh_full_input_manifest_sha256": "8f7c45139aff860aaa89a8a2dfdd7d7dbf0fc895e5ee4c6dce2139eb761bfac5",
+    "capture_and_semantic_identity_are_distinct": true,
+    "dry_run_status": "planned; no workspace write",
+    "publication_status": "created; selected failure remains exit 1/ok false",
+    "repeat_status": "skipped with identical pair hashes",
+    "refusal_codes": {
+      "doctor": "DISCOVERY_ENFORCEMENT_UNAVAILABLE",
+      "malformed": "SERVICE_REQUEST",
+      "unknown-operation": "SERVICE_REQUEST",
+      "opaque-reference-refusal": "SERVICE_IO",
+      "host-refusal": "SERVICE_FAILURE",
+      "identity-missing": "RUNTIME_UNAVAILABLE",
+      "identity-corrupt": "RUNTIME_CORRUPT"
+    },
+    "no_write_assertions": "Retained executed report-dry-no-write, report-idempotent, controls-no-workspace-write and complete before/after footprint comparisons all pass."
+  },
+  "historical_chain": {
+    "same_package_six_prefix": {
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf2-suffix.2026-10-21T05-19.json",
+        "sha256": "bac9ec664f1c5878e800fe79c081f870d063fa7a6fa5473e65b8ba6c519be87b"
+      },
+      "steps": [
+        "installed-identity",
+        "configure-dry",
+        "configure-real",
+        "profile",
+        "validate-profile",
+        "inventory"
+      ],
+      "qualification": "Same unchanged package; prior actual prefix successes remain evidence; fresh identity will run again."
+    },
+    "stale_report_refusal": "The 05:19 report-dry invocation returned exit 1, REPORT_RESULT and no artifacts; its failed pair assertion remains immutable. Public refresh corrected only the stale fixture pair.",
+    "initialization_carry": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf2-source-confirmation.2026-10-21T05-17.json",
+      "sha256": "85c902e1f024aeac5e3e97bee94dead14a6e29f957d2d35baf93f4dfa9012143"
+    },
+    "initialization_replayed": false,
+    "initialization_qualification": "Successful initialization remains setup evidence on build 2db25325. This continuation freshly verifies the NCF2 package and unchanged retained initialized state; it does not relabel old initialization as new-package execution."
+  },
+  "prepared_populations": [
+    {
+      "candidate": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-candidate-disabled.2026-10-21T04-02.json",
+        "sha256": "43f4dd75979e1f6898bf18bbb564d941455d2a2ac456a5d785fa52a0fd1109e5"
+      },
+      "nodes": 264,
+      "added_nodes": 57,
+      "original_node_order_within_modules_preserved": true,
+      "contracts": 4,
+      "archived_delta_scripts": 4,
+      "execution_released_in_historical_record": false
+    },
+    {
+      "candidate": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf1-candidate-disabled.2026-10-21T04-52.json",
+        "sha256": "d02b042d6e9d6af05552c0ee23f1085e5a1b5f72272c38a68848568e25ea8ad7"
+      },
+      "nodes": 286,
+      "added_nodes": 22,
+      "original_node_order_within_modules_preserved": true,
+      "contracts": 4,
+      "archived_delta_scripts": 2,
+      "execution_released_in_historical_record": false
+    },
+    {
+      "candidate": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-ncf2-candidate-disabled.2026-10-21T05-18.json",
+        "sha256": "54ae694727ad42395cc7b374a9b71c46d524e7885d889822bb35937d046c7981"
+      },
+      "nodes": 294,
+      "added_nodes": 8,
+      "original_node_order_within_modules_preserved": true,
+      "contracts": 4,
+      "archived_delta_scripts": 2,
+      "execution_released_in_historical_record": false
+    }
+  ],
+  "usage_recovery": {
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-final-nio1-recovery.2026-10-21T04-03.json",
+      "sha256": "ccd4f0d815559f638e1c349cc0115a209dc64f1e5295c71dcab73a977e23e2a2"
+    },
+    "qualification": "The unchanged preparer records its original 2026-10-20 route; this addendum records the freshly attested recovery authority.",
+    "scope": "Bound receipt identities and prepared-script syntax only; no collection, static toolchain, tests, native execution, package execution, source edits, staging or Git operations.",
+    "prior_interruption": "Account usage limit during metadata-only preparation; original results, receipts and partial preparation were retained without suite replay."
+  },
+  "qualifications": [
+    "Exact archived original requests, stdout/stderr, scripts, import origins and output bytes remain unchanged. Readable locator normalization is a presentation only qualification; raw stream hashes remain authoritative.",
+    "Disabled preparation fields and the continuation sentence that final 294 plus four remains disabled describe their publication time. The coordinator subsequently released that independent final sequence; none of its scripts, outputs, failures or eventual results are part of this preservation review.",
+    "The 207/264/286/294 candidate and archive chain is preparation evidence, not passing aggregate coverage or test evidence. The original 52/109 core prefix and operational interruptions retain their original qualifications.",
+    "Installed Windows local service/Git composition is proven only for these retained invocations. No coding-agent host authority, Python 3.10/3.11, P6-T2/P6-T3 or whole-task acceptance claim is made."
+  ],
+  "excluded_absolute_locator_originals": {
+    "committed_lossless_qualification": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-readable.2026-10-20T17-19.json",
+      "sha256": "6e432439ab962443f732d3c2fb2d46ab364ff0dbf0ca9cfe42cbe4e0f46173b3"
+    },
+    "files": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-build.2026-10-20T17-19.json",
+        "sha256": "7932978f306ea64ba0e125e82165cdc4b1c641b9a3075d2c548c8912dc2bc6a4"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-check.2026-10-20T17-19.json",
+        "sha256": "e1a131324730d6166397419c1e9421a45ac175c196268a82e24e728807f43dfc"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-install.2026-10-20T17-19.json",
+        "sha256": "52533c42adc3662365c8172d38c047f8f1488e0131a4115a42c5ce6c3d8345bc"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-handoff.2026-10-20T17-19.json",
+        "sha256": "22d43501f691643b8a7c831bf9b3e1a5a4c7b309e35c21f305b562b261fe2bf9"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-retry-raw-archive.2026-10-20T17-19.json",
+        "sha256": "9a9be59202c2ac74d33cb500812c51eb721ccb78db627a1532021191395652ee"
+      }
+    ],
+    "disposition": "Not staged; exact originals already preserved losslessly in the committed decoded-locator normalization artifact."
+  },
+  "reviewer_execution": "Read and decode frozen evidence only; no production or test changes, service/factory/native/projection/test/build execution, fixture writes, checkpoint changes or Git/index mutation. No live final-gate artifact was read or added.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-native-preservation-staging.2026-10-21T06-02.json"
+}
