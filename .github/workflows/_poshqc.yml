@@ -117,7 +117,7 @@ jobs:
 
       - name: Download PowerShell shard test artifacts
         if: ${{ inputs.run-heavy }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: poshqc-test-results-shard-*
           path: artifacts/shards
