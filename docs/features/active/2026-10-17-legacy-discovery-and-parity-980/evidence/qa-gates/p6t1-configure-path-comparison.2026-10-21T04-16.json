@@ -1,0 +1,118 @@
+{
+  "Timestamp": "2026-10-21T04-16",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -I -S -B SCRATCH/issue-980-p6t1-gateway-configure-path-comparison.py SCRATCH/issue-980-p6t1-gateway-configure-factory-2026-10-21T04-13.json",
+  "EXIT_CODE": 0,
+  "Output Summary": "Two path comparisons and at most 16 registry/ancestor metadata entries; no runtime calls.",
+  "first_probe": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-13.json",
+    "sha256": "377b357d9c36807671dcd33f94a3628fa8d46525a4ad3d3795cfa098ab8f193b"
+  },
+  "request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+  "execution_count": 1,
+  "elapsed_seconds": 0.11019109998596832,
+  "timeout": false,
+  "overflow": false,
+  "watchdog_seconds": 30,
+  "stream_limit": 65536,
+  "bindings_unchanged": true,
+  "result": {
+    "blocked_events": [],
+    "factory_calls": 0,
+    "metadata": [
+      {
+        "component": "registry",
+        "error_type": "FileNotFoundError"
+      },
+      {
+        "component": "ancestor-1",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-2",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-3",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-4",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-5",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-6",
+        "file_attributes": 16,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-7",
+        "file_attributes": 17,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      },
+      {
+        "component": "ancestor-8",
+        "file_attributes": 22,
+        "kind": "directory",
+        "reparse": false,
+        "reparse_tag": 0
+      }
+    ],
+    "runtime_imported": false,
+    "state_absolute": true,
+    "state_inside_workspace_lexical": false,
+    "state_resolve_equals_lexical": false,
+    "workspace_absolute": true,
+    "workspace_resolve_equals_lexical": true
+  },
+  "lexical_expression_sources": [
+    "gateway_local.py:378-391",
+    "activation_filesystem.py:47-75"
+  ],
+  "qualification": "Windows lexical argument construction inspected before execution; both arguments are derived from absolute inputs. No factory invocation, runtime import, service, Git, test or writer call.",
+  "raw_encoding": "gzip-base64 exact bytes; original path aliases remain in the first probe archive",
+  "raw": {
+    "issue-980-p6t1-gateway-configure-path-comparison.py": {
+      "sha256": "fcb3ed3e114e458f1bd4c46fb5065f65ca355630e54c9faaa3c74087e7346800",
+      "bytes": 3079,
+      "gzip_base64": "H4sIAAAAAAAC/5VWXW/bNhR916/gNKCQVldtN3QYMvghazIgQJAYjoti8AKBlq5tLrKokVRio8t/37mkJNtpunZ+MT/u57n3HiqO4+uFJXNPQtfVTrg1Cdk0Rt9TKRrp1qLQm0YaZXVthaxLsdBtXeKyoq0qZCU25GQpncziOI6ipdEbsZZ2XamFUJtGGyfsWv747udwpRwZp3Vl+0tlK1VQ1O3+gpt+rW1Q4SgOrE2wHYlJa+ijqkv9YPmg17FOumG9s1FU6HqpVq2RTulajL2DrNKytAnrJRDKpFndz9/eppkhWeaOti6hutClqlfjuHXLV7/EaRqxpHWlbh3kerP0meRI1PRQqZrG8Z91PKiRMf9LbVHp4g4oj8X8NoqikpZCtqVCZPdUu5FAzO0GK5ueRAI/gD8x/g5F2omlqgieHW3EgwHmI4GSFmSt0Aae3IM2d4KWSyqcrxubKKlW3mMwo2rxKdY229yVyiA+XhvaoDH6zebwopab/gJp3MUjb/OZH0vY3SYI+V2x3uiyW7dOBTu2XXQhZxPdUP01g5yr12PcXAakayR3cLJAt8SP3ohadjmOx9Bm4yeDcYQCtJaVXFlAMcA8f3vy0+0gNECVKKtqNF1dUBI0rTOpnxOUIWEzDCRfiSWg7w/iB7l9ia7iciRHiR0Y9EGMIO7SbvJ0FQ7FC5Eg6+v84/T66vIP8Y/wu+nZx2m/fj89P531m9n0w9X7fnM6mZxfnaVo6Q6LkM0egq73MvAA1WXouHS4NVJZEtO25kqdG6NNgtbTC+IWW6sFuo2T77oLrRz5GZBl6Rt4rfVd4ldpBN+IiDtHfIdK1K6rw3MuZiAmA6rBiICYKukAJ+jE4vDvVhkq4el7ASloSkOeyGgrCyc6mhgIi7aNQVspJjSUYkorhaLtLnXhSSKD4XytrfsV9motfDmqCl5NCIir2VbEpVvCvjY7DiOQDqRwTFsqWqyzqPOZ87zZRhaEnnlCXYGHjnhqHg/yudHaxeAmafNGW7VNULeFtM8ZApZU3yvDBi6v359eotJnp7NTqEelWpFFw3dknCDj5LPgUjDjA5kkzTw9EXxla9oG3SSNjrJgj59ZOAqTyXgQTXzQr0Vcms2rQjeq0u51qWwBQjG7mG8GK5a3wetx4qhbW3EWnwLp7WGSC6srYB6fiH0wyg7nScpMwAEdivqDJ2LBchBF7VVJ+/TyLuFDVUNoRnVPudPJHsnOTNcgOXQqC603iKJro7zvGBz/LisL7oi7ycv9yLF8d9BZ659aXMxvR9FjxJRSyQVVI/9KevZRhefuJNmjAxYc1iMxMy3iE0nIMR6FVEYhiLR7TzAQe0IIsM+9J/FSxMgZcCFljB6UBlRuURmOI+vukxDOOPylTLd87e3StqDGiesbP99CWkG8+BanLOd9uV2Dl5S3aZbnzCN5zqTyhQ7wJPpMyYNPxhLDRNuAJWNINcgfI0lJ0mH0Q/hcCdsM30Vcp5F4+y7tgfO51YCPuzTmjyddEzMbCt8xTcyk610xIm8EAXcRM+VbNMurGNnyeHqJ9HGwelQS/1R17dCjXnFUSXokIx2wXyBNfs1WUMA+6RX9SOT8rZDv5dAQb45t+HSytikZiU/xHT+kSAevP/nu9vmw7+wmv7g5u5gODvDlk/Pbl3Y5arCy+fJL7ifmSTQnByn8p6IhlMPyVPt38iDxFyG43y8uz/PT2Wx68duH2Xk+PZ+cTm/O88n1xdUs/RbTuZMrmH8exUMZRvBxj+FXW30AeR77m5wb+8sd/mRC9rRwOzzZbCyNGoNvh8R/8pbtprFJ0MDEg3jyO9rZsSeDNPoXcve71QcMAAA="
+    },
+    "issue-980-p6t1-gateway-configure-path-controller.py": {
+      "sha256": "ea8909eb258aa8d0fd50c432fae8e67712960b40ee25db9ccc24293eb83982f8",
+      "bytes": 4928,
+      "gzip_base64": "H4sIAAAAAAAC/8VYa2/bOBb97l9BcBFAxlqyHcePpMiHTlrMBDvdFo0Xs4vUUGmJsjmQJVWk4niK/Pc9l5T80CbdFoPFuoAikZf3ee6D5Zx/rDJm1pLlmWSiKMr8QcZsI42IhREsX2pZPgij8oxtlVlb0hK7KgMZqCOpNVvLtJBlwDnvdNSmyEvDhDbN61JoObnoJGW+YWAqjdpIVu813z1Gzz+gRHNq9Ycqmve10OtULZvP33WeOXaFMLTRcPuAz4aorLJi13zone50yjw3PaajUphoza4tdRBtY6/bs+9eGCYqlWHYDQpRysx0vgiQ0THWZzzOI91PpDBVKXVfREY9yP754HziDwf+cOqnciWinR8rHcGH5c4XWeyDkTI7/3I26MsHFcsskv0vwl/BbM07iSq1CckIyIEwSCkmZuhHeZaoFeT4CeTk4AVPL2XQSDsfzgcX/nAUkCcaNssdeILPgWlQShG7da/bERqh3Psy0GtxPp54R2e7wVo+xmoltfG67Pqa8dF0uhyNp/FlNJrMBtPJdBhH8WiUXF6I0eR8lohZfDEZn4/FhYhH8Wh6OY4SMbicieUsGV6OlrVqUIoUDdJcxPpEYsdZ2rigiQ38oLSuJPnNtx4hh23F7hnPvOCTmnHjlCM5p15pGDqInyh6zALuK6M1In5K4tXgsDbd85qGL+45SeKL7omwl2JwIqgdhJrnPQcgSwXULO6PjcnERkKc48QXnX1uOnx7/Oaq/w8I1f03InuXKy2y/uuieIPk7v+aRyLtz+Wm6MflBr4tVJobXz7KqIJv/cFQDMeX8bi/DwbvdpBXmSwpLxpJ/xktlWkj0lTG4IkE1Iqc62flMCh2/AUnOL6n/mr7onYz7DdlDv5luLc7yUumjNwwlTVkOq/KSIZIw3CvULhUWayyFdx41WH4Pa9ME1fi+EIs27o50r0+3+Bt43KCu3teK2i/IGov+qB4KWmXwPVjitjK8YO5RQbb0KF6Edhd1AyVRS09V4vawG52W5X0lMw1CkpIW54DPC2MPW3KGgEoxrRKuL7mDcbCo5DHMlGZRZQGHJsWdF03IY1wuSVnO70FYbhK86VIdRje899ez29+efP+Z77osWcJfr19dzvnC7AcDXpsMh6PJh1EYVNgpelXQZZvvaZlBZWJugFMSGjF42f/8s82/lk8P/vFP3sHJV0XtUlZS/Tu0ZICl2limaL/cf+W0/POPn/Ck3xifd1170dp34XuS857Fmat3zfyMrMIsiVzODgfzIez4Wwwe57NAS/edwKGs78y6ycEGi2ySluFv/ECwGnivDKEc5Www7J8VAaRjiU5/5oNmEy1ZF/50RASJgLAivkVm5eVfOqIxAAS8kslUghDpnjWlv9NOmfx/zmXSYsfL3Sd7p+EbymjvCTwfrUa8DnILEeEwf51AOI3+WYDJbDKf3v/8W93H17fvO0HDzJ76N9FpSqM7hc7swYgAHzm3zL/jvk/sbubj5SSfcKPqy2U/PjgJ1vtrlcLffvP23l48/7NW4h9FkpIp/eVKSrD7iroV+5Iv/k2t8MjO1Q5bQMsDNvkGFmGEyTSSsEru77A1KbREA9jcd2LX7Esp2plJ1r00lQHdTLxegojcyDvqwPd1elw5kAQmtzisxsIHVKzfKSBtAn61fcObE+14BLJgIVwf74GSWud3OLKD2VVlMMI0A5rJlCt0ACRRuSzWJ+6trVHnMgBlNHHdM0a7dNAnKT59oRgv7iopW6p4MT56kgsVWCUCyTJJkzVRpEIW5Gx3CA8rLJoLbKVLQtHBWHvECpF2HIv9WoKhCBioXwssK7JCS6NSOo9r0tcmNKIhP53NZrO/NHlkIqzHf3raoRihEKOdCSai6k/He+tIRVUAiG2DlBOQN98q1ktGpPdqtoASYRsmFhFdgRFBhcyMqjfS4lcl2wfpVdsmQOxzTHgFbuxLBV1FnsdEkudp5XB7SoD3nXA/p6zek7G0kPudOntIetuR+guiIiK0IR+VvgCsgwD2re4umDSI1zvYV2KbYhLTE6OJ5volua7Cx4UhShmkfkK59VKZbDSZhk8ARqNEGzQm6h00T3SXQ7cgNKMzgc5lDYA9ZMd7WzCk6MMOQznPe9QKnrsmZGkx9qjiCP91nzybCPEz6s7VgDIAQHPNLKeo5Fl+RwNlkHTdROnq6b31sTFvZ3fqbS+mPC10SfJTugnnUGdymxP8pL+9mdjFbpY4Zx7CZaTCxtP6dF2QOWQ8qFh2WMbQsr1AL0plpaOCx0pxbtPneOLq9e+ubZnyP10QIXdXdLQWcQWDDw7JMTVptCe804PIcZl2Vyfd4n8E2iDWk1emcSf4az97whbSfMCPuCPS97FyM1ctXC+du+BRbIHYdTLUMExcJFY/hf2YeLPh2yvdbsnfMK/fbcD3I9toL26412xz7TVRLbpgwsi+0x0/CQwh57VsCy95uyhnS26jZTT9uXONPSt1rZozrQkfv78+XdrD509cbetiW13g/xTTdwIOi1niyYsR2Ggt1BXSYIOxoNNjJh9b2TqoLRjTOO9yswxPvad9M/0UEJCK53aXeK/t5cnqPdvCiQOMEATAAA="
+    },
+    "stdout.bin": {
+      "sha256": "ad5d58c61238ef40bb64ed7dbd73a48772b3507a08064a3eeb4b4cd5afd23a84",
+      "bytes": 1192,
+      "gzip_base64": "H4sIAAAAAAAC/72UvU7DMBDHd54i8lwkGqBF7HTkBRCyLva1suLY4XwpRFXfnTuWINoyIJHR/6+fF/tgmphdi97iHhMX81i9vC4qswXHmUbrIEYVb0TrkMEDg2YOxuWuz0k6cjSEu1CYRiMxJMpkeexRnU2I+Jx5k4fkn9Qxx0X1ow3JYRHc9VL7W2lYYKbQDIwKX65EbkPyGvaB8OtumiXsgYqCthALTopl2Om1f4HVc8Ju54TdzQm7nxO2mhO2vgBb/wfs4Tysrv8O03dMQ+LQoQ3CJEb/LV4YWGhNyVFgYjANkx5SCR7te6a29ODQRvwI8hucDBDKwB4tvg2in4lNE6esybs4o8nj1SeeI/A3qAQAAA=="
+    },
+    "stderr.bin": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+    }
+  }
+}

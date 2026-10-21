@@ -1,0 +1,763 @@
+{
+  "Timestamp": "2026-10-20T18-20",
+  "Command": [
+    "WORKSPACE\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "SCRATCH\\issue-980-p6t1-installed-composition-nr1.py",
+    "--installation",
+    "PACKAGE_SCRATCH\\installed",
+    "--dependencies",
+    "WORKSPACE\\.venv\\Lib\\site-packages",
+    "--wheel",
+    "PACKAGE_SCRATCH\\dist\\drm_copilot_discovery-2.0.0-py3-none-any.whl",
+    "--release",
+    "SCRATCH\\issue-980-p6t1-native-release-20261020T181808.json",
+    "--output",
+    "SCRATCH\\issue-980-p6t1-native-result-20261020T181808.json"
+  ],
+  "EXIT_CODE": 1,
+  "Output Summary": "Released installed composition stopped on first concrete failure",
+  "nr1_finding_sha256": "bf4afb5502ae86e8cff4a623237b1c6d19925b75286d633bba2033787920eef5",
+  "original_native_receipt_sha256": "ee16910a59bec165773fd6f6e02227f772049207d0c39f0408d20269dfd981a8",
+  "nio1_delta": {
+    "freeze_sha256": "34dbbbe3defe71a31770cbce6331f8733ff5a0e11dc0d38ae9f91a67d3858faa",
+    "scope": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py",
+        "sha256": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+        "bytes": 20052,
+        "old_sha256": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+        "lines": 497
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+        "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+        "bytes": 17604,
+        "old_sha256": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+        "lines": 403
+      },
+      {
+        "path": "tests/discovery_runtime/test_gateway_boundaries.py",
+        "sha256": "fa43bdaaa8a6311daa7674a47fada782832263044da4dc89365b711042933430",
+        "bytes": 17390,
+        "old_sha256": "2ede9044651603b24a62207a6fcf8d0f9d8a25382ebc2bd75b4c59154ec592f3",
+        "lines": 425
+      }
+    ],
+    "source_delta": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "old": "b21caef1d224dbcf62bab65160c1eb29f37daf581c5085d0920a3a61d1e75197",
+        "new": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12"
+      },
+      "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": {
+        "old": "adcbf4a65bc444aa9794ff447c660ef9950f2a513a6c8d8c24ef76d3171156b2",
+        "new": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd"
+      }
+    },
+    "handoff_sha256": "0bb7a6b6dc31f34e420821e8c5b19d2b94fdf07724aa1dd7d9a149d0060af482",
+    "prior_nr1_receipt_sha256": "f08ddaa5bd9477514e3e83def4c213093b7993e431d61ab75d6df2b4e2f1c478"
+  },
+  "route": "build_review_p6t1_nio1_installed_native_retry_20261020 / S5_P6T1_nio1_installed_native_retry",
+  "elapsed_seconds": 113.15805780002847,
+  "status": "INSTALLED_NATIVE_FAILED_NO_REPLAY",
+  "release": {
+    "path": "SCRATCH/issue-980-p6t1-native-release-20261020T181808.json",
+    "sha256": "308901ab7fb83ce1ec86bae1d2de1a84baf6ed903c114c3f63909b6814805c19"
+  },
+  "package_release": {
+    "sha256": "0cb5e584e714ea2c476d627ff12ad64041e2a0d9be9419a2e6d2f0712a60d052",
+    "wheel_sha256": "115ad5d263908c4ee1d52ae3719c35d76ead7485fe0a6f942ea76a2a7f5ed4d9",
+    "runtime": {
+      "package_version": "2.0.0",
+      "schema_version": "2.0.0",
+      "build_sha256": "2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66",
+      "policy_version": 2,
+      "policy_sha256": "ee929567bb66b0f58cb4e58cdb0bd327926c4d055aec0030b644ab6fd3078b42"
+    },
+    "payload_members_verified": 168
+  },
+  "fixture": {
+    "binding_sha256": "f3198f808d400cda5a647e20d6e8a8781c472a87bda35d42575f1627fd91c91d",
+    "selected_files": 48,
+    "declared_directories": 32,
+    "original50_unchanged": true
+  },
+  "sources_stable_after": true,
+  "source_inputs": 211,
+  "result": {
+    "task": "P6-T1",
+    "state": "native-composition-failed",
+    "results": [
+      {
+        "exit_code": 0,
+        "elapsed_seconds": 1.3137553000124171,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "installed-identity",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\installed-identity.origins.json",
+          "--action",
+          "identity",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\workspace",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout_raw": {
+          "sha256": "49b04a4b096a7b3ed4d39205377dcd255c8349b8e48ebb9409f262a1112f42c9",
+          "bytes": 309,
+          "gzip_base64": "H4sIAAAAAAAC/22PwWoDMQxE7/2K4HMIWtmW7f5MsGS5MU2yYd0tlJB/j9ND00IvEpqBN6OrWdbzRzuped1czSXLe37T/acuvc3noRncwQ7MdmO6HPSU/7V4bcey74eMnr6NwugteuZYfZhqHccEoh6mUhyEWAVt8MWmMCWNRG6sBBIw1JiJHszLfGzy9SsOn+IzSTVh8hSYiRiqj8JOxywMXCyGhCSugPdZBcACk3OZqRY7WrBDcxvURfu8LqL9kdZq0zLQNv38/Fe3t5c7mH76aTUBAAA="
+        },
+        "stderr_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout": "{\"runtime\": {\"package_version\": \"2.0.0\", \"schema_version\": \"2.0.0\", \"build_sha256\": \"2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66\", \"policy_version\": 2, \"policy_sha256\": \"ee929567bb66b0f58cb4e58cdb0bd327926c4d055aec0030b644ab6fd3078b42\"}, \"resources_verified\": 39, \"schemas_verified\": 33}\n",
+        "stderr": "",
+        "import_proof": {
+          "origins": {
+            "drm_copilot_discovery.domain_profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile_models.py",
+            "drm_copilot_discovery.domain_profile": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile.py",
+            "drm_copilot_discovery": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\__init__.py",
+            "drm_copilot_discovery.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\findings.py",
+            "drm_copilot_discovery.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\models.py",
+            "drm_copilot_discovery.parsing": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parsing.py",
+            "drm_copilot_discovery.path_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_models.py",
+            "drm_copilot_discovery.rendering": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\rendering.py",
+            "drm_copilot_discovery.report_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\report_models.py",
+            "drm_copilot_discovery.resources": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\resources.py",
+            "drm_copilot_discovery.repository_reader": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\repository_reader.py",
+            "drm_copilot_discovery.snapshot": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot.py",
+            "drm_copilot_discovery.build_identity": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\build_identity.py",
+            "drm_copilot_discovery.catalog": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\catalog.py",
+            "drm_copilot_discovery.runtime_claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\runtime_claim_rules.py",
+            "drm_copilot_discovery.schema_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\schema_validation.py",
+            "drm_copilot_discovery.profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_models.py",
+            "drm_copilot_discovery.profile_v2": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_v2.py",
+            "drm_copilot_discovery.activation_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_models.py",
+            "drm_copilot_discovery.path_policy": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_policy.py",
+            "drm_copilot_discovery.snapshot_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_io.py",
+            "drm_copilot_discovery.coverage_scope_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_scope_rules.py",
+            "drm_copilot_discovery.reference_links": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\reference_links.py",
+            "drm_copilot_discovery.transport_manifest": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\transport_manifest.py",
+            "drm_copilot_discovery.references": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\references.py",
+            "drm_copilot_discovery.agent_output": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\agent_output.py",
+            "drm_copilot_discovery.service_request_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_request_rules.py",
+            "drm_copilot_discovery.service_serialization": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_serialization.py",
+            "drm_copilot_discovery.source_read_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\source_read_models.py",
+            "drm_copilot_discovery.service_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_contracts.py"
+          },
+          "all_installed": true,
+          "sys_path": [
+            "PACKAGE_SCRATCH\\installed",
+            "WORKSPACE\\.venv\\Lib\\site-packages",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\DLLs",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\Lib",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313"
+          ],
+          "isolated": 1,
+          "no_site": 1
+        }
+      },
+      {
+        "exit_code": 0,
+        "elapsed_seconds": 17.07000920001883,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "init-dry",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\init-dry.origins.json",
+          "--action",
+          "gateway",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\initialization",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "b5e4b786afdc755fe9c791b51c83c567fe5705d4b42b5ce5aca4e63112677605",
+          "bytes": 748,
+          "gzip_base64": "H4sIAAAAAAAC/31STW/bMAz9K4GxY53YAVqkvg3rsdupO02DQch0w1USNUrKmhX975Nkr8iAYjeL70l8H35pPgR9RAvNsGmSuGES22r2ZDgOEwXNJ5TzsN92224IKCfS2Ar+TBhic7VplstjJgViVx6p1AKBRJpBx/GJ3FSQd65TBRxEOmFeaz0HiuWhjK208X8c9igQ183kqD5qecK6L0rSMQmYMv3F8hQ8aByFORb806DU1ywqKHUH7jNTAKfUR+/vIIJS96zBKPWA1it1EUuLz6hTZGm7Hvrr2+laKQohYXt76C4+W38T+3bVve/2N3237x76Q3/oDpmWxRIY+g1/vXjhmQyOHuKxyJtYh52lx8Xg7q2M3cQWyLUrf3sGWw1Och4llSSybyyOhWIJYgYTynlmsVCd/wjLSnI+xZAnL004h4j237CXWa15QR3YmuyXim9mes7x4gVB2FSCwUfQ5zZwEo1LmbU2zhqXFW915DjBeoNrBFOuLNutJRVl35oguvle/cEcV3evVfwpN7SQcc6AS8aU/y7FI8sa7AX0+geR0QIM7AIAAA=="
+        },
+        "stdout_raw": {
+          "sha256": "53f311d9d2c8767f6614897be8e029e90e0041958b5004d85424d86f06664d81",
+          "bytes": 2537,
+          "gzip_base64": "H4sIAAAAAAAC/5VVSXLjSAy8zysmeLbs2hc9YK7zgIkOBQqFkqtNkQwujnY7/PcBpfbWtmX3RRQJoJBIAFn3DYxzLYDz1Gz/u29uapebbYP9LY2wp01LeU9jc9EMMF+zIfc4XR3qfoS59t1VrtPR9e7qt4jL71Pfcdh0Dco6DrTaSdQCwfsACC4FVFobVaSWKJKIJVijFEgRvKYsfRYxORGictoljOtZM8wLw2yGFrqOcvNw8QQ49weo3WYY+1Jb+gLe1wGXd3BoX8INyhltDGFJwaWSbDIuqpBL9FEJi5Z0liBDMllnDlFFWxVsdEWpmIz/BC6nzQvOm0xYJwa2wb5tCVeMX8D+e/T0Br4mkZVHX4xOZKzPAF5nUxzE4FAEIa0vQWARoGOK/CgJJISgcs4ylE/gM5DhKyQf/d6AyzaYBNFFrWyxSFJy5620RRRdiCFKb3hKTCSkUAoW5VxWQplALhuPn4BbumlgYkqlvEl0Dbe1H/+M3/dOeMuxYcRe65TA8KwaMOCyVUYyy1FoCFZBAKZUSgHexcyV+SxJFTIulJjfLePbRUM/6rzDPlOzFRdN4aJqt1+3k221G5Z5d4CuFprmZnvfUDePlU7LizDTvh/vTrUtB7bB65KnEa/+IU460iVOL6sRqQhZpHQ+oocijRdJKlwnxWFxySdKGRAJuVJtZOR5QeuNVmy26jjw9SdjdmYt4lCniWHv1rwrOFaUrtQ9e62s/3o8k//mw3M3zpiuVjzDDB3SOS+8hpEFjsb687NkH8nYH8rIh+50WzN9Arec+sMjy609CvMZ53oYWnpq9GYk7Md8PqK7Zff+PLEDjHW+2xyAh+vHpyR8qEcfRow09OP5yl5px8de/TIibaYOhum6P3/imbX+9mITioi25Ki1C4rHXAuQKhNBJCNVAW2Bl1iAscRWXhiwqKMThgIUEMKum3BEtVurnCpzfVpQTjLDuKf5jeGBF+a48KwIIzO5jLBW3d80W34n/jfQr0XZsgbUmY0jTUs777iy6fRdXYpLsRqWbq4HWsUhLbXNu6fKVE7KsuimFIr1shR+kQLJCpmzET4UvpO9zTp6GSk4x2tOUaBXfFmAc0cdwRtej3fSDn1b8e45GVFU0TqfknNJFBswGeLfnETKWvE16pCF01ogFEKL5IyB5ErWDCQZ9XzkUy7FzOI1HeBNeiZwWg4HWLWPdbBnCk6S2MHKRJMrb8aJ792j1l40t9AubJVyvT3e8cSRV/Glp/jAcbqpw/AVx1UFuab5pedR1m97PPaXR6M0225pWx4Jmibmmo/497H9fw8wTZQvj/1HqsP8MoCPrPnxmHU61puFA5qHh7/+BzuDH3npCQAA"
+        },
+        "stderr_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout": "{\"artifacts\":[{\"kind\":\"coverage-ledger\",\"path\":\"docs/migration/discovery/coverage-ledger.json\",\"sha256\":\"5361c30ca778aca6b8c23342f131c0b09f85422a10873ed17d09b60892636bc9\",\"status\":\"planned\"},{\"kind\":\"domain-profile\",\"path\":\"docs/migration/discovery/domain-profile.yaml\",\"sha256\":\"8264344ecfb86bfb5b46928df979205c5e3d1a18b4d3d2562f3528596f229b47\",\"status\":\"planned\"},{\"kind\":\"product-decision-collection\",\"path\":\"docs/migration/discovery/product-decisions.yaml\",\"sha256\":\"3e0d27c7f43be457daa73d4f6a986c080157f80cf0a39b9f0afba1a882ddd18f\",\"status\":\"planned\"},{\"kind\":\"scope\",\"path\":\"docs/migration/discovery/scope.yaml\",\"sha256\":\"d584ba969325f5ce11542515f0f3fe6a917477849ece8ffcf266d20248e6d47c\",\"status\":\"planned\"},{\"kind\":\"unspecified-behavior-collection\",\"path\":\"docs/migration/discovery/unspecified-behaviors.yaml\",\"sha256\":\"415f733bba4d094a4a6d52414f6903a852a8aa88110a769de6a7d1e2fe468f9d\",\"status\":\"planned\"}],\"exit_code\":0,\"findings\":[],\"input_manifest\":{\"entries\":[{\"category\":\"documentation\",\"path\":\"src/Feature.cs\",\"sha256\":\"0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527\",\"size\":64}],\"missing_paths\":[\"config\",\"docs\",\"docs/migration\",\"docs/migration/discovery\",\"docs/migration/discovery/acceptance\",\"docs/migration/discovery/characterization\",\"docs/migration/discovery/coverage-ledger.json\",\"docs/migration/discovery/domain-profile.yaml\",\"docs/migration/discovery/evidence\",\"docs/migration/discovery/feature-contracts\",\"docs/migration/discovery/implementation-records\",\"docs/migration/discovery/inventory\",\"docs/migration/discovery/parity-matrix.json\",\"docs/migration/discovery/product-decisions.yaml\",\"docs/migration/discovery/reports\",\"docs/migration/discovery/scope.yaml\",\"docs/migration/discovery/source-snapshots\",\"docs/migration/discovery/unspecified-behaviors.yaml\"],\"sha256\":\"f095fd93368219b30a12deea9e412fa35a1e20a45e19b116a5c39604e8afa005\",\"source_repositories\":[],\"target_repositories\":[]},\"mode\":\"structural\",\"ok\":true,\"operation\":\"init\",\"result_version\":\"2.0.0\",\"runtime\":{\"build_sha256\":\"2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66\",\"package_version\":\"2.0.0\",\"policy_sha256\":\"ee929567bb66b0f58cb4e58cdb0bd327926c4d055aec0030b644ab6fd3078b42\",\"policy_version\":2,\"schema_version\":\"2.0.0\"},\"summary\":{\"counts\":[{\"name\":\"directories_planned\",\"value\":11},{\"name\":\"directories_created\",\"value\":0},{\"name\":\"directories_skipped\",\"value\":0},{\"name\":\"directories_conflict\",\"value\":0}],\"invocation_ref\":null,\"message\":\"Operation passed.\",\"receipt_ref\":null,\"validation_result\":\"pass\"}}\n",
+        "stderr": "",
+        "import_proof": {
+          "origins": {
+            "drm_copilot_discovery.domain_profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile_models.py",
+            "drm_copilot_discovery.domain_profile": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile.py",
+            "drm_copilot_discovery": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\__init__.py",
+            "drm_copilot_discovery.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\findings.py",
+            "drm_copilot_discovery.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\models.py",
+            "drm_copilot_discovery.analyzer.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\findings.py",
+            "drm_copilot_discovery.path_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_models.py",
+            "drm_copilot_discovery.repository_reader": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\repository_reader.py",
+            "drm_copilot_discovery.snapshot": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot.py",
+            "drm_copilot_discovery.analyzer.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\models.py",
+            "drm_copilot_discovery.analyzer.pipeline": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\pipeline.py",
+            "drm_copilot_discovery.analyzer.inventory": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\inventory.py",
+            "drm_copilot_discovery.parsing": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parsing.py",
+            "drm_copilot_discovery.resources": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\resources.py",
+            "drm_copilot_discovery.catalog": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\catalog.py",
+            "drm_copilot_discovery.profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_models.py",
+            "drm_copilot_discovery.schema_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\schema_validation.py",
+            "drm_copilot_discovery.profile_v2": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_v2.py",
+            "drm_copilot_discovery.analyzer.registry": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\registry.py",
+            "drm_copilot_discovery.analyzer": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\__init__.py",
+            "drm_copilot_discovery.mutation_filesystem": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_filesystem.py",
+            "drm_copilot_discovery.activation_filesystem": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_filesystem.py",
+            "drm_copilot_discovery.activation_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_models.py",
+            "drm_copilot_discovery.configuration": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\configuration.py",
+            "drm_copilot_discovery.path_policy": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_policy.py",
+            "drm_copilot_discovery.activation_store": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_store.py",
+            "drm_copilot_discovery.rendering": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\rendering.py",
+            "drm_copilot_discovery.report_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\report_models.py",
+            "drm_copilot_discovery.build_identity": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\build_identity.py",
+            "drm_copilot_discovery.init_projection": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_projection.py",
+            "drm_copilot_discovery.runtime_claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\runtime_claim_rules.py",
+            "drm_copilot_discovery.snapshot_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_io.py",
+            "drm_copilot_discovery.coverage_scope_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_scope_rules.py",
+            "drm_copilot_discovery.reference_links": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\reference_links.py",
+            "drm_copilot_discovery.transport_manifest": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\transport_manifest.py",
+            "drm_copilot_discovery.references": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\references.py",
+            "drm_copilot_discovery.agent_output": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\agent_output.py",
+            "drm_copilot_discovery.snapshot_inventory_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_inventory_inputs.py",
+            "drm_copilot_discovery.snapshot_loading": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_loading.py",
+            "drm_copilot_discovery.revision_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\revision_rules.py",
+            "drm_copilot_discovery.evidence_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\evidence_rules.py",
+            "drm_copilot_discovery.claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\claim_rules.py",
+            "drm_copilot_discovery.coverage_population": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_population.py",
+            "drm_copilot_discovery.coverage_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_report.py",
+            "drm_copilot_discovery.parity_metrics": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_metrics.py",
+            "drm_copilot_discovery.parity_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_report.py",
+            "drm_copilot_discovery.completion_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\completion_report.py",
+            "drm_copilot_discovery.validation_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation_inputs.py",
+            "drm_copilot_discovery.coverage_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_rules.py",
+            "drm_copilot_discovery.decision_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\decision_rules.py",
+            "drm_copilot_discovery.dimension_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\dimension_rules.py",
+            "drm_copilot_discovery.acceptance_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\acceptance_rules.py",
+            "drm_copilot_discovery.completion_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\completion_rules.py",
+            "drm_copilot_discovery.parity_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_models.py",
+            "drm_copilot_discovery.parity_entry_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_entry_rules.py",
+            "drm_copilot_discovery.parity_target_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_target_rules.py",
+            "drm_copilot_discovery.parity_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_rules.py",
+            "drm_copilot_discovery.validation_operation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation_operation.py",
+            "drm_copilot_discovery.validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation.py",
+            "drm_copilot_discovery.mutation_plan": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_plan.py",
+            "drm_copilot_discovery.mutation_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_io.py",
+            "drm_copilot_discovery.init_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_io.py",
+            "drm_copilot_discovery.service_request_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_request_rules.py",
+            "drm_copilot_discovery.service_serialization": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_serialization.py",
+            "drm_copilot_discovery.source_read_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\source_read_models.py",
+            "drm_copilot_discovery.service_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_contracts.py",
+            "drm_copilot_discovery.gateway_local": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\gateway_local.py",
+            "drm_copilot_discovery.analyzer.input_capture": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\input_capture.py",
+            "drm_copilot_discovery.extension_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_inputs.py",
+            "drm_copilot_discovery.extension_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_validation.py",
+            "drm_copilot_discovery.operations": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\operations.py",
+            "drm_copilot_discovery.service": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service.py",
+            "drm_copilot_discovery.service_mutations": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_mutations.py",
+            "drm_copilot_discovery.service_reports": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_reports.py",
+            "drm_copilot_discovery.draft_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\draft_contracts.py",
+            "drm_copilot_discovery.draft_scenarios": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\draft_scenarios.py",
+            "drm_copilot_discovery.evidence_linking": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\evidence_linking.py",
+            "drm_copilot_discovery.analyzer.emitter": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\emitter.py",
+            "drm_copilot_discovery.extension_results": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_results.py",
+            "drm_copilot_discovery.service_bootstrap": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_bootstrap.py",
+            "drm_copilot_discovery.init_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_models.py",
+            "drm_copilot_discovery.init_flow": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_flow.py",
+            "drm_copilot_discovery.gateway.__executed__": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\gateway.py"
+          },
+          "all_installed": true,
+          "sys_path": [
+            "PACKAGE_SCRATCH\\installed",
+            "WORKSPACE\\.venv\\Lib\\site-packages",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\DLLs",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\Lib",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313"
+          ],
+          "isolated": 1,
+          "no_site": 1
+        }
+      },
+      {
+        "exit_code": 0,
+        "elapsed_seconds": 91.94655019999482,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "init-real",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\init-real.origins.json",
+          "--action",
+          "gateway",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\initialization",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "9e0db107f0e2401e2a2089e2f5ef2ba46cd5037dca897414efbc8ab85222678e",
+          "bytes": 749,
+          "gzip_base64": "H4sIAAAAAAAC/31STW/bMAz9K4GxY53YAVqkvg3rsdupO02DQch0w1USNUrKmhX975Nkr8iAYjeL70l8H35pPgR9RAvNsGmSuGES22r2ZDgOEwXNJ5TzsN92224IKCfS2Ar+TBhic7VplstjJgViVx6p1AKBRJpBx/GJ3FSQd65TBRxEOmFeaz0HiuWhjK208X8c9igQ183kqD5qecK6L0rSMQmYMv3F8hQ8aByFORb806DU1ywqKHUH7jNTAKfUR+/vIIJS96zBKPWA1it1EUuLz6hTZGm7Hvrr2+laKQohYXt76C4+W38T+3bVve/2N3237x76Q3/oDpmWxRIY+g1/vXjhmQyOHuKxyJtYh52lx8Xg7q2M3cQWyLUrf3sGWw1Och4llSRmMAGLZaGIF+eZxUK1/iMsO8n5FEOevDThHCLaf9NeZrXnBXVga7RfKr6Z6TnnixcEYVMJBh9Bn9vASTQubdbeOItcVrz1kfME6w2uGUy5s+y3tlSUfWuC6OZ7NQhzUZ9rxdcq/pQrWsg4Z8AlY8qPl+KRZU32Anr9A9V7ff7tAgAA"
+        },
+        "stdout_raw": {
+          "sha256": "eb2d7c0b758100443b52a2d64bb5e5292926d9c55c310fef3d51161613f9cef5",
+          "bytes": 2537,
+          "gzip_base64": "H4sIAAAAAAAC/5VWSXLjOBC8zysmeLZs7IseMNd5wESHogAUZLS5BUE62u3w36cotbe2JbkvoqjashJVCT02MM0lQ5xrs/3vsbkrfWq2TRzucYI9blpMe5yaq2aE+ZYMaYj1piv7CeYy9Dep1IPrw81vEdff69BTWL0FoQ0Faml4lCyCtQ4imOCikFKJzCWPLDCfnVZCAGfOSkzcJuaDYc4LI02Ifs01w7zUFd2EMGNqnq5eAKehg9JvxmnIpcUv4H0fcP0AXfsWrhNGSaUw5uBMyEEHZbxwKXvrBdNRo0wcuAsqyUQhIkstnPYmC+GDshfgUtm0xHmTMJZKwDZxaFuMK8YvYP89un6AL5ElYaPNSgZU2iYAK5PKBrwzkTnGtc2OxcxA+uDpkQNwcE6klLjLF+ATkPErJB/8PoBL2qkA3ngpdNYROaeT11xnlmVGgsitoilRHiO6nGMWxiTBhHJokrLxArilryMRkwumTcBbuC/D9Gf8fpbhI8eKEFspQwBFs6pAgUlaKE4seybBaQEOiFLOGVjjE3VmE0eRURmXffq0jW9XDf4o8y4OCZstu2oyNVX6/bqdZCv9uMy7DvqSsc7N9rHBfp4KHpc3Uo79MD0ce1s6ssH7lusUb/6hUsuE17G+7YaFzHjm3FgfLWSuLAtcxHVSTMwm2IAhQYwYqVOpuKd5idoqKcisxWHgy0/CbNTaRFdqJdi7te4KjhSlz2VPXivrvx6v5H/44fU0zphuVjzjDH3Ec17xFiYSOJzKz0vFTsnYH8rISXe8LwkvwM3H86GRpaM9CPMZ59KNLb4c9GbCOEzpfER/T+7DeWJHmMr8sOmAhuvHRRJO6tHJiAnHYTrf2TvtOO01LFPETe1hrLfD+Yxn1vrbm03IzOucvJTGCRpzyYCLhAgeFRcZpAZaYgZKI1lpYUBH6Q1T6CADY3rdhAOq3dplLcT1cUGpyAzTHucPhidamMPCkyJMxOQywdr1cNds6R3p24i/FmVLGlBmMk5Yl3beUWf1+Lu4ZtdsNSz9XDpcxSEspU27l85ECkKT6IbgsrY8Z3rhLKJmPCXFrMt0J1udpLfcozOG1hw9i1bQZQHGHHQk3tF6fFJ2HNoSH16LIXrhtbEhGBNY1i4GhfSZAgtJCrpGTSTh1BowMiZZMEpBMDlJAhKUeE35UksQs/EWO/hQngisS9fBqn2kgwNRcJTEHlYmmlRoM45878YW+h5X+b2HdllVdr08PnF8FuUXR85PeNa7Mo5fSkkqSD3Nbz0Psn4/xMP50mjkZtsvbUsjgbUS15Ti3+fj/3uEWjFdH84/YhnntwGUsqTnNOt0rP80KKB5evrrf+YIKvnpCQAA"
+        },
+        "stderr_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout": "{\"artifacts\":[{\"kind\":\"coverage-ledger\",\"path\":\"docs/migration/discovery/coverage-ledger.json\",\"sha256\":\"5361c30ca778aca6b8c23342f131c0b09f85422a10873ed17d09b60892636bc9\",\"status\":\"created\"},{\"kind\":\"domain-profile\",\"path\":\"docs/migration/discovery/domain-profile.yaml\",\"sha256\":\"8264344ecfb86bfb5b46928df979205c5e3d1a18b4d3d2562f3528596f229b47\",\"status\":\"created\"},{\"kind\":\"product-decision-collection\",\"path\":\"docs/migration/discovery/product-decisions.yaml\",\"sha256\":\"3e0d27c7f43be457daa73d4f6a986c080157f80cf0a39b9f0afba1a882ddd18f\",\"status\":\"created\"},{\"kind\":\"scope\",\"path\":\"docs/migration/discovery/scope.yaml\",\"sha256\":\"d584ba969325f5ce11542515f0f3fe6a917477849ece8ffcf266d20248e6d47c\",\"status\":\"created\"},{\"kind\":\"unspecified-behavior-collection\",\"path\":\"docs/migration/discovery/unspecified-behaviors.yaml\",\"sha256\":\"415f733bba4d094a4a6d52414f6903a852a8aa88110a769de6a7d1e2fe468f9d\",\"status\":\"created\"}],\"exit_code\":0,\"findings\":[],\"input_manifest\":{\"entries\":[{\"category\":\"documentation\",\"path\":\"src/Feature.cs\",\"sha256\":\"0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527\",\"size\":64}],\"missing_paths\":[\"config\",\"docs\",\"docs/migration\",\"docs/migration/discovery\",\"docs/migration/discovery/acceptance\",\"docs/migration/discovery/characterization\",\"docs/migration/discovery/coverage-ledger.json\",\"docs/migration/discovery/domain-profile.yaml\",\"docs/migration/discovery/evidence\",\"docs/migration/discovery/feature-contracts\",\"docs/migration/discovery/implementation-records\",\"docs/migration/discovery/inventory\",\"docs/migration/discovery/parity-matrix.json\",\"docs/migration/discovery/product-decisions.yaml\",\"docs/migration/discovery/reports\",\"docs/migration/discovery/scope.yaml\",\"docs/migration/discovery/source-snapshots\",\"docs/migration/discovery/unspecified-behaviors.yaml\"],\"sha256\":\"f095fd93368219b30a12deea9e412fa35a1e20a45e19b116a5c39604e8afa005\",\"source_repositories\":[],\"target_repositories\":[]},\"mode\":\"structural\",\"ok\":true,\"operation\":\"init\",\"result_version\":\"2.0.0\",\"runtime\":{\"build_sha256\":\"2db25325bb8f571ff53210ce501dd4078fc2375d39719e866419e90c727f8a66\",\"package_version\":\"2.0.0\",\"policy_sha256\":\"ee929567bb66b0f58cb4e58cdb0bd327926c4d055aec0030b644ab6fd3078b42\",\"policy_version\":2,\"schema_version\":\"2.0.0\"},\"summary\":{\"counts\":[{\"name\":\"directories_planned\",\"value\":0},{\"name\":\"directories_created\",\"value\":11},{\"name\":\"directories_skipped\",\"value\":0},{\"name\":\"directories_conflict\",\"value\":0}],\"invocation_ref\":null,\"message\":\"Operation passed.\",\"receipt_ref\":null,\"validation_result\":\"pass\"}}\n",
+        "stderr": "",
+        "import_proof": {
+          "origins": {
+            "drm_copilot_discovery.domain_profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile_models.py",
+            "drm_copilot_discovery.domain_profile": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile.py",
+            "drm_copilot_discovery": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\__init__.py",
+            "drm_copilot_discovery.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\findings.py",
+            "drm_copilot_discovery.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\models.py",
+            "drm_copilot_discovery.analyzer.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\findings.py",
+            "drm_copilot_discovery.path_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_models.py",
+            "drm_copilot_discovery.repository_reader": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\repository_reader.py",
+            "drm_copilot_discovery.snapshot": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot.py",
+            "drm_copilot_discovery.analyzer.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\models.py",
+            "drm_copilot_discovery.analyzer.pipeline": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\pipeline.py",
+            "drm_copilot_discovery.analyzer.inventory": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\inventory.py",
+            "drm_copilot_discovery.parsing": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parsing.py",
+            "drm_copilot_discovery.resources": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\resources.py",
+            "drm_copilot_discovery.catalog": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\catalog.py",
+            "drm_copilot_discovery.profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_models.py",
+            "drm_copilot_discovery.schema_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\schema_validation.py",
+            "drm_copilot_discovery.profile_v2": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_v2.py",
+            "drm_copilot_discovery.analyzer.registry": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\registry.py",
+            "drm_copilot_discovery.analyzer": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\__init__.py",
+            "drm_copilot_discovery.mutation_filesystem": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_filesystem.py",
+            "drm_copilot_discovery.activation_filesystem": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_filesystem.py",
+            "drm_copilot_discovery.activation_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_models.py",
+            "drm_copilot_discovery.configuration": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\configuration.py",
+            "drm_copilot_discovery.path_policy": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_policy.py",
+            "drm_copilot_discovery.activation_store": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_store.py",
+            "drm_copilot_discovery.rendering": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\rendering.py",
+            "drm_copilot_discovery.report_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\report_models.py",
+            "drm_copilot_discovery.build_identity": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\build_identity.py",
+            "drm_copilot_discovery.init_projection": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_projection.py",
+            "drm_copilot_discovery.runtime_claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\runtime_claim_rules.py",
+            "drm_copilot_discovery.snapshot_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_io.py",
+            "drm_copilot_discovery.coverage_scope_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_scope_rules.py",
+            "drm_copilot_discovery.reference_links": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\reference_links.py",
+            "drm_copilot_discovery.transport_manifest": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\transport_manifest.py",
+            "drm_copilot_discovery.references": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\references.py",
+            "drm_copilot_discovery.agent_output": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\agent_output.py",
+            "drm_copilot_discovery.snapshot_inventory_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_inventory_inputs.py",
+            "drm_copilot_discovery.snapshot_loading": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_loading.py",
+            "drm_copilot_discovery.revision_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\revision_rules.py",
+            "drm_copilot_discovery.evidence_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\evidence_rules.py",
+            "drm_copilot_discovery.claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\claim_rules.py",
+            "drm_copilot_discovery.coverage_population": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_population.py",
+            "drm_copilot_discovery.coverage_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_report.py",
+            "drm_copilot_discovery.parity_metrics": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_metrics.py",
+            "drm_copilot_discovery.parity_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_report.py",
+            "drm_copilot_discovery.completion_report": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\completion_report.py",
+            "drm_copilot_discovery.validation_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation_inputs.py",
+            "drm_copilot_discovery.coverage_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_rules.py",
+            "drm_copilot_discovery.decision_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\decision_rules.py",
+            "drm_copilot_discovery.dimension_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\dimension_rules.py",
+            "drm_copilot_discovery.acceptance_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\acceptance_rules.py",
+            "drm_copilot_discovery.completion_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\completion_rules.py",
+            "drm_copilot_discovery.parity_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_models.py",
+            "drm_copilot_discovery.parity_entry_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_entry_rules.py",
+            "drm_copilot_discovery.parity_target_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_target_rules.py",
+            "drm_copilot_discovery.parity_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parity_rules.py",
+            "drm_copilot_discovery.validation_operation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation_operation.py",
+            "drm_copilot_discovery.validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\validation.py",
+            "drm_copilot_discovery.mutation_plan": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_plan.py",
+            "drm_copilot_discovery.mutation_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\mutation_io.py",
+            "drm_copilot_discovery.init_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_io.py",
+            "drm_copilot_discovery.service_request_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_request_rules.py",
+            "drm_copilot_discovery.service_serialization": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_serialization.py",
+            "drm_copilot_discovery.source_read_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\source_read_models.py",
+            "drm_copilot_discovery.service_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_contracts.py",
+            "drm_copilot_discovery.gateway_local": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\gateway_local.py",
+            "drm_copilot_discovery.analyzer.input_capture": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\input_capture.py",
+            "drm_copilot_discovery.extension_inputs": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_inputs.py",
+            "drm_copilot_discovery.extension_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_validation.py",
+            "drm_copilot_discovery.operations": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\operations.py",
+            "drm_copilot_discovery.service": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service.py",
+            "drm_copilot_discovery.service_mutations": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_mutations.py",
+            "drm_copilot_discovery.service_reports": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_reports.py",
+            "drm_copilot_discovery.draft_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\draft_contracts.py",
+            "drm_copilot_discovery.draft_scenarios": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\draft_scenarios.py",
+            "drm_copilot_discovery.evidence_linking": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\evidence_linking.py",
+            "drm_copilot_discovery.analyzer.emitter": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\analyzer\\emitter.py",
+            "drm_copilot_discovery.extension_results": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\extension_results.py",
+            "drm_copilot_discovery.service_bootstrap": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_bootstrap.py",
+            "drm_copilot_discovery.init_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_models.py",
+            "drm_copilot_discovery.init_flow": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\init_flow.py",
+            "drm_copilot_discovery.gateway.__executed__": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\gateway.py"
+          },
+          "all_installed": true,
+          "sys_path": [
+            "PACKAGE_SCRATCH\\installed",
+            "WORKSPACE\\.venv\\Lib\\site-packages",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\DLLs",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\Lib",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313"
+          ],
+          "isolated": 1,
+          "no_site": 1
+        }
+      },
+      {
+        "exit_code": 3,
+        "elapsed_seconds": 1.214488000026904,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "configure-dry",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\configure-dry.origins.json",
+          "--action",
+          "gateway",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\workspace",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+          "bytes": 669,
+          "gzip_base64": "H4sIAAAAAAAC/51SwU7kMAz9FVRxpDPtSKCht9VyhBt7i1RZqcsYmjg4TndnEf9O0qlGCK32wC3Je7bfe85bdRntAR1U3UWVxHeDuNpyoIm1GyhanlGO3W7TbJouosxksRZ8TRi1urqoTsV9JkViX5os1AKBKI1gtX8hPxTkH+W0AB6UZsxjXeBIWhplbKX1/+NwQAFdJ1v2Iz0lwYI4HnAZqpKsJoGpvP5meYkBLPbCrAX/2RnzKyuLxtyBf2CK4I35EcIdKBhzzxYmYx7RBWM+ZVPjH7RJWeqmhfb6drg2hmJMWN/um0/HOtxoW6/id83upm12zWO7b/fN3piznKItCI80YR9AD0XZwDZuHT2dDG7Py9gO7IB8vfI3R3CLt0GOvaSSRLaMxayQlgxGmGK5jywOFtPP8RQf+ZA05pe3c3jLsD6vbQ21nGZQPNO/p+99KZ9zmkt/wTG38GmaykdJemChv1+h9w8DYccynQIAAA=="
+        },
+        "stdout_raw": {
+          "sha256": "98bfe0e43956ca57e0da83fa801e622e48afc8640a3686c390b363d8507633b4",
+          "bytes": 539,
+          "gzip_base64": "H4sIAAAAAAAC/2VQy2oDMQy89yuMz0sa2tveSppCoKf0cSnFuLY2EfHaW1kOCSH/Xm29CYXe7BnNaEYnbYmxs46zbj8+Gw0HZOOSB93eN7rD6DFuRu50nTSD5a1uYwmh0XVUvyzX76vF0jw9rJ7f1kvd6B5ytpuRe92C8phd2gMdFcF3gczKpRK8ionVF8inHwIw+JkoIxzYyB5MUdSLLbidYvG4KG308h4sUoVLZOxBYacigK8eQ8LIQKK/nXgBCYKVHQb9VPYCjIUmKIOkRD6KEogS6bOAGIfCprcROwlwqd7X6pmpOC5kg6xIO912NmSQ5wBkpxIuxQ43hWqKXAIbWZMreTebz+YjMQWd7HPpe0sS5CRyoaaAGPfJ/foagu6a5Xrtx3+X7iyGehUCBzjwX+HeBvQXuzFYJc7nmx+L5QZZGwIAAA=="
+        },
+        "stderr_raw": {
+          "sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151",
+          "bytes": 53,
+          "gzip_base64": "H4sIAAAAAAAC/3PJLE7OL0stqlQoSi0sTS0uUUhLzMxJTbFWyMwrLkhNLlEoyUhV8Ar291NIy8xLycxLL9bjAgCKbrL9NQAAAA=="
+        },
+        "stdout": "{\"artifacts\":[],\"exit_code\":3,\"findings\":[{\"artifact_path\":null,\"code\":\"SERVICE_FAILURE\",\"message\":\"The discovery request could not be completed.\",\"next_action\":\"Check the request and repair the runtime if needed.\",\"pointer\":\"/runtime\",\"related_ids\":[],\"related_paths\":[],\"severity\":\"error\"}],\"input_manifest\":null,\"mode\":\"structural\",\"ok\":false,\"operation\":\"configure\",\"result_version\":\"2.0.0\",\"runtime\":null,\"summary\":{\"counts\":[],\"invocation_ref\":null,\"message\":\"Discovery request failed.\",\"receipt_ref\":null,\"validation_result\":null}}\n",
+        "stderr": "Discovery request failed; inspect the JSON findings.\n"
+      }
+    ],
+    "checks": [
+      {
+        "label": "installed-identity-bounded",
+        "passed": true
+      },
+      {
+        "label": "installed-identity-exit",
+        "passed": true
+      },
+      {
+        "label": "installed-identity-installed-imports",
+        "passed": true
+      },
+      {
+        "label": "identity-release",
+        "passed": true
+      },
+      {
+        "label": "init-dry-bounded",
+        "passed": true
+      },
+      {
+        "label": "init-dry-exit",
+        "passed": true
+      },
+      {
+        "label": "init-dry-installed-imports",
+        "passed": true
+      },
+      {
+        "label": "init-dry-wire-exit",
+        "passed": true
+      },
+      {
+        "label": "init-dry-safe-stderr",
+        "passed": true
+      },
+      {
+        "label": "init-dry-runtime",
+        "passed": true
+      },
+      {
+        "label": "init-dry-no-write",
+        "passed": true
+      },
+      {
+        "label": "init-real-bounded",
+        "passed": true
+      },
+      {
+        "label": "init-real-exit",
+        "passed": true
+      },
+      {
+        "label": "init-real-installed-imports",
+        "passed": true
+      },
+      {
+        "label": "init-real-wire-exit",
+        "passed": true
+      },
+      {
+        "label": "init-real-safe-stderr",
+        "passed": true
+      },
+      {
+        "label": "init-real-runtime",
+        "passed": true
+      },
+      {
+        "label": "init-created-files",
+        "passed": true
+      },
+      {
+        "label": "init-safe-path",
+        "passed": true
+      },
+      {
+        "label": "init-digest",
+        "passed": true
+      },
+      {
+        "label": "init-safe-path",
+        "passed": true
+      },
+      {
+        "label": "init-digest",
+        "passed": true
+      },
+      {
+        "label": "init-safe-path",
+        "passed": true
+      },
+      {
+        "label": "init-digest",
+        "passed": true
+      },
+      {
+        "label": "init-safe-path",
+        "passed": true
+      },
+      {
+        "label": "init-digest",
+        "passed": true
+      },
+      {
+        "label": "init-safe-path",
+        "passed": true
+      },
+      {
+        "label": "init-digest",
+        "passed": true
+      },
+      {
+        "label": "init-remains-draft",
+        "passed": true
+      },
+      {
+        "label": "configure-dry-bounded",
+        "passed": true
+      },
+      {
+        "label": "configure-dry-exit",
+        "passed": false
+      }
+    ],
+    "release_sha256": "308901ab7fb83ce1ec86bae1d2de1a84baf6ed903c114c3f63909b6814805c19",
+    "error_type": "AssertionError",
+    "error": "configure-dry-exit",
+    "elapsed_seconds": 111.60757910000393,
+    "timestamp_utc": "2026-10-20T18:20:02.032272+00:00",
+    "qualifications": [
+      "Windows local/Git installed-wheel composition only; no native host authority.",
+      "No P6-T2 registration or P6-T3 adapter proof; no actual Python3.10 execution.",
+      "Build identity is installed content; wheel digest is archive identity."
+    ]
+  },
+  "controller_stdout": "START installed-identity\r\nPASS installed-identity-bounded\r\nPASS installed-identity-exit\r\nPASS installed-identity-installed-imports\r\nPASS identity-release\r\nSTART init-dry\r\ninit-dry: running, elapsed 15.1s\r\nPASS init-dry-bounded\r\nPASS init-dry-exit\r\nPASS init-dry-installed-imports\r\nPASS init-dry-wire-exit\r\nPASS init-dry-safe-stderr\r\nPASS init-dry-runtime\r\nPASS init-dry-no-write\r\nSTART init-real\r\ninit-real: running, elapsed 15.1s\r\ninit-real: running, elapsed 30.1s\r\ninit-real: running, elapsed 45.2s\r\ninit-real: running, elapsed 60.2s\r\ninit-real: running, elapsed 75.3s\r\ninit-real: running, elapsed 90.3s\r\nPASS init-real-bounded\r\nPASS init-real-exit\r\nPASS init-real-installed-imports\r\nPASS init-real-wire-exit\r\nPASS init-real-safe-stderr\r\nPASS init-real-runtime\r\nPASS init-created-files\r\nPASS init-safe-path\r\nPASS init-digest\r\nPASS init-safe-path\r\nPASS init-digest\r\nPASS init-safe-path\r\nPASS init-digest\r\nPASS init-safe-path\r\nPASS init-digest\r\nPASS init-safe-path\r\nPASS init-digest\r\nPASS init-remains-draft\r\nSTART configure-dry\r\nPASS configure-dry-bounded\r\nFAIL configure-dry-exit\r\n",
+  "controller_stderr": "Traceback (most recent call last):\r\n  File \"SCRATCH\\issue-980-p6t1-installed-composition-nr1.py\", line 427, in <module>\r\n    main()\r\n    ~~~~^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-composition-nr1.py\", line 334, in main\r\n    invoke('configure-dry', request('configure', workspace, inputs=configure, dry_run=True), 0)\r\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-composition-nr1.py\", line 293, in invoke\r\n    check(label + '-exit', result['exit_code'] == expected)\r\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-composition-nr1.py\", line 274, in check\r\n    require(condition, label)\r\n    ~~~~~~~^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-composition-nr1.py\", line 35, in require\r\n    raise AssertionError(label)\r\nAssertionError: configure-dry-exit\r\n",
+  "current_effects": {
+    "workspace": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+      "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+      "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+      "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+      "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+      "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+      "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+      "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+      "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+      "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+      "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+      "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    },
+    "initialization": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/migration/discovery/coverage-ledger.json": "5361c30ca778aca6b8c23342f131c0b09f85422a10873ed17d09b60892636bc9",
+      "docs/migration/discovery/domain-profile.yaml": "8264344ecfb86bfb5b46928df979205c5e3d1a18b4d3d2562f3528596f229b47",
+      "docs/migration/discovery/product-decisions.yaml": "3e0d27c7f43be457daa73d4f6a986c080157f80cf0a39b9f0afba1a882ddd18f",
+      "docs/migration/discovery/scope.yaml": "d584ba969325f5ce11542515f0f3fe6a917477849ece8ffcf266d20248e6d47c",
+      "docs/migration/discovery/unspecified-behaviors.yaml": "415f733bba4d094a4a6d52414f6903a852a8aa88110a769de6a7d1e2fe468f9d",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    }
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nio1-raw.2026-10-20T18-20.json",
+    "sha256": "8bfa8eb62f44155c8e1fa38b849dfc2df8a4bc1dee3a61dccdc51a6b90799430"
+  },
+  "qualifications": [
+    "Actual installed local service/gateway composition; no native coding-agent host-hook authority.",
+    "No automatic replay, source/assertion change or final caller-test execution.",
+    "Actual Python3.10/3.11 execution remains unavailable locally."
+  ],
+  "ac_status": "P6-T1 remains coordinator-owned; combined final264 plus contracts stays disabled on any native failure."
+}

@@ -356,14 +356,34 @@ def _invalidate_empty_authority() -> None:
     """
 
 
+def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:
+    """Resolve validated host storage while preserving its workspace partition.
+
+    location (RegistryLocation): output of for_host after its absolute, platform,
+    parent-component and external-root checks. Return a location with the same
+    workspace identity and fixed layout under the resolved host base. Reads path
+    metadata only; an absent leaf is permitted. Resolution errors propagate;
+    ValueError rejects a derived path redirected outside that exact layout.
+    """
+    state = Path(location.directory)
+    # The accepted builder appends drm-copilot/discovery/workspaces/workspace-digest.
+    # Resolve its trusted base, then verify the complete path against that layout.
+    base = state.parents[3]
+    expected = base.resolve() / state.relative_to(base)
+    if state.resolve() != expected:
+        raise ValueError("Host state must retain its fixed workspace partition")
+    return replace(location, directory=expected.as_posix())
+
+
 def installed_local_io(
     root: str, repository: RepositoryReader | None, principal: str, author_id: str
 ) -> LocalServiceIO:
     """Compose fixed installed ports from trusted outer host values; create no files.
 
     Root must already be absolute/canonical. Host state paths come from platform
-    settings, never request JSON. Invalid paths/principals raise fixed errors; catalog
-    and runtime-provider failures retain their existing typed boundaries.
+    settings, never request JSON. Validate their spelling before resolving aliases,
+    preserving the fixed state partition and strict store guard. Invalid paths or
+    principals raise fixed errors; resolution and catalog failures propagate.
 
     root (str): trusted absolute canonical workspace. repository (RepositoryReader |
     None): exact optional repository reader. principal (str): explicit outer principal;
@@ -390,7 +410,7 @@ def installed_local_io(
         xdg_state_home=os.environ.get("XDG_STATE_HOME"),
     )
     activation = ActivationStore.local(
-        location=location,
+        location=_canonical_state_location(location),
         catalog=load_catalog(),
         authorize_root=_authorize_local_root,
         invalidate_authority=_invalidate_empty_authority,

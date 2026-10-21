@@ -1,0 +1,213 @@
+{
+  "Timestamp": "2026-10-21T04-20",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -I -S -B SCRATCH/issue-980-p6t1-gateway-configure-finding.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Established canonical-state guard mismatch; specific path spelling cause unproven; no repair performed.",
+  "task": "P6-T1",
+  "finding_id": "NCF1",
+  "status": "ESTABLISHED_CONSTRUCTION_FAILURE_REPAIR_PROPOSAL_PENDING_CONFIRMATION",
+  "route": "gateway_doctor_p6t1_configure_native_diagnosis_resume_20261021T040049",
+  "historical_invocation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nio1.2026-10-20T18-20.json",
+    "sha256": "17e09426abfa61fc9470b9550f1f157f82a54c90f3976874fcf3632a0c465be5"
+  },
+  "historical_request_sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+  "observations": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-13.json",
+      "sha256": "377b357d9c36807671dcd33f94a3628fa8d46525a4ad3d3795cfa098ab8f193b",
+      "bytes": 3836
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-path-comparison.2026-10-21T04-16.json",
+      "sha256": "6b0f9984a580c02f45e07d84510a7a393a3086fce226dc85a0046351be240376",
+      "bytes": 8581
+    }
+  ],
+  "source_and_installed_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "installed_relative": "drm_copilot_discovery/gateway.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "sha256": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+      "installed_relative": "drm_copilot_discovery/gateway_local.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "sha256": "e597f46b02e938afe9de51bab42081a66d9b1d277b4458f8ff22ece7bd3f0746",
+      "installed_relative": "drm_copilot_discovery/activation_filesystem.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "sha256": "dff3a775e99185523bfcae2de63d5eae70a1f397d221899944f28f87789c2bfa",
+      "installed_relative": "drm_copilot_discovery/activation_store.py"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+      "sha256": "790613abf92e1355d14332d52cae3d125a5d139e093cfea0d25cae04eb36b164",
+      "installed_relative": "drm_copilot_discovery/mutation_filesystem.py"
+    }
+  ],
+  "established": {
+    "constructor_exception": {
+      "frames": [
+        {
+          "function": "<module>",
+          "line": 80,
+          "module": "__main__"
+        },
+        {
+          "function": "installed_local_io",
+          "line": 392,
+          "module": "drm_copilot_discovery.gateway_local"
+        },
+        {
+          "function": "local",
+          "line": 113,
+          "module": "drm_copilot_discovery.activation_store"
+        }
+      ],
+      "type": "ValueError"
+    },
+    "factory_calls": 1,
+    "path_comparison_executions": 1,
+    "workspace_absolute": true,
+    "workspace_resolve_equals_lexical": true,
+    "state_absolute": true,
+    "state_inside_workspace_lexical": false,
+    "state_resolve_equals_lexical": false,
+    "state_leaf": "missing",
+    "ancestor_count": 8,
+    "observed_ancestor_reparse_count": 0,
+    "runtime_operation_or_git_calls": 0,
+    "write_capable_port_calls": 0,
+    "blocked_effects": 0,
+    "timeouts": 0,
+    "overflows": 0,
+    "five_source_and_installed_bindings_unchanged": true
+  },
+  "source_references": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "symbol": "run_gateway",
+      "purpose": "Pre-execution generic factory exception maps to retained SERVICE_FAILURE with null runtime/manifest."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "line": 384,
+      "symbol": "installed_local_io",
+      "purpose": "Passes trusted platform settings to the lexical RegistryLocation constructor, then calls the strict local-store constructor."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_filesystem.py",
+      "line": 25,
+      "symbol": "RegistryLocation",
+      "purpose": "Existing contract requires trusted host aliases to be resolved before construction; for_host performs lexical derivation."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/activation_store.py",
+      "line": 112,
+      "symbol": "ActivationStore.local",
+      "purpose": "Exact canonical workspace/state guard; preserved unchanged."
+    }
+  ],
+  "classification": "Runtime composition rejects its derived host-state identity. Whether the input must be canonicalized by this trusted provider or intentionally rejected requires the narrow contract disposition; no request/profile/grant defect is established.",
+  "uncertainties": [
+    "The safe historical response did not retain a traceback; the current bound reproduction supplies the constructor location.",
+    "No particular alias, junction or short-name spelling is proven; original unrecorded host settings are not claimed identical.",
+    "The component causing the resolved-state difference is not recorded, so platform-base normalization alone is a proposed design, not a demonstrated fix."
+  ],
+  "test_composition_gap": {
+    "path": "tests/discovery_runtime/test_gateway_local.py",
+    "line": 433,
+    "node": "test_installed_factory_wires_only_trusted_outer_host_values",
+    "reason": "Identity Path.resolve and replacement ActivationStore.local prevent the trusted platform input and strict guard from being exercised together."
+  },
+  "candidate_repair": {
+    "status": "PROPOSAL_ONLY_PENDING_INDEPENDENT_CONTRACT_DISPOSITION",
+    "production": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_gateway_local.py",
+      "tests/discovery_runtime/test_gateway_boundaries.py"
+    ],
+    "approach": "Resolve only validated absolute trusted platform storage inputs before lexical registry derivation; preserve the strict low-level guard and external-workspace condition.",
+    "must_preserve": [
+      "ActivationStore.local canonical/external guard",
+      "request root and authority rules",
+      "no host-marker fallback",
+      "no native capability issuance",
+      "no write during construction"
+    ],
+    "required_controls": [
+      "canonical trusted base",
+      "trusted spelling canonicalized before derivation",
+      "relative or unsupported path refused",
+      "resolution failure propagated",
+      "resolved internal state refused",
+      "unsafe derived-state guard still refuses",
+      "host markers still refused"
+    ],
+    "existing_direct_subset": [
+      "tests/discovery_runtime/test_gateway_local.py::test_installed_factory_wires_only_trusted_outer_host_values",
+      "tests/discovery_runtime/test_activation_filesystem.py::test_registry_locations_are_platform_fixed_and_workspace_partitioned",
+      "tests/discovery_runtime/test_activation_filesystem.py::test_windows_workspace_hash_uses_canonical_case_and_native_separators",
+      "tests/discovery_runtime/test_activation_filesystem.py::test_local_factory_requires_canonical_external_host_locations"
+    ],
+    "line_counts": {
+      "gateway_local.py": 403,
+      "test_gateway_local.py": 494,
+      "test_gateway_boundaries.py": 425
+    }
+  },
+  "validation": {
+    "tests_executed": 0,
+    "source_changes": 0,
+    "package_changes": 0,
+    "qa_gate": "Not run: read-only diagnosis only; existing implementation proofs retained without extension."
+  },
+  "historical_dispositions": {
+    "NR1_format": "separate retained harness failure",
+    "NIO1_workspace_identity": "separate repaired cause; init successes retained",
+    "configure_dry": "not accepted",
+    "later_native_invocations": "14 unrun"
+  },
+  "evidence_bindings_excluding_this_manifest": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-13.json",
+      "sha256": "377b357d9c36807671dcd33f94a3628fa8d46525a4ad3d3795cfa098ab8f193b",
+      "bytes": 3836
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe.2026-10-21T04-13.md",
+      "sha256": "3a9b347c1854de2fb7e24551247917d62137196a662e4a27fdf058aa6299ca10",
+      "bytes": 1543
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-factory-probe-raw.2026-10-21T04-13.json",
+      "sha256": "4a5f875bc5c55ca55d69b8f6fd56ff83f477874e601a4a65c2d361132d075909",
+      "bytes": 9297
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-path-comparison.2026-10-21T04-16.json",
+      "sha256": "6b0f9984a580c02f45e07d84510a7a393a3086fce226dc85a0046351be240376",
+      "bytes": 8581
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-configure-path-comparison.2026-10-21T04-16.md",
+      "sha256": "f3ee39ee2d47bb1bd400f01818f81cccaa2940fd40877f14c2a97ab6859e5636",
+      "bytes": 2132
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-configure-construction-finding.2026-10-21T04-20.md",
+      "sha256": "256f10bc9c0495e942cf331e94b71029d4d9b67c70efc61f1adadc03fca14b0a",
+      "bytes": 3850
+    }
+  ],
+  "self_binding": "This JSON excludes itself; caller receives its exact SHA-256. The raw archive and observation receipts exclude themselves.",
+  "normalization": "Explicit UTF-8/LF readable views; no original artifact or raw byte changed; exact helper/request/output bytes in prior referenced archives."
+}

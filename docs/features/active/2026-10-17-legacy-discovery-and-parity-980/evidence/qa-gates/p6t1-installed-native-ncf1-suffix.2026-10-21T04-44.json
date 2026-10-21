@@ -1,0 +1,363 @@
+{
+  "Timestamp": "2026-10-21T04-44",
+  "task": "P6-T1",
+  "status": "INSTALLED_NATIVE_SUFFIX_FAILED_NO_REPLAY",
+  "route": "build_identity_review_p6t1_ncf1_native_suffix_20261021T044234",
+  "Command": [
+    "WORKSPACE\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py",
+    "--installation",
+    "PACKAGE_SCRATCH\\installed",
+    "--dependencies",
+    "WORKSPACE\\.venv\\Lib\\site-packages",
+    "--wheel",
+    "PACKAGE_SCRATCH\\dist\\drm_copilot_discovery-2.0.0-py3-none-any.whl",
+    "--release",
+    "SCRATCH\\issue-980-p6t1-native-release-suffix-ncf1-20261021T044424.json",
+    "--output",
+    "SCRATCH\\issue-980-p6t1-native-result-suffix-ncf1-20261021T044424.json"
+  ],
+  "EXIT_CODE": 1,
+  "elapsed_seconds": 4.029436499986332,
+  "release": {
+    "path": "SCRATCH/issue-980-p6t1-native-release-suffix-ncf1-20261021T044424.json",
+    "sha256": "1c6ae3a52afb2b32cc158c20147eb76b4b691d8c3b0d81ddacb2d4edc19a6521"
+  },
+  "adapter_sha256": "5b82ead3544ca96af64dcdf5b1d7b403419b6809f2faf6a3c11ed8eb0eb245ec",
+  "package": {
+    "descriptor_sha256": "2c13f09e8dfec0ed4d3014788d2a3d0e64d361bc3919b932017c07b98a1bf9e9",
+    "wheel_sha256": "97ff4f4ef1206008e04c31d28d185b16e1b83f3617c572cdda76242ec2667b57",
+    "runtime": {
+      "package_version": "2.0.0",
+      "schema_version": "2.0.0",
+      "build_sha256": "c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3",
+      "policy_version": 2,
+      "policy_sha256": "86bd57ee57840a340c4f205d99db2fc85de29c17c24f7aebbfa02919f6d88265"
+    },
+    "payload_members": 168
+  },
+  "repair_delta": {
+    "source": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "old": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+        "new": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d"
+      }
+    },
+    "confirmation_sha256": "3785a3346a98ecfe9c7f50157cd4bc933726ca68ce0c3d824646d8035635a8e9",
+    "tests": [
+      {
+        "path": "tests/discovery_runtime/test_gateway_local.py",
+        "sha256": "e9aad5aa4f89deafd8014217a663edf997cb611dfecc2858d408fa5160e4b693"
+      },
+      {
+        "path": "tests/discovery_runtime/test_gateway_factory.py",
+        "sha256": "bb808612c9c310e53d6404697dcbb2e69b1a7efb0ab84ec1b377e3f45e21e9b3"
+      }
+    ]
+  },
+  "historical_init_carry": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-source-confirmation.2026-10-21T04-40.json",
+    "sha256": "3785a3346a98ecfe9c7f50157cd4bc933726ca68ce0c3d824646d8035635a8e9"
+  },
+  "historical_init_replayed": false,
+  "retained_state_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t1-native-suffix-preparation.2026-10-21T04-13.json",
+    "sha256": "88bb68a61f10b7a84c00867737113fa9ee93f319c4077e3f8e1aae5101c94916"
+  },
+  "stable_after": {
+    "sources211": true,
+    "original50": true,
+    "base_fixture48": true,
+    "historical_initialized_state": true,
+    "installed_package": true
+  },
+  "result": {
+    "task": "P6-T1",
+    "state": "native-composition-failed",
+    "results": [
+      {
+        "exit_code": 0,
+        "elapsed_seconds": 1.3132393999840133,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "installed-identity",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-suffix-ncf1-20261021T044424\\installed-identity.origins.json",
+          "--action",
+          "identity",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\workspace",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout_raw": {
+          "sha256": "8adb34ae8fa462c478e83b9e75de1ea5ac28c188568186c9fc631c863a9c72ad",
+          "bytes": 309,
+          "gzip_base64": "H4sIAAAAAAAC/22PQWoDMQxF9z1F8LoEjzwa2blMkGWpMU0yYdwplJC7d7xpWiho9T68h+5uWa8f9aLusLu7G8s7v+nxU5dW5+vGHOz93rvXnWty0gv/O+W1nsuxnRhw6oOg5MCGGQH7lUgGOSaQEDhTHFBSIU8eIjFyHD2PXMzMQ1ay0J23+Vzl61cOnvBZilMuSKpIXRJGL6OBx5JSyWASsSgkGUhgNGLN2dhDGpJNJUaY0D0266JtXhfR1mvVqpZNHdLPz395eLx8A3yVMIE1AQAA"
+        },
+        "stderr_raw": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "gzip_base64": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+        },
+        "stdout": "{\"runtime\": {\"package_version\": \"2.0.0\", \"schema_version\": \"2.0.0\", \"build_sha256\": \"c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3\", \"policy_version\": 2, \"policy_sha256\": \"86bd57ee57840a340c4f205d99db2fc85de29c17c24f7aebbfa02919f6d88265\"}, \"resources_verified\": 39, \"schemas_verified\": 33}\n",
+        "stderr": "",
+        "import_proof": {
+          "origins": {
+            "drm_copilot_discovery.domain_profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile_models.py",
+            "drm_copilot_discovery.domain_profile": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\domain_profile.py",
+            "drm_copilot_discovery": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\__init__.py",
+            "drm_copilot_discovery.findings": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\findings.py",
+            "drm_copilot_discovery.models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\models.py",
+            "drm_copilot_discovery.parsing": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\parsing.py",
+            "drm_copilot_discovery.path_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_models.py",
+            "drm_copilot_discovery.rendering": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\rendering.py",
+            "drm_copilot_discovery.report_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\report_models.py",
+            "drm_copilot_discovery.resources": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\resources.py",
+            "drm_copilot_discovery.repository_reader": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\repository_reader.py",
+            "drm_copilot_discovery.snapshot": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot.py",
+            "drm_copilot_discovery.build_identity": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\build_identity.py",
+            "drm_copilot_discovery.catalog": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\catalog.py",
+            "drm_copilot_discovery.runtime_claim_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\runtime_claim_rules.py",
+            "drm_copilot_discovery.schema_validation": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\schema_validation.py",
+            "drm_copilot_discovery.profile_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_models.py",
+            "drm_copilot_discovery.profile_v2": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\profile_v2.py",
+            "drm_copilot_discovery.activation_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\activation_models.py",
+            "drm_copilot_discovery.path_policy": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\path_policy.py",
+            "drm_copilot_discovery.snapshot_io": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\snapshot_io.py",
+            "drm_copilot_discovery.coverage_scope_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\coverage_scope_rules.py",
+            "drm_copilot_discovery.reference_links": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\reference_links.py",
+            "drm_copilot_discovery.transport_manifest": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\transport_manifest.py",
+            "drm_copilot_discovery.references": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\references.py",
+            "drm_copilot_discovery.agent_output": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\agent_output.py",
+            "drm_copilot_discovery.service_request_rules": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_request_rules.py",
+            "drm_copilot_discovery.service_serialization": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_serialization.py",
+            "drm_copilot_discovery.source_read_models": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\source_read_models.py",
+            "drm_copilot_discovery.service_contracts": "PACKAGE_SCRATCH\\installed\\drm_copilot_discovery\\service_contracts.py"
+          },
+          "all_installed": true,
+          "sys_path": [
+            "PACKAGE_SCRATCH\\installed",
+            "WORKSPACE\\.venv\\Lib\\site-packages",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\python313.zip",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\DLLs",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313\\Lib",
+            "C:\\Users\\DanMoisan\\AppData\\Local\\Programs\\Python\\Python313"
+          ],
+          "isolated": 1,
+          "no_site": 1
+        }
+      },
+      {
+        "exit_code": 3,
+        "elapsed_seconds": 1.0112770000123419,
+        "watchdog_seconds": 300,
+        "timeout": false,
+        "overflow": false,
+        "label": "configure-dry",
+        "argv": [
+          "WORKSPACE\\.venv\\Scripts\\python.exe",
+          "-I",
+          "-S",
+          "-B",
+          "SCRATCH\\issue-980-p6t1-installed-bootstrap.py",
+          "--installation",
+          "PACKAGE_SCRATCH\\installed",
+          "--dependencies",
+          "WORKSPACE\\.venv\\Lib\\site-packages",
+          "--proof",
+          "SCRATCH\\issue-980-p6t1-native-suffix-ncf1-20261021T044424\\configure-dry.origins.json",
+          "--action",
+          "gateway",
+          "--workspace-root",
+          "SCRATCH\\issue-980-p6t1-native-20261020T181808\\workspace",
+          "--principal",
+          "local-user",
+          "--repository-id",
+          "workspace-example"
+        ],
+        "request_raw": {
+          "sha256": "7915dd29e01ce25cb93174571daf126d8cc07c308601137417a51a1def778cb6",
+          "bytes": 669,
+          "gzip_base64": "H4sIAAAAAAAC/51SwU7kMAz9FVRxpDPtSKCht9VyhBt7i1RZqcsYmjg4TndnEf9O0qlGCK32wC3Je7bfe85bdRntAR1U3UWVxHeDuNpyoIm1GyhanlGO3W7TbJouosxksRZ8TRi1urqoTsV9JkViX5os1AKBKI1gtX8hPxTkH+W0AB6UZsxjXeBIWhplbKX1/+NwQAFdJ1v2Iz0lwYI4HnAZqpKsJoGpvP5meYkBLPbCrAX/2RnzKyuLxtyBf2CK4I35EcIdKBhzzxYmYx7RBWM+ZVPjH7RJWeqmhfb6drg2hmJMWN/um0/HOtxoW6/id83upm12zWO7b/fN3piznKItCI80YR9AD0XZwDZuHT2dDG7Py9gO7IB8vfI3R3CLt0GOvaSSRLaMxayQlgxGmGK5jywOFtPP8RQf+ZA05pe3c3jLsD6vbQ21nGZQPNO/p+99KZ9zmkt/wTG38GmaykdJemChv1+h9w8DYccynQIAAA=="
+        },
+        "stdout_raw": {
+          "sha256": "98bfe0e43956ca57e0da83fa801e622e48afc8640a3686c390b363d8507633b4",
+          "bytes": 539,
+          "gzip_base64": "H4sIAAAAAAAC/2VQy2oDMQy89yuMz0sa2tveSppCoKf0cSnFuLY2EfHaW1kOCSH/Xm29CYXe7BnNaEYnbYmxs46zbj8+Gw0HZOOSB93eN7rD6DFuRu50nTSD5a1uYwmh0XVUvyzX76vF0jw9rJ7f1kvd6B5ytpuRe92C8phd2gMdFcF3gczKpRK8ionVF8inHwIw+JkoIxzYyB5MUdSLLbidYvG4KG308h4sUoVLZOxBYacigK8eQ8LIQKK/nXgBCYKVHQb9VPYCjIUmKIOkRD6KEogS6bOAGIfCprcROwlwqd7X6pmpOC5kg6xIO912NmSQ5wBkpxIuxQ43hWqKXAIbWZMreTebz+YjMQWd7HPpe0sS5CRyoaaAGPfJ/foagu6a5Xrtx3+X7iyGehUCBzjwX+HeBvQXuzFYJc7nmx+L5QZZGwIAAA=="
+        },
+        "stderr_raw": {
+          "sha256": "98dd4099cbe2425b5e29bdc0d0aee1335fa1c90d30525b92361d6d3078bd3151",
+          "bytes": 53,
+          "gzip_base64": "H4sIAAAAAAAC/3PJLE7OL0stqlQoSi0sTS0uUUhLzMxJTbFWyMwrLkhNLlEoyUhV8Ar291NIy8xLycxLL9bjAgCKbrL9NQAAAA=="
+        },
+        "stdout": "{\"artifacts\":[],\"exit_code\":3,\"findings\":[{\"artifact_path\":null,\"code\":\"SERVICE_FAILURE\",\"message\":\"The discovery request could not be completed.\",\"next_action\":\"Check the request and repair the runtime if needed.\",\"pointer\":\"/runtime\",\"related_ids\":[],\"related_paths\":[],\"severity\":\"error\"}],\"input_manifest\":null,\"mode\":\"structural\",\"ok\":false,\"operation\":\"configure\",\"result_version\":\"2.0.0\",\"runtime\":null,\"summary\":{\"counts\":[],\"invocation_ref\":null,\"message\":\"Discovery request failed.\",\"receipt_ref\":null,\"validation_result\":null}}\n",
+        "stderr": "Discovery request failed; inspect the JSON findings.\n"
+      }
+    ],
+    "checks": [
+      {
+        "label": "installed-identity-bounded",
+        "passed": true
+      },
+      {
+        "label": "installed-identity-exit",
+        "passed": true
+      },
+      {
+        "label": "installed-identity-installed-imports",
+        "passed": true
+      },
+      {
+        "label": "identity-release",
+        "passed": true
+      },
+      {
+        "label": "configure-dry-bounded",
+        "passed": true
+      },
+      {
+        "label": "configure-dry-exit",
+        "passed": false
+      }
+    ],
+    "release_sha256": "1c6ae3a52afb2b32cc158c20147eb76b4b691d8c3b0d81ddacb2d4edc19a6521",
+    "error_type": "AssertionError",
+    "error": "configure-dry-exit",
+    "elapsed_seconds": 2.343691400019452,
+    "timestamp_utc": "2026-10-21T04:44:27.649002+00:00",
+    "qualifications": [
+      "Windows local/Git installed-wheel composition only; no native host authority.",
+      "No P6-T2 registration or P6-T3 adapter proof; no actual Python3.10 execution.",
+      "Build identity is installed content; wheel digest is archive identity."
+    ]
+  },
+  "controller_stdout": "START installed-identity\r\nPASS installed-identity-bounded\r\nPASS installed-identity-exit\r\nPASS installed-identity-installed-imports\r\nPASS identity-release\r\nSTART configure-dry\r\nPASS configure-dry-bounded\r\nFAIL configure-dry-exit\r\n",
+  "controller_stderr": "Traceback (most recent call last):\r\n  File \"SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py\", line 450, in <module>\r\n    main()\r\n    ~~~~^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py\", line 355, in main\r\n    invoke('configure-dry', request('configure', workspace, inputs=configure, dry_run=True), 0)\r\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py\", line 328, in invoke\r\n    check(label + '-exit', result['exit_code'] == expected)\r\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py\", line 309, in check\r\n    require(condition, label)\r\n    ~~~~~~~^^^^^^^^^^^^^^^^^^\r\n  File \"SCRATCH\\issue-980-p6t1-installed-suffix-adapter-20261021T0426.py\", line 35, in require\r\n    raise AssertionError(label)\r\nAssertionError: configure-dry-exit\r\n",
+  "current_effects": {
+    "workspace": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+      "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+      "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+      "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+      "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+      "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+      "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+      "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+      "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+      "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+      "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+      "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    },
+    "initialization": {
+      ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+      ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+      ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+      ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+      ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+      ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+      ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+      ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+      ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+      ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+      ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+      ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+      ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+      ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+      ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+      ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+      ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+      ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+      ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+      ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "docs/migration/discovery/coverage-ledger.json": "5361c30ca778aca6b8c23342f131c0b09f85422a10873ed17d09b60892636bc9",
+      "docs/migration/discovery/domain-profile.yaml": "8264344ecfb86bfb5b46928df979205c5e3d1a18b4d3d2562f3528596f229b47",
+      "docs/migration/discovery/product-decisions.yaml": "3e0d27c7f43be457daa73d4f6a986c080157f80cf0a39b9f0afba1a882ddd18f",
+      "docs/migration/discovery/scope.yaml": "d584ba969325f5ce11542515f0f3fe6a917477849ece8ffcf266d20248e6d47c",
+      "docs/migration/discovery/unspecified-behaviors.yaml": "415f733bba4d094a4a6d52414f6903a852a8aa88110a769de6a7d1e2fe468f9d",
+      "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+    }
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-ncf1-suffix-raw.2026-10-21T04-44.json",
+    "sha256": "ec0bacc50a3c0e23c9e91e2dff8d04552a6b9200f87de430ddd2d252a2139c08"
+  },
+  "qualifications": [
+    "Historical init successes remain on build 2db25325; this suffix does not replay or relabel them.",
+    "Installed local service composition only; no native coding-agent host authority or Python 3.10/3.11 proof.",
+    "Stop first concrete failure; no replay or source/assertion changes.",
+    "Final 286 plus four remains coordinator-disabled pending native pass and release."
+  ]
+}

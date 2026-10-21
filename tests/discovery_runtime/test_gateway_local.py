@@ -443,11 +443,11 @@ def test_installed_factory_wires_only_trusted_outer_host_values(
     case = ConfigurationCase(config_catalog)
 
     def resolve(self: Path, strict: bool = False) -> Path:
-        """Retain the fake trusted absolute root without touching disk. strict (bool):
-        whether canonical resolution must require existence. Returns Path; memory-only
-        effects; AssertionError on mismatch.
+        """Preserve synthetic paths without I/O. strict (bool) requires the workspace
+        to exist while state may be absent. Return Path; AssertionError on the wrong
+        existence policy; memory-only effects.
         """
-        assert strict
+        assert strict == (self == Path(case.disk.root))
         return self
 
     def home(cls: type[Path]) -> Path:

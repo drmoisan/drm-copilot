@@ -1,0 +1,121 @@
+{
+  "Timestamp": "2026-10-21T04-44",
+  "Command": "WORKSPACE/.venv/Scripts/python.exe -B SCRATCH/issue-980-ncf1-close.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Frozen NCF1 BODY, exact-source, ordered-gate and package bindings reconcile; repair/recovery/package union is ready for a checked commit.",
+  "task": "P6-T1",
+  "head": "bb249a0751b8e74d2e42a1e6ee1b4fca2dcf2e17",
+  "route": "atomic_execution_p6t1_ncf1_repair_confirmation_20261021T043642",
+  "status": "READY_FOR_CHECKED_REPAIR_PACKAGE_COMMIT",
+  "source_and_carry_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-source-confirmation.2026-10-21T04-40.json",
+    "sha256": "3785a3346a98ecfe9c7f50157cd4bc933726ca68ce0c3d824646d8035635a8e9"
+  },
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-gateway-ncf1-freeze.2026-10-21T04-42.json",
+    "sha256": "f949c408ed5cc5e0791031f687f00ca2e7f7b3cfbe4c172a2d762b133bc3c988",
+    "paths_including_self": 22
+  },
+  "body_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-ncf1-proof.2026-10-21T04-39.json",
+    "sha256": "54adfec1bfa14ced4cc9dc75b073641050acd7c5161500af064e5974c6b22907",
+    "fresh_helper": "6/6 lines; 2/2 branches",
+    "fresh_factory": "9/9 lines; 4/4 branches",
+    "declarations_excluded": true
+  },
+  "reconciliation": {
+    "focused_passed": 26,
+    "new_nodes": 22,
+    "retained_nodes": 4,
+    "ordered_stages": [
+      "loop3-black",
+      "loop3-ruff",
+      "loop3-pyright",
+      "loop3-focused"
+    ],
+    "decoded_source_coverage_helper_streams": 8,
+    "decoded_original_source_streams": 2,
+    "decoded_gate_streams": 14,
+    "unchanged_callable_asts": 13,
+    "legacy_test_delta": "Only the approved nested resolve stub/docstring; all surrounding AST is identical.",
+    "protected_bindings_unchanged": 12,
+    "findings": [],
+    "open_probes": []
+  },
+  "coverage": {
+    "raw_fresh": "60/138 lines and 8/40 branches; terminal combined percentage rounds to 38%",
+    "qualified_fresh_and_retained": "137/138 lines and 39/40 branches",
+    "unchanged_missing": {
+      "lines": [
+        145
+      ],
+      "branches": [
+        [
+          144,
+          145
+        ]
+      ]
+    },
+    "raw_counter_augmentation": false,
+    "retained_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-nio1-proof.2026-10-20T18-10.json",
+      "sha256": "e045acce696bc66fd7df51c83eefdeb3d03cb552272a283943893a59d0ae23ba",
+      "bytes": 128460
+    },
+    "qualification": "Only the two named changed/new bodies claim fresh coverage. Qualified whole-file coverage composes exact AST-identical unchanged ranges with retained proof; it is not a new whole-file test run."
+  },
+  "presentation": {
+    "diff": "The immutable proof's diff field used raw old lines and universal-newline after lines. This view normalizes both sides to LF; original/current exact bytes remain in the bound input/proof archives. No source/evidence original was rewritten.",
+    "originals_preserved": true,
+    "raw_stdout_stderr": "Exact archived bytes verified separately from normalized UTF-8/LF Markdown. No original bytes rewritten.",
+    "readable_markdown_paths_checked": 15,
+    "proof_builder_diagnostic": "Original tuple/list equality diagnostic retained in the owner proof; measured values unchanged."
+  },
+  "package": {
+    "handoff": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-ncf1-handoff.2026-10-21T04-39.json",
+    "sha256": "a81b630778de44112ca3682abb1351371116686001454ba7e2fd3f629922205a",
+    "build_sha256": "c5cb3af5b5255255d87f2b892c33ab7815c9d7070287a5a840a4adfff02be7f3",
+    "payload_members_verified": 168,
+    "source_delta": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py": {
+        "before": "5753880094845f5f9092cd5a98214f56fd2c43943998744d18fd9e55c8519a12",
+        "after": "06fb0733a795474aa7f399820335ae02a8b768bf9fc8611b83f5ab2f6b4d325d"
+      }
+    },
+    "scope": "Six completed package outputs only; existing build/check/install proof reused."
+  },
+  "historical_chain": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native.2026-10-20T17-26.json",
+      "sha256": "ee16910a59bec165773fd6f6e02227f772049207d0c39f0408d20269dfd981a8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nr1.2026-10-20T17-43.json",
+      "sha256": "f08ddaa5bd9477514e3e83def4c213093b7993e431d61ab75d6df2b4e2f1c478"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-nio1.2026-10-20T18-20.json",
+      "sha256": "17e09426abfa61fc9470b9550f1f157f82a54c90f3976874fcf3632a0c465be5"
+    }
+  ],
+  "native_disposition": "Carry approval is exactly the separate 04:40 receipt: historical init remains tied to the old package; fresh retained-state and rebuilt installed-identity checks precede the prepared suffix. No current suffix outcome is included or claimed here.",
+  "scope_exclusions": [
+    "Active native suffix outputs",
+    "Unrelated final-runner/P6 preparation",
+    "Task or AC checkoffs"
+  ],
+  "reviewer_execution": "Evidence/source-byte reads and owned evidence writes only; no test, runtime, factory, build, fixture/state, Git/index or checkpoint mutation.",
+  "task_accepted": false,
+  "counts": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-ncf1-staging.2026-10-21T04-44.json"
+}
