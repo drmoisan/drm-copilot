@@ -1,0 +1,230 @@
+{
+  "Timestamp": "2026-10-21T15-08",
+  "Command": "Read retained P6-T2 interface and native receipts; parse TOML/AST as data; author disabled finite handoff",
+  "EXIT_CODE": 0,
+  "Output Summary": "31 equal fixed registrations verified statically; four representative console invocations prepared, none executed.",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "route": "build_identity_p6t2_cli_preparation_20261021T150600 / S5_P6T2_installed_preparation",
+  "status": "PREPARATION_READY_EXECUTION_DISABLED",
+  "execution_released": false,
+  "accepted_predecessor_commit": "cb34737468e0bdb94056c51ee61c2a29ee3728b0",
+  "predecessor_final_population": "370+4 accepted; reuse without replay",
+  "references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-cli-preparation-delta.2026-10-20T15-11.md",
+      "sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+      "sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-report-continuation.2026-10-21T05-49.json",
+      "sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a"
+    }
+  ],
+  "observed_frozen_cli": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "sha256": "791f03c1933b69b0b5e8fe3d3abd06acdb9eb76b8cdb1f9b438a5a9abe5cbb37"
+  },
+  "observed_registration_files": [
+    {
+      "path": "pyproject.toml",
+      "sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d"
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "sha256": "22d79f77a64d38387f45a015cebc799e4589bd076bbdb3cb9383dbeb9bb3bb76"
+    }
+  ],
+  "parser_status": "Parser PA1 reported 109 passing controls; composition malformed-argv and injected-relative-root findings remain under diagnosis. This intended-contract preparation does not assert current candidate output correctness; final exact repair/source freeze remains required.",
+  "expected_entrypoints": {
+    "dev.discovery.init": "drm_copilot_discovery.cli:main_init",
+    "dev.discovery.configure": "drm_copilot_discovery.cli:main_configure",
+    "dev.discovery.profile": "drm_copilot_discovery.cli:main_profile",
+    "dev.discovery.inventory": "drm_copilot_discovery.cli:main_inventory",
+    "dev.discovery.dotnet": "drm_copilot_discovery.cli:main_dotnet",
+    "dev.discovery.vsto": "drm_copilot_discovery.cli:main_vsto",
+    "dev.discovery.new-contract": "drm_copilot_discovery.cli:main_new_contract",
+    "dev.discovery.new-scenario": "drm_copilot_discovery.cli:main_new_scenario",
+    "dev.discovery.update-artifact": "drm_copilot_discovery.cli:main_update_artifact",
+    "dev.discovery.link-evidence": "drm_copilot_discovery.cli:main_link_evidence",
+    "dev.discovery.validate-profile": "drm_copilot_discovery.cli:main_validate_profile",
+    "dev.discovery.validate-feature-contract": "drm_copilot_discovery.cli:main_validate_feature_contract",
+    "dev.discovery.validate-coverage-ledger": "drm_copilot_discovery.cli:main_validate_coverage_ledger",
+    "dev.discovery.validate-runtime-scenario": "drm_copilot_discovery.cli:main_validate_runtime_scenario",
+    "dev.discovery.validate-parity-matrix": "drm_copilot_discovery.cli:main_validate_parity_matrix",
+    "dev.discovery.validate-unspecified-behavior": "drm_copilot_discovery.cli:main_validate_unspecified_behavior",
+    "dev.discovery.validate-product-decision": "drm_copilot_discovery.cli:main_validate_product_decision",
+    "dev.discovery.validate-evidence-reference": "drm_copilot_discovery.cli:main_validate_evidence_reference",
+    "dev.discovery.validate-decisions": "drm_copilot_discovery.cli:main_validate_decisions",
+    "dev.discovery.validate-all": "drm_copilot_discovery.cli:main_validate_all",
+    "dev.discovery.validate": "drm_copilot_discovery.cli:main_validate",
+    "dev.discovery.coverage-report": "drm_copilot_discovery.cli:main_coverage_report",
+    "dev.discovery.parity-report": "drm_copilot_discovery.cli:main_parity_report",
+    "dev.discovery.completion-report": "drm_copilot_discovery.cli:main_completion_report",
+    "dev.discovery.generate-acceptance": "drm_copilot_discovery.cli:main_generate_acceptance",
+    "dev.discovery.generate-acceptance-scenarios": "drm_copilot_discovery.cli:main_generate_acceptance_scenarios",
+    "dev.discovery.snapshot-export": "drm_copilot_discovery.cli:main_snapshot_export",
+    "dev.discovery.snapshot-import": "drm_copilot_discovery.cli:main_snapshot_import",
+    "dev.discovery.import-inventory": "drm_copilot_discovery.cli:main_import_inventory",
+    "dev.discovery.migrate": "drm_copilot_discovery.cli:main_migrate",
+    "dev.discovery.doctor": "drm_copilot_discovery.cli:main_doctor"
+  },
+  "installed_metadata_check": [
+    "Read the exact new wheel dist-info entry_points.txt and the new installed distribution entry_points.txt without loading entry points. Require exactly these 31 dev.discovery names/targets; compare both TOML maps and all fixed wrappers by installed AST.",
+    "Require every generated Scripts/dev.discovery.<suffix>.exe to exist as a regular non-link file. Bind each exact hash and installed RECORD entry. Inspect launcher embedded __main__.py/import target and interpreter binding; no arbitrary command or module selection.",
+    "Reuse packager source/wheel/install payload parity and refreshed build/policy/resource identity. Include the three CLI modules in the final installed manifest. Do not reuse the predecessor build manifest as current proof."
+  ],
+  "actual_console_install_prerequisite": {
+    "reason": "Earlier pip --target installation creates launchers bound to the checkout interpreter; target-path metadata alone does not prove independently resolved actual console execution.",
+    "owner": "snapshot_inventory_capture during separately released package window",
+    "recipe": [
+      "APPROVED_PYTHON -m venv --without-pip CLI_ENV",
+      "APPROVED_PYTHON -m pip --python CLI_ENV/Scripts/python.exe install --no-index --no-deps EXACT_RELEASED_WHEEL"
+    ],
+    "dependencies": "Expose only the already approved dependency site-packages directory using one fixed UTF-8 .pth path in the fresh environment; do not enable system-site-packages, copy dependency .pth files, install dependencies, or add checkout source roots.",
+    "alternative": "If the installed pip lacks --python support, report the exact prerequisite before execution; do not silently substitute a checkout entry-point wrapper.",
+    "paths": "CLI_ENV and all evidence/observer files are unique child SCRATCH locations; actual launcher exe is invoked directly, not a Python call to main_*."
+  },
+  "origin_proof": {
+    "mechanism": "A separately bound stdlib-only atexit observer loaded by a fixed test-environment .pth records runtime module __file__ values, sys.path, sys.prefix/base_prefix, actual argv and interpreter. It must not wrap, replace or invoke the CLI. The generated console executable remains the process entry point.",
+    "checks": [
+      "Every drm_copilot_discovery origin lies under CLI_ENV/Lib/site-packages/drm_copilot_discovery",
+      "sys.prefix is the fresh environment; user site disabled; PYTHONPATH and PYTHONHOME absent",
+      "Approved dependency directory is the only additional library root; no checkout package/scripts/tests roots",
+      "Sidecar emission occurs for help, error and typed results; missing sidecar fails verification"
+    ],
+    "qualification": "Actual console launchers use normal site initialization for their isolated virtual environment; do not claim -I/-S interpreter flags. Isolation is proven through exact fresh venv, controlled .pth, environment and recorded origins."
+  },
+  "fixture": {
+    "alias": "SCRATCH/issue-980-p6t1-native-20261020T181808/workspace",
+    "authority": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-report-continuation.2026-10-21T05-49.json",
+      "sha256": "81b554702d3e9c754dc13114f042cc17182a3148fe8486529acb876ae00f629a"
+    },
+    "expected_map_pointer": "/current_effects/workspace",
+    "profile": "docs/migration/discovery/domain-profile.yaml",
+    "repository_id": "workspace-example",
+    "revision": "00367d1c6b0af4630878401524aae631b36bcd0a",
+    "reuse": "Read existing configured fixture only; verify exact retained file and directory/link state before execution. No init/configure/parity refresh/clone/migration or manual artifact editing. Any mismatch is a precise prerequisite failure, not automatic fixture reconstruction."
+  },
+  "invocations": [
+    {
+      "label": "alias-help",
+      "argv": [
+        "CLI_ENV/Scripts/dev.discovery.validate.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Exactly fixed Usage: dev.discovery.validate [options] LF and fixed Options line; not a JSON result.",
+      "stderr": "",
+      "effects": "None",
+      "assertions": [
+        "Alias executable exists and calls fixed main_validate wrapper",
+        "No service/provider invocation claim is carried from accepted in-memory proof; actual console fixture remains unchanged"
+      ]
+    },
+    {
+      "label": "invalid-authority-option",
+      "argv": [
+        "CLI_ENV/Scripts/dev.discovery.doctor.exe",
+        "--principal",
+        "host"
+      ],
+      "exit_code": 2,
+      "stdout": "One closed service-result JSON plus LF; result_version=2.0.0, ok=false, exit_code=2, CLI_ARGUMENTS finding, runtime=null, input_manifest=null, artifacts=[]. Exact operation/mode context pair must be bound from the final reviewed malformed-argv repair before execution.",
+      "stderr": "Discovery command failed; inspect the JSON findings.\n",
+      "effects": "None",
+      "assertions": [
+        "No host authority flag exists",
+        "No caller-controlled token echoed in diagnostics",
+        "No activated state or host fallback"
+      ]
+    },
+    {
+      "label": "doctor",
+      "argv": [
+        "CLI_ENV/Scripts/dev.discovery.doctor.exe",
+        "--workspace-root",
+        "FIXTURE",
+        "--profile",
+        "docs/migration/discovery/domain-profile.yaml",
+        "--repository-id",
+        "workspace-example"
+      ],
+      "exit_code": 0,
+      "stdout": "One closed service-result JSON plus LF; operation=doctor, mode=structural, ok=true, exit_code=0, actual new installed runtime and nonnull input_manifest, artifacts=[]",
+      "stderr": "",
+      "effects": "None",
+      "assertions": [
+        "DISCOVERY_ENFORCEMENT_UNAVAILABLE warning retained",
+        "summary.deployment, receipt_ref and invocation_ref null",
+        "No native-host authority claimed"
+      ]
+    },
+    {
+      "label": "completion-preview",
+      "argv": [
+        "CLI_ENV/Scripts/dev.discovery.completion-report.exe",
+        "--workspace-root",
+        "FIXTURE",
+        "--profile",
+        "docs/migration/discovery/domain-profile.yaml",
+        "--repository-id",
+        "workspace-example",
+        "--mode",
+        "parity-complete",
+        "--format",
+        "both",
+        "--write",
+        "--dry-run"
+      ],
+      "exit_code": 1,
+      "stdout": "One closed service-result JSON plus LF; operation=completion-report, mode=parity-complete, ok=false, exit_code=1, summary.validation_result=fail; JSON and Markdown planned representations inside artifacts",
+      "stderr": "Discovery command failed; inspect the JSON findings.\n",
+      "effects": "None; write plus dry-run must only preview",
+      "assertions": [
+        "Typed blocking exit propagates through actual installed console",
+        "Both report representations remain inside one JSON envelope",
+        "Current runtime identity equals released package; semantic input digest remains distinct from full input-manifest digest",
+        "Full fixture membership and every byte unchanged after call"
+      ]
+    }
+  ],
+  "actual_invocations_planned": 4,
+  "result_validation": "Validate every JSON result against the installed service-result schema/catalog with its full reference closure; strict duplicate/nonfinite rejection, exactly one LF-delimited JSON document, actual process exit equals result.exit_code. Help is the declared text exception. Reuse accepted output-failure exit-3 qualification; do not fabricate a result after partial output.",
+  "controller": {
+    "reuse": "Retained P6-T1 process/controller UTF-8/raw-readable archive mechanics",
+    "total_cap_seconds": 600,
+    "per_child_cap_seconds": 300,
+    "progress_seconds": 20,
+    "stream_cap_bytes": 16777216,
+    "stop_first_failure": true,
+    "automatic_retries": false,
+    "cleanup": "Only the exact launched PID and descendants, as in retained bounded controller; preserve streams/effects first.",
+    "timing_basis": {
+      "report-dry": 29.109639500034973,
+      "doctor": 4.529261499992572
+    },
+    "rationale": "Comparable installed doctor took about 4.53s and completion dry-run about 29.11s. Four calls have no publication; 300s per-child/600s total is an operational ceiling with startup/host variability margin, not an ETA."
+  },
+  "evidence_requirements": [
+    "Archive exact final runner/observer/release/console launcher and installed entry-point metadata hashes, argv/env allowlist, actual exits/timings, complete bounded stdout/stderr, origin sidecars, before/after effects and package/source bindings",
+    "Preserve raw UTF-8 bytes losslessly and separate normalized readable views using SCRATCH/WORKSPACE aliases only",
+    "No production/test/config/spec/plan/Git/checkpoint/package generation or native operation occurred during this preparation"
+  ],
+  "release_prerequisites": [
+    "PA1 parser repair and composition tests reviewed/clean with exact final source and test freeze",
+    "Both pyprojects retain the same exact31 mappings and unchanged unrelated metadata",
+    "Packager completes serialized refreshed identity/wheel/install plus actual-console environment and provides immutable paths/hashes",
+    "Bind observer/controller syntax and exact fixture-state check before released execution; do not alter assertions to accommodate a live failure",
+    "Coordinator explicitly releases the four-call sequence against new verified package identity"
+  ],
+  "pending_package_identity": null,
+  "pending_environment": null,
+  "no_missing_product_decision": true,
+  "scope_limits": "Installed console registration/transport proof only. Existing 31-command mapping, service semantics, exit3 failure/output handling and PA1 edge controls remain in accepted in-memory proof. No 31-operation native replay and no agent-host/P8 authority claim.",
+  "preparation_diagnostic": "Before handoff, removed an assumed structural mode from the malformed-argv expected envelope: parser currently retains null mode before complete parsing. Final schema-valid context pair is a repair-freeze binding, not a missing product decision. Initial draft bytes are preserved in child SCRATCH."
+}

@@ -1,0 +1,107 @@
+{
+  "Timestamp": "2026-10-21T15-50",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "CAPTURED_HELP_ALL_POSTCONDITIONS_PASSED_NO_REPLAY",
+  "Command": "Offline exact retained help/origin/effect verification and finite three-predicate continuation transform; syntax only",
+  "EXIT_CODE": 0,
+  "Output Summary": "Retained help passes all corrected transport and unchanged postconditions, including formerly unreached lazy-service assertion. Zero actual console calls in this step.",
+  "authority": "build_identity_p6t2_native_continue_20261021T154900 / S5_P6T2_installed_cli_continuation",
+  "independent_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+    "sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6"
+  },
+  "original_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+    "sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108"
+  },
+  "original_harness_sha256": "462f33a658b29e9ed962ad95c9052246efb135472e33c61031ad2b21ec8fbac9",
+  "candidate": "SCRATCH/issue-980-p6t2-console-native-remaining-three.py",
+  "candidate_sha256": "adc5d47a01a86124cbeb4fb0ac085249e10f33d4886e100255c8a11014886b9e",
+  "observer_sha256": "ee9ce4f55048bebaa2d14d73b7147b2e7d5b2bdf321bd69037e90a6695ddbb3b",
+  "changes": [
+    {
+      "kind": "predicate1_fixed_stderr",
+      "old": "check(result['stderr'].decode('utf-8')==row['stderr'],stage+' exact stderr')",
+      "new": "check(result['stderr'] in (row['stderr'].encode('utf-8'), row['stderr'].encode('utf-8').replace(b'\\n',b'\\r\\n')),stage+' exact fixed stderr transport')"
+    },
+    {
+      "kind": "predicate2_fixed_help",
+      "old": "check(text.startswith('Usage: dev.discovery.validate [options]\\nOptions: --help -h ') and text.endswith('\\n') and text.count('\\n')==2 and '\\r' not in text,stage+' fixed LF usage text')",
+      "new": "expected_help=b'Usage: dev.discovery.validate [options]\\nOptions: --help -h --workspace-root --profile --repository-id --mode --format --output-prefix --dry-run\\n'\n  check(result['stdout'] in (expected_help, expected_help.replace(b'\\n',b'\\r\\n')),stage+' fixed LF or CRLF usage text')"
+    },
+    {
+      "kind": "predicate3_json_transport",
+      "old": "check(text.endswith('\\n') and text.count('\\n')==1 and '\\r' not in text,stage+' single LF JSON envelope')",
+      "new": "raw_json=result['stdout']; payload=raw_json[:-2] if raw_json.endswith(b'\\r\\n') else raw_json[:-1] if raw_json.endswith(b'\\n') else None\n check(payload is not None and b'\\r' not in payload and b'\\n' not in payload,stage+' single terminal LF or CRLF JSON envelope')"
+    },
+    {
+      "kind": "continuation_reuse_exact_existing_observer_no_environment_mutation",
+      "old": "pth=installation/('issue980_cli_observer_'+stamp+'.pth')\nassert not pth.exists()\npth_raw=('import runpy; runpy.run_path('+repr(str(observer))+')\\n').encode('utf-8')\npth.write_bytes(pth_raw)\ninstrumented=tree(envroot)\nassert {p:h for p,h in instrumented.items() if p not in installed_before}=={pth.relative_to(envroot).as_posix():sha(pth_raw)}\nassert all(instrumented[p]==h for p,h in installed_before.items())",
+      "new": "pth=installation/'issue980_cli_observer_20261021T153823.pth'\npth_raw=pth.read_bytes()\nassert pth_raw==('import runpy; runpy.run_path('+repr(str(observer))+')\\n').encode('utf-8')\ninstrumented=tree(envroot)\nassert instrumented==installed_before"
+    },
+    {
+      "kind": "continuation_route",
+      "old": "'build_identity_p6t2_native_cli_20261021T153500 / S5_P6T2_installed_cli'",
+      "new": "'build_identity_p6t2_native_continue_20261021T154900 / S5_P6T2_installed_cli_continuation'"
+    },
+    {
+      "kind": "continuation_skip_already_executed_help",
+      "old": "for row in prep['invocations']:invoke(row)",
+      "new": "for row in prep['invocations'][1:]:invoke(row)"
+    },
+    {
+      "kind": "continuation_counts",
+      "old": "'planned_invocations':4,'unrun_labels':[row['label'] for row in prep['invocations'][len(results):]]",
+      "new": "'planned_invocations':3,'historical_help_carried':True,'total_original_planned_invocations':4,'unrun_labels':[row['label'] for row in prep['invocations'][1+len(results):]]"
+    },
+    {
+      "kind": "retain_original_total_budget",
+      "old": "remaining=600-(time.monotonic()-start)",
+      "new": "remaining=600-0.3706669000093825-(time.monotonic()-start)"
+    },
+    {
+      "kind": "continuation_start_message",
+      "old": "print('Bound release '+sha((run/'release.json').read_bytes())+'; four actual consoles only',flush=True)",
+      "new": "print('Bound release '+sha((run/'release.json').read_bytes())+'; remaining three actual consoles only; help carried offline',flush=True)"
+    },
+    {
+      "kind": "continuation_status",
+      "old": "'INSTALLED_CONSOLE_FOUR_PASSED' if failure is None",
+      "new": "'INSTALLED_CONSOLE_REMAINING_THREE_PASSED_HELP_CARRIED' if failure is None"
+    },
+    {
+      "kind": "continuation_command",
+      "old": "'Command':'Four exact generated installed console executables; no checkout entry-point wrapper'",
+      "new": "'Command':'Remaining three exact generated installed consoles; retained help reevaluated offline; no replay'"
+    },
+    {
+      "kind": "continuation_bind_offline_carry_and_independent_confirmation",
+      "old": "descriptor=json.loads(checked(descriptor_path,'7e1d5f749b1b9aa56c15689bb1b6d486334d4b7a60abdb9832242455d8b9e682'))",
+      "new": "descriptor=json.loads(checked(descriptor_path,'7e1d5f749b1b9aa56c15689bb1b6d486334d4b7a60abdb9832242455d8b9e682'))\ncarry_path=q/'p6t2-native-help-offline-carry.2026-10-21T15-50.json'\ncarry=json.loads(carry_path.read_bytes())\nassert carry['status']=='CAPTURED_HELP_ALL_POSTCONDITIONS_PASSED_NO_REPLAY'\nchecked(q/'p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json', 'd26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6')\n"
+    },
+    {
+      "kind": "continuation_release_bindings",
+      "old": "write(run/'release.json',release)",
+      "new": "release['offline_help_carry_sha256']=sha(carry_path.read_bytes())\nrelease['transport_confirmation_sha256']='d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6'\nrelease['original_elapsed_seconds_charged']=0.3706669000093825\nwrite(run/'release.json',release)"
+    }
+  ],
+  "unchanged": "All requests, schema/content/effect/origin assertions, strict_json original-byte parsing, helper limits/cleanup, source/package/fixture/observer/raw bytes.",
+  "offline_checks": [
+    "Actual retained exit0, no timeout/overflow",
+    "Exact fixed all-CRLF help alternative; no normalization",
+    "Exactly empty stderr",
+    "Exact isolated environment/interpreter",
+    "Every runtime origin installed",
+    "No checkout paths except approved dependency path",
+    "No user site, PYTHONPATH or PYTHONHOME",
+    "Lazy service module absent",
+    "Fixture byte/membership unchanged",
+    "216 source hashes and31 launcher hashes unchanged"
+  ],
+  "native_calls_in_this_step": 0,
+  "historical_help_replayed": false,
+  "remaining_actual_calls": 3,
+  "original_operation_seconds_charged_against_600s_total": 0.3706669000093825,
+  "original_failure_preserved": true
+}

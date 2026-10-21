@@ -1,0 +1,24 @@
+{
+  "Timestamp": "2026-10-21T15-38",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "RETAIN_STOPPED_NATIVE_EVIDENCE_ONLY",
+  "actual_invocations": 1,
+  "unrun_invocations": 3,
+  "qualification": "Help exited zero; exact LF-text assertion failed. No diagnosis or retry. No task acceptance or final167 execution.",
+  "entries": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+      "sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+      "sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-stopped-staging-union.2026-10-21T15-38.json",
+      "binding": "self",
+      "sha256": null
+    }
+  ]
+}
