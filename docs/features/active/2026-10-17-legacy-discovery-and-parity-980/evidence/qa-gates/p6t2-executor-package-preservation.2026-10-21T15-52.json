@@ -1,0 +1,143 @@
+{
+  "Timestamp": "2026-10-21T15:52:47.667908+00:00",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "READY_FOR_CHECKED_PACKAGE_PRESERVATION",
+  "route": "atomic_execution_p6t2_package_native_20261021T154000",
+  "current_head": "ce51f57d8afe9f43c73127fc39854eeca6d22325",
+  "package_owner_closure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-staging-qualification.2026-10-21T15-33.json",
+    "working_sha256": "4111b94ff525b1d30fe7d7d4de24795eb8309fefdab720105e53d2058eaad925",
+    "git_lf_sha256": "4111b94ff525b1d30fe7d7d4de24795eb8309fefdab720105e53d2058eaad925",
+    "expected_git_blob": "8c4c162c35f1e927c60c1f2689dd610396bb40b7",
+    "bytes": 94683,
+    "git_lf_bytes": 94683
+  },
+  "package_handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+    "working_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+    "git_lf_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+    "expected_git_blob": "2f8b98c6f8678d47aff643e8694788e8e134f409",
+    "bytes": 64490,
+    "git_lf_bytes": 64490
+  },
+  "build_manifest": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+    "working_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+    "git_lf_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+    "expected_git_blob": "3468a9cdbda1a2c3204d7a6e5ac320ba886abd0a",
+    "bytes": 22677,
+    "git_lf_bytes": 22677
+  },
+  "build_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+  "policy_sha256": "bef024420dc551d7eeab7162b8a2c3ed4649f88b3690a57ae44df7a892674564",
+  "wheel_sha256": "670ed87df9ba1050fb9988af1ffbfd9ddd7b7383af0763ead0d13dc4d6f30bcd",
+  "verification": {
+    "source_inputs_current_and_equal_to_all_gate_maps": 216,
+    "installed_payload_byte_matches_excluding_manifest": 172,
+    "installed_manifest_byte_match": true,
+    "frozen_launcher_hash_matches": 31,
+    "launcher_targets_and_PE_framing": "Reuse the completed exact static verification in the bound handoff; no launcher or package execution was repeated.",
+    "ordered_gates": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-pip-support.2026-10-21T15-32.json",
+        "sha256": "55446ffd47dc3c1684e5b9b9222d7133cafd4560db3f0ccb82ac7df5f78b7f9e",
+        "stage": "pip-support",
+        "exit_code": 0,
+        "seconds": 0.3017380000092089
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-build.2026-10-21T15-32.json",
+        "sha256": "2ce93f6b9bd9c5752633a9b3d4fbfa6e3e7ad3a023c30822300d6ee4f4fa58b1",
+        "stage": "build",
+        "exit_code": 0,
+        "seconds": 3.1814949000254273
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-check.2026-10-21T15-32.json",
+        "sha256": "8ae93dfb706f00707be11a6de8bceb186c46bc2e397843a7312e0dc683c9623b",
+        "stage": "check",
+        "exit_code": 0,
+        "seconds": 1.2660990000003949
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-venv.2026-10-21T15-32.json",
+        "sha256": "50bfe13afa63e72ddedb73668806e99a6e52e8a47ea00ec2087fdf2d55581cda",
+        "stage": "venv",
+        "exit_code": 0,
+        "seconds": 0.15576100000180304
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-install.2026-10-21T15-32.json",
+        "sha256": "d5733ad868aeb5b35c9d850d5966fa6c7338dcfcc7ff3ce0ae5ba3826c6d7385",
+        "stage": "install",
+        "exit_code": 0,
+        "seconds": 3.8179709000396542
+      }
+    ],
+    "lossless_archive_members": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-raw-archive.2026-10-21T15-32.json": 12,
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-raw-archive.2026-10-21T15-31.json": 6,
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-raw-archive.2026-10-21T15-33.json": 2,
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json": 14
+    },
+    "raw_readable": "Each successful process stream matches the normalizer extracted unchanged from the archived package harness, using its recorded SCRATCH and WORKSPACE roots. Raw UTF-8 bytes, including CR/LF, remain unchanged."
+  },
+  "initial_failure_preservation": {
+    "excluded_original": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-build.2026-10-21T15-31.json",
+      "sha256": "d8955c7bde555ce145e5ba8ae1d137aa032b96ca05613ead384353d4b478bd41",
+      "bytes": 66914
+    },
+    "recovery": "The exact existing original bytes round-trip from initial_failure.original_gzip_base64 in the included qualification. Its decoded readable view replaces the host Poetry locator with HOST_POETRY. The original file remains untouched and excluded.",
+    "resolution": "The outer Poetry-selected repository interpreter invokes the unchanged builder module directly. This avoids nested Poetry startup under PYTHONNOUSERSITE=1; no source or dependency change."
+  },
+  "verifier_diagnostic": {
+    "source": "Retained tool execution output; this structured description is not asserted to be raw stderr bytes.",
+    "exception": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x95 in position 1240: invalid start byte",
+    "cause": "First #! bytes occurred inside PE launcher data, before the actual interpreter line.",
+    "resolution": "Bound the final shebang immediately preceding the embedded ZIP member header; exact expected interpreter and target assertions remain unchanged.",
+    "reruns": "Only static verification resumed. Successful build/check/venv/install processes were not replayed."
+  },
+  "reader_shape_qualification": "A metadata-only inspection initially used .items() on the manifest files list and raised AttributeError: 'list' object has no attribute 'items'. A subsequent local assertion incorrectly added the separately checked manifest to the handoff's 172 payload count. The existing files list contains exactly 172 payload entries, with the manifest checked separately. Both assumptions were corrected directly from the existing metadata; no source, artifact, measured counter, verifier, or execution changed.",
+  "native_preservation": {
+    "bindings": [
+      [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+        "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108"
+      ],
+      [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+        "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc"
+      ],
+      [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-byte-diagnosis.2026-10-21T15-41.json",
+        "e210ac0913f97bdcd254b2321645435f9b334938fc2e7d4156e8caf2fd81c508"
+      ],
+      [
+        "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+        "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6"
+      ]
+    ],
+    "status": "Original help child exited 0 with fixed CRLF-transport text; the original LF-only controller assertion failed and remains preserved. The separate transport confirmation defines the accepted finite harness correction. The three remaining calls and any new continuation outputs are outside this immutable preservation boundary."
+  },
+  "limitations": [
+    "No source/test review is reopened.",
+    "No package build, install, native invocation, or behavioral test was repeated by this review.",
+    "Package identity success and recoverable stopped native evidence do not constitute P6-T2 task acceptance.",
+    "Final 167-case aggregate, native continuation and task acceptance remain pending."
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-package-preservation-staging-union.2026-10-21T15-52.json",
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "47/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

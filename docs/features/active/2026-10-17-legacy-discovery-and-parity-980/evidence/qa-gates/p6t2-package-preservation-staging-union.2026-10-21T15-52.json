@@ -1,0 +1,180 @@
+{
+  "Timestamp": "2026-10-21T15:52:47.667908+00:00",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "READY_FOR_CHECKED_PACKAGE_PRESERVATION",
+  "current_head": "ce51f57d8afe9f43c73127fc39854eeca6d22325",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-package-preservation.2026-10-21T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-byte-diagnosis.2026-10-21T15-41.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-package-preservation-staging-union.2026-10-21T15-52.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-pip-support.2026-10-21T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-build.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-check.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-install.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-pip-support.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-raw-archive.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-venv.2026-10-21T15-32.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-raw-archive.2026-10-21T15-31.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-staging-qualification.2026-10-21T15-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-raw-archive.2026-10-21T15-33.json",
+    "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json"
+  ],
+  "path_count_including_self": 18,
+  "bindings_excluding_self": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "working_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+      "git_lf_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+      "expected_git_blob": "3468a9cdbda1a2c3204d7a6e5ac320ba886abd0a",
+      "bytes": 22677,
+      "git_lf_bytes": 22677
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-pip-support.2026-10-21T15-32.json",
+      "working_sha256": "55446ffd47dc3c1684e5b9b9222d7133cafd4560db3f0ccb82ac7df5f78b7f9e",
+      "git_lf_sha256": "55446ffd47dc3c1684e5b9b9222d7133cafd4560db3f0ccb82ac7df5f78b7f9e",
+      "expected_git_blob": "4a8ca6fa88860eb7bf89825ced9fba0d5dd8b889",
+      "bytes": 71369,
+      "git_lf_bytes": 71369
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-build.2026-10-21T15-32.json",
+      "working_sha256": "2ce93f6b9bd9c5752633a9b3d4fbfa6e3e7ad3a023c30822300d6ee4f4fa58b1",
+      "git_lf_sha256": "2ce93f6b9bd9c5752633a9b3d4fbfa6e3e7ad3a023c30822300d6ee4f4fa58b1",
+      "expected_git_blob": "698c33acc253bb4f9f4837086d27e186baed9d0c",
+      "bytes": 76700,
+      "git_lf_bytes": 76700
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-check.2026-10-21T15-32.json",
+      "working_sha256": "8ae93dfb706f00707be11a6de8bceb186c46bc2e397843a7312e0dc683c9623b",
+      "git_lf_sha256": "8ae93dfb706f00707be11a6de8bceb186c46bc2e397843a7312e0dc683c9623b",
+      "expected_git_blob": "450c1521a10bd8c72e4f1364deccaab735a78097",
+      "bytes": 76467,
+      "git_lf_bytes": 76467
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-venv.2026-10-21T15-32.json",
+      "working_sha256": "50bfe13afa63e72ddedb73668806e99a6e52e8a47ea00ec2087fdf2d55581cda",
+      "git_lf_sha256": "50bfe13afa63e72ddedb73668806e99a6e52e8a47ea00ec2087fdf2d55581cda",
+      "expected_git_blob": "ad26d3927a3a846d5ee3cab8123ca5e709e3be6d",
+      "bytes": 66506,
+      "git_lf_bytes": 66506
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-install.2026-10-21T15-32.json",
+      "working_sha256": "d5733ad868aeb5b35c9d850d5966fa6c7338dcfcc7ff3ce0ae5ba3826c6d7385",
+      "git_lf_sha256": "d5733ad868aeb5b35c9d850d5966fa6c7338dcfcc7ff3ce0ae5ba3826c6d7385",
+      "expected_git_blob": "4eafca9304838de08c48e3297d088f0e6db4c51f",
+      "bytes": 66938,
+      "git_lf_bytes": 66938
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-r2-raw-archive.2026-10-21T15-32.json",
+      "working_sha256": "3f31f5d4818f948b7ae1e8740c54bd9931aff65ace8528b311d63abc368960d6",
+      "git_lf_sha256": "3f31f5d4818f948b7ae1e8740c54bd9931aff65ace8528b311d63abc368960d6",
+      "expected_git_blob": "fde27caaffe7d33f861e454e798fa7906b9eaa61",
+      "bytes": 30157,
+      "git_lf_bytes": 30157
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-pip-support.2026-10-21T15-31.json",
+      "working_sha256": "808702110d619d724e4033d0eed01d852c714da5b4477070d83de5739828071c",
+      "git_lf_sha256": "808702110d619d724e4033d0eed01d852c714da5b4477070d83de5739828071c",
+      "expected_git_blob": "99c52e8a19c2385339468bd41ed32601351d1666",
+      "bytes": 71368,
+      "git_lf_bytes": 71368
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-raw-archive.2026-10-21T15-31.json",
+      "working_sha256": "8b480b7fcc29426617c2b15846e3ca6b5014847211719b760af739067b29405a",
+      "git_lf_sha256": "8b480b7fcc29426617c2b15846e3ca6b5014847211719b760af739067b29405a",
+      "expected_git_blob": "f161d268d5d956401577a7d67b9f7f96b32e8696",
+      "bytes": 23945,
+      "git_lf_bytes": 23945
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+      "working_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+      "git_lf_sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8",
+      "expected_git_blob": "2f8b98c6f8678d47aff643e8694788e8e134f409",
+      "bytes": 64490,
+      "git_lf_bytes": 64490
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-raw-archive.2026-10-21T15-33.json",
+      "working_sha256": "50fe4b403a1646a48540b41f828afb31abec24cada879acc4f4cf5c208afb67a",
+      "git_lf_sha256": "50fe4b403a1646a48540b41f828afb31abec24cada879acc4f4cf5c208afb67a",
+      "expected_git_blob": "bc401fb40924d6aaa87be01f8fdb1f307e70784d",
+      "bytes": 19891,
+      "git_lf_bytes": 19891
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-staging-qualification.2026-10-21T15-33.json",
+      "working_sha256": "4111b94ff525b1d30fe7d7d4de24795eb8309fefdab720105e53d2058eaad925",
+      "git_lf_sha256": "4111b94ff525b1d30fe7d7d4de24795eb8309fefdab720105e53d2058eaad925",
+      "expected_git_blob": "8c4c162c35f1e927c60c1f2689dd610396bb40b7",
+      "bytes": 94683,
+      "git_lf_bytes": 94683
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli.2026-10-21T15-38.json",
+      "working_sha256": "e20f2d7009e075eef83b0fd7ba7df7c780c2178b14c5b91537713be67b3d3108",
+      "git_lf_sha256": "9596ff31957ff898fb86042de4de2fbe2b2728a193073bfad9ee09d4fd9e6775",
+      "expected_git_blob": "fb7d69490418d8380b09e9bc3c86f6624703f659",
+      "bytes": 16043,
+      "git_lf_bytes": 15858
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-installed-cli-raw.2026-10-21T15-38.json",
+      "working_sha256": "34900a9a4dcd074497a38770bfa57ee550c229b4a05afb56bb8e0234464617bc",
+      "git_lf_sha256": "98f5918b16220de6362c01629d8afb820ae7b27cefb4cad2745ec7825ef1575d",
+      "expected_git_blob": "2e83b4796d32bca4e2a46fe7f3f0bc29bbb02eb1",
+      "bytes": 265367,
+      "git_lf_bytes": 265281
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-help-byte-diagnosis.2026-10-21T15-41.json",
+      "working_sha256": "e210ac0913f97bdcd254b2321645435f9b334938fc2e7d4156e8caf2fd81c508",
+      "git_lf_sha256": "7d4404e7e803678bf70754228f97d8f9435469128ecb47917acae24ff435be78",
+      "expected_git_blob": "cba0c68f065c6b124c5bf7a87c94a705306bfdd6",
+      "bytes": 6459,
+      "git_lf_bytes": 6343
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+      "working_sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6",
+      "git_lf_sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6",
+      "expected_git_blob": "c16422c9f0a4ac07d05f0112132f3c78f89754d2",
+      "bytes": 7442,
+      "git_lf_bytes": 7442
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-package-preservation.2026-10-21T15-52.json",
+      "working_sha256": "1a352247a0a08069548943ee8d24e7a3e263de4c251fd50ca86371901efbb140",
+      "git_lf_sha256": "1a352247a0a08069548943ee8d24e7a3e263de4c251fd50ca86371901efbb140",
+      "expected_git_blob": "453a7284fca6eefcdb8c762267232f4212e7c9f8",
+      "bytes": 8976,
+      "git_lf_bytes": 8976
+    }
+  ],
+  "committed_dependencies": [],
+  "self_binding": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-package-preservation-staging-union.2026-10-21T15-52.json",
+    "included": true,
+    "treatment": "Self is included in stage_paths; its working/Git-LF SHA is returned externally to avoid a recursive self hash."
+  },
+  "exclusions": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-build.2026-10-21T15-31.json",
+    "Active native-continuation scripts/streams and future receipts",
+    "Disabled final-167 preparation not part of the completed package/native-failure boundary",
+    "Ignored scratch, venv, wheel, build caches and canonical checkpoint"
+  ],
+  "raw_preservation": "All original raw streams remain losslessly archived. The excluded original host-locator receipt is verified recoverable through the included qualification; it is not rewritten or deleted.",
+  "task_acceptance": false
+}
