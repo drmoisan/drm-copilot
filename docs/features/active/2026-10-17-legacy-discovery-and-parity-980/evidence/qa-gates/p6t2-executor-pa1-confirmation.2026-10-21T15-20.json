@@ -1,0 +1,343 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T15:20:01.584865+00:00",
+  "task": "P6-T2",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-pa1-reconcile.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "PA1 repair and exact prose qualification confirmed with 109 retained passes, original probe ordering and all 13 raw named BODY ranges; parser subset ready for checked preservation.",
+  "status": "READY_FOR_CHECKED_WIP",
+  "source_head": "cb34737468e0bdb94056c51ee61c2a29ee3728b0",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-freeze.2026-10-21T15-06.json",
+    "working_sha256": "3ed31d60fc643574c68f19055adf4532db2d7f7f3e343bd857f17bb4cac4f8a3",
+    "git_lf_sha256": "3ed31d60fc643574c68f19055adf4532db2d7f7f3e343bd857f17bb4cac4f8a3",
+    "expected_git_blob": "54343126e6baca6d7f7a088c56b676d2c87093e5",
+    "bytes": 31215,
+    "git_lf_bytes": 31215
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-staging.2026-10-21T15-06.json",
+    "working_sha256": "0d01a081b5df2fe060492c95613ab6fce952da8d93595dbc68807475c3906b69",
+    "git_lf_sha256": "0d01a081b5df2fe060492c95613ab6fce952da8d93595dbc68807475c3906b69",
+    "expected_git_blob": "5bd8ebdf85eb460d2bafe9947e9fd746fbfd237c",
+    "bytes": 3675,
+    "git_lf_bytes": 3675
+  },
+  "original_review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-parser-review.2026-10-21T14-59.json",
+    "sha256": "62758cfb1d4222d6b1c7641be06ec35d7b8b507b8d8ca58db723ce4a619f3189"
+  },
+  "confirmed_source": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "working_sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "git_lf_sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "expected_git_blob": "45efa9902c44014d45da54f4539be99951ff3711",
+      "bytes": 15999,
+      "git_lf_bytes": 15999
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "working_sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "git_lf_sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "expected_git_blob": "ade15e157e3e74881b247f5ba6d78138efa67a6d",
+      "bytes": 8474,
+      "git_lf_bytes": 8474
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_commands.py",
+      "working_sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9",
+      "git_lf_sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9",
+      "expected_git_blob": "2b72744a80fb9b3acaa596a2a4e3f5af4d559043",
+      "bytes": 12322,
+      "git_lf_bytes": 12322
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_errors.py",
+      "working_sha256": "d1cdaa2b21dedc7926698d6eaae8205e227eb8bbd5eef28a0806811b0b7cefb9",
+      "git_lf_sha256": "d1cdaa2b21dedc7926698d6eaae8205e227eb8bbd5eef28a0806811b0b7cefb9",
+      "expected_git_blob": "c72d83225798dd736553cbf4f41f6be3634c014a",
+      "bytes": 15535,
+      "git_lf_bytes": 15535
+    }
+  ],
+  "source_confirmation": "Only the JsonValue type import, _reserve_request_work and its call before budget.check alter production AST. The iterative immutable walk reserves container expansion and string work before measurement/copy/reconstruction/encoding. Existing command table and every prior function body remain unchanged except that call. Root substitution and public service semantics are preserved.",
+  "probe_qualification": "The original two 64/1024-character inputs and measurement/work seams were reused once. The adaptation updates only the frozen source hash and observation handling for the now-absent text scan. Both refuse with ReportLimitError before every text measurement; no providers, service, schema, native process or owner suite was invoked.",
+  "probe_observations": {
+    "issue": 980,
+    "probe": "public build_cli_request prepaid character-work ordering",
+    "before": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+    },
+    "after": {
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+    },
+    "cases": [
+      {
+        "supplied_root_characters": 64,
+        "expanded_work_capacity": 128,
+        "outcome": "ReportLimitError",
+        "text_measurements": [],
+        "events": [
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 128
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 127
+          },
+          {
+            "event": "work_reservation",
+            "requested": 32,
+            "work_left": 126
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 94
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 93
+          },
+          {
+            "event": "work_reservation",
+            "requested": 40,
+            "work_left": 92
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 52
+          },
+          {
+            "event": "work_reservation",
+            "requested": 512,
+            "work_left": 51
+          }
+        ]
+      },
+      {
+        "supplied_root_characters": 1024,
+        "expanded_work_capacity": 128,
+        "outcome": "ReportLimitError",
+        "text_measurements": [],
+        "events": [
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 128
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 127
+          },
+          {
+            "event": "work_reservation",
+            "requested": 32,
+            "work_left": 126
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 94
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 93
+          },
+          {
+            "event": "work_reservation",
+            "requested": 40,
+            "work_left": 92
+          },
+          {
+            "event": "work_reservation",
+            "requested": 1,
+            "work_left": 52
+          },
+          {
+            "event": "work_reservation",
+            "requested": 8192,
+            "work_left": 51
+          }
+        ]
+      }
+    ],
+    "provider_or_service_calls": 0,
+    "timing_assertions": false
+  },
+  "probe_streams": {
+    "issue-980-p6t2-builder-work-probe.py": {
+      "encoding": "gzip-base64",
+      "sha256": "e85d9d46d7efcd6c79c3faef319d86e6f04d4cc940a47b3e65449709379cac94",
+      "bytes": 2999,
+      "data": "H4sIAAAAAAAC/7VW32/jNgx+918h9MX2kLqJk1x+AHnZYQM6HNbDXotAkCW60dW2PElumx36vx8lO4596XXDAcuLI4n8SH4kRV1dXd1lBvQTEHsAkmv1D1Tk46dbkjWyEKBDQ2oN1xqcELNSVcRwVpFnaQ+qseT25o7USluTXF1dBbJ0/8mBmUMhs9Pyi1FVgNAlqZl1B6Q7+IzL9qCppLVgbFIq/ng6Rml+CFoBoUvKVS0LZamQhqsn0MeEF5Iy/dCUUFlzUvtYyNvqSXHv7aQNhDpJDX83aGOCwNoAHSm/Z6VUAooe/g+M5i77AhyBPjugT7KU7wNocJp0jPOX3/y1EQ9gg8AxY8iO3Ic144/sAcxNr3+tm8rKEm6M5jdvWrgZxZLUx3ASkNPv5xG5KktWCQ+4DzLIlQb08atzdnvKcmIOLF1+iFwyI3cSY7xM0OyICY3iODnAi5Bo3kYxQQRfBERW/mteA2awtCwpJAq0JpInVjRel+wcI1mWs2W6WqzSjOWL2ZRNeTrl6/l6NZ2nqxnMQcz5bLlIgaV8s54D4yJdLFZiwebZZpMNyXj7F+bT9ZrP55vFOp2vpqnIxTxf83yVrflinYuMz9bLzXTDNulstYINY6tlni9Xm9ksTfM5Y44eZhw5b9RWFArFrdLhhETxBCN19bIb1A5GeqJBGlkZyyoOkQOcjKs5DpSWD7JiBbXwggXYL5+VfkTrw6JKWpHRlhMLsJmbwvpq2wcuIwVUD21O7j8sJmQ2TRf7refMNHVdSBAoG+qQ/NKJ+jPZu4WnIzejrtN2516JbFMXEEWPcJycUWVOcMNlOXSeGaxUoFopGxLsFCC+EOI+e85XD+D3nb+Oo6SzlpRQZqBNjBy7jjMSOT9SKXZ/qqpDablHf4fsM21lzrjFC4IrLcwubYXhyV8rnia3FpATrrBzQHj6IwNF3jkTb3svW7WE1TVUIvoa+nW4JaHTwRoI+YFpNIeu4i4SGrUIeCINPXHT0rA9hWp60n5YzJ5CWkDu1JxrSb/xeuZQg210RUZ1NArkIlSH0kn4rf8Sqrc8GBou7C5NIFDAA01+0uULh7ykm0jtyEhUW3LDyp/09A8zGE/e1XCGBhpuOQje6uN2lIuLSRPJwRwaF/guvHkO+7ug/cQjNJyueP+C7zxPABJ3Jv6FQ23Jb/7jOpAZAlorvf0Bhj3WEHmJOKG0YiVQ6kV9n7Q9XLlSkJWAF99p/h+2knp2nQYVXmaaWUTxSY9d8+JZglRFl4Ubt8F0V825QkZS9PtOwKsFaYeXGqdORzjlDEmT9ugkPE1Jf17hQDXnfgi7cFGy+4dgY4Pu7YLHbQj3p9j3A4zvK9fQdijRN4HuHTuOrBNLLfC2R+5Yuu9aY9/fdaPuGDpw5oSWwEyj0WTnQi61sfRCG1unKSNvZUDo/i2/3kzxv2S49323u/Q83scD31vFnmDsYZajM//Xm+H0ItkRbyaotaxs5J6biWjK2mC9SWMaVxCb9RSLodYqc6uwbrJC8suOdY/dmklBeiKv/WTFsQAI/tA9JcLWMiK1fxDae4Ab/usueZxMjomuA1rjTxJhqNLUESjxKuCsKJzUtMPFRxlaoW18rvrw7HeGo/B14pNVWRxOcfANe+moo7cLAAA="
+    },
+    "issue-980-p6t2-builder-work-confirmation-adapted.py": {
+      "encoding": "gzip-base64",
+      "sha256": "5a1220fb2dad74ed1a42ad32fa135be5371d2ad65be5cc1059cbd85639b9e1ad",
+      "bytes": 2697,
+      "data": "H4sIAAAAAAAC/7VWTW/jNhC961cQvkgqFPk7sgz40sUWSLFoFr0GgUCRI5sbSVRJyom7yH/vkJJlq8kGxQL1RRI5fDPz5s3Qk8nkPtegjkDMAUih5N9Qk09f7kjeipKD8jVpFNwosEbUCFkTzWhNnoU5yNaQu+k9aaQyOp5MJp6o7Ds5UH0oRX7+/KZl7SF0RRpq7AbpN77iZ7fR1sIY0CauJHs6b6M1O3idAVdVxmQjSmkyLjSTR1CnmJUio2rfVlAbfT72qRR39VEyF23UJZJZSwV/tegjQmClIRsd/shLJTmUA/zvmM19/g0YAn21QF9EJT4GUGBPZmOcP93iry3fg/E8y4wmO/LgN5Q90T3o6XD+RrW1ERVMtWLTdz1MR7nEzcmPPHL+/Twik1VFa+4AH70cCqkAY/xug92eqxzrA12sbwNbzMDuhJgv5Vl+woIGYRgf4IULdG+CkCCCEwERtXvqV49qlJYhpUCDzkV8pGXrzpKdZSTP2TplKcw5nfFkuU4Tvl4vWZ4AzNLbNGVsTpf5iiXzxWqzWa8KoCldbXiS8iSns/U1Ge///GK22bDlMl1tFstktuAFXxYbViT5hq02Bc/ZfLNOZylNF/MkgZTSZF0U6ySdzxeLYkmppYdqS8472gp8LpmRyo9IEEaYqdXL7ko7mOmZBqFFrQ2tGQQWMBqrOfSkEntR0zIz8IICHD6fpXpC79eiijuT0ZI187CZ29I4tT16tiIl1PuuJg+3q4jMZ4vV49ZxptumKQVwtPWVT37pTd2eGMLC3VGYQd9pu0uvBKZtSgiCJzhFF1RREFywVfZtZBqVCpmS0vgEOwWIE0I4VM/G6gDcuo3XchT33uIKqhyUDpFj23FaIOenTPDdH7LuUTruMd5r9qkyoqDM4IBgUnG9W3TGcHRjxdFkvzkUhEnsHOCO/kBDWfTBhNshyu5YTJsGah589923vyW+PYMa8NmBKnSHoeIqEhp0CLgjdHbmpqNhe05VD6T9UMyOwqyEwh6zocXDwuuFQwWmVTUZ6WiUyJtULUpv4Zb+S6rO89WlYdPuywQcDRxQ9JMhvwnIWdobqbsyYtlJ7lr50UD/dQXD6MMT1tHVCft5lbxRp+2oFm9umkBc3UNjge/86bM/zILuEY7Q8HbF+Quu8xwBSNyF+BcGjSGf3cN2INUElJJq+wMMc2ogcBZhnGU1rSDLnGkFVLfKdfiDks+ux+wTm6vXPzYpLjz0xX103eq47LqiH1yDK9ztaHTd9dm69AneIleeho7qJ9FFQCP1Z/9uFJw8WBV4aRCur0fGKHIqzMlaOBbjYb/G+1Zf2sXvQ0TL/q0XRdZH5oY17p4Dtb6O/Vr3gqL0aIEB/V+34PmO3RHnxmuUqE1g/0DFvK0ajRQJrVubQ7qZYYCNkrn98ps2LwV7q0H7962hgpOBzBt3V+CgAwTf95ej33lGpO4FoV0EuOCedmzhrLVU9EXrnB8FwmRSZbbVBYqb0bK0VrMeF/9moJesyw+Vavd+ozjcXyNMnyOrOG5D7x+RAf2piQoAAA=="
+    },
+    "issue-980-p6t2-builder-work-confirmation.stdout": {
+      "encoding": "gzip-base64",
+      "sha256": "5e9cd39ef0e408fac5ce8d59e49021cc273237e04ff1c44f82827ce79084dc79",
+      "bytes": 3067,
+      "data": "H4sIAAAAAAAC/+1WTW/bMAy9F+h/MHxOF8u2Kmn33XbadQgMWqIyoXbkSXLWouh/n2Tna5eg25DlsJwsk898jzRF8PX+Lsty4/2I+cdM8GIxGQZn22TIh7HtjMza0XSqkZ1pHH4f0YdscDiAUZn8Bg5kQPfww7qnzDqFzmzW+RynRW1dCvSaXlNgkE+wRr9Uxku7Rffy4MZNMD0uvZNL5fpG2sF0NjQHxDLxgluPPW6C/zC8JGFtK6mQAomCQrGKCqYorWTLEAvxKISUBKq2loyUNee01ggCaq6YUKyFgs4C/0aRtH0PG7UXpAvOZVWJmpcVK0qlVaW51KzlsuZatZJwKgoBoiSMoQBgVGvKBCFlqSuAPOl5m8sGOhb0VrXfrJoEjz4G/Tpr3BUvOvw4DJ1B1Tgb9Rw6NmEf68UBhs9DVBZhqZMbCTFHE5JKUvIjyo4h5jBdji84WBc+m96ET85Zlx9RAZ9D0yP40eH0A5Ku1QnXdm/cm04EHxGJZVLj0KPbQjB2c2SZcLsLiSoJ/dU1fdmhDnMOR9/b4p+xskuxVuU52scrJCvqa5BWlyKtizOs5RVSpRcjpeRMM1FyQrs/rubDXsa7Zg0pytu0uU2b27T5z6cNJ+JPx016rA4r+tbEZbuxrkmsRmKcIl2Xrvlui4/rWFzFG/DRnzQll4bO4/1djPQTkjP12/sLAAA="
+    },
+    "issue-980-p6t2-builder-work-confirmation.stderr": {
+      "encoding": "gzip-base64",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "data": "H4sIAAAAAAAC/wMAAAAAAAAAAAA="
+    }
+  },
+  "ordered_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-format.2026-10-21T15-05.json",
+      "sha256": "a0e7431b5d27a6126232f25420578b323f3e238063c32f3ba0245341f0c5e48c",
+      "started": "2026-10-21T15:05:05.350547+00:00",
+      "finished": "2026-10-21T15:05:06.887751+00:00",
+      "seconds": 1.5373034999938682
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-lint.2026-10-21T15-05.json",
+      "sha256": "9ad76de6324003a116a5b15661fa67e267cf9f2a9b35ec273f885391d82e178d",
+      "started": "2026-10-21T15:05:06.892406+00:00",
+      "finished": "2026-10-21T15:05:08.092028+00:00",
+      "seconds": 1.1997166000073776
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-types.2026-10-21T15-05.json",
+      "sha256": "061a0fcc46a43ec47093e27b4be1b888af4078cbefb37038ab8d6d59324df533",
+      "started": "2026-10-21T15:05:08.096381+00:00",
+      "finished": "2026-10-21T15:05:10.587015+00:00",
+      "seconds": 2.490742900001351
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-tests.2026-10-21T15-05.json",
+      "sha256": "776f0bddaa7d3ed2393f02a3f9d01cf2e41fea2e54004119fe34aa6a0307497e",
+      "started": "2026-10-21T15:05:10.594320+00:00",
+      "finished": "2026-10-21T15:05:44.998062+00:00",
+      "seconds": 34.40384859999176
+    }
+  ],
+  "evidence_qualifications": [
+    "Owner ordered_receipts is filename-sorted; actual immutable started/finished fields confirm Black, Ruff, Pyright, then tests.",
+    "PowerShell's default ConvertFrom-Json rejected coverage.py's empty module-scope function key during an initial read. The existing UTF-8 JSON reader retains that valid key; named BODY mapping excludes only the empty module bucket.",
+    "The initial AST confinement check omitted the newly required JsonValue import and stopped before any artifact write. Accounting for that exact type import, helper and call proves all remaining original AST unchanged.",
+    "The first stdout comparison lacked the already recorded parser SCRATCH prefix and stopped before writing. Applying that exact observed prefix through the existing normalizer resolves the equality; no raw bytes, view, source or test changed.",
+    "Raw CRLF and terminal whitespace remain in exact base64 streams. Readable equivalence uses the established path/newline/trailing-blank normalization; raw hashes are unchanged."
+  ],
+  "test_and_coverage_confirmation": {
+    "passed": 109,
+    "failed": 0,
+    "original_nodes_and_definitions_preserved": 106,
+    "added_nodes": [
+      "tests/discovery_runtime/test_cli_errors.py::test_builder_reserves_direct_text_before_measurement[root]",
+      "tests/discovery_runtime/test_cli_errors.py::test_builder_reserves_direct_text_before_measurement[nested]",
+      "tests/discovery_runtime/test_cli_errors.py::test_adequate_direct_builder_keeps_identity_and_public_schema"
+    ],
+    "named_bodies": 13,
+    "module_statements": [
+      182,
+      41
+    ],
+    "module_branches": [
+      70,
+      10
+    ],
+    "all_statement_and_branch_counts_fully_covered": true,
+    "raw_counts_augmented": false
+  },
+  "documentation_confirmation": {
+    "id": "PA1-DOC1",
+    "status": "CLOSED",
+    "qualification": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc-qualification.2026-10-21T15-16.json",
+      "working_sha256": "65be64063e5ef3ff877f0aa8d1868928efb04b035dbe19bfe16c071ef320ea02",
+      "git_lf_sha256": "65be64063e5ef3ff877f0aa8d1868928efb04b035dbe19bfe16c071ef320ea02",
+      "expected_git_blob": "2a287a756c5f2c3ee451011e114c050b1a88b48a",
+      "bytes": 31170,
+      "git_lf_bytes": 31170
+    },
+    "owner_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc-staging.2026-10-21T15-16.json",
+      "working_sha256": "f16810eb4dbda9023614a296a7fdd735ff71f379bd4a9e24100a1bd33a7e9ad4",
+      "git_lf_sha256": "f16810eb4dbda9023614a296a7fdd735ff71f379bd4a9e24100a1bd33a7e9ad4",
+      "expected_git_blob": "42ba4646f304a462f4e39a853d79e6c1760dc42a",
+      "bytes": 5443,
+      "git_lf_bytes": 5443
+    },
+    "current": {
+      "path": "tests/discovery_runtime/test_cli_errors.py",
+      "working_sha256": "d1cdaa2b21dedc7926698d6eaae8205e227eb8bbd5eef28a0806811b0b7cefb9",
+      "git_lf_sha256": "d1cdaa2b21dedc7926698d6eaae8205e227eb8bbd5eef28a0806811b0b7cefb9",
+      "expected_git_blob": "c72d83225798dd736553cbf4f41f6be3634c014a",
+      "bytes": 15535,
+      "git_lf_bytes": 15535
+    },
+    "delta": "Only nested reserve's docstring adds ReportBudget and reflows its return/error contract. Exact prior and current streams were decoded and compared; replacing only that docstring restores the complete module AST. All 109 IDs/assertions/decorators remain unchanged.",
+    "static_receipts": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc-format.2026-10-21T15-15.json",
+        "sha256": "e1a164ee9e4d5dc7cbae1dc4859f949402392d166dd7ab10573869eb264d548b",
+        "exit_code": 0,
+        "started": "2026-10-21T15:15:45.046004+00:00"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc-lint.2026-10-21T15-15.json",
+        "sha256": "18e58333e5d10e651433e7be79b08e724a0016b437ccb1428ff6fb200a0e9ae2",
+        "exit_code": 1,
+        "started": "2026-10-21T15:15:46.587169+00:00"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc2-format.2026-10-21T15-16.json",
+        "sha256": "9b91f83cd3f405dab54483b2e9d128c0add1090217303b769cd34cd86b27a295",
+        "exit_code": 0,
+        "started": "2026-10-21T15:15:59.729369+00:00"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc2-lint.2026-10-21T15-16.json",
+        "sha256": "3edd171a2e162f575ee68e7f01b3d7003db72a84c528341744713948e6f3d8f3",
+        "exit_code": 0,
+        "started": "2026-10-21T15:16:01.324829+00:00"
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc2-types.2026-10-21T15-16.json",
+        "sha256": "33aec75c666173c57e99732e66a056e6225e2c57ec20950ee1b29059c53b4759",
+        "exit_code": 0,
+        "started": "2026-10-21T15:16:03.055604+00:00"
+      }
+    ],
+    "qualification_detail": "The literal insertion's E501 is preserved; the clean Black/Ruff/Pyright restart passed after prose-only reflow. No behavior was replayed for that wording."
+  },
+  "other_findings": [],
+  "open_probes": [],
+  "task_accepted": false,
+  "pending": "Composition behavior/repair, final task isolation, regenerated package/installed registration identity and P6-T2 acceptance are separate and pending.",
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

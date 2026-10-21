@@ -1,0 +1,550 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T14:37:51.369215+00:00",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-baseline.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Accepted predecessor and exact retained CLI interface bound; six planned files absent; no tests or service execution.",
+  "status": "BASELINE_AND_INTERFACE_READY",
+  "source_head": "cb34737468e0bdb94056c51ee61c2a29ee3728b0",
+  "task": "P6-T2",
+  "scope": "Baseline and stable interface only; implementation requires coordinator release. No task acceptance or checkoff.",
+  "writer_diagnostic": "Initial read-only table extraction counted the Markdown separator row and stopped at the 31-row assertion before any write. Excluding that separator preserves the exact 31 prepared commands; no behavior or source was changed.",
+  "plan": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "working_sha256": "3cc9e9857d12a0f9f575ff136b68c8e7afe80d20e2dfd5aed748daf6fdbf03ea",
+    "git_lf_sha256": "0949eed76237a2386ff104540c9f8044b1421a2551996c80342dbe8952d8b226",
+    "expected_git_blob": "8d3425dc1bde8e43ecd8d8b34e63d578878b1101",
+    "bytes": 100092,
+    "git_lf_bytes": 99533
+  },
+  "specification": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+    "working_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+    "git_lf_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+    "expected_git_blob": "4a24d3c85c739f240cb8f5eaa27ef0df7d82189f",
+    "bytes": 112130,
+    "git_lf_bytes": 112130
+  },
+  "retained_preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-cli-preparation-delta.2026-10-20T15-11.md",
+    "working_sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923",
+    "git_lf_sha256": "52fa180d56688577e3ac0f4acfbe7b811375c69f4487e0c1b5a9e744cf18a923",
+    "expected_git_blob": "b1dd867ee8998c993a71e0c9b8a93129fc709669",
+    "bytes": 16389,
+    "git_lf_bytes": 16389
+  },
+  "preparation_qualification": "Original provisional-dependency wording and observed hashes remain historical. Accepted P6-T1 dependencies are rebound below. The recorded post-execution output-failure qualification supersedes unconditional JSON-result wording.",
+  "accepted_predecessor": {
+    "acceptance": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-final-acceptance.2026-10-21T14-29.json",
+      "working_sha256": "1f3c7589421bcb38b139524f6022550891429240b5740cd8899c6aa1df82459f",
+      "git_lf_sha256": "1f3c7589421bcb38b139524f6022550891429240b5740cd8899c6aa1df82459f",
+      "expected_git_blob": "db9a1839a6b5224e314d3a5360a63bea8697a874",
+      "bytes": 28174,
+      "git_lf_bytes": 28174
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-handoff.2026-10-21T14-16.json",
+      "working_sha256": "6392124516a47c4055103501907effab17abaad2ffcd52832a1d4a50fb5425f9",
+      "git_lf_sha256": "6392124516a47c4055103501907effab17abaad2ffcd52832a1d4a50fb5425f9",
+      "expected_git_blob": "24e9e027c007b5f54a77bf5ad8d47838177ffe24",
+      "bytes": 92056,
+      "git_lf_bytes": 92056
+    },
+    "quality_baseline": "Accepted ordered statics, 370 passing tests, four contracts, 13 modules/132 named ranges and 13 no-loss predicates; no replay.",
+    "package_identity": {
+      "build_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+      "policy_sha256": "e524eaae711434f0d31901051b7ad1e1eb91e41f9c3a17d113fae4518c25bbfb",
+      "wheel_sha256": "c2b3be3d6157f9d80e13210de8cca63cb095f1d10fabe7db9dda5e01d81e8889"
+    },
+    "package_contract_node": "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python"
+  },
+  "stable_interface": {
+    "ownership": {
+      "composition": [
+        "cli.py",
+        "test_cli_dry_run.py",
+        "both pyproject registrations",
+        "test_init_cli.py registration assertion"
+      ],
+      "parser": [
+        "cli_arguments.py",
+        "cli_commands.py",
+        "test_cli_commands.py",
+        "test_cli_errors.py"
+      ]
+    },
+    "implementation_released": false,
+    "source": "Existing15:11 preparation plus message-only public signature delta",
+    "parser": {
+      "signatures": [
+        "parse_cli_arguments(command:str,argv:Sequence[str],*,limits:ParseLimits)->CliInvocation|CliHelp|CliError",
+        "build_cli_request(invocation:CliInvocation,*,workspace_root:str,limits:ParseLimits)->JsonObject"
+      ],
+      "module": "cli_arguments.py",
+      "root_semantics": "Pure parser retains explicit root or dot; composition independently canonicalizes before request identity/schema validation.",
+      "carriers": [
+        "CliInvocation(request:JsonObject,repository_id:str|None)",
+        "CliHelp(text:str)",
+        "CliError(operation:Operation|None,mode:Mode|None,findings:tuple[Finding,...])"
+      ]
+    },
+    "unresolved_conflicts": [],
+    "output_qualification": "After execution begins, unexpected execution/serialization failure returns3 with fixed stderr, never fabricates empty-effect replacement or appends second document after partial stdout. Supersedes unconditional one-JSON-result wording.",
+    "status": "CONTRACT_READY_PREPARATION_ONLY",
+    "composition": {
+      "carrier": "CliPorts(resolve_workspace,repository_factory,create_io,clock,analyzer_registry,execute_request)",
+      "signature": "run_cli(command:str,argv:Sequence[str],*,ports:CliPorts,stdout:TextIO,stderr:TextIO,limits:ParseLimits)->int",
+      "executor_protocol": "Reuse gateway.ServiceExecutor",
+      "module": "cli.py",
+      "authority": "Fixed local-user; same RepositoryReader object to installed_local_io and execute; no host fallback",
+      "port_types": {
+        "resolve_workspace": "Callable[[str], str]",
+        "repository_factory": "Callable[[str, str], RepositoryReader]; called only for an explicit repository_id",
+        "create_io": "Callable[[str, RepositoryReader | None], ServiceIO]",
+        "clock": "Clock",
+        "analyzer_registry": "InventoryRegistry",
+        "execute_request": "gateway.ServiceExecutor"
+      }
+    },
+    "owner_compatibility": "Both owners confirm public signatures and fixed authority composition without conflicts; no source/test writes",
+    "compatibility_confirmation": "Both named owners confirmed signatures and import locations without source edits; all parser carriers/functions reside in cli_arguments."
+  },
+  "interface_constraints": [
+    "parse_cli_arguments and build_cli_request remain pure, bounded, immutable-carrier transforms using ParseLimits and existing JSON types.",
+    "The parser retains the explicit workspace root or dot; composition resolves the existing root once before deterministic request IDs and schema validation. No ancestor or sibling discovery.",
+    "run_cli uses gateway.ServiceExecutor, fixed local-user composition and the exact same RepositoryReader in installed_local_io and execute. No caller-selected module/executable, host grants or fallback.",
+    "All 31 fixed wrappers dispatch to the 27 prepared canonical operations. No console command is added for read-source, prepare-agent or finalize-agent.",
+    "Path/profile inputs remain workspace-relative data. Existing public service parsing and operation rules remain semantic authority; do not copy private rule constants.",
+    "Keep the recorded mode, format, write and dry-run applicability. validate-all publishes its canonical pair by default; dry-run plans without effects.",
+    "Help performs no service/provider call; invalid arguments produce safe invocation errors. Unexpected execution or output failure returns 3 via fixed diagnostics without an invented empty-effects result or a second document after partial output.",
+    "Reserve argument count and aggregate text/encoded-byte work before input copying or repeatable collection allocation. Disable argument abbreviation and response files; reject duplicate scalar options and invalid duplicate selections."
+  ],
+  "command_registration_map": [
+    {
+      "console": "dev.discovery.init",
+      "operation": "init",
+      "target": "drm_copilot_discovery.cli:main_init",
+      "prepared_option_mapping": "--system-id -> system_id; --system-name -> system_name; --role -> system_role; --repository-id -> repository_id; repeatable --production-root/--test-root -> production_roots/test_roots; --draft -> draft"
+    },
+    {
+      "console": "dev.discovery.configure",
+      "operation": "configure",
+      "target": "drm_copilot_discovery.cli:main_configure",
+      "prepared_option_mapping": "mutually exclusive required --activate/--deactivate -> configuration_action; --input -> input_path; activate requires input or profile; deactivate rejects input"
+    },
+    {
+      "console": "dev.discovery.profile",
+      "operation": "profile",
+      "target": "drm_copilot_discovery.cli:main_profile",
+      "prepared_option_mapping": "optional --input -> input_path; simultaneous --profile must agree"
+    },
+    {
+      "console": "dev.discovery.inventory",
+      "operation": "inventory",
+      "target": "drm_copilot_discovery.cli:main_inventory",
+      "prepared_option_mapping": "repeatable --analyzer -> analyzer_ids; omission leaves configured-all, never serialize an empty explicit list"
+    },
+    {
+      "console": "dev.discovery.dotnet",
+      "operation": "inventory",
+      "target": "drm_copilot_discovery.cli:main_dotnet",
+      "prepared_option_mapping": "fixed analyzer_ids=['dotnet']; do not permit an overriding analyzer selector"
+    },
+    {
+      "console": "dev.discovery.vsto",
+      "operation": "inventory",
+      "target": "drm_copilot_discovery.cli:main_vsto",
+      "prepared_option_mapping": "fixed analyzer_ids=['office-vsto']; same whole-selection consent validation as inventory"
+    },
+    {
+      "console": "dev.discovery.new-contract",
+      "operation": "new-contract",
+      "target": "drm_copilot_discovery.cli:main_new_contract",
+      "prepared_option_mapping": "--feature-id -> feature_id; --name -> name; optional --capability-group -> capability_group; --input -> input_path"
+    },
+    {
+      "console": "dev.discovery.new-scenario",
+      "operation": "new-scenario",
+      "target": "drm_copilot_discovery.cli:main_new_scenario",
+      "prepared_option_mapping": "--scenario-id -> scenario_id; repeatable --feature-id -> feature_ids; --input -> input_path"
+    },
+    {
+      "console": "dev.discovery.update-artifact",
+      "operation": "update-artifact",
+      "target": "drm_copilot_discovery.cli:main_update_artifact",
+      "prepared_option_mapping": "--kind -> artifact_kind; --path -> artifact_path; --input -> input_path; --expected-sha256 -> expected_sha256; fixed update_action='replace'; no implicit approval"
+    },
+    {
+      "console": "dev.discovery.link-evidence",
+      "operation": "link-evidence",
+      "target": "drm_copilot_discovery.cli:main_link_evidence",
+      "prepared_option_mapping": "--artifact-kind -> artifact_kind; --artifact-id -> artifact_id; --evidence -> evidence_path; --expected-sha256 -> expected_sha256"
+    },
+    {
+      "console": "dev.discovery.validate-profile",
+      "operation": "validate-profile",
+      "target": "drm_copilot_discovery.cli:main_validate_profile",
+      "prepared_option_mapping": "optional --input -> input_path; --profile retained; exact v1 compatibility only where service permits"
+    },
+    {
+      "console": "dev.discovery.validate-feature-contract",
+      "operation": "validate-feature-contract",
+      "target": "drm_copilot_discovery.cli:main_validate_feature_contract",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-coverage-ledger",
+      "operation": "validate-coverage-ledger",
+      "target": "drm_copilot_discovery.cli:main_validate_coverage_ledger",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-runtime-scenario",
+      "operation": "validate-runtime-scenario",
+      "target": "drm_copilot_discovery.cli:main_validate_runtime_scenario",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-parity-matrix",
+      "operation": "validate-parity-matrix",
+      "target": "drm_copilot_discovery.cli:main_validate_parity_matrix",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-unspecified-behavior",
+      "operation": "validate-unspecified-behavior",
+      "target": "drm_copilot_discovery.cli:main_validate_unspecified_behavior",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-product-decision",
+      "operation": "validate-product-decision",
+      "target": "drm_copilot_discovery.cli:main_validate_product_decision",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-evidence-reference",
+      "operation": "validate-evidence-reference",
+      "target": "drm_copilot_discovery.cli:main_validate_evidence_reference",
+      "prepared_option_mapping": "required --artifact -> artifact_path"
+    },
+    {
+      "console": "dev.discovery.validate-decisions",
+      "operation": "validate-decisions",
+      "target": "drm_copilot_discovery.cli:main_validate_decisions",
+      "prepared_option_mapping": "no operation inputs; entire configured decision/unresolved collection assessment"
+    },
+    {
+      "console": "dev.discovery.validate-all",
+      "operation": "validate-all",
+      "target": "drm_copilot_discovery.cli:main_validate_all",
+      "prepared_option_mapping": "--mode structural/discovery-complete/parity-complete/planning; optional --output-prefix -> output_prefix"
+    },
+    {
+      "console": "dev.discovery.validate",
+      "operation": "validate-all",
+      "target": "drm_copilot_discovery.cli:main_validate",
+      "prepared_option_mapping": "exactly the same options/defaults; reject positional legacy file/type probing"
+    },
+    {
+      "console": "dev.discovery.coverage-report",
+      "operation": "coverage-report",
+      "target": "drm_copilot_discovery.cli:main_coverage_report",
+      "prepared_option_mapping": "selected root --mode; no operation inputs"
+    },
+    {
+      "console": "dev.discovery.parity-report",
+      "operation": "parity-report",
+      "target": "drm_copilot_discovery.cli:main_parity_report",
+      "prepared_option_mapping": "selected root --mode; no operation inputs"
+    },
+    {
+      "console": "dev.discovery.completion-report",
+      "operation": "completion-report",
+      "target": "drm_copilot_discovery.cli:main_completion_report",
+      "prepared_option_mapping": "selected root --mode; no operation inputs; default structural stays explicitly structural"
+    },
+    {
+      "console": "dev.discovery.generate-acceptance",
+      "operation": "generate-acceptance",
+      "target": "drm_copilot_discovery.cli:main_generate_acceptance",
+      "prepared_option_mapping": "--kind -> acceptance_kind; repeatable --feature-id/--client-id/--mode-id/--platform-id -> corresponding plural selectors; optional --repository-id -> repository_id; --output-format markdown/gherkin/both -> output_format"
+    },
+    {
+      "console": "dev.discovery.generate-acceptance-scenarios",
+      "operation": "generate-acceptance",
+      "target": "drm_copilot_discovery.cli:main_generate_acceptance_scenarios",
+      "prepared_option_mapping": "identical accepted generator options/defaults; no unconditional characterization file"
+    },
+    {
+      "console": "dev.discovery.snapshot-export",
+      "operation": "snapshot-export",
+      "target": "drm_copilot_discovery.cli:main_snapshot_export",
+      "prepared_option_mapping": "repeatable required --selected-id -> selected_ids; optional repeatable --path -> paths; no destination outside configured roots"
+    },
+    {
+      "console": "dev.discovery.snapshot-import",
+      "operation": "snapshot-import",
+      "target": "drm_copilot_discovery.cli:main_snapshot_import",
+      "prepared_option_mapping": "required --manifest -> manifest_path"
+    },
+    {
+      "console": "dev.discovery.import-inventory",
+      "operation": "import-inventory",
+      "target": "drm_copilot_discovery.cli:main_import_inventory",
+      "prepared_option_mapping": "required --manifest -> manifest_path; data only, no plugin/module selector"
+    },
+    {
+      "console": "dev.discovery.migrate",
+      "operation": "migrate",
+      "target": "drm_copilot_discovery.cli:main_migrate",
+      "prepared_option_mapping": "--from-version 1/--to-version 2 -> integers; --destination -> destination; exactly one --input -> input_path OR repeatable --path -> paths; same explicit system/repository/root/draft context as init"
+    },
+    {
+      "console": "dev.discovery.doctor",
+      "operation": "doctor",
+      "target": "drm_copilot_discovery.cli:main_doctor",
+      "prepared_option_mapping": "no operation inputs; no capability assertion flag"
+    }
+  ],
+  "ownership": {
+    "source_inspection_preparation": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "tests/discovery_runtime/test_cli_commands.py",
+      "tests/discovery_runtime/test_cli_errors.py"
+    ],
+    "workspace_operations": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "tests/discovery_runtime/test_cli_dry_run.py",
+      "pyproject.toml",
+      "packages/discovery-runtime/pyproject.toml",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py"
+    ],
+    "serialized_packaging_owner": "Only the designated packaging owner regenerates _build_manifest.json and package/installed identity after frozen packaged sources and console metadata."
+  },
+  "absence_baseline": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "exists": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_commands.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_errors.py",
+      "exists": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "exists": false
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "exists": false
+    }
+  ],
+  "existing_edit_baseline": [
+    {
+      "path": "pyproject.toml",
+      "working_sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "git_lf_sha256": "ac61ea8813f500d25a4917e1922b260f8c9225f71ad5419615f6ca5559dd0284",
+      "expected_git_blob": "c407c56cb06e3bcd50465af80748ab44ee3e6cd2",
+      "bytes": 6157,
+      "git_lf_bytes": 6157
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "working_sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "git_lf_sha256": "c9bb4b58c41a63c7af01ff2e1515d22736a053970589b3f8362ee3054ae3940b",
+      "expected_git_blob": "f67f47e8c4825aa899733af4d5121235417a45a8",
+      "bytes": 653,
+      "git_lf_bytes": 653
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "working_sha256": "5ac3972ac82b2da5dc0281167c72efd3e67c66033229ec92bad9188683ab7ea0",
+      "git_lf_sha256": "d704099a5928b96da855028b04a2740d8e0b1f828f13b3982c2366b1c9339193",
+      "expected_git_blob": "d52c8a481aed0318bc23c2196f24eb1680e40011",
+      "bytes": 5258,
+      "git_lf_bytes": 5103
+    }
+  ],
+  "existing_registration_targets": {
+    "pyproject.toml": {
+      "dev.discovery.completion-report": "scripts.dev_tools.discovery.completion_report:main",
+      "dev.discovery.coverage-report": "scripts.dev_tools.discovery.coverage_report:main",
+      "dev.discovery.generate-acceptance-scenarios": "scripts.dev_tools.generate_acceptance_scenarios:main",
+      "dev.discovery.init": "scripts.dev_tools.discovery.init_cli:main",
+      "dev.discovery.inventory": "scripts.dev_tools.discovery.analyzer.cli:main",
+      "dev.discovery.dotnet": "scripts.dev_tools.discovery.analyzer.stack_cli:main_dotnet",
+      "dev.discovery.parity-report": "scripts.dev_tools.discovery.parity_report:main",
+      "dev.discovery.vsto": "scripts.dev_tools.discovery.analyzer.stack_cli:main_vsto",
+      "dev.discovery.profile": "scripts.dev_tools.discovery.profile_cli:main",
+      "dev.discovery.validate-all": "scripts.dev_tools.validate_discovery_artifacts:main",
+      "dev.discovery.validate-coverage-ledger": "scripts.dev_tools.validate_discovery_artifacts:main_coverage_ledger",
+      "dev.discovery.validate-evidence-reference": "scripts.dev_tools.validate_discovery_artifacts:main_evidence_reference",
+      "dev.discovery.validate-feature-contract": "scripts.dev_tools.validate_discovery_artifacts:main_feature_contract",
+      "dev.discovery.validate-parity-matrix": "scripts.dev_tools.validate_discovery_artifacts:main_parity_matrix",
+      "dev.discovery.validate-product-decision": "scripts.dev_tools.validate_discovery_artifacts:main_product_decision",
+      "dev.discovery.validate-profile": "scripts.dev_tools.validate_discovery_artifacts:main_profile",
+      "dev.discovery.validate-runtime-scenario": "scripts.dev_tools.validate_discovery_artifacts:main_runtime_scenario",
+      "dev.discovery.validate-unspecified-behavior": "scripts.dev_tools.validate_discovery_artifacts:main_unspecified_behavior"
+    },
+    "packages/discovery-runtime/pyproject.toml": {}
+  },
+  "existing_caller_disposition": {
+    "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+    "function": "test_console_script_registered_in_pyproject",
+    "only_authorized_change": "Expect \"dev.discovery.init\" = \"drm_copilot_discovery.cli:main_init\"; preserve every other test body and assertion.",
+    "unchanged_since_retained_preparation": [
+      "pyproject.toml",
+      "packages/discovery-runtime/pyproject.toml",
+      "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "tests/discovery_runtime/test_package_contract.py"
+    ],
+    "runtime_metadata_placement": "Put [tool.poetry.scripts] before [tool.poetry.dependencies] to preserve the accepted bounded-dependency assertion."
+  },
+  "current_public_dependency_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "working_sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "git_lf_sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "expected_git_blob": "1f1ff113b624820dd1a1a2d84ff0894c3b2dfdae",
+      "bytes": 12628,
+      "git_lf_bytes": 12628
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway.py",
+      "working_sha256": "9f1d238263a85b1bdeb0152131395474093af21fd3f2d4524ecade5592e51536",
+      "git_lf_sha256": "d1e3f228929269783100fc468466b8a5c5c5125f20701bed880e7d50226c34a2",
+      "expected_git_blob": "596f5125647c8d919969c9ff39647506b53ff2f1",
+      "bytes": 14986,
+      "git_lf_bytes": 14632
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gateway_local.py",
+      "working_sha256": "4fc82f8c36e6321bbab64a60b04af6b077e1ee3761e0d6a8f3d0401142e0ff4a",
+      "git_lf_sha256": "9dbb1dc8fc0148a73d80e171173b6a8d5dfca0e647b0e6e087617680bd2eaa6d",
+      "expected_git_blob": "9ed627956bdb124c144c8fb7c2f94f961f8030ac",
+      "bytes": 19117,
+      "git_lf_bytes": 18686
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+      "working_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "git_lf_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "expected_git_blob": "65c32127f47b9f5a6c907138e5c28f50ece969ee",
+      "bytes": 17125,
+      "git_lf_bytes": 17125
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+      "working_sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "git_lf_sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "expected_git_blob": "39487b5a32fa839e1c6620d8b6939b99f5729a63",
+      "bytes": 16674,
+      "git_lf_bytes": 16674
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py",
+      "working_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "git_lf_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "expected_git_blob": "00baeb653fa044792fc090fb2e520b1dd515826c",
+      "bytes": 10018,
+      "git_lf_bytes": 10018
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/models.py",
+      "working_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "git_lf_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "expected_git_blob": "2093aa96e1b81e582d293ef58ef794a65939440b",
+      "bytes": 6858,
+      "git_lf_bytes": 6858
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py",
+      "working_sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "git_lf_sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "expected_git_blob": "478b20959275de55e1dab0e21a2fd0f9a98491c3",
+      "bytes": 7121,
+      "git_lf_bytes": 7121
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py",
+      "working_sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "git_lf_sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "expected_git_blob": "fc813ed46504b3f4a9468f44cf873cad6fc7d66e",
+      "bytes": 9683,
+      "git_lf_bytes": 9683
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "working_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+      "git_lf_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+      "expected_git_blob": "4ad84f3888202a6b05a95309f2666dc2a4fc6f98",
+      "bytes": 22338,
+      "git_lf_bytes": 22338
+    },
+    {
+      "path": "schemas/discovery/v2/service-request.schema.json",
+      "working_sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "git_lf_sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "expected_git_blob": "ae9d64f0f23908eb6e15d26ac54e6038554b8ffa",
+      "bytes": 11635,
+      "git_lf_bytes": 11635
+    },
+    {
+      "path": "schemas/discovery/v2/service-result.schema.json",
+      "working_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "git_lf_sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "expected_git_blob": "37e4733a5ff259c3019232a196ae51fc22f7580f",
+      "bytes": 8893,
+      "git_lf_bytes": 8893
+    },
+    {
+      "path": "tests/discovery_runtime/test_package_contract.py",
+      "working_sha256": "7d15e14b199a0e24d21d3d8ac8a1e61497500c5f7d6e7e9ef69409d1e5ca0e1d",
+      "git_lf_sha256": "7d15e14b199a0e24d21d3d8ac8a1e61497500c5f7d6e7e9ef69409d1e5ca0e1d",
+      "expected_git_blob": "38616fd2fffb81aac2280b1d0af111a0236bc7d5",
+      "bytes": 7275,
+      "git_lf_bytes": 7275
+    }
+  ],
+  "verification_remaining": [
+    "Ordered Black, Ruff, Pyright and focused tests of all 31 names plus concrete parser, output-failure, relative-path, registration and dry-run cases.",
+    "Use injected in-memory ports and meaningful service compositions, without temporary files, external process tests or predecessor suite replay.",
+    "Fresh per-module line/branch and named BODY coverage; new modules/classes/methods target at least 90% line coverage, changed module branch floor at least 75%, no changed-line coverage loss.",
+    "Reverse the new/changed Python test-module order in one process for final isolation proof; preserve independent raw measurements and previous accepted proof.",
+    "Every production/test file remains at most 500 physical lines. Any required cohesive split is coordinator-owned before implementation expansion.",
+    "Refresh package/installed identity and verify fixed console registrations after the packaged-source freeze; earlier package identity is a baseline, not proof of the new CLI."
+  ],
+  "excluded": [
+    "P6-T3 adapters and successor tasks",
+    "Production/test/schema edits during baseline",
+    "Plan/AC/checkpoint/Git/index changes",
+    "Test, service, native or package execution"
+  ],
+  "unresolved_contract_conflicts": [],
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

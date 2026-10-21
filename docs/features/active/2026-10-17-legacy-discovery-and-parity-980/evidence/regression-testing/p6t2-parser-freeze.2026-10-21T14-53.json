@@ -1,0 +1,531 @@
+{
+  "status": "FOCUSED_PASS_PENDING_INDEPENDENT_REVIEW",
+  "owned": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_commands.py",
+      "sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9"
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_errors.py",
+      "sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2"
+    }
+  ],
+  "sizes": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": 366,
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": 241,
+    "tests/discovery_runtime/test_cli_commands.py": 372,
+    "tests/discovery_runtime/test_cli_errors.py": 265
+  },
+  "nodes": [
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[init-init-argv0]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[configure-configure-argv1]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[profile-profile-argv2]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[inventory-inventory-argv3]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[dotnet-inventory-argv4]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[vsto-inventory-argv5]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-contract-new-contract-argv6]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[new-scenario-new-scenario-argv7]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[update-artifact-update-artifact-argv8]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[link-evidence-link-evidence-argv9]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-profile-validate-profile-argv10]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-feature-contract-validate-feature-contract-argv11]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-coverage-ledger-validate-coverage-ledger-argv12]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-runtime-scenario-validate-runtime-scenario-argv13]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-parity-matrix-validate-parity-matrix-argv14]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-unspecified-behavior-validate-unspecified-behavior-argv15]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-product-decision-validate-product-decision-argv16]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-evidence-reference-validate-evidence-reference-argv17]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-decisions-validate-decisions-argv18]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-all-validate-all-argv19]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[validate-validate-all-argv20]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[coverage-report-coverage-report-argv21]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[parity-report-parity-report-argv22]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[completion-report-completion-report-argv23]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-generate-acceptance-argv24]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[generate-acceptance-scenarios-generate-acceptance-argv25]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-export-snapshot-export-argv26]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[snapshot-import-snapshot-import-argv27]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[import-inventory-import-inventory-argv28]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[migrate-migrate-argv29]",
+    "tests/discovery_runtime/test_cli_commands.py::test_all_fixed_commands_build_schema_valid_closed_requests[doctor-doctor-argv30]",
+    "tests/discovery_runtime/test_cli_commands.py::test_exact_command_population_and_alias_semantics",
+    "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[init]",
+    "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[inventory]",
+    "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[validate-all]",
+    "tests/discovery_runtime/test_cli_commands.py::test_help_is_fixed_and_does_not_require_operation_inputs[doctor]",
+    "tests/discovery_runtime/test_cli_commands.py::test_reordered_selection_and_option_spelling_preserve_identity",
+    "tests/discovery_runtime/test_cli_commands.py::test_repository_binding_is_outer_data_except_explicit_service_inputs",
+    "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[structural]",
+    "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[discovery-complete]",
+    "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[parity-complete]",
+    "tests/discovery_runtime/test_cli_commands.py::test_report_mode_format_and_publication_flags_remain_explicit[planning]",
+    "tests/discovery_runtime/test_cli_commands.py::test_optional_fields_switches_and_literal_paths_are_retained",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[unknown-secret-argv0]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dev.discovery.doctor-argv1]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[read-source-argv2]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[prepare-agent-argv3]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[finalize-agent-argv4]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv5]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv6]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv7]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv8]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv9]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv10]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv11]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv12]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv13]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv14]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv15]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv16]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv17]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv18]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv19]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv20]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv21]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[doctor-argv22]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv23]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv24]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[inventory-argv25]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[dotnet-argv26]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[vsto-argv27]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv28]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv29]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[configure-argv30]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[profile-argv31]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-argv32]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv33]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv34]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv35]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[validate-all-argv36]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-contract-argv37]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[new-scenario-argv38]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[snapshot-export-argv39]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv40]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[generate-acceptance-argv41]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv42]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[migrate-argv43]",
+    "tests/discovery_runtime/test_cli_errors.py::test_unsupported_ambiguous_or_incomplete_arguments_are_redacted[init-argv44]",
+    "tests/discovery_runtime/test_cli_errors.py::test_argument_count_reservation_precedes_any_sequence_access",
+    "tests/discovery_runtime/test_cli_errors.py::test_character_work_reservation_precedes_token_retention",
+    "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9\\xe9]",
+    "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680\\U0001f680]",
+    "tests/discovery_runtime/test_cli_errors.py::test_encoded_and_escaped_bytes_are_charged_before_retention[\\x01\\x01\\x01\\x01\\x01]",
+    "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help0]",
+    "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[--help1]",
+    "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv2]",
+    "tests/discovery_runtime/test_cli_errors.py::test_bad_argument_containers_types_and_unicode_fail_closed[argv3]",
+    "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[None]",
+    "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[True]",
+    "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[limits2]",
+    "tests/discovery_runtime/test_cli_errors.py::test_policy_requires_the_exact_validated_limits_type[1]",
+    "tests/discovery_runtime/test_cli_errors.py::test_limits_are_revalidated_and_help_reserves_output_capacity",
+    "tests/discovery_runtime/test_cli_errors.py::test_help_and_argument_errors_never_construct_or_execute_providers",
+    "tests/discovery_runtime/test_cli_errors.py::test_direct_carrier_and_builder_misuse_is_rejected",
+    "tests/discovery_runtime/test_cli_errors.py::test_unknown_context_and_metadata_refusal_preserve_safe_values",
+    "tests/discovery_runtime/test_cli_errors.py::test_builder_reuses_public_combination_checks_for_direct_invocations"
+  ],
+  "test_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-tests.2026-10-21T14-52.json",
+    "sha256": "691496d593309f201b8428a6fd157510e757fc359852b7db0aacf01435aaa304"
+  },
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-format.2026-10-21T14-51.json",
+      "sha256": "d153ed819a5a6d7f7818b1fa392a26b3e25a55759d8f56791547e64da3e7c642"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-lint.2026-10-21T14-51.json",
+      "sha256": "1c4284c20cffccba83ff0ccd109a6d4ccfacc2d70f25b25ad6adab0037e41782"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-tests.2026-10-21T14-52.json",
+      "sha256": "691496d593309f201b8428a6fd157510e757fc359852b7db0aacf01435aaa304"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass3-types.2026-10-21T14-51.json",
+      "sha256": "487f18c299aedcf41fe3ad2ad777a40f56d222f2d3a1deb4b189c1bf3d40d4e9"
+    }
+  ],
+  "retained_initial_diagnostics": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate-format.2026-10-21T14-49.json",
+      "sha256": "a6034b2713f38ec9a3e018a49ddcfd6ab718fa6033927fa819ab3e3d59d3e117"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate-lint.2026-10-21T14-49.json",
+      "sha256": "004e679defa4ddb86014ee7a87ea1f24779839d6cca5d4e1be89bb0772eec73d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate2-format.2026-10-21T14-49.json",
+      "sha256": "f97dbe54f8f9263280bbbca66c9a9f2a1056d69ac1dbda82b547b050ba4f4203"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate2-lint.2026-10-21T14-49.json",
+      "sha256": "71306aa092ce58110318858d83fd2277966c17d64a41cec6e5b071abc708228e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate3-format.2026-10-21T14-51.json",
+      "sha256": "81750e2118e823c518cb7a824702b4a19805513507c16a8b658c7d060051bc96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-consolidate3-lint.2026-10-21T14-51.json",
+      "sha256": "c7795df3a76fbc21ba4d6709625c19f0d32e7087332665b8f6d53402ee7aad92"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass1-format.2026-10-21T14-50.json",
+      "sha256": "5ee3a7be94624d3313b34b4cd9aa805b0483787c722ecf0e439a97591310de94"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass1-lint.2026-10-21T14-50.json",
+      "sha256": "f03e9ba0d1010914322d0d7c874d4ea880dc9e3cbd14187cd18d0a49b2df45e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass1-types.2026-10-21T14-50.json",
+      "sha256": "c6a5f32c66dce28fad2f9b21c6acd8b8182246714e14f9150857d53d76ba086c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass2-format.2026-10-21T14-50.json",
+      "sha256": "90c899d8308d7facba701176d8ff127bc65e1880a61374c73197b77546a76125"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass2-lint.2026-10-21T14-50.json",
+      "sha256": "2ed5eea5cd2f00832d1762aa822cf85b02cf62b44be150df0b15911bedd27107"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass2-tests.2026-10-21T14-51.json",
+      "sha256": "1d2b43235a0c4e1bd30c1018a0b28e692daa8b602b4fd1d36890dabb8c3c83b3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pass2-types.2026-10-21T14-50.json",
+      "sha256": "708876ef2714190d1e4ff3a567cd69512d23171bce27b87c2ab064ad22521b0a"
+    }
+  ],
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-originals.2026-10-21T14-53.json",
+    "sha256": "d11ba5daede3c50fe66dfd74936c969bd7c04d01a00c5eb87c6e310eab63a010"
+  },
+  "coverage": {
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_arguments.py": {
+      "module": {
+        "covered_lines": 162,
+        "num_statements": 162,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 0,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 56,
+        "num_partial_branches": 0,
+        "covered_branches": 56,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {
+        "CliInvocation.__post_init__": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "CliHelp.__post_init__": {
+          "covered_lines": 3,
+          "num_statements": 3,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "CliError.__post_init__": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_budget": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_tokens": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_help": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_fields": {
+          "covered_lines": 49,
+          "num_statements": 49,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 28,
+          "num_partial_branches": 0,
+          "covered_branches": 28,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "_request": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "parse_cli_arguments": {
+          "covered_lines": 20,
+          "num_statements": 20,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "build_cli_request": {
+          "covered_lines": 14,
+          "num_statements": 14,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    },
+    "packages\\discovery-runtime\\src\\drm_copilot_discovery\\cli_commands.py": {
+      "module": {
+        "covered_lines": 41,
+        "num_statements": 41,
+        "percent_covered": 100.0,
+        "percent_covered_display": "100",
+        "missing_lines": 0,
+        "excluded_lines": 2,
+        "percent_statements_covered": 100.0,
+        "percent_statements_covered_display": "100",
+        "num_branches": 10,
+        "num_partial_branches": 0,
+        "covered_branches": 10,
+        "missing_branches": 0,
+        "percent_branches_covered": 100.0,
+        "percent_branches_covered_display": "100"
+      },
+      "named_bodies": {
+        "command_definition": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        },
+        "command_options": {
+          "covered_lines": 6,
+          "num_statements": 6,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    }
+  },
+  "coverage_selector": [
+    "coverage.json"
+  ],
+  "dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "sha256": "bbfa527472baf410a0c20c838703271e3ed3c1542ea2c983eacd2447d4a3b99b",
+      "physical_lines": 366
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "physical_lines": 241
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9",
+      "physical_lines": 372
+    },
+    "tests/discovery_runtime/test_cli_errors.py": {
+      "sha256": "d463475db4e878305828e39a73af611037753d453c8a76fa9701e70c227882d2",
+      "physical_lines": 265
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+      "physical_lines": 170
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "physical_lines": 339
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015",
+      "physical_lines": 279
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd",
+      "physical_lines": 178
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88",
+      "physical_lines": 156
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "physical_lines": 335
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9",
+      "physical_lines": 212
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    }
+  },
+  "test_elapsed_seconds": 31.01021999999648,
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+    "sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+    "qualification": "Four owned paths were absent; no accepted predecessor suite replayed."
+  },
+  "fixture_correction": "The new-scenario positive row now supplies the accepted required input_path. 105/106 receipt retained; production unchanged across the correction.",
+  "interface": "Agreed five public exports from cli_arguments; fixed31 suffixes/27operations/fouraliases. No provider/path/schema/graph implementation or authority added.",
+  "preservation": "No other source/tests/configuration/Git/index/checkpoint/package-manifest edits. Composition-owned changes remain outside this subset.",
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ]
+}
