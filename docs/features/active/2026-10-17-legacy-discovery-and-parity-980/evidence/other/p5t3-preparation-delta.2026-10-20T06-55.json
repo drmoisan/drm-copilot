@@ -1,0 +1,174 @@
+{
+  "Timestamp": "2026-10-20T06-55",
+  "actual_prerequisites": [
+    "Parent must approve exact extraction/test paths outside original P5-T3 named files before mutation.",
+    "Final P5-T2 acceptance/freeze is required before successor execution.",
+    "Freeze completion envelope/action shape and malformed-input contract between the three owners before parallel implementation."
+  ],
+  "direct_caller_disposition": {
+    "completion": "All seven functions reviewed. Replace the entry-count/missing-entry readiness successes and fake-validator empty-dict success authority; preserve deterministic rendering, stdout, combined validation errors and no-build/no-write on failure through the correct runtime import seam.",
+    "coverage_parity": "Existing Set D coverage/parity populations remain unchanged absent a concrete compatibility defect. No accepted behavioral rerun solely for preparation.",
+    "io": "Four functions: validate_or_raise pass/error, read_artifact_text stub and exact Path.write_text content. Retain legacy-only behavior unless adapter migration changes import use-site; new controlled publication tests use runtime mutation seams.",
+    "rendering": "Seven existing functions retain deterministic sorting, exact JSON/escaping/single-LF and v1 row compatibility. Add completion view tests in planned runtime file."
+  },
+  "exact_set_d_definition_population": {
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": [
+      "test_build_completion_summary_reports_entry_counts_and_readiness",
+      "test_render_completion_report_is_deterministic",
+      "test_main_returns_1_on_coverage_validation_failure_and_skips_build",
+      "test_build_completion_summary_handles_missing_entries_key",
+      "test_main_returns_0_when_both_validators_pass",
+      "test_main_returns_1_when_either_validator_fails",
+      "test_main_writes_to_stdout_when_output_omitted"
+    ],
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": [
+      "test_build_and_render_coverage_report_sorts_and_counts_entries",
+      "test_render_coverage_report_is_deterministic",
+      "test_main_returns_1_and_prints_errors_on_validation_failure",
+      "test_build_coverage_rows_handles_missing_entries_key",
+      "test_main_returns_0_on_success",
+      "test_main_returns_1_on_failure",
+      "test_main_writes_to_stdout_when_output_omitted",
+      "test_true_v1_preserves_unit_fields_without_completion_claims",
+      "test_accepted_invalid_text_never_reaches_output",
+      "test_helper_value_errors_are_redacted_before_any_output",
+      "test_path_and_validator_seams_preserve_call_order",
+      "test_default_validator_and_sys_argv_remain_injectable",
+      "test_missing_input_arguments_fail_before_read",
+      "test_io_errors_propagate_without_a_success_report"
+    ],
+    "tests/scripts/dev_tools/discovery/test_io.py": [
+      "test_validate_or_raise_passes_with_no_errors",
+      "test_validate_or_raise_raises_with_errors",
+      "test_read_artifact_text_returns_stubbed_text",
+      "test_write_report_calls_write_text_with_exact_content"
+    ],
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": [
+      "test_build_and_render_parity_report_sorts_and_counts_entries",
+      "test_render_parity_report_is_deterministic",
+      "test_main_returns_1_and_prints_errors_on_validation_failure",
+      "test_build_parity_rows_handles_missing_entries_key",
+      "test_main_returns_0_on_success",
+      "test_main_returns_1_on_failure",
+      "test_main_writes_to_stdout_when_output_omitted",
+      "test_actual_v1_rows_keep_their_fields_and_feature_order",
+      "test_injected_acceptance_cannot_bypass_safe_compatibility_boundary",
+      "test_default_validator_uses_existing_lazy_upstream_seam",
+      "test_unexpected_boundary_failures_propagate",
+      "test_missing_input_is_an_argument_error",
+      "test_helper_rejection_never_writes_partial_report"
+    ],
+    "tests/scripts/dev_tools/discovery/test_rendering.py": [
+      "test_sort_rows_sorts_ascending_by_id_field",
+      "test_sort_rows_falls_back_to_joined_field_sort_when_id_absent",
+      "test_sort_rows_falls_back_when_id_field_partially_present",
+      "test_render_pretty_json_exact_literal_output",
+      "test_render_pretty_json_is_deterministic",
+      "test_coverage_adapter_retains_pretty_json_escaping_and_single_lf",
+      "test_explicit_v1_unit_sort_preserves_rows_and_original_order"
+    ]
+  },
+  "material_delta": [
+    "validation.py is 498 physical lines; the original 392-line extension assumption is obsolete.",
+    "report_models.DiscoveryReport/ReportBudget/bounded_object and authoritative coverage/parity summaries now exist.",
+    "_Validation retains operation-local mode caching, shared source completion findings/dimensions and complete parity outcomes. Reuse them instead of repeated validate_snapshot or counting findings."
+  ],
+  "observed_bindings": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/coverage_report.py": {
+      "physical_lines": 430,
+      "sha256": "a4373afbd48b787bc2c999fd00de8f2579af5673bf213e4ec2ebb51cebe6bc10"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": {
+      "physical_lines": 173,
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "physical_lines": 346,
+      "sha256": "33fda93f79130add1ca2f122dd4039a03a5690f4c29ef2fb9db59a708b93f903"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/validation.py": {
+      "physical_lines": 498,
+      "sha256": "49d0e022bbe32f42c39d7c54c019496b82836afe181f3d7ba7b8ad761b1b0b02"
+    },
+    "tests/discovery_runtime/test_parity_report_projection.py": {
+      "physical_lines": 314,
+      "sha256": "d0d83b3a4bb0add6f87e8fb81b9185239441234d78279caf3b31f48ae8be8b7d"
+    },
+    "tests/discovery_runtime/test_validation_modes.py": {
+      "physical_lines": 476,
+      "sha256": "ce088dfd024e432b69b0fd6d6f1849d9cca77e1d404fefd265ae6c5f3b7bb1e4"
+    }
+  },
+  "ownership_and_order": [
+    {
+      "contract": "Mechanical extraction first; freeze internal seam, then wire trusted completion projection and malformed-input/warning parity. No rule-family changes or validator replay.",
+      "owner": "assessment/integration",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+        "tests/discovery_runtime/test_completion_projection.py",
+        "tests/discovery_runtime/test_parity_report_projection.py"
+      ]
+    },
+    {
+      "contract": "Use one captured snapshot and explicitly selected root mode. Producer calls authoritative report_projection; the operation calls a pure completion-summary projector over its retained selected-mode findings, never the producer. A pure planning helper rederives both generated views from CapturedWorkspace before MutationChange/WriteGrant/plan_mutation; native commit remains existing commit_mutation.",
+      "owner": "completion model/producer/planning",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+        "tests/discovery_runtime/test_completion_report.py"
+      ]
+    },
+    {
+      "contract": "Freeze report shape with producer before editing; share DiscoveryReport/budgets. Add fixed completion heading (currently non-parity defaults to coverage), preserve existing coverage/parity bytes. Thin legacy adapter and exact old caller expectations; no direct-write v2 authority.",
+      "owner": "rendering/compatibility",
+      "paths": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_rendering.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+        "scripts/dev_tools/discovery/completion_report.py",
+        "tests/discovery_runtime/test_report_rendering.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ]
+    }
+  ],
+  "performed": "Read-only inspection and this single evidence write; no production/test edits, gates, staging, checkpoint/Git changes or new external research.",
+  "plan": "plan.2026-10-17T22-38.md [P5-T3] unchanged",
+  "population_qualification": "AST function inventory only; no collection or suite executed. Parametrized executed case counts remain in accepted/frozen predecessor receipts, not inferred from function counts.",
+  "publication": [
+    "Use captured baseline, exact current expected_sha256, root-authenticated WriteGrant and MutationChange for configured reports/completion-report.json and matching .md only. plan_mutation followed by commit_mutation retains CAS, identity, freshness, dry-run, idempotency and failure semantics.",
+    "Planner binds Markdown peer kind/ID, not rendering bytes; producer planning must reconstruct both byte sequences. Native/source/evidence/contracts are never authored through this route; no io.write_report for v2 and no host authority.",
+    "An accurate failed completion report can publish only when prospective graph is structurally valid. Malformed core cannot publish; other stale reports remain visible unless their refresh is explicitly granted."
+  ],
+  "recommended_prerequisite": {
+    "interface": "Internal operation keeps snapshot/index/evidence/revisions/claims/decisions/dimensions, evaluate(mode), report(kind,identifier,mode), complete_dimensions and complete_parity. No new public validation entrypoint or injected caller result grants authority.",
+    "move": "Move the cohesive _Validation operation class and its bounded _findings aggregation helper, retaining class bodies and cache semantics first. validation.py imports the operation and aggregation helper; public ValidationMode, SnapshotValidation, validate_snapshot, report_projection and report_input_digest remain at existing paths.",
+    "new_source": "packages/discovery-runtime/src/drm_copilot_discovery/validation_operation.py",
+    "reason": "A single stateful assessment owner avoids circular validator callbacks and separate copies of mode evaluation. Existing class spans lines 103-340; the extracted module fits below 500 with imports and completion additions. validation.py drops roughly 230 lines before integration; do not compress source merely to fit.",
+    "size_constraint": "test_validation_modes.py is 476 lines; put new completion integration cases in the dedicated prerequisite module rather than extending it.",
+    "test_patch": "test_multiple_derived_reports_reuse_one_complete_assessment patches validation.validate_coverage/validate_dimensions/validate_acceptance/validate_parity/parity_summary dynamically. Move those observers to the extracted use-site; preserve exact once-only/carrier-identity assertions. Keep _schema_findings and report_projection patches in validation.py.",
+    "test_scope": [
+      "tests/discovery_runtime/test_completion_projection.py",
+      "tests/discovery_runtime/test_parity_report_projection.py"
+    ],
+    "warning_delta": "validate_inputs retains snapshot warnings, but report_projection currently discards non-error input findings before constructing _Validation. Thread the same validated input-findings tuple into the operation/report assembly at both generation and recomputation; preserve bounded ordering and truncation. This is a separately tested semantic correction, not part of an AST-equivalent move."
+  },
+  "retained_preparation": {
+    "checkpoint_key": "execution_progress.p5t3_preparation",
+    "completed_at": "2026-10-19T11:04:47.4758678Z"
+  },
+  "retained_proof": [
+    "P5-T1 repaired-final handoff 2026-10-20T05-24 and accepted base7012d20245cd27d29bf66ede6ac9756dec354ed4 retain coverage/model/digest/report-root repair evidence.",
+    "P5-T2 projection-final-freeze2026-10-20T06-50 and outcome/source freezes are current candidate evidence, not whole-task acceptance. Bind accepted final P5-T2 before P5-T3 execution.",
+    "Retain unchanged callable/body coverage through explicit AST/line mapping for the extraction; focused new completion and import-seam tests prove changed ranges. Preserve real P5-T2 native fixture/harness for bounded later completion adaptation rather than repeating inventory/path setup suites."
+  ],
+  "semantics": [
+    "Actual modes are structural, discovery-complete, parity-complete and planning. agent-output is excluded. Selected-mode result and planning prerequisite are explicit; no ready label from arbitrary dicts, counts or injected passing validators.",
+    "Completion should not independently evaluate all gates merely to populate headings. If independent mode assessments are displayed, obtain them through the same operation cache and label each distinctly.",
+    "Retain complete ordered Finding fields, blockers, warnings, stale/conflicting references, incomplete artifacts, pending scenarios and unknown codes. Group display without creating validator rules. Deduplicate next_action text deterministically while retaining associated finding codes, paths/pointers and targets; FINDINGS_LIMIT remains blocking.",
+    "Malformed core inputs currently have coverage/parity fail/unavailable envelopes, but completion still raises. Add a shared completion diagnostic projection retaining original findings, empty/unavailable counts, fail status and actions without semantic evaluation. It is read-only diagnostic data; structural mutation gating remains unchanged.",
+    "Use report_input_digest for semantic freshness; full SnapshotValidation.input_sha256 is snapshot.sha256. Keep configured reports-root exclusion and authored documentation scan membership.",
+    "Generate both JSON and Markdown from exactly the same bounded immutable projection. ReportBudget and canonical LF JSON apply; no independent Markdown readiness calculation."
+  ],
+  "status": "READ_ONLY_DELTA_PREPARATION_NO_IMPLEMENTATION_RELEASE",
+  "task": "P5-T3"
+}

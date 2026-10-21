@@ -1,0 +1,36 @@
+{
+  "task": "P6-T1",
+  "timestamp": "2026-10-20T15-13",
+  "status": "REVIEW_EVIDENCE_ONLY",
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-probe.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review-staging.2026-10-20T15-13.json"
+  ],
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-probe.2026-10-20T15-13.json",
+      "sha256": "ca11517c8d775d10c3b8938701c4c1c3f9d027357f7ee890dde6b8c08297b4cc",
+      "bytes": 12496
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.json",
+      "sha256": "e17cb15a5550b54975c7986de62ef68c676459d403869a51af3e011a0053c30d",
+      "bytes": 12430
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-shared-review.2026-10-20T15-13.md",
+      "sha256": "9337a94db5a4fd68dbe82399d6f9333de9bcc4777fe3839ec97833be99d23b36",
+      "bytes": 1946
+    }
+  ],
+  "path_count": 4,
+  "self_binding": "Manifest is included in stage_paths; self hash is returned externally, avoiding recursive content.",
+  "retained_owner_evidence": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-shared-candidate.2026-10-20T14-58.json",
+    "sha256": "1081c36750ce9cce889436fe6b5c2a90acb6845d8ffd2c995ebf723c5e04c934",
+    "bytes": 19394
+  },
+  "qualification": "Only four new reviewer evidence files; not an owner implementation staging closure or task acceptance."
+}

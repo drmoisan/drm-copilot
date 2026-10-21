@@ -1,0 +1,188 @@
+"""Preserve native preparation only; never import runtime APIs or mutate the fixture."""
+
+import ast
+import base64
+import ctypes
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+
+ROOT = Path.cwd()
+SCRATCH = Path(__file__).resolve().parent
+FEATURE = ROOT / "docs/features/active/2026-10-17-legacy-discovery-and-parity-980"
+QA = FEATURE / "evidence/qa-gates"
+STAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M")
+
+
+def sha(data):
+    """Bind exact original bytes without encoding or newline conversion."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def reference(path):
+    """Return a portable canonical artifact reference with exact byte identity."""
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(raw), "bytes": len(raw)}
+
+
+def write(path, value):
+    """Write one new LF UTF-8 preparation receipt without replacing any predecessor."""
+    if path.exists():
+        raise ValueError("Preparation evidence already exists")
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+    return reference(path)
+
+
+def variants(path):
+    """Observe Windows short/long spellings for readable redaction; perform no writes."""
+    values = {str(path), path.as_posix()}
+    if os.name == "nt":
+        # Both actual Windows aliases must map to the same portable evidence token.
+        for name in ("GetLongPathNameW", "GetShortPathNameW"):
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = getattr(ctypes.windll.kernel32, name)(str(path), buffer, len(buffer))
+            if not 0 < size < len(buffer):
+                raise ValueError("Cannot observe the native path alias")
+            values.update((buffer.value, buffer.value.replace("\\", "/")))
+    return values
+
+
+contract = FEATURE / "evidence/other/p5t3-interface-contract.2026-10-20T08-23.json"
+shared = FEATURE / "evidence/baseline/p5t3-shared-baseline.2026-10-20T08-36.json"
+predecessor = QA / "p5t2-final-handoff.2026-10-20T08-12.json"
+raw_archive = QA / "p5t2-final-remaining-raw.2026-10-20T08-15.json"
+old_descriptor = SCRATCH / "issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83.json"
+assert sha(contract.read_bytes()) == "71fb7f502f0b99a98f75f4f3e44d4a7a93bcdb840ffc4806d99282aeda288c61"
+assert sha(shared.read_bytes()) == "86d79e0ddf170caecf84457cf4a439bebc297ecc4a2d42ffb28df5a953b3681d"
+assert sha(predecessor.read_bytes()) == "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347"
+assert sha(old_descriptor.read_bytes()) == "c7106cf2a33beede99453ff8475c2c0bbf8b06295b2e573277b19eb824664273"
+previous = json.loads(predecessor.read_bytes())["native"]
+descriptor = json.loads(old_descriptor.read_bytes())
+root = SCRATCH / descriptor["fixture"].removeprefix("SCRATCH/")
+actual = {path.relative_to(root).as_posix(): sha(path.read_bytes())
+          for path in sorted(root.rglob("*")) if path.is_file()}
+assert actual == previous["after"]
+harness = SCRATCH / "issue-980-p5t3-native-composition.py"
+source = harness.read_bytes()
+module = ast.parse(source)
+assert len(source.splitlines()) <= 500
+assert b"\r" not in source and source.endswith(b"\n") and not source.endswith(b"\n\n")
+assert all(line == line.rstrip() for line in source.decode("utf-8").splitlines())
+
+aliases = [(spelling, label) for path, label in ((ROOT, "WORKSPACE"), (SCRATCH, "SCRATCH"))
+           for spelling in variants(path)]
+aliases.sort(key=lambda item: len(item[0]), reverse=True)
+# Test redaction only on observed path strings, without launching any runtime or harness.
+for original, expected in aliases:
+    text = original
+    for spelling, label in aliases:
+        text = re.sub(re.escape(spelling), lambda match: label, text, flags=re.I)
+    assert text == expected
+
+descriptor.update(task="P5-T3", state="PRESERVED_FIXTURE_EXECUTION_UNRELEASED",
+                  files=actual, input_sha256=previous["input_sha256"],
+                  accepted_predecessor="cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+                  predecessor_native=reference(predecessor),
+                  original_fixture_raw_archive=reference(raw_archive),
+                  original_fixture_sha256=sha(old_descriptor.read_bytes()),
+                  qualifications=[
+                      "Source/target identity and authored inputs reuse the accepted P5-T2 fixture.",
+                      "Both accepted parity report outputs remain byte-identical.",
+                      "P5-T3 runtime/native/publication execution remains unreleased.",
+                  ])
+descriptor["predecessor_setup_seconds"] = descriptor.pop("setup_seconds")
+descriptor_path = SCRATCH / f"issue-980-p5t3-native-fixture.{STAMP}.json"
+if descriptor_path.exists():
+    raise ValueError("Native descriptor already exists")
+descriptor_path.write_text(json.dumps(descriptor, indent=2, sort_keys=True) + "\n",
+                           encoding="utf-8", newline="\n")
+native_copy = QA / f"p5t3-native-fixture.{STAMP}.json"
+write(native_copy, descriptor)
+snapshots = []
+# Persist exact executed preparation and future composition scripts without importing them.
+for path, label in ((Path(__file__), "preparation"), (harness, "composition")):
+    copy = QA / f"p5t3-native-{label}-harness.{STAMP}.txt"
+    if copy.exists():
+        raise ValueError("Harness snapshot already exists")
+    copy.write_bytes(path.read_bytes())
+    snapshots.append({"label": label, **reference(copy), "lines": len(path.read_bytes().splitlines())})
+alias_raw = {
+    "qualification": "Exact observed host aliases are base64-only raw provenance; readable artifacts use WORKSPACE/SCRATCH.",
+    "observed_aliases": [{"alias": label, "utf8_base64": base64.b64encode(spelling.encode("utf-8")).decode("ascii")}
+                         for spelling, label in aliases],
+}
+alias_ref = write(QA / f"p5t3-native-path-aliases-raw.{STAMP}.json", alias_raw)
+expected = {
+    "creation": {"mode": "structural", "mode_label": "Structural validation", "validation_result": "pass",
+                 "assessment_state": "available", "findings": [], "blocking_findings": [], "warning_findings": []},
+    "replacement": {"mode": "parity-complete", "mode_label": "Parity completion", "validation_result": "fail",
+                    "assessment_state": "available", "blocking_findings": [0, 1, 2, 3, 4], "warning_findings": [],
+                    "retained_finding_counts": {"error": 5, "warning": 0, "info": 0},
+                    "codes": ["ACCEPTANCE_CRITERIA", "DIMENSION_UNSPECIFIED", "DIMENSION_MISSING",
+                              "DIMENSION_UNSPECIFIED", "PARITY_INCOMPLETE"]},
+    "both": {"findings_complete": True, "planning_prerequisite": None,
+             "counts": {"coverage-ledger": 1, "evidence-reference": 2, "feature-contract": 1,
+                        "inventory-snapshot": 1, "parity-matrix": 1, "scope": 1}},
+    "malformed": {"validation_result": "fail", "assessment_state": "unavailable", "counts": None,
+                  "planning_prerequisite": None, "planning_error": "MUTATION_INVALID"},
+    "wrong_grants": "MUTATION_GRANT",
+}
+receipt = {
+    "task": "P5-T3", "Timestamp": STAMP, "state": "PREPARATION_READY",
+    "Command": "poetry run python SCRATCH/issue-980-p5t3-native-prepare.py",
+    "EXIT_CODE": 0, "Output Summary": "Syntax, <=500 lines, preserved fixture bytes and observed short/long alias mapping verified. Runtime/native/publication execution not run.",
+    "accepted_predecessor": "cb6fdef6f2ff266d09cc326854b9dbc518bec8c4",
+    "contract": reference(contract), "shared_baseline": reference(shared),
+    "previous_native_proof": reference(predecessor), "previous_raw_archive": reference(raw_archive),
+    "fixture": reference(native_copy),
+    "runtime_fixture_receipt": "SCRATCH/" + descriptor_path.name,
+    "harnesses": snapshots, "path_alias_raw": alias_ref,
+    "harness_runtime_path": "SCRATCH/" + harness.name,
+    "execution_released": False, "runtime_imports_executed": False, "tests_executed": 0,
+    "fixture_writes": 0, "publication_executed": False,
+    "expected_contract": expected,
+    "scope": [
+        "Actual capture/local Git/source pin identity against the preserved P5-T2 result, without setup replay.",
+        "Structural/pass creation and parity-complete/available/fail replacement through plan_completion_report and the existing guarded writer.",
+        "One immutable projection per paired JSON/Markdown view; exact mode labels, retained findings/actions and current semantic input digest.",
+        "Wrong-kind, missing and authored-path grants; malformed byte overlay cannot become a valid structural plan.",
+        "Dry-run/no-write, exact original digest replacement, recapture/recomputation, idempotence and stale-plan rejection.",
+    ],
+    "later_release": {
+        "required_flags": {"task": "P5-T3", "execution_released": True,
+                           "ordered_static_passed": True, "independent_review_closed": True},
+        "fixture_receipt_sha256": sha(descriptor_path.read_bytes()),
+        "harness_sha256": sha(source),
+        "source_bindings": "Required final owner-frozen source/test/dependency hash mapping; currently absent, not guessed.",
+        "order": "Final format -> lint -> types -> static -> this native composition -> exact reversed frozen task nodes -> existing per-unit coverage/retained-AST reconciliation and affected contracts.",
+        "node_population": "Await exact final owner node manifests; no discovery or expansion during preparation.",
+        "suggested_timeout_seconds": 660,
+        "timeout_basis": "Prior one-publication native loop took151.326s; this approved bounded sequence performs two guarded publications.",
+        "capture": "Reuse existing20s live progress and lossless raw stdout/stderr/result archives; readable views normalize both observed short/long Windows TEMP spellings.",
+        "invocation": "WORKSPACE/.venv/Scripts/python.exe SCRATCH/issue-980-p5t3-native-composition.py SCRATCH/"
+                      + descriptor_path.name + " SCRATCH/<new-result>.json --release SCRATCH/<final-release>.json",
+    },
+    "limitations": [
+        "Preparation only; no P5-T3 behavior, publication result or acceptance is claimed.",
+        "The malformed control is an in-memory loader overlay of real captured bytes; authored disk input remains unchanged.",
+        "Native invalidation callback instrumentation does not establish installed host-hook authority or non-Windows behavior.",
+        "All predecessor raw proof remains immutable; fresh final coverage must remain separate from qualified unchanged-body proof.",
+    ],
+}
+receipt_path = QA / f"p5t3-native-preparation.{STAMP}.json"
+receipt_ref = write(receipt_path, receipt)
+markdown = QA / f"p5t3-native-preparation.{STAMP}.md"
+markdown.write_text(
+    f"# P5-T3 native preparation\n\nTimestamp: {STAMP}\n"
+    "Command: `poetry run python SCRATCH/issue-980-p5t3-native-prepare.py`\nEXIT_CODE: 0\n"
+    "Output Summary: PREPARATION_READY; script syntax/size, unchanged fixture bytes and observed Windows alias mapping verified. No runtime suite or native publication was executed.\n\n"
+    "The accepted P5-T2 fixture and its parity outputs remain byte-identical. The prepared composition will create a structural/pass completion pair, replace it with a parity-complete/available/fail pair, then verify recapture, recomputation, idempotence and stale-plan rejection. Wrong/authored grants and malformed-core planning must fail before disk writes.\n\n"
+    "Execution requires the exact final reviewed source bindings, this harness and fixture digest, completed ordered static gates, and explicit native-first release. Expected statuses/counts/actions are fixed independently of generated values. Final test populations and existing coverage qualifications remain owner-controlled.\n\n"
+    "Raw output will retain original bytes, including CRLF or missing terminal newlines; readable receipts use LF UTF-8 and normalize observed short/long TEMP aliases. Installed host hooks and non-Windows behavior are outside this fixture proof.\n",
+    encoding="utf-8", newline="\n")
+print(json.dumps({"receipt": receipt_ref, "fixture": reference(native_copy),
+                  "harnesses": snapshots, "execution_released": False}, indent=2))

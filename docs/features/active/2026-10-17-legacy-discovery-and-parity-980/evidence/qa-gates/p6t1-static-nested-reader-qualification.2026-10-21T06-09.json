@@ -1,0 +1,72 @@
+{
+  "checker_controls": [
+    {
+      "control": "with nested function preserves lexical qualification",
+      "passed": true
+    },
+    {
+      "control": "try/if class and async method preserve lexical qualification",
+      "passed": true
+    },
+    {
+      "control": "handler nested function preserves lexical qualification",
+      "passed": true
+    },
+    {
+      "control": "sibling does not inherit previous lexical qualification",
+      "passed": true
+    },
+    {
+      "control": "compound statement creates no extra named scope",
+      "passed": true
+    },
+    {
+      "control": "changed executable body still fails equality",
+      "passed": true
+    },
+    {
+      "control": "actual archived/current nested helper retains exact executable AST",
+      "passed": true
+    },
+    {
+      "control": "all other checker definitions and predicates unchanged",
+      "passed": true
+    }
+  ],
+  "not_final_gate": true,
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-static-nested-reader-originals.2026-10-21T06-09.json",
+    "sha256": "570a051f9aa72a8b3b80fc9ce7b3bd2d66fc5e09146daa2510755cbeec87d12a"
+  },
+  "preflight": {
+    "elapsed_seconds": 0.31344529998023063,
+    "exit_code": 0,
+    "file_count": 19,
+    "retained_units": 28
+  },
+  "preserved_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-060321-static.2026-10-21T06-03.json",
+    "sha256": "4e9738dae367433f1cc6194aec6f651b6d89cd21f175dfeabc7481e3512e9871"
+  },
+  "prior_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-static-qualified.2026-10-21T06-02.json",
+    "sha256": "7f0315a5bd52b62b3f64a3cc0adc4fc54f90f80769351e731fffd9ab7486aad2"
+  },
+  "qualification": "Traverse compound statements while preserving lexical qualified names. Exact retained-body AST comparison, injected-port qualification and every other static predicate remain unchanged.",
+  "raw_coverage_reader_bytes_unchanged": true,
+  "reader_after_sha256": "6220ec9b754ce290bfd783b6ca2ecbe4bb6b42873fee1b2944752929902d7dc4",
+  "reader_before": {
+    "archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-060321-static-raw.2026-10-21T06-03.json",
+      "sha256": "bae4677e4ad886263be93858b8aaf165d13b3a0ce44cfda6741ec9c69510a9a4"
+    },
+    "member": "harness:p6t1_final_nio1_static.py",
+    "sha256": "e88852fa5bfac3addf73e82e281cb0b7521408fcd107cf38b50e868c25149348"
+  },
+  "route": "inventory_analyzers_p6t1_static_qualification_20261021T055900",
+  "sole_changed_bound_stream": "SCRATCH/p6t1_final_nio1_static.py",
+  "source_test_package_changes": false,
+  "status": "CHECKER_PREFLIGHT_PASSED",
+  "task": "P6-T1",
+  "unchanged_bound_streams": 234
+}

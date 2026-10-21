@@ -1,0 +1,60 @@
+{
+  "bound_basis": {
+    "prior_instrumented_incomplete_seconds": [
+      900.19082,
+      1201.913359
+    ],
+    "qualification": "3600 seconds is a finite diagnostic stop bound above the combined observed incomplete durations; no unmeasured coverage speedup or completion ETA is assumed."
+  },
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+    "sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a"
+  },
+  "collect_all_failures": true,
+  "coverage_enabled": false,
+  "derived_from": {
+    "runtime_path": "SCRATCH/p6t1_final_ncf2_gates.py",
+    "sha256": "d679d6efd91254996251528718ace3bd491b3029d8976811b8f399ed612190b1"
+  },
+  "diagnostic_only": true,
+  "execution_released": false,
+  "flags": [
+    "-m",
+    "pytest",
+    "-v",
+    "--tb=short",
+    "--maxfail=0",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "@SCRATCH/<run>-nodes.txt"
+  ],
+  "full294_isolation_and_coverage_still_required": true,
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+    "sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab"
+  },
+  "no_automatic_retry": true,
+  "node_count": 83,
+  "operational_bound_seconds": 3600,
+  "original235_bindings_preserved": true,
+  "progress_seconds": 20,
+  "route": "inventory_analyzers_p6t1_remaining_precheck_20261021T064800",
+  "runner": {
+    "physical_lines": 239,
+    "runtime_path": "SCRATCH/p6t1_remaining83_precheck.py",
+    "sha256": "7a37b3ac0aa9906679e578ac541b80518a3fe9d796c67f23dd6cddc605c547e7"
+  },
+  "scope": {
+    "test_service": 34,
+    "test_service_boundaries": 15,
+    "test_service_publication": 34
+  },
+  "selection": {
+    "bytes": 9904,
+    "path": "SCRATCH/p6t1-remaining83-nodes.txt",
+    "sha256": "7c2bb3481298e87676ea5608c31d14b6dd6df7a2e1098f730556e9b15d8a0c90"
+  },
+  "task": "P6-T1"
+}

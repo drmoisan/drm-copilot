@@ -1,0 +1,281 @@
+{
+  "Timestamp": "2026-10-20T16-47",
+  "Command": "Read exact owner-supplied P5 fixture root, descriptor/archive bytes and JSON profile; SHA256 reconciliation only",
+  "EXIT_CODE": 0,
+  "Output Summary": "Exact50 current files match accepted P5-T3 final; configured repository-only profile and original source/report pins verified. No operational mutation or native replay.",
+  "route": "build_review_p6t1_native_fixture_binding_20261020 / S5_P6T1_native_fixture_binding",
+  "task": "P6-T1",
+  "status": "FIXTURE_BINDINGS_RESOLVED_DIRECTORY_COPY_QUALIFICATION_REQUIRED",
+  "elapsed_seconds": 0.21422269998583943,
+  "operational_lookup": {
+    "alias": "SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83",
+    "provenance": "Exact absolute retained root supplied by recorded P5 native owner inventory_analyzers; literal lookup only. Absolute path intentionally omitted from committed evidence."
+  },
+  "source_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-native-fixture.2026-10-20T08-50.json",
+      "sha256": "dbea7cc24664797d6d3f0949c98af6b623ad2dfc5142dd48c15eae86891c8355",
+      "bytes": 7110
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-remaining-raw.2026-10-20T08-15.json",
+      "sha256": "1be9623f14f5f6565e6faadc3a4c4125ef1e401f16a09869811fb218848111f8",
+      "bytes": 1017629
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-final-handoff.2026-10-20T08-12.json",
+      "sha256": "742d008a70bea7c3d59717f8d76a58615b6dded453187f664b9c2e5ea3841347",
+      "bytes": 64104
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t3-final-handoff.2026-10-20T09-57.json",
+      "sha256": "9425239aff129df9ee94be1a47ce9673aecea8c3ec05bab1f5720bbfdc8a0b41",
+      "bytes": 46567
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p5t2-native-fixture-harness.2026-10-20T06-22.txt",
+      "sha256": "4455e60c7b99d607d84477d8af2cd73c477cd29c63930ecccebafdbcfe80356e",
+      "bytes": 9623
+    }
+  ],
+  "archive_entries_verified": {
+    "NATIVE_SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83.json": {
+      "sha256": "c7106cf2a33beede99453ff8475c2c0bbf8b06295b2e573277b19eb824664273",
+      "bytes": 6097
+    },
+    "NATIVE_SCRATCH/issue-980-p5t2-native-release.2026-10-20T08-03.json": {
+      "sha256": "880e5019a945268f67ba9aa6c44f9c7e2b8ccd90014c293cf2b95e6ffcaeea48",
+      "bytes": 4287
+    },
+    "NATIVE_SCRATCH/issue-980-p5t2-native-result.2026-10-20T08-03.json": {
+      "sha256": "7b9a5321bdb7b94f4618652446c3dd00726e5c1c83e40085bc28b648ada50c70",
+      "bytes": 24597
+    },
+    "FIXTURE_REPORT/parity-report.json": {
+      "sha256": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+      "bytes": 6791
+    },
+    "FIXTURE_REPORT/parity-report.md": {
+      "sha256": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+      "bytes": 9956
+    }
+  },
+  "archive_scope": "The referenced remaining-raw archive contains original descriptor, release/result and parity report bytes, not every fixture file. The preserved operational root was separately read and hashed. No claim that this archive alone reconstructs all fixture bytes.",
+  "original_descriptor": {
+    "archive_entry": "NATIVE_SCRATCH/issue-980-p5t2-fixture-547e8c4158814bbaabc09f68eb577c83.json",
+    "sha256": "c7106cf2a33beede99453ff8475c2c0bbf8b06295b2e573277b19eb824664273",
+    "bytes": 6097,
+    "file_count": 46
+  },
+  "accepted_pre_completion_file_mapping": {
+    ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+    ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+    ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+    ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+    ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+    ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+    ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+    ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+    ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+    ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+    ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+    ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+    ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+    ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+    ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+    ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+    ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+    ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+    ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+    ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+    ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+    ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+    ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+    ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+    ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+    ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+    ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+    ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+    ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+    ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+    ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+    ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+    ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+    ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+    ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+    "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+    "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+    "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+    "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+    "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+    "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+    "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+    "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+    "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+    "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+    "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+    "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+    "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+  },
+  "current_file_mapping": {
+    ".git/COMMIT_EDITMSG": "311154fcab36baef4c52d3a40bb86b1687d63dc989c8bd996d876b0edb17522e",
+    ".git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+    ".git/config": "8aaa67c70ca2329f13fa10d0191a861f5e5d9b26215676b9892f0df0b2c3e9b8",
+    ".git/description": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+    ".git/hooks/applypatch-msg.sample": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+    ".git/hooks/commit-msg.sample": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+    ".git/hooks/fsmonitor-watchman.sample": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+    ".git/hooks/post-update.sample": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+    ".git/hooks/pre-applypatch.sample": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+    ".git/hooks/pre-commit.sample": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+    ".git/hooks/pre-merge-commit.sample": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+    ".git/hooks/pre-push.sample": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+    ".git/hooks/pre-rebase.sample": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+    ".git/hooks/pre-receive.sample": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+    ".git/hooks/prepare-commit-msg.sample": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+    ".git/hooks/push-to-checkout.sample": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+    ".git/hooks/sendemail-validate.sample": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+    ".git/hooks/update.sample": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+    ".git/index": "0ebdaeb4e48edc28af8e384955d209ee7e1c45d5deb5b0e7f710fbef1049d045",
+    ".git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+    ".git/logs/HEAD": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+    ".git/logs/refs/heads/master": "27298b6d25b2e13f7653dcd475c3eb919de3016eb1efa2cb314e6e40e3149826",
+    ".git/objects/00/367d1c6b0af4630878401524aae631b36bcd0a": "5d1d6fe13e496fb4e3c740ef1501fce57bd40e1a3c4b0ca5758cce3c6e85db0a",
+    ".git/objects/0a/5e29e0684dbd5f2da8e1fcca13b4d894ce1f79": "7236f2be8628497961667d0dd8ad94f19bdbee5b934dee5a1d8295893a1119b7",
+    ".git/objects/1d/3085b8e1d716ebf99cd2dbf57b460e7b716d75": "054eff636b2e60e67186e15d1c0a7969e6f972042feca18e4591f763ff628a0f",
+    ".git/objects/41/05c0b886c4ce3d57b00713b95d945d60935361": "4cfcc137daf7c444ec00bfbc4e2dba2d44196bede05a37cd1b2da1dc30f8b67e",
+    ".git/objects/5c/181989a02c8c810d3f5024048ff1e5f537aa26": "82dc0b7800980ae33f8eed66fad9f9d26100648712b5893173c4aaf7cee2755f",
+    ".git/objects/85/617454c3c3ff2a0ebee8b8949bb6b8b074209d": "e8a7328ce9e265970f0b1b85e43f47bac9e844cd09d38e0cadc4d647d9a21abc",
+    ".git/objects/97/1082fb0d60c27e58bf8ddc3dfa51e66d74405f": "cf0701d9323ce52d5b06bd0c920ebf2b523e382c5d0ace479699674814f02bab",
+    ".git/objects/a3/86f37d19464e71746f48232280093e08709a27": "17e087946da03ed4d7e498582c79f5fd66ba3b3b207b5d5458404c8ba295861e",
+    ".git/objects/c5/1c5cf74b3a0936db9ef25cdd0cd012e4472e67": "e27cd1144e17a8d478a6a5ac26b652f63af7969e551f85ac8116326be67226d8",
+    ".git/objects/fa/1385d99a319b43c06f5309d1aae9fdd3adea46": "0c91e0cbfe08b43cfa5b12622253cada11338d73a5ad4ea2fa7930f652503517",
+    ".git/objects/fe/222024eef577db9f4ba843799401ac786f9e79": "d4a0bc5a64b59af138395bc6bf81ca9f2f93f4399d88bc3ea305bfa7d7c5f8fc",
+    ".git/refs/heads/master": "df388be947c910dfb2604a68348e910aeb94210f88f7affc9f9b22e1a0a122ba",
+    ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+    "docs/authored.md": "fb9e4a0ae5c7667af90fe3795d3c8c10e3169782dc8a3b6b0a9eb572b5684918",
+    "docs/migration/discovery/coverage-ledger.json": "d0c25a0bc22868dc34ca21eec6edd38f47df0599a4555469cd1d4204a4f0b717",
+    "docs/migration/discovery/domain-profile.yaml": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+    "docs/migration/discovery/evidence/confirmation.json": "88c4cc43b82be4f58c8c7c59fe06b9cc296897860ff44119eb89ed8762fdf24a",
+    "docs/migration/discovery/evidence/confirmation.txt": "5f05259b3fa4fcff940b05254af790e795a7414e9f24a4968268be771ef90452",
+    "docs/migration/discovery/evidence/source.json": "ee8ccb35d820c930f12291c8cb9b8cd5f6385d70af241e38278aab41dae55c79",
+    "docs/migration/discovery/feature-contracts/feature.json": "f05286213a580d3911244668faba260f320549b39456d3fe060fc7d1685706ff",
+    "docs/migration/discovery/inventory/empty.json": "5f61759fa792851de9812f1a419909a7525f6be4228d3f63b4eb2a6a6014ff36",
+    "docs/migration/discovery/parity-matrix.json": "78975dd62c677b1701d56017c7aa575890ea84a8755ce44cba02ed70a2b00bfa",
+    "docs/migration/discovery/reports/completion-report.json": "98f7f7a3f4cfa09ea5827831eff461c217c79bbc26354feb191a918066eff119",
+    "docs/migration/discovery/reports/completion-report.md": "7614d7590c5fe5c43e19853872523c24a6e49a9190bb2fa662f6e40642cdf6a8",
+    "docs/migration/discovery/reports/parity-report.json": "5263c9943c3a89daa9662b8dccdb37cdab18889ed5e91b1907add75f68d7db6b",
+    "docs/migration/discovery/reports/parity-report.md": "8aff67f1c89469ee5abc9f5668999d990391a581c773772739a12f0c82d643ef",
+    "docs/migration/discovery/scope.yaml": "fe97443f84cd9f7a96ba57eec44e19a6e3be744c8977b7017ec95162fd1b5306",
+    "src/Feature.cs": "0bf01f11679c7af1470b12c80156cf6b7bebdaccec4a43419ba1c574326cf527"
+  },
+  "current_directories": [
+    ".git",
+    ".git/hooks",
+    ".git/info",
+    ".git/logs",
+    ".git/logs/refs",
+    ".git/logs/refs/heads",
+    ".git/objects",
+    ".git/objects/00",
+    ".git/objects/0a",
+    ".git/objects/1d",
+    ".git/objects/41",
+    ".git/objects/5c",
+    ".git/objects/85",
+    ".git/objects/97",
+    ".git/objects/a3",
+    ".git/objects/c5",
+    ".git/objects/fa",
+    ".git/objects/fe",
+    ".git/objects/info",
+    ".git/objects/pack",
+    ".git/refs",
+    ".git/refs/heads",
+    ".git/refs/tags",
+    "docs",
+    "docs/migration",
+    "docs/migration/discovery",
+    "docs/migration/discovery/evidence",
+    "docs/migration/discovery/feature-contracts",
+    "docs/migration/discovery/inventory",
+    "docs/migration/discovery/reports",
+    "src",
+    "tests"
+  ],
+  "empty_directories": [
+    ".git/objects/info",
+    ".git/objects/pack",
+    ".git/refs/tags",
+    "tests"
+  ],
+  "mapping_reconciliation": "Original46 authored/Git files + two accepted parity report views =48 P5-T3 descriptor members. Final50 files add exactly the two completion report views; all48 previous member hashes are identical.",
+  "source_revision": "00367d1c6b0af4630878401524aae631b36bcd0a",
+  "repository_id": "workspace-example",
+  "report_input_sha256": "2c9ef1794d6cfabbf527eabe7a1e175b7d3a30767f7088e42eaf94256fec7075",
+  "digest_provenance": "Semantic digest agrees across P5-T3 descriptor, accepted P5-T2/P5-T3 native results, and actual retained parity/completion JSON reports. It is not a newly recomputed runtime digest or installed proof.",
+  "profile": {
+    "path": "docs/migration/discovery/domain-profile.yaml",
+    "sha256": "c7446835e2d788f55e7f1382267c232f1149a86b540e0bc460d3d801f791f2f0",
+    "bytes": 2739,
+    "raw_base64": "eyIkc2NoZW1hIjoidXJuOmRybS1jb3BpbG90OmRpc2NvdmVyeToyLjAuMDpkb21haW4tcHJvZmlsZSIsImFuYWx5emVycyI6eyJlbmFibGVkIjpbInJlcG9zaXRvcnkiXSwiZXh0ZW5zaW9uX3Jlc3VsdF9tYW5pZmVzdHMiOltdLCJpZ25vcmVkX3BhdGhzIjpbeyJwYXRoX29yX2dsb2IiOiJzcmMvZ2VuZXJhdGVkLyoqIiwicmF0aW9uYWxlIjoiR2VuZXJhdGVkIG91dHB1dCBpcyBpbnZlbnRvcmllZCB0aHJvdWdoIGl0cyBpbnB1dHMuIn1dLCJvcHRpb25zIjp7Im1heF9maWxlX2J5dGVzIjoxNjc3NzIxNn19LCJhcnRpZmFjdF9raW5kIjoiZG9tYWluLXByb2ZpbGUiLCJhcnRpZmFjdHMiOnsiYWNjZXB0YW5jZSI6ImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS9hY2NlcHRhbmNlIiwiY2hhcmFjdGVyaXphdGlvbiI6ImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS9jaGFyYWN0ZXJpemF0aW9uIiwiY292ZXJhZ2VfbGVkZ2VyIjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5L2NvdmVyYWdlLWxlZGdlci5qc29uIiwiZXZpZGVuY2UiOiJkb2NzL21pZ3JhdGlvbi9kaXNjb3ZlcnkvZXZpZGVuY2UiLCJmZWF0dXJlX2NvbnRyYWN0cyI6ImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS9mZWF0dXJlLWNvbnRyYWN0cyIsImltcGxlbWVudGF0aW9uX3JlY29yZHMiOiJkb2NzL21pZ3JhdGlvbi9kaXNjb3ZlcnkvaW1wbGVtZW50YXRpb24tcmVjb3JkcyIsImludmVudG9yeSI6ImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS9pbnZlbnRvcnkiLCJwYXJpdHlfbWF0cml4IjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5L3Bhcml0eS1tYXRyaXguanNvbiIsInByb2R1Y3RfZGVjaXNpb25zIjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5L3Byb2R1Y3QtZGVjaXNpb25zLnlhbWwiLCJwcm9maWxlIjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5L2RvbWFpbi1wcm9maWxlLnlhbWwiLCJyZXBvcnRzIjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5L3JlcG9ydHMiLCJyb290IjoiZG9jcy9taWdyYXRpb24vZGlzY292ZXJ5Iiwic2NvcGUiOiJkb2NzL21pZ3JhdGlvbi9kaXNjb3Zlcnkvc2NvcGUueWFtbCIsInNvdXJjZV9zbmFwc2hvdHMiOiJkb2NzL21pZ3JhdGlvbi9kaXNjb3Zlcnkvc291cmNlLXNuYXBzaG90cyIsInVuc3BlY2lmaWVkX2JlaGF2aW9ycyI6ImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS91bnNwZWNpZmllZC1iZWhhdmlvcnMueWFtbCJ9LCJjbGllbnRzIjpbeyJhcHBsaWNhYmlsaXR5X2RlZmF1bHRzIjp7fSwiaWQiOiJicm93c2VyIiwibW9kZXMiOlsib25saW5lIl0sInBsYXRmb3JtcyI6WyJicm93c2VyIl0sInJlcXVpcmVkX2ZlYXR1cmVfZGltZW5zaW9ucyI6W10sInRhcmdldF9yZXBvc2l0b3J5Ijoid29ya3NwYWNlLWV4YW1wbGUifV0sImNvbXBsZXRpb25fZ2F0ZXMiOnsiYmxvY2tfb25fdW5yZXNvbHZlZF9yZXF1aXJlZF9iZWhhdmlvciI6dHJ1ZSwicGxhbm5pbmdfcHJlcmVxdWlzaXRlIjoiZGlzY292ZXJ5LWNvbXBsZXRlIiwicmVxdWlyZV9hY2NlcHRhbmNlX3NjZW5hcmlvcyI6dHJ1ZSwicmVxdWlyZV9hbGxfZGlzcG9zaXRpb25zIjp0cnVlLCJyZXF1aXJlX2FwcHJvdmVkX2RldmlhdGlvbnMiOnRydWUsInJlcXVpcmVfY29uZmlybWVkX3Njb3BlIjp0cnVlLCJyZXF1aXJlX2N1cnJlbnRfaW52ZW50b3J5Ijp0cnVlLCJyZXF1aXJlX2ZlYXR1cmVfZXZpZGVuY2UiOnRydWUsInJlcXVpcmVfcnVudGltZV9mb3JfZGVjbGFyZWRfZmVhdHVyZXMiOnRydWV9LCJkZWNpc2lvbl9vd25lcnMiOlt7ImlkIjoib3duZXItZXhhbXBsZSIsInJlcXVpcmVkX2V2aWRlbmNlX3R5cGVzIjpbImRlY2lzaW9uIl19XSwiZG9jdW1lbnRhdGlvbl9yb290cyI6WyJkb2NzIl0sImV2aWRlbmNlX3Jvb3RzIjpbImRvY3MvbWlncmF0aW9uL2Rpc2NvdmVyeS9ldmlkZW5jZSJdLCJleGNsdWRlZF9wYXRocyI6W3sicGF0aF9vcl9nbG9iIjoic3JjL3ZlbmRvci8qKiIsInJhdGlvbmFsZSI6IlZlbmRvcmVkIGRlcGVuZGVuY2llcyBhcmUgYWNjb3VudGVkIGZvciBieSBkZXBlbmRlbmN5IGludmVudG9yeS4ifV0sImV4dGVuc2lvbnMiOnsiZXhhbXBsZS5kaXNjb3ZlcnkiOnsiY2F0YWxvZ19sYWJlbCI6IlN5bnRoZXRpYyBmaXh0dXJlIiwicmV2aXNpb25fbm90ZXMiOltdfX0sImlkIjoicHJvZmlsZS1leGFtcGxlIiwicHJvZHVjdGlvbl9yb290cyI6WyJzcmMiXSwicHJvZmlsZV9zdGF0ZSI6ImNvbmZpZ3VyZWQiLCJwcm9maWxlX3ZlcnNpb24iOjIsInByb2plY3RfZW50cnlfcG9pbnRzIjpbXSwicmVwb3NpdG9yaWVzIjpbXSwicmVwb3NpdG9yeSI6eyJpZCI6IndvcmtzcGFjZS1leGFtcGxlIiwicmV2aXNpb24iOiIwMDM2N2QxYzZiMGFmNDYzMDg3ODQwMTUyNGFhZTYzMWIzNmJjZDBhIiwicmV2aXNpb25fcG9saWN5Ijoid29ya2luZy10cmVlLWF0LXBpbiIsInZjcyI6ImdpdCJ9LCJyZXF1aXJlZF9mZWF0dXJlX2RpbWVuc2lvbnMiOlsidHJpZ2dlciIsIm9ic2VydmFibGVfb3V0cHV0cyJdLCJyZXF1aXJlZF9tb2RlcyI6WyJvbmxpbmUiXSwicmVxdWlyZWRfcGxhdGZvcm1zIjpbImJyb3dzZXIiXSwicnVudGltZSI6eyJjYXBhYmlsaXR5IjoibWFudWFsIiwicmVxdWlyZWRfZmVhdHVyZV9pZHMiOltdfSwic2NoZW1hX3ZlcnNpb24iOiIyLjAuMCIsInN5c3RlbSI6eyJpZCI6InByb2Nlc3NpbmctZXhhbXBsZSIsIm5hbWUiOiJFeGFtcGxlIHByb2Nlc3Npbmcgc3lzdGVtIiwicm9sZSI6ImNvbWJpbmVkIn0sInRlc3Rfcm9vdHMiOlsidGVzdHMiXX0K",
+    "profile_state": "configured",
+    "system": {
+      "id": "processing-example",
+      "name": "Example processing system",
+      "role": "combined"
+    },
+    "repository": {
+      "id": "workspace-example",
+      "revision": "00367d1c6b0af4630878401524aae631b36bcd0a",
+      "revision_policy": "working-tree-at-pin",
+      "vcs": "git"
+    },
+    "analyzers": {
+      "enabled": [
+        "repository"
+      ],
+      "extension_result_manifests": [],
+      "ignored_paths": [
+        {
+          "path_or_glob": "src/generated/**",
+          "rationale": "Generated output is inventoried through its inputs."
+        }
+      ],
+      "options": {
+        "max_file_bytes": 16777216
+      }
+    },
+    "production_roots": [
+      "src"
+    ],
+    "test_roots": [
+      "tests"
+    ],
+    "clients": [
+      {
+        "applicability_defaults": {},
+        "id": "browser",
+        "modes": [
+          "online"
+        ],
+        "platforms": [
+          "browser"
+        ],
+        "required_feature_dimensions": [],
+        "target_repository": "workspace-example"
+      }
+    ]
+  },
+  "configuration_requirement": "Profile already configured with explicit repository analyzer and browser/online client. Do not rewrite profile or invent pins. Prepared configure activate/input_path selects these exact bytes in a fresh workspace before configured operations.",
+  "concrete_runner_prerequisite": "Prepared copy_fixture copies files and parent directories only. It drops the verified empty configured tests directory. Before execution, a bounded separately authorized runner qualification must preserve the exact safe declared fixture directory set, including tests, without altering file bytes or source/report pins.",
+  "native_fixture_prerequisite": "After release, materialize a fresh fixture from the48 descriptor members and verified directories, excluding only the two later completion report outputs. Preserve the original50-file fixture unchanged. This makes actual paired creation observable; a full50-file copy already contains the expected completion views.",
+  "release_fragment": {
+    "path": "SCRATCH/issue-980-p6t1-native-fixture-release-fragment.json",
+    "sha256": "c7b949c9d5166ad760ec783355fc0a9a2e7ce3cc0468d2d7e0194696beb2affd",
+    "execution_released": false
+  },
+  "moving_bindings": "No current source/package/runtime/wheel hash is bound; final freeze and packaging release remain separate.",
+  "effects": "Read-only fixture/receipt analysis; authored only this evidence and SCRATCH metadata helper/fragment. No production import, fixture copy/mutation, Git process, build/install/native execution or checkpoint write.",
+  "ac_status": "P6-T1 remains in progress; preservation commit and active tests are independent."
+}

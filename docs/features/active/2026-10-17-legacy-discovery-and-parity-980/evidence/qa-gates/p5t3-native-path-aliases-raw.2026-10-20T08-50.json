@@ -1,0 +1,37 @@
+{
+  "observed_aliases": [
+    {
+      "alias": "SCRATCH",
+      "utf8_base64": "QzpcVXNlcnNcRGFuTW9pc2FuXEFwcERhdGFcTG9jYWxcVGVtcFxjb2RleC1sZWdhY3ktZGlzY292ZXJ5XGlzc3VlLTk4MA=="
+    },
+    {
+      "alias": "SCRATCH",
+      "utf8_base64": "QzovVXNlcnMvRGFuTW9pc2FuL0FwcERhdGEvTG9jYWwvVGVtcC9jb2RleC1sZWdhY3ktZGlzY292ZXJ5L2lzc3VlLTk4MA=="
+    },
+    {
+      "alias": "WORKSPACE",
+      "utf8_base64": "QzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzA="
+    },
+    {
+      "alias": "WORKSPACE",
+      "utf8_base64": "QzovVXNlcnMvRGFuTW9pc2FuL3JlcG9zL2RybS1jb3BpbG90LXd0LzIwMjYtMTAtMTdUMjItMzA="
+    },
+    {
+      "alias": "SCRATCH",
+      "utf8_base64": "QzovVXNlcnMvREFOTU9JfjEvQXBwRGF0YS9Mb2NhbC9UZW1wL0NPQjUyRX4xL0lTU1VFLX4x"
+    },
+    {
+      "alias": "SCRATCH",
+      "utf8_base64": "QzpcVXNlcnNcREFOTU9JfjFcQXBwRGF0YVxMb2NhbFxUZW1wXENPQjUyRX4xXElTU1VFLX4x"
+    },
+    {
+      "alias": "WORKSPACE",
+      "utf8_base64": "QzpcVXNlcnNcREFOTU9JfjFccmVwb3NcRFJNLUNPfjJcMjAyNi0xfjI="
+    },
+    {
+      "alias": "WORKSPACE",
+      "utf8_base64": "QzovVXNlcnMvREFOTU9JfjEvcmVwb3MvRFJNLUNPfjIvMjAyNi0xfjI="
+    }
+  ],
+  "qualification": "Exact observed host aliases are base64-only raw provenance; readable artifacts use WORKSPACE/SCRATCH."
+}

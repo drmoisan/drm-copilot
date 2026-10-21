@@ -1,0 +1,297 @@
+"""Run released completion publication against the preserved P5-T2 native fixture."""
+
+import argparse
+from dataclasses import replace
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+
+SCRATCH = Path(__file__).resolve().parent
+COUNTS = {
+    "coverage-ledger": 1, "evidence-reference": 2, "feature-contract": 1,
+    "inventory-snapshot": 1, "parity-matrix": 1, "scope": 1,
+}
+PARITY_CODES = (
+    "ACCEPTANCE_CRITERIA", "DIMENSION_UNSPECIFIED", "DIMENSION_MISSING",
+    "DIMENSION_UNSPECIFIED", "PARITY_INCOMPLETE",
+)
+NEXT_ACTION = "Correct the identity or supply the artifact, then validate again."
+
+
+def digest(data):
+    """Return the SHA-256 identity of exact bytes; never normalize raw inputs."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def tree(root):
+    """Reuse the prior read-only file/Git inventory without refreshing Git metadata."""
+    return {path.relative_to(root).as_posix(): digest(path.read_bytes())
+            for path in sorted(root.rglob("*")) if path.is_file()}
+
+
+def bounded_git(argv, *, output_limit):
+    """Retain the prior bounded read-only Git process seam and fixed failures."""
+    process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        data = process.stdout.read(output_limit + 1)
+        if len(data) > output_limit:
+            process.kill()
+            raise OSError("Native Git output exceeded its bounded read")
+        if process.wait() != 0:
+            raise OSError("Native Git read failed")
+        return data
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        process.stdout.close()
+
+
+def main():
+    """Require the frozen explicit release before importing or exercising runtime APIs."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fixture_receipt")
+    parser.add_argument("output")
+    parser.add_argument("--release", required=True)
+    args = parser.parse_args()
+    descriptor_path = Path(args.fixture_receipt).resolve()
+    output_path = Path(args.output).resolve()
+    if descriptor_path.parent != SCRATCH or output_path.parent != SCRATCH:
+        raise ValueError("Native descriptor and output must remain inside SCRATCH")
+    if output_path.exists():
+        raise ValueError("Existing native evidence must not be replaced")
+    descriptor = json.loads(descriptor_path.read_bytes())
+    release = json.loads(Path(args.release).read_bytes())
+    if (release.get("task") != "P5-T3"
+            or release.get("execution_released") is not True
+            or release.get("ordered_static_passed") is not True
+            or release.get("independent_review_closed") is not True):
+        raise ValueError("Explicit native-first final execution release is required")
+    if release["fixture_receipt_sha256"] != digest(descriptor_path.read_bytes()):
+        raise ValueError("Release must bind the preserved fixture descriptor")
+    if release["harness_sha256"] != digest(Path(__file__).read_bytes()):
+        raise ValueError("Release must bind this exact harness")
+    if not release["source_bindings"]:
+        raise ValueError("The complete final candidate must be frozen")
+    # Import only after every executable dependency matches its reviewed release.
+    for path, expected in release["source_bindings"].items():
+        if digest(Path(path).read_bytes()) != expected:
+            raise ValueError("Frozen candidate bytes changed: " + path)
+    root = (SCRATCH / descriptor["fixture"].removeprefix("SCRATCH/")).resolve()
+    if root.parent != SCRATCH:
+        raise ValueError("Fixture must be directly inside operational SCRATCH")
+    from drm_copilot_discovery.catalog import load_catalog
+    from drm_copilot_discovery.completion_report import (
+        build_completion_report, plan_completion_report,
+    )
+    from drm_copilot_discovery.mutation_filesystem import LocalMutationPrimitives
+    from drm_copilot_discovery.mutation_io import (
+        GuardedMutationWriter, capture_workspace, commit_mutation,
+    )
+    from drm_copilot_discovery.mutation_plan import (
+        MutationChange, MutationError, project_snapshot,
+    )
+    from drm_copilot_discovery.path_models import WriteGrant
+    from drm_copilot_discovery.repository_reader import LocalGitReader
+    from drm_copilot_discovery.validation import report_input_digest, validate_snapshot
+    from drm_copilot_discovery.validation_inputs import validate_inputs
+
+    started = time.monotonic()
+    checks, durations, invalidations = [], {}, []
+    result = {"task": "P5-T3", "state": "running", "checks": checks,
+              "operation_seconds": durations, "fixture": descriptor["fixture"],
+              "fixture_receipt_sha256": digest(descriptor_path.read_bytes())}
+
+    def measured(label, operation):
+        """Retain actual duration even when the supplied operation raises."""
+        clock = time.monotonic()
+        try:
+            return operation()
+        finally:
+            durations[label] = time.monotonic() - clock
+
+    def check(label, condition):
+        """Record each independent condition before stopping at a concrete failure."""
+        checks.append({"label": label, "passed": bool(condition)})
+        print(("PASS " if condition else "FAIL ") + label, flush=True)
+        if not condition:
+            raise AssertionError(label)
+
+    def rejected(label, operation, code):
+        """Require the stated mutation boundary rather than an arbitrary exception."""
+        caught = None
+        try:
+            operation()
+        except MutationError as error:
+            caught = error
+        check(label, caught is not None and caught.code == code)
+        return caught
+
+    def view_pair(label, report):
+        """Compare both public renderings with one immutable report projection."""
+        value = report.to_dict()
+        check(label + "-identity", value["artifact_kind"] == "completion-report"
+              and value["id"] == "completion" and value["schema_version"] == "2.0.0")
+        check(label + "-json", json.loads(report.to_json()) == value)
+        markdown = report.to_markdown()
+        check(label + "-heading", markdown.startswith("# Discovery completion report\n"))
+        check(label + "-markdown", json.loads(
+            markdown.split("```json\n", 1)[1].rsplit("```", 1)[0]) == value)
+        check(label + "-no-authority", not {"readiness", "output_valid", "required_outputs"} & value.keys())
+        return value
+
+    try:
+        before = descriptor["files"]
+        check("accepted-fixture-byte-identity", tree(root) == before)
+        catalog = load_catalog()
+        primitives = LocalMutationPrimitives(
+            workspace_root=str(root), lock_path=str(SCRATCH / (root.name + ".lock")))
+        repository = LocalGitReader(workspace_root=str(root),
+            repository_id=descriptor["expected_source_id"], run=bounded_git)
+
+        def capture():
+            """Reload actual metadata, captured input bytes and local Git pins."""
+            return capture_workspace(workspace_root=str(root),
+                profile_path=descriptor["profile_path"], metadata=primitives.metadata,
+                read_bytes=primitives.read_bytes, catalog=catalog, repository=repository)
+
+        baseline = measured("capture-baseline", capture)
+        snapshot = baseline.snapshot
+        check("checkout-identity", (snapshot.checkout.id, snapshot.checkout.revision)
+              == (descriptor["expected_source_id"], descriptor["revision"]))
+        check("captured-byte-identity", all(
+            item.sha256 == before[item.path] for item in snapshot.manifest.files))
+        check("semantic-input-identity", report_input_digest(snapshot) == descriptor["input_sha256"])
+        structural = measured("structural-validation", lambda: validate_snapshot(snapshot, mode="structural"))
+        check("actual-core-structural-pass", structural.ok)
+        output_root = snapshot.profile.artifacts["reports"]
+        outputs = (output_root + "/completion-report.json", output_root + "/completion-report.md")
+        grants = tuple(WriteGrant(artifact_kind="completion-report", artifact_id="completion", path=path)
+                       for path in outputs)
+        check("completion-output-absence", all(snapshot.file(path) is None for path in outputs))
+        rejected("missing-grants-refused",
+                 lambda: plan_completion_report(baseline, mode="parity-complete", grants=()), "MUTATION_GRANT")
+        wrong = (replace(grants[0], artifact_kind="parity-report"), grants[1])
+        rejected("wrong-kind-refused",
+                 lambda: plan_completion_report(baseline, mode="parity-complete", grants=wrong), "MUTATION_GRANT")
+        authored = (replace(grants[0], path=descriptor["feature_path"]), grants[1])
+        rejected("authored-contract-grant-refused",
+                 lambda: plan_completion_report(baseline, mode="parity-complete", grants=authored), "MUTATION_GRANT")
+
+        # The public loader overlays malformed bytes in memory; authored disk inputs remain intact.
+        malformed = measured("malformed-overlay", lambda: project_snapshot(baseline, (MutationChange(
+            artifact_kind="feature-contract", artifact_id="feature", path=descriptor["feature_path"],
+            content=b"{}\n", expected_sha256=snapshot.file(descriptor["feature_path"]).sha256),)))
+        malformed_capture = replace(baseline, snapshot=malformed)
+        input_findings = validate_inputs(malformed)
+        bad_report = measured("malformed-diagnostic", lambda: build_completion_report(
+            malformed, mode="parity-complete"))
+        bad = view_pair("malformed", bad_report)
+        check("malformed-known-error", any(item.severity == "error" for item in input_findings))
+        check("malformed-unavailable", bad["validation_result"] == "fail"
+              and bad["counts"] is None and bad["completion"]["assessment_state"] == "unavailable"
+              and bad["completion"]["planning_prerequisite"] is None)
+        check("malformed-input-findings-retained", bad["findings"] == [item.to_dict() for item in input_findings])
+        check("malformed-structural-refused", not validate_snapshot(malformed, mode="structural").ok)
+        error = rejected("malformed-publication-plan-refused",
+            lambda: plan_completion_report(malformed_capture, mode="parity-complete", grants=grants),
+            "MUTATION_INVALID")
+        check("malformed-plan-keeps-findings", bool(error.findings))
+        check("negative-controls-no-write", tree(root) == before and not invalidations)
+
+        report = measured("derive-structural", lambda: build_completion_report(snapshot, mode="structural"))
+        data = view_pair("structural", report)
+        check("structural-explicit-mode", data["mode"] == "structural" and data["validation_result"] == "pass"
+              and data["completion"]["mode_label"] == "Structural validation")
+        check("structural-current-input-digest", data["input_sha256"] == descriptor["input_sha256"])
+        check("structural-independent-expectations", data["counts"] == COUNTS and data["findings"] == []
+              and data["completion"] == {"assessment_state": "available", "blocking_findings": [],
+                  "findings_complete": True, "mode_label": "Structural validation", "next_actions": [],
+                  "planning_prerequisite": None, "retained_finding_counts": {"error": 0, "warning": 0, "info": 0},
+                  "warning_findings": []})
+        plan = measured("plan-structural", lambda: plan_completion_report(baseline, mode="structural", grants=grants))
+        expected = {outputs[0]: report.to_json().encode("utf-8"), outputs[1]: report.to_markdown().encode("utf-8")}
+        check("planned-immutable-pair", {item.change.path: item.change.content for item in plan.writes} == expected)
+        check("new-output-preconditions", all(item.change.expected_sha256 is None for item in plan.writes))
+        # Callback observations prove this injected seam only, never an installed host gate.
+        writer = GuardedMutationWriter(capture=capture,
+            invalidate_authority=lambda: invalidations.append("fixture-only"), primitives=primitives)
+        dry = measured("structural-dry-run", lambda: commit_mutation(plan, writer=writer, dry_run=True))
+        check("dry-run-planned", dry.ok and all(item.status == "planned" for item in dry.artifacts))
+        check("dry-run-no-write", tree(root) == before and not invalidations)
+        created = measured("publish-structural", lambda: commit_mutation(plan, writer=writer))
+        check("structural-publication", created.ok and {item.path for item in created.artifacts} == set(outputs))
+        first = measured("recapture-structural", capture)
+        check("structural-pair-on-disk", all(first.snapshot.file(path).content == content
+                                           for path, content in expected.items()))
+        check("structural-invalidation-seam", len(invalidations) == 1)
+        failed_report = measured("derive-parity-complete", lambda: build_completion_report(
+            first.snapshot, mode="parity-complete"))
+        failed = view_pair("parity-complete", failed_report)
+        check("selected-failure-explicit", failed["mode"] == "parity-complete"
+              and failed["validation_result"] == "fail" and failed["counts"] == COUNTS
+              and failed["completion"]["mode_label"] == "Parity completion"
+              and failed["completion"]["assessment_state"] == "available")
+        check("independent-error-population", tuple(item["code"] for item in failed["findings"]) == PARITY_CODES
+              and all(item["severity"] == "error" for item in failed["findings"]))
+        check("failure-actions-and-indices", failed["completion"] == {
+            "assessment_state": "available", "blocking_findings": [0, 1, 2, 3, 4],
+            "findings_complete": True, "mode_label": "Parity completion",
+            "next_actions": [{"action": NEXT_ACTION, "finding_indices": [0, 1, 2, 3, 4]}],
+            "planning_prerequisite": None, "retained_finding_counts": {"error": 5, "warning": 0, "info": 0},
+            "warning_findings": []})
+        replacement = measured("plan-replacement", lambda: plan_completion_report(
+            first, mode="parity-complete", grants=grants))
+        expected = {outputs[0]: failed_report.to_json().encode("utf-8"),
+                    outputs[1]: failed_report.to_markdown().encode("utf-8")}
+        check("replacement-immutable-pair", {item.change.path: item.change.content for item in replacement.writes}
+              == expected)
+        check("replacement-cas-preconditions", all(item.change.expected_sha256
+              == first.snapshot.file(item.change.path).sha256 and not item.skipped for item in replacement.writes))
+        replaced = measured("publish-truthful-failure", lambda: commit_mutation(replacement, writer=writer))
+        check("truthful-failure-published", replaced.ok)
+        final = measured("recapture-replacement", capture)
+        check("replacement-pair-on-disk", all(final.snapshot.file(path).content == content
+                                            for path, content in expected.items()))
+        check("semantic-digest-stable", report_input_digest(final.snapshot) == descriptor["input_sha256"]
+              and failed["input_sha256"] == descriptor["input_sha256"])
+        check("full-snapshot-changed", final.snapshot.sha256 != snapshot.sha256)
+        check("source-pins-unchanged", final.snapshot.repository_files == snapshot.repository_files
+              and final.snapshot.manifest.source_repositories == snapshot.manifest.source_repositories
+              and final.snapshot.manifest.target_repositories == snapshot.manifest.target_repositories)
+        check("authored-identities-unchanged", all(baseline.inspect(item.path).identity == final.inspect(item.path).identity
+              for item in snapshot.manifest.files))
+        recomputed = measured("recompute-replacement", lambda: build_completion_report(
+            final.snapshot, mode="parity-complete"))
+        check("authoritative-recomputation", recomputed.to_dict() == failed)
+        check("published-structural-pass", validate_snapshot(final.snapshot, mode="structural").ok)
+        check("replacement-invalidation-seam", len(invalidations) == 2)
+        repeated_plan = measured("plan-idempotent", lambda: plan_completion_report(
+            final, mode="parity-complete", grants=grants))
+        repeated = measured("commit-idempotent", lambda: commit_mutation(repeated_plan, writer=writer))
+        check("idempotent-no-write", repeated.ok and all(item.status == "skipped" for item in repeated.artifacts)
+              and len(invalidations) == 2)
+        stale = measured("stale-plan-dry-run", lambda: commit_mutation(plan, writer=writer, dry_run=True))
+        check("stale-original-rejected", not stale.ok and len(invalidations) == 2)
+        expected_after = {**before, **{path: digest(content) for path, content in expected.items()}}
+        check("only-completion-output-bytes-changed", tree(root) == expected_after)
+        # Recheck candidate identities at the end, independently of the outer runner.
+        check("source-bindings-stable", all(digest(Path(path).read_bytes()) == value
+              for path, value in release["source_bindings"].items()))
+        result.update(state="native-composition-passed", report=failed, after=expected_after,
+                      initial_snapshot_sha256=snapshot.sha256, input_sha256=descriptor["input_sha256"])
+    finally:
+        result["elapsed_seconds"] = time.monotonic() - started
+        result["qualifications"] = [
+            "Actual Windows/Git fixture, capture, guarded creation/replacement and recapture; no consumer repository or network.",
+            "Malformed-core refusal uses an immutable in-memory loader overlay of the actual capture, not an authored disk mutation.",
+            "Expected mode/status/count/action values are fixed independently of generated actual values.",
+            "Authority invalidation is fixture instrumentation, not proof of installed host hooks or non-Windows execution.",
+        ]
+        output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+if __name__ == "__main__":
+    main()

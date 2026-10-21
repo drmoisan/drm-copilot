@@ -1,0 +1,38 @@
+{
+  "Timestamp": "2026-10-20T16-04",
+  "Command": "Reconcile one appended reversed shared test stage against unchanged 24-input final freeze",
+  "EXIT_CODE": 0,
+  "Output Summary": "145-case reversed shared isolation PASS",
+  "status": "SHARED_FINAL_ISOLATION_SATISFIED",
+  "route": "build_review_p6t1_shared_isolation_gate_20261020 / S5_P6T1_shared_isolation_gate",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-freeze.2026-10-20T15-34.json",
+    "sha256": "fa15d9c6baa761682075afa49181bf54684ba489a5ce2e24599489f0fb1a2536"
+  },
+  "retained_forward": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-repair1-tests.2026-10-20T15-27.json",
+    "sha256": "a4ec4337c3a8d47668d13be5c64a9bff8912fad33034fa72952c6a08778d4b96"
+  },
+  "reverse": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-shared-reverse-final.2026-10-20T16-04.json",
+    "sha256": "5cb4f0f7ba7b2efe97f5c050cb234963727beea76fee55b98c30b1c9a4614042"
+  },
+  "checks": {
+    "exit_zero": true,
+    "watchdog_not_triggered": true,
+    "all_145_passed": true,
+    "same_exact_nodes": true,
+    "exact_reverse_module_order": true,
+    "all_24_bindings_unchanged": true
+  },
+  "module_order": [
+    "tests/schemas/discovery/test_v2_service_result_failures.py",
+    "tests/discovery_runtime/test_service_result_limits.py",
+    "tests/discovery_runtime/test_service_failures.py",
+    "tests/discovery_runtime/test_service_request_rules.py"
+  ],
+  "append_only": "Original clean ordered static/forward/coverage receipts retained; no forward or coverage replay. Exact same 145 nodes in four reversed modules; later final runner may reuse this isolation proof while 24 bindings stay identical.",
+  "concurrency": "Core service/operations/service_inspection/service_reports/service_mutations/service_bootstrap and gateway/gateway_local/doctor are outside the exact 24-input shared closure. Bound repository_reader and every other dependency stayed identical before/after this run.",
+  "effects": "Only issue-specific SCRATCH harness/raw streams and three canonical evidence artifacts authored; no source/test/schema/resource/build-manifest/Git/checkpoint changes.",
+  "ac_status": "This closes the shared isolation gap only. P6-T1 acceptance remains coordinator-owned."
+}
