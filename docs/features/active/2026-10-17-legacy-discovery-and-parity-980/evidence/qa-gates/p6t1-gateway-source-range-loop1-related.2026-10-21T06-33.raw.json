@@ -1,0 +1,66 @@
+{
+  "Timestamp": "2026-10-21T06-33",
+  "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[selection] tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[encoding] tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[capacity] tests/discovery_runtime/test_service_boundaries.py::test_source_first_page_exposes_exact_truncation",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "--tb=short",
+    "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[selection]",
+    "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[encoding]",
+    "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[capacity]",
+    "tests/discovery_runtime/test_service_boundaries.py::test_source_first_page_exposes_exact_truncation"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 27.941208,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[selection]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[encoding]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_failures_do_not_return_partial_rows[capacity]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_source_first_page_exposes_exact_truncation",
+      "outcome": "PASSED"
+    }
+  ],
+  "streams": {
+    "stdout": {
+      "base64": "PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdCBzZXNzaW9uIHN0YXJ0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KcGxhdGZvcm0gd2luMzIgLS0gUHl0aG9uIDMuMTMuMTIsIHB5dGVzdC05LjAuMiwgcGx1Z2d5LTEuNi4wIC0tIEM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXC52ZW52XFNjcmlwdHNccHl0aG9uLmV4ZQ0Kcm9vdGRpcjogQzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzANCmNvbmZpZ2ZpbGU6IHB5cHJvamVjdC50b21sDQpwbHVnaW5zOiBhbnlpby00LjEyLjEsIGNvdi03LjAuMA0KY29sbGVjdGluZyAuLi4gY29sbGVjdGVkIDQgaXRlbXMNCg0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9zZXJ2aWNlX2JvdW5kYXJpZXMucHk6OnRlc3Rfc291cmNlX2ZhaWx1cmVzX2RvX25vdF9yZXR1cm5fcGFydGlhbF9yb3dzW3NlbGVjdGlvbl0gUEFTU0VEIFsgMjUlXQ0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9zZXJ2aWNlX2JvdW5kYXJpZXMucHk6OnRlc3Rfc291cmNlX2ZhaWx1cmVzX2RvX25vdF9yZXR1cm5fcGFydGlhbF9yb3dzW2VuY29kaW5nXSBQQVNTRUQgWyA1MCVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9zb3VyY2VfZmFpbHVyZXNfZG9fbm90X3JldHVybl9wYXJ0aWFsX3Jvd3NbY2FwYWNpdHldIFBBU1NFRCBbIDc1JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X3NvdXJjZV9maXJzdF9wYWdlX2V4cG9zZXNfZXhhY3RfdHJ1bmNhdGlvbiBQQVNTRUQgWzEwMCVdDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09IDQgcGFzc2VkIGluIDI3LjU0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCg==",
+      "sha256": "5a93a6185b67288ce4eae7fdce5251a3f1b8124166f52db31654deb3676ae1dc",
+      "bytes": 967
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

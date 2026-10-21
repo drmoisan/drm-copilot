@@ -97,7 +97,9 @@ def test_invalid_inventory_selector_is_a_typed_invocation_failure(
 def test_reversed_source_line_range_is_rejected_before_inspection(
     service_io: MemoryService, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Use counted reader interception for invalid bounds; return None, no reads."""
+    """Use MemoryService/MonkeyPatch to reject reversed bounds at request parsing.
+    Return None; require null runtime/manifest and no inspection or writes.
+    """
     path = "application/a.cs"
     service_io.disk.store.put(path, b"one\ntwo\nthree\n")
     service_io.repository.files[path] = service_io.disk.store.files[path]
@@ -115,7 +117,9 @@ def test_reversed_source_line_range_is_rejected_before_inspection(
         "read-source",
         {"read_operation": "read", "paths": [path], "line_start": 3, "line_end": 2},
     )
-    assert result.exit_code == 2 and result.findings[0].code == "SERVICE_SOURCE"
+    assert result.exit_code == 2 and result.findings[0].code == "SERVICE_REQUEST"
+    assert result.findings[0].pointer == "/"
+    assert result.runtime is None and result.input_manifest is None
     assert calls == [] and result.artifacts == () and service_io.writer_calls == 0
 
 
