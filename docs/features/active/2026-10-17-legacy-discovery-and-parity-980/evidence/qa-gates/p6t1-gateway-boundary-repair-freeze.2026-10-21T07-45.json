@@ -1,0 +1,423 @@
+{
+  "Timestamp": "2026-10-21T07:45:07.881660+00:00",
+  "route": "gateway_doctor_p6t1_boundary_repair_20261021T072400",
+  "status": "CHECKED_BOUNDARY_TEST_REPAIR_READY_FOR_INDEPENDENT_CONFIRMATION",
+  "scope": {
+    "path": "tests/discovery_runtime/test_service_boundaries.py",
+    "functions": [
+      "test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "test_context_invalid_or_unavailable_inputs_fail_explicitly"
+    ],
+    "before_lines": 499,
+    "after_lines": 500,
+    "before_ranges": {
+      "test_context_invalid_or_unavailable_inputs_fail_explicitly": [
+        294,
+        312
+      ],
+      "test_bootstrap_interruption_retains_directory_effects_without_file_digest": [
+        345,
+        371
+      ]
+    },
+    "after_ranges": {
+      "test_context_invalid_or_unavailable_inputs_fail_explicitly": [
+        294,
+        312
+      ],
+      "test_bootstrap_interruption_retains_directory_effects_without_file_digest": [
+        345,
+        372
+      ]
+    }
+  },
+  "borrowed_dependency": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+    "sha256": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807",
+    "qualification": "Released by its production owner; exact hash bound before/after every gate. Not owned or staged by this slice."
+  },
+  "retained_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-missing-read-diagnosis.2026-10-21T06-52.json",
+      "sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-boundary-consolidated-diagnosis.2026-10-21T07-17.json",
+      "sha256": "851934069b666c8d9f4361b678ca1f4c3e6b6565e0f9e3f09688ee8350d04f04"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-source-range-repair-freeze.2026-10-21T06-35.json",
+      "sha256": "40a7350d334dc31bbb93acca3994b611ec2f23169285b25fbc257946cd64ad96"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+      "sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4"
+    }
+  ],
+  "exact_test_streams": {
+    "before": {
+      "sha256": "cf09535609ab03ea9c6788e85d2f2253258f878044de8471b77302f799c1ccea",
+      "bytes": 20315,
+      "encoding": "gzip_base64",
+      "gzip_base64": "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"
+    },
+    "failed_loop1": {
+      "sha256": "e16d8f8a17fe20c04630d8dd76ca230f773bb6014eb9276471b6c724cb9cdb38",
+      "bytes": 20422,
+      "encoding": "gzip_base64",
+      "gzip_base64": "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"
+    },
+    "repaired_loop2": {
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "bytes": 20434,
+      "encoding": "gzip_base64",
+      "gzip_base64": "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"
+    }
+  },
+  "delta_proof": {
+    "outside_two_functions_bytes_identical": true,
+    "outside_two_functions_ast_identical": true,
+    "six_action_bodies_and_parameter_ids_identical": true,
+    "init_request_exit_findings_and_directory_count_assertions_identical": true,
+    "prior_source_range_five_case_test_bodies_identical": true,
+    "loop1_to_loop2_exact_single_literal_addition": "Add conflict to the required status set; no other byte changes.",
+    "diff": "--- tests/discovery_runtime/test_service_boundaries.py (before)\n+++ tests/discovery_runtime/test_service_boundaries.py (after)\n@@ -294,9 +294,9 @@\n def test_context_invalid_or_unavailable_inputs_fail_explicitly(\n     context: OperationContext, service_io: MemoryService, action: str\n ) -> None:\n-    \"\"\"Exercise action over a bootstrap context; return None, no invented capture.\"\"\"\n+    \"\"\"Preserve bootstrap read I/O errors for action; return None, no writes.\"\"\"\n     context.inputs[\"bad\"] = 5\n-    with pytest.raises(OperationFailure):\n+    with pytest.raises(FileNotFoundError if action == \"read\" else OperationFailure):\n         if action == \"snapshot\":\n             _ = context.snapshot\n         elif action == \"plan\":\n@@ -345,7 +345,7 @@\n def test_bootstrap_interruption_retains_directory_effects_without_file_digest(\n     initialization_catalog: SchemaCatalog,\n ) -> None:\n-    \"\"\"Fail file publication after real memory bootstrap; return None with effects.\"\"\"\n+    \"\"\"Fail memory writes; retain planned hashes and directory effects; return None.\"\"\"\n     io = MemoryService(initialization_catalog)\n     io.disk.fail_publish = True\n     result = invoke(\n@@ -360,7 +360,8 @@\n         },\n     )\n     assert result.exit_code == 3 and not result.ok and result.findings\n-    assert result.artifacts == () and result.input_manifest is not None\n+    assert {row.status for row in result.artifacts} == {\"planned\", \"conflict\"}\n+    assert not io.disk.store.files and result.input_manifest is not None\n     counts = result.summary[\"counts\"]\n     assert isinstance(counts, tuple)\n     created = next(\n"
+  },
+  "failed_attempt_and_review_qualification": {
+    "loop1_result": "6 passed, 1 failed; all-planned status expectation was too restrictive.",
+    "superseded_inference": "The original short traceback rendered only the first planned row and truncated the rest. The all-planned requirement in the prior proposal/source review is qualified; all other finite review scope remains unchanged.",
+    "exact_contract": "init_projection.py:108-113 derives docs/migration/discovery/domain-profile.yaml. init_io.py:278 records that attempted path and 329-339 returns it as conflict; init_flow.py:283-294 retains five other planned files and all proposed-byte hashes. Require exactly planned and conflict; never allow created, updated or skipped.",
+    "remaining_operand_reconciliation_before_edit": [
+      "MemoryStore begins empty (test_snapshot_io.py:29-34); fail_publish raises before storing the target (mutation_test_support.py:280-285); ExitStack removes its owned stage (mutation_filesystem.py:415-435).",
+      "_remember retains a real InputManifest before commit (service_bootstrap.py:83-101); OperationContext.manifest returns it at 205-206 and result uses it at 282.",
+      "Missing profile ancestors are created and recorded before publication (init_io.py:181-202,278-292); initialization preserves those directory effects and the service counts their actual dispositions."
+    ],
+    "previously_unexecuted": "Empty memory store, non-null manifest and positive directories_created assertions were not reached in loop1. They are now verified by the corrected interruption-only pass and final seven-case pass; no additional probe was run."
+  },
+  "ordered_gates": [
+    {
+      "loop": 1,
+      "stage": "black",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m black --check tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.341063,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.md",
+      "test_results": []
+    },
+    {
+      "loop": 1,
+      "stage": "ruff",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m ruff check tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.106495,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.md",
+      "test_results": []
+    },
+    {
+      "loop": 1,
+      "stage": "pyright",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m pyright tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.981413,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.md",
+      "test_results": []
+    },
+    {
+      "loop": 1,
+      "stage": "focused",
+      "EXIT_CODE": 1,
+      "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --maxfail=1 tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "elapsed_seconds": 24.069167,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.md",
+      "test_results": [
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+          "outcome": "FAILED"
+        }
+      ]
+    },
+    {
+      "loop": 2,
+      "stage": "black",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m black --check tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.37197,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.md",
+      "test_results": []
+    },
+    {
+      "loop": 2,
+      "stage": "ruff",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m ruff check tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.152803,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.md",
+      "test_results": []
+    },
+    {
+      "loop": 2,
+      "stage": "pyright",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -m pyright tests/discovery_runtime/test_service_boundaries.py",
+      "elapsed_seconds": 0.991,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.md",
+      "test_results": []
+    },
+    {
+      "loop": 2,
+      "stage": "interruption",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --maxfail=1 tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "elapsed_seconds": 16.260292,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.md",
+      "test_results": [
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+          "outcome": "PASSED"
+        }
+      ]
+    },
+    {
+      "loop": 2,
+      "stage": "focused",
+      "EXIT_CODE": 0,
+      "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --maxfail=1 tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "elapsed_seconds": 22.815567,
+      "raw_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.raw.json",
+      "readable_path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.md",
+      "test_results": [
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+          "outcome": "PASSED"
+        },
+        {
+          "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+          "outcome": "PASSED"
+        }
+      ]
+    }
+  ],
+  "final_test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "outcome": "PASSED"
+    }
+  ],
+  "final_population": {
+    "unique_existing_controls": 7,
+    "interruption_precheck_passes": 1,
+    "final_passed": 7,
+    "final_failed": 0,
+    "new_node_ids": []
+  },
+  "coverage_qualification": "This owner changes tests only. Test files are excluded from production coverage; no new production coverage floor or whole-suite claim is made. The borrowed production repair and final coverage/isolation remain coordinator-owned. Historical source-range five-case proof is preserved, not rerun.",
+  "runner": {
+    "member": "SCRATCH/issue-980-p6t1-gateway-boundary-run.py",
+    "reuse": "Existing source-range runner with only its description and two-file watched binding changed; raw UTF-8 and readable path/line-ending normalization unchanged.",
+    "sha256": "df175a058c6700dc9fa03c5354649a9227d392b47a9b5ffc0158bc3a45520247",
+    "bytes": 3802,
+    "encoding": "gzip_base64",
+    "gzip_base64": "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"
+  },
+  "stage_paths": [
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.raw.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-repair-freeze.2026-10-21T07-45.json"
+  ],
+  "stage_bindings_excluding_self": [
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "bytes": 20434
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.raw.json",
+      "sha256": "8d21db956b2a02082ba195bedb82afed482864f19ee3259562551afb05adc98f",
+      "bytes": 1878
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-black.2026-10-21T07-35.md",
+      "sha256": "1c4710142df58848c9c05d6b2d8405734de7181a155d558671047ebc37318114",
+      "bytes": 296
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.raw.json",
+      "sha256": "e20b40189abd00364c20532b3485a8f9b5cf203a4478e48c9f3abbf79c17576f",
+      "bytes": 1824
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-ruff.2026-10-21T07-35.md",
+      "sha256": "9f310b7672b515d15c6c7803fbadb40cc3a538b0fcde046f3c1211ebc97c4fbd",
+      "bytes": 256
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.raw.json",
+      "sha256": "8cbc50112bd68ea1ff7fd6da7599a8792b6d284b6f9c072b9c592f9eb6dd4b43",
+      "bytes": 2044
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-pyright.2026-10-21T07-35.md",
+      "sha256": "59694a25b7ccaed0c296cd1b762d4a3ea23e57f80ee12b4c79c5761b0447ab5f",
+      "bytes": 428
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.raw.json",
+      "sha256": "e5af3c3fe711cdd0633c4d39fbafe594f74cb17a83d52952613dcb15ca50a155",
+      "bytes": 6921
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop1-focused.2026-10-21T07-35.md",
+      "sha256": "a635b78ce4da1dd4b2a23a1a7b1ed3ec32b4b3854928c418a0d1ebfa892c82d9",
+      "bytes": 2828
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.raw.json",
+      "sha256": "56066250dde5dde4561b24fb33fda8c51ed3376dcb3a128ba44830af338f7376",
+      "bytes": 1877
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-black.2026-10-21T07-40.md",
+      "sha256": "9efde6c089c23ae31f998b3129108bafc07e893066b67b37587366ec03d0744d",
+      "bytes": 296
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.raw.json",
+      "sha256": "999951fc485676ca4c2fb3193a57151dfb3ba2c0c9eb76ddc321535d78411d39",
+      "bytes": 1824
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-ruff.2026-10-21T07-41.md",
+      "sha256": "52f9410c8bce776997663677e3a3a616debb2743f79212dfb167aa0d5542e845",
+      "bytes": 256
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.raw.json",
+      "sha256": "4073bf99f1bb76a97b75898e3e649a5861003f181e150b375cdd139100e5f12b",
+      "bytes": 2041
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-pyright.2026-10-21T07-41.md",
+      "sha256": "a9da874178c71bdd72bfb27f6b7e7b3870e40e22d2936a240a200154d0ebacc1",
+      "bytes": 428
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.raw.json",
+      "sha256": "55426bbfed3181b50297b1ae4ad1c174683c31d20a935475002b3d63b4fc0931",
+      "bytes": 3124
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-interruption.2026-10-21T07-41.md",
+      "sha256": "de606e916578a39bda12831576ed4d9fd218a4f635ca54c28ee747ecca345b9c",
+      "bytes": 891
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.raw.json",
+      "sha256": "4f61c32a78690626bfc2325c1023f392c52145bae895025303a815072036fb4c",
+      "bytes": 5493
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-gateway-boundary-loop2-focused.2026-10-21T07-42.md",
+      "sha256": "449415a93d51c83ec883edf60cc6d4f2c50f41a1b8a4cb44bc69a48b0db4fbae",
+      "bytes": 1795
+    }
+  ],
+  "self_binding": "stage_paths includes this manifest; its hash is reported externally and is not embedded.",
+  "limitations": [
+    "No production/schema/package/harness-source changes by this owner.",
+    "No broad predecessor, final294, native, package rebuild or four-contract execution.",
+    "No staging, Git, checkpoint or acceptance writes."
+  ]
+}

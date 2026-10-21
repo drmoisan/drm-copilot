@@ -1,0 +1,79 @@
+{
+  "Timestamp": "2026-10-21T07-35",
+  "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --maxfail=1 tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "--tb=short",
+    "--maxfail=1",
+    "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly",
+    "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest"
+  ],
+  "EXIT_CODE": 1,
+  "elapsed_seconds": 24.069167,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "e16d8f8a17fe20c04630d8dd76ca230f773bb6014eb9276471b6c724cb9cdb38",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "e16d8f8a17fe20c04630d8dd76ca230f773bb6014eb9276471b6c724cb9cdb38",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "outcome": "FAILED"
+    }
+  ],
+  "streams": {
+    "stdout": {
+      "base64": "PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdCBzZXNzaW9uIHN0YXJ0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KcGxhdGZvcm0gd2luMzIgLS0gUHl0aG9uIDMuMTMuMTIsIHB5dGVzdC05LjAuMiwgcGx1Z2d5LTEuNi4wIC0tIEM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXC52ZW52XFNjcmlwdHNccHl0aG9uLmV4ZQ0Kcm9vdGRpcjogQzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzANCmNvbmZpZ2ZpbGU6IHB5cHJvamVjdC50b21sDQpwbHVnaW5zOiBhbnlpby00LjEyLjEsIGNvdi03LjAuMA0KY29sbGVjdGluZyAuLi4gY29sbGVjdGVkIDcgaXRlbXMNCg0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9zZXJ2aWNlX2JvdW5kYXJpZXMucHk6OnRlc3RfY29udGV4dF9pbnZhbGlkX29yX3VuYXZhaWxhYmxlX2lucHV0c19mYWlsX2V4cGxpY2l0bHlbc25hcHNob3RdIFBBU1NFRCBbIDE0JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W3BsYW5dIFBBU1NFRCBbIDI4JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W3JlYWRdIFBBU1NFRCBbIDQyJV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W2RvY3VtZW50XSBQQVNTRUQgWyA1NyVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9jb250ZXh0X2ludmFsaWRfb3JfdW5hdmFpbGFibGVfaW5wdXRzX2ZhaWxfZXhwbGljaXRseVt0ZXh0XSBQQVNTRUQgWyA3MSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9jb250ZXh0X2ludmFsaWRfb3JfdW5hdmFpbGFibGVfaW5wdXRzX2ZhaWxfZXhwbGljaXRseVtzdHJpbmdzXSBQQVNTRUQgWyA4NSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9ib290c3RyYXBfaW50ZXJydXB0aW9uX3JldGFpbnNfZGlyZWN0b3J5X2VmZmVjdHNfd2l0aG91dF9maWxlX2RpZ2VzdCBGQUlMRUQgWzEwMCVdDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gRkFJTFVSRVMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCl9fIHRlc3RfYm9vdHN0cmFwX2ludGVycnVwdGlvbl9yZXRhaW5zX2RpcmVjdG9yeV9lZmZlY3RzX3dpdGhvdXRfZmlsZV9kaWdlc3QgX18NCnRlc3RzXGRpc2NvdmVyeV9ydW50aW1lXHRlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5OjM2MzogaW4gdGVzdF9ib290c3RyYXBfaW50ZXJydXB0aW9uX3JldGFpbnNfZGlyZWN0b3J5X2VmZmVjdHNfd2l0aG91dF9maWxlX2RpZ2VzdA0KICAgIGFzc2VydCB7cm93LnN0YXR1cyBmb3Igcm93IGluIHJlc3VsdC5hcnRpZmFjdHN9ID09IHsicGxhbm5lZCJ9DQpFICAgQXNzZXJ0aW9uRXJyb3I6IGFzc2VydCB7J3BsYW5uZWQnLCAnY29uZmxpY3QnfSA9PSB7J3BsYW5uZWQnfQ0KRSAgICAgDQpFICAgICBFeHRyYSBpdGVtcyBpbiB0aGUgbGVmdCBzZXQ6DQpFICAgICAnY29uZmxpY3QnDQpFICAgICANCkUgICAgIEZ1bGwgZGlmZjoNCkUgICAgICAgew0KRSAgICAgKyAgICAgJ2NvbmZsaWN0JywNCkUgICAgICAgICAgICdwbGFubmVkJywNCkUgICAgICAgfQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09IHNob3J0IHRlc3Qgc3VtbWFyeSBpbmZvID09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KRkFJTEVEIHRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2Jvb3RzdHJhcF9pbnRlcnJ1cHRpb25fcmV0YWluc19kaXJlY3RvcnlfZWZmZWN0c193aXRob3V0X2ZpbGVfZGlnZXN0IC0gQXNzZXJ0aW9uRXJyb3I6IGFzc2VydCB7J3BsYW5uZWQnLCAnY29uZmxpY3QnfSA9PSB7J3BsYW5uZWQnfQ0KICANCiAgRXh0cmEgaXRlbXMgaW4gdGhlIGxlZnQgc2V0Og0KICAnY29uZmxpY3QnDQogIA0KICBGdWxsIGRpZmY6DQogICAgew0KICArICAgICAnY29uZmxpY3QnLA0KICAgICAgICAncGxhbm5lZCcsDQogICAgfQ0KISEhISEhISEhISEhISEhISEhISEhISEhISEgc3RvcHBpbmcgYWZ0ZXIgMSBmYWlsdXJlcyAhISEhISEhISEhISEhISEhISEhISEhISEhIQ0KPT09PT09PT09PT09PT09PT09PT09PT09IDEgZmFpbGVkLCA2IHBhc3NlZCBpbiAyMy42M3MgPT09PT09PT09PT09PT09PT09PT09PT09PQ0K",
+      "sha256": "0480cd115d01e72d7e314d4d44dfa1c1a127ee4f47a32fb890a4f4f890e79fa5",
+      "bytes": 2493
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

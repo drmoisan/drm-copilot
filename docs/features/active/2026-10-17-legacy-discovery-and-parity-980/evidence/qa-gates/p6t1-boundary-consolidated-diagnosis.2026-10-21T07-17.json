@@ -1,0 +1,143 @@
+{
+  "Timestamp": "2026-10-21T07:17:37.492768+00:00",
+  "task": "P6-T1",
+  "route": "gateway_doctor_p6t1_boundary_diagnosis_20261021T071400",
+  "status": "TWO_TEST_EXPECTATION_CORRECTIONS_PROPOSED_NO_PRODUCTION_CHANGE",
+  "retained_missing_read_diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-missing-read-diagnosis.2026-10-21T06-52.json",
+    "sha256": "0531871eba094fe3038085ed071aea97a467a0ad76539cbc4610a1b05ed9564a",
+    "disposition": "Carry forward unchanged; required bootstrap missing read propagates FileNotFoundError, while the other five actions retain OperationFailure."
+  },
+  "retained_precheck": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests.2026-10-21T07-12.json",
+    "sha256": "7a959ad8836fcfdf3a21ecc4e9cff43fce964deb55e72f40458de251fb25a1d4",
+    "raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-remaining83-065323-diagnostic-tests-raw.2026-10-21T07-12.json",
+      "sha256": "0219279e1c726504112b1edb007e5a58b7632917270b8d4ec0096ba3f67a4569"
+    },
+    "counts": {
+      "passed": 78,
+      "failed": 5,
+      "selected": 83
+    },
+    "diagnostic_only": true,
+    "coverage_enabled": false,
+    "preserved_frozen_bindings": 235,
+    "qualification": "Existing diagnostic output is reused; no new execution and no full isolation/coverage claim."
+  },
+  "interruption_finding": {
+    "classification": "TEST_EXPECTATION_CONFLATES_PLANNED_PROVENANCE_WITH_COMPLETED_WRITES",
+    "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+    "actual_failure": "Line 363 asserts artifacts == () before testing input_manifest. The retained short traceback reports six extra ServiceArtifact rows and renders the first as status=planned; the remainder of the tuple rendering is truncated.",
+    "already_passed_assertion": "Line 362 established exit_code == 3, not ok, and nonempty findings.",
+    "not_established_by_failed_assertion": "The short-circuited manifest operand and subsequent directory-count assertions were not reached. Their expected behavior remains required by the proposed repair and must be verified in its focused run.",
+    "contract_reason": "InitializationOutput explicitly distinguishes planned from created. Proposed profile/artifact hashes are computed from the validated plan bytes before publication. Interruption preserves those dispositions; the service deliberately returns non-directory rows with real planned or committed digests and reports directory effects in counters. Thus a planned digest does not claim a file was created or confer completion authority.",
+    "source_references": [
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_projection.py",
+        "lines": [
+          410,
+          431
+        ],
+        "fact": "InitializationOutput supports planned/created/skipped/conflict; InitializationResult reports partial effects without a completion receipt."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+        "lines": [
+          208,
+          235
+        ],
+        "fact": "Profile and ordinary artifact digests hash their exact proposed bytes; directory rows have no digest."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_flow.py",
+        "lines": [
+          278,
+          305
+        ],
+        "fact": "Bootstrap effects update created/conflict statuses; failed bootstrap preserves all other planned dispositions."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+        "lines": [
+          129,
+          160
+        ],
+        "fact": "File artifact rows accept real planned/committed digests, directories are counted by disposition, and an unsuccessful initialization returns exit 3 with fixed effect findings."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py",
+        "lines": [
+          199,
+          225
+        ],
+        "fact": "ServiceArtifact explicitly supports planned status without authorizing an effect; directory/uncertain effects must not receive fabricated file rows."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py",
+        "lines": [
+          349,
+          367
+        ],
+        "fact": "Success must agree with exit code/findings; output-bearing failures require actual runtime/input context."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/init_io.py",
+        "lines": [
+          268,
+          294
+        ],
+        "fact": "Profile ancestors may be created before exclusive profile publication."
+      },
+      {
+        "path": "tests/discovery_runtime/mutation_test_support.py",
+        "lines": [
+          280,
+          285
+        ],
+        "fact": "The injected fail_publish error occurs before the memory target file is stored."
+      },
+      {
+        "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_filesystem.py",
+        "lines": [
+          415,
+          435
+        ],
+        "fact": "The direct publication path owns and cleans its temporary stage on failed publication."
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "lines": [
+          294,
+          308
+        ],
+        "fact": "Preserve exact partial effects, distinguish artifact status including planned, and never report partial writes as success."
+      }
+    ]
+  },
+  "finite_repair_contract": {
+    "owned_paths": [
+      "tests/discovery_runtime/test_service_boundaries.py"
+    ],
+    "owned_functions": [
+      "test_context_invalid_or_unavailable_inputs_fail_explicitly",
+      "test_bootstrap_interruption_retains_directory_effects_without_file_digest"
+    ],
+    "missing_read_change": "Select FileNotFoundError only for action=read; retain OperationFailure for all other actions and clarify the docstring. Preserve every action body and existing six node identities.",
+    "interruption_change": "Replace the empty-artifact expectation with a nonempty planned-status assertion and an explicit empty in-memory file-store assertion. Retain non-null input_manifest, exit 3/not-ok/findings, tuple count validation and positive directories_created. Clarify that planned file hashes are distinct from completed writes; preserve node identity.",
+    "size_and_scope": "Current module is 499 lines. The read expectation can change without added lines; the interruption replacement can add one line, keeping the module at 500. No edits outside these two functions, production/schema/package changes, or test split required.",
+    "focused_controls": [
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+      "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest"
+    ],
+    "focused_count": 7,
+    "gate_sequence_after_release": "Black -> Ruff -> Pyright -> seven focused controls; coordinator owns consolidated release, independent confirmation and complete final294/four-contract sequence.",
+    "implementation_status": "NOT_APPLIED_AWAITING_CONSOLIDATED_RELEASE"
+  },
+  "preservation": "No source/test edits, probes, tests, package/native actions, staging, Git or checkpoint writes. Original missing-read evidence and 78-pass/5-failure diagnostic bytes remain unchanged. Publication failure diagnosis remains a separate owner scope."
+}

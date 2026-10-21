@@ -1,0 +1,135 @@
+{
+  "Timestamp": "2026-10-21T06:52:21.199951+00:00",
+  "task": "P6-T1",
+  "route": "gateway_doctor_p6t1_missing_read_20261021T064700",
+  "status": "TEST_EXCEPTION_EXPECTATION_MISMATCH_NO_PRODUCTION_CHANGE",
+  "retained_failure": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-stopped.2026-10-21T06-46.json",
+    "sha256": "4dcb9e8c2e6ac67978f1a16e806bce8a458820dbe86374f2daa89b76ce58a8ab",
+    "candidate": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-candidate-source-range.2026-10-21T06-39.json",
+      "sha256": "8f51055aff12c244cc0dfbba1fdef348ce03d371461b1fd9e4be08b11d36da8a"
+    },
+    "candidate_source_commit": "e9d18aca08857fc8c44b3b030fa10349da4cd4f2",
+    "counts": {
+      "contracts_unexecuted": 4,
+      "failed": 1,
+      "passed": 210,
+      "selected": 294,
+      "unexecuted": 83
+    },
+    "failed_node": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+    "partial_coverage": {
+      "archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-063910-tests-raw.2026-10-21T06-45.json",
+        "sha256": "e9ee5aeefa6d9f989f46a75916d88235f2a93208923c123028a6f7a286ad30d8"
+      },
+      "bytes": 114688,
+      "coverage_json_or_floors_claimed": false,
+      "member": "coverage_data",
+      "sha256": "dcd29fe2ed2d019d687ee314c31df6833c496fb94f63c18fbbc10130e4401d58"
+    },
+    "bindings_unchanged": 235
+  },
+  "conclusion": "The bootstrap context has baseline=None. Its required missing-file read intentionally propagates FileNotFoundError, an OSError subtype. The test incorrectly expects OperationFailure for every parameter. Production behavior matches the explicit read contract, existing snapshot controls and the public I/O failure classification.",
+  "source_trace": [
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "lines": [
+        49,
+        81
+      ],
+      "fact": "The fixture creates a fresh bootstrap OperationContext with baseline=None and an actual memory-backed SnapshotIO."
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_boundaries.py",
+      "lines": [
+        291,
+        312
+      ],
+      "fact": "All six actions currently share pytest.raises(OperationFailure); read calls context.read(missing.json)."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "lines": [
+        155,
+        170
+      ],
+      "fact": "The documented OperationFailure/OSError contract distinguishes absent configured capture from bootstrap SnapshotIO reading. The bootstrap call uses default required=True and does not translate I/O errors."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/snapshot_io.py",
+      "lines": [
+        168,
+        208
+      ],
+      "fact": "inspect retains missing_paths; required missing reads raise FileNotFoundError. required=False alone returns None."
+    },
+    {
+      "path": "tests/discovery_runtime/test_snapshot_io.py",
+      "lines": [
+        162,
+        171
+      ],
+      "fact": "Existing direct contract explicitly expects optional absence as None, required absence as FileNotFoundError, and a directory read as OSError."
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "lines": [
+        325,
+        326
+      ],
+      "fact": "The public service owns OSError conversion to fixed SERVICE_IO with exit 3."
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+      "lines": [
+        300,
+        308
+      ],
+      "fact": "The authoritative service separates adapters and classifies I/O failures as exit 3; it does not require helper exceptions to become OperationFailure."
+    }
+  ],
+  "directly_related_review": {
+    "scope": "Six actions in the failed parametrization, configured versus bootstrap read branches, bootstrap/mutation read-document callers, and explicit optional-absence control only.",
+    "parameter_expectations": {
+      "snapshot": "OperationFailure/SERVICE_CAPTURE",
+      "plan": "OperationFailure/SERVICE_CAPTURE",
+      "read": "FileNotFoundError",
+      "document": "OperationFailure/SERVICE_DOCUMENT for the existing [] fixture",
+      "text": "OperationFailure/SERVICE_INPUT for integer bad input",
+      "strings": "OperationFailure/SERVICE_INPUT for integer bad input"
+    },
+    "other_contract_references": [
+      "operations.py:125-153",
+      "operations.py:172-185",
+      "operations.py:333-347",
+      "service_bootstrap.py:183,254-259",
+      "service_mutations.py:50,74,140,181,200,212",
+      "test_service_boundaries.py:419-435"
+    ],
+    "additional_expectation_findings": [],
+    "qualification": "Source review only; unexecuted cases are not claimed to pass."
+  },
+  "minimal_repair": {
+    "path": "tests/discovery_runtime/test_service_boundaries.py",
+    "function": "test_context_invalid_or_unavailable_inputs_fail_explicitly",
+    "replacement": "with pytest.raises(FileNotFoundError if action == \"read\" else OperationFailure):",
+    "preserve": [
+      "all six node identities",
+      "all action bodies and fixtures",
+      "strict SnapshotIO required-read behavior",
+      "configured graph OperationFailure behavior",
+      "public SERVICE_IO conversion"
+    ],
+    "docstring": "Clarify the distinction between bootstrap I/O errors and typed input/capture errors without expanding the function.",
+    "size": "Current module is 499 lines; the conditional exception expression can replace its existing one-line context manager without growth.",
+    "affected_controls": "The existing six parameters of this function; existing direct SnapshotIO proof is retained rather than replayed."
+  },
+  "remaining83_precheck": {
+    "production_contract_blocker_identified": false,
+    "disposition": "A separately authorized uninstrumented run of exactly the retained 83 nodes may proceed on frozen bytes. Preserve its result separately; it does not replace the mandatory complete ordered isolation/coverage run.",
+    "executed_by_this_diagnosis": false
+  },
+  "preservation": "No source/test/schema/package/harness/checkpoint/index edits or tests, service calls, native calls, probes, or predecessor replay. Original 210 passes, failure, 83 unexecuted nodes and raw partial coverage remain unchanged."
+}

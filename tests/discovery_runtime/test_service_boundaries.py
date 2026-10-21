@@ -294,9 +294,9 @@ def test_opaque_binary_projection_retains_digest_without_fake_text(
 def test_context_invalid_or_unavailable_inputs_fail_explicitly(
     context: OperationContext, service_io: MemoryService, action: str
 ) -> None:
-    """Exercise action over a bootstrap context; return None, no invented capture."""
+    """Preserve bootstrap read I/O errors for action; return None, no writes."""
     context.inputs["bad"] = 5
-    with pytest.raises(OperationFailure):
+    with pytest.raises(FileNotFoundError if action == "read" else OperationFailure):
         if action == "snapshot":
             _ = context.snapshot
         elif action == "plan":
@@ -345,7 +345,7 @@ def test_interrupted_publication_preserves_actual_conflict_and_failure(
 def test_bootstrap_interruption_retains_directory_effects_without_file_digest(
     initialization_catalog: SchemaCatalog,
 ) -> None:
-    """Fail file publication after real memory bootstrap; return None with effects."""
+    """Fail memory writes; retain planned hashes and directory effects; return None."""
     io = MemoryService(initialization_catalog)
     io.disk.fail_publish = True
     result = invoke(
@@ -360,7 +360,8 @@ def test_bootstrap_interruption_retains_directory_effects_without_file_digest(
         },
     )
     assert result.exit_code == 3 and not result.ok and result.findings
-    assert result.artifacts == () and result.input_manifest is not None
+    assert {row.status for row in result.artifacts} == {"planned", "conflict"}
+    assert not io.disk.store.files and result.input_manifest is not None
     counts = result.summary["counts"]
     assert isinstance(counts, tuple)
     created = next(

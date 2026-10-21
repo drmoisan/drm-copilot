@@ -1,0 +1,79 @@
+{
+  "Timestamp": "2026-10-21T07-42",
+  "Command": ".venv/Scripts/python.exe -B -m pytest -o addopts= -p no:cacheprovider -vv --tb=short --maxfail=1 tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-p",
+    "no:cacheprovider",
+    "-vv",
+    "--tb=short",
+    "--maxfail=1",
+    "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly",
+    "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest"
+  ],
+  "EXIT_CODE": 0,
+  "elapsed_seconds": 22.815567,
+  "input_hashes_before": {
+    "tests/discovery_runtime/test_service_boundaries.py": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_after": {
+    "tests/discovery_runtime/test_service_boundaries.py": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": "2b4a8e77a8d58830c808723673c6b1ba834b27ffac6252697ed5d1f2e6a80807"
+  },
+  "input_hashes_unchanged": true,
+  "qualification": "Exact UTF-8 stdout/stderr bytes; normalized readable view only.",
+  "readable_transform": "Replace observed path aliases; CR+LF or CR -> LF; remove trailing SP/TAB before LF/EOF.",
+  "OBSERVED_PATH_ALIASES": {
+    "WORKSPACE": "1a8210da8cb0de983262e1929afabb4bcc614d66e210ab9d894cd47a537be8ca",
+    "SCRATCH": "e500d62b2627fe1b8770d9a28981ccec2e0314512c3023a022d3aa389f49889e",
+    "USER_HOME": "d6fb48c9f450ca7df2de7a8dc206bed9af792e9a0efe376fa765aee7aa7827de"
+  },
+  "test_results": [
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[snapshot]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[plan]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[read]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[document]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[text]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_context_invalid_or_unavailable_inputs_fail_explicitly[strings]",
+      "outcome": "PASSED"
+    },
+    {
+      "node_id": "tests/discovery_runtime/test_service_boundaries.py::test_bootstrap_interruption_retains_directory_effects_without_file_digest",
+      "outcome": "PASSED"
+    }
+  ],
+  "streams": {
+    "stdout": {
+      "base64": "PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gdGVzdCBzZXNzaW9uIHN0YXJ0cyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KcGxhdGZvcm0gd2luMzIgLS0gUHl0aG9uIDMuMTMuMTIsIHB5dGVzdC05LjAuMiwgcGx1Z2d5LTEuNi4wIC0tIEM6XFVzZXJzXERhbk1vaXNhblxyZXBvc1xkcm0tY29waWxvdC13dFwyMDI2LTEwLTE3VDIyLTMwXC52ZW52XFNjcmlwdHNccHl0aG9uLmV4ZQ0Kcm9vdGRpcjogQzpcVXNlcnNcRGFuTW9pc2FuXHJlcG9zXGRybS1jb3BpbG90LXd0XDIwMjYtMTAtMTdUMjItMzANCmNvbmZpZ2ZpbGU6IHB5cHJvamVjdC50b21sDQpwbHVnaW5zOiBhbnlpby00LjEyLjEsIGNvdi03LjAuMA0KY29sbGVjdGluZyAuLi4gY29sbGVjdGVkIDcgaXRlbXMNCg0KdGVzdHMvZGlzY292ZXJ5X3J1bnRpbWUvdGVzdF9zZXJ2aWNlX2JvdW5kYXJpZXMucHk6OnRlc3RfY29udGV4dF9pbnZhbGlkX29yX3VuYXZhaWxhYmxlX2lucHV0c19mYWlsX2V4cGxpY2l0bHlbc25hcHNob3RdIFBBU1NFRCBbIDE0JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W3BsYW5dIFBBU1NFRCBbIDI4JV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W3JlYWRdIFBBU1NFRCBbIDQyJV0NCnRlc3RzL2Rpc2NvdmVyeV9ydW50aW1lL3Rlc3Rfc2VydmljZV9ib3VuZGFyaWVzLnB5Ojp0ZXN0X2NvbnRleHRfaW52YWxpZF9vcl91bmF2YWlsYWJsZV9pbnB1dHNfZmFpbF9leHBsaWNpdGx5W2RvY3VtZW50XSBQQVNTRUQgWyA1NyVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9jb250ZXh0X2ludmFsaWRfb3JfdW5hdmFpbGFibGVfaW5wdXRzX2ZhaWxfZXhwbGljaXRseVt0ZXh0XSBQQVNTRUQgWyA3MSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9jb250ZXh0X2ludmFsaWRfb3JfdW5hdmFpbGFibGVfaW5wdXRzX2ZhaWxfZXhwbGljaXRseVtzdHJpbmdzXSBQQVNTRUQgWyA4NSVdDQp0ZXN0cy9kaXNjb3ZlcnlfcnVudGltZS90ZXN0X3NlcnZpY2VfYm91bmRhcmllcy5weTo6dGVzdF9ib290c3RyYXBfaW50ZXJydXB0aW9uX3JldGFpbnNfZGlyZWN0b3J5X2VmZmVjdHNfd2l0aG91dF9maWxlX2RpZ2VzdCBQQVNTRUQgWzEwMCVdDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09IDcgcGFzc2VkIGluIDIyLjQycyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCg==",
+      "sha256": "e26ed0b71641dad2a50f69a157bf3fe6a4561f96ce973b41645ab621f59fbfdf",
+      "bytes": 1420
+    },
+    "stderr": {
+      "base64": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
