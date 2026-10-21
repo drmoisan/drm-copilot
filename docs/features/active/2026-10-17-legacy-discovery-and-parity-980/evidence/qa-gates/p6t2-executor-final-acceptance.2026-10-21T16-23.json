@@ -1,0 +1,572 @@
+{
+  "Timestamp": "2026-10-21T16-23",
+  "issue_number": 980,
+  "task": "P6-T2",
+  "status": "ACCEPTED",
+  "commit_readiness": "READY_FOR_ACCEPTANCE_COMMIT",
+  "source_head": "fc4f1ff2df9f2fb154fb4f818eda352518cc6f69",
+  "route": "atomic_execution_p6t2_acceptance_20261021T161700",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-accept-p6t2-final167.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Accepted P6-T2 after exact final 167-case, four-contract, three-module/60-range/no-loss and package/native reconciliation. Checked off only P6-T2 and AC-15/AC-21 in the two full-feature requirement sources.",
+  "final_evidence": {
+    "freeze": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-freeze.2026-10-21T16-18.json",
+      "working_sha256": "d7d8a47c831a8d37243924fecf023d1f6cb809f692ecb3a429a84e2350ac9fe5",
+      "git_lf_sha256": "d7d8a47c831a8d37243924fecf023d1f6cb809f692ecb3a429a84e2350ac9fe5",
+      "expected_git_blob": "6c7926aa5c000b9716760d3146643bb08513a3bb",
+      "bytes": 22390,
+      "git_lf_bytes": 22390
+    },
+    "owner_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-staging.2026-10-21T16-18.json",
+      "working_sha256": "f2b6d0fcc69f058361e9b81abe9d1406fd9f8dd0b1b9e99311fa0678d7535c98",
+      "git_lf_sha256": "f2b6d0fcc69f058361e9b81abe9d1406fd9f8dd0b1b9e99311fa0678d7535c98",
+      "expected_git_blob": "5aaf450577e1d9ce5e2aa32ea916656c3a5ac46a",
+      "bytes": 9943,
+      "git_lf_bytes": 9943
+    },
+    "handoff": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+      "working_sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc",
+      "git_lf_sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc",
+      "expected_git_blob": "93ea597535976b2bd4b5a9a7b0b7babdac1529a1",
+      "bytes": 65345,
+      "git_lf_bytes": 65345
+    }
+  },
+  "ordered_gates": [
+    {
+      "stage": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black.2026-10-21T16-08.json",
+        "working_sha256": "ebf0344e869ba4e52efe012b309b34c0b8177336159dd81a40be597f63968815",
+        "git_lf_sha256": "ebf0344e869ba4e52efe012b309b34c0b8177336159dd81a40be597f63968815",
+        "expected_git_blob": "2c361127798d1986560e2501ee9d54c8c284c620",
+        "bytes": 76334,
+        "git_lf_bytes": 76334
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "black",
+        "--check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+        "tests/discovery_runtime/test_cli_commands.py",
+        "tests/discovery_runtime/test_cli_errors.py",
+        "tests/discovery_runtime/test_cli_dry_run.py",
+        "tests/scripts/dev_tools/discovery/test_init_cli.py",
+        "tests/discovery_runtime/cli_test_support.py"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:08:27.466374+00:00",
+      "elapsed_seconds": 0.808347,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black-raw.2026-10-21T16-08.json",
+        "sha256": "a6a8bb29590946af2ea38594f70d5a38514278b793967dcc181332ef3d8ae99a"
+      }
+    },
+    {
+      "stage": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff.2026-10-21T16-08.json",
+        "working_sha256": "fef750d2ba0ac8bc485aa18f5819f1dcfea81dd5621a86fa159365e699c87965",
+        "git_lf_sha256": "fef750d2ba0ac8bc485aa18f5819f1dcfea81dd5621a86fa159365e699c87965",
+        "expected_git_blob": "57d8656115af93ef81e3f30ad484c9d61db3883b",
+        "bytes": 76277,
+        "git_lf_bytes": 76277
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "ruff",
+        "check",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+        "tests/discovery_runtime/test_cli_commands.py",
+        "tests/discovery_runtime/test_cli_errors.py",
+        "tests/discovery_runtime/test_cli_dry_run.py",
+        "tests/scripts/dev_tools/discovery/test_init_cli.py",
+        "tests/discovery_runtime/cli_test_support.py"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:08:28.327936+00:00",
+      "elapsed_seconds": 0.207439,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff-raw.2026-10-21T16-08.json",
+        "sha256": "2543d62dd2b1ae3dad0b46a4d8ca2c3445ae628d52f57d3a38fd657c5c917df8"
+      }
+    },
+    {
+      "stage": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright.2026-10-21T16-08.json",
+        "working_sha256": "49f5edb4cea062b0a9c5aea8e7689c259bbad4e7ba4c3af1523e103b189af39a",
+        "git_lf_sha256": "49f5edb4cea062b0a9c5aea8e7689c259bbad4e7ba4c3af1523e103b189af39a",
+        "expected_git_blob": "01aa1844476a8fee8b6c536ba30bb9c032996fcd",
+        "bytes": 75967,
+        "git_lf_bytes": 75967
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "pyright"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:08:28.583565+00:00",
+      "elapsed_seconds": 14.867802,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright-raw.2026-10-21T16-08.json",
+        "sha256": "ec4934d9bab4bd59c49b6552e2848e1d1b9b089959724082f46a487159f0da19"
+      }
+    },
+    {
+      "stage": "static",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static.2026-10-21T16-08.json",
+        "working_sha256": "c0800b09afc2c07f84c9fc42e3ec84bec8c9da2f5a786b59370343b2eaeaf66e",
+        "git_lf_sha256": "c0800b09afc2c07f84c9fc42e3ec84bec8c9da2f5a786b59370343b2eaeaf66e",
+        "expected_git_blob": "a3afa4c6466204f3b7295b53e2078db351df987b",
+        "bytes": 77947,
+        "git_lf_bytes": 77947
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "SCRATCH\\p6t1_final_nio1_static.py",
+        "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p6t2-final-candidate-released.2026-10-21T16-08.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:08:43.527227+00:00",
+      "elapsed_seconds": 0.209238,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static-raw.2026-10-21T16-08.json",
+        "sha256": "33310c51bc3d824ed0daf1d245335653cf34d838b4f39c3a820777ae7b6c8c64"
+      }
+    },
+    {
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests.2026-10-21T16-16.json",
+        "working_sha256": "e430c2aecdb1147fb10f5e90e5b499722fa46aa674e802a5d5ab025dc185a5ac",
+        "git_lf_sha256": "e430c2aecdb1147fb10f5e90e5b499722fa46aa674e802a5d5ab025dc185a5ac",
+        "expected_git_blob": "eaef1200924aff404e59ede8fd2dafab171219ae",
+        "bytes": 120428,
+        "git_lf_bytes": 120428
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "coverage",
+        "run",
+        "--branch",
+        "--source=drm_copilot_discovery.cli,drm_copilot_discovery.cli_arguments,drm_copilot_discovery.cli_commands",
+        "-m",
+        "pytest",
+        "-v",
+        "--tb=short",
+        "--maxfail=1",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "@SCRATCH\\p6t2-final-160827-nodes.txt"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:08:43.818998+00:00",
+      "elapsed_seconds": 469.351664,
+      "passed": 167,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests-raw.2026-10-21T16-16.json",
+        "sha256": "d5ca4a79dcdb93da0c4e0e75f3ebf175d3ea01868bb39002a3f431a16ce25335"
+      }
+    },
+    {
+      "stage": "coverage-json",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json.2026-10-21T16-16.json",
+        "working_sha256": "585fb0be5edb71127333e056aa36f8031c9c6eae37c4cb726fbfb642a9dd1893",
+        "git_lf_sha256": "585fb0be5edb71127333e056aa36f8031c9c6eae37c4cb726fbfb642a9dd1893",
+        "expected_git_blob": "77a7d75339800b4228f15cb42e525b3fa27ab9df",
+        "bytes": 75940,
+        "git_lf_bytes": 75940
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "coverage",
+        "json",
+        "--show-contexts",
+        "-o",
+        "SCRATCH\\p6t2-final-160827-coverage.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:16:33.263320+00:00",
+      "elapsed_seconds": 0.409104,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json-raw.2026-10-21T16-16.json",
+        "sha256": "5d9e079502cdc5b383b5d83257e9cd920f27c31a900d8fe954704fbbc820002c"
+      }
+    },
+    {
+      "stage": "coverage-proof",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof.2026-10-21T16-16.json",
+        "working_sha256": "c8b0fd8a6d068f62cbcdc8af1b3669ebeba7c654f78755900edc1f808dce9386",
+        "git_lf_sha256": "c8b0fd8a6d068f62cbcdc8af1b3669ebeba7c654f78755900edc1f808dce9386",
+        "expected_git_blob": "b553f63d821307da94a86abad68c2d0d5df378f9",
+        "bytes": 76747,
+        "git_lf_bytes": 76747
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "SCRATCH\\issue-980-p6t2-final-coverage.py",
+        "WORKSPACE\\docs\\features\\active\\2026-10-17-legacy-discovery-and-parity-980\\evidence\\qa-gates\\p6t2-final-candidate-released.2026-10-21T16-08.json",
+        "SCRATCH\\p6t2-final-160827-coverage.json",
+        "SCRATCH\\p6t2-final-160827-coverage-result.json"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:16:33.764842+00:00",
+      "elapsed_seconds": 0.20919,
+      "passed": 0,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof-raw.2026-10-21T16-16.json",
+        "sha256": "31de6cd8d6273be793e3facf92ed050c7b7f7505e9c3b31193655dabdaeeb932"
+      }
+    },
+    {
+      "stage": "contracts",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts.2026-10-21T16-16.json",
+        "working_sha256": "6e71c34e6c3a39ae30327ce4162a5f3ae70f422de2718eb5f1d012f4b7c67336",
+        "git_lf_sha256": "6e71c34e6c3a39ae30327ce4162a5f3ae70f422de2718eb5f1d012f4b7c67336",
+        "expected_git_blob": "277133a564a88fbffc4d967e11d41f70fd2ae0c3",
+        "bytes": 77766,
+        "git_lf_bytes": 77766
+      },
+      "command": [
+        "WORKSPACE\\.venv\\Scripts\\python.exe",
+        "-u",
+        "-m",
+        "pytest",
+        "-v",
+        "--tb=short",
+        "--maxfail=1",
+        "-o",
+        "addopts=",
+        "-p",
+        "no:cacheprovider",
+        "tests/discovery_runtime/test_package_contract.py::test_runtime_metadata_has_bounded_dependencies_and_minimum_python",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-request]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_schemas_are_closed_valid_and_packaged[service-result]",
+        "tests/schemas/discovery/test_v2_control_schemas.py::test_control_definitions_have_complete_offline_reference_closure"
+      ],
+      "exit_code": 0,
+      "started_utc": "2026-10-21T16:16:34.062129+00:00",
+      "elapsed_seconds": 0.609924,
+      "passed": 4,
+      "raw_archive": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts-raw.2026-10-21T16-16.json",
+        "sha256": "616c5e2ad038439fc491a258402b4a5c4936f504c6841a3f3324a6f4fc1ddda2"
+      }
+    }
+  ],
+  "population": {
+    "passed": 167,
+    "failed": 0,
+    "errors": 0,
+    "processes": 1,
+    "order": "Four module blocks reversed; within-module identities retained exactly.",
+    "parser_cases": 109,
+    "composition_and_registration_cases": 58,
+    "selection_sha256": "f6eab247f6b677042658ba813497cc594b33e70a6f7669c07c6e91d0d77b9827",
+    "contracts_passed": 4,
+    "bound_streams": 254,
+    "repository_streams": 249,
+    "archived_or_package_bound_scratch_streams": 5
+  },
+  "coverage": {
+    "statements": [
+      366,
+      366
+    ],
+    "branches": [
+      90,
+      90
+    ],
+    "module_count": 3,
+    "named_range_count": 60,
+    "no_loss_comparisons": 3,
+    "lost_lines": 0,
+    "lost_branches": 0,
+    "raw_counters_augmented": false,
+    "prior_proof_qualifications": 0,
+    "raw_coverage_sha256": "18c377f77024dea597824dcdb31ab6ec7f9821b90d1e74b1eeef67bbeb1b86a2",
+    "raw_coverage_bytes": 238829,
+    "raw_terminal_newline": false,
+    "scope": "Fresh task-module/BODY coverage only. Retained repository-wide proof is not relabeled as a new repository-wide run. Zero-executable carriers retain their explicit 0/0 BODY denominator."
+  },
+  "reused_review_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-pa1-confirmation.2026-10-21T15-20.json",
+      "working_sha256": "8726963c2d55923ba7e09ef8d681fd0e7006c27dba83927b3188eb3b6028ccd6",
+      "git_lf_sha256": "8726963c2d55923ba7e09ef8d681fd0e7006c27dba83927b3188eb3b6028ccd6",
+      "expected_git_blob": "6acb25566942c13cb61d7039a5b50ae78a40972b",
+      "bytes": 19561,
+      "git_lf_bytes": 19561
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-composition-confirmation.2026-10-21T15-35.json",
+      "working_sha256": "7a8c1169af4f0c5062b19701c5cd6b9db5a1e131fc6486a2f47c11b0a1c0ed58",
+      "git_lf_sha256": "7a8c1169af4f0c5062b19701c5cd6b9db5a1e131fc6486a2f47c11b0a1c0ed58",
+      "expected_git_blob": "213ec95952a2515ce92210268f346ef9dc2ac0ff",
+      "bytes": 10500,
+      "git_lf_bytes": 10500
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-package-preservation.2026-10-21T15-52.json",
+      "working_sha256": "1a352247a0a08069548943ee8d24e7a3e263de4c251fd50ca86371901efbb140",
+      "git_lf_sha256": "1a352247a0a08069548943ee8d24e7a3e263de4c251fd50ca86371901efbb140",
+      "expected_git_blob": "453a7284fca6eefcdb8c762267232f4212e7c9f8",
+      "bytes": 8976,
+      "git_lf_bytes": 8976
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-transport-confirmation.2026-10-21T15-48.json",
+      "working_sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6",
+      "git_lf_sha256": "d26514374bf72b1cf0ddff857882a16868e2211c031b0c6a67c92241ec34efd6",
+      "expected_git_blob": "c16422c9f0a4ac07d05f0112132f3c78f89754d2",
+      "bytes": 7442,
+      "git_lf_bytes": 7442
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-executor-native-preview-confirmation.2026-10-21T15-56.json",
+      "working_sha256": "0683f8824affbbf70c913e451491fc762531f8630a95e2e3aec318618b825c8b",
+      "git_lf_sha256": "0683f8824affbbf70c913e451491fc762531f8630a95e2e3aec318618b825c8b",
+      "expected_git_blob": "4e060432bf654dcba4822680d77745809f425b3d",
+      "bytes": 9140,
+      "git_lf_bytes": 9140
+    }
+  ],
+  "package_native": {
+    "package": {
+      "build_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+      "payload_members": 172,
+      "policy_sha256": "bef024420dc551d7eeab7162b8a2c3ed4649f88b3690a57ae44df7a892674564",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+        "sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8"
+      },
+      "source_input_count": 216,
+      "wheel_sha256": "670ed87df9ba1050fb9988af1ffbfd9ddd7b7383af0763ead0d13dc4d6f30bcd"
+    },
+    "native_closure": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-offline-closure.2026-10-21T16-01.json",
+      "working_sha256": "d3efb7c4a9702489fb55e8ed99e49e832a8b979465739ced5aef24139dd390c5",
+      "git_lf_sha256": "3ac0a2ee82c4b40328287ae3e474aaf30fd6df8a8ee1c47d47d2d411c11c81b0",
+      "expected_git_blob": "700dadbc8ff33ba7c13b597b9b6889b39067e1d9",
+      "bytes": 10600,
+      "git_lf_bytes": 10408
+    },
+    "actual_console_calls": 4,
+    "offline_checks": 50,
+    "offline_replay_calls": 0,
+    "actual_exits": [
+      0,
+      2,
+      0,
+      1
+    ],
+    "new_native_or_package_execution_by_reviewer": 0
+  },
+  "qualifications": [
+    "The original LF-only native help assertion and planned-inline-content publication-preview assertion remain failed historical controller results. Their exact qualified corrections were reevaluated over retained bytes without relaunching any console.",
+    "Native transport accepts only exact LF/CRLF framing equivalents. Strict JSON/schema/content checks retain raw bytes; report artifact content is not normalized.",
+    "The actual --write --dry-run completion invocation proves an unchanged existing pair with skipped statuses and exact digests, not fresh planned inline content. The independent service/CLI tests retain their separate dry-run/report-publication proof.",
+    "Four installed console invocations and 31 static launcher bindings do not assert a native coding-agent-host capability or protected host authority; P8 remains pending.",
+    "All final lossless archive members retain exact hashes/EOF. Readable streams match the existing OBSERVED_PATH_ALIASES and newline/trailing-blank convention; no original evidence was rewritten.",
+    "A metadata-only PowerShell read of coverage JSON rejected coverage.py's empty-string named scope key. The established Python UTF-8 JSON reader preserved that valid key and completed reconciliation; no source, coverage or execution changed."
+  ],
+  "criteria_mapping": [
+    {
+      "criterion": "P6-T2: every required noninteractive command and alias",
+      "proof": "Accepted parser/composition reviews, 31 registrations in both pyprojects, exact 109+58 final population, and installed metadata/launcher bindings."
+    },
+    {
+      "criterion": "P6-T2: service routing, typed outcomes, help/errors, canonical workspace and dry-run/report semantics",
+      "proof": "Accepted injected-port composition, CC1 and PA1 corrections, final error/no-effect/paired-publication controls, and qualified installed exits 0/2/0/1."
+    },
+    {
+      "criterion": "AC-15",
+      "text": "A deterministic command initializes a consumer discovery workspace.",
+      "proof": "Accepted deterministic initialization planner/idempotency proof plus the registered init command's exact request mapping, single authoritative service composition, full final CLI population and preserved initialization/setup qualification."
+    },
+    {
+      "criterion": "AC-21",
+      "text": "A complete validation command exists.",
+      "proof": "Accepted whole-workspace validation and graph proof plus registered validate-all/validate, real paired report publication and dry-run/no-effects controls in the final CLI population."
+    }
+  ],
+  "task_checkoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "task": "P6-T2",
+    "before": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "3cc9e9857d12a0f9f575ff136b68c8e7afe80d20e2dfd5aed748daf6fdbf03ea",
+      "git_lf_sha256": "0949eed76237a2386ff104540c9f8044b1421a2551996c80342dbe8952d8b226",
+      "expected_git_blob": "8d3425dc1bde8e43ecd8d8b34e63d578878b1101",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "after": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "a33a55b1e050276efcdd6accfd6b9ae5a17bd1d6233d1a50014eeee01da074fa",
+      "git_lf_sha256": "ce70ab11fa9fb4b89d3bfa7150f5ebce9fd868c162b1f93288c1370a278cc8cd",
+      "expected_git_blob": "b249c2f2a688ab27df46a30edab7753292096986",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "accepted": 48,
+    "total": 84,
+    "remaining": 36
+  },
+  "acceptance_criteria": {
+    "work_mode": "full-feature",
+    "sources": {
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": {
+        "before_binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+          "working_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+          "git_lf_sha256": "622fd11cd9ac5cf83ecfa93c32ec418f7e1ab6edaf765cee94953ab5fba8fe8f",
+          "expected_git_blob": "4a24d3c85c739f240cb8f5eaa27ef0df7d82189f",
+          "bytes": 112130,
+          "git_lf_bytes": 112130
+        },
+        "pending": [
+          {
+            "id": "AC-20",
+            "text": "Individual artifact validators exist."
+          },
+          {
+            "id": "AC-22",
+            "text": "Blocking failures return nonzero exit codes."
+          },
+          {
+            "id": "AC-37",
+            "text": "Python is the authoritative implementation layer."
+          },
+          {
+            "id": "AC-38",
+            "text": "CLI commands are documented and tested."
+          }
+        ],
+        "after_binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+          "working_sha256": "e1b3bcf2e892b2ded19048e8466c052e3b0f42e0f90f0a45d72c4d8a5f013d52",
+          "git_lf_sha256": "e1b3bcf2e892b2ded19048e8466c052e3b0f42e0f90f0a45d72c4d8a5f013d52",
+          "expected_git_blob": "3834559a1a84376eb8f4874f6a54c60ec3426fd2",
+          "bytes": 112130,
+          "git_lf_bytes": 112130
+        },
+        "total": 66,
+        "accepted": 25,
+        "remaining": 41,
+        "newly_accepted": [
+          "AC-15",
+          "AC-21"
+        ]
+      },
+      "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md": {
+        "before_binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+          "working_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+          "git_lf_sha256": "ff8201dc37a6997d8cc812809f87e303b11425657778274e929593d1e8f834ad",
+          "expected_git_blob": "1960d61788c9b89e736e7ae3f394a4155358cf3a",
+          "bytes": 11870,
+          "git_lf_bytes": 11870
+        },
+        "pending": [
+          {
+            "id": "AC-20",
+            "text": "Individual artifact validators exist."
+          },
+          {
+            "id": "AC-22",
+            "text": "Blocking failures return nonzero exit codes."
+          },
+          {
+            "id": "AC-37",
+            "text": "Python is the authoritative implementation layer."
+          },
+          {
+            "id": "AC-38",
+            "text": "CLI commands are documented and tested."
+          }
+        ],
+        "after_binding": {
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+          "working_sha256": "c0dd4bee3d2f6cc9af5dc8e753955948c5e005194fa9865d22f751ef3b985d5d",
+          "git_lf_sha256": "c0dd4bee3d2f6cc9af5dc8e753955948c5e005194fa9865d22f751ef3b985d5d",
+          "expected_git_blob": "3c183858537eb6dc885df66afa84fb2ca47fd9ee",
+          "bytes": 11870,
+          "git_lf_bytes": 11870
+        },
+        "total": 66,
+        "accepted": 25,
+        "remaining": 41,
+        "newly_accepted": [
+          "AC-15",
+          "AC-21"
+        ]
+      }
+    },
+    "accepted": 25,
+    "total": 66,
+    "remaining": 41,
+    "issue_unchanged": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/issue.md",
+      "working_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "git_lf_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "expected_git_blob": "1e70a8917895d77c46a9b91c35eb815ea9fff4a0",
+      "bytes": 25717,
+      "git_lf_bytes": 25717
+    },
+    "pending_mapping": {
+      "AC-20": "Legacy/public validator adapter obligations remain in P6-T3.",
+      "AC-22": "MCP/wrapper/host blocking result mappings remain pending.",
+      "AC-37": "Cross-layer Python authority and native-host composition remain pending.",
+      "AC-38": "Complete consumer CLI reference/documentation remains in P10-T4."
+    }
+  },
+  "successor_preparation_only": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+    "working_sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2",
+    "git_lf_sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2",
+    "expected_git_blob": "9149cbc67e985a061d032b11802d225edd767882",
+    "bytes": 27623,
+    "git_lf_bytes": 27623
+  },
+  "limitations": "P6-T3 and subsequent phases, broader cross-layer criteria, delivery, feature review and CI remain pending. This task acceptance does not approve successor implementation. No production, tests, package, Git/index or checkpoint mutation was performed.",
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-acceptance-staging-union.2026-10-21T16-23.json",
+  "next_five": [
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3",
+    "P8-T1"
+  ]
+}

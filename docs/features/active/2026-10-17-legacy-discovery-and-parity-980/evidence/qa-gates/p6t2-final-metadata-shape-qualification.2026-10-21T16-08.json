@@ -1,0 +1,139 @@
+{
+  "Timestamp": "2026-10-21T16-08",
+  "composition_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-freeze.2026-10-21T15-31.json",
+    "sha256": "5dbaff1f3d5ec8b6a60e49fbee5c812b2ed19ab1385be72ef1d2893b940f21a6"
+  },
+  "coverage_reader_view": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-composition-coverage-view.2026-10-21T16-08.json",
+    "sha256": "6995f1e46ea07d7bbee471eff22e46595eaeba819c9926f91cb2ee90102b8f59"
+  },
+  "equal_hashes_verified": true,
+  "gate_execution_occurred": false,
+  "generated_manifest_update": {
+    "authority": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+      "sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8"
+    },
+    "new_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+    "old_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json"
+  },
+  "node_count": 167,
+  "normalization": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "original": {
+        "physical_lines": 201,
+        "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13"
+      },
+      "scalar_sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-request.schema.json": {
+      "original": {
+        "physical_lines": 212,
+        "sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"
+      },
+      "scalar_sha256": "e75eab99e20323e3c9b83a46b3595e406c422a6d3051ba4aac428b5ebbde73e9"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": {
+      "original": {
+        "physical_lines": 382,
+        "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647"
+      },
+      "scalar_sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": {
+      "original": {
+        "physical_lines": 405,
+        "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05"
+      },
+      "scalar_sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": {
+      "original": {
+        "physical_lines": 241,
+        "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+      },
+      "scalar_sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/findings.py": {
+      "original": {
+        "physical_lines": 156,
+        "sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+      },
+      "scalar_sha256": "ded9a343d078351e012f81f4dc8519f46e321b1de87f539517f09d840683ae88"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": {
+      "original": {
+        "physical_lines": 170,
+        "sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+      },
+      "scalar_sha256": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": {
+      "original": {
+        "physical_lines": 339,
+        "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+      },
+      "scalar_sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/repository_reader.py": {
+      "original": {
+        "physical_lines": 178,
+        "sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+      },
+      "scalar_sha256": "0a1d622a70510b1cbcde1182938572796c6096b5b3ee4af7b58e96dec93d19bd"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": {
+      "original": {
+        "physical_lines": 335,
+        "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b"
+      },
+      "scalar_sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "original": {
+        "physical_lines": 440,
+        "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85"
+      },
+      "scalar_sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_request_rules.py": {
+      "original": {
+        "physical_lines": 279,
+        "sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015"
+      },
+      "scalar_sha256": "e62fa8e8703e2936283067be3b1463ed1a0b2e9fdf28d655721fd195fc7c6015"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "original": {
+        "physical_lines": 415,
+        "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab"
+      },
+      "scalar_sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab"
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "original": {
+        "physical_lines": 141,
+        "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395"
+      },
+      "scalar_sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395"
+    },
+    "tests/discovery_runtime/test_cli_commands.py": {
+      "original": {
+        "physical_lines": 372,
+        "sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9"
+      },
+      "scalar_sha256": "79d9c5e2c610577bbfe257f3705e668e8a872f258cff53710882055e77b7d4e9"
+    }
+  },
+  "original_candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-candidate-disabled.2026-10-21T15-22.json",
+    "sha256": "279ce5f9a236c058a37a2098e5db7aa54841d382dc61a84bc0860f41cb780af4"
+  },
+  "original_diagnostic": "Metadata assembler exited 1 before any gates or output writes: direct structured-versus-scalar dependency comparison raised AssertionError. Exact comparison reconstructed from the unchanged two receipts; original stderr exists in the tool transcript, not a separately captured byte stream.",
+  "parser_coverage_source_bindings_normalized": true,
+  "production_test_runner_reader_bytes_unchanged": true,
+  "selection_sha256": "f6eab247f6b677042658ba813497cc594b33e70a6f7669c07c6e91d0d77b9827",
+  "task": "P6-T2"
+}

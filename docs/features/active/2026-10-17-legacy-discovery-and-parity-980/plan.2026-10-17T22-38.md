@@ -332,7 +332,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Exercise every implemented operation through real validators and in-memory snapshots, stable findings/artifact statuses, unsupported requests, dependency/I/O failures, interrupted writes, result/exit consistency, and separation of local-user versus host-granted invocation context. Verify doctor remains read-only and cannot self-assert host capability.
   - Acceptance: The installed module is the sole semantic authority; malformed inputs return exit 2, blocking findings 1, runtime failures 3, and success 0 without arbitrary executable/module dispatch.
 
-- [ ] [P6-T2] Register every required noninteractive console command.
+- [x] [P6-T2] Register every required noninteractive console command.
   - Files and behavior: Create R/{cli,cli_arguments,cli_commands}.py and PT/test_{cli_commands,cli_errors,cli_dry_run}.py; update packages/discovery-runtime/pyproject.toml and root pyproject.toml console registrations.
   - Tests and proof: Exercise every command in spec.md's Command inventory, including create/update/link, all individual validators, decisions/workspace modes, report pairs, snapshots/extensions/migration/configure/doctor, and both acceptance aliases. Verify workspace/profile-relative resolution, help, mutually exclusive flags, and dry-run semantics.
   - Acceptance: All documented commands invoke service.execute and return its typed outcome; validate-all emits canonical JSON and Markdown reports by default, and dry-run emits projected reports without writes.

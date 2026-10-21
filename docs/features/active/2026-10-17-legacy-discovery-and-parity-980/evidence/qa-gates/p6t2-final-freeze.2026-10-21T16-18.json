@@ -1,0 +1,495 @@
+{
+  "Timestamp": "2026-10-21T16:18:36.696383+00:00",
+  "acceptance": "Independent bounded confirmation and coordinator acceptance remain required.",
+  "binding_qualification": {
+    "all_stage_before_after_equal": true,
+    "count": 254,
+    "head_and_checkpoint_unbound": true,
+    "reference": {
+      "bytes": 65345,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+      "sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc"
+    },
+    "selector": [
+      "final_bindings"
+    ]
+  },
+  "candidate": {
+    "bytes": 105136,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-candidate-released.2026-10-21T16-08.json",
+    "sha256": "a328f032f34803eae87bd65af9a0c540a2ea4db77ec886cddd94afc38528a5e2"
+  },
+  "contracts": {
+    "expected": 4,
+    "passed": 4,
+    "reference": {
+      "bytes": 65345,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+      "sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc"
+    },
+    "selector": [
+      "contracts"
+    ]
+  },
+  "coverage": {
+    "convention": "Existing coverage.py named class/function executable BODY attribution excludes declarations; raw AST ranges, current counters, retained unchanged proof and no-loss coordinates remain separate. New modules/classes/callables require90% statements; changed module branch floor75%.",
+    "current": {
+      "bytes": 873758,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+      "sha256": "7665816e67f810c66b3048c4c59603618122e5929566996bd42bedc54f4082eb"
+    },
+    "lost_branches": 0,
+    "lost_lines": 0,
+    "module_gate_count": 3,
+    "named_range_gate_count": 60,
+    "no_loss_comparison_count": 3,
+    "ranges": {
+      "bytes": 76635,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-coverage-ranges.2026-10-21T16-16.json",
+      "sha256": "72fe295311c087a810ab306f7b81f3cc175c67e293411e92485c54a6280a7d20"
+    },
+    "raw_archive_member": {
+      "archive": {
+        "bytes": 86683,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json-raw.2026-10-21T16-16.json",
+        "sha256": "5d9e079502cdc5b383b5d83257e9cd920f27c31a900d8fe954704fbbc820002c"
+      },
+      "bytes": 238829,
+      "member": "coverage_json",
+      "sha256": "18c377f77024dea597824dcdb31ab6ec7f9821b90d1e74b1eeef67bbeb1b86a2",
+      "terminal_newline": false
+    },
+    "raw_counters_augmented": false,
+    "raw_totals": {
+      "covered_branches": 90,
+      "covered_lines": 366,
+      "excluded_lines": 10,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "num_branches": 90,
+      "num_partial_branches": 0,
+      "num_statements": 366,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100",
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "scope": "Only three task modules are freshly measured. Prior repository-wide coverage remains retained evidence, not a fresh repository-wide claim.",
+    "separately_retained_qualification_count": 0
+  },
+  "handoff": {
+    "bytes": 65345,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+    "sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc"
+  },
+  "history": {
+    "candidate_retains_prior_qualification_chain": true,
+    "metadata_diagnostic": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-metadata-shape-qualification.2026-10-21T16-08.json",
+      "sha256": "3ce78b6e44959f4dad6625da4a853934087b0a41c1ccbca7e97f60316db8c7ad"
+    },
+    "qualification": "All historical parser/composition and installed native harness diagnostics remain immutable; this final run supplies fresh task coverage and order-isolation proof. No native or package replay occurred."
+  },
+  "native_confirmation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-native-offline-closure.2026-10-21T16-01.json",
+    "sha256": "d3efb7c4a9702489fb55e8ed99e49e832a8b979465739ced5aef24139dd390c5"
+  },
+  "normalization": {
+    "authored_receipts": "LF and exactly one terminal newline; no trailing whitespace or observed operational-root spelling",
+    "encoding": "UTF-8",
+    "raw_archives": [
+      {
+        "raw_stdout_crlf_count": 0,
+        "raw_stdout_terminal_newline": false,
+        "reference": {
+          "bytes": 54921,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black-raw.2026-10-21T16-08.json",
+          "sha256": "a6a8bb29590946af2ea38594f70d5a38514278b793967dcc181332ef3d8ae99a"
+        },
+        "verified_members": 8
+      },
+      {
+        "raw_stdout_crlf_count": 0,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 54869,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff-raw.2026-10-21T16-08.json",
+          "sha256": "2543d62dd2b1ae3dad0b46a4d8ca2c3445ae628d52f57d3a38fd657c5c917df8"
+        },
+        "verified_members": 8
+      },
+      {
+        "raw_stdout_crlf_count": 3,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 55058,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright-raw.2026-10-21T16-08.json",
+          "sha256": "ec4934d9bab4bd59c49b6552e2848e1d1b9b089959724082f46a487159f0da19"
+        },
+        "verified_members": 8
+      },
+      {
+        "raw_stdout_crlf_count": 75,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 55323,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static-raw.2026-10-21T16-08.json",
+          "sha256": "33310c51bc3d824ed0daf1d245335653cf34d838b4f39c3a820777ae7b6c8c64"
+        },
+        "verified_members": 8
+      },
+      {
+        "raw_stdout_crlf_count": 175,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 81236,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests-raw.2026-10-21T16-16.json",
+          "sha256": "d5ca4a79dcdb93da0c4e0e75f3ebf175d3ea01868bb39002a3f431a16ce25335"
+        },
+        "verified_members": 10
+      },
+      {
+        "raw_stdout_crlf_count": 1,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 86683,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json-raw.2026-10-21T16-16.json",
+          "sha256": "5d9e079502cdc5b383b5d83257e9cd920f27c31a900d8fe954704fbbc820002c"
+        },
+        "verified_members": 10
+      },
+      {
+        "raw_stdout_crlf_count": 14,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 86955,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof-raw.2026-10-21T16-16.json",
+          "sha256": "31de6cd8d6273be793e3facf92ed050c7b7f7505e9c3b31193655dabdaeeb932"
+        },
+        "verified_members": 10
+      },
+      {
+        "raw_stdout_crlf_count": 12,
+        "raw_stdout_terminal_newline": true,
+        "reference": {
+          "bytes": 55406,
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts-raw.2026-10-21T16-16.json",
+          "sha256": "616c5e2ad038439fc491a258402b4a5c4936f504c6841a3f3324a6f4fc1ddda2"
+        },
+        "verified_members": 8
+      }
+    ],
+    "raw_coverage_eof_preserved": true,
+    "readable_checks": [
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-candidate-disabled.2026-10-21T15-22.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-preparation-originals.2026-10-21T15-22.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-runner-preparation.2026-10-21T15-22.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black-raw.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black.2026-10-21T16-08.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts-raw.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts.2026-10-21T16-16.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json-raw.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json.2026-10-21T16-16.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof-raw.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof.2026-10-21T16-16.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright-raw.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright.2026-10-21T16-08.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff-raw.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff.2026-10-21T16-08.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static-raw.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static.2026-10-21T16-08.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests-raw.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 1,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests.2026-10-21T16-16.md",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-candidate-released.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-composition-coverage-view.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-coverage-ranges.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-current-coverage.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+        "utf8_lf_single_terminal_newline": true
+      },
+      {
+        "max_consecutive_blank_lines": 0,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-metadata-shape-qualification.2026-10-21T16-08.json",
+        "utf8_lf_single_terminal_newline": true
+      }
+    ]
+  },
+  "package": {
+    "build_sha256": "c5912e4dbfb2d3dd983821c17ae89449a85c21123caeb77a48f1e570a80309d6",
+    "payload_members": 172,
+    "policy_sha256": "bef024420dc551d7eeab7162b8a2c3ed4649f88b3690a57ae44df7a892674564",
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-packaged-cli-verification-handoff.2026-10-21T15-33.json",
+      "sha256": "0bde3dc7f60c8f979e7e7d5cbdcc29c078a1a18ca7310b1a2b459c8505a801f8"
+    },
+    "source_input_count": 216,
+    "wheel_sha256": "670ed87df9ba1050fb9988af1ffbfd9ddd7b7383af0763ead0d13dc4d6f30bcd"
+  },
+  "preparation": [
+    {
+      "bytes": 4677,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-runner-preparation.2026-10-21T15-22.json",
+      "sha256": "ae1f143e3ffb310c628232c6577ee36d3b9dac09ee1ac9e6099ee5e4dd102fb0"
+    },
+    {
+      "bytes": 34388,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-candidate-disabled.2026-10-21T15-22.json",
+      "sha256": "279ce5f9a236c058a37a2098e5db7aa54841d382dc61a84bc0860f41cb780af4"
+    },
+    {
+      "bytes": 12702,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t2-final-preparation-originals.2026-10-21T15-22.json",
+      "sha256": "5858ea3ccda7491ad4da42b63b42dfbbb78722e93aecd8d6415a7376ca195b83"
+    }
+  ],
+  "stages": [
+    {
+      "clean": true,
+      "elapsed_seconds": 0.808347,
+      "passed": 0,
+      "receipt": {
+        "bytes": 76334,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-black.2026-10-21T16-08.json",
+        "sha256": "ebf0344e869ba4e52efe012b309b34c0b8177336159dd81a40be597f63968815"
+      },
+      "stage": "black"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.207439,
+      "passed": 0,
+      "receipt": {
+        "bytes": 76277,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-ruff.2026-10-21T16-08.json",
+        "sha256": "fef750d2ba0ac8bc485aa18f5819f1dcfea81dd5621a86fa159365e699c87965"
+      },
+      "stage": "ruff"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 14.867802,
+      "passed": 0,
+      "receipt": {
+        "bytes": 75967,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-pyright.2026-10-21T16-08.json",
+        "sha256": "49f5edb4cea062b0a9c5aea8e7689c259bbad4e7ba4c3af1523e103b189af39a"
+      },
+      "stage": "pyright"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.209238,
+      "passed": 0,
+      "receipt": {
+        "bytes": 77947,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-static.2026-10-21T16-08.json",
+        "sha256": "c0800b09afc2c07f84c9fc42e3ec84bec8c9da2f5a786b59370343b2eaeaf66e"
+      },
+      "stage": "static"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 469.351664,
+      "passed": 167,
+      "receipt": {
+        "bytes": 120428,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-tests.2026-10-21T16-16.json",
+        "sha256": "e430c2aecdb1147fb10f5e90e5b499722fa46aa674e802a5d5ab025dc185a5ac"
+      },
+      "stage": "tests"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.409104,
+      "passed": 0,
+      "receipt": {
+        "bytes": 75940,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-json.2026-10-21T16-16.json",
+        "sha256": "585fb0be5edb71127333e056aa36f8031c9c6eae37c4cb726fbfb642a9dd1893"
+      },
+      "stage": "coverage-json"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.20919,
+      "passed": 0,
+      "receipt": {
+        "bytes": 76747,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-coverage-proof.2026-10-21T16-16.json",
+        "sha256": "c8b0fd8a6d068f62cbcdc8af1b3669ebeba7c654f78755900edc1f808dce9386"
+      },
+      "stage": "coverage-proof"
+    },
+    {
+      "clean": true,
+      "elapsed_seconds": 0.609924,
+      "passed": 4,
+      "receipt": {
+        "bytes": 77766,
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-160827-contracts.2026-10-21T16-16.json",
+        "sha256": "6e71c34e6c3a39ae30327ce4162a5f3ae70f422de2718eb5f1d012f4b7c67336"
+      },
+      "stage": "contracts"
+    }
+  ],
+  "status": "FINAL_GATES_PASSED_ACCEPTANCE_PENDING",
+  "task": "P6-T2",
+  "tests": {
+    "elapsed_seconds": 469.351664,
+    "errors": 0,
+    "expected": 167,
+    "failed": 0,
+    "node_reference": {
+      "bytes": 65345,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-final-handoff.2026-10-21T16-16.json",
+      "sha256": "635c7a2fc8a1e1702dd97f3208c007a453fc781ff997a88108094ac480ec11fc"
+    },
+    "node_selector": [
+      "executed_nodes"
+    ],
+    "operational_bound_seconds": 1200,
+    "order": "Four module blocks reversed; within-module identities retained.",
+    "passed": 167,
+    "process_count": 1,
+    "progress_seconds": 20,
+    "selection_sha256": "f6eab247f6b677042658ba813497cc594b33e70a6f7669c07c6e91d0d77b9827",
+    "skipped": 0
+  },
+  "total_ordered_stage_elapsed_seconds": 486.672708
+}
