@@ -1,0 +1,314 @@
+{
+  "Timestamp": "2026-10-21T11:52:29.845421+00:00",
+  "boundaries": "All tests stay in memory. Reuse accepted validators/planners and existing controlled fixtures; inject only external/provider/assessment seams for explicit error contracts. Assert typed refusal, original findings, exact retained bytes and absence/presence of real planned effects instead of asserting implementation traversal. No subprocess/filesystem/native calls.",
+  "comparable_history": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [],
+      "source_sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [],
+      "source_sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [
+        {
+          "encoding": "gzip-base64",
+          "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-final-coverage-view.2026-10-21T10-22.json",
+          "selector": [
+            "coverage"
+          ],
+          "sha256": "e18bffeece1001a90d8975f03f1a73781403e79a9441eb7df53de2325bde0069"
+        }
+      ],
+      "source_sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [],
+      "source_sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [],
+      "source_sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_reports.py": {
+      "retained_body_qualifications": [],
+      "same_source_coverage_proofs": [],
+      "source_sha256": "650172e2041ae469274d51bd35ea826788132496310c245747ad95b2bc5b46f8"
+    }
+  },
+  "contracts_unchanged": 4,
+  "critical_module_branches": "Control map includes successful snapshot import, canonical inventory write, blocked/clean extension import, explicit approval and acceptance source/view publication, as well as refusal branches. It does not select superficial lines solely to cross floors.",
+  "diagnosis": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-diagnosis.2026-10-21T11-47.json",
+    "sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa"
+  },
+  "expected_additional_nodes": 41,
+  "fixture_reuse": [
+    "tests/discovery_runtime/test_service.py",
+    "tests/discovery_runtime/test_service_boundaries.py",
+    "tests/discovery_runtime/test_service_publication.py"
+  ],
+  "historical_qualification": "No retained unchanged-body or statement mapping applies to these13 failed core bodies. Bootstrap has same-source focused40 proof of4/7 body statements, with missing349,351,354; the final329 improved this to6/7, retaining the same remaining354. Other failed bodies have no same-source focused proof in the released candidate; earlier incomplete/no-coverage passes cannot fill their missing coordinates. All existing zero-loss comparisons pass.",
+  "ordered_validation_proposal": "After owner release, each disjoint file receives its required clean static and focused new-control proof. Use exact final current coverage plus additive proof only for diagnosis; final acceptance still requires the coordinator-released clean ordered single-process reversed complete population with unchanged BODY/no-loss reader and four contracts. No behavioral execution is released by this proposal.",
+  "ownership": "Coordinator assigns the four disjoint new test files; no implementation or delegation has begun. Existing fixture files are read-only dependencies.",
+  "provisional_final_union": 370,
+  "read_guard_classification": {
+    "inspection113": "Redundant missing-baseline guard after earlier context.snapshot access; do not mutate context mid-operation or weaken the reader to force it. Canonical write and ProfileError controls cover the meaningful missing paths while preserving required per-body floor.",
+    "operations165": "Real configured read-authorization refusal not exercised.",
+    "operations169": "Defensive absent-byte guard. Real required SnapshotIO.read raises FileNotFoundError; do not change that accepted public behavior. Test only explicit injected contract violation."
+  },
+  "retained_original_nodes": 329,
+  "scope": {
+    "existing_test_changes": [],
+    "production_changes": [],
+    "proposed_new_tests": [
+      {
+        "absent_now": true,
+        "controls": [
+          {
+            "coordinates": "operations.py:OperationContext.read:165",
+            "id": "CG1",
+            "observable_assertion": "Configured uncaptured input is refused before any physical read, write or result artifact."
+          },
+          {
+            "coordinates": "operations.py:OperationContext.read:169",
+            "id": "CG2",
+            "observable_assertion": "An injected required-read adapter contract violation returning None is refused without fabricated bytes or effects; the real missing-file OSError control remains unchanged."
+          },
+          {
+            "coordinates": "service.py:_context:176",
+            "id": "CG3",
+            "observable_assertion": "Naive trusted clock is rejected with SERVICE_CLOCK before capture/publication."
+          },
+          {
+            "coordinates": "service.py:_context:196",
+            "id": "CG4",
+            "observable_assertion": "An activation result without a selected profile is rejected with SERVICE_PROFILE; no graph or write authority is fabricated."
+          },
+          {
+            "coordinates": "service.py:_context:210",
+            "id": "CG5",
+            "observable_assertion": "Profile bytes changing between trusted selection and capture cause SERVICE_CAPTURE with no writer call."
+          },
+          {
+            "coordinates": "service.py:_context:220",
+            "id": "CG6",
+            "observable_assertion": "Reauthorization changing authenticated actor causes SERVICE_AUTHORITY before dispatch or write."
+          },
+          {
+            "coordinates": "service_bootstrap.py:bootstrap:354",
+            "id": "CG7",
+            "observable_assertion": "A valid request from another operation family is refused by bootstrap without initialization effects."
+          }
+        ],
+        "expected_parameterized_nodes": 7,
+        "path": "tests/discovery_runtime/test_service_context_guards.py",
+        "responsibility": "test_service_context_guards"
+      },
+      {
+        "absent_now": true,
+        "controls": [
+          {
+            "coordinates": "service_inspection.py:_profile:35-36",
+            "id": "IG1",
+            "observable_assertion": "Omitted profile path uses actual trusted activation selection and returns its exact captured bytes without writes."
+          },
+          {
+            "coordinates": "service_inspection.py:_profile:44",
+            "id": "IG2",
+            "observable_assertion": "Unsupported profile version returns a typed refusal, never a successful profile artifact."
+          },
+          {
+            "coordinates": "service_inspection.py:_profile:57",
+            "id": "IG3",
+            "observable_assertion": "Malformed v2 profile retains original ProfileError findings and blocking result, with no activation or writer call."
+          },
+          {
+            "coordinates": "service_inspection.py:_inventory:92",
+            "id": "IG4",
+            "observable_assertion": "ProfileError at analyzer selection retains its original typed findings instead of becoming a selector error or proceeding to analysis/publication."
+          },
+          {
+            "coordinates": "service_inspection.py:_inventory:112,114",
+            "id": "IG5",
+            "observable_assertion": "Inventory write composes the real canonical planner with exact grants and selected analyzer IDs; injected preview output cannot become publication authority."
+          },
+          {
+            "coordinates": "service_inspection.py:_source.read:168",
+            "id": "IG6",
+            "observable_assertion": "Changed physical source bytes after capture are refused; no stale source row or writer call is returned."
+          },
+          {
+            "coordinates": "service_inspection.py:_source.read:168",
+            "id": "IG7",
+            "observable_assertion": "Captured source exceeding the requested reader bound is refused before publication or source-row retention."
+          },
+          {
+            "coordinates": "service_inspection.py:_source:191-192",
+            "id": "IG8",
+            "observable_assertion": "An invalid direct source request is classified SERVICE_SOURCE without reading or writing its requested data."
+          },
+          {
+            "coordinates": "service_inspection.py:inspect_request:272",
+            "id": "IG9",
+            "observable_assertion": "A valid request from another family is refused without graph assessment or write effects."
+          }
+        ],
+        "expected_parameterized_nodes": 9,
+        "path": "tests/discovery_runtime/test_service_inspection_guards.py",
+        "responsibility": "test_service_inspection_guards"
+      },
+      {
+        "absent_now": true,
+        "controls": [
+          {
+            "coordinates": "service_mutations.py:_authored:27",
+            "id": "MG1",
+            "observable_assertion": "Missing capture cannot produce an authored proposal view or grant publication authority."
+          },
+          {
+            "coordinates": "service_mutations.py:_update:55",
+            "id": "MG2",
+            "observable_assertion": "Explicit replacement identity differing from captured document is refused without a plan or write."
+          },
+          {
+            "coordinates": "service_mutations.py:_update:57-63",
+            "id": "MG3",
+            "observable_assertion": "A decision that is not actually approved cannot be upgraded by the approve request; captured payload remains unchanged."
+          },
+          {
+            "coordinates": "service_mutations.py:_update:64-68",
+            "id": "MG4",
+            "observable_assertion": "Approval-owner mismatch is refused without replacing the captured decision."
+          },
+          {
+            "coordinates": "service_mutations.py:_update:64-68",
+            "id": "MG5",
+            "observable_assertion": "Approval-evidence mismatch is refused without inventing evidence or replacing the decision."
+          },
+          {
+            "coordinates": "service_mutations.py:_update:64-69",
+            "id": "MG6",
+            "observable_assertion": "Matching explicit approval preserves exact payload, identity, owner, evidence and expected digest in the bounded replacement proposal."
+          },
+          {
+            "coordinates": "service_mutations.py:mutate:178",
+            "id": "MG7",
+            "observable_assertion": "A non-bootstrap mutation without capture fails before planning or writes."
+          },
+          {
+            "coordinates": "service_mutations.py:_transport:98",
+            "id": "MG8",
+            "observable_assertion": "Transport without capture fails without export/import effects."
+          },
+          {
+            "coordinates": "service_mutations.py:_transport:124",
+            "id": "MG9",
+            "observable_assertion": "Unknown export identity fails exact selection without emitting a transport or writing files."
+          },
+          {
+            "coordinates": "service_mutations.py:_transport:124",
+            "id": "MG10",
+            "observable_assertion": "Ambiguous export identity fails exact selection without choosing an arbitrary authored record."
+          },
+          {
+            "coordinates": "service_mutations.py:_transport:146",
+            "id": "MG11",
+            "observable_assertion": "A valid captured snapshot import composes the accepted planner, exact manifest/source identity and guarded publication as one bounded operation."
+          },
+          {
+            "coordinates": "service_mutations.py:mutate:222-240",
+            "id": "MG12",
+            "observable_assertion": "Valid extension inventory preview preserves source identity and proposed exact bytes without invoking a writer."
+          },
+          {
+            "coordinates": "service_mutations.py:mutate:222-240",
+            "id": "MG13",
+            "observable_assertion": "Blocking extension diagnostics remain blocking in preview, with no successful/publication claim or writer call."
+          },
+          {
+            "coordinates": "service_mutations.py:mutate:222-246",
+            "id": "MG14",
+            "observable_assertion": "Valid extension inventory write uses its exact normalized document in one prospective plan and existing guarded writer."
+          },
+          {
+            "coordinates": "service_mutations.py:mutate:245",
+            "id": "MG15",
+            "observable_assertion": "A valid request from another family is refused without a mutation plan or write."
+          }
+        ],
+        "expected_parameterized_nodes": 15,
+        "path": "tests/discovery_runtime/test_service_mutation_guards.py",
+        "responsibility": "test_service_mutation_guards"
+      },
+      {
+        "absent_now": true,
+        "controls": [
+          {
+            "coordinates": "service_reports.py:report_findings:31",
+            "id": "RG1",
+            "observable_assertion": "Malformed findings container is rejected rather than interpreted as an empty successful assessment."
+          },
+          {
+            "coordinates": "service_reports.py:report_findings:36",
+            "id": "RG2",
+            "observable_assertion": "Malformed findings entry is rejected without suppressing a potentially blocking diagnostic."
+          },
+          {
+            "coordinates": "service_reports.py:_report:74-75",
+            "id": "RG3",
+            "observable_assertion": "Report resource failure propagates before serialization, fallback assessment or publication."
+          },
+          {
+            "coordinates": "service_reports.py:_report:77-78",
+            "id": "RG4",
+            "observable_assertion": "A non-validation projection error propagates without a replacement success envelope or write."
+          },
+          {
+            "coordinates": "service_reports.py:_report:79-80",
+            "id": "RG5",
+            "observable_assertion": "Malformed validate-all core retains actual public-validator failure findings and exit1, with no report plan or writer call."
+          },
+          {
+            "coordinates": "service_reports.py:_report:87",
+            "id": "RG6",
+            "observable_assertion": "A trusted projection with an invalid validation result is rejected before artifacts or publication."
+          },
+          {
+            "coordinates": "service_reports.py:_acceptance:161-165,179",
+            "id": "RG7",
+            "observable_assertion": "Markdown preview retains all real ready/pending structured specifications and selected Markdown views while excluding Gherkin; no writer call or invented readiness."
+          },
+          {
+            "coordinates": "service_reports.py:_acceptance:161-165,179",
+            "id": "RG8",
+            "observable_assertion": "Gherkin preview retains all ready/pending structured specifications and only eligible Gherkin views; pending criteria remain non-executable and no writer is called."
+          },
+          {
+            "coordinates": "service_reports.py:_acceptance:190",
+            "id": "RG9",
+            "observable_assertion": "Acceptance write composes complete structured sources and selected views in one actual prospective plan, retaining findings and exact identity/digests without inventing execution proof."
+          },
+          {
+            "coordinates": "service_reports.py:project:217",
+            "id": "RG10",
+            "observable_assertion": "A valid request from another operation family is refused without projection or publication."
+          }
+        ],
+        "expected_parameterized_nodes": 10,
+        "path": "tests/discovery_runtime/test_service_report_guards.py",
+        "responsibility": "test_service_report_guards"
+      }
+    ],
+    "reader_changes": []
+  },
+  "size": "Existing three core test files are near500lines. Four cohesive new modules keep each <=500 after Black; no production split.",
+  "status": "FINITE_TEST_ONLY_PROPOSAL_AWAITING_OWNER_RELEASE",
+  "task": "P6-T1"
+}

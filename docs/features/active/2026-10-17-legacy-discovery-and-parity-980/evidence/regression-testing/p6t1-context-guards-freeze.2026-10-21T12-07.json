@@ -1,0 +1,70 @@
+{
+  "body_preflight": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-body-preflight.2026-10-21T12-07.json",
+    "sha256": "51f3a0e82f75e3a02f0fe8d04d4edd13a0a3411d596915561d2a8b4369aec4d6"
+  },
+  "control_map": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+    "sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705"
+  },
+  "counts": {
+    "errors": 0,
+    "failed": 0,
+    "passed": 7
+  },
+  "dependency_bindings": {
+    "all_unchanged": true,
+    "count": 239,
+    "receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-tests.2026-10-21T12-05.json",
+      "sha256": "70b2c5d27c15895c2d6d8bd66f6c2c04c7d3c7d9ff2c99692389a84feddf1a39"
+    },
+    "selector": "after"
+  },
+  "executed_nodes": [
+    "tests/discovery_runtime/test_service_context_guards.py::test_configured_uncaptured_read_refuses_before_physical_io",
+    "tests/discovery_runtime/test_service_context_guards.py::test_required_read_none_contract_violation_refuses_fabricated_bytes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_naive_trusted_clock_refuses_before_capture_or_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_missing_activation_profile_refuses_without_graph_authority",
+    "tests/discovery_runtime/test_service_context_guards.py::test_profile_change_between_selection_and_capture_refuses_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_bootstrap_rejects_wrong_operation_family_without_effects"
+  ],
+  "ordered_stages": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-black.2026-10-21T12-04.json",
+      "sha256": "11c0043253aed68c5d21a3380a77382f130803fd1696f8303c646c5befd17a73"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-coverage.2026-10-21T12-05.json",
+      "sha256": "8db9081e075e130522bb204739f649489017f1f23db7a7a919e3624cc86943cf"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-pyright.2026-10-21T12-04.json",
+      "sha256": "f937fd30dce162f511bb3505ffecbcf3443a43c8d6b3245737fb8f084437c0db"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-ruff.2026-10-21T12-04.json",
+      "sha256": "365f666551124a144f599165b2731c2bbdca2b3c8636162ef83d5a8a53bc677a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-tests.2026-10-21T12-05.json",
+      "sha256": "70b2c5d27c15895c2d6d8bd66f6c2c04c7d3c7d9ff2c99692389a84feddf1a39"
+    }
+  ],
+  "originals": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-originals.2026-10-21T12-07.json",
+    "sha256": "a207ad4eabd19ca9d103950c159b08f22acb5873bb26d7b84c29d37b39dd097e"
+  },
+  "owned_file": {
+    "lines": 250,
+    "path": "tests/discovery_runtime/test_service_context_guards.py",
+    "sha256": "1563b054e7ab188b6ac11742ca24a6c317ee65dea03f2cb8d74ecf3673d44ee9"
+  },
+  "previous_diagnostics": "Initial scratch locator correction, format pass and three then one Ruff E501 diagnostics retained in the staging closure.",
+  "production_changes": [],
+  "scope": "Only new test file; all existing 329 node identities, production, package and readers unchanged. No full task acceptance or aggregate raw coverage claim.",
+  "status": "FOCUSED_SEVEN_PASSED_FINAL_ACCEPTANCE_PENDING",
+  "task": "P6-T1",
+  "test_elapsed_seconds": 55.135124
+}
