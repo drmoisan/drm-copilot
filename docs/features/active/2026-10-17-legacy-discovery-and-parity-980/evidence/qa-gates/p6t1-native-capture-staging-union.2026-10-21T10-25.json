@@ -1,0 +1,33 @@
+{
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_NATIVE_EVIDENCE",
+  "entries": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-capture.2026-10-21T10-21.json",
+      "sha256": "6dd20201cb7396b6c7f7f71eedc331d350a5d096f68dbc27051a75545637a515",
+      "bytes": 41095
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-capture-raw.2026-10-21T10-21.json",
+      "sha256": "0bef4b09e65aae25e23f407081286f4c529cdac585486917f80416cfbe383722",
+      "bytes": 68174
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-capture-postcondition-diagnosis.2026-10-21T10-23.json",
+      "sha256": "bbc94dff9d27f4042621616607539ba00b8e43bbd7ffb74d920bac162e3a9820",
+      "bytes": 10296
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-capture-postconditions-confirmed.2026-10-21T10-25.json",
+      "sha256": "1ae83dfe30fa879d3e60741ef21b6f5915de5b22399dc16e5213edc427b6ca1b",
+      "bytes": 16679
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-native-capture-staging-union.2026-10-21T10-25.json",
+      "binding": "self",
+      "sha256": null
+    }
+  ],
+  "scope": "Four exact evidence files plus this self-bound union; no source/test/package/Git changes"
+}

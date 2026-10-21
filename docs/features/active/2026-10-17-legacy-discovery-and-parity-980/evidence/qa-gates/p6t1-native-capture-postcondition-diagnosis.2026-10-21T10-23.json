@@ -1,0 +1,147 @@
+{
+  "Timestamp": "2026-10-21T10-23",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "HARNESS_PREDICATE_DEFECTS_RETAINED_OUTPUT_REEVALUATION_PROPOSED",
+  "authority": "Coordinator read-only diagnosis after stopped native run; no native replay or fixture/source mutation",
+  "retained_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-capture.2026-10-21T10-21.json",
+    "sha256": "6dd20201cb7396b6c7f7f71eedc331d350a5d096f68dbc27051a75545637a515"
+  },
+  "retained_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-installed-native-capture-raw.2026-10-21T10-21.json",
+    "sha256": "0bef4b09e65aae25e23f407081286f4c529cdac585486917f80416cfbe383722"
+  },
+  "native_outcomes": {
+    "installed_identity_exit": 0,
+    "migrate_exit": 0,
+    "migrate_elapsed_seconds": 173.4332335999934
+  },
+  "output_bindings": {
+    "migrated/coverage-ledger.json": "5dfd538b8dfe46fb235322186e6508faccddf3c8b798b5f3176bb7fb2cd7691f",
+    "migrated/domain-profile.yaml": "b66537fc4bdfc339d383f4fd85f82d446085727f4301739ae1cfe33f83a042ac",
+    "migrated/feature-contracts/feature-alpha.json": "3fe208c5749339dbcec9ace9c3cce7ac9c8a117f17a400a5a12f5c63dba877d9",
+    "migrated/parity-matrix.json": "5dfc8766b636b6bc030ac201fa2a6bc913ff84bab2ee081f0f55590c757c4417",
+    "migrated/product-decisions.yaml": "a3c51d1e040334f2f1af49680bc75cb5895d5441e52f79763a721fb9eba9e426",
+    "migrated/reports/migration-report.json": "c10e926956ccc8e971da57854e5230cbde42452ca0858da58367d0bde9b51b95",
+    "migrated/scope.yaml": "b03a384e2a68f421c3a71e835c64a54c8f6438fda16fe48f30c463d47983ac60",
+    "migrated/unspecified-behaviors.yaml": "352742b19e9e321240ddaaef4a03231aa0b49e424881ce2e9c318d9486387ffa"
+  },
+  "actual_extension_count": 3,
+  "actual_counted_set": [
+    "migrated/coverage-ledger.json",
+    "migrated/feature-contracts/feature-alpha.json",
+    "migrated/reports/migration-report.json"
+  ],
+  "selected_original_locations": [
+    {
+      "output": "migrated/coverage-ledger.json",
+      "source_path": "legacy/coverage-ledger.json",
+      "source_sha256": "871e258ee3f685ee596739374a8e947887c634a3ffab342df1dec76be0fc2372",
+      "metadata_pointer": "/extensions/drm-copilot.migration-v1",
+      "disposition": "draft-reconciliation-required",
+      "references": [
+        {
+          "artifact_kind": "unspecified-behavior",
+          "id": "unknown-migration-coverage-ledger-alpha"
+        }
+      ],
+      "reference_locations": [
+        {
+          "path": "migrated/unspecified-behaviors.yaml",
+          "pointer": "/records/1",
+          "id": "unknown-migration-coverage-ledger-alpha",
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "output": "migrated/feature-contracts/feature-alpha.json",
+      "source_path": "legacy/feature-contract.json",
+      "source_sha256": "701c400d1f5fb5ce2535110e11e14f6ecb881e3c9cdeca7c7571829cb9cff90c",
+      "metadata_pointer": "/extensions/drm-copilot.migration-v1",
+      "disposition": "draft-reconciliation-required",
+      "references": [
+        {
+          "artifact_kind": "unspecified-behavior",
+          "id": "unknown-feature-feature-alpha"
+        }
+      ],
+      "reference_locations": [
+        {
+          "path": "migrated/unspecified-behaviors.yaml",
+          "pointer": "/records/0",
+          "id": "unknown-feature-feature-alpha",
+          "status": "open"
+        }
+      ]
+    }
+  ],
+  "report_operational_metadata": {
+    "next_action": "Resolve linked questions and approve target decisions before completion.",
+    "publication": "projection-only",
+    "validation": "structural-draft-only"
+  },
+  "findings": [
+    {
+      "id": "NMP1",
+      "kind": "harness-only",
+      "predicate": "Count every document containing the migration extension; require exactly two.",
+      "cause": "mapping_report intentionally uses the same extension namespace for operational projection metadata, yielding three documents.",
+      "proposed_correction": "Use the two exact report mappings and source_path/source_sha256/original_document identity to select the converted originals; retain report separately."
+    },
+    {
+      "id": "NMP2",
+      "kind": "harness-only",
+      "predicate": "Find a top-level artifact_kind unspecified-behavior among new files.",
+      "cause": "Open questions are records in the unspecified-behavior-collection.",
+      "proposed_correction": "Resolve both converted originals unresolved_behavior_refs against the exact collection records and assert open status."
+    }
+  ],
+  "remaining_postconditions_reviewed_once": [
+    "Exact original_document and source hash for both originals",
+    "draft-reconciliation-required and nonempty unresolved refs for both originals",
+    "Ledger components and inventory_snapshot_refs remain empty",
+    "Referenced unresolved collection records remain open"
+  ],
+  "formal_assertions_unexecuted_after_original_failure": [
+    "Corrected exact-two-original selection",
+    "Two exact original provenance checks",
+    "Two draft/unresolved reference checks",
+    "Empty authoritative ledger arrays",
+    "Resolved open collection records"
+  ],
+  "observations": {
+    "converted_original_metadata_present": true,
+    "ledger_components": [],
+    "ledger_inventory_snapshot_refs": [],
+    "feature_lifecycle": "draft",
+    "activation_switched": false
+  },
+  "contract_sources": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_models.py",
+      "sha256": "8321659cfcb72493ca673353532eb5f12479693f8846b9fbd40ee1493702d141"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1"
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_v1.py",
+      "sha256": "9b38dee2308125faed6791dde0ac12bc26f757c04bb227fddf88a27f6fef58ab"
+    }
+  ],
+  "source_locations": {
+    "migration_models.py": "mapping_report, extension metadata lines 278-289",
+    "migration_conversion.py": "convert_artifact, provenance fields and empty ledger arrays lines 298-322",
+    "migration_v1.py": "_append and _convert, collection records lines 122-144 and 209-210"
+  },
+  "next_step": "Authorize read-only corrected postcondition reevaluation against the immutable archive and unchanged actual output hashes. No operation replay, source fix, rebuild, or fixture edit is needed.",
+  "final_329_plus_4": "REMAINS_DISABLED",
+  "diagnostic_source": {
+    "sha256": "d9b70a332c95c8e97dbe559de8dbd98ae0fa2110bcb6e93a4f58ec36c61c73d9",
+    "encoding": "gzip-base64",
+    "data": "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"
+  }
+}
