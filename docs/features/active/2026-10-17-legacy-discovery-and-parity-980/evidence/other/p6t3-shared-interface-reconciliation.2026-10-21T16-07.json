@@ -1,0 +1,510 @@
+{
+  "status": "PREPARATION_READY_WITH_ONE_NARROW_P6T3_PREREQUISITE",
+  "timestamp_utc": "2026-10-21T16:09:05.812045+00:00",
+  "authority": "source_inspection_p6t3_interface_20261021T160700 / S5_P6T3_interface_preparation; coordinator verified exact native C3 elevated profile",
+  "head_context": "fc4f1ff2df9f2fb154fb4f818eda352518cc6f69 supplied pushed head; P6-T2 final167 running, not accepted by this preparation",
+  "scope": "One read-only reconciliation artifact only. No tests/import execution, source/package/config/state/Git edits or new behavioral baseline. Captured hashes are preparation bindings; implementation awaits accepted P6-T2 and routed baseline/release.",
+  "retained_preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-adapter-preparation-delta.2026-10-20T16-07.md",
+    "sha256": "b82a0059b513aeac141f076da7a68b52309f987fb247dc19d5350036ee1a8fb7",
+    "lines": 69
+  },
+  "owners": [
+    {
+      "owner": "profile_init",
+      "production": [
+        "scripts/dev_tools/discovery/profile_cli.py",
+        "scripts/dev_tools/discovery/init_cli.py"
+      ],
+      "tests": [
+        "tests/scripts/dev_tools/discovery/test_profile_cli.py",
+        "tests/scripts/dev_tools/discovery/test_init_cli.py"
+      ],
+      "retained_controls": [
+        "tests/scripts/dev_tools/discovery/test_domain_profile.py"
+      ],
+      "forwarding": [
+        "main(argv: Sequence[str] | None = None) -> int delegates fixed profile/init command through proposed run_installed_cli. Existing init main returns None; explicitly qualify updated exit return and module guard instead of silently retaining ignored failures.",
+        "Retain pure render_text/render_json and actual v1 domain_profile readers. Preserve parse_args name only as nonauthoritative parsing; ambiguous positional/template-root/force contracts refuse before effects."
+      ],
+      "caller_delta": "Update explicit/default profile CLI display and positional-init assertions; retain invalid/no-effect and no-overwrite intent. Preserve the P6-T2 test_console_script_registered_in_pyproject registration assertion unchanged."
+    },
+    {
+      "owner": "validation_reports",
+      "production": [
+        "scripts/dev_tools/validate_discovery_artifacts.py",
+        "scripts/dev_tools/validate_discovery_profile.py",
+        "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+        "scripts/dev_tools/discovery/coverage_report.py",
+        "scripts/dev_tools/discovery/parity_report.py",
+        "scripts/dev_tools/discovery/completion_report.py"
+      ],
+      "tests": [
+        "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+        "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+        "tests/scripts/dev_tools/discovery/test_parity_report.py",
+        "tests/scripts/dev_tools/discovery/test_completion_report.py"
+      ],
+      "retained_controls": [
+        "tests/scripts/dev_tools/test_validate_discovery_profile.py",
+        "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+        "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+        "tests/scripts/dev_tools/discovery/test_rendering.py",
+        "tests/scripts/dev_tools/discovery/test_io.py"
+      ],
+      "forwarding": [
+        "Schedule validator then report batches under this orchestrated owner; the two already-thin pure validators need no semantic rewrite.",
+        "main(argv: list[str] | None = None) retains explicit kind selection; fixed main_profile/main_feature_contract/main_coverage_ledger/main_runtime_scenario/main_parity_matrix/main_unspecified_behavior/main_product_decision/main_evidence_reference forward to corresponding installed validate-* command. Single-file all probing refuses; workspace validate-all is separate.",
+        "Report main(argv, *, validator=None), or completion coverage_validator/parity_validator keywords, retain explicit legacy single/two-file compatibility path using existing package parse/build/render and monkeypatchable read_artifact_text/write_report. Canonical workspace argv forwards to fixed report suffix; injected validators cannot authorize v2 and are rejected on canonical route rather than ignored. No mixed-path inference."
+      ],
+      "caller_delta": "Replace dispatch tests test_main_all_returns_zero_when_path_conforms_to_at_least_one_type and test_main_all_returns_one_with_aggregated_errors_when_nothing_conforms; adapt test_main_artifact_wrappers_dispatch_with_correct_argv_prefix. Preserve unsupported-kind negative. Retain report helper/version/refusal/serialization/I-O exceptions; adapt only main canonical entry assertions."
+    },
+    {
+      "owner": "analyzer",
+      "production": [
+        "scripts/dev_tools/discovery/analyzer/__init__.py",
+        "scripts/dev_tools/discovery/analyzer/__main__.py",
+        "scripts/dev_tools/discovery/analyzer/cli.py",
+        "scripts/dev_tools/discovery/analyzer/stack_cli.py"
+      ],
+      "tests": [
+        "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+        "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py"
+      ],
+      "retained_controls": [
+        "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+        "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+        "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py"
+      ],
+      "forwarding": [
+        "main/main_dotnet/main_vsto(argv: Sequence[str] | None = None, *, clock, fs=None, schema_path=None) retain practical named call compatibility; canonical argv delegates inventory/dotnet/vsto fixed suffixes. Old fs/schema_path/clock are not ServiceIO/RepositoryReader/CliPorts; unsupported supplied authority-changing seams refuse before invoking them. No adaptation by field guessing.",
+        "__all__ remains Analyzer/main/run_analyzer; Analyzer/run_analyzer preserve legacy runtime analyzer.pipeline identities, not InventoryAdapter. __main__ imports compatibility main and raises SystemExit(main())."
+      ],
+      "caller_delta": "Update old v1 filesystem/output-dir successes to explicit canonical forwarding or migration refusal. Retain help/usage/read-only/consent and no-callback negatives; exact test_module_entry_point_imports_cli_main and test_pipeline package export identity remain controls."
+    },
+    {
+      "owner": "acceptance",
+      "production": [
+        "scripts/dev_tools/generate_acceptance_scenarios.py"
+      ],
+      "tests": [
+        "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+      ],
+      "retained_controls": [
+        "tests/scripts/dev_tools/test_acceptance_generation_projection.py"
+      ],
+      "forwarding": [
+        "main(argv: Sequence[str] | None = None) -> int forwards fixed generate-acceptance-scenarios alias. project_* / assemble_scenarios / build_document preserve names but insufficient placeholder context produces actionable migration error. No second generation engine.",
+        "Retain nonauthoritative immutable data and safe derive_scenario_id/compute_source_digest/format_document/collect_input_paths behavior only. Checkout schema-path/fabricated fallback refuses; package catalog owns real v1 readers. --check is never relabeled --dry-run; unsupported old context refuses without writes."
+      ],
+      "caller_delta": "Update exact seam fallback/path tests, placeholder projection/generation positives, main/check/parse_args assertions listed in retained16:07 preparation. Retain safe digest/order/neutrality/error intent. The seven actual v2 projection cases remain unchanged and reuse P5-T4/T5 proof."
+    },
+    {
+      "owner": "integration_and_public_entry_prerequisite",
+      "production": [
+        "packages/discovery-runtime/src/drm_copilot_discovery/cli.py"
+      ],
+      "tests": [
+        "tests/discovery_runtime/test_legacy_adapters.py"
+      ],
+      "retained_controls": [
+        "tests/discovery_runtime/test_cli_dry_run.py"
+      ],
+      "forwarding": [
+        "Proposed narrow prerequisite run_installed_cli(command: str, argv: Sequence[str] | None = None) -> int. Reuse exactly the current _main default limits/ports/sys streams and lazy service wiring; explicit argv forwards uncopied to the bounded parser, None retains existing count-before-slice process argv behavior. Unknown commands remain parser refusals before providers.",
+        "Keep all zero-argument main_* wrappers compatible, forwarding fixed suffix through this installed entry; preserve cli.run_cli monkeypatch seam. No public provider factory or alternative composition engine. Public run_cli(command, argv, *, ports, stdout, stderr, limits) remains explicit injected-I/O API."
+      ],
+      "caller_delta": "New integration tests own fixed adapter forwarding, safe exports, legacy refusal, optional-import neutrality and reverse-import prohibition. Put new explicit-argv/default-argv/nonmutation/count-first refusal controls here; test_cli_dry_run is493lines and should not grow. Retain its test_every_console_wrapper_uses_its_fixed_command[31], test_process_argument_copy_is_bounded and test_installed_entry_binds_fixed_local_user_and_one_reader as exact changed-entry controls, not full service replay."
+    }
+  ],
+  "observed_public_signatures": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": {
+      "run_cli": "command: str, argv: Sequence[str], *, ports: CliPorts, stdout: TextIO, stderr: TextIO, limits: ParseLimits -> int",
+      "_main": "command: str -> int",
+      "main_init": " -> int",
+      "main_configure": " -> int",
+      "main_profile": " -> int",
+      "main_inventory": " -> int",
+      "main_dotnet": " -> int",
+      "main_vsto": " -> int",
+      "main_new_contract": " -> int",
+      "main_new_scenario": " -> int",
+      "main_update_artifact": " -> int",
+      "main_link_evidence": " -> int",
+      "main_validate_profile": " -> int",
+      "main_validate_feature_contract": " -> int",
+      "main_validate_coverage_ledger": " -> int",
+      "main_validate_runtime_scenario": " -> int",
+      "main_validate_parity_matrix": " -> int",
+      "main_validate_unspecified_behavior": " -> int",
+      "main_validate_product_decision": " -> int",
+      "main_validate_evidence_reference": " -> int",
+      "main_validate_decisions": " -> int",
+      "main_validate_all": " -> int",
+      "main_validate": " -> int",
+      "main_coverage_report": " -> int",
+      "main_parity_report": " -> int",
+      "main_completion_report": " -> int",
+      "main_generate_acceptance": " -> int",
+      "main_generate_acceptance_scenarios": " -> int",
+      "main_snapshot_export": " -> int",
+      "main_snapshot_import": " -> int",
+      "main_import_inventory": " -> int",
+      "main_migrate": " -> int",
+      "main_doctor": " -> int"
+    },
+    "scripts/dev_tools/discovery/completion_report.py": {
+      "parse_args": "argv: Sequence[str] | None -> argparse.Namespace",
+      "main": "argv: Sequence[str] | None=None, *, coverage_validator: ArtifactValidator | None=None, parity_validator: ArtifactValidator | None=None -> int"
+    },
+    "scripts/dev_tools/validate_discovery_profile.py": {
+      "validate_profile_text": "text: str, *, schema_version: str='2.0.0', catalog: SchemaCatalog | None=None -> list[str]"
+    },
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": {
+      "load_schema": "uri: str, cache_dir: Path=_DEFAULT_CACHE_DIR -> dict[str, object]",
+      "validate_feature_contract_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_coverage_ledger_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_runtime_scenario_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_parity_matrix_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_unspecified_behavior_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_product_decision_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]",
+      "validate_evidence_reference_text": "text: str, *, cache_dir: Path=_DEFAULT_CACHE_DIR, schema_version: str='1.0.0' -> list[str]"
+    }
+  },
+  "proposed_prerequisite": "One existing runtime file cli.py453lines; expose current installed composition as run_installed_cli(command, argv=None) with no provider or authority changes. Parent confirmed this belongs to P6-T3, not P6-T2. Dedicated new test_legacy_adapters.py owns additions; existing493line test_cli_dry_run is retained unchanged. No other actual API prerequisite found.",
+  "output_contract": "run_cli help0, malformed invocation2, runtime/output3, or service exit0/1/2/3. Canonical stdout is exact DiscoveryResult JSON with one LF, even when report format selects artifact views. Help is fixed text; stderr errors fixed. Provider/output failures do not fabricate a second success/result. Pure legacy helper OSError/unexpected injected errors retain their direct-call contracts rather than being recast as CLI exits.",
+  "trusted_io": "CliPorts supplies resolve_workspace, repository_factory, create_io, clock, analyzer_registry, execute_request. Canonical root resolved once before IDs; explicit outer repository_id selects the same reader passed to IO/service. Installed invocation remains local-user only, no host fallback. Existing per-artifact read/write/validator seams are nonauthoritative compatibility only; never promote fs/schema_path/clock into v2 grants.",
+  "memory_reuse": {
+    "tests/discovery_runtime/cli_test_support.py": [
+      "memory_ports(store: MemoryService, executor: ServiceExecutor) -> CliPorts",
+      "invoke(ports, command=\"doctor\", argv=()) -> tuple[int,str,str]",
+      "CLI_WRAPPERS exact31 suffixes"
+    ],
+    "tests/discovery_runtime/gateway_test_support.py": [
+      "MemoryExecutor",
+      "result_for(exit_code=0)",
+      "NOW"
+    ],
+    "tests/discovery_runtime/test_service.py": [
+      "MemoryService",
+      "service_io",
+      "service_plan",
+      "initialization_catalog",
+      "initialization_templates"
+    ],
+    "tests/conftest.py": [
+      "mem_fs_path in-memory pathlib seam; no physical temporary files"
+    ]
+  },
+  "baseline_reuse": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+      "sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+      "lines": 550
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-freeze.2026-10-21T15-06.json",
+      "sha256": "3ed31d60fc643574c68f19055adf4532db2d7f7f3e343bd857f17bb4cac4f8a3",
+      "lines": 509
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t2-parser-pa1-doc-qualification.2026-10-21T15-16.json",
+      "sha256": "65be64063e5ef3ff877f0aa8d1868928efb04b035dbe19bfe16c071ef320ea02",
+      "lines": 167
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-freeze.2026-10-21T15-31.json",
+      "sha256": "5dbaff1f3d5ec8b6a60e49fbee5c812b2ed19ab1385be72ef1d2893b940f21a6",
+      "lines": 720
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t1-legacy-freeze.2026-10-19T14-54.json",
+      "sha256": "cc6c50c83a1263b872eea1ee632abf9d7e139c09a86b4554b9274762f39d0e38",
+      "lines": 266
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t2-adapter-freeze.2026-10-20T05-51.json",
+      "sha256": "656c6a446a2d26fff8222010cf6f15494525a9f71d8eccd5cc4b95f9af9d103b",
+      "lines": 521
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t3-legacy-freeze.2026-10-20T08-55.json",
+      "sha256": "1d5fe0c17ea6eaf272d3b30dd3a52390679ca43fc2b0dbe51e33c45add895f92",
+      "lines": 147
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p5t5-shared-baseline.2026-10-20T12-11.json",
+      "sha256": "79109749d909db45d4224e63ad1ce90e405f8074745f7bd2caea797ebc550475",
+      "lines": 597
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+      "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4",
+      "lines": 1610
+    }
+  ],
+  "baseline_qualification": "Retained receipts supply exact executed IDs/raw coverage and historical source bindings. Reuse unchanged body proof only after matching bytes/AST; changed main argv and refusal behavior gets focused new adapter proof. Do not equate retained placeholder generator positives with post-conversion expected success. No invented case counts or all-Sets suite replay. P6-T2 final167 result must be linked only after it completes.",
+  "direction": "Legacy scripts import installed drm_copilot_discovery only. Runtime cannot import scripts.dev_tools or locate checkout-relative schemas/templates; no module/provider selection from request data. Keep real v1 parsing explicitly versioned and separate from v2 proof/completion.",
+  "source_and_caller_bindings": [
+    {
+      "path": "scripts/dev_tools/discovery/profile_cli.py",
+      "sha256": "7e9af5d4ff4dfd84a5249fa422f79581bb2ef3c226379a487f60e06bb2da77ad",
+      "lines": 154
+    },
+    {
+      "path": "scripts/dev_tools/discovery/init_cli.py",
+      "sha256": "d022975a3936cc4ece66e6cd7763a00af381d0a1c0ef70b316fb65523ec2c997",
+      "lines": 66
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_profile_cli.py",
+      "sha256": "82189a117a8a940172bb06f5d78bd65091ca0f676a2bfa1147d594612d1fa0d8",
+      "lines": 180
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "sha256": "b967a992e83dedacf2d18469e9e1d57bd78aeaae78da49c6f327cb6ef3263139",
+      "lines": 154
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_domain_profile.py",
+      "sha256": "846b5342c3364f41d4f92d935641a6eb6bffb7f948c9360e9d3e6b7a5dc44cf9",
+      "lines": 452
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "sha256": "30eb485f9b0d32f161ab20f657b24f64a5e42055027e41694f97fbd345555f4a",
+      "lines": 258
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_profile.py",
+      "sha256": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2",
+      "lines": 39
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+      "lines": 142
+    },
+    {
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "lines": 127
+    },
+    {
+      "path": "scripts/dev_tools/discovery/parity_report.py",
+      "sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "lines": 127
+    },
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "sha256": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6",
+      "lines": 155
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "a5aec57d3d51baae4ff00c37bd14d8f18763da69e4d43a65e5f6a68aa17c9a6f",
+      "lines": 168
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "lines": 421
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_parity_report.py",
+      "sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "lines": 344
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "sha256": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25",
+      "lines": 382
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_profile.py",
+      "sha256": "f0c7905112c236b181f328ded26215b7b14c90b60c5bcaea3962002541e0f16a",
+      "lines": 66
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py",
+      "sha256": "6d3319e7344492a4e0f702386158c86b28ce940a11343226667b4ba67832fe7f",
+      "lines": 138
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py",
+      "sha256": "37c9ba4e658ec4840916fcf069a7da8faeaa186e62ce86adcf7f3ddfe37b6577",
+      "lines": 39
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_rendering.py",
+      "sha256": "ecb2537ce0a3c7728208b3170a474dd3cb43185ae9a24eab5f51ec42a5447ab2",
+      "lines": 123
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_io.py",
+      "sha256": "594a1a30ab3311acae00b271bb575655c65a0a87bacb7b170e6ef438eae24a5f",
+      "lines": 87
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__init__.py",
+      "sha256": "bda306382c2a7335f09f6e62add357089cdbe7acb0c0c52851cf738f4eae7c09",
+      "lines": 53
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__main__.py",
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7",
+      "lines": 12
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/cli.py",
+      "sha256": "f775c05019116140cd28d0a2f353e7cd2ea26133eed587f5873546b42380b89a",
+      "lines": 163
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "8dee57ce119d934b882815297843df0dcc5b5bf3faaf3f55892c59efabbc3678",
+      "lines": 209
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "6f177e8070be9599de1d3f0e36899123050ca668dce71d7f328b3639dca09ad0",
+      "lines": 205
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "e0b10c734cedf004dd49a1b8cfcb09999583a9ee8ba1db016a1b28db95560529",
+      "lines": 305
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_pipeline.py",
+      "sha256": "08c2a4b1da50740c9ff018c85334d84d6f96513b17971628474d67bab6a9d7da",
+      "lines": 145
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_domain_neutrality.py",
+      "sha256": "50a15778085dc7c2ce1992e3cbe26cf991d4627dd7775853bf4c9af8835cfea5",
+      "lines": 233
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_neutrality.py",
+      "sha256": "f59b8f0a4f05fc4c4dc4d2f15cb01f8de020ebd3e725271f8fbd86071fdbf8f3",
+      "lines": 174
+    },
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "lines": 492
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe",
+      "lines": 488
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+      "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+      "lines": 222
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0",
+      "lines": 453
+    },
+    {
+      "path": "tests/discovery_runtime/test_legacy_adapters.py",
+      "state": "absent"
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "sha256": "1147d9de3942555ab4e2c578dc0d32b9ae89b84784b779a2ee3c374e7c223b53",
+      "lines": 493
+    }
+  ],
+  "dependency_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py",
+      "sha256": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "lines": 405
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py",
+      "sha256": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "lines": 241
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py",
+      "sha256": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+      "lines": 475
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py",
+      "sha256": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+      "lines": 158
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py",
+      "sha256": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+      "lines": 339
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py",
+      "sha256": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+      "lines": 173
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py",
+      "sha256": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+      "lines": 261
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py",
+      "sha256": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+      "lines": 382
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py",
+      "sha256": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+      "lines": 335
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py",
+      "sha256": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+      "lines": 494
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py",
+      "sha256": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+      "lines": 329
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py",
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "lines": 304
+    },
+    {
+      "path": "tests/discovery_runtime/cli_test_support.py",
+      "sha256": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+      "lines": 85
+    },
+    {
+      "path": "tests/discovery_runtime/gateway_test_support.py",
+      "sha256": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+      "lines": 319
+    },
+    {
+      "path": "tests/discovery_runtime/test_service.py",
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "lines": 495
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+      "lines": 660
+    }
+  ],
+  "normalization": "Paths are repository-relative POSIX; SHA256 binds original bytes without newline normalization. JSON presentation UTF-8/LF with exactly one terminal newline. No absolute scratch locators or external outputs.",
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current shared checkout; recorded paths are repository-relative"
+  ]
+}

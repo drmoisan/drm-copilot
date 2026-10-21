@@ -713,7 +713,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 
 **Initialization**
 
-- [ ] A deterministic command initializes a consumer discovery workspace.
+- [x] A deterministic command initializes a consumer discovery workspace.
 - [x] Initialization is idempotent.
 - [x] Dry-run is supported.
 - [x] Existing files are not silently overwritten.
@@ -722,7 +722,7 @@ These 66 criteria preserve the promoted requirements. Category headings are not 
 **Validation and reporting**
 
 - [ ] Individual artifact validators exist.
-- [ ] A complete validation command exists.
+- [x] A complete validation command exists.
 - [ ] Blocking failures return nonzero exit codes.
 - [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.

@@ -60,14 +60,14 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [x] Cross-artifact references are validated.
 - [x] Extensions cannot bypass core required fields.
 ### Initialization
-- [ ] A deterministic command initializes a consumer discovery workspace.
+- [x] A deterministic command initializes a consumer discovery workspace.
 - [x] Initialization is idempotent.
 - [x] Dry-run is supported.
 - [x] Existing files are not silently overwritten.
 - [x] The initialized workspace validates successfully.
 ### Validation and reporting
 - [ ] Individual artifact validators exist.
-- [ ] A complete validation command exists.
+- [x] A complete validation command exists.
 - [ ] Blocking failures return nonzero exit codes.
 - [x] Markdown and JSON reports are generated.
 - [x] Completion checks coverage, evidence, unresolved behavior, acceptance scenarios, and configured platform dimensions.
