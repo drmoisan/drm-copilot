@@ -1,10 +1,8 @@
-"""Deterministic, domain-neutral acceptance-scenario generator.
+"""Forward generation to the installed captured-workspace acceptance service.
 
-Transforms three discovery artifacts (Feature Contract, Parity Matrix, and
-Runtime Characterization Scenario) into a single JSON acceptance-scenario-set
-document. The transform is pure: identical inputs produce byte-identical output,
-with no seeded RNG and no wall-clock read. ``source_digest`` is a SHA-256 over
-the canonicalized inputs, never a clock value.
+Historical values and pure utilities remain nonauthoritative compatibility data.
+They establish no schema validity, v2 identity, readiness or publication grant.
+The old three-document placeholder shape cannot supply a validated snapshot.
 """
 
 from __future__ import annotations
@@ -12,71 +10,76 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING
+
+from drm_copilot_discovery.cli import run_installed_cli
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+# Historical labels remain import-compatible; no schema is emitted from them.
 GENERATOR_ID = "dev.discovery.acceptance-scenarios"
 SCHEMA_VERSION = "v1"
 SCHEMA_SELF_REF = "schemas/v1/acceptance-scenario-set.schema.json"
+_MIGRATION = (
+    "Legacy placeholder generation is unsupported. Use "
+    "dev.discovery.generate-acceptance-scenarios --workspace-root <root> "
+    "--profile <relative-profile> --repository-id <id> with configured v2 "
+    "artifacts. Read-only --check is not --dry-run and establishes no readiness."
+)
 
 
 class GenerationError(Exception):
-    """Raised when an input artifact is missing, malformed, or incomplete.
+    """Reject unsupported legacy generation without reads or input mutation.
 
-    A single, specific exception type lets the CLI entry point translate any
-    expected failure into exit code 1 with a clear message.
+    Catch this historical exception type to display fixed migration guidance.
+    It carries no schema, validation result, or publication authority.
     """
 
 
 def resolve_discovery_schema(
-    schema_name: str,
-    *,
-    root: Path,
-    version: str | None = None,
+    schema_name: str, *, root: Path, version: str | None = None
 ) -> Path:
-    """Return the filesystem path to a versioned discovery schema.
+    """Refuse checkout schema selection without probing its filesystem.
 
-    Isolates all schema-location knowledge behind a single seam so this feature
-    can proceed before feature #9002 lands. ``schema_name`` is a domain-neutral
-    key such as ``feature-contract``. Until #9002 lands this raises
-    ``FileNotFoundError`` whose message names the expected
-    ``schemas/vN/<schema_name>.schema.json`` convention.
+    Args:
+        schema_name (str): Historical name; never used for lookup.
+        root (Path): Historical checkout location; never inspected.
+        version (str | None): Historical selector; never grants authority.
+    Returns:
+        Path: Never returned; the import-compatible signature remains.
+    Raises:
+        GenerationError: Always, with installed-command migration guidance.
+    Effects:
+        None; existing checkout schemas cannot enable this unsupported path.
     """
-    resolved_version = version or SCHEMA_VERSION
-    expected = root / "schemas" / resolved_version / f"{schema_name}.schema.json"
-    if expected.is_file():
-        return expected
-    raise FileNotFoundError(
-        "Discovery schema tree is not present. Feature #9002 owns the schema "
-        "definitions; the expected convention is "
-        f"schemas/v<version>/{schema_name}.schema.json (resolved candidate: "
-        f"{expected}). Supply explicit input paths on the command line until "
-        "#9002 lands."
-    )
+    raise GenerationError(_MIGRATION)
 
 
 def resolve_schema_self_ref(root: Path) -> str:
-    """Return the ``$schema`` self-reference via the schema-location seam.
+    """Refuse the fabricated schema fallback without filesystem access.
 
-    Routes the ``$schema`` value through ``resolve_discovery_schema`` so
-    downstream code never hard-codes a schema path. Before feature #9002 lands
-    the seam raises and this falls back to the ``schemas/vN/`` convention string.
+    Args:
+        root (Path): Historical checkout hint; never inspected.
+    Returns:
+        str: Never returned; no substitute schema reference is fabricated.
+    Raises:
+        GenerationError: Always, directing callers to installed generation.
+    Effects:
+        None.
     """
-    try:
-        resolved = resolve_discovery_schema("acceptance-scenario-set", root=root)
-    except FileNotFoundError:
-        return SCHEMA_SELF_REF
-    return resolved.as_posix()
+    raise GenerationError(_MIGRATION)
 
 
 @dataclass(frozen=True)
 class FeatureContractProjection:
-    """Read surface for the Feature Contract input."""
+    """Retain feature fields as frozen, nonauthoritative compatibility data.
+
+    Construct from strings/tuples; fields are retained without interpretation,
+    validation, I/O or generation. These values do not establish v2 provenance.
+    """
 
     feature_ref: str
     title: str
@@ -88,7 +91,11 @@ class FeatureContractProjection:
 
 @dataclass(frozen=True)
 class ParityRow:
-    """A single Parity Matrix row keyed to a feature."""
+    """Retain a historical row without asserting target equivalence.
+
+    Construct from strings/tuples; frozen fields are neither interpreted nor
+    verified. No I/O, mutable state or generation authority is introduced.
+    """
 
     parity_ref: str
     feature_ref: str
@@ -98,14 +105,22 @@ class ParityRow:
 
 @dataclass(frozen=True)
 class ParityMatrixProjection:
-    """Read surface for the Parity Matrix input."""
+    """Store historical rows without validation, readiness or side effects.
+
+    Construct from a row tuple; this frozen carrier neither traverses nor
+    interprets its values and cannot authorize generation.
+    """
 
     rows: tuple[ParityRow, ...] = ()
 
 
 @dataclass(frozen=True)
 class CharacterizationScenario:
-    """A single Runtime Characterization Scenario observation."""
+    """Retain observation fields without claiming verified runtime evidence.
+
+    Construct from strings/tuples; frozen values are not interpreted or linked.
+    No I/O, validation, approval or scenario generation occurs.
+    """
 
     characterization_ref: str
     feature_ref: str
@@ -116,208 +131,121 @@ class CharacterizationScenario:
 
 @dataclass(frozen=True)
 class RuntimeCharacterizationProjection:
-    """Read surface for the Runtime Characterization Scenario input."""
+    """Store historical observations without evaluating their authority.
+
+    Construct from a scenario tuple; this frozen carrier performs no traversal,
+    generation or side effects and cannot establish accepted runtime evidence.
+    """
 
     scenarios: tuple[CharacterizationScenario, ...] = ()
 
 
-def _require_str(document: dict[str, Any], key: str, *, context: str) -> str:
-    """Return a required non-empty string field or raise ``GenerationError``."""
-    value = document.get(key)
-    if not isinstance(value, str) or not value.strip():
-        raise GenerationError(
-            f"{context}: required field '{key}' is missing or not a non-empty string"
-        )
-    return value
+def project_feature_contract(document: dict[str, object]) -> FeatureContractProjection:
+    """Reject placeholder projection without reading or mutating input fields.
 
-
-def _string_tuple(document: dict[str, Any], key: str) -> tuple[str, ...]:
-    """Return a tuple of strings for an optional array field, ignoring absence."""
-    value = document.get(key, [])
-    if not isinstance(value, list):
-        return ()
-    return tuple(str(item) for item in cast("list[Any]", value))
-
-
-def project_feature_contract(document: dict[str, Any]) -> FeatureContractProjection:
-    """Project a Feature Contract document onto the generator read surface.
-
-    Unknown or extra keys are ignored so a #9002 field-name change touches only
-    this adapter. Raises ``GenerationError`` when a required field is missing.
+    Args:
+        document (dict[str, object]): Untrusted historical feature fields.
+    Returns:
+        FeatureContractProjection: Never returned from unsupported context.
+    Raises:
+        GenerationError: Always; use a configured captured workspace instead.
+    Effects:
+        None.
     """
-    context = "feature contract"
-    return FeatureContractProjection(
-        feature_ref=_require_str(document, "feature_ref", context=context),
-        title=_require_str(document, "title", context=context),
-        given=_string_tuple(document, "given"),
-        when=_string_tuple(document, "when"),
-        then=_string_tuple(document, "then"),
-        evidence_refs=_string_tuple(document, "evidence_refs"),
-    )
+    raise GenerationError(_MIGRATION)
 
 
-def project_parity_matrix(document: dict[str, Any]) -> ParityMatrixProjection:
-    """Project a Parity Matrix document onto the generator read surface.
+def project_parity_matrix(document: dict[str, object]) -> ParityMatrixProjection:
+    """Reject placeholder parity projection without assuming target readiness.
 
-    Unknown or extra keys are ignored. Raises ``GenerationError`` when a required
-    field is missing or malformed.
+    Args:
+        document (dict[str, object]): Untrusted historical parity fields.
+    Returns:
+        ParityMatrixProjection: Never returned from unsupported context.
+    Raises:
+        GenerationError: Always; use the installed generation command.
+    Effects:
+        None; inputs remain unexamined and unchanged.
     """
-    raw_rows = document.get("rows", [])
-    if not isinstance(raw_rows, list):
-        raise GenerationError("parity matrix: required field 'rows' must be an array")
-    rows: list[ParityRow] = []
-    for index, raw_item in enumerate(cast("list[Any]", raw_rows)):
-        if not isinstance(raw_item, dict):
-            raise GenerationError(f"parity matrix: row {index} must be an object")
-        raw = cast("dict[str, Any]", raw_item)
-        context = f"parity matrix row {index}"
-        rows.append(
-            ParityRow(
-                parity_ref=_require_str(raw, "parity_ref", context=context),
-                feature_ref=_require_str(raw, "feature_ref", context=context),
-                then=_string_tuple(raw, "then"),
-                evidence_refs=_string_tuple(raw, "evidence_refs"),
-            )
-        )
-    return ParityMatrixProjection(rows=tuple(rows))
+    raise GenerationError(_MIGRATION)
 
 
 def project_runtime_characterization(
-    document: dict[str, Any],
+    document: dict[str, object],
 ) -> RuntimeCharacterizationProjection:
-    """Project a Runtime Characterization document onto the read surface.
+    """Reject placeholder observations without inventing evidence or approvals.
 
-    Unknown or extra keys are ignored. Raises ``GenerationError`` when a required
-    field is missing or malformed.
+    Args:
+        document (dict[str, object]): Untrusted historical observation fields.
+    Returns:
+        RuntimeCharacterizationProjection: Never returned from this context.
+    Raises:
+        GenerationError: Always; use the installed generation command.
+    Effects:
+        None; inputs are not traversed or mutated.
     """
-    raw_scenarios = document.get("scenarios", [])
-    if not isinstance(raw_scenarios, list):
-        raise GenerationError(
-            "runtime characterization: required field 'scenarios' must be an array"
-        )
-    scenarios: list[CharacterizationScenario] = []
-    for index, raw_item in enumerate(cast("list[Any]", raw_scenarios)):
-        if not isinstance(raw_item, dict):
-            raise GenerationError(
-                f"runtime characterization: scenario {index} must be an object"
-            )
-        raw = cast("dict[str, Any]", raw_item)
-        context = f"runtime characterization scenario {index}"
-        scenarios.append(
-            CharacterizationScenario(
-                characterization_ref=_require_str(
-                    raw, "characterization_ref", context=context
-                ),
-                feature_ref=_require_str(raw, "feature_ref", context=context),
-                given=_string_tuple(raw, "given"),
-                when=_string_tuple(raw, "when"),
-                evidence_refs=_string_tuple(raw, "evidence_refs"),
-            )
-        )
-    return RuntimeCharacterizationProjection(scenarios=tuple(scenarios))
+    raise GenerationError(_MIGRATION)
 
 
 def derive_scenario_id(
-    feature_ref: str,
-    parity_ref: str | None,
-    characterization_ref: str | None,
+    feature_ref: str, parity_ref: str | None, characterization_ref: str | None
 ) -> str:
-    """Derive a stable ``scn-<16 hex>`` identifier from input references only.
+    """Preserve the historical hash utility, which is not a v2 scenario identity.
 
-    Deterministic: no RNG and no wall-clock value participate, so identical
-    inputs always yield the same identifier.
+    Args:
+        feature_ref (str): Historical feature token.
+        parity_ref (str | None): Historical parity token; None becomes empty.
+        characterization_ref (str | None): Historical observation token.
+    Returns:
+        str: Stable scn- prefix plus sixteen hexadecimal characters.
+    Effects:
+        None; no clock, randomness, validation or readiness claim participates.
     """
     key = "|".join([feature_ref, parity_ref or "", characterization_ref or ""])
     digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
     return f"scn-{digest}"
 
 
-def _scenario_sort_key(scenario: dict[str, Any]) -> tuple[str, str, str, str]:
-    """Return the stable total-order key for a scenario object."""
-    return (
-        str(scenario["feature_ref"]),
-        str(scenario["parity_ref"] or ""),
-        str(scenario["characterization_ref"] or ""),
-        str(scenario["id"]),
-    )
-
-
 def assemble_scenarios(
     feature: FeatureContractProjection,
     parity_matrix: ParityMatrixProjection,
     characterization: RuntimeCharacterizationProjection,
-) -> list[dict[str, Any]]:
-    """Combine the three projections into scenario objects.
+) -> list[dict[str, object]]:
+    """Reject assembly because historical carriers lack a validated snapshot.
 
-    Produces one scenario per applicable combination of parity row and
-    characterization scenario for the feature. When no parity row or no
-    characterization applies, the corresponding reference is ``None``. Each
-    scenario carries ``id``, ``title``, ``feature_ref``, ``parity_ref``,
-    ``characterization_ref``, ``given``, ``when``, ``then``, and ``evidence_refs``.
+    Args:
+        feature (FeatureContractProjection): Non-authoritative feature fields.
+        parity_matrix (ParityMatrixProjection): Historical unverified rows.
+        characterization (RuntimeCharacterizationProjection): Unverified fields.
+    Returns:
+        list[dict[str, object]]: Never returned; no scenarios are invented.
+    Raises:
+        GenerationError: Always, with actionable installed-command guidance.
+    Effects:
+        None; the carriers are not inspected, expanded or mutated.
     """
-    parity_rows = sorted(
-        (row for row in parity_matrix.rows if row.feature_ref == feature.feature_ref),
-        key=lambda row: row.parity_ref,
-    )
-    char_scenarios = sorted(
-        (
-            scenario
-            for scenario in characterization.scenarios
-            if scenario.feature_ref == feature.feature_ref
-        ),
-        key=lambda scenario: scenario.characterization_ref,
-    )
-    parity_options: list[ParityRow | None] = list(parity_rows) or [None]
-    char_options: list[CharacterizationScenario | None] = list(char_scenarios) or [None]
-
-    scenarios: list[dict[str, Any]] = []
-    for parity_row in parity_options:
-        for char_scenario in char_options:
-            parity_ref = parity_row.parity_ref if parity_row is not None else None
-            characterization_ref = (
-                char_scenario.characterization_ref
-                if char_scenario is not None
-                else None
-            )
-            given = list(feature.given)
-            when = list(feature.when)
-            then = list(feature.then)
-            evidence = list(feature.evidence_refs)
-            if char_scenario is not None:
-                given.extend(char_scenario.given)
-                when.extend(char_scenario.when)
-                evidence.extend(char_scenario.evidence_refs)
-            if parity_row is not None:
-                then.extend(parity_row.then)
-                evidence.extend(parity_row.evidence_refs)
-            scenarios.append(
-                {
-                    "id": derive_scenario_id(
-                        feature.feature_ref, parity_ref, characterization_ref
-                    ),
-                    "title": feature.title,
-                    "feature_ref": feature.feature_ref,
-                    "parity_ref": parity_ref,
-                    "characterization_ref": characterization_ref,
-                    "given": given,
-                    "when": when,
-                    "then": then,
-                    "evidence_refs": sorted(set(evidence)),
-                }
-            )
-    return scenarios
+    raise GenerationError(_MIGRATION)
 
 
 def compute_source_digest(
-    feature_doc: dict[str, Any],
-    parity_doc: dict[str, Any],
-    characterization_doc: dict[str, Any],
+    feature_doc: dict[str, object],
+    parity_doc: dict[str, object],
+    characterization_doc: dict[str, object],
 ) -> str:
-    """Return a 64-char SHA-256 hex digest over the canonicalized inputs.
+    """Preserve a pure historical hash without claiming a v2 input digest.
 
-    A deterministic content fingerprint that changes only when input content
-    changes. This is never a clock value.
+    Args:
+        feature_doc (dict[str, object]): JSON-serializable feature data.
+        parity_doc (dict[str, object]): JSON-serializable parity data.
+        characterization_doc (dict[str, object]): Serializable observation data.
+    Returns:
+        str: Lowercase 64-character SHA-256 over ordered canonical documents.
+    Raises:
+        TypeError, ValueError: JSON cannot represent the supplied data.
+    Effects:
+        None; dictionary keys are sorted without modifying inputs.
     """
+    # Preserve document roles while ignoring irrelevant dictionary key ordering.
     canonical = "".join(
         json.dumps(document, sort_keys=True, ensure_ascii=False)
         for document in (feature_doc, parity_doc, characterization_doc)
@@ -326,167 +254,93 @@ def compute_source_digest(
 
 
 def build_document(
-    feature_doc: dict[str, Any],
-    parity_doc: dict[str, Any],
-    characterization_doc: dict[str, Any],
+    feature_doc: dict[str, object],
+    parity_doc: dict[str, object],
+    characterization_doc: dict[str, object],
     *,
     root: Path,
-) -> dict[str, Any]:
-    """Assemble the top-level acceptance-scenario-set document.
+) -> dict[str, object]:
+    """Reject placeholder generation before reads, interpretation or publication.
 
-    Projects the three inputs, assembles and sorts the scenarios, and builds the
-    document with ``$schema``, ``schema_version``, ``generator``,
-    ``source_digest``, and ``scenarios``. Raises ``GenerationError`` when an input
-    is missing a required field.
+    Args:
+        feature_doc (dict[str, object]): Historical feature data.
+        parity_doc (dict[str, object]): Historical parity data.
+        characterization_doc (dict[str, object]): Unverified observation fields.
+        root (Path): Checkout hint; never inspected or used for schema lookup.
+    Returns:
+        dict[str, object]: Never returned; use the authoritative installed CLI.
+    Raises:
+        GenerationError: Always, with configured-workspace migration guidance.
+    Effects:
+        None; no fallback scenarios, schemas, approvals or files are produced.
     """
-    feature = project_feature_contract(feature_doc)
-    parity = project_parity_matrix(parity_doc)
-    characterization = project_runtime_characterization(characterization_doc)
-    scenarios = sorted(
-        assemble_scenarios(feature, parity, characterization),
-        key=_scenario_sort_key,
-    )
-    return {
-        "$schema": resolve_schema_self_ref(root),
-        "schema_version": SCHEMA_VERSION,
-        "generator": GENERATOR_ID,
-        "source_digest": compute_source_digest(
-            feature_doc, parity_doc, characterization_doc
-        ),
-        "scenarios": scenarios,
-    }
+    raise GenerationError(_MIGRATION)
 
 
-def format_document(document: dict[str, Any]) -> str:
-    """Serialize with sorted keys, two-space indent, and one trailing newline."""
+def format_document(document: dict[str, object]) -> str:
+    """Serialize historical data deterministically without endorsing its content.
+
+    Args:
+        document (dict[str, object]): JSON-serializable compatibility data.
+    Returns:
+        str: Sorted keys, two-space indentation, Unicode and one final LF.
+    Raises:
+        TypeError, ValueError: JSON cannot represent the supplied data.
+    Effects:
+        None; does not validate, generate, write or mutate the document.
+    """
     return json.dumps(document, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
 
 
 def collect_input_paths(paths: Sequence[str] | Sequence[Path]) -> list[Path]:
-    """Return input paths sorted by POSIX string form.
+    """Sort historical path values without resolving, reading or granting access.
 
-    Ensures input-path processing order is stable across platforms and does not
-    depend on filesystem ``glob``/``rglob`` yield order.
+    Args:
+        paths (Sequence[str] | Sequence[Path]): Legacy path values.
+    Returns:
+        list[Path]: New list sorted by POSIX spelling; duplicates remain.
+    Effects:
+        None; filesystem existence and authorization remain unexamined.
     """
+    # Retain portable ordering independently of filesystem enumeration.
     return sorted((Path(entry) for entry in paths), key=lambda entry: entry.as_posix())
 
 
-def _load_json_document(path: Path, *, label: str) -> dict[str, Any]:
-    """Read one existing input artifact, enforcing JSON parse and object root.
-
-    Existence is validated by the caller (``_generate_from_args``). Raises
-    ``GenerationError`` when the content does not parse as JSON or the root is
-    not an object.
-    """
-    text = path.read_text(encoding="utf-8")
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError as exc:
-        raise GenerationError(f"{label}: invalid JSON in {path}: {exc}") from exc
-    if not isinstance(parsed, dict):
-        raise GenerationError(f"{label}: JSON root must be an object: {path}")
-    return cast("dict[str, Any]", parsed)
-
-
-def _generate_from_args(args: argparse.Namespace, *, root: Path) -> dict[str, Any]:
-    """Load the three CLI-named inputs and build the document.
-
-    Uses the stable sorted-path view for a deterministic missing-file diagnostic,
-    then loads each artifact in its fixed positional role. Raises
-    ``GenerationError`` when any input is missing, malformed, or incomplete.
-    """
-    ordered_paths = collect_input_paths(
-        [args.feature_contract, args.parity_matrix, args.runtime_characterization]
-    )
-    for path in ordered_paths:
-        if not path.is_file():
-            raise GenerationError(f"input file not found: {path}")
-    feature_doc = _load_json_document(
-        Path(args.feature_contract), label="feature contract"
-    )
-    parity_doc = _load_json_document(Path(args.parity_matrix), label="parity matrix")
-    characterization_doc = _load_json_document(
-        Path(args.runtime_characterization), label="runtime characterization"
-    )
-    return build_document(feature_doc, parity_doc, characterization_doc, root=root)
-
-
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    """Parse CLI arguments into the input paths, ``output``, and ``check``."""
-    parser = argparse.ArgumentParser(
-        description=(
-            "Generate a deterministic, domain-neutral acceptance-scenario-set "
-            "document from discovery artifacts."
-        )
-    )
-    parser.add_argument(
-        "--feature-contract",
-        required=True,
-        help="Path to the Feature Contract input JSON.",
-    )
-    parser.add_argument(
-        "--parity-matrix",
-        required=True,
-        help="Path to the Parity Matrix input JSON.",
-    )
-    parser.add_argument(
-        "--runtime-characterization",
-        required=True,
-        help="Path to the Runtime Characterization Scenario input JSON.",
-    )
-    parser.add_argument(
-        "--output",
-        default=None,
-        help="Output path for the generated document; prints to stdout when omitted.",
-    )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Assert the on-disk output matches regenerated output without writing.",
-    )
+    """Retain legacy argument inspection only; canonical main never calls this.
+
+    Args:
+        argv (Sequence[str] | None): Historical tokens, or process arguments.
+    Returns:
+        argparse.Namespace: Raw input paths, output and check metadata.
+    Raises:
+        SystemExit: Argparse help or malformed legacy inspection arguments.
+    Effects:
+        Argparse may emit help/errors, but never reads or writes input files.
+        Successful inspection supplies no generation or readiness authority.
+    """
+    parser = argparse.ArgumentParser(description=_MIGRATION)
+    parser.add_argument("--feature-contract", required=True)
+    parser.add_argument("--parity-matrix", required=True)
+    parser.add_argument("--runtime-characterization", required=True)
+    parser.add_argument("--output", default=None)
+    parser.add_argument("--check", action="store_true")
     return parser.parse_args(list(argv) if argv is not None else None)
 
 
-def _run_check(rendered: str, output: str | None) -> int:
-    """Return ``0`` when the on-disk document matches regenerated output, else ``1``."""
-    if output is None:
-        print("error: --check requires --output", file=sys.stderr)
-        return 1
-    output_path = Path(output)
-    if not output_path.is_file():
-        print(f"error: --check target does not exist: {output_path}", file=sys.stderr)
-        return 1
-    existing = output_path.read_text(encoding="utf-8")
-    if existing != rendered:
-        print(f"error: --check mismatch: {output_path} is out of date", file=sys.stderr)
-        return 1
-    print(f"ok: {output_path} matches regenerated output")
-    return 0
-
-
 def main(argv: Sequence[str] | None = None) -> int:
-    """CLI entry point: ``0`` on success; ``1`` on any failure."""
-    args = parse_args(argv or sys.argv[1:])
-    root = Path(__file__).resolve().parents[2]
+    """Forward canonical arguments to the installed acceptance command unchanged.
 
-    try:
-        document = _generate_from_args(args, root=root)
-    except GenerationError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 1
-
-    rendered = format_document(document)
-
-    if args.check:
-        return _run_check(rendered, args.output)
-
-    if args.output:
-        Path(args.output).write_text(rendered, encoding="utf-8")
-        print(f"ok: wrote {args.output}")
-    else:
-        sys.stdout.write(rendered)
-    return 0
+    Args:
+        argv (Sequence[str] | None): Canonical tokens; None uses process argv.
+    Returns:
+        int: Installed CLI status 0, 1, 2 or 3; no independent success decision.
+    Effects:
+        Installed CLI owns parsing, streams, validation and guarded publication.
+        Unsupported legacy flags fail before workspace effects.
+    """
+    return run_installed_cli("generate-acceptance-scenarios", argv)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

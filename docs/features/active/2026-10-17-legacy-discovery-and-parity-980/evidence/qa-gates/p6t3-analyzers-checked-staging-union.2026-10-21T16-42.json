@@ -1,0 +1,92 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "status": "READY_FOR_CHECKED_SUBSET_NOT_STAGED",
+  "timestamp": "2026-10-21T16:42:52.267078+00:00",
+  "paths": [
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__init__.py",
+      "sha256": "3905cd4b6c8f7498267d1b1789fdc0802341d56b54ec0b6ebde833ac404b1e45"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/__main__.py",
+      "sha256": "8bffe5f2ac2471bcfb9cfd33fe1851cbca94254e41628a59b78cd5e7f73483d7"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/cli.py",
+      "sha256": "8ef3a6bb2422af14f88c39f16a167bf04393fd5976a822b7e3da0b84b0fb0dee"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/analyzer/stack_cli.py",
+      "sha256": "835bfb91eb9d04a2a2541a1cb55404608187734f47dcf829b90ae7b2a487ca51"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_cli.py",
+      "sha256": "120d7696a04d1e0a86b2de74f29f47fa39cab212196d84d7fa9f73582f593cc7"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/analyzer/test_stack_cli.py",
+      "sha256": "00a1ff1417324c0f443be57caa3877c3c82e95040670614b1d3f611fa8b4610c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-format.2026-10-21T16-36.json",
+      "sha256": "4afed8fc4c80abb5118187f761dc12f1be1ea56f9d0f946e5d01f7d9360ef734"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-consolidate-lint.2026-10-21T16-36.json",
+      "sha256": "24780e91c4ad8567bf9f99a6836af1010150bf8c639af7d0922bd5627b351801"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-format.2026-10-21T16-36.json",
+      "sha256": "ded29927e7e2fe5310efc6ac767e165ae5cf43b2f3f4a0fff52d620f81e58f0d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-lint.2026-10-21T16-36.json",
+      "sha256": "2694d1b8cd998a527f87ab21f0402669ca641d47501336d3220bf3c730f40d1b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-tests.2026-10-21T16-37.json",
+      "sha256": "b007697d88ee9af742f5ba91a09c9d31334dc058dfddaaf09f5601ebb8c63755"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-pass1-types.2026-10-21T16-37.json",
+      "sha256": "1f672b22d5887e03090ba55856f2c1d5e4f683ef7a4207f6c5396fe646042330"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-preedit-originals.2026-10-21T16-30.json",
+      "sha256": "2d8470e0b1a9a32ca3e8ead9c64b48f22e018073d4572663bf5089c6f50a2376"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-originals.2026-10-21T16-39.json",
+      "sha256": "1a608616f0ad2568362c4974fa0afd90ef7f85b1214ba1055d2ade353f09e1ee"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-freeze.2026-10-21T16-39.json",
+      "sha256": "aaeeb38c5d149057697c32748bf28c7a300782f2152f97dba0d7f3943b0d526d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t3-analyzers-staging.2026-10-21T16-39.json",
+      "sha256": "d293b233c01c49a774ec9e3ab3d36703fa74d6d37343c331d02ec4264166cc78"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-independent-review.2026-10-21T16-42.json",
+      "sha256": "9c2ec8832dfc21418a2ed50c95434a1723d6387a9af6273434afee2bfc2f75d1"
+    }
+  ],
+  "manifest_self": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-analyzers-checked-staging-union.2026-10-21T16-42.json",
+  "path_count_including_manifest": 18,
+  "self_binding": "The coordinator binds this manifest by the exact SHA reported with this handoff; it contains no recursive self-digest.",
+  "existing_prerequisites": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+      "sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-entry-source-freeze.2026-10-21T16-35.json",
+      "sha256": "a6040de0de31179f687d448402868ca89cb356f94d818ee0ca80c19cb95218b3"
+    }
+  ],
+  "dependency_closure": "Requires the reviewed public run_installed_cli prerequisite at cli.py c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3. Commit with that prerequisite or after it; no claim of standalone closure before its commit. No other concurrent slices included.",
+  "exclusions": "No unrelated compatibility slice, runtime CLI source, live final gate, checkpoint or preparation artifacts are included. Unchanged __main__ is intentionally retained in the exact owner closure.",
+  "acceptance": "Source review clear; final reversed-module isolation and full P6-T3 acceptance remain pending."
+}

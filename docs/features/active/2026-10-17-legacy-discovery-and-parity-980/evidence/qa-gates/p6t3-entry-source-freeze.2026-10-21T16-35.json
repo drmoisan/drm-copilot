@@ -1,0 +1,72 @@
+{
+  "Timestamp": "2026-10-21T16-35",
+  "added_symbols": [
+    "run_installed_cli"
+  ],
+  "changed_symbols": [
+    "_main"
+  ],
+  "gate_state": "Source Black check passed; first combined Black check stopped only for new-test formatting. Scoped Ruff/Pyright and 40 cases remain pending.",
+  "package_window": "No manifest regeneration during the imminent bounded prerequisite run; package installation proof remains separately designated.",
+  "preedit": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t3-entry-preedit.2026-10-21T16-31.json",
+    "sha256": "aca64ff8a4c2dc1de97a2c459a4651a6e0f3fdf1e5dd31c461d370aab2f861c4"
+  },
+  "public_signature": "run_installed_cli(command: str, argv: Sequence[str] | None = None) -> int",
+  "semantics": [
+    "Explicit argv is forwarded to the existing bounded parser without copying.",
+    "None preserves existing count-before-slice process argument handling.",
+    "Fixed wrappers and run_cli monkeypatch seam remain unchanged.",
+    "Unknown command is refused before trusted providers; no alternative authority or global argv mutation."
+  ],
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "physical_lines": 467,
+    "sha256": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3"
+  },
+  "status": "SOURCE_FROZEN_BEHAVIOR_PENDING",
+  "task": "P6-T3",
+  "unchanged_definition_ast_sha256": {
+    "CliPorts": "9384176915d0454bc216dd3a1a2791ee14b9915892db75cd065f31bd2a9e0f30",
+    "_clock": "959ee6bde2646b718627260702f03a5e7c9b910d03a348ceed518dfa832375bd",
+    "_create_io": "43bdec4c6997c57712aef0c1b9fcbccd8edabd02f8b81e0641c97a1a0cd31e4b",
+    "_emit": "f3f8c4b84785e26e0a73245c428911bffbacdfc13e91b3b9d2a7de416c46936b",
+    "_execute": "c4b812ac0ab80c3380c9e47b79560cb8237c32472183e2f1bdb285075938d1f5",
+    "_failure": "4050d97fb6b2e64845f1b2c82a4079708c3cf877fc361676078cba69ed2917b6",
+    "_repository": "d798466caf7fa8ae4147a157477f2f5f903ed2446259f270c751512697737969",
+    "_resolve_workspace": "e197807b633a7057e0294b7869c8acf5ca1c69721e43385f678703a14ccba257",
+    "_write": "94cded54ff1a8d7dd1ffeeec0cc83dbf36b88406a645be9090d1f3dcfa5d91d2",
+    "main_completion_report": "97ec15202bffb68cf001ceec8587db39d2128550d487d502bd9c7a3f18ad7acd",
+    "main_configure": "49b5bf99076855972a916367b28757eca3bf3c928c33c9ec6a0692ee314d4351",
+    "main_coverage_report": "fc443d29796f29cfb46f47807dc1535c134942f11217dea4d259d8b9e1324f80",
+    "main_doctor": "5e2a26f9f18d1bbd52adaa9df04ae8fe7908a7e493c880fa4742abe5e7ab8aa0",
+    "main_dotnet": "4b535ee6c0d429418b6674e16e6fe84981897c7f5970beabc54155321eb27fc2",
+    "main_generate_acceptance": "4da5888f3add4143f19d5af0efd365797271dbd50faf3ac9ab1173faee34f9c2",
+    "main_generate_acceptance_scenarios": "0c1a9318bce0fb2008f96a532fecac54ca815e42e35cc30dbf07867838b8d426",
+    "main_import_inventory": "a1584e5f3808eab1c687ec6f7dc9a01b532982605179930df685b248d9208b24",
+    "main_init": "7479565d1c79c42c935fc5e6f20b08a99135baf97f3d48f4e2dc122182e87b6e",
+    "main_inventory": "2d157d30d219dd98d2228ec32b32e8e7e2d1a4bb24f7fcb0f45b19d7151eccff",
+    "main_link_evidence": "07b43983b6ebb4512e0acac543a8785dda806a2b1f4c4b5d56b0e8dcd673a6d4",
+    "main_migrate": "0f106747c8d50ed2f25cd064aae3f67ca83c6fa0116661e12fe5dcfb065d06df",
+    "main_new_contract": "b4b4faa466850092dc4b0815294172d7ece21a27a2ea77d02888869643caf245",
+    "main_new_scenario": "66c75c4dcb572b239c01e4be426c37d382fa9c60eca285d0fb08b84b73c28f3f",
+    "main_parity_report": "61fe60ee03fe801e6905a3e634873f2d6b6ec5d218d18f25a50299e2f6879e23",
+    "main_profile": "c6efacbb729a6efd1762438c4d72ef4964cba68a379597b95f5a6d6ab43b7d43",
+    "main_snapshot_export": "f23a0c72229602d98ca74f49eea445368536a273bea791d48c3759a8e7d3c325",
+    "main_snapshot_import": "f6bf57740de8cba393b2fa3988a564bee3d96b4d5a010b2a2b00d4bf7e6760ac",
+    "main_update_artifact": "9ced83f7d136db9a051b19ba7b175a9c7dcca41d65fb0a926417c2f8b0b45265",
+    "main_validate": "9ec224fd00ad828025e3b144b277ad56dc1e86697b8d8c6e8975cbac0bde5cd9",
+    "main_validate_all": "6e3beff707349f971d66c8d6527807fedc198e3c54f7fd3b8eb6681677a0c9b1",
+    "main_validate_coverage_ledger": "6e75beb7ce6619343cfde4dd54f79f4ee3a6e3bce7e9e76b886ca090bf7bc756",
+    "main_validate_decisions": "74dacb7530ac064fed34345280bbdca075841966f1cafa7b5449187642edd905",
+    "main_validate_evidence_reference": "16975f55d4a759e2e358cdc63a14f395abe6ad1a6a3434c26d17e34ef1becc75",
+    "main_validate_feature_contract": "89246691a859adc19306821480591524a9c12fee1e0d4d5378103accaee35d0f",
+    "main_validate_parity_matrix": "4a8b18481b2e23eb50f2fabe5e3adbc66ff441856d96f275129553f30896f91f",
+    "main_validate_product_decision": "f559b31998fb01a801af7aec3f0deac4d0690fc0e15b41bf11c7acce5ab03caa",
+    "main_validate_profile": "1c2852c8763980b98ea3e138c48ed739efd8be14136818dd93e17e223eb50d8b",
+    "main_validate_runtime_scenario": "2b3bce046ed4df24b54107041b5b2dd8d64ef9462d483f2cce12b0a8b2bd138c",
+    "main_validate_unspecified_behavior": "eef1650a3a2e72b6037e9eebde86ffb69329c9751b8510e3a3cdee906fff2847",
+    "main_vsto": "5a109169cb942b6d89a32b227868913c396c8e0a15149d18b113610d56037d76",
+    "run_cli": "b10256571723f18a3da3e9f5236e92be0064a0c9e36abf45d72b4abdea53cb86"
+  }
+}

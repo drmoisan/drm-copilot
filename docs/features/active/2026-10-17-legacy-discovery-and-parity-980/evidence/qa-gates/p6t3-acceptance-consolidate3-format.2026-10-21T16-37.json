@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-10-21T16-37",
+  "argv": [
+    "WORKSPACE\\.venv\\Scripts\\python.exe",
+    "-m",
+    "black",
+    "scripts/dev_tools/generate_acceptance_scenarios.py",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+  ],
+  "exit_code": 0,
+  "seconds": 0.6429120000102557,
+  "source_before": {
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "de5d9c49e3d4d85321299dc76e22f584ae2e602930cc8e388c8a6ff2c4da8a35",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+  },
+  "source_after": {
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+  },
+  "streams": {
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "readable": ""
+    },
+    "stderr": {
+      "sha256": "7baeff6fdf911ec14e58cbe520543efcea0834bff893d9735e5964bf90a5141f",
+      "readable": "reformatted tests\\scripts\\dev_tools\\test_generate_acceptance_scenarios.py\r\n\r\nAll done! \u2728 \ud83c\udf70 \u2728\r\n1 file reformatted, 1 file left unchanged.\r\n"
+    }
+  }
+}

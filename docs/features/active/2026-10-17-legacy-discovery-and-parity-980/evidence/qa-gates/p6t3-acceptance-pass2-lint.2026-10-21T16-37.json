@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-10-21T16-37",
+  "argv": [
+    "WORKSPACE\\.venv\\Scripts\\python.exe",
+    "-m",
+    "ruff",
+    "check",
+    "scripts/dev_tools/generate_acceptance_scenarios.py",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py"
+  ],
+  "exit_code": 0,
+  "seconds": 0.10662080004112795,
+  "source_before": {
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+  },
+  "source_after": {
+    "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+  },
+  "streams": {
+    "stdout": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "readable": "All checks passed!\n"
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "readable": ""
+    }
+  }
+}

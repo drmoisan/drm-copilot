@@ -1,0 +1,122 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T16:46:28.892971+00:00",
+  "route": "build_identity_p6t3_acceptance_review_20261021T164400",
+  "status": "SOURCE_CLEAR_READY_FOR_CHECKED_SUBSET",
+  "task_acceptance": false,
+  "scope": [
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+      "bytes": 12464,
+      "physical_lines": 346
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+      "bytes": 12917,
+      "physical_lines": 338
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-freeze.2026-10-21T16-40.json",
+    "sha256": "84c4a317730f5ee6467bef1fdf1ba1d3c5d1eb9f98ccf5342e13f853e445b946"
+  },
+  "proof_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-proof-archive.2026-10-21T16-40.json",
+    "sha256": "94ad8a4f420e5e3dc3825d25c3cffa08667ec30b53f58c5f3384988a6ac7867b"
+  },
+  "findings": [],
+  "open_probes": [],
+  "source_confirmation": [
+    "main forwards the fixed generate-acceptance-scenarios suffix and unchanged argv object/status to the public installed entry. No copied vector, independent parser, result approval or publication path is inserted. Canonical argument resource bounds remain owned by the separately reviewed installed entry.",
+    "Schema resolvers, projections, assembly and document generation reject inadequate legacy context immediately with fixed actionable workspace/profile/repository guidance; no input traversal, fabricated schema, placeholder engine, approval or output survives.",
+    "Historical inspection-only parse_args retains its argparse namespace and help/error behavior; it is not called by main and grants no generation authority. Its existing list conversion is not claimed as a bounded canonical parser. --check is explicitly distinct from --dry-run and cannot establish readiness.",
+    "Four safe utility bodies and five immutable carrier bodies are AST-identical to the retained baseline after excluding docstrings. They remain nonauthoritative compatibility data; no schema/readiness/native-host claim is made.",
+    "Intent, parameter, return, error and effects documentation agrees with reviewed behavior. Tests use existing memory fixtures, local callbacks and malformed parser refusals; no new filesystem/process/network unit-test dependency."
+  ],
+  "proof": {
+    "ordered_gates": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-format.2026-10-21T16-37.json",
+        "sha256": "5b3d353dd10de45dfa221b5092d75bc94a1fdd861992d027460b084f0af78b73",
+        "bytes": 2369,
+        "physical_lines": 39
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-lint.2026-10-21T16-37.json",
+        "sha256": "d335391c44bfe1587ed3926ae187e4c16719d1f2bbcb56c41ed2a59e945b712c",
+        "bytes": 2311,
+        "physical_lines": 39
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-types.2026-10-21T16-37.json",
+        "sha256": "01532eb3d1559914fe8197bf808beadb48010d2739e79e450bcef7b546b64bea",
+        "bytes": 2516,
+        "physical_lines": 40
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-acceptance-pass2-tests.2026-10-21T16-37.json",
+        "sha256": "ae8ec53e04e3e57529f05721e019f0f48fd40f6bb89e3f4ed5fa7f14d9b1e89c",
+        "bytes": 15021,
+        "physical_lines": 44
+      }
+    ],
+    "ordered_execution_verified_from_archived_harness": true,
+    "all_gate_exit_codes_zero": true,
+    "dependencies": {
+      "scripts/dev_tools/generate_acceptance_scenarios.py": "22c5d4053986118315fe6821d5e9ce03629b1f909bfe0cceaef36e988fd6a577",
+      "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+      "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+      "tests/scripts/dev_tools/test_acceptance_generation_projection.py": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5"
+    },
+    "dependencies_current_and_before_after_identical": true,
+    "passed_unique_nodes": 75,
+    "raw_passed_node_sequence_matches_freeze": true,
+    "raw_stream_hashes_match_readable_receipts": true,
+    "test_seconds": 18.761484999966342,
+    "coverage_summary": {
+      "covered_lines": 75,
+      "num_statements": 75,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 4,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 0,
+      "num_partial_branches": 0,
+      "covered_branches": 0,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "ast_units": 19,
+    "executable_bodies_at_100_percent": 18,
+    "no_executable_body": [
+      "GenerationError"
+    ],
+    "retained_ast_bodies_identical": 9,
+    "original_case_dispositions": 34,
+    "disposition_set_exactly_matches_baseline_nodes": true,
+    "replacement_test_names_exist": true,
+    "unchanged_actual_v2_test_file": {
+      "path": "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+      "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+      "bytes": 8948,
+      "physical_lines": 222
+    },
+    "actual_v2_cases_replayed": false,
+    "archived_proof_helpers_verified": 3
+  },
+  "retained_diagnostics": "Initial Black formatting edits, E501, format-check restart and harness stdout cp1252 UnicodeEncodeError are preserved; UTF-8 harness correction changed no product behavior. Read-only evidence inspection required ConvertFrom-Json -AsHashtable for an empty coverage function key. Initial proof assembly assumed POSIX coverage keys and raised KeyError; corrected Windows path-key lookup without changing raw coverage or product bytes.",
+  "qualifications": [
+    "Requires runtime cli.py c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3 committed with or before this subset. That entry is independently reviewed; its implementation is not re-reviewed here.",
+    "This is the focused single-module forward proof. Final P6-T3 combined reversed-order isolation and integration remain pending; this receipt does not accept the whole task.",
+    "The old placeholder engine denominator is not presented as current coverage. Seven accepted actual-v2 projection cases are unchanged historical semantic proof.",
+    "Review performed source/metadata/AST inspection only; no imports, behavior probes, tests, package/native operations, source/test changes, Git, staging or checkpoint writes."
+  ]
+}
