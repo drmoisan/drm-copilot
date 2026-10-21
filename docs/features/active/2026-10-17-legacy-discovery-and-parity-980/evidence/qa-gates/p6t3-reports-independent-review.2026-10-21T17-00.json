@@ -1,0 +1,141 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T17:00:47.891398+00:00",
+  "route": "build_identity_p6t3_reports_20261021T165700",
+  "status": "SOURCE_CLEAR_READY_FOR_CHECKED_SUBSET",
+  "task_acceptance": false,
+  "scope": [
+    {
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "sha256": "853ce3981c280c0cb21f718d1ae11c17c7f060c50401ead7ca9aa08b4a24bdae"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/parity_report.py",
+      "sha256": "a177c2650da0ee50634041fa62778ab2ef72fdfc20e59d634a451659d5a9d327"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "sha256": "90f412e21774820a2dcbeaeba7e3ba029f680dcde395d3c45338f9d1400f08a8"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "sha256": "290a72f597ca7c6150fd04ff75cefd8a66776ddb42bf083bb2116a6d4f8c9e94"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_parity_report.py",
+      "sha256": "395c3bef59111028ef46b01415c69f641de3a5eb3cce7d3c03402604dfd612a0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "sha256": "df276fb715fb7374bc6f0b30da5dd6481347458b74b243390f005af223b1f263"
+    }
+  ],
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-freeze.2026-10-21T16-56.json",
+    "sha256": "cfba9282e13c9446c3844f1680ef7d18da6f788747eaad7076ce5c630c3ff489"
+  },
+  "owner_staging": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-staging.2026-10-21T16-56.json",
+    "sha256": "9319b7aba3a0e06f670c053c3a3ab9e28183313af536b07e219fb0fc1a93fedc"
+  },
+  "findings": [],
+  "open_probes": [],
+  "confirmation": [
+    "All three main adapters use the repaired shared bounded capture/classifier. Only explicit legacy input/output flags select compatibility rendering; mixed canonical/legacy options return 2 before artifact reads or callbacks.",
+    "Canonical routing refuses any explicitly supplied validator using is not None, before invocation; otherwise it forwards the fixed coverage-report, parity-report or completion-report suffix, bounded exact argument values and installed exit.",
+    "Legacy validation retains ordered diagnostics, monkeypatchable read/write seams, strict runtime parse/build/render version and resource checks, fixed redacted helper ValueErrors, and original unexpected I/O/validator exception propagation. Accepting injected validators cannot bypass v2 rejection in legacy helpers.",
+    "Completion collects both validator outcomes before parsing/building/publication. Compatibility report results confer no v2 completion or host authority.",
+    "Pure parsing/render exports retain runtime identities. Only routing logic changes; no new schema lookup, artifact inference, publication authority or second report engine is introduced. Intent documentation matches reviewed behavior."
+  ],
+  "proof": {
+    "test_receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests.2026-10-21T16-53.json",
+      "sha256": "c351f20cc6472bd26dbf796abdc06f5182bbc6b7e5d86228d7ef41459042bc6c"
+    },
+    "body_receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-body.2026-10-21T16-56.json",
+      "sha256": "c14582fcf5cdd4703a4143fe8226ce1b6b22a90a22d0148a77443e367b17afd0"
+    },
+    "ordered_stages": [
+      "165258-format-check",
+      "165303-lint",
+      "165306-types",
+      "165311-tests"
+    ],
+    "all_exit_codes": 0,
+    "chronological_order_verified": true,
+    "raw_gzip_member_hashes_verified": true,
+    "passed_unique_nodes": 97,
+    "raw_stdout_nodes_match_freeze": true,
+    "test_elapsed_seconds": 1.212565,
+    "current_before_after_dependencies_identical": 32,
+    "owner_staging_bindings_verified": 47,
+    "modules": {
+      "scripts/dev_tools/discovery/completion_report.py": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          65,
+          65
+        ]
+      },
+      "scripts/dev_tools/discovery/coverage_report.py": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          50,
+          50
+        ]
+      },
+      "scripts/dev_tools/discovery/parity_report.py": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          50,
+          50
+        ]
+      }
+    },
+    "named_body_ranges": 10,
+    "all_named_body_statement_branch_percent": 100,
+    "preserved_executable_body_entries_including_nested_helpers": 97,
+    "removed_old_bodies": 0,
+    "intentional_test_change": "The three existing missing-input parameter identities remain. Empty argv with an injected validator now asserts canonical refusal exit 2, fixed guidance and zero reads; explicit legacy options retain SystemExit(2), argparse diagnostics and zero reads.",
+    "old_proof_reused": true
+  },
+  "prerequisites": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-valr1-confirmation.2026-10-21T16-54.json",
+      "sha256": "74878c12ff5f79ad86f833116b4bf30be4ac8e2d671daa1ba0c7aee6dc0509b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-repair-checked-union.2026-10-21T16-58.json",
+      "sha256": "26b83b05381004c760520b334af2e901622ea8644bc1dbdbbd6c14cf1935ec59"
+    }
+  ],
+  "diagnostic_preservation": "Both owner evidence-assembly diagnostics and failed assembly scripts are retained unchanged. They concern LF presentation checks of immutable external reviewer CRLF originals, not product/test failures. This review does not rewrite originals. A read-only review regex initially omitted node parameters containing spaces; exact full-line matching reconciled all 97 original identities without modifying evidence.",
+  "qualifications": [
+    "Public runtime entry c7273db5 is independently reviewed and committed; no repeated entry review.",
+    "Only metadata/source/AST inspection performed. No tests, production imports, native operations, source/test edits, Git, staging or checkpoint changes.",
+    "Final combined reversed-module isolation/composition remains pending; checked-subset readiness does not accept P6-T3."
+  ]
+}

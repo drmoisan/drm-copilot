@@ -1,0 +1,439 @@
+{
+  "Timestamp": "2026-10-21T16:56:07.600294+00:00",
+  "assembly_readers": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-56.json",
+    "sha256": "955a7a0d956ec9fe4e1d6bbd8713a58eef0c6ba7cdea343d4721e72eec3a6d98"
+  },
+  "modules": {
+    "scripts/dev_tools/discovery/completion_report.py": {
+      "branch_percent": 100.0,
+      "branches": [
+        10,
+        10
+      ],
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "statements": [
+        65,
+        65
+      ]
+    },
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "branch_percent": 100.0,
+      "branches": [
+        8,
+        8
+      ],
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "statements": [
+        50,
+        50
+      ]
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "branch_percent": 100.0,
+      "branches": [
+        8,
+        8
+      ],
+      "line_percent": 100.0,
+      "missing_branches": [],
+      "missing_lines": [],
+      "statements": [
+        50,
+        50
+      ]
+    }
+  },
+  "named_BODY": [
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          2,
+          2
+        ]
+      },
+      "ast_range": [
+        39,
+        50
+      ],
+      "name": "_default_coverage_ledger_validator",
+      "path": "scripts/dev_tools/discovery/coverage_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          4,
+          4
+        ]
+      },
+      "ast_range": [
+        53,
+        70
+      ],
+      "name": "parse_args",
+      "path": "scripts/dev_tools/discovery/coverage_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          30,
+          30
+        ]
+      },
+      "ast_range": [
+        73,
+        142
+      ],
+      "name": "main",
+      "path": "scripts/dev_tools/discovery/coverage_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          2,
+          2
+        ]
+      },
+      "ast_range": [
+        39,
+        50
+      ],
+      "name": "_default_parity_matrix_validator",
+      "path": "scripts/dev_tools/discovery/parity_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          4,
+          4
+        ]
+      },
+      "ast_range": [
+        53,
+        70
+      ],
+      "name": "parse_args",
+      "path": "scripts/dev_tools/discovery/parity_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          30,
+          30
+        ]
+      },
+      "ast_range": [
+        73,
+        142
+      ],
+      "name": "main",
+      "path": "scripts/dev_tools/discovery/parity_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          2,
+          2
+        ]
+      },
+      "ast_range": [
+        38,
+        48
+      ],
+      "name": "_default_coverage_ledger_validator",
+      "path": "scripts/dev_tools/discovery/completion_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          2,
+          2
+        ]
+      },
+      "ast_range": [
+        51,
+        61
+      ],
+      "name": "_default_parity_matrix_validator",
+      "path": "scripts/dev_tools/discovery/completion_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          5,
+          5
+        ]
+      },
+      "ast_range": [
+        64,
+        82
+      ],
+      "name": "parse_args",
+      "path": "scripts/dev_tools/discovery/completion_report.py"
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          40,
+          40
+        ]
+      },
+      "ast_range": [
+        85,
+        172
+      ],
+      "name": "main",
+      "path": "scripts/dev_tools/discovery/completion_report.py"
+    }
+  ],
+  "no_loss": "All current module and named BODY executable statements/arcs are freshly covered. Preserved bodies have no missing points. No raw counters were augmented.",
+  "preimages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+    "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+  },
+  "preserved_bodies": {
+    "scripts/dev_tools/discovery/completion_report.py": {
+      "changed_existing_body_names": [
+        "main"
+      ],
+      "preimage_sha256": "cccb1a4787c664a015c78db3354f5673823c182a7f28162ce578aa73db1240a6",
+      "removed": [],
+      "same_executable_body_names": [
+        "_default_coverage_ledger_validator",
+        "_default_parity_matrix_validator",
+        "parse_args"
+      ]
+    },
+    "scripts/dev_tools/discovery/coverage_report.py": {
+      "changed_existing_body_names": [
+        "main"
+      ],
+      "preimage_sha256": "ff810993313ad4367c9c6273dcb01a9e2d17fcbdcca135c6bd2750675ca17abb",
+      "removed": [],
+      "same_executable_body_names": [
+        "_default_coverage_ledger_validator",
+        "parse_args"
+      ]
+    },
+    "scripts/dev_tools/discovery/parity_report.py": {
+      "changed_existing_body_names": [
+        "main"
+      ],
+      "preimage_sha256": "96a034efce392545caf21e6215b2792a438a38f0a7d7c517a21eb3a1850be461",
+      "removed": [],
+      "same_executable_body_names": [
+        "_default_parity_matrix_validator",
+        "parse_args"
+      ]
+    },
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": {
+      "changed_existing_body_names": [],
+      "preimage_sha256": "60e6557aa4508e3714c6a93833d186875d0108fbfa188c21585484cf9523dc25",
+      "removed": [],
+      "same_executable_body_names": [
+        "_passing_validator",
+        "_failing_validator",
+        "test_build_completion_summary_reports_entry_counts_and_compatibility",
+        "test_render_completion_report_is_deterministic",
+        "test_main_returns_1_on_coverage_validation_failure_and_skips_build",
+        "test_main_returns_1_on_coverage_validation_failure_and_skips_build.fake_read_artifact_text",
+        "test_main_returns_1_on_coverage_validation_failure_and_skips_build.fake_build_completion_summary",
+        "test_main_returns_1_on_coverage_validation_failure_and_skips_build.fake_write_report",
+        "test_build_completion_summary_handles_missing_entries_key",
+        "test_main_returns_0_when_both_validators_pass",
+        "test_main_returns_0_when_both_validators_pass.fake_read_artifact_text",
+        "test_main_returns_0_when_both_validators_pass.fake_write_report",
+        "test_main_returns_1_when_either_validator_fails",
+        "test_main_returns_1_when_either_validator_fails.fake_read_artifact_text",
+        "test_main_writes_to_stdout_when_output_omitted",
+        "test_main_writes_to_stdout_when_output_omitted.fake_read_artifact_text",
+        "test_injected_acceptance_cannot_bypass_strict_runtime_checks",
+        "test_injected_acceptance_cannot_bypass_strict_runtime_checks.read",
+        "test_injected_acceptance_cannot_bypass_strict_runtime_checks.write",
+        "test_default_validator_bindings_preserve_both_diagnostics",
+        "test_default_validator_bindings_preserve_both_diagnostics.read",
+        "test_default_validator_bindings_preserve_both_diagnostics.coverage",
+        "test_default_validator_bindings_preserve_both_diagnostics.parity",
+        "test_none_arguments_use_process_argument_seam",
+        "test_missing_required_arguments_fail_before_io",
+        "test_unexpected_boundary_errors_propagate_without_conversion",
+        "test_unexpected_boundary_errors_propagate_without_conversion.read",
+        "test_unexpected_boundary_errors_propagate_without_conversion.validator",
+        "test_unexpected_boundary_errors_propagate_without_conversion.write"
+      ]
+    },
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": {
+      "changed_existing_body_names": [
+        "test_missing_input_arguments_fail_before_read"
+      ],
+      "preimage_sha256": "b835528fe89deb20969ad8fff8de59b69a93382e38bea0802a6bb0747e80dcb1",
+      "removed": [],
+      "same_executable_body_names": [
+        "_passing_validator",
+        "_failing_validator",
+        "_empty_read",
+        "_install_memory_io",
+        "_install_memory_io.read",
+        "_install_memory_io.write",
+        "test_build_and_render_coverage_report_sorts_and_counts_entries",
+        "test_render_coverage_report_is_deterministic",
+        "test_main_returns_1_and_prints_errors_on_validation_failure",
+        "test_main_returns_1_and_prints_errors_on_validation_failure.fake_read_artifact_text",
+        "test_main_returns_1_and_prints_errors_on_validation_failure.fake_write_report",
+        "test_build_coverage_rows_handles_missing_entries_key",
+        "test_main_returns_0_on_success",
+        "test_main_returns_0_on_success.fake_read_artifact_text",
+        "test_main_returns_0_on_success.fake_write_report",
+        "test_main_returns_1_on_failure",
+        "test_main_returns_1_on_failure.fake_read_artifact_text",
+        "test_main_writes_to_stdout_when_output_omitted",
+        "test_main_writes_to_stdout_when_output_omitted.fake_read_artifact_text",
+        "test_true_v1_preserves_unit_fields_without_completion_claims",
+        "test_accepted_invalid_text_never_reaches_output",
+        "test_helper_value_errors_are_redacted_before_any_output",
+        "test_helper_value_errors_are_redacted_before_any_output.reject",
+        "test_path_and_validator_seams_preserve_call_order",
+        "test_path_and_validator_seams_preserve_call_order.read",
+        "test_path_and_validator_seams_preserve_call_order.validate",
+        "test_path_and_validator_seams_preserve_call_order.write",
+        "test_default_validator_and_sys_argv_remain_injectable",
+        "test_default_validator_and_sys_argv_remain_injectable.validate",
+        "test_missing_input_arguments_fail_before_read.read",
+        "test_io_errors_propagate_without_a_success_report",
+        "test_io_errors_propagate_without_a_success_report.fail"
+      ]
+    },
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": {
+      "changed_existing_body_names": [],
+      "preimage_sha256": "5755e7a9206ee0155c1c2a0519d210a1220e6e8ded1dcbe9d9d93692a921eb29",
+      "removed": [],
+      "same_executable_body_names": [
+        "_reader",
+        "_reader.read",
+        "_writer",
+        "_writer.write",
+        "_passing_validator",
+        "_failing_validator",
+        "test_build_and_render_parity_report_sorts_and_counts_entries",
+        "test_render_parity_report_is_deterministic",
+        "test_main_returns_1_and_prints_errors_on_validation_failure",
+        "test_main_returns_1_and_prints_errors_on_validation_failure.fake_read_artifact_text",
+        "test_main_returns_1_and_prints_errors_on_validation_failure.fake_write_report",
+        "test_build_parity_rows_handles_missing_entries_key",
+        "test_main_returns_0_on_success",
+        "test_main_returns_0_on_success.fake_read_artifact_text",
+        "test_main_returns_0_on_success.fake_write_report",
+        "test_main_returns_1_on_failure",
+        "test_main_returns_1_on_failure.fake_read_artifact_text",
+        "test_main_writes_to_stdout_when_output_omitted",
+        "test_main_writes_to_stdout_when_output_omitted.fake_read_artifact_text",
+        "test_actual_v1_rows_keep_their_fields_and_feature_order",
+        "test_injected_acceptance_cannot_bypass_safe_compatibility_boundary",
+        "test_default_validator_uses_existing_lazy_upstream_seam",
+        "test_default_validator_uses_existing_lazy_upstream_seam.validate",
+        "test_unexpected_boundary_failures_propagate",
+        "test_unexpected_boundary_failures_propagate.fail",
+        "test_unexpected_boundary_failures_propagate.validator",
+        "test_missing_input_is_an_argument_error",
+        "test_helper_rejection_never_writes_partial_report",
+        "test_helper_rejection_never_writes_partial_report.fail"
+      ]
+    }
+  },
+  "qualification": "Existing count/definition/coverage readers; BODY counters exclude declarations. Validator comparison uses the retained 38-pass source; reports use accepted pre-edit sources. The one report test adaptation retains its three identities and exit/no-read contract, distinguishing canonical injection refusal from legacy argparse.",
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests-raw.2026-10-21T16-53.json",
+    "sha256": "dd66b0b2acdb79b058f669fce9d52842adaf54bcfbaf775bc88aa405f67f09dc"
+  },
+  "raw_coverage_sha256": "3342ebc92342b231e416e72e0f56fa465fb710ffea0a0e5696f24389d8b35522",
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests.2026-10-21T16-53.json",
+    "sha256": "c351f20cc6472bd26dbf796abdc06f5182bbc6b7e5d86228d7ef41459042bc6c"
+  },
+  "subset": "reports",
+  "task": "P6-T3"
+}

@@ -1,0 +1,364 @@
+{
+  "Timestamp": "2026-10-21T16:56:07.634325+00:00",
+  "baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+    "sha256": "a107250172c377fdfe85426f8a6a42ae47d23d4cb874a3a31dfc4123d194bba2"
+  },
+  "body": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-body.2026-10-21T16-56.json",
+    "sha256": "c14582fcf5cdd4703a4143fe8226ce1b6b22a90a22d0148a77443e367b17afd0"
+  },
+  "elapsed_seconds": 1.212565,
+  "evidence": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164858-format-raw.2026-10-21T16-49.json",
+      "sha256": "fd080179e3bb9320f33dc799a10ee6b09e0fb7d2edc44b1e6ed58447084ca5ae"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164858-format.2026-10-21T16-49.json",
+      "sha256": "a5ca845b14c3aa08aa720c41c6976864cdb2c7726c0e0e0a615da12568fef051"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164918-format-check-raw.2026-10-21T16-49.json",
+      "sha256": "d164209d00023c4c6a53e9005cf0e6500167250f9a2e584b0ba8896d0269d596"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164918-format-check.2026-10-21T16-49.json",
+      "sha256": "644a5c505636a92e34c1b51b9cb81838b9565ff303b30716bfa61389144cfd9b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164923-lint-raw.2026-10-21T16-49.json",
+      "sha256": "36e20ddb9bdae1c63d3d7602c9fd9790f2463e41fc7dac8e03e60dd298764cb6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164923-lint.2026-10-21T16-49.json",
+      "sha256": "e39041ca5fd45e4d5c2b49831e6289e08e6f8e535f84349b25a1e75354bef820"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164927-types-raw.2026-10-21T16-49.json",
+      "sha256": "55c6d34e795a22afe20eb1910256882cc584f0777ddfb1c3c6450903550835c2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164927-types.2026-10-21T16-49.json",
+      "sha256": "a1a7e5d5e8fb8625adcd0089c67982cbd54060898f8c21ab19d6dc9f96987cf0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164953-format-check-raw.2026-10-21T16-49.json",
+      "sha256": "05aeb87400207902f4e724fe421a5a1841c3fdf144fa088237ac292884fda057"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164953-format-check.2026-10-21T16-49.json",
+      "sha256": "596bcbd1242cebba1ffb41dff7f87054d7c97e58e65c6e14f605207ce24f4f1c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164959-lint-raw.2026-10-21T16-49.json",
+      "sha256": "6c4e9d6be117a6854decb2ab9d66472ea7d8420bcdb094e46bccfa834ac8ff38"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164959-lint.2026-10-21T16-49.json",
+      "sha256": "940f77a0f71e01f0eee89e2e08a9aa4e1d2bd1ef6a7a27f7a80d7350d04fe2ff"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165003-types-raw.2026-10-21T16-50.json",
+      "sha256": "89f016cdbd90b90eac97f2b6c994fd1c0e70a8db3009f4974c84dd82982a78ed"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165003-types.2026-10-21T16-50.json",
+      "sha256": "cec8e0afa1e099b3b37902d9d95e4690706a2053570f04de17b41cf3c1777c0d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165258-format-check-raw.2026-10-21T16-52.json",
+      "sha256": "31b8596185efb2546cf9c34260d3e269aca305e7890d840b306bc146183113bb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165258-format-check.2026-10-21T16-52.json",
+      "sha256": "4bbaa80a7eb021d9225e87cd0e1eca30c48f681c5839afb7488c426950e31909"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165303-lint-raw.2026-10-21T16-53.json",
+      "sha256": "ec74cfd947b33a64fe0b3bbcc2d44270843f70261fb509aacc09abc700020983"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165303-lint.2026-10-21T16-53.json",
+      "sha256": "d86e8e093cb56dbf26834458954d45c685b9c3cc7c3aca587d74259da40d45b8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165306-types-raw.2026-10-21T16-53.json",
+      "sha256": "af65a69b6829dda3956671f1d6cf9d2eb90ec3254039221142e03565e1fb16fd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165306-types.2026-10-21T16-53.json",
+      "sha256": "0ff56b97d3f205569b34ce1b3d38383da3f9ed83f6f3c2abe5cd955b1ba601da"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests-raw.2026-10-21T16-53.json",
+      "sha256": "dd66b0b2acdb79b058f669fce9d52842adaf54bcfbaf775bc88aa405f67f09dc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests.2026-10-21T16-53.json",
+      "sha256": "c351f20cc6472bd26dbf796abdc06f5182bbc6b7e5d86228d7ef41459042bc6c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164858-format.2026-10-21T16-49.md",
+      "sha256": "2ddb5795124f3058bd063c7cc66fcbcf5298f43209c407a5cf7522de56c64b6f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164918-format-check.2026-10-21T16-49.md",
+      "sha256": "cd0b72e8a6513dd8f7364124cc74d4359c905b3c48ceef4bffd01df65db558b0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164923-lint.2026-10-21T16-49.md",
+      "sha256": "01aac0f8b0dfe19c512475774fba080e7cd0c2a4743c49639d4c85b96da629cb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164927-types.2026-10-21T16-49.md",
+      "sha256": "694900e6bb33d9244eb560b23d2d82aa88faa18c2b9b99a4ef7d137767595071"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164953-format-check.2026-10-21T16-49.md",
+      "sha256": "2d0bcf8c2721cf2c1758f03434de24bbda899cc518b84d33592a660cc8091f60"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-164959-lint.2026-10-21T16-49.md",
+      "sha256": "f951760e28d108c79a47da35cffa9612750a8fb08c4c041c391ca35e97261368"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165003-types.2026-10-21T16-50.md",
+      "sha256": "055694f8d1eb2bb748336e11ed697c8839c7068666ba4f274cea1ebaa2d87a85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165258-format-check.2026-10-21T16-52.md",
+      "sha256": "949eb07054b4fe29b66f316e30fd9bc57eabc104a306a462ca94da77053ba8e8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165303-lint.2026-10-21T16-53.md",
+      "sha256": "a34c09a70b13cb656a8f7b7668623d724f97ec59f607c6ff39296e5e1e62a2ab"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165306-types.2026-10-21T16-53.md",
+      "sha256": "64b9b1b3dce461c23fd45ddaebc7853ccb65ffbb9116d23152140c19cb33227b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests.2026-10-21T16-53.md",
+      "sha256": "d16396c77058ecb0c6f57e228b270d7ff899109c4c90e2c4984d12daa36ed824"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-body.2026-10-21T16-56.json",
+      "sha256": "c14582fcf5cdd4703a4143fe8226ce1b6b22a90a22d0148a77443e367b17afd0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-54.json",
+      "sha256": "0213afd00fc29e8914ef29a887b993882056d4cf2358a6ec98e21a447c7a2f3b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-55.json",
+      "sha256": "c892b22b52dd0fabec74d900cb2b221d7f4ed7865bf3f8275c468b459dda6b3f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-diagnostic.2026-10-21T16-55.json",
+      "sha256": "8ee30748c70655182f6dac02e39c82de9fab33c38fd6c12fc4bf1a8abca47414"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-diagnostic.2026-10-21T16-56.json",
+      "sha256": "8aa4d6706c02d009cb2ca27902eed5df4510276b560f32839370f17e176dc715"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-adapter-subsets-assembly-raw.2026-10-21T16-56.json",
+      "sha256": "955a7a0d956ec9fe4e1d6bbd8713a58eef0c6ba7cdea343d4721e72eec3a6d98"
+    }
+  ],
+  "module_order": [
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py"
+  ],
+  "node_count": 97,
+  "nodes": [
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_and_render_coverage_report_sorts_and_counts_entries",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_render_coverage_report_is_deterministic",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_and_prints_errors_on_validation_failure",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_build_coverage_rows_handles_missing_entries_key",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_0_on_success",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_returns_1_on_failure",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_main_writes_to_stdout_when_output_omitted",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.0.0]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_true_v1_preserves_unit_fields_without_completion_claims[1.2.3]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[secret malformed text]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[null]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[[]]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": null}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": {}}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [\"secret\"]}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [], \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"entries\": [{\"secret\": NaN}]}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.0.0\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"2.99.0\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_accepted_invalid_text_never_reaches_output[{\"schema_version\": \"unknown\", \"entries\": []}]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[parse_coverage_ledger]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[build_coverage_rows]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_helper_value_errors_are_redacted_before_any_output[render_coverage_report]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_path_and_validator_seams_preserve_call_order",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_default_validator_and_sys_argv_remain_injectable",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments0]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments1]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_missing_input_arguments_fail_before_read[arguments2]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[read_artifact_text]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_io_errors_propagate_without_a_success_report[write_report]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_workspace_route_forwards_exact_command_and_exit[False]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_workspace_route_forwards_exact_command_and_exit[True]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_workspace_refusal_precedes_every_callback[mixed]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_workspace_refusal_precedes_every_callback[injected]",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py::test_workspace_refusal_precedes_every_callback[invalid]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_build_and_render_parity_report_sorts_and_counts_entries",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_render_parity_report_is_deterministic",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_1_and_prints_errors_on_validation_failure",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_build_parity_rows_handles_missing_entries_key",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_0_on_success",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_main_returns_1_on_failure",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_main_writes_to_stdout_when_output_omitted",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_actual_v1_rows_keep_their_fields_and_feature_order[1.0.0]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_actual_v1_rows_keep_their_fields_and_feature_order[1.12.34]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[[]]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"entries\":null}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"entries\":[null]}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"entries\":[],\"entries\":[]}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"entries\":[{\"score\":NaN}]}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"schema_version\":\"2.0.0\",\"entries\":[]}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_injected_acceptance_cannot_bypass_safe_compatibility_boundary[{\"schema_version\":\"1.bad\",\"rows\":[]}]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_default_validator_uses_existing_lazy_upstream_seam",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_unexpected_boundary_failures_propagate[read]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_unexpected_boundary_failures_propagate[write]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_unexpected_boundary_failures_propagate[validator]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_missing_input_is_an_argument_error",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_helper_rejection_never_writes_partial_report[build]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_helper_rejection_never_writes_partial_report[render]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_workspace_route_forwards_exact_command_and_exit[False]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_workspace_route_forwards_exact_command_and_exit[True]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_workspace_refusal_precedes_every_callback[mixed]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_workspace_refusal_precedes_every_callback[injected]",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py::test_workspace_refusal_precedes_every_callback[invalid]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_build_completion_summary_reports_entry_counts_and_compatibility",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_render_completion_report_is_deterministic",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_1_on_coverage_validation_failure_and_skips_build",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_build_completion_summary_handles_missing_entries_key",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_0_when_both_validators_pass",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_returns_1_when_either_validator_fails",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_main_writes_to_stdout_when_output_omitted",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"schema_version\":2,\"entries\":[]}-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"schema_version\":2,\"entries\":[]}-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":[],\"entries\":[{\"id\":\"secret-token\"}]}-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":[],\"entries\":[{\"id\":\"secret-token\"}]}-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":NaN}-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":NaN}-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":\"secret-token\"}-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[{\"entries\":\"secret-token\"}-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[[\"secret-token\"]-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[[\"secret-token\"]-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[secret-token is not JSON-coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_injected_acceptance_cannot_bypass_strict_runtime_checks[secret-token is not JSON-parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_default_validator_bindings_preserve_both_diagnostics",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_none_arguments_use_process_argument_seam",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments0]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments1]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_missing_required_arguments_fail_before_io[arguments2]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[read]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[validator]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_unexpected_boundary_errors_propagate_without_conversion[write]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_route_forwards_exact_command_and_exit[False]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_route_forwards_exact_command_and_exit[True]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_refusal_precedes_every_callback[mixed]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_refusal_precedes_every_callback[coverage]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_refusal_precedes_every_callback[parity]",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py::test_workspace_refusal_precedes_every_callback[invalid]"
+  ],
+  "owned": [
+    {
+      "path": "scripts/dev_tools/discovery/coverage_report.py",
+      "sha256": "853ce3981c280c0cb21f718d1ae11c17c7f060c50401ead7ca9aa08b4a24bdae"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/parity_report.py",
+      "sha256": "a177c2650da0ee50634041fa62778ab2ef72fdfc20e59d634a451659d5a9d327"
+    },
+    {
+      "path": "scripts/dev_tools/discovery/completion_report.py",
+      "sha256": "90f412e21774820a2dcbeaeba7e3ba029f680dcde395d3c45338f9d1400f08a8"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_coverage_report.py",
+      "sha256": "290a72f597ca7c6150fd04ff75cefd8a66776ddb42bf083bb2116a6d4f8c9e94"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_parity_report.py",
+      "sha256": "395c3bef59111028ef46b01415c69f641de3a5eb3cce7d3c03402604dfd612a0"
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_completion_report.py",
+      "sha256": "df276fb715fb7374bc6f0b30da5dd6481347458b74b243390f005af223b1f263"
+    }
+  ],
+  "pending": [
+    "Independent bounded confirmation",
+    "Coordinator checked commit",
+    "Final whole-task isolation/composition"
+  ],
+  "physical_lines": {
+    "scripts/dev_tools/discovery/completion_report.py": 176,
+    "scripts/dev_tools/discovery/coverage_report.py": 146,
+    "scripts/dev_tools/discovery/parity_report.py": 146,
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": 444,
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": 489,
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": 401
+  },
+  "preimages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+    "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+  },
+  "raw_qualification": "Exact raw source/output/coverage streams use verified gzip-base64. Readable receipts normalize observed WORKSPACE/SCRATCH aliases, LF and trailing whitespace. Raw coverage EOF is preserved. The immutable external reviewer receipt retains its existing CRLF bytes and is not rewritten.",
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-reports-165311-tests.2026-10-21T16-53.json",
+    "sha256": "c351f20cc6472bd26dbf796abdc06f5182bbc6b7e5d86228d7ef41459042bc6c"
+  },
+  "review": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-independent-review.2026-10-21T16-49.json",
+    "sha256": "ade6938ae9d150bcde81fa3e354846c8afc700407018e26751ffbb0b3f7f2128"
+  },
+  "status": "FOCUSED_PASS_READY_FOR_BOUNDED_CONFIRMATION",
+  "subset": "reports",
+  "task": "P6-T3",
+  "tested_dependencies": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+    "packages/discovery-runtime/src/drm_copilot_discovery/acceptance_generation.py": "7c8d94345993ac8a248a315bd575ad50b6d37baa5d3c4e2756b239ab8676f91f",
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+    "packages/discovery-runtime/src/drm_copilot_discovery/catalog.py": "27357fa105d8e7c7ea903acbd9e421d5e856a854313e07631e3f060375295647",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli.py": "c7273db52551cedda7b82f5e62257243a06ce32b4d71199f200cabb989867de3",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_arguments.py": "bbc59c9e1da0d73597d553cb7ee09699cc1a3b4c71248854fea9a48d79d7ba05",
+    "packages/discovery-runtime/src/drm_copilot_discovery/cli_commands.py": "f088c3394823702dfd3f8cf7b8c48fdbc185909a92177e9aa75ff5791122f3aa",
+    "packages/discovery-runtime/src/drm_copilot_discovery/completion_report.py": "2e2986d2d6dc3048ca3aca8f32bb07946db1795e2a534bccae685b86d78a2a69",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile.py": "ef5e47eb40d7722f1de0edd6c776cd27246314ac07586be58d9f99b00e695512",
+    "packages/discovery-runtime/src/drm_copilot_discovery/domain_profile_models.py": "6193c13ab21c04c9def4a1229881dceb5f29a4222cb33cf321bb0f57cbc5d65a",
+    "packages/discovery-runtime/src/drm_copilot_discovery/gherkin.py": "7454f9a5ccc5395191ad768d56d34f746502ba1e79e84e17de9811c9c1029457",
+    "packages/discovery-runtime/src/drm_copilot_discovery/models.py": "263f96478ccd3b6cce661de15044fcf9ca6e88c5fc9f59c757480c6397d4562e",
+    "packages/discovery-runtime/src/drm_copilot_discovery/parity_report.py": "84f41340681edc53e5fdf2f2fb183eb23632cd7d8f1ceb91407fa2120f934036",
+    "packages/discovery-runtime/src/drm_copilot_discovery/report_models.py": "3ca56a07f1056802ff414b44bddf52393c573dd0ddbd3142e6c7a2b6192d5bd0",
+    "packages/discovery-runtime/src/drm_copilot_discovery/schema_validation.py": "a0f93d8e2853002d91f4e1ba01f0f21cb57136366ed69c6ddec3022feda2670b",
+    "scripts/dev_tools/discovery/completion_report.py": "90f412e21774820a2dcbeaeba7e3ba029f680dcde395d3c45338f9d1400f08a8",
+    "scripts/dev_tools/discovery/coverage_report.py": "853ce3981c280c0cb21f718d1ae11c17c7f060c50401ead7ca9aa08b4a24bdae",
+    "scripts/dev_tools/discovery/io.py": "708c14c8f24042e65f69c1743e9b258984dc7d7634142556e6e61f445b43b796",
+    "scripts/dev_tools/discovery/parity_report.py": "a177c2650da0ee50634041fa62778ab2ef72fdfc20e59d634a451659d5a9d327",
+    "scripts/dev_tools/validate_discovery_artifacts.py": "c5bcf32874dfb52485c54b0a403e00b6feca661c5f0510d425840074d7652af7",
+    "scripts/dev_tools/validate_discovery_profile.py": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2",
+    "scripts/dev_tools/validate_discovery_schema_artifacts.py": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "tests/discovery_runtime/cli_test_support.py": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+    "tests/discovery_runtime/gateway_test_support.py": "f839379a14cd69e104ed1955def074fc5ab262b971c97890970892a1992d2996",
+    "tests/discovery_runtime/test_profile_v2.py": "f4557ed9d5b54b2b1c24917067fdb97510ced83e61b72f327b79eb19a8133ade",
+    "tests/discovery_runtime/test_service.py": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+    "tests/scripts/dev_tools/discovery/test_completion_report.py": "df276fb715fb7374bc6f0b30da5dd6481347458b74b243390f005af223b1f263",
+    "tests/scripts/dev_tools/discovery/test_coverage_report.py": "290a72f597ca7c6150fd04ff75cefd8a66776ddb42bf083bb2116a6d4f8c9e94",
+    "tests/scripts/dev_tools/discovery/test_parity_report.py": "395c3bef59111028ef46b01415c69f641de3a5eb3cce7d3c03402604dfd612a0",
+    "tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py": "6d3319e7344492a4e0f702386158c86b28ce940a11343226667b4ba67832fe7f",
+    "tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py": "81d9ade0bb971e16b923776f3fa661558c1a9267ea00f2f29484520697f1fda8"
+  }
+}

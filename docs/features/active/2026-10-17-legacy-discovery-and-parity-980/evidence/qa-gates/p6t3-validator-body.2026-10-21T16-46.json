@@ -1,0 +1,367 @@
+{
+  "Timestamp": "2026-10-21T16:46:13.521887+00:00",
+  "intentional_test_replacements": {
+    "test_main_all_returns_one_with_aggregated_errors_when_nothing_conforms": "test_direct_all_dispatch_is_an_actionable_refusal",
+    "test_main_all_returns_zero_when_path_conforms_to_at_least_one_type": "test_main_all_refuses_file_probing_before_reading"
+  },
+  "module": {
+    "branch_percent": 100.0,
+    "branches": [
+      32,
+      32
+    ],
+    "line_percent": 100.0,
+    "missing_branches": [],
+    "missing_lines": [],
+    "statements": [
+      102,
+      102
+    ]
+  },
+  "named_BODY": [
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          8,
+          8
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          18,
+          18
+        ]
+      },
+      "ast_range": [
+        62,
+        89
+      ],
+      "name": "compatibility_arguments",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          6,
+          6
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          13,
+          13
+        ]
+      },
+      "ast_range": [
+        92,
+        118
+      ],
+      "name": "report_arguments",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        121,
+        142
+      ],
+      "name": "_read_text",
+      "unchanged_executable_body": true
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          6,
+          6
+        ]
+      },
+      "ast_range": [
+        145,
+        179
+      ],
+      "name": "build_parser",
+      "unchanged_executable_body": true
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          6,
+          6
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          6,
+          6
+        ]
+      },
+      "ast_range": [
+        182,
+        210
+      ],
+      "name": "_validate_from_args",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          22,
+          22
+        ]
+      },
+      "ast_range": [
+        213,
+        250
+      ],
+      "name": "main",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        253,
+        255
+      ],
+      "name": "main_profile",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        258,
+        260
+      ],
+      "name": "main_feature_contract",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        263,
+        265
+      ],
+      "name": "main_coverage_ledger",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        268,
+        270
+      ],
+      "name": "main_runtime_scenario",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        273,
+        275
+      ],
+      "name": "main_parity_matrix",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        278,
+        280
+      ],
+      "name": "main_unspecified_behavior",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        283,
+        285
+      ],
+      "name": "main_product_decision",
+      "unchanged_executable_body": false
+    },
+    {
+      "BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "ast_range": [
+        288,
+        290
+      ],
+      "name": "main_evidence_reference",
+      "unchanged_executable_body": false
+    }
+  ],
+  "no_loss": "All current executable statements/arcs are freshly covered; preserved bodies have no missing points. Raw coverage is unmodified.",
+  "preimages": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+    "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests-raw.2026-10-21T16-44.json",
+    "sha256": "b25afabde16d34821e848ff4ff6240225cb5678f6441935f03c6f7a47a82e57d"
+  },
+  "raw_coverage_sha256": "e7bfe05cced3ed278aaa01d2aa725dffd50421e91c14be8c8921b7b4deb26bcb",
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.json",
+    "sha256": "ec21553dcb4688e4e0252873f29011f099bb38c60523f1d3c815499602ba998c"
+  },
+  "source": {
+    "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+    "sha256": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c"
+  },
+  "unchanged_pure_validators": [
+    {
+      "path": "scripts/dev_tools/validate_discovery_profile.py",
+      "sha256": "0c03c092a6a7056079e66ae1ae04bc473da0b53ae731a4d8d28224da454d58e2"
+    },
+    {
+      "path": "scripts/dev_tools/validate_discovery_schema_artifacts.py",
+      "sha256": "a0c5cc771670d0daa0715d8be5e74bc7eccd2ec374d116baac27b951660858c8"
+    }
+  ],
+  "unchanged_test_bodies": [
+    "test_validate_from_args_returns_unsupported_artifact_type",
+    "test_main_profile_returns_zero_for_conforming_fixture",
+    "test_main_profile_returns_one_for_missing_authoritative_profile_contract",
+    "test_main_feature_contract_returns_zero_for_conforming_fixture",
+    "test_main_feature_contract_returns_one_for_non_conforming_fixture"
+  ],
+  "wrapper_adaptation": "Eight original parametrized wrapper identities now assert fixed installed suffix, argv=None and unchanged typed exit."
+}

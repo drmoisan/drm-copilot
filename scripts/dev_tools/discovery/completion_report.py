@@ -1,4 +1,4 @@
-"""Route two legacy artifacts through bounded runtime compatibility helpers.
+"""Route explicit legacy files separately from installed workspace completion.
 
 The historical flags, callable exports and injected validators remain supported.
 The resulting counts describe legacy artifacts only and confer no v2 completion,
@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from drm_copilot_discovery.cli import run_installed_cli
 from drm_copilot_discovery.completion_report import (
     build_completion_summary as build_completion_summary,
 )
@@ -28,6 +29,7 @@ from scripts.dev_tools.discovery.io import (
     validate_or_raise,
     write_report,
 )
+from scripts.dev_tools.validate_discovery_artifacts import report_arguments
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -86,17 +88,19 @@ def main(
     coverage_validator: ArtifactValidator | None = None,
     parity_validator: ArtifactValidator | None = None,
 ) -> int:
-    """Read, validate and render two legacy artifacts through injectable seams.
+    """Forward workspace flags or render two explicitly selected legacy artifacts.
 
     Args:
         argv (Sequence[str] | None): CLI arguments; None reads sys.argv.
         coverage_validator (ArtifactValidator | None): Coverage checker, or lazy
-            upstream default. Injection cannot bypass runtime helper validation.
+            upstream default on the legacy route. Canonical calls refuse any
+            injection; legacy helpers still enforce version and resource limits.
         parity_validator (ArtifactValidator | None): Parity checker, or lazy
             upstream default, subject to the same bounded helper authority.
 
     Returns:
-        int: Zero after rendering; one for validator or runtime helper rejection.
+        int: Installed exit for workspace calls; legacy 0/1 for render/rejection,
+            or 2 for mixed routes, invalid argv or canonical validator injection.
 
     Raises:
         OSError: Input/output boundary failures propagate unchanged.
@@ -106,9 +110,26 @@ def main(
     Side Effects:
         Reads both inputs and writes one compatibility report to disk or stdout.
         Validator diagnostics go to stderr; helper failures use a fixed message.
-        No v2 publication, authored artifact change or gate assessment occurs.
+        The legacy route grants no v2 authority. Canonical effects belong solely
+        to the installed service, including controlled report publication.
     """
-    args = parse_args(argv)
+    try:
+        arguments, legacy = report_arguments(
+            argv, input_flags=("--coverage-input", "--parity-input")
+        )
+    except ValueError:
+        print(
+            "Use separate legacy file or canonical workspace report arguments",
+            file=sys.stderr,
+        )
+        return 2
+    # Neither explicitly supplied validator may be ignored by canonical execution.
+    if not legacy:
+        if coverage_validator is not None or parity_validator is not None:
+            print("Injected validators require the legacy file route", file=sys.stderr)
+            return 2
+        return run_installed_cli("completion-report", arguments)
+    args = parse_args(arguments)
     active_coverage_validator = coverage_validator or _default_coverage_ledger_validator
     active_parity_validator = parity_validator or _default_parity_matrix_validator
     coverage_text = read_artifact_text(Path(args.coverage_input))
