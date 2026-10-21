@@ -1,0 +1,96 @@
+{
+  "Timestamp": "2026-10-21T10-13",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "PACKAGE_READY_FOR_CHECKED_COMMIT_NATIVE_PENDING",
+  "route": "build_identity_review_p6t1_capture_installed_native_20261021T101200",
+  "handoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-handoff.2026-10-21T10-08.json",
+    "sha256": "34b48dca0918f88c6fba9478e75b6331faf6df7c451bdefa6c42bd285504bbb3"
+  },
+  "receipts": [
+    {
+      "stage": "build",
+      "exit_code": 0,
+      "seconds": 3.9432588999625295,
+      "sha256": "306a54a60f84b16aba15aaea7fde588b828a943ac25ac8c48fde154dbb3fb1ee"
+    },
+    {
+      "stage": "check",
+      "exit_code": 0,
+      "seconds": 2.407572700001765,
+      "sha256": "a11c9a2f5fd51eaca5d262c5c5a0994e3f86109ab9303f2da29dcaad27f4ba67"
+    },
+    {
+      "stage": "install",
+      "exit_code": 0,
+      "seconds": 3.87014159996761,
+      "sha256": "b9f5168ff77445a84506583ca941dd47503eb0afd54362bc7e58d9057ed7c93a"
+    }
+  ],
+  "source_count": 212,
+  "source_wheel_installed_payload_members": 169,
+  "build_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+  "policy_sha256": "e524eaae711434f0d31901051b7ad1e1eb91e41f9c3a17d113fae4518c25bbfb",
+  "wheel_sha256": "c2b3be3d6157f9d80e13210de8cca63cb095f1d10fabe7db9dda5e01d81e8889",
+  "source_delta": {
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py": {
+      "before": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "after": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py": {
+      "before": null,
+      "after": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py": {
+      "before": "618cd0e0c10929dfdbd67bf4da1a6bb32270f2baca293de68414944dfa7a7372",
+      "after": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "before": "1d0b1970f8ca3d4e139060f322e3d82c9989b515cb62b2f881f1b7abc968dace",
+      "after": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043"
+    }
+  },
+  "six_stage_paths": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/_build_manifest.json",
+      "working_sha256": "c455e13ca6ecaa9d25acb1173a22f5cb813fa1e7a67cf29a14e4d329351480e1",
+      "bytes": 22338,
+      "expected_git_blob": "4ad84f3888202a6b05a95309f2666dc2a4fc6f98"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-build.2026-10-21T10-08.json",
+      "working_sha256": "306a54a60f84b16aba15aaea7fde588b828a943ac25ac8c48fde154dbb3fb1ee",
+      "bytes": 75545,
+      "expected_git_blob": "1c82a6e25e63f9eaeb58e2c9f2faaac823245588"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-check.2026-10-21T10-08.json",
+      "working_sha256": "a11c9a2f5fd51eaca5d262c5c5a0994e3f86109ab9303f2da29dcaad27f4ba67",
+      "bytes": 75307,
+      "expected_git_blob": "0d9e329deafe5577a2244805ae3f207f325165ed"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-install.2026-10-21T10-08.json",
+      "working_sha256": "b9f5168ff77445a84506583ca941dd47503eb0afd54362bc7e58d9057ed7c93a",
+      "bytes": 65903,
+      "expected_git_blob": "d8b9cfb22509663d986593f5546200667ece28fa"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-handoff.2026-10-21T10-08.json",
+      "working_sha256": "34b48dca0918f88c6fba9478e75b6331faf6df7c451bdefa6c42bd285504bbb3",
+      "bytes": 38443,
+      "expected_git_blob": "88a7fd5794b42f5f7651b879465f1f05470b4926"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-packaged-capture-raw-archive.2026-10-21T10-08.json",
+      "working_sha256": "dd06029647ee3629b6b143dbc83fe189b8af73d6ab4962dc947b6714248757d6",
+      "bytes": 24327,
+      "expected_git_blob": "9693e134da495d559c3f083ae602fa410bb80b35"
+    }
+  ],
+  "raw_archive_sha256": "dd06029647ee3629b6b143dbc83fe189b8af73d6ab4962dc947b6714248757d6",
+  "verification": "Verified exact source/wheel/install bytes, all212 current inputs, three capture test bindings, all archived raw bytes and three readable streams, clean build/check/install receipts. No behavioral execution or package mutation.",
+  "qualification": "This package proof is independent of pending two-invocation native migration and final329+4. Prior native migration was not claimed.",
+  "additional_stage_candidate": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-package-confirmation.2026-10-21T10-13.json"
+}
