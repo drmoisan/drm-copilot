@@ -1,0 +1,50 @@
+{
+  "behavior_executed": false,
+  "candidate": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-final-candidate-released.2026-10-21T17-16.json",
+    "sha256": "f3fea6c0f8deae8b05dee149ef44a6b17754d5a2359dc12a45fa7107f52c3421"
+  },
+  "complete_same_predicate_findings": [
+    {
+      "call": "schema.parent.mkdir(parents=True, exist_ok=True)",
+      "call_ast_sha256": "3c855c55b6d9c9b420ed43bfca1f05ad18fee9ff6a7e2a6e0e9db621198e4bf1",
+      "definition_ast_sha256": "ec9774612c154e92d1aea5e7f0ff6e1e4a34d81f0690e5a4a667d1ce074a8e15",
+      "line": 39,
+      "name": "test_schema_path_refuses_checkout_authority",
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "source_sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f"
+    },
+    {
+      "call": "schema.write_text('{}', encoding='utf-8')",
+      "call_ast_sha256": "94884c1916ab14a8d674b1bcf559f721965cf0ee187eeeb9584cabce61ae410d",
+      "definition_ast_sha256": "ec9774612c154e92d1aea5e7f0ff6e1e4a34d81f0690e5a4a667d1ce074a8e15",
+      "line": 40,
+      "name": "test_schema_path_refuses_checkout_authority",
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "source_sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f"
+    },
+    {
+      "call": "existing.write_text('unchanged\\n', encoding='utf-8')",
+      "call_ast_sha256": "511fb58234efa84d30f8545f7ba993e4e4382b4327313946aedbc764b098f41a",
+      "definition_ast_sha256": "9b1ae092f5ea93e5bd3a53083ee81d23f6c900dcbb2e2f279e5f277545b2e913",
+      "line": 329,
+      "name": "test_legacy_generation_arguments_fail_without_effects",
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "source_sha256": "f9c57b4430539ab77d4c7d48f7f8ce8d4e4506980fd34bfe8932032b2bfe6e4f"
+    }
+  ],
+  "failed_predicate": "Unqualified open/write_bytes/write_text/mkdir/unlink calls",
+  "finding": "Three calls are test setup on schema/existing Paths derived only from mem_fs_path, whose accepted fixture patches pathlib operations under its synthetic memory root. These calls seed the in-memory negative fixtures and do not perform native writes.",
+  "fixture": {
+    "name": "mem_fs_path",
+    "path": "tests/conftest.py",
+    "sha256": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf"
+  },
+  "original_stop": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-final-171646-static.2026-10-21T17-17.json"
+  },
+  "production_test_reader_mutated": false,
+  "proposal": "Qualify only these exact file/definition/call AST identities plus the frozen mem_fs_path fixture. Preserve rejection of different receivers, callables or source bytes; do not whitelist the whole file or native pathlib operations.",
+  "status": "READ_ONLY_CHECKER_DIAGNOSIS_NO_BEHAVIOR",
+  "task": "P6-T3"
+}
