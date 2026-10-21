@@ -1,0 +1,415 @@
+{
+  "Timestamp": "2026-10-21T12:19:42.926820+00:00",
+  "convention": "Existing coverage.py named BODY counters exclude declaration; raw AST ranges remain separate. Same-source unions are gap checks only, never rewritten raw coverage or final aggregate acceptance.",
+  "current_module": {
+    "branch_percent": 82.5,
+    "branches": [
+      33,
+      40
+    ],
+    "line_percent": 88.54166666666667,
+    "missing_branches": [
+      [
+        52,
+        53
+      ],
+      [
+        117,
+        126
+      ],
+      [
+        123,
+        125
+      ],
+      [
+        171,
+        172
+      ],
+      [
+        179,
+        180
+      ],
+      [
+        194,
+        195
+      ],
+      [
+        205,
+        206
+      ]
+    ],
+    "missing_lines": [
+      53,
+      125,
+      126,
+      144,
+      145,
+      172,
+      174,
+      180,
+      185,
+      195,
+      206
+    ],
+    "statements": [
+      85,
+      96
+    ]
+  },
+  "current_receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.json",
+    "sha256": "0040cc599f2ccb9bec90c0b79e9d70972b14e5ec34de716edbf7f6c1be760d49"
+  },
+  "diagnostic_union_module": {
+    "branch_percent": 100.0,
+    "branches": [
+      40,
+      40
+    ],
+    "line_percent": 100.0,
+    "missing_branches": [],
+    "missing_lines": [],
+    "statements": [
+      96,
+      96
+    ]
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests-raw.2026-10-21T12-17.json",
+    "sha256": "619935c353a228bb1f96a52d7fc7e76022374a9fd46c4a1949f099f4fdcd7beb"
+  },
+  "raw_coverage_sha256": "21f84e591b02157ca446a4572ec15f7c4e24b5241ef66ecc1fc0baa42f2c8525",
+  "retained_329_raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-json-raw.2026-10-21T11-43.json",
+    "sha256": "c3aa5a742c864eb1b7702ac499d4c82d5c04a77f01cc3845b295951ee0d7b020"
+  },
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_mutations.py",
+    "sha256": "69baad58dedfc54e1054612fe2447dfe74481ad8c2b6a6c22e53b2679f04f6e0"
+  },
+  "status": "PREFLIGHT_ONLY_NOT_FINAL_ACCEPTANCE",
+  "task": "P6-T1",
+  "units": [
+    {
+      "ast_range": [
+        18,
+        37
+      ],
+      "current_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          5,
+          5
+        ]
+      },
+      "diagnostic_union_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          5,
+          5
+        ]
+      },
+      "name": "_authored",
+      "retained_329_BODY": {
+        "branch_percent": 50.0,
+        "branches": [
+          1,
+          2
+        ],
+        "line_percent": 80.0,
+        "missing_branches": [
+          [
+            26,
+            27
+          ]
+        ],
+        "missing_lines": [
+          27
+        ],
+        "statements": [
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "ast_range": [
+        40,
+        77
+      ],
+      "current_BODY": {
+        "branch_percent": 90.0,
+        "branches": [
+          9,
+          10
+        ],
+        "line_percent": 93.33333333333333,
+        "missing_branches": [
+          [
+            52,
+            53
+          ]
+        ],
+        "missing_lines": [
+          53
+        ],
+        "statements": [
+          14,
+          15
+        ]
+      },
+      "diagnostic_union_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          15,
+          15
+        ]
+      },
+      "name": "_update",
+      "retained_329_BODY": {
+        "branch_percent": 40.0,
+        "branches": [
+          4,
+          10
+        ],
+        "line_percent": 60.0,
+        "missing_branches": [
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            57
+          ],
+          [
+            58,
+            63
+          ],
+          [
+            58,
+            64
+          ],
+          [
+            64,
+            68
+          ],
+          [
+            64,
+            69
+          ]
+        ],
+        "missing_lines": [
+          55,
+          57,
+          58,
+          63,
+          64,
+          68
+        ],
+        "statements": [
+          9,
+          15
+        ]
+      }
+    },
+    {
+      "ast_range": [
+        80,
+        155
+      ],
+      "current_BODY": {
+        "branch_percent": 80.0,
+        "branches": [
+          8,
+          10
+        ],
+        "line_percent": 87.5,
+        "missing_branches": [
+          [
+            117,
+            126
+          ],
+          [
+            123,
+            125
+          ]
+        ],
+        "missing_lines": [
+          125,
+          126,
+          144,
+          145
+        ],
+        "statements": [
+          28,
+          32
+        ]
+      },
+      "diagnostic_union_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          32,
+          32
+        ]
+      },
+      "name": "_transport",
+      "retained_329_BODY": {
+        "branch_percent": 80.0,
+        "branches": [
+          8,
+          10
+        ],
+        "line_percent": 90.625,
+        "missing_branches": [
+          [
+            97,
+            98
+          ],
+          [
+            123,
+            124
+          ]
+        ],
+        "missing_lines": [
+          98,
+          124,
+          146
+        ],
+        "statements": [
+          29,
+          32
+        ]
+      }
+    },
+    {
+      "ast_range": [
+        158,
+        246
+      ],
+      "current_BODY": {
+        "branch_percent": 77.77777777777777,
+        "branches": [
+          14,
+          18
+        ],
+        "line_percent": 81.81818181818181,
+        "missing_branches": [
+          [
+            171,
+            172
+          ],
+          [
+            179,
+            180
+          ],
+          [
+            194,
+            195
+          ],
+          [
+            205,
+            206
+          ]
+        ],
+        "missing_lines": [
+          172,
+          174,
+          180,
+          185,
+          195,
+          206
+        ],
+        "statements": [
+          27,
+          33
+        ]
+      },
+      "diagnostic_union_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          18,
+          18
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          33,
+          33
+        ]
+      },
+      "name": "mutate",
+      "retained_329_BODY": {
+        "branch_percent": 77.77777777777777,
+        "branches": [
+          14,
+          18
+        ],
+        "line_percent": 69.6969696969697,
+        "missing_branches": [
+          [
+            177,
+            178
+          ],
+          [
+            215,
+            245
+          ],
+          [
+            235,
+            236
+          ],
+          [
+            235,
+            246
+          ]
+        ],
+        "missing_lines": [
+          178,
+          222,
+          223,
+          224,
+          235,
+          236,
+          238,
+          239,
+          240,
+          245
+        ],
+        "statements": [
+          23,
+          33
+        ]
+      }
+    }
+  ]
+}

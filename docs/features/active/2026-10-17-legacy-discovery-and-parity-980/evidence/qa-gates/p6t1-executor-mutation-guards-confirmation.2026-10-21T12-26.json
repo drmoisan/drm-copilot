@@ -1,0 +1,497 @@
+{
+  "Timestamp": "2026-10-21T12:26:17.577064+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "status": "READY_FOR_CHECKED_WIP",
+  "current_head": "55223d57effb8090ed2940786df0902d1ed9b145",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-freeze.2026-10-21T12-19.json",
+    "working_sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2",
+    "git_lf_sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2",
+    "expected_git_blob": "61adff5048c9ac8856d0a096d26b322052284ada",
+    "bytes": 47825,
+    "git_lf_bytes": 47825
+  },
+  "owned_test": {
+    "path": "tests/discovery_runtime/test_service_mutation_guards.py",
+    "working_sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4",
+    "git_lf_sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4",
+    "expected_git_blob": "b341064e4c3a82508a9001dc81cd85dcce0532f4",
+    "bytes": 20110,
+    "git_lf_bytes": 20110
+  },
+  "review": {
+    "scope": "MG1-MG15 and four measured mutation body scopes only",
+    "findings": [],
+    "intent_types_size_clear": true,
+    "controls": [
+      "Missing capture refuses independently at authoring, mutation and transport entry boundaries.",
+      "Explicit identity and CAS are independently enforced; approval requires actual status, owner and matching evidence.",
+      "Matching approval control proves bounded proposal fields without claiming validated graph approval.",
+      "Unknown/ambiguous exports refuse; real captured import preserves verified transport, source pins and written digests.",
+      "Extension previews preserve exact normalized bytes and blocking status; real write publishes through one guarded plan.",
+      "Wrong-family mutation dispatch refuses with unchanged files and zero writer calls."
+    ],
+    "isolation": "Accepted in-memory ports and real public planners; private entry controls are limited to the measured guards. No external I/O or temporary files."
+  },
+  "doc_qualification": {
+    "old_sha256": "786d616875766f8747441baae42ac795e5dbf3c47d87479948337ab9b0385503",
+    "current_sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4",
+    "changed_docstrings": [
+      "approval_context",
+      "test_missing_capture_cannot_authorize_mutation",
+      "test_approval_requires_actual_status_owner_and_evidence",
+      "test_export_identity_must_resolve_exactly_once",
+      "test_extension_preview_retains_normalized_bytes_and_blockers"
+    ],
+    "complete_executable_assertion_decorator_parameter_AST_equal": true,
+    "old_source_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests-raw.2026-10-21T12-17.json",
+      "sha256": "619935c353a228bb1f96a52d7fc7e76022374a9fd46c4a1949f099f4fdcd7beb",
+      "member": "tests/discovery_runtime/test_service_mutation_guards.py"
+    },
+    "behavior_reuse": "Fifteen cases executed on archived pre-prose bytes. Current prose/comment changes have identical executable AST and node identities; ordered current statics pass. No fresh fifteen-case execution is claimed."
+  },
+  "ordered_gates": [
+    {
+      "group": "tested_executable",
+      "stage": "format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.json",
+        "sha256": "03833c8ff2812a4a82c89621e6e2a6cacd585bffde99f0c92f6a927ae7fc5fa5"
+      },
+      "elapsed_seconds": 0.421665,
+      "exit_code": 0
+    },
+    {
+      "group": "tested_executable",
+      "stage": "lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.json",
+        "sha256": "2d3b32332e84cf78832d0ed1d7f013a7a31d1eb84986e1639cd26d6739beb756"
+      },
+      "elapsed_seconds": 0.222533,
+      "exit_code": 0
+    },
+    {
+      "group": "tested_executable",
+      "stage": "types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.json",
+        "sha256": "333098dec221af0a6114edc3beb3357614a40ef859bcf7fa6f6e4d0944706457"
+      },
+      "elapsed_seconds": 1.224873,
+      "exit_code": 0
+    },
+    {
+      "group": "tested_executable",
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.json",
+        "sha256": "0040cc599f2ccb9bec90c0b79e9d70972b14e5ec34de716edbf7f6c1be760d49"
+      },
+      "elapsed_seconds": 664.697755,
+      "exit_code": 0
+    },
+    {
+      "group": "documentation_only_restart",
+      "stage": "format",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.json",
+        "sha256": "44b95e8601bd65407ba42088613fac20e2185b18ed7820f988e3bf29127b8812"
+      },
+      "elapsed_seconds": 0.422189,
+      "exit_code": 0
+    },
+    {
+      "group": "documentation_only_restart",
+      "stage": "lint",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.json",
+        "sha256": "d79b1aafa9b6581a3147a2d46405afba9e351bbbdfaca1cff41c30943ae61bd7"
+      },
+      "elapsed_seconds": 0.223858,
+      "exit_code": 0
+    },
+    {
+      "group": "documentation_only_restart",
+      "stage": "types",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.json",
+        "sha256": "d58d80598e9efe3e5600818630405e76384c30bc10b67a36f80f47da3a2b3217"
+      },
+      "elapsed_seconds": 1.224375,
+      "exit_code": 0
+    }
+  ],
+  "exact_nodes": [
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_missing_capture_cannot_authorize_mutation[MG1]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_missing_capture_cannot_authorize_mutation[MG7]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_missing_capture_cannot_authorize_mutation[MG8]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_explicit_identity_and_cas_are_independent_preconditions",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_approval_requires_actual_status_owner_and_evidence[MG3]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_approval_requires_actual_status_owner_and_evidence[MG4]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_approval_requires_actual_status_owner_and_evidence[MG5]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_matching_approval_preserves_exact_bounded_proposal",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_export_identity_must_resolve_exactly_once[MG9]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_export_identity_must_resolve_exactly_once[MG10]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_captured_snapshot_import_uses_real_planner_and_guarded_writer",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_extension_preview_retains_normalized_bytes_and_blockers[MG12]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_extension_preview_retains_normalized_bytes_and_blockers[MG13]",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_extension_write_publishes_real_normalized_inventory",
+    "tests/discovery_runtime/test_service_mutation_guards.py::test_mutation_dispatch_refuses_another_valid_operation_family"
+  ],
+  "counts": {
+    "passed": 15,
+    "failed": 0,
+    "errors": 0
+  },
+  "test_seconds": 664.697755,
+  "body_preflight": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-body.2026-10-21T12-19.json",
+    "working_sha256": "e8d013636e119f064cb5150e7257749be610522118dc43bd9ee0337687715d9e",
+    "git_lf_sha256": "e8d013636e119f064cb5150e7257749be610522118dc43bd9ee0337687715d9e",
+    "expected_git_blob": "28ac919f82318ecb0fbbeedb67c85dc60ed78480",
+    "bytes": 7839,
+    "git_lf_bytes": 7839
+  },
+  "verified_units": [
+    {
+      "name": "_authored",
+      "current": {
+        "statements": [
+          5,
+          5
+        ],
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      },
+      "retained329": {
+        "statements": [
+          4,
+          5
+        ],
+        "branches": [
+          1,
+          2
+        ],
+        "line_percent": 80.0,
+        "branch_percent": 50.0,
+        "missing_lines": [
+          27
+        ],
+        "missing_branches": [
+          [
+            26,
+            27
+          ]
+        ]
+      },
+      "diagnostic_union": {
+        "statements": [
+          5,
+          5
+        ],
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "_update",
+      "current": {
+        "statements": [
+          14,
+          15
+        ],
+        "branches": [
+          9,
+          10
+        ],
+        "line_percent": 93.33333333333333,
+        "branch_percent": 90.0,
+        "missing_lines": [
+          53
+        ],
+        "missing_branches": [
+          [
+            52,
+            53
+          ]
+        ]
+      },
+      "retained329": {
+        "statements": [
+          9,
+          15
+        ],
+        "branches": [
+          4,
+          10
+        ],
+        "line_percent": 60.0,
+        "branch_percent": 40.0,
+        "missing_lines": [
+          55,
+          57,
+          58,
+          63,
+          64,
+          68
+        ],
+        "missing_branches": [
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            57
+          ],
+          [
+            58,
+            63
+          ],
+          [
+            58,
+            64
+          ],
+          [
+            64,
+            68
+          ],
+          [
+            64,
+            69
+          ]
+        ]
+      },
+      "diagnostic_union": {
+        "statements": [
+          15,
+          15
+        ],
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "_transport",
+      "current": {
+        "statements": [
+          28,
+          32
+        ],
+        "branches": [
+          8,
+          10
+        ],
+        "line_percent": 87.5,
+        "branch_percent": 80.0,
+        "missing_lines": [
+          125,
+          126,
+          144,
+          145
+        ],
+        "missing_branches": [
+          [
+            117,
+            126
+          ],
+          [
+            123,
+            125
+          ]
+        ]
+      },
+      "retained329": {
+        "statements": [
+          29,
+          32
+        ],
+        "branches": [
+          8,
+          10
+        ],
+        "line_percent": 90.625,
+        "branch_percent": 80.0,
+        "missing_lines": [
+          98,
+          124,
+          146
+        ],
+        "missing_branches": [
+          [
+            97,
+            98
+          ],
+          [
+            123,
+            124
+          ]
+        ]
+      },
+      "diagnostic_union": {
+        "statements": [
+          32,
+          32
+        ],
+        "branches": [
+          10,
+          10
+        ],
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    },
+    {
+      "name": "mutate",
+      "current": {
+        "statements": [
+          27,
+          33
+        ],
+        "branches": [
+          14,
+          18
+        ],
+        "line_percent": 81.81818181818181,
+        "branch_percent": 77.77777777777777,
+        "missing_lines": [
+          172,
+          174,
+          180,
+          185,
+          195,
+          206
+        ],
+        "missing_branches": [
+          [
+            171,
+            172
+          ],
+          [
+            179,
+            180
+          ],
+          [
+            194,
+            195
+          ],
+          [
+            205,
+            206
+          ]
+        ]
+      },
+      "retained329": {
+        "statements": [
+          23,
+          33
+        ],
+        "branches": [
+          14,
+          18
+        ],
+        "line_percent": 69.6969696969697,
+        "branch_percent": 77.77777777777777,
+        "missing_lines": [
+          178,
+          222,
+          223,
+          224,
+          235,
+          236,
+          238,
+          239,
+          240,
+          245
+        ],
+        "missing_branches": [
+          [
+            177,
+            178
+          ],
+          [
+            215,
+            245
+          ],
+          [
+            235,
+            236
+          ],
+          [
+            235,
+            246
+          ]
+        ]
+      },
+      "diagnostic_union": {
+        "statements": [
+          33,
+          33
+        ],
+        "branches": [
+          18,
+          18
+        ],
+        "line_percent": 100.0,
+        "branch_percent": 100.0,
+        "missing_lines": [],
+        "missing_branches": []
+      }
+    }
+  ],
+  "module_diagnostic_union": {
+    "branch_percent": 100.0,
+    "branches": [
+      40,
+      40
+    ],
+    "line_percent": 100.0,
+    "missing_branches": [],
+    "missing_lines": [],
+    "statements": [
+      96,
+      96
+    ]
+  },
+  "coverage_qualification": "Focused raw and retained329 coordinates remain separate and unchanged. Same-source diagnostic union reaches all four body/module floors; final combined reversed isolation and four contracts remain pending.",
+  "presentation_qualification": "Exact executable/output/coverage streams are gzip-base64 archived. Readable views use retained observed WORKSPACE/SCRATCH aliases and LF/trailing-whitespace normalization. Raw coverage EOF is preserved without adding a terminal newline. Initial baseline CRLF bytes remain unchanged and are paired with the normalized readable baseline.",
+  "baseline_semantic_identity_verified": true,
+  "retained_failures": "Initial formatting/lint diagnostics remain immutable in owner evidence; no behavioral failure in fifteen-case population.",
+  "staging_union": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-staging-union.2026-10-21T12-26.json",
+  "committed_dependencies": [],
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "acceptance_criteria": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}

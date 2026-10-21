@@ -1,0 +1,151 @@
+{
+  "Timestamp": "2026-10-21T12:19:42.945382+00:00",
+  "freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-freeze.2026-10-21T12-19.json",
+    "sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2"
+  },
+  "paths": [
+    {
+      "path": "tests/discovery_runtime/test_service_mutation_guards.py",
+      "sha256": "4291c35b55376e1ab612d5ce32e0eef604be945cb4f1b4fd472a82196ea42fd4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t1-mutation-guards.2026-10-21T12-01.json",
+      "sha256": "e080c0dfd95d33318a972a3d2623e098a2fd12af104b922d8cc7905dc3bcf8a7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format-raw.2026-10-21T12-05.json",
+      "sha256": "b22c01455808e688d594ceba0619bf93ff16811f9bd6f1cadd6f85af3b032e29"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.json",
+      "sha256": "5d8734a600913650fc0ed1dcfeed0f9063f27721e18f4f3f351bf1e715d67fe4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check-raw.2026-10-21T12-05.json",
+      "sha256": "515ba083e030d5fca3d6ee38aa7c6043376f9237b2107f9cae31f327abca8461"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.json",
+      "sha256": "a0fe580b0f840a5cc7062134740c4455eed343e3c9155bb48e69b389043d14ea"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint-raw.2026-10-21T12-05.json",
+      "sha256": "a1f2df88eedcd8055bb0bd93879904627c1c73d454c7af3d797e43eb1ce67a1c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.json",
+      "sha256": "464422f4d96afaab1e104fccca7ae53b7164adbd49e3f2ee6a15175e1c2cf54a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check-raw.2026-10-21T12-06.json",
+      "sha256": "38f1d1b76e2a39dce2a9b61b69e3d51c2ca00e317d8beb99b9dbc490b330fb1d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.json",
+      "sha256": "03833c8ff2812a4a82c89621e6e2a6cacd585bffde99f0c92f6a927ae7fc5fa5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint-raw.2026-10-21T12-06.json",
+      "sha256": "7e71a7d82517028aaed3fa88ac2a01df1078571631e3f486e37112cd33d0d6fd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.json",
+      "sha256": "2d3b32332e84cf78832d0ed1d7f013a7a31d1eb84986e1639cd26d6739beb756"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types-raw.2026-10-21T12-06.json",
+      "sha256": "c956dba1a5aff79f78ddc9a98214c512f62c3d319ff2a8058615d9412ee54524"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.json",
+      "sha256": "333098dec221af0a6114edc3beb3357614a40ef859bcf7fa6f6e4d0944706457"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests-raw.2026-10-21T12-17.json",
+      "sha256": "619935c353a228bb1f96a52d7fc7e76022374a9fd46c4a1949f099f4fdcd7beb"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.json",
+      "sha256": "0040cc599f2ccb9bec90c0b79e9d70972b14e5ec34de716edbf7f6c1be760d49"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check-raw.2026-10-21T12-19.json",
+      "sha256": "a9ab2b8953b5008ea49fe224a2865fbb4b5efbc49ecd49de18be3031ead5d6e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.json",
+      "sha256": "44b95e8601bd65407ba42088613fac20e2185b18ed7820f988e3bf29127b8812"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint-raw.2026-10-21T12-19.json",
+      "sha256": "c48efbfad3abb910ef750138f0f73c4e64de425d000284c5e1da7e3cba96200d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.json",
+      "sha256": "d79b1aafa9b6581a3147a2d46405afba9e351bbbdfaca1cff41c30943ae61bd7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types-raw.2026-10-21T12-19.json",
+      "sha256": "222d8022d67f86fa614c6e9e2c6ac40af4c29784c229df8c87115d4737a31f04"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.json",
+      "sha256": "d58d80598e9efe3e5600818630405e76384c30bc10b67a36f80f47da3a2b3217"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-baseline-readable.2026-10-21T12-19.json",
+      "sha256": "9aac4eb3aaf35c6f53747e9e4f3839cfa2c92577071528a82a688e2389311167"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-body.2026-10-21T12-19.json",
+      "sha256": "e8d013636e119f064cb5150e7257749be610522118dc43bd9ee0337687715d9e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120532-format.2026-10-21T12-05.md",
+      "sha256": "3ca6b8e068deebfebab180680be17e72fba6bb73266e60190f7351be8161d617"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120542-format-check.2026-10-21T12-05.md",
+      "sha256": "08f42c275eff6094ac32afb9390310347392e56d924ccd16b568728d4fd76a38"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120545-lint.2026-10-21T12-05.md",
+      "sha256": "298e82dd8d129f53991711cf29e017ec084e56b16a61822dd5835a4c43fe52c1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120612-format-check.2026-10-21T12-06.md",
+      "sha256": "39ac3762861c3a9944273f3b2e8f1e6f007d932fa685f99e30e74ff7949ceedd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120613-lint.2026-10-21T12-06.md",
+      "sha256": "c3253208a27e8f290ecd33eab1bbd5952c1c32f83bf04675b4fe75b08fcd07dd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120615-types.2026-10-21T12-06.md",
+      "sha256": "39effa6bef22bd2bc62560176c9990a59b7d8b79c007829c984e9cd594a2a7f8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-120632-tests.2026-10-21T12-17.md",
+      "sha256": "9acc471ec577abc3b87295d5855db5ac589344ae150f7bc9c21c88d678e827a1"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121915-format-check.2026-10-21T12-19.md",
+      "sha256": "740e7fc6e5a7c2984a51dc3bf74d6abd2bc5bdc3969c4f1624ad567dab5a806a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121923-lint.2026-10-21T12-19.md",
+      "sha256": "844f98e6a8b7096417370af879fb5fb94865093a354f0a456e666c8f119589e0"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-121930-types.2026-10-21T12-19.md",
+      "sha256": "c8f112e8348a905b82f2d9931c4e63c065f7e0c3ca9c5d9c2e2cb4e413bcf6fc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-mutation-guards-freeze.2026-10-21T12-19.json",
+      "sha256": "c1c0aeb8b3cc6a5a5844b2684254f58e4cbe7d7e9d2317f494bf5aa43dfb96e2"
+    }
+  ],
+  "qualification": "This staging list is evidence-only plus the one new test; append this list itself when staging. No active outputs, production, package or existing test paths.",
+  "task": "P6-T1"
+}
