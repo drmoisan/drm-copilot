@@ -1,0 +1,260 @@
+{
+  "Timestamp": "2026-10-21T17:55:20.744591+00:00",
+  "issue_number": 980,
+  "task": "P7-T1",
+  "status": "READY_FOR_ACCEPTANCE_COMMIT",
+  "task_accepted": true,
+  "route": "atomic_p7t1_review_20261021T174700",
+  "current_head": "5c6bceddd5b164e49544da8ac0adb9d841b40700",
+  "owner_freeze": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-freeze.2026-10-21T17-47.json",
+    "working_sha256": "874c1a69dedb9fa32293d7ac18d8a4009e3a126a53d8534932f8067eb99c1564",
+    "git_lf_sha256": "874c1a69dedb9fa32293d7ac18d8a4009e3a126a53d8534932f8067eb99c1564",
+    "expected_git_blob": "42ef03601250eb458b3e1508e1ceb79dc681a894",
+    "bytes": 20397,
+    "git_lf_bytes": 20397
+  },
+  "scope": [
+    {
+      "path": ".github/agents/legacy-parity-analyst.agent.md",
+      "sha256": "d509368846ec2202fff7e839018b25ff0bfa288ce1c629c1ffda67a1a6ab5afb",
+      "lines": 122
+    },
+    {
+      "path": ".github/agents/runtime-characterization-analyst.agent.md",
+      "sha256": "bbc9dacd58b4a85c235b3ee280e3d4650dfe081d7144a19ad947c617a5087d10",
+      "lines": 124
+    },
+    {
+      "path": ".github/agents/requirements-reconciler.agent.md",
+      "sha256": "0f3e4ea4164f669ea6e0c4621150dd56a79c581d319ebbac60ca45cc58fec0df",
+      "lines": 138
+    },
+    {
+      "path": ".github/agents/migration-coverage-reviewer.agent.md",
+      "sha256": "67b9d95b3c4ffecc2b88b632d9bd39560b369204badfc15061c42e25e42def71",
+      "lines": 128
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_agent_contracts.py",
+      "sha256": "cadf87bdeacbd06a0f81b6187ab216c33f62cceebecf36ccda9a0f2b89c85620",
+      "lines": 457
+    }
+  ],
+  "findings": [],
+  "review": {
+    "canonical_contracts": "Four domain-neutral canonical roles have exact fixed tool grants, selected inputs, closed output-kind/profile-key maps, bounded source reads and managed project-memory limits.",
+    "authority": "Configuration bootstrap and product-decision approval remain root-only. Role contracts deny source/test/configuration/authority writes, shell/evaluation, arbitrary MCP and general write capabilities. Preparation, pinned native provenance, output manifests, finalization and native-stop obligations are explicit; unavailable capability blocks without local-user fallback.",
+    "role_precision": "Non-reviewer reports grants permit only the exact required-output manifest. Reconciler-generated acceptance never authorizes feature-contract writes. Runtime outcomes require supplied evidence with honest manual states. A structurally valid failing review can finalize output validity without granting completion authority.",
+    "tests": "The reviewed 457-line module asserts exact allowlists/output maps and all required common/per-role contracts in 43 independent cases. It reads checked-in assets and creates no temporary files or native operational effects.",
+    "coverage_scope": "Markdown is declarative and test code is excluded from production coverage. No executable production body changed; accepted runtime agent-output/path/validation proof remains unchanged. No synthetic coverage measurement or native enforcement claim is made."
+  },
+  "ordered_clean_gates": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-black.2026-10-21T17-45.json",
+      "sha256": "2f9c4d9d869e4a259576d26333d20ffbd2a555a9dfb77ba68c0e55bbf8dc5956",
+      "stage": "black",
+      "clean": true,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:45:58.583258+00:00",
+      "elapsed_seconds": 0.408008,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-black-raw.2026-10-21T17-45.json",
+      "raw_archive_sha256": "19c89602e41ec56594f9ec6b516a26b5f0e4c7869828dcd61b7e4bbeb0a02134"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-ruff.2026-10-21T17-45.json",
+      "sha256": "e4307d536a945f80acce0c16788edc25270d3920bcf2b066255e8771717090c5",
+      "stage": "ruff",
+      "clean": true,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:45:58.999668+00:00",
+      "elapsed_seconds": 0.2075,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-ruff-raw.2026-10-21T17-45.json",
+      "raw_archive_sha256": "63423d4b8ceaba85d9ca641c6293c535e440d8fdde69f7d8d6835b4833286cc6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-pyright.2026-10-21T17-46.json",
+      "sha256": "69c561c5a793c9bf0b9936c8cc5858b0a69c13d1800f472b9d2cb39506d4638e",
+      "stage": "pyright",
+      "clean": true,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:45:59.218407+00:00",
+      "elapsed_seconds": 0.808154,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-pyright-raw.2026-10-21T17-46.json",
+      "raw_archive_sha256": "7c9cdf40fd42260cf4a3dd7762175dbb498879ae4769a6c433b3c763950b6de9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-tests.2026-10-21T17-46.json",
+      "sha256": "af530b172acf482a512ba3faf7f2ba7151da69d4126a1740848f13e05711962e",
+      "stage": "tests",
+      "clean": true,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:46:00.033777+00:00",
+      "elapsed_seconds": 0.40735,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop3-tests-raw.2026-10-21T17-46.json",
+      "raw_archive_sha256": "59b84ff7698d4bd996c214069cd60e6c1c8952f2b51b0f140583ffe0b61a16e2"
+    }
+  ],
+  "retained_attempts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop1format-black.2026-10-21T17-45.json",
+      "sha256": "86ec1878c8a309846827eecd016972c758dfd1224a5263791f61f036256fa390",
+      "stage": "black",
+      "clean": false,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:45:14.473143+00:00",
+      "elapsed_seconds": 0.408047,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop1format-black-raw.2026-10-21T17-45.json",
+      "raw_archive_sha256": "27074682463f195a16d3789ef6bb8e7ac325191248bb72d27a73ab1f7c72606d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop2-black.2026-10-21T17-45.json",
+      "sha256": "ea299b87fe5a0cfce3d05ebc7a1363e0e8c9f0835d5a8080e922713da6f8e581",
+      "stage": "black",
+      "clean": true,
+      "exit_code": 0,
+      "started_utc": "2026-10-21T17:45:24.916738+00:00",
+      "elapsed_seconds": 0.409212,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop2-black-raw.2026-10-21T17-45.json",
+      "raw_archive_sha256": "da727230028b931fc85347f6e5dac636cf68b7ac724e30a5249ad91c34c6af0a"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop2-ruff.2026-10-21T17-45.json",
+      "sha256": "093fe0d233fa57555c9c59141c616df08f8315d1f8f6e90a4095a3e096eaff98",
+      "stage": "ruff",
+      "clean": false,
+      "exit_code": 1,
+      "started_utc": "2026-10-21T17:45:25.338777+00:00",
+      "elapsed_seconds": 0.208581,
+      "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop2-ruff-raw.2026-10-21T17-45.json",
+      "raw_archive_sha256": "072e439ac2547186b823bcd513fc8bdae04929e5b0889691a8e9847b660c5336"
+    }
+  ],
+  "isolation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p7t1-single-module-isolation-qualification.2026-10-21T17-55.json",
+    "working_sha256": "4a710189eccc8906535c74c23eec18159660c2fab724e7d4080680d41c7c06fa",
+    "git_lf_sha256": "4a710189eccc8906535c74c23eec18159660c2fab724e7d4080680d41c7c06fa",
+    "expected_git_blob": "3dc2ed633946b68941fb96d29f58750e6ac301f8",
+    "bytes": 8953,
+    "git_lf_bytes": 8953
+  },
+  "archive_reconciliation": {
+    "archives": 7,
+    "lossless_members": 68,
+    "raw_readable_streams": 14,
+    "bound_inputs": 13,
+    "all_current_bound_inputs_unchanged": true,
+    "normalization": {
+      "raw": "Each -raw.json preserves exact stdout/stderr, executed harness/support and all five owned streams as gzip-base64 with byte length and SHA256. Formatting changes also archive before/ streams.",
+      "readable": "The archived harness substitutes observed host path aliases with WORKSPACE/SCRATCH labels, case-insensitively; converts CRLF and standalone CR to LF; strips trailing line/end whitespace; writes UTF-8 without BOM.",
+      "retained_alias_reference": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-freeze.2026-10-21T16-46.json",
+      "qualification": "Same workspace, scratch and support normalization convention; no raw exception or host-path text substituted into source or tests.",
+      "views_checked": "All 21 new gate/raw/readable files are UTF-8 without BOM, CR bytes or trailing line whitespace; each raw archive member length/hash reconstructs."
+    },
+    "observed_aliases_reference": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-profile-init-freeze.2026-10-21T16-46.json",
+      "working_sha256": "8341779604c6e089f9945d414e5032a7863ed4956979caa83123680c997cc7a5",
+      "git_lf_sha256": "8341779604c6e089f9945d414e5032a7863ed4956979caa83123680c997cc7a5",
+      "expected_git_blob": "e713c94eee4ac8ff69f4ca41dedfc36347557228",
+      "bytes": 31689,
+      "git_lf_bytes": 31689
+    },
+    "observed_aliases_sha256": "3f8fad3b0cc11f239cde0a8d2b02c1fe851615806bb7583117bc0dfa93346416",
+    "raw_bytes_preserved": true,
+    "reader_shape_note": "The raw archive contains member names at its root, including harness and stdout; it has no entries wrapper. The initial metadata-only wrapper lookup returned no fields and no evidence was changed."
+  },
+  "acceptance_mapping": {
+    "plan_task": "P7-T1",
+    "satisfied": "Each of the four canonical roles has one domain-neutral body with precise inputs, outputs, routing and stop obligations, verified by independent review and 43 contract cases.",
+    "new_acceptance_criteria": [],
+    "pending": {
+      "AC-05": "Canonical contracts are complete; generated deployment families and cross-ecosystem validation remain pending.",
+      "AC-06": "Invoked workflow contracts remain P7-T2 and later publication work.",
+      "AC-07": "Declared path/output restrictions do not establish native enforcement.",
+      "AC-08": "Declared native-stop obligations do not establish installed hook delivery.",
+      "AC-09": "Generated/published supported-ecosystem assets remain pending.",
+      "AC-22/37/38": "Previously pending cross-layer/documentation criteria remain unchanged."
+    }
+  },
+  "checkoff": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+    "task": "P7-T1",
+    "before": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "82e51c9a7de41c12b193a198a3aad096139f2228e5ecd66895cc7dfefa86b42a",
+      "git_lf_sha256": "bca1dc42e68fb6c39e99672ea3ba40c05d19c000ae7713ef539d1d6c5756d120",
+      "expected_git_blob": "9d9f6b61c0c1f0e5d40f65e0f5945ab6a4e1564a",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "after": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/plan.2026-10-17T22-38.md",
+      "working_sha256": "f13dca223e52cd1cd805a456af2b7b03640b4f51dbc12d69ed527fcee82f48c4",
+      "git_lf_sha256": "970041c57a2a4a7f608ca4efb4aee5beb807efdd2daee6275baaab2f22ee9e2d",
+      "expected_git_blob": "1a3bf6157ed4eeee8480d501ec7ea9b5f4918d8e",
+      "bytes": 100092,
+      "git_lf_bytes": 99533
+    },
+    "accepted": 50,
+    "total": 84,
+    "remaining": 34
+  },
+  "acceptance_criteria": {
+    "sources_unchanged": [
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md",
+        "working_sha256": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+        "git_lf_sha256": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+        "expected_git_blob": "95f6b07781a281842396d2d539d8b01b9bd9cc0a",
+        "bytes": 112130,
+        "git_lf_bytes": 112130,
+        "accepted": 26,
+        "total": 66,
+        "changed": false
+      },
+      {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/user-story.md",
+        "working_sha256": "a98d0ef01b16a1529912f2b03e580ea0516e2a356cb608cfc04127928f160c9c",
+        "git_lf_sha256": "a98d0ef01b16a1529912f2b03e580ea0516e2a356cb608cfc04127928f160c9c",
+        "expected_git_blob": "350276685406153925eaf04ed4e99d9da18949c4",
+        "bytes": 11870,
+        "git_lf_bytes": 11870,
+        "accepted": 26,
+        "total": 66,
+        "changed": false
+      }
+    ],
+    "issue_unchanged": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/issue.md",
+      "working_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "git_lf_sha256": "f3dca9019032b4ac452ec6190befb9ffb14e5491dbb4d8d957b2d2d03fa8f5b4",
+      "expected_git_blob": "1e70a8917895d77c46a9b91c35eb815ea9fff4a0",
+      "bytes": 25717,
+      "git_lf_bytes": 25717
+    },
+    "accepted": 26,
+    "total": 66,
+    "remaining": 40
+  },
+  "preserved_preparation_only": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t3-routing-publication-preparation.2026-10-21T17-43.md",
+    "working_sha256": "371a76bfd33476a21287981d12160fb58cb78388aa4482acd7426ef93ea6d212",
+    "git_lf_sha256": "371a76bfd33476a21287981d12160fb58cb78388aa4482acd7426ef93ea6d212",
+    "expected_git_blob": "9a078cd52ade12baa9a3e2ab706bb283a6fd3f36",
+    "bytes": 10474,
+    "git_lf_bytes": 10474
+  },
+  "limitations": [
+    "Generated/native agent and skill surfaces, deterministic discovery routing and Set K proof remain P7-T3.",
+    "Native authority, capability delivery and hooks remain P8/P9. No actual coding-agent-host enforcement or completion authority is claimed.",
+    "The broader feature remains incomplete; this acceptance changes only P7-T1."
+  ],
+  "staging_manifest": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-acceptance-staging-union.2026-10-21T17-55.json",
+  "next_five": [
+    "P7-T2",
+    "P7-T3",
+    "P8-T1",
+    "P8-T2",
+    "P8-T3"
+  ]
+}

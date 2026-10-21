@@ -344,7 +344,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 7 — Canonical specialist workflows and existing routing integration
 
-- [ ] [P7-T1] Author the four constrained specialist contracts canonically.
+- [x] [P7-T1] Author the four constrained specialist contracts canonically.
   - Files and behavior: Create .github/agents/{legacy-parity-analyst,runtime-characterization-analyst,requirements-reconciler,migration-coverage-reviewer}.agent.md and DTTEST/test_discovery_agent_contracts.py. Existing Set K native assertions are updated with the first generated outputs in P7-T3.
   - Tests and proof: Assert all specified responsibilities, project memory limits, selected source reads, closed controlled-output grants, no production/configuration/authority writes, no shell/evaluation/arbitrary MCP, no analyst approval, per-role required-output/finalize contract, and explicit failing-review semantics.
   - Acceptance: Each role has one canonical domain-neutral body with precise inputs, outputs, routing and stop obligations; native derivatives are generated later rather than independently authored.
