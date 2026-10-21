@@ -1,0 +1,172 @@
+{
+  "status": "FOCUSED_PASS_PENDING_INDEPENDENT_REVIEW",
+  "owned": [
+    {
+      "path": "tests/discovery_runtime/test_service_inspection_guards.py",
+      "sha256": "79da7a7479dbeea9ae5ff1a00ad91baca8af99752972d9d32219c38b4ea5dcbf"
+    }
+  ],
+  "physical_lines": 364,
+  "nodes": [
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig1_default_profile_uses_trusted_selection_and_exact_bytes",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig2_unsupported_profile_version_refuses_artifacts",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig3_malformed_v2_preserves_original_profile_findings",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig4_selector_profile_error_survives_before_analysis",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig5_inventory_write_reconstructs_exact_selection_and_grants",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig6_changed_physical_source_refuses_captured_page",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig7_captured_source_bound_refuses_before_physical_read",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig8_invalid_direct_source_request_refuses_before_read",
+    "tests/discovery_runtime/test_service_inspection_guards.py::test_ig9_other_operation_family_refuses_before_assessment"
+  ],
+  "ordered_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-format.2026-10-21T12-11.json",
+      "sha256": "eae376db6cd7cb3bab47f56927b1be93a346a39f984bc4c2c05b546b8531c6c3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-lint.2026-10-21T12-11.json",
+      "sha256": "16f7588d93f3f14bc42f0f5cba9fb5c5733e03b1ad984be9c025c9c0bd481b8c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-tests.2026-10-21T12-15.json",
+      "sha256": "976e1f64a23f19986ce05de488fd2e75d5bf4e3da866a199ebbbca64a98b41e4"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass2-types.2026-10-21T12-11.json",
+      "sha256": "c7f4003f502980837f31e1bb66432859a40f978ac345669bba4a178e89222141"
+    }
+  ],
+  "retained_failure_receipts": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-consolidate-format.2026-10-21T12-06.json",
+      "sha256": "02758bf3ef61e81cc72ec76fb60003dab2f7189991ddb8ff655d2029647e744e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-consolidate-lint.2026-10-21T12-06.json",
+      "sha256": "7759420724bfc11a02ff7c1c414eafb39fcc92b5ee63523eb539a4906d6e9fe5"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-format.2026-10-21T12-06.json",
+      "sha256": "f62a2e6f520bb0d5994a7c553792aa350dd9080ec7642305bf649841e6af2482"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-lint.2026-10-21T12-06.json",
+      "sha256": "7fa52612c5b16dad8fb9ff6373a23ac466618b18fdec1cbcc87eb3d107f1113b"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-tests.2026-10-21T12-10.json",
+      "sha256": "6a4c4b6c8190a3f6c5ad0b5dac422e0740136db4fe66866e333a521228ed0710"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-pass1-types.2026-10-21T12-06.json",
+      "sha256": "d27b6f7dbff06fbaba64a0bd7cbac3077251440122c561345f3a375d4058ce2e"
+    }
+  ],
+  "harness_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-inspection-guards-harness-archive.2026-10-21T12-15.json",
+    "sha256": "9376f51bd67b826efce0d0752ace3f9ac4ac2367496bcf4664da5d0238be93f5"
+  },
+  "dependencies": {
+    "tests/discovery_runtime/test_service_inspection_guards.py": {
+      "sha256": "79da7a7479dbeea9ae5ff1a00ad91baca8af99752972d9d32219c38b4ea5dcbf",
+      "physical_lines": 364
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/operations.py": {
+      "sha256": "dfa1c9f174f75551037817399315b578e17a4d6e57bc0c7da7f9d5fc45bb2de3",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service.py": {
+      "sha256": "fa624d625177512b5752a891ebd73c5cc5bf000b1ce0a5e236d25728e68b4c3e",
+      "physical_lines": 334
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_inspection.py": {
+      "sha256": "e66eebfdca69edc01d7df3775fa6bd845fb44a84ebc7b51b23c4f9fcfba3a162",
+      "physical_lines": 278
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_contracts.py": {
+      "sha256": "e81579104dbf8d3c7b146942393e1f82786fdb3891841ece8427bb26b2a3bb85",
+      "physical_lines": 440
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/service_serialization.py": {
+      "sha256": "0bcdcb5cf374912da69ea837dd6d75d51a7a93a18de5bb0db54896615001a6ab",
+      "physical_lines": 415
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/profile_v2.py": {
+      "sha256": "a42c0f396679b451117122247d5813d801d9ff534624bef1556d7330603779e2",
+      "physical_lines": 382
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_reads.py": {
+      "sha256": "8317c5389495257af0a9975e1f477ae5cbf5c168b92f7912c075b5a17ec6d5da",
+      "physical_lines": 481
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/source_read_models.py": {
+      "sha256": "c7d61f9eb10181e52affb56e14f0b0cac567574abb14424ce043196bebf148cc",
+      "physical_lines": 423
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_io.py": {
+      "sha256": "d88262205076138fb8a6f7f5bd115d9d2c79a492be82ce1c6920bec0866a82eb",
+      "physical_lines": 437
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py": {
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043",
+      "physical_lines": 500
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/pipeline.py": {
+      "sha256": "b6f001d94995e00992d4e3b3b0eb8a8b191e2290fb76409de33f4172047cf02b",
+      "physical_lines": 304
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/registry.py": {
+      "sha256": "0ca6534f58f034ee510b9f44fdc4eddc302dffc863faa4938d9f129a4830b7f4",
+      "physical_lines": 232
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/input_capture.py": {
+      "sha256": "23c07e93bba1c6f15de40994530d7d2cedd6c170df57150ca04b05631c7c4886",
+      "physical_lines": 311
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/analyzer/emitter.py": {
+      "sha256": "470d482fa053f86fe6f6cc14b3d33ea1132f25cfec603bf7f7478e3c6c4be786",
+      "physical_lines": 319
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/manifest.json": {
+      "sha256": "15d20eebf1eed42192ac437c5cc7ee06e0036247d84a47c43961b0fa965cfd13",
+      "physical_lines": 201
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/_resources/schemas/discovery/v2/service-result.schema.json": {
+      "sha256": "e963a5c0afe28119ea5639a7b8e922ea4880b54231e7a1c8be3567e0dbc763de",
+      "physical_lines": 166
+    },
+    "tests/discovery_runtime/test_service.py": {
+      "sha256": "6ecf084c2cfe65fb537de9dad09774c5dba40350b0f4180c90fc7027e6b4a568",
+      "physical_lines": 495
+    },
+    "tests/discovery_runtime/test_service_boundaries.py": {
+      "sha256": "912dd9e48d4c3b2b685ca6c46d1ff6cde8279f8c7d150de0b0e531e099ff3396",
+      "physical_lines": 500
+    },
+    "tests/discovery_runtime/test_service_publication.py": {
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "physical_lines": 497
+    },
+    "tests/discovery_runtime/initialization_test_support.py": {
+      "sha256": "92d7395546db7d23d0ce20e8a1febae51b6ce3c4d31414c70699859467452395",
+      "physical_lines": 141
+    },
+    "tests/discovery_runtime/test_activation_store.py": {
+      "sha256": "8cc5f600177fa2ae5d3e51c3250e265780d41074bd521b9250f7f9a698ab58cd",
+      "physical_lines": 465
+    }
+  },
+  "test_elapsed_seconds": 203.42669940000633,
+  "coverage_selector": [
+    "coverage.json",
+    "files"
+  ],
+  "historical_fixture_failure": "IG4 retained read-source-only inputs when constructing inventory request. Fixed by empty JsonObject inputs and matching direct context inputs. No production defect.",
+  "documentation_change": "Explicit typed parameters, return and effect contracts consolidated; all other assertions and nine node names retained.",
+  "coverage_qualification": "Nine-case proof targets the newly authorized guards. inventory_analyzers owns same-hash retained329 BODY diagnostic union, not a new behavioral execution. No unreachable assertion for line113; do not force impossible mutable context.",
+  "preservation": "No production or existing-test edits; no Git/index/checkpoint/plan changes.",
+  "OBSERVED_PATH_ALIASES": [
+    "WORKSPACE=current checkout including observed drive-letter variants",
+    "SCRATCH=task-specific external harness directory"
+  ]
+}
