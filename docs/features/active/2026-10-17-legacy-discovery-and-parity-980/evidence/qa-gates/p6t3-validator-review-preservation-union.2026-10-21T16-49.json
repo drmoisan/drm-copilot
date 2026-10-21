@@ -1,0 +1,155 @@
+{
+  "issue": 980,
+  "task": "P6-T3",
+  "timestamp": "2026-10-21T16:49:58.636520+00:00",
+  "status": "REPAIR_REQUIRED_PRESERVATION_ONLY_NOT_STAGED",
+  "paths": [
+    {
+      "path": "scripts/dev_tools/validate_discovery_artifacts.py",
+      "sha256": "5f1211cd606da0cafe4f54bebf96f2cc6dfcc565d5c4e59a7dedbf1e57cd9f2c"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py",
+      "sha256": "0e8a16f4e26e8c053e5eb763631100b05548ec1bafd995ff66986e7a2a228578"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validation-reports-preimages.2026-10-21T16-35.json",
+      "sha256": "4ec1f7ac1b99b152b79f3d86cf53131a738fddec73a5eba75bd91e6913b293de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format-raw.2026-10-21T16-42.json",
+      "sha256": "883f36240cdb5e7bf548be0fe5056675af161b13e5838e7f1c087a1c72c28490"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format.2026-10-21T16-42.json",
+      "sha256": "ecf294d78520ba9c91c2f5cb3df466283d7bd564b6357fe551c7d55dc8f7bf38"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check-raw.2026-10-21T16-42.json",
+      "sha256": "f5036af14001ce69c48aa04021a73f3781c11cc16b48f060d315dafbde74d99f"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check.2026-10-21T16-42.json",
+      "sha256": "3970dfc7fbfb5fbe874d9b6d75b272b42f81c4df81a8b6615147d4695a8e6c1e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint-raw.2026-10-21T16-42.json",
+      "sha256": "3370fb9d45b87c53567e236db6b88e3351e52050249c27a4fb06ab7a773f14e6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint.2026-10-21T16-42.json",
+      "sha256": "1b27108f9414d2af6d3b4f45f4c5ebac4f52ba215bf527458d5daaef9cb87874"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check-raw.2026-10-21T16-43.json",
+      "sha256": "1db8030a236f217ac903ee1a4fa03da0b4cc219c2c0075d32af1b005f5389fa2"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check.2026-10-21T16-43.json",
+      "sha256": "5b5a9d29766096f55cfb86ddf0528fdc5fce607983d8b27edc060216b60e0c25"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint-raw.2026-10-21T16-43.json",
+      "sha256": "00ec89c42c731a67e45705953599d46ebf6ffb7b9e563873322bda1c71933cf7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint.2026-10-21T16-43.json",
+      "sha256": "17619c1ac4ad551d3bbedd9f95ccd8b621bc0863151c6dcf3de5cce6eae8d552"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check-raw.2026-10-21T16-43.json",
+      "sha256": "e8257b0fd54d45199e8b5122022bb4c2476f1f9595f23fb685847abb572376cd"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check.2026-10-21T16-43.json",
+      "sha256": "8dfa97c277bdd1ab4db68846e9f7bdf63b8565540e3016c7494f02d1c386a466"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint-raw.2026-10-21T16-43.json",
+      "sha256": "416f2e737410dcbf4e1d5df8449f16c3995c1ac98d120a3356c57380a68d3bb8"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint.2026-10-21T16-43.json",
+      "sha256": "0c5ccc23a6f635eb783492e13014468155872d740db9c87d541295c146ce09b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types-raw.2026-10-21T16-43.json",
+      "sha256": "c2c60121a968bf13e6890a7eb441f32d0393ba407ece2e05c90bd64404ddb6c6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types.2026-10-21T16-43.json",
+      "sha256": "7876fd32e000f8335f9db0654b01873dc0c4f9b45868db39c5679e75048722de"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests-raw.2026-10-21T16-44.json",
+      "sha256": "b25afabde16d34821e848ff4ff6240225cb5678f6441935f03c6f7a47a82e57d"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.json",
+      "sha256": "ec21553dcb4688e4e0252873f29011f099bb38c60523f1d3c815499602ba998c"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-assembly-raw.2026-10-21T16-46.json",
+      "sha256": "499f866c91b3c980f942f2101ef0b99d26f079c48e9ca07f8dced3d3b1745d5e"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-body.2026-10-21T16-46.json",
+      "sha256": "2b52134342e9613c6a5a048d2e547d86ede12c176358922eed1cb7abb3f36d67"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164245-format.2026-10-21T16-42.md",
+      "sha256": "731dc50ba34987c44ea6510578c6544d270e3b3c43e797b24f359ac1f47fcd84"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164255-format-check.2026-10-21T16-42.md",
+      "sha256": "d7b165ac6a5351212adf9dd6fd3b188a0df7699367cd5122dd65509c9c72dff6"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164259-lint.2026-10-21T16-42.md",
+      "sha256": "c1a405e7e898a762196f80912c9301b8311ae803449e4f018a023c275c675bac"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164315-format-check.2026-10-21T16-43.md",
+      "sha256": "27b3fe2ce28ad019d0f0020661fd15527e73dd854523f42ee8c989a4268d01a9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164319-lint.2026-10-21T16-43.md",
+      "sha256": "2ed94583a4809ba59525cc7dc8b4a9831a6ded832d7b52c19182ad86c69196fc"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164332-format-check.2026-10-21T16-43.md",
+      "sha256": "e79451b08dc89053543086be90a94447c2ca1ade5b5c876c865fab9a4a9f93b7"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164337-lint.2026-10-21T16-43.md",
+      "sha256": "ea827b87e52a513cb79e10911e56b3724c0e44612cd48784b49bcfc4c292b8ff"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164341-types.2026-10-21T16-43.md",
+      "sha256": "4660c7323a5deec1b863420a41dcdaf1df622002010b5851b03d49bedd7f9cf9"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-164354-tests.2026-10-21T16-44.md",
+      "sha256": "591c7820cf41a44f6870f75bf9683b607d96c301e1adab2a353bb876081791a3"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-freeze.2026-10-21T16-46.json",
+      "sha256": "2716dc2cf0e431a69c45279b09bf3b8415558723585c8ff3485efcecd328da09"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-staging.2026-10-21T16-46.json",
+      "sha256": "cd5ea94b7857e8830881b85f590b616dacc122044f6ac1833a414660c3149c85"
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-independent-review.2026-10-21T16-49.json",
+      "sha256": "ade6938ae9d150bcde81fa3e354846c8afc700407018e26751ffbb0b3f7f2128"
+    }
+  ],
+  "manifest_self": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t3-validator-review-preservation-union.2026-10-21T16-49.json",
+  "path_count_including_manifest": 36,
+  "self_binding": "Coordinator binds exact manifest SHA from handoff; no recursive self-digest.",
+  "blocking_findings": [
+    "VAL-R1"
+  ],
+  "qualification": "Preserve original frozen 38-case evidence and one complete finding; checked-source readiness withheld until bounded repair confirmation. No moving report source/tests or unrelated artifacts included."
+}

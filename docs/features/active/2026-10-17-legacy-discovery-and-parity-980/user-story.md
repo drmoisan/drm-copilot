@@ -66,7 +66,7 @@ The authoritative full-feature acceptance sources are this file and [spec.md](sp
 - [x] Existing files are not silently overwritten.
 - [x] The initialized workspace validates successfully.
 ### Validation and reporting
-- [ ] Individual artifact validators exist.
+- [x] Individual artifact validators exist.
 - [x] A complete validation command exists.
 - [ ] Blocking failures return nonzero exit codes.
 - [x] Markdown and JSON reports are generated.
