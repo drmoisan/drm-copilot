@@ -1,0 +1,451 @@
+{
+  "timestamp": "2026-10-21T16-31",
+  "status": "RETAINED_BASELINE_BOUND_NO_REPLAY",
+  "owned": [
+    {
+      "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+      "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+      "lines": 492,
+      "original_gzip_base64": "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"
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py",
+      "sha256": "001e8869e6657fc4405b22c01a9026de3a990afffbfd4560a718aecf33f2ebfe",
+      "lines": 488,
+      "original_gzip_base64": "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"
+    }
+  ],
+  "shared_interface": "evidence/other/p6t3-shared-interface-reconciliation.2026-10-21T16-07.json",
+  "retained_ordered_proof": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p5t5-set-e-freeze.2026-10-20T12-26.json",
+    "sha256": "14859545b59822b63c51717c65d0db755c9abf704d234827228cbc8ac4cceff4",
+    "passed": 41,
+    "legacy_cases": 34,
+    "v2_cases": 7
+  },
+  "old_coverage": {
+    "path": "scripts/dev_tools/generate_acceptance_scenarios.py",
+    "sha256": "e57fe9534965325b9d077dc0487256f7d154702a94784e89c9d01e295be63b39",
+    "summary": {
+      "covered_lines": 186,
+      "num_statements": 186,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 4,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100",
+      "num_branches": 42,
+      "num_partial_branches": 0,
+      "covered_branches": 42,
+      "missing_branches": 0,
+      "percent_branches_covered": 100.0,
+      "percent_branches_covered_display": "100"
+    },
+    "callables": [
+      {
+        "name": "resolve_discovery_schema",
+        "summary": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "resolve_schema_self_ref",
+        "summary": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_require_str",
+        "summary": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_string_tuple",
+        "summary": {
+          "covered_lines": 4,
+          "num_statements": 4,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "project_feature_contract",
+        "summary": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "project_parity_matrix",
+        "summary": {
+          "covered_lines": 11,
+          "num_statements": 11,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "project_runtime_characterization",
+        "summary": {
+          "covered_lines": 11,
+          "num_statements": 11,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "derive_scenario_id",
+        "summary": {
+          "covered_lines": 3,
+          "num_statements": 3,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_scenario_sort_key",
+        "summary": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "assemble_scenarios",
+        "summary": {
+          "covered_lines": 22,
+          "num_statements": 22,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 8,
+          "num_partial_branches": 0,
+          "covered_branches": 8,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "compute_source_digest",
+        "summary": {
+          "covered_lines": 2,
+          "num_statements": 2,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "build_document",
+        "summary": {
+          "covered_lines": 5,
+          "num_statements": 5,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "format_document",
+        "summary": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "collect_input_paths",
+        "summary": {
+          "covered_lines": 1,
+          "num_statements": 1,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_load_json_document",
+        "summary": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 2,
+          "num_partial_branches": 0,
+          "covered_branches": 2,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_generate_from_args",
+        "summary": {
+          "covered_lines": 8,
+          "num_statements": 8,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "parse_args",
+        "summary": {
+          "covered_lines": 7,
+          "num_statements": 7,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 0,
+          "num_partial_branches": 0,
+          "covered_branches": 0,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "_run_check",
+        "summary": {
+          "covered_lines": 13,
+          "num_statements": 13,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 6,
+          "num_partial_branches": 0,
+          "covered_branches": 6,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      },
+      {
+        "name": "main",
+        "summary": {
+          "covered_lines": 15,
+          "num_statements": 15,
+          "percent_covered": 100.0,
+          "percent_covered_display": "100",
+          "missing_lines": 0,
+          "excluded_lines": 0,
+          "percent_statements_covered": 100.0,
+          "percent_statements_covered_display": "100",
+          "num_branches": 4,
+          "num_partial_branches": 0,
+          "covered_branches": 4,
+          "missing_branches": 0,
+          "percent_branches_covered": 100.0,
+          "percent_branches_covered_display": "100"
+        }
+      }
+    ]
+  },
+  "legacy_nodes": [
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_raises_naming_convention_when_tree_absent",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_keyword_only_parameters",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_downstream_calls_resolver",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_falls_back_to_convention_when_absent",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_seam_returns_path_when_schema_present",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_feature_contract_positive",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_parity_matrix_positive",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_runtime_characterization_positive",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_non_list_string_field_ignored",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document0-must be an array]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_parity_matrix-document1-must be an object]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document2-must be an array]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_structural_errors_raise[project_runtime_characterization-document3-must be an object]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_projection_adapters_ignore_unknown_fields",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_maps_given_when_then",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_derives_stable_id",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_top_level_fields",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_positive_generation_null_refs_when_none_match",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_byte_identical_repeat",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_invariant_to_input_ordering",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_determinism_source_digest_stable",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_domain_neutrality_module_source_and_output_fields",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_file-not found]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_non_object_root-root must be an object]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_parse_error-invalid JSON]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_negative_inputs_return_one_with_message[_mutate_missing_field-feature_ref]",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_parse_args_defaults_and_flags",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_collect_input_paths_sorted",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_writes_output",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_main_success_stdout",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_matches",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_mismatch",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_requires_output",
+    "tests/scripts/dev_tools/test_generate_acceptance_scenarios.py::test_cli_check_target_absent"
+  ],
+  "real_v2_tests": {
+    "path": "tests/scripts/dev_tools/test_acceptance_generation_projection.py",
+    "sha256": "60d58c5ce0d1ee8d099fbc8217a481b0abcb7f0d9a570aea613133dfe2ecf0c5",
+    "disposition": "Keep all seven accepted cases and exact bytes unchanged."
+  },
+  "policy": "Authorized removal of placeholder engine and fabricated schema/unsafe CLI semantics; retain safe utility bodies and nonauthoritative carriers. Final BODY/range proof must preserve all retained behavior coverage."
+}

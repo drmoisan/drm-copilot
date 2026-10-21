@@ -269,18 +269,23 @@ def _execute(
     )
 
 
-def _main(command: str) -> int:
-    """Run fixed command (str) with process argv/streams and local ports; return int.
+def run_installed_cli(command: str, argv: Sequence[str] | None = None) -> int:
+    """Run command (str) with the installed local-user composition; return int.
 
-    Reserve the argument-reference copy by count before slicing process argv.
-    Service import is fixed and lazy; runtime effects are delegated to run_cli.
-    No request data can select an implementation, principal or interpreter.
+    argv (Sequence[str] | None) supplies option tokens unchanged, or None selects
+    process arguments with count-before-slice reservation. Inputs and sys.argv
+    are never mutated. Unknown commands refuse before provider access. The fixed
+    lazy service receives the existing ports and process output streams; run_cli
+    owns invocation/runtime exits and any authorized workspace effects.
     """
     limits = ParseLimits()
-    # An oversized vector goes uncopied to the parser's count-first refusal path.
-    arguments = (
-        sys.argv if len(sys.argv) > limits.artifact_records + 1 else sys.argv[1:]
-    )
+    arguments = argv
+    # Explicit vectors reach the bounded parser uncopied; only process argv drops
+    # its executable token, after reserving the reference copy by count.
+    if arguments is None:
+        arguments = (
+            sys.argv if len(sys.argv) > limits.artifact_records + 1 else sys.argv[1:]
+        )
     return run_cli(
         command,
         arguments,
@@ -296,6 +301,15 @@ def _main(command: str) -> int:
         stderr=sys.stderr,
         limits=limits,
     )
+
+
+def _main(command: str) -> int:
+    """Forward fixed command (str) to the public installed entry; return its exit.
+
+    Keep existing zero-argument wrappers and the run_cli patch seam compatible.
+    The installed entry owns process arguments, output and service effects.
+    """
+    return run_installed_cli(command)
 
 
 def main_init() -> int:
