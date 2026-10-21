@@ -51,6 +51,7 @@ def migration_capture_case(
     # Materialize the shared immutable graph into fresh per-test memory.
     for path in plan.directories:
         io.disk.store.metadata.add(path, kind="directory")
+    # Preserve captured file bytes in this test's isolated memory store.
     for file in plan.mutation.prospective.manifest.files:
         io.disk.store.put(file.path, file.content)
     io.disk.store.put("legacy/original.json", b'{"legacy":true}')
