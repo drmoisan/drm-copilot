@@ -1,0 +1,50 @@
+{
+  "Timestamp": "2026-10-21T17-38",
+  "Command": "git rev-parse HEAD; Test-Path for the five exact owned paths",
+  "EXIT_CODE": 0,
+  "Output Summary": "Accepted HEAD matches; all five canonical agent/test paths are absent.",
+  "task": "P7-T1",
+  "head": "5c6bceddd5b164e49544da8ac0adb9d841b40700",
+  "route": "gateway_p7t1_implementation_20261021T173800",
+  "profile_sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+  "owned_paths": [
+    {
+      "path": ".github/agents/legacy-parity-analyst.agent.md",
+      "exists": false,
+      "sha256": null
+    },
+    {
+      "path": ".github/agents/runtime-characterization-analyst.agent.md",
+      "exists": false,
+      "sha256": null
+    },
+    {
+      "path": ".github/agents/requirements-reconciler.agent.md",
+      "exists": false,
+      "sha256": null
+    },
+    {
+      "path": ".github/agents/migration-coverage-reviewer.agent.md",
+      "exists": false,
+      "sha256": null
+    },
+    {
+      "path": "tests/scripts/dev_tools/test_discovery_agent_contracts.py",
+      "exists": false,
+      "sha256": null
+    }
+  ],
+  "baseline_gates": {
+    "black": "not applicable: owned files absent",
+    "ruff": "not applicable: owned files absent",
+    "pyright": "not applicable: owned files absent",
+    "pytest": "new contract module absent; accepted semantic proof reused",
+    "coverage": "Markdown authoring and test module only; no executable production body changed"
+  },
+  "retained_contract": "evidence/other/p7-service-interface-delta.2026-10-20T17-14.md",
+  "retained_semantic_proof": [
+    "tests/discovery_runtime/test_agent_output.py",
+    "tests/discovery_runtime/test_validation_modes.py"
+  ],
+  "qualification": "Owned-path absence only; no second shared baseline or predecessor suite execution."
+}

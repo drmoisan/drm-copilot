@@ -1,0 +1,53 @@
+{
+  "task": "P7-T1 canonical agents",
+  "stage": "black",
+  "command": [
+    "WORKSPACE\\.venv\\Scripts\\python.exe",
+    "-m",
+    "black",
+    "--check",
+    "tests/scripts/dev_tools/test_discovery_agent_contracts.py"
+  ],
+  "clean": true,
+  "exit_code": 0,
+  "timeout": false,
+  "elapsed_seconds": 0.409212,
+  "started_utc": "2026-10-21T17:45:24.916738+00:00",
+  "operational_cap_seconds": 300,
+  "cap_is_eta": false,
+  "before": {
+    ".github/agents/legacy-parity-analyst.agent.md": "d509368846ec2202fff7e839018b25ff0bfa288ce1c629c1ffda67a1a6ab5afb",
+    ".github/agents/runtime-characterization-analyst.agent.md": "bbc9dacd58b4a85c235b3ee280e3d4650dfe081d7144a19ad947c617a5087d10",
+    ".github/agents/requirements-reconciler.agent.md": "0f3e4ea4164f669ea6e0c4621150dd56a79c581d319ebbac60ca45cc58fec0df",
+    ".github/agents/migration-coverage-reviewer.agent.md": "67b9d95b3c4ffecc2b88b632d9bd39560b369204badfc15061c42e25e42def71",
+    "tests/scripts/dev_tools/test_discovery_agent_contracts.py": "bbcdff51fcdc0bed31d87a099c06920074520be09b1594411ed9f620a93a50bf",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "pyproject.toml": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "tests/discovery_runtime/test_agent_output.py": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+    "tests/discovery_runtime/test_validation_modes.py": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7-service-interface-delta.2026-10-20T17-14.md": "41f4e54da8277a4650d4b5412818c2230826a891446bec01a6374968f6c0e143"
+  },
+  "after": {
+    ".github/agents/legacy-parity-analyst.agent.md": "d509368846ec2202fff7e839018b25ff0bfa288ce1c629c1ffda67a1a6ab5afb",
+    ".github/agents/runtime-characterization-analyst.agent.md": "bbc9dacd58b4a85c235b3ee280e3d4650dfe081d7144a19ad947c617a5087d10",
+    ".github/agents/requirements-reconciler.agent.md": "0f3e4ea4164f669ea6e0c4621150dd56a79c581d319ebbac60ca45cc58fec0df",
+    ".github/agents/migration-coverage-reviewer.agent.md": "67b9d95b3c4ffecc2b88b632d9bd39560b369204badfc15061c42e25e42def71",
+    "tests/scripts/dev_tools/test_discovery_agent_contracts.py": "bbcdff51fcdc0bed31d87a099c06920074520be09b1594411ed9f620a93a50bf",
+    "tests/conftest.py": "c4a06d5a23a8eec8d2e416c4e53fe1791b6ee7fe7395acacadc612f99d66a8bf",
+    "pyproject.toml": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+    "packages/discovery-runtime/src/drm_copilot_discovery/path_policy.py": "f36d8d6f8d8e8320a522e4a45c8d42b4220b48ca7cc4ad6188dff43affcfa7fd",
+    "tests/discovery_runtime/test_agent_output.py": "564ea83477f16f10a107c25a9a4b8e3adf4833193de4325443b6f453728e721b",
+    "tests/discovery_runtime/test_validation_modes.py": "98d747f7309d2a9240c248c3eaf684572b0899809a41e116ae19475f9490c113",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md": "9af963db8e83af6d36fdb7214bf6d6a3313f6206ca7e0a58b67fccac879da718",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7-service-interface-delta.2026-10-20T17-14.md": "41f4e54da8277a4650d4b5412818c2230826a891446bec01a6374968f6c0e143"
+  },
+  "stdout": "",
+  "stderr": "All done! \u2728 \ud83c\udf70 \u2728\n1 file would be left unchanged.",
+  "executed_nodes": [],
+  "raw_archive": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p7t1-canonical-agents-loop2-black-raw.2026-10-21T17-45.json",
+  "raw_archive_sha256": "da727230028b931fc85347f6e5dac636cf68b7ac724e30a5249ad91c34c6af0a"
+}
