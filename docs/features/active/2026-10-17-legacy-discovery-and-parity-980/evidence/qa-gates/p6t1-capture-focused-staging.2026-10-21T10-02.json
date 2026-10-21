@@ -1,0 +1,73 @@
+{
+  "Timestamp": "2026-10-21T10:02:52.787639+00:00",
+  "bindings_excluding_self": [
+    {
+      "bytes": 7129,
+      "expected_git_blob": "75859559897c17097d04acbc75b53230bd4d00f7",
+      "git_lf_sha256": "c46d437ddc4a4177775bf9bb57cd61cb87e00ca04e6111b3dc3821fd92b92402",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-assembly-failure.2026-10-21T10-03.json",
+      "working_sha256": "c46d437ddc4a4177775bf9bb57cd61cb87e00ca04e6111b3dc3821fd92b92402"
+    },
+    {
+      "bytes": 6332,
+      "expected_git_blob": "b900433a4ca2a61a117f1c4cbe71a8424d14bdb5",
+      "git_lf_sha256": "a9b1eb7bcfc79e50d7989c69c3fc3ca69cc8230bb3a7b140843fe6f96fe5b2c6",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-assembly-raw.2026-10-21T10-02.json",
+      "working_sha256": "a9b1eb7bcfc79e50d7989c69c3fc3ca69cc8230bb3a7b140843fe6f96fe5b2c6"
+    },
+    {
+      "bytes": 63778,
+      "expected_git_blob": "ff63d06e2fee55921784d56ce1f891f3f3de5877",
+      "git_lf_sha256": "33ff9dcc48dc9797c443a098e5c2e83d7673e8f87ab2a96e025fecc1bd333952",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-body.2026-10-21T10-02.json",
+      "working_sha256": "33ff9dcc48dc9797c443a098e5c2e83d7673e8f87ab2a96e025fecc1bd333952"
+    },
+    {
+      "bytes": 8280,
+      "expected_git_blob": "cc1f2b952c78ee8878eab2e1ebdba0586766a671",
+      "git_lf_sha256": "2099d3be471f1d522193e3c605b52faf795779a5078337e5689740cdf1a03ab3",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-freeze.2026-10-21T10-02.json",
+      "working_sha256": "2099d3be471f1d522193e3c605b52faf795779a5078337e5689740cdf1a03ab3"
+    },
+    {
+      "bytes": 84446,
+      "expected_git_blob": "73d111190664e9b60eb57411d1093b714abb78b6",
+      "git_lf_sha256": "3aaeebf019491dfd7ad87966ab9c819cfc9f7b50a6fb204fcc49c21d70542480",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests-raw.2026-10-21T09-57.json",
+      "working_sha256": "3aaeebf019491dfd7ad87966ab9c819cfc9f7b50a6fb204fcc49c21d70542480"
+    },
+    {
+      "bytes": 88881,
+      "expected_git_blob": "e7fdd887e3d8a9e385d39253f1bd10d029109a05",
+      "git_lf_sha256": "bad7595d9b9dd7e58dcead976553d30d551ae8e69ebc003bd3609d241006f602",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests.2026-10-21T09-57.json",
+      "working_sha256": "bad7595d9b9dd7e58dcead976553d30d551ae8e69ebc003bd3609d241006f602"
+    },
+    {
+      "bytes": 12321,
+      "expected_git_blob": "e341060c162569dcb51acfcb03bf543f0e966c8a",
+      "git_lf_sha256": "312399756ab0b0f9b4a1ca8a66dd7f9646792325b236db76b8e7af4a7da38ed4",
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests.2026-10-21T09-57.md",
+      "working_sha256": "312399756ab0b0f9b4a1ca8a66dd7f9646792325b236db76b8e7af4a7da38ed4"
+    }
+  ],
+  "freeze": {
+    "bytes": 8280,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-freeze.2026-10-21T10-02.json",
+    "sha256": "2099d3be471f1d522193e3c605b52faf795779a5078337e5689740cdf1a03ab3"
+  },
+  "self_binding": "Listed; hash reported externally.",
+  "source_or_package_changes": false,
+  "stage_paths": [
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-assembly-failure.2026-10-21T10-03.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-assembly-raw.2026-10-21T10-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-body.2026-10-21T10-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-freeze.2026-10-21T10-02.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests-raw.2026-10-21T09-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests.2026-10-21T09-57.json",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-093334-tests.2026-10-21T09-57.md",
+    "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-focused-staging.2026-10-21T10-02.json"
+  ],
+  "task": "P6-T1",
+  "total_stage_paths": 8
+}
