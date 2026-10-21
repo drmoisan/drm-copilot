@@ -1,0 +1,190 @@
+{
+  "Timestamp": "2026-10-21T09:34:01.788061+00:00",
+  "accepted_wip_commit": "3ba2063649ae7112db056ef04255232ffbb47a17",
+  "approved_predecessor_deviation": {
+    "change": "Only forced revision=None removed from the coverage-ledger update. The trusted initialization revision is retained; components and inventory references stay empty. Original legacy provenance and unresolved obligations remain unchanged.",
+    "current_sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1",
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+    "preimage_qualification": "Reconstructed by reversing the single authorized assignment removal and verified against the immutable preimage digest.",
+    "preimage_sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db"
+  },
+  "archive": {
+    "bytes": 16595,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-trusted-revision-wip-raw.2026-10-21T09-34.json",
+    "sha256": "a2a11e9a335b0bd5414f8170315c5dafbc3091bd3956c400db413edb4b305248"
+  },
+  "candidate": [
+    {
+      "bytes": 15075,
+      "lines": 354,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "sha256": "56ab62413a73c9e9e3e1e8f3c68de5e426222115366a0362f1bb0b792e13ec01"
+    },
+    {
+      "bytes": 13127,
+      "lines": 287,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_capture.py",
+      "sha256": "ffb07582f5aa78c99d16f6ddfc4e815702e520d49ccc415d3bb011d8dbdbaf28"
+    },
+    {
+      "bytes": 22266,
+      "lines": 500,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/mutation_plan.py",
+      "sha256": "757adb171348afeca9c8c9a58b909fef094fc6d21d0a57072092f5a33c3b2043"
+    },
+    {
+      "bytes": 20056,
+      "lines": 497,
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0"
+    },
+    {
+      "bytes": 7308,
+      "lines": 168,
+      "path": "tests/discovery_runtime/test_service_migration.py",
+      "sha256": "e7fac4f94494755928f19abe6857df611692c32e14f7d6c990e02a04e1115165"
+    },
+    {
+      "bytes": 19857,
+      "lines": 480,
+      "path": "tests/discovery_runtime/test_migration_capture.py",
+      "sha256": "4cb44991947a5fc4083a7aabedcfc19778d51eb88878d52d481bc7008e302b4f"
+    },
+    {
+      "bytes": 12914,
+      "lines": 326,
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "74939d26d340018eebc3de0ec4b6fba833badcfc98f19f6ef4017cf77e3c5bc1"
+    }
+  ],
+  "complete_focused_population": {
+    "count": 40,
+    "nodes": [
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[coverage-ledger]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[evidence-reference]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[feature-contract]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[parity-matrix]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[product-decision]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[runtime-characterization-scenario]",
+      "tests/discovery_runtime/test_service_migration.py::test_registered_v1_kind_reaches_exact_migration_request[unspecified-behavior]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[unknown]",
+      "tests/discovery_runtime/test_service_migration.py::test_invalid_v1_schema_identity_never_publishes[body-mismatch]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[False]",
+      "tests/discovery_runtime/test_service_publication.py::test_snapshot_export_uses_authored_identity_and_complete_original_capture[True]",
+      "tests/discovery_runtime/test_service_publication.py::test_clean_snapshot_export_publishes_exact_files",
+      "tests/discovery_runtime/test_service_publication.py::test_link_evidence_uses_captured_payload_and_exact_target_digest",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_empty_selection_preserves_original_io",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_retains_exact_files_and_trusted_ports",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[duplicate]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[traversal]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_invalid_selection[link]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[changed]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_changed_originals[missing]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_rejects_conflicting_observations",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[file-count]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[work]",
+      "tests/discovery_runtime/test_migration_capture.py::test_migration_capture_reserves_before_reads[bytes]",
+      "tests/discovery_runtime/test_mutation_plan.py::test_values_reject_mutability_and_metadata_ambiguity",
+      "tests/discovery_runtime/test_mutation_plan.py::test_planner_projects_complete_valid_graph_and_preserves_originals",
+      "tests/discovery_runtime/test_mutation_plan.py::test_projection_refuses_uncaptured_profile_bytes",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[coalesced]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[count-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[read-exhausted]",
+      "tests/discovery_runtime/test_migration_capture.py::test_capture_checks_exact_capacity_and_original_bytes[byte-conflict]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[count-short]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-exact]",
+      "tests/discovery_runtime/test_migration_capture.py::test_projection_reserves_exact_merged_capacity_before_retention[bytes-short]",
+      "tests/discovery_runtime/test_migration_unknowns.py::test_every_original_field_remains_untrusted_metadata[coverage-ledger]",
+      "tests/discovery_runtime/test_migration_unknowns.py::test_legacy_claims_do_not_become_verified_target_state[coverage-ledger-fields4]",
+      "tests/discovery_runtime/test_coverage_scope.py::test_trusted_pin_mismatch_is_rejected_even_when_documents_agree[coverage-ledger]"
+    ],
+    "status": "Pending; the five-control proof is not full40 coverage."
+  },
+  "coverage_qualification": "Exact raw coverage remains in the five-control archive; full focused named-body/changed-line audit and separately retained unchanged-body proof are pending.",
+  "dependencies": {
+    "additional_existing_tests": [
+      {
+        "bytes": 19193,
+        "path": "tests/discovery_runtime/test_mutation_plan.py",
+        "sha256": "5530ef4b21063238d5a2a4ef3d2d409a078d534b3ad7504e99fb39f32b5e71c4"
+      },
+      {
+        "bytes": 17429,
+        "path": "tests/discovery_runtime/test_migration_unknowns.py",
+        "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e"
+      },
+      {
+        "bytes": 17403,
+        "path": "tests/discovery_runtime/test_coverage_scope.py",
+        "sha256": "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3"
+      }
+    ],
+    "before_after_equal": true,
+    "binding_receipt": {
+      "bytes": 75764,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+      "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+    }
+  },
+  "elapsed_seconds": 495.998109,
+  "five_control_pass": {
+    "bytes": 75764,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092509-revision-precheck.2026-10-21T09-33.json",
+    "sha256": "6bd62cee09b51f6bdb5ec2aa66fa72ba35f898f5dbd33e864a9983753fd881b0"
+  },
+  "five_nodes": [
+    "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+    "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+    "tests/discovery_runtime/test_migration_unknowns.py::test_every_original_field_remains_untrusted_metadata[coverage-ledger]",
+    "tests/discovery_runtime/test_migration_unknowns.py::test_legacy_claims_do_not_become_verified_target_state[coverage-ledger-fields4]",
+    "tests/discovery_runtime/test_coverage_scope.py::test_trusted_pin_mismatch_is_rejected_even_when_documents_agree[coverage-ledger]"
+  ],
+  "fixture_qualification": {
+    "added_assertion": "Both selected original path/content pairs retained.",
+    "all_prior_assertion_asts_preserved": true,
+    "only_existing_function_changed": "test_migration_uses_explicit_v1_bytes_and_reports_real_effects",
+    "other_function_class_asts_identical": true,
+    "parameter_nodes_unchanged": true,
+    "path": "tests/discovery_runtime/test_service_publication.py"
+  },
+  "ordered_statics": [
+    {
+      "bytes": 71868,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092448-format-check.2026-10-21T09-24.json",
+      "sha256": "e322f94c9623ffb83e376112326738393cbba6fa5ac380bae3465c3a7df8d470"
+    },
+    {
+      "bytes": 71797,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092458-lint.2026-10-21T09-24.json",
+      "sha256": "39bda63735d978db174bffc01fa4e0b05a98cf7018f6407af855c457e4733afe"
+    },
+    {
+      "bytes": 71965,
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-092502-types.2026-10-21T09-25.json",
+      "sha256": "491744b51833585507a4d844f759d723b418a751ce7ff2adab7884edd81f65e3"
+    }
+  ],
+  "pending": [
+    "Full40 focused tests and body coverage",
+    "Independent bounded confirmation",
+    "Package identity regeneration by designated owner",
+    "Final expected329 deduplication/execution and task acceptance"
+  ],
+  "retained_base": {
+    "bytes": 12351,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-checked-wip-freeze.2026-10-21T08-53.json",
+    "sha256": "0edbedb11c8237558b0afe2fb38a5c8540aa9103175f5c67a53483c9d467317c"
+  },
+  "review_authority": {
+    "bytes": 6433,
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-executor-migration-revision-confirmation.2026-10-21T09-21.json",
+    "sha256": "aee29e20fbcab4a11146117ff7512523aeef53edc6c331303413631537ad7c10"
+  },
+  "route": "workspace_operations_p6t1_trusted_revision_20261021T091800",
+  "status": "CHECKED_REVISION_FIX_PENDING_FULL40",
+  "task": "P6-T1",
+  "task_acceptance": false
+}

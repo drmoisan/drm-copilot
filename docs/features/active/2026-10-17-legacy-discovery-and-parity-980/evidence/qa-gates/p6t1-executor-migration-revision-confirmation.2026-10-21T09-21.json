@@ -1,0 +1,106 @@
+{
+  "issue": 980,
+  "task": "P6-T1",
+  "timestamp_utc": "2026-10-21T09:21:00Z",
+  "status": "READY_FOR_BOUNDED_REPAIR",
+  "review_kind": "Read-only contract confirmation; not implementation or acceptance",
+  "authority_route": "atomic_execution_p6t1_context_confirmation_20261021T090800",
+  "head": "3ba2063649ae7112db056ef04255232ffbb47a17",
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-capture-repair-090717-migration-diagnosis.2026-10-21T09-08.json",
+      "sha256": "850309dffe7eb885f4980b36a48078e88c2f8408b858e482bea43915617de006",
+      "bytes": 87161
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py",
+      "sha256": "8f7acfecbf198ee472f2ecafa363c455b02991e097d4bd918b07923506c5a6db",
+      "bytes": 12929
+    },
+    {
+      "path": "tests/discovery_runtime/test_service_publication.py",
+      "sha256": "17a77ad291a9ad3fce81e1bb34768fb2f33bf6e66396b792ed5915b439acacc0",
+      "bytes": 20056
+    }
+  ],
+  "finding": {
+    "id": "MIGRATION_CURRENT_REVISION",
+    "classification": "Production composition mismatch",
+    "location": "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py:302",
+    "retained_result": "Both existing migration variants failed with exit 1 / COVERAGE_IDENTITY at migrated/coverage-ledger.json /scope_ref; zero passes. Earlier missing-context failure was removed by the separately confirmed two-source fixture.",
+    "source_basis": [
+      "init_projection.py:268-275 derives both empty scope and ledger draft values from the effective consumer profile, including its independently observed repository revision.",
+      "migration_conversion.py:298-302 copies the initialized ledger template and then overwrites only its revision with None.",
+      "coverage_scope_rules.py:297-315 correctly requires ledger, scope and trusted artifact ownership to agree."
+    ],
+    "contract": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/spec.md:461",
+    "contract_disposition": "Absent original legacy revision remains unknown legacy provenance. Retaining the independently observed current target revision in an empty initialized ledger is current ownership, not a claim that legacy rows were observed or verified at that revision.",
+    "preserved_provenance": "migration_conversion.py:254-260 and 307-318 retain open reconciliation records, original_document, source_path, source_sha256 and draft-reconciliation-required disposition. Legacy rows remain outside the authoritative empty target ledger."
+  },
+  "minimal_repair": {
+    "production_scope": [
+      "packages/discovery-runtime/src/drm_copilot_discovery/migration_conversion.py"
+    ],
+    "change": "Remove only revision=None from the coverage-ledger fields.update call; keep components=() and inventory_snapshot_refs=(). Retain the initialized template revision instead of assigning a caller/legacy revision.",
+    "comment_clarification": "If needed, clarify locally that legacy rows cannot establish pins or coverage, while the empty target retains its trusted initialization identity.",
+    "unchanged_contracts": [
+      "Original v1 bytes and declared migration extension",
+      "Open unresolved obligations and draft state",
+      "Scope/profile and trusted repository identity",
+      "Strict coverage identity validator",
+      "Empty components and inventory references",
+      "No activation or coverage/completion claim"
+    ],
+    "scope_exclusions": [
+      "No profile/scope nulling",
+      "No legacy pin promotion",
+      "No coverage validator change",
+      "No migration context fallback",
+      "No broader predecessor repair"
+    ]
+  },
+  "minimum_existing_controls": [
+    {
+      "node": "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[True]",
+      "purpose": "Existing pinned dry-run composition must validate without effects; retain both exact selected originals."
+    },
+    {
+      "node": "tests/discovery_runtime/test_service_publication.py::test_migration_uses_explicit_v1_bytes_and_reports_real_effects[False]",
+      "purpose": "Existing pinned real-write composition must retain the original effect and original-byte assertions."
+    },
+    {
+      "node": "tests/discovery_runtime/test_migration_unknowns.py::test_every_original_field_remains_untrusted_metadata[coverage-ledger]",
+      "purpose": "Exact original document, path, hash, draft disposition and open unresolved records remain intact."
+    },
+    {
+      "node": "tests/discovery_runtime/test_migration_unknowns.py::test_legacy_claims_do_not_become_verified_target_state[coverage-ledger-fields4]",
+      "purpose": "The existing no-repository-provider template remains null-pinned with empty components; no current pin is invented."
+    },
+    {
+      "node": "tests/discovery_runtime/test_coverage_scope.py::test_trusted_pin_mismatch_is_rejected_even_when_documents_agree[coverage-ledger]",
+      "purpose": "Actual captured ownership still rejects a mismatched trusted ledger pin; no validator weakening."
+    }
+  ],
+  "selector_qualification": "Selectors are derived from existing definitions and literal parametrization. No collection or execution was performed by this review. The two service nodes already belong to the affected population; the three other selectors are the only requested direct retained controls.",
+  "test_source_bindings": [
+    {
+      "path": "tests/discovery_runtime/test_migration_unknowns.py",
+      "sha256": "b6bfc944e756e01c0555823ce1ec5622a67f39da66762bd10123f03a24f44e1e",
+      "bytes": 17429
+    },
+    {
+      "path": "tests/discovery_runtime/test_coverage_scope.py",
+      "sha256": "aaca57772de274ebd9d82a2a6c0b55ccc8d6c57a8c5a62e021310b6d3d479fc3",
+      "bytes": 17403
+    }
+  ],
+  "verification_limits": {
+    "tests_run": false,
+    "runtime_or_native_invocations": false,
+    "source_or_test_edits": false,
+    "staging_or_git_mutation": false,
+    "task_accepted": false,
+    "new_matrix_required": false
+  },
+  "next": "Owner implements the one-branch correction under parent release and runs ordered statics plus these affected controls before the remaining authorized focused proof. Rebind the changed production body and regenerate package identity before any new installed-package claim. Existing unaffected source review remains reusable."
+}

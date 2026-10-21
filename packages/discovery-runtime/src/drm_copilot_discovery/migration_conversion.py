@@ -299,7 +299,7 @@ def convert_artifact(
         fields["id"] = identifier
         # Legacy rows cannot prove v2 pins/evidence; retain them only in metadata.
         if source.kind == "coverage-ledger":
-            fields.update(revision=None, components=(), inventory_snapshot_refs=())
+            fields.update(components=(), inventory_snapshot_refs=())
         else:
             fields.update(entries=(), source_repositories=(), target_repositories=())
         converted = JsonObject(tuple(fields.items()))

@@ -32,6 +32,7 @@ from tests.discovery_runtime.test_service import (
 from tests.discovery_runtime.test_service import (
     service_plan as service_plan,
 )
+from tests.discovery_runtime.test_service_migration import migration_inputs
 
 if TYPE_CHECKING:
     from drm_copilot_discovery.catalog import SchemaCatalog
@@ -414,30 +415,29 @@ def test_failed_initialization_retains_conflicting_path_without_fake_digest(
 def test_migration_uses_explicit_v1_bytes_and_reports_real_effects(
     initialization_catalog: SchemaCatalog, dry_run: bool
 ) -> None:
-    """Migrate explicit legacy bytes in memory with dry_run; return None."""
+    """Migrate linked originals using initialization_catalog (SchemaCatalog).
+
+    dry_run (bool) selects planning or memory publication. Return None after
+    checking both exact originals and real effects; no external I/O occurs.
+    """
     io = MemoryService(initialization_catalog)
     source = source_for("coverage-ledger")
-    io.disk.store.put(source.path, source.content)
+    sources = (source, source_for("feature-contract"))
+    # The ledger's authored feature-alpha reference needs this explicit contract.
+    for original in sources:
+        io.disk.store.put(original.path, original.content)
+    inputs = migration_inputs(source)
+    del inputs["input_path"]
+    # Select exactly both originals without granting their containing directory.
+    inputs["paths"] = [original.path for original in sources]
     before = dict(io.disk.store.files)
-    result = invoke(
-        io,
-        "migrate",
-        {
-            "input_path": source.path,
-            "from_version": 1,
-            "to_version": 2,
-            "destination": "migrated",
-            "system_id": "consumer-system",
-            "system_name": "Consumer system",
-            "system_role": "combined",
-            "repository_id": "consumer-repository",
-            "draft": True,
-        },
-        dry_run=dry_run,
-    )
+    result = invoke(io, "migrate", inputs, dry_run=dry_run)
     assert result.ok and result.artifacts, result.findings
     assert result.input_manifest is not None
     assert any(file.content == source.content for file in result.input_manifest.files)
+    # Preserve each original under its exact selected identity, not merely bytes.
+    captured = {file.path: file.content for file in result.input_manifest.files}
+    assert all(captured[original.path] == original.content for original in sources)
     assert (io.disk.store.files == before) is dry_run
     assert all(row.kind != "directory" for row in result.artifacts)
 
