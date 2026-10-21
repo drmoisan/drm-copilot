@@ -1,0 +1,20 @@
+{
+  "task": "P6-T1",
+  "timestamp": "2026-10-21T12:01:05.2837976Z",
+  "status": "APPROVED_NEW_PATH_ABSENT",
+  "owned_path": "tests/discovery_runtime/test_service_context_guards.py",
+  "absent": true,
+  "existing_production_changes": [],
+  "existing_test_changes": [],
+  "expected_new_cases": 7,
+  "control_map": {
+    "sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json"
+  },
+  "retained_baseline": {
+    "tests": "329 passed; coverage gate failed; contracts unexecuted",
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-stopped-handoff.2026-10-21T11-44.json",
+    "sha256": "48dfc038b543a07175ead8f10aa00a22eae878190b7f913d07d2dc9c2d783c23",
+    "reuse": "No behavioral baseline replay authorized"
+  }
+}

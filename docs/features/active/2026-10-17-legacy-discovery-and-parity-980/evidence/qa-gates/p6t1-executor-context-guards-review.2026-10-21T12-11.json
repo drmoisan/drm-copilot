@@ -1,0 +1,363 @@
+{
+  "Timestamp": "2026-10-21T12:11:42.669716+00:00",
+  "issue_number": 980,
+  "task": "P6-T1",
+  "route": "atomic_execution_p6t1_guard_confirmation_20261021T120600",
+  "status": "CHANGES_REQUIRED_DOCSTRINGS_ONLY",
+  "current_head": "77d9c7e464f4516765c9697e18909d927ab036d5",
+  "owned_test": {
+    "path": "tests/discovery_runtime/test_service_context_guards.py",
+    "working_sha256": "1563b054e7ab188b6ac11742ca24a6c317ee65dea03f2cb8d74ecf3673d44ee9",
+    "git_lf_sha256": "1563b054e7ab188b6ac11742ca24a6c317ee65dea03f2cb8d74ecf3673d44ee9",
+    "expected_git_blob": "73ec2cf8e37464dac087b445b230570cdbe8e871",
+    "bytes": 11332,
+    "git_lf_bytes": 11332
+  },
+  "bindings": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-freeze.2026-10-21T12-07.json",
+      "working_sha256": "80b69e65e8e9c8f7aa8eb9a0539e9f280e1dc023a23a177e370a9d20d4b04506",
+      "git_lf_sha256": "80b69e65e8e9c8f7aa8eb9a0539e9f280e1dc023a23a177e370a9d20d4b04506",
+      "expected_git_blob": "7815f5081cc8bc11c67bcf7db4a7d81da3919f86",
+      "bytes": 4127,
+      "git_lf_bytes": 4127
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-context-guards-body-preflight.2026-10-21T12-07.json",
+      "working_sha256": "51f3a0e82f75e3a02f0fe8d04d4edd13a0a3411d596915561d2a8b4369aec4d6",
+      "git_lf_sha256": "51f3a0e82f75e3a02f0fe8d04d4edd13a0a3411d596915561d2a8b4369aec4d6",
+      "expected_git_blob": "dfe48aaba9f9c196531f5ec159801fc1cb3529ed",
+      "bytes": 61407,
+      "git_lf_bytes": 61407
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-staging.2026-10-21T12-07.json",
+      "working_sha256": "250146ffd838c6af08fdaeeb7defc45420fc6098aca3e0bed0589d2a959ccb70",
+      "git_lf_sha256": "250146ffd838c6af08fdaeeb7defc45420fc6098aca3e0bed0589d2a959ccb70",
+      "expected_git_blob": "5e9f00c6437bf2c39093d5c0c94358eb50c9378f",
+      "bytes": 9627,
+      "git_lf_bytes": 9627
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-order-qualification.2026-10-21T12-08.json",
+      "working_sha256": "bc60028a9266f0909146432b9e4768dda22dbdf41ac5953254ac01c85a2ac15f",
+      "git_lf_sha256": "bc60028a9266f0909146432b9e4768dda22dbdf41ac5953254ac01c85a2ac15f",
+      "expected_git_blob": "bf42fd84e8cadc858ddc4ac541636dc6c5a21db5",
+      "bytes": 2748,
+      "git_lf_bytes": 2748
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-diagnosis.2026-10-21T11-47.json",
+      "working_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "git_lf_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "expected_git_blob": "1562bcf4e55de51a52def2159fc19245a8c1ad52",
+      "bytes": 59777,
+      "git_lf_bytes": 59777
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+      "working_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "git_lf_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "expected_git_blob": "0bc58a5960d85b0af970c2f0769cf50d685588f0",
+      "bytes": 17120,
+      "git_lf_bytes": 17120
+    }
+  ],
+  "functional_review": "CLEAR for CG1-CG7. Typed codes/exit status, exact captured state, read/writer absence, drift and actor refusal are asserted using in-memory collaborators. CG2 explicitly labels its injected None contract violation and does not reinterpret the real required-read behavior. No new behavior probe, production edit or existing-test change is requested.",
+  "complete_findings": [
+    {
+      "id": "CG-DOC1",
+      "severity": "repository-policy",
+      "scope": "Exactly the 13 function docstrings in the new context test module.",
+      "policy": ".agents/skills/self-explanatory-code-commenting/SKILL.md#mandatory-function-and-method-docstrings",
+      "requirement": "Parameters: meaning, constraints, and how used (types included, even when type hints are present); returns and contract-relevant raises/side effects.",
+      "wording": [
+        {
+          "function": "test_configured_uncaptured_read_refuses_before_physical_io",
+          "line": 37,
+          "parameters": {
+            "service_io": "MemoryService",
+            "monkeypatch": "pytest.MonkeyPatch"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_required_read_none_contract_violation_refuses_fabricated_bytes",
+          "line": 66,
+          "parameters": {
+            "context": "OperationContext",
+            "service_io": "MemoryService",
+            "monkeypatch": "pytest.MonkeyPatch"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_naive_trusted_clock_refuses_before_capture_or_publication",
+          "line": 100,
+          "parameters": {
+            "service_io": "MemoryService"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_missing_activation_profile_refuses_without_graph_authority",
+          "line": 142,
+          "parameters": {
+            "service_io": "MemoryService",
+            "monkeypatch": "pytest.MonkeyPatch"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_profile_change_between_selection_and_capture_refuses_publication",
+          "line": 171,
+          "parameters": {
+            "service_io": "MemoryService",
+            "monkeypatch": "pytest.MonkeyPatch"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+          "line": 200,
+          "parameters": {
+            "service_io": "MemoryService",
+            "monkeypatch": "pytest.MonkeyPatch"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "test_bootstrap_rejects_wrong_operation_family_without_effects",
+          "line": 236,
+          "parameters": {
+            "context": "OperationContext",
+            "service_io": "MemoryService"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None; use the specified function-scoped memory fixtures and patcher, preserve the asserted refusal/state boundary, and describe any deliberate fake mutation. No external I/O."
+        },
+        {
+          "function": "read_uncaptured",
+          "line": 49,
+          "parameters": {
+            "selected": "OperationContext"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "NoReturn: propagate OperationFailure for the uncaptured path; append the prior read observations to the local list, with no new physical read or write."
+        },
+        {
+          "function": "absent_bytes",
+          "line": 80,
+          "parameters": {
+            "reader": "SnapshotIO",
+            "path": "str",
+            "limit": "int",
+            "required": "bool"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return None deliberately as a contract-violating fake; append only the exact call tuple, with no I/O."
+        },
+        {
+          "function": "select_without_profile",
+          "line": 150,
+          "parameters": {
+            "store": "ActivationStore",
+            "profile_path": "str | None",
+            "controlled": "bool"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return an inactive ConfigurationSelection; append only the selection arguments, with no reads or writes."
+        },
+        {
+          "function": "select_then_change_profile",
+          "line": 179,
+          "parameters": {
+            "store": "ActivationStore",
+            "profile_path": "str | None",
+            "controlled": "bool"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return the original ConfigurationSelection after real trusted selection; deliberately mutate the in-memory profile bytes and propagate selection errors."
+        },
+        {
+          "function": "changed_actor",
+          "line": 207,
+          "parameters": {
+            "provider": "MemoryService",
+            "request": "ServiceRequest",
+            "baseline": "CapturedWorkspace | None"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "Return ServiceAuthority, changing the actor only after capture; call the memory authorization provider and retain its counter effect, without file writes."
+        },
+        {
+          "function": "reject_dispatch",
+          "line": 220,
+          "parameters": {
+            "selected": "OperationContext"
+          },
+          "required_correction": "Name each parameter with its explicit type and existing role/constraints in the docstring; type hints alone do not meet the repository docstring contract.",
+          "return_and_effect_contract": "NoReturn: fail the test if a typed context reaches dispatch; no external I/O or file mutation."
+        }
+      ],
+      "repair_boundary": "Docstrings only. Preserve all executable, assertion, decorator and parameter ASTs, seven node identities, source/dependency/package/reader bytes and original diagnostics."
+    }
+  ],
+  "ordered_gates": [
+    {
+      "stage": "black",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-black.2026-10-21T12-04.json",
+        "sha256": "11c0043253aed68c5d21a3380a77382f130803fd1696f8303c646c5befd17a73"
+      },
+      "started_utc": "2026-10-21T12:04:38.048353+00:00",
+      "elapsed_seconds": 0.408248,
+      "exit_code": 0,
+      "unchanged_bindings": 239
+    },
+    {
+      "stage": "ruff",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-ruff.2026-10-21T12-04.json",
+        "sha256": "365f666551124a144f599165b2731c2bbdca2b3c8636162ef83d5a8a53bc677a"
+      },
+      "started_utc": "2026-10-21T12:04:38.492138+00:00",
+      "elapsed_seconds": 0.207874,
+      "exit_code": 0,
+      "unchanged_bindings": 239
+    },
+    {
+      "stage": "pyright",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-pyright.2026-10-21T12-04.json",
+        "sha256": "f937fd30dce162f511bb3505ffecbcf3443a43c8d6b3245737fb8f084437c0db"
+      },
+      "started_utc": "2026-10-21T12:04:38.741488+00:00",
+      "elapsed_seconds": 1.218091,
+      "exit_code": 0,
+      "unchanged_bindings": 239
+    },
+    {
+      "stage": "tests",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-tests.2026-10-21T12-05.json",
+        "sha256": "70b2c5d27c15895c2d6d8bd66f6c2c04c7d3c7d9ff2c99692389a84feddf1a39"
+      },
+      "started_utc": "2026-10-21T12:04:39.998250+00:00",
+      "elapsed_seconds": 55.135124,
+      "exit_code": 0,
+      "unchanged_bindings": 239
+    },
+    {
+      "stage": "coverage",
+      "receipt": {
+        "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-pass3-coverage.2026-10-21T12-05.json",
+        "sha256": "8db9081e075e130522bb204739f649489017f1f23db7a7a919e3624cc86943cf"
+      },
+      "started_utc": "2026-10-21T12:05:35.195021+00:00",
+      "elapsed_seconds": 0.409024,
+      "exit_code": 0,
+      "unchanged_bindings": 239
+    }
+  ],
+  "verified_raw_members": 16,
+  "exact_seven_nodes": [
+    "tests/discovery_runtime/test_service_context_guards.py::test_configured_uncaptured_read_refuses_before_physical_io",
+    "tests/discovery_runtime/test_service_context_guards.py::test_required_read_none_contract_violation_refuses_fabricated_bytes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_naive_trusted_clock_refuses_before_capture_or_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_missing_activation_profile_refuses_without_graph_authority",
+    "tests/discovery_runtime/test_service_context_guards.py::test_profile_change_between_selection_and_capture_refuses_publication",
+    "tests/discovery_runtime/test_service_context_guards.py::test_changed_reauthorization_actor_refuses_dispatch_and_writes",
+    "tests/discovery_runtime/test_service_context_guards.py::test_bootstrap_rejects_wrong_operation_family_without_effects"
+  ],
+  "body_confirmation": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/operations.py",
+      "name": "OperationContext.read",
+      "fresh_lines": 7,
+      "fresh_total": 9,
+      "retained_lines": 7,
+      "diagnostic_union_lines": 9,
+      "diagnostic_union_branches": 6,
+      "raw_counters_augmented": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service.py",
+      "name": "_context",
+      "fresh_lines": 26,
+      "fresh_total": 29,
+      "retained_lines": 25,
+      "diagnostic_union_lines": 29,
+      "diagnostic_union_branches": 14,
+      "raw_counters_augmented": false
+    },
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/service_bootstrap.py",
+      "name": "bootstrap",
+      "fresh_lines": 4,
+      "fresh_total": 7,
+      "retained_lines": 6,
+      "diagnostic_union_lines": 7,
+      "diagnostic_union_branches": 6,
+      "raw_counters_augmented": false
+    }
+  ],
+  "body_qualification": "Retained 329 plus focused seven is diagnostic preflight only. All three exact named BODY unions close their measured statement/branch gaps. Raw run counters remain separate and unaugmented. Final single-process reversed complete population and four contracts remain pending.",
+  "evidence_closure": {
+    "owner_staging": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-staging.2026-10-21T12-07.json",
+      "working_sha256": "250146ffd838c6af08fdaeeb7defc45420fc6098aca3e0bed0589d2a959ccb70",
+      "git_lf_sha256": "250146ffd838c6af08fdaeeb7defc45420fc6098aca3e0bed0589d2a959ccb70",
+      "expected_git_blob": "5e9f00c6437bf2c39093d5c0c94358eb50c9378f",
+      "bytes": 9627,
+      "git_lf_bytes": 9627
+    },
+    "order_qualification": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/regression-testing/p6t1-context-guards-order-qualification.2026-10-21T12-08.json",
+      "working_sha256": "bc60028a9266f0909146432b9e4768dda22dbdf41ac5953254ac01c85a2ac15f",
+      "git_lf_sha256": "bc60028a9266f0909146432b9e4768dda22dbdf41ac5953254ac01c85a2ac15f",
+      "expected_git_blob": "bf42fd84e8cadc858ddc4ac541636dc6c5a21db5",
+      "bytes": 2748,
+      "git_lf_bytes": 2748
+    },
+    "diagnosis": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-diagnosis.2026-10-21T11-47.json",
+      "working_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "git_lf_sha256": "7789126d81b64b57fef63b5b6604d0ef196aab646356937ecb832eea266d84fa",
+      "expected_git_blob": "1562bcf4e55de51a52def2159fc19245a8c1ad52",
+      "bytes": 59777,
+      "git_lf_bytes": 59777
+    },
+    "control_map": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t1-final-103256-coverage-control-map.2026-10-21T11-52.json",
+      "working_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "git_lf_sha256": "9d12fc47706822cd5591e381d885ec26f71c355c237e2e35db15ef25d7292705",
+      "expected_git_blob": "0bc58a5960d85b0af970c2f0769cf50d685588f0",
+      "bytes": 17120,
+      "git_lf_bytes": 17120
+    },
+    "all_owner_path_hashes_match": true,
+    "originals_retained": true
+  },
+  "reader_diagnostic": "One exploratory metadata read correctly decoded both exact coverage_json members, then mistakenly attempted JSON parsing of a harness member whose key contained coverage; it raised JSONDecodeError Extra data. Reconciliation subsequently selected only the existing exact coverage_json key. No raw bytes, reader code, source or tests changed.",
+  "next_transition": "Parent may release the finite docstring correction with executable/assertion/decorator/parameter identity and clean ordered statics. Reuse the retained seven behavioral results under that exact prose-only qualification where policy permits. No added test or broad replay is requested.",
+  "open_behavior_findings": [],
+  "task_acceptance": false,
+  "counts_unchanged": {
+    "tasks": "46/84",
+    "AC": "23/66"
+  },
+  "next_five": [
+    "P6-T1",
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2"
+  ]
+}
