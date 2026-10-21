@@ -1,0 +1,2420 @@
+{
+  "Timestamp": "2026-10-21T15:31:13.599244+00:00",
+  "body_floor_gaps": [],
+  "convention": "Existing named BODY counters exclude declarations; empty class bodies are explicit zero denominators. Original executable lines/arcs and raw EOF remain unchanged.",
+  "module": {
+    "branch_percent": 100.0,
+    "branches": [
+      10,
+      10
+    ],
+    "line_percent": 100.0,
+    "missing_branches": [],
+    "missing_lines": [],
+    "statements": [
+      143,
+      143
+    ]
+  },
+  "new_module_baseline": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+    "sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465"
+  },
+  "raw_archive": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-152323-tests-raw.2026-10-21T15-30.json",
+    "sha256": "59c7ad644081ede217778b68f32af09f217200798cf1a8477e2085507b472315"
+  },
+  "raw_coverage_sha256": "c777f05c6c6458429995e3bcc4e86781ed1d09779f4b67ec52ccbfff8ef94af3",
+  "reader_bindings": {
+    "p6t1-mutation-guards-freeze.py": "20c8b8ba5dec95c6bab388440ae46b67b35441228089c9a907bd2c356e108d12",
+    "p6t1_final_nio1_coverage.py": "623edd1fe5f7befafd87052811b61d0554e747ca8711a10711e1186e31991b92",
+    "p6t1_final_nio1_static.py": "0b5c934b3bef161b3a34b73cf4e5637ee8df8f2c0ae7febeaf1d2b9ef7b785b9"
+  },
+  "receipt": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-152323-tests.2026-10-21T15-30.json",
+    "sha256": "d0f1c591a7575a16d9946a8582e20952dbc86fb5a56edba7f7a146af5cefc862"
+  },
+  "repair_no_loss": {
+    "changed_production_bodies": [
+      "_failure"
+    ],
+    "comparisons": [
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            0,
+            0
+          ]
+        },
+        "line_percent_delta": 0,
+        "name": "CliPorts",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            0,
+            0
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_failure",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": false
+      },
+      {
+        "branch_percent_delta": 0.0,
+        "current_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            3,
+            3
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_write",
+        "prior_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            3,
+            3
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0.0,
+        "current_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            4,
+            4
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_emit",
+        "prior_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            4,
+            4
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0.0,
+        "current_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            4,
+            4
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            30,
+            30
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "run_cli",
+        "prior_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            4,
+            4
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            30,
+            30
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0.0,
+        "current_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            4,
+            4
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_resolve_workspace",
+        "prior_BODY": {
+          "branch_percent": 100.0,
+          "branches": [
+            2,
+            2
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            4,
+            4
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_repository",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_create_io",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_clock",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            2,
+            2
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_execute",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            2,
+            2
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            3,
+            3
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "_main",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            3,
+            3
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_init",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_configure",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_profile",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_inventory",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_dotnet",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_vsto",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_new_contract",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_new_scenario",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_update_artifact",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_link_evidence",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_profile",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_feature_contract",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_coverage_ledger",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_runtime_scenario",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_parity_matrix",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_unspecified_behavior",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_product_decision",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_evidence_reference",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_decisions",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate_all",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_validate",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_coverage_report",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_parity_report",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_completion_report",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_generate_acceptance",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_generate_acceptance_scenarios",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_snapshot_export",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_snapshot_import",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_import_inventory",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_migrate",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      },
+      {
+        "branch_percent_delta": 0,
+        "current_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "line_percent_delta": 0.0,
+        "name": "main_doctor",
+        "prior_BODY": {
+          "branch_percent": 100,
+          "branches": [
+            0,
+            0
+          ],
+          "line_percent": 100.0,
+          "missing_branches": [],
+          "missing_lines": [],
+          "statements": [
+            1,
+            1
+          ]
+        },
+        "unchanged_executable_AST": true
+      }
+    ],
+    "original_node_order_preserved": true,
+    "original_outcomes": {
+      "failed": 4,
+      "passed": 54
+    },
+    "prior_raw_archive": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests-raw.2026-10-21T15-13.json",
+      "sha256": "8cddad96b2d593f2cd281f7da08c68af44256b6d3b518d4daefe83d06fd4c52f"
+    },
+    "prior_raw_coverage_sha256": "52bfe39e1e6f2df080cc45e2c114b88da52ff241ef91654d16e2491c80b743af",
+    "prior_receipt": {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests.2026-10-21T15-13.json",
+      "sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2"
+    },
+    "qualification": "The prior 54-pass/4-fail raw measurement is retained as comparison only. All current BODY and module counters come solely from the passing 58-case stream; no coverage union or acceptance is inferred from failed behavior."
+  },
+  "retained_predecessor": "P6-T1 accepted proof is unchanged and not combined with this new-module measurement.",
+  "source": {
+    "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+    "sha256": "95fb80158fb3600389299c8da9d47e619bf252e150203dacd9a4d5c0ce9f92b0"
+  },
+  "status": "FOCUSED_MEASUREMENT_NOT_FINAL_ACCEPTANCE",
+  "task": "P6-T2",
+  "units": [
+    {
+      "ast_range": [
+        41,
+        59
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          0,
+          0
+        ]
+      },
+      "kind": "classes",
+      "name": "CliPorts"
+    },
+    {
+      "ast_range": [
+        62,
+        104
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "_failure"
+    },
+    {
+      "ast_range": [
+        107,
+        115
+      ],
+      "current_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          3,
+          3
+        ]
+      },
+      "kind": "functions",
+      "name": "_write"
+    },
+    {
+      "ast_range": [
+        118,
+        128
+      ],
+      "current_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          4,
+          4
+        ]
+      },
+      "kind": "functions",
+      "name": "_emit"
+    },
+    {
+      "ast_range": [
+        131,
+        205
+      ],
+      "current_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          4,
+          4
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          30,
+          30
+        ]
+      },
+      "kind": "functions",
+      "name": "run_cli"
+    },
+    {
+      "ast_range": [
+        208,
+        217
+      ],
+      "current_BODY": {
+        "branch_percent": 100.0,
+        "branches": [
+          2,
+          2
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          4,
+          4
+        ]
+      },
+      "kind": "functions",
+      "name": "_resolve_workspace"
+    },
+    {
+      "ast_range": [
+        220,
+        228
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "_repository"
+    },
+    {
+      "ast_range": [
+        231,
+        238
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "_create_io"
+    },
+    {
+      "ast_range": [
+        241,
+        243
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "_clock"
+    },
+    {
+      "ast_range": [
+        246,
+        269
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          2,
+          2
+        ]
+      },
+      "kind": "functions",
+      "name": "_execute"
+    },
+    {
+      "ast_range": [
+        272,
+        298
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          3,
+          3
+        ]
+      },
+      "kind": "functions",
+      "name": "_main"
+    },
+    {
+      "ast_range": [
+        301,
+        303
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_init"
+    },
+    {
+      "ast_range": [
+        306,
+        308
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_configure"
+    },
+    {
+      "ast_range": [
+        311,
+        313
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_profile"
+    },
+    {
+      "ast_range": [
+        316,
+        318
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_inventory"
+    },
+    {
+      "ast_range": [
+        321,
+        323
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_dotnet"
+    },
+    {
+      "ast_range": [
+        326,
+        328
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_vsto"
+    },
+    {
+      "ast_range": [
+        331,
+        333
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_new_contract"
+    },
+    {
+      "ast_range": [
+        336,
+        338
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_new_scenario"
+    },
+    {
+      "ast_range": [
+        341,
+        343
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_update_artifact"
+    },
+    {
+      "ast_range": [
+        346,
+        348
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_link_evidence"
+    },
+    {
+      "ast_range": [
+        351,
+        353
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_profile"
+    },
+    {
+      "ast_range": [
+        356,
+        358
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_feature_contract"
+    },
+    {
+      "ast_range": [
+        361,
+        363
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_coverage_ledger"
+    },
+    {
+      "ast_range": [
+        366,
+        368
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_runtime_scenario"
+    },
+    {
+      "ast_range": [
+        371,
+        373
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_parity_matrix"
+    },
+    {
+      "ast_range": [
+        376,
+        378
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_unspecified_behavior"
+    },
+    {
+      "ast_range": [
+        381,
+        383
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_product_decision"
+    },
+    {
+      "ast_range": [
+        386,
+        388
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_evidence_reference"
+    },
+    {
+      "ast_range": [
+        391,
+        393
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_decisions"
+    },
+    {
+      "ast_range": [
+        396,
+        398
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate_all"
+    },
+    {
+      "ast_range": [
+        401,
+        403
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_validate"
+    },
+    {
+      "ast_range": [
+        406,
+        408
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_coverage_report"
+    },
+    {
+      "ast_range": [
+        411,
+        413
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_parity_report"
+    },
+    {
+      "ast_range": [
+        416,
+        418
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_completion_report"
+    },
+    {
+      "ast_range": [
+        421,
+        423
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_generate_acceptance"
+    },
+    {
+      "ast_range": [
+        426,
+        428
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_generate_acceptance_scenarios"
+    },
+    {
+      "ast_range": [
+        431,
+        433
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_snapshot_export"
+    },
+    {
+      "ast_range": [
+        436,
+        438
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_snapshot_import"
+    },
+    {
+      "ast_range": [
+        441,
+        443
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_import_inventory"
+    },
+    {
+      "ast_range": [
+        446,
+        448
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_migrate"
+    },
+    {
+      "ast_range": [
+        451,
+        453
+      ],
+      "current_BODY": {
+        "branch_percent": 100,
+        "branches": [
+          0,
+          0
+        ],
+        "line_percent": 100.0,
+        "missing_branches": [],
+        "missing_lines": [],
+        "statements": [
+          1,
+          1
+        ]
+      },
+      "kind": "functions",
+      "name": "main_doctor"
+    }
+  ]
+}

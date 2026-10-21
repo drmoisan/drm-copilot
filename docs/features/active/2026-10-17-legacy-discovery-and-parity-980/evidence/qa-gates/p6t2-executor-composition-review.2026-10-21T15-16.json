@@ -1,0 +1,168 @@
+{
+  "issue": 980,
+  "Timestamp": "2026-10-21T15:16:44.115545+00:00",
+  "task": "P6-T2",
+  "Command": ".venv/Scripts/python.exe -B SCRATCH/issue-980-p6t2-composition-findings.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "One composition failure-envelope defect and two fixture corrections explain all four failures in the complete frozen 58-case batch.",
+  "status": "CHANGES_REQUIRED",
+  "route": "atomic_execution_p6t2_composition_review_20261021T150200",
+  "source_head": "cb34737468e0bdb94056c51ee61c2a29ee3728b0",
+  "candidate_bindings": [
+    {
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "working_sha256": "791f03c1933b69b0b5e8fe3d3abd06acdb9eb76b8cdb1f9b438a5a9abe5cbb37",
+      "git_lf_sha256": "791f03c1933b69b0b5e8fe3d3abd06acdb9eb76b8cdb1f9b438a5a9abe5cbb37",
+      "expected_git_blob": "c37b2e97ff385754d10f7af0935fd0ed55046d9d",
+      "bytes": 16036,
+      "git_lf_bytes": 16036
+    },
+    {
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "working_sha256": "eb0927aafdfe4395961ee568d8cfd29c48a95830afd05699b1e35e5e4231e390",
+      "git_lf_sha256": "eb0927aafdfe4395961ee568d8cfd29c48a95830afd05699b1e35e5e4231e390",
+      "expected_git_blob": "bcff9d597cca29afd802b2f254e76d85483cd312",
+      "bytes": 18731,
+      "git_lf_bytes": 18731
+    },
+    {
+      "path": "tests/discovery_runtime/cli_test_support.py",
+      "working_sha256": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+      "git_lf_sha256": "1c193d50f6c45047053a10eb9868cf1c3d2f861cb1f6efd65409a88c8c728b36",
+      "expected_git_blob": "8669a385a43e8935f882c8a244d9be8d06dd056e",
+      "bytes": 2577,
+      "git_lf_bytes": 2577
+    },
+    {
+      "path": "pyproject.toml",
+      "working_sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+      "git_lf_sha256": "12a22982244f72e53e468af99a4c935c4e75b2ebca3bcdf59e9989e2f5e1d37d",
+      "expected_git_blob": "bb4048df7092b716c09f9851eadc9b7a7c3d5320",
+      "bytes": 7015,
+      "git_lf_bytes": 7015
+    },
+    {
+      "path": "packages/discovery-runtime/pyproject.toml",
+      "working_sha256": "22d79f77a64d38387f45a015cebc799e4589bd076bbdb3cb9383dbeb9bb3bb76",
+      "git_lf_sha256": "22d79f77a64d38387f45a015cebc799e4589bd076bbdb3cb9383dbeb9bb3bb76",
+      "expected_git_blob": "f5fb5cb67575e6c23b5de0f38fa878d845afc77e",
+      "bytes": 3267,
+      "git_lf_bytes": 3267
+    },
+    {
+      "path": "tests/scripts/dev_tools/discovery/test_init_cli.py",
+      "working_sha256": "b967a992e83dedacf2d18469e9e1d57bd78aeaae78da49c6f327cb6ef3263139",
+      "git_lf_sha256": "ee5e23e1f40f0b819bc7b9f87c21c3c527e9d084a01b631fdae87377d2f3f3ec",
+      "expected_git_blob": "87acd7e4674561be232d132e2c36da1cf9167911",
+      "bytes": 5243,
+      "git_lf_bytes": 5089
+    }
+  ],
+  "immutable_references": [
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150612-types.2026-10-21T15-06.json",
+      "working_sha256": "f599f0646381acb744bfd0e952a9a62353c9f6ce0fff476c621f633d929aa52a",
+      "git_lf_sha256": "f599f0646381acb744bfd0e952a9a62353c9f6ce0fff476c621f633d929aa52a",
+      "expected_git_blob": "107d6dd75d3221432e805b4479cc7358b0bf9cee",
+      "bytes": 74782,
+      "git_lf_bytes": 74782
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests.2026-10-21T15-13.json",
+      "working_sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2",
+      "git_lf_sha256": "4f0360f7ac78e9ad4e74c11f99e725dddd4fdbc103e1885bf0b26ce650912da2",
+      "expected_git_blob": "8ebd0be399b0b8dd86abe6372d31878fcc94681f",
+      "bytes": 94266,
+      "git_lf_bytes": 94266
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-body.2026-10-21T15-13.json",
+      "working_sha256": "a2dd070c93d3fd2146d8d2cdbe602ee91454c998a8feee4d608536175b39ebeb",
+      "git_lf_sha256": "a2dd070c93d3fd2146d8d2cdbe602ee91454c998a8feee4d608536175b39ebeb",
+      "expected_git_blob": "856965f84b73f1d9ef5744062d80e1dec443d043",
+      "bytes": 18953,
+      "git_lf_bytes": 18953
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/baseline/p6t2-cli-baseline-interface.2026-10-21T14-37.json",
+      "working_sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+      "git_lf_sha256": "2cf3ddacc82c44f6d975464dffa362fc7ec382243d755d7f7af56bde4ebf2465",
+      "expected_git_blob": "894ba05bfe2f3eedba2a73ba0580cb330e92f9f2",
+      "bytes": 29386,
+      "git_lf_bytes": 29386
+    },
+    {
+      "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/qa-gates/p6t2-composition-150621-tests-raw.2026-10-21T15-13.json",
+      "working_sha256": "8cddad96b2d593f2cd281f7da08c68af44256b6d3b518d4daefe83d06fd4c52f",
+      "git_lf_sha256": "8cddad96b2d593f2cd281f7da08c68af44256b6d3b518d4daefe83d06fd4c52f",
+      "expected_git_blob": "c1e147ca918e5d2ddf26b469db1d27c0b9055103",
+      "bytes": 64961,
+      "git_lf_bytes": 64961
+    }
+  ],
+  "actual_result": {
+    "passed": 54,
+    "failed": 4,
+    "unexecuted": 0,
+    "expected": 58,
+    "harness_seconds": 448.532,
+    "pytest_seconds": 447.47,
+    "all_bound_inputs_unchanged": true
+  },
+  "prior_review_qualification": "The earlier source-only CLEAR message was provisional and is superseded by these actual composition failures. Its draft writer was never executed and no source-clear artifact was published. All original source, tests, raw output and failed assertions remain unchanged.",
+  "findings": [
+    {
+      "id": "CC1",
+      "classification": "production composition defect",
+      "path": "packages/discovery-runtime/src/drm_copilot_discovery/cli.py",
+      "function": "_failure",
+      "evidence": "The unsupported --principal and oversized process-argv controls return 3 rather than 2. Parser Findings intentionally retain pointer='', while accepted DiscoveryResult pre-execution validation requires at least one nonempty-pointer error. _failure forwards a nonempty parser tuple instead of its fixed '/' anchor, so construction fails and the outer handler returns 3.",
+      "minimal_remedy": "Retain the original parser findings and add the existing fixed anchored invocation failure. Keep the repair in composition; do not change parser diagnostics, result schema, accepted service validation or post-execution output handling.",
+      "required_controls": "Both existing argument-error/oversized-vector controls must return 2 with valid single JSON, original parser diagnostics and the fixed anchor, with zero provider/executor calls. Preserve unknown-effect and partial-output refusal assertions."
+    },
+    {
+      "id": "CT1",
+      "classification": "injected fixture violates trusted port contract",
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "function": "test_preexecution_failures_are_redacted_and_do_not_execute[canonical]",
+      "evidence": "The injected resolver returns 'relative' although CliPorts.resolve_workspace promises a canonical root, and the executor stub bypasses service path validation. build_cli_request intentionally performs no path resolution and its direct invalid-root guard rejects non-string/empty values. The actual installed resolver resolves the explicit existing directory before IDs.",
+      "minimal_remedy": "Use an empty returned string for this documented builder refusal. Retain the exact parameter identity, redaction/no-executor assertions, installed resolver positive/non-directory controls and service path authority. Do not add a second resolver or broaden accepted roots."
+    },
+    {
+      "id": "CT2",
+      "classification": "fixture confuses factory use with publication effects",
+      "path": "tests/discovery_runtime/test_cli_dry_run.py",
+      "function": "test_validate_all_default_pair_uses_real_planner[True]",
+      "evidence": "Accepted operations constructs the writer before commit_mutation performs dry-run freshness checks. writer_calls counts factory use. The dry run returns exit 0 and the exact planned pair; the zero-factory expectation is incorrect.",
+      "minimal_remedy": "Expect one writer factory call for both dry and real invocations. Preserve planned versus created statuses, the paired JSON/Markdown paths, unchanged dry-run file bytes and actual real-write changes."
+    }
+  ],
+  "remaining_review_clear": [
+    "One explicit root resolution precedes IDs; same optional reader reaches both I/O and execution.",
+    "Fixed installed local-user ports and lazy fixed service import introduce no caller-selected implementation or host fallback.",
+    "Typed results retain service exits and partial effects; unexpected execution/serialization/write/flush failures do not fabricate a second result.",
+    "Both pyprojects match the exact 31 wrappers, with runtime scripts before dependencies; only the existing registration assertion changes.",
+    "Intent/size and memory-only test design are clear within the six owned paths; no additional documentation-only residue was found."
+  ],
+  "coverage_qualification": "The owner's retained raw BODY diagnostic reports cli.py 143/143 statements, 10/10 branches and 42 named units without gaps. That coverage does not override the four failed behavioral assertions. This changes-required receipt does not claim final coverage acceptance.",
+  "real_composition_proof": "Both real-write report controls passed: validate-all paired publication and failed completion-report publication. Preserve that proof under unchanged callable/fixture bindings.",
+  "open_probes": [],
+  "reviewer_behavior_executions": 0,
+  "repair_release": "Coordinator-owned; all source/test bytes remain frozen pending this finite receipt.",
+  "task_accepted": false,
+  "task_counts": {
+    "accepted": 47,
+    "total": 84
+  },
+  "ac_counts": {
+    "accepted": 23,
+    "total": 66
+  },
+  "next_five_tasks": [
+    "P6-T2",
+    "P6-T3",
+    "P7-T1",
+    "P7-T2",
+    "P7-T3"
+  ]
+}

@@ -126,8 +126,7 @@ def test_console_script_registered_in_pyproject() -> None:
     workspace_root = Path(__file__).resolve().parents[4]
     pyproject_text = (workspace_root / "pyproject.toml").read_text(encoding="utf-8")
     assert (
-        '"dev.discovery.init" = "scripts.dev_tools.discovery.init_cli:main"'
-        in pyproject_text
+        '"dev.discovery.init" = "drm_copilot_discovery.cli:main_init"' in pyproject_text
     )
 
 
