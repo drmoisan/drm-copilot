@@ -584,3 +584,15 @@ def test_main_runs_sync(monkeypatch: pytest.MonkeyPatch) -> None:
     # Run main
     exit_code = agentic_sync.main(args)
     assert exit_code == 0
+
+
+def test_root_folders_include_published_github_hooks_in_scoped_order() -> None:
+    """Keep `.github/hooks` in the shared scoped-root contract in sorted order."""
+
+    assert agentic_sync.ROOT_FOLDERS == (
+        Path(".github/agents"),
+        Path(".github/hooks"),
+        Path(".github/instructions"),
+        Path(".github/prompts"),
+        Path(".github/skills"),
+    )

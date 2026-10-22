@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "pwsh -File .github/hooks/discovery-pre-tool.ps1"
+      }
+    ]
+  }
+}

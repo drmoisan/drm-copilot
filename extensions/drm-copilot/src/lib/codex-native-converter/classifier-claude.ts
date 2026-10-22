@@ -35,10 +35,60 @@ const PROMPT_ENFORCEMENT_PATTERN =
 // Numbered-step structure indicating a procedural workflow.
 const NUMBERED_STEP_PATTERN = /^\d+[.)]\s+/gm;
 
+// Approved native helper surface: PowerShell modules and scripts the published
+// Codex hooks import by name from `.codex/lib/<library>/`.
+const HELPER_MODULE_SUFFIXES: ReadonlyArray<string> = [
+  ".psm1",
+  ".psd1",
+  ".ps1",
+];
+const CLAUDE_HELPER_ROOT = ".claude/lib/";
+
+/**
+ * Classify one `.claude/lib` helper resource.
+ *
+ * Mirrors `_classify_claude_helper`: PowerShell helpers are a direct native
+ * helper surface published under `.codex/lib`; every other helper resource
+ * (bash libraries, documentation) is explicitly unsupported and optional.
+ *
+ * @param pathText Source-root-relative helper path.
+ * @returns The classification result with an unresolved target path.
+ */
+function classifyClaudeHelper(pathText: string): MappingRecord {
+  if (HELPER_MODULE_SUFFIXES.some((suffix) => pathText.endsWith(suffix))) {
+    return {
+      sourcePath: pathText,
+      sourceEcosystem: SourceEcosystem.CLAUDE,
+      sourceKind: SourceKind.HOST_ADAPTER_REFERENCE,
+      conversionClass: ConversionClass.DIRECT,
+      targetRole: TargetRole.HOOK,
+      targetPath: null,
+      notes: [
+        "Shared PowerShell helper publishes verbatim under the native " +
+          "hook library root.",
+      ],
+      isRequired: true,
+    };
+  }
+  return {
+    sourcePath: pathText,
+    sourceEcosystem: SourceEcosystem.CLAUDE,
+    sourceKind: SourceKind.UNKNOWN,
+    conversionClass: ConversionClass.UNSUPPORTED,
+    targetRole: TargetRole.UNSUPPORTED,
+    targetPath: null,
+    notes: [
+      "Helper resources other than PowerShell modules have no native " +
+        "runtime surface in v1.",
+    ],
+    isRequired: false,
+  };
+}
+
 /**
  * Classify one Claude source artifact.
  *
- * Mirrors `_classify_claude`, preserving every `SourceKind`, `ConversionClass`,
+ * Mirrors `classify_claude`, preserving every `SourceKind`, `ConversionClass`,
  * `TargetRole`, note string, and branch ordering verbatim.
  *
  * @param fileSystem Injected filesystem.
@@ -117,6 +167,10 @@ export function classifyClaude(
       notes: [],
       isRequired: true,
     };
+  }
+
+  if (pathText.startsWith(CLAUDE_HELPER_ROOT)) {
+    return classifyClaudeHelper(pathText);
   }
 
   if (pathText === ".claude/settings.json") {

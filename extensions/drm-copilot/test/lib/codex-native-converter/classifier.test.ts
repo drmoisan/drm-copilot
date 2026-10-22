@@ -31,6 +31,9 @@ function seed(fs: InMemoryFileSystem): void {
   fs.addFile(`${SOURCE_ROOT}/.github/agents/plain.agent.md`, "plain agent");
   fs.addFile(`${SOURCE_ROOT}/.github/prompts/launch.prompt.md`, "prompt");
   fs.addFile(`${SOURCE_ROOT}/.github/prompts/template.md`, "template");
+  fs.addFile(`${SOURCE_ROOT}/.github/hooks/discovery-pre-tool.ps1`, "hook");
+  fs.addFile(`${SOURCE_ROOT}/.github/hooks/discovery.json`, "{}");
+  fs.addFile(`${SOURCE_ROOT}/.github/hooks/README.md`, "docs");
   fs.addFile(`${SOURCE_ROOT}/.github/unknown/file.md`, "unknown");
 
   // Claude surfaces.
@@ -51,6 +54,11 @@ function seed(fs: InMemoryFileSystem): void {
     `${SOURCE_ROOT}/.claude/rules/path-scoped.md`,
     "paths:\n  - src/**\n\nrule",
   );
+  fs.addFile(
+    `${SOURCE_ROOT}/.claude/lib/discovery-validation/DiscoveryValidation.psm1`,
+    "helper",
+  );
+  fs.addFile(`${SOURCE_ROOT}/.claude/lib/bash/parallel-common.sh`, "bash");
   fs.addFile(`${SOURCE_ROOT}/.claude/unknown.txt`, "unknown");
 }
 
@@ -130,6 +138,30 @@ const GITHUB_CASES: ReadonlyArray<MatrixCase> = [
   },
   {
     ecosystem: SourceEcosystem.GITHUB_COPILOT,
+    path: ".github/hooks/discovery-pre-tool.ps1",
+    kind: SourceKind.HOOK_DEFINITION,
+    conversionClass: ConversionClass.DIRECT,
+    targetRole: TargetRole.HOOK,
+    isRequired: true,
+  },
+  {
+    ecosystem: SourceEcosystem.GITHUB_COPILOT,
+    path: ".github/hooks/discovery.json",
+    kind: SourceKind.PERMISSIONS_OR_SETTINGS,
+    conversionClass: ConversionClass.DECOMPOSED,
+    targetRole: TargetRole.MCP_CONFIG,
+    isRequired: true,
+  },
+  {
+    ecosystem: SourceEcosystem.GITHUB_COPILOT,
+    path: ".github/hooks/README.md",
+    kind: SourceKind.UNKNOWN,
+    conversionClass: ConversionClass.UNSUPPORTED,
+    targetRole: TargetRole.UNSUPPORTED,
+    isRequired: false,
+  },
+  {
+    ecosystem: SourceEcosystem.GITHUB_COPILOT,
     path: ".github/unknown/file.md",
     kind: SourceKind.UNKNOWN,
     conversionClass: ConversionClass.UNSUPPORTED,
@@ -194,6 +226,22 @@ const CLAUDE_CASES: ReadonlyArray<MatrixCase> = [
     conversionClass: ConversionClass.DECOMPOSED,
     targetRole: TargetRole.SHARED_SKILL,
     isRequired: true,
+  },
+  {
+    ecosystem: SourceEcosystem.CLAUDE,
+    path: ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+    kind: SourceKind.HOST_ADAPTER_REFERENCE,
+    conversionClass: ConversionClass.DIRECT,
+    targetRole: TargetRole.HOOK,
+    isRequired: true,
+  },
+  {
+    ecosystem: SourceEcosystem.CLAUDE,
+    path: ".claude/lib/bash/parallel-common.sh",
+    kind: SourceKind.UNKNOWN,
+    conversionClass: ConversionClass.UNSUPPORTED,
+    targetRole: TargetRole.UNSUPPORTED,
+    isRequired: false,
   },
   {
     ecosystem: SourceEcosystem.CLAUDE,

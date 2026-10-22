@@ -8,6 +8,7 @@ from scripts.dev_tools.codex_native_converter.classifier import classify_source_
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     SourceEcosystem,
+    SourceKind,
     TargetRole,
 )
 
@@ -179,3 +180,96 @@ def test_classify_github_skills_readme_as_optional_unsupported_documentation() -
     assert skills_readme.conversion_class is ConversionClass.UNSUPPORTED
     assert skills_readme.target_role is TargetRole.UNSUPPORTED
     assert skills_readme.is_required is False
+
+
+def test_classify_github_hook_handler_as_direct_native_hook() -> None:
+    """Map a published GitHub hook handler script onto the direct native hook role."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    hook_handler = classify_source_artifact(
+        fixture_root,
+        Path(".github/hooks/discovery-pre-tool.ps1"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert hook_handler.source_kind is SourceKind.HOOK_DEFINITION
+    assert hook_handler.conversion_class is ConversionClass.DIRECT
+    assert hook_handler.target_role is TargetRole.HOOK
+    assert hook_handler.is_required is True
+
+
+def test_classify_github_hook_registration_as_decomposed_native_config() -> None:
+    """Decompose a GitHub hook registration document into native Codex config."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    registration = classify_source_artifact(
+        fixture_root,
+        Path(".github/hooks/discovery.json"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert registration.source_kind is SourceKind.PERMISSIONS_OR_SETTINGS
+    assert registration.conversion_class is ConversionClass.DECOMPOSED
+    assert registration.target_role is TargetRole.MCP_CONFIG
+    assert any("registration" in note.lower() for note in registration.notes)
+
+
+def test_classify_github_hook_documentation_as_optional_unsupported() -> None:
+    """Keep hook documentation and templates out of the native control surface."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    documentation = classify_source_artifact(
+        fixture_root,
+        Path(".github/hooks/README.md"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert documentation.conversion_class is ConversionClass.UNSUPPORTED
+    assert documentation.target_role is TargetRole.UNSUPPORTED
+    assert documentation.is_required is False
+
+
+def test_classify_unrelated_github_path_remains_required_unsupported() -> None:
+    """Leave an unrelated `.github` path unsupported and still flagged for review."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    workflow = classify_source_artifact(
+        fixture_root,
+        Path(".github/workflows/ci.yml"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert workflow.conversion_class is ConversionClass.UNSUPPORTED
+    assert workflow.target_role is TargetRole.UNSUPPORTED
+    assert workflow.is_required is True
+
+
+def test_classify_claude_powershell_helper_as_direct_helper_surface() -> None:
+    """Approve a `.claude/lib` PowerShell module as a direct native helper."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    helper = classify_source_artifact(
+        fixture_root,
+        Path(".claude/lib/discovery-validation/DiscoveryValidation.psm1"),
+        SourceEcosystem.CLAUDE,
+    )
+
+    assert helper.source_kind is SourceKind.HOST_ADAPTER_REFERENCE
+    assert helper.conversion_class is ConversionClass.DIRECT
+    assert helper.target_role is TargetRole.HOOK
+    assert helper.is_required is True
+
+
+def test_classify_claude_bash_helper_as_optional_unsupported() -> None:
+    """Keep non-PowerShell helper resources out of the native control surface."""
+
+    fixture_root = _fixture_root("native_surfaces")
+    bash_helper = classify_source_artifact(
+        fixture_root,
+        Path(".claude/lib/bash/parallel-common.sh"),
+        SourceEcosystem.CLAUDE,
+    )
+
+    assert bash_helper.conversion_class is ConversionClass.UNSUPPORTED
+    assert bash_helper.target_role is TargetRole.UNSUPPORTED
+    assert bash_helper.is_required is False

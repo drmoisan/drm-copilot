@@ -78,11 +78,11 @@ export function camelOrPascalToSnake(value: string): string {
 const UNRESOLVED_RUNTIME_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
   [/\bdrmCopilotExtension\.[A-Za-z0-9_]+\b/, "raw VS Code command identifier"],
   [
-    /(^|[^A-Za-z0-9_])\.github\/(copilot-instructions\.md|instructions\/|skills\/|agents\/|prompts\/)/,
+    /(^|[^A-Za-z0-9_])\.github\/(copilot-instructions\.md|instructions\/|skills\/|agents\/|prompts\/|hooks\/)/,
     "GitHub Copilot runtime path",
   ],
   [
-    /(^|[^A-Za-z0-9_])\.claude\/(skills\/|agents\/|hooks\/|settings\.json)/,
+    /(^|[^A-Za-z0-9_])\.claude\/(skills\/|agents\/|hooks\/|lib\/|settings\.json)/,
     "Claude runtime path",
   ],
   [/\bCLAUDE\.md\b/, "Claude standing-instructions file"],

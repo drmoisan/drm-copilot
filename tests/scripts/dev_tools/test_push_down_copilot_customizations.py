@@ -284,6 +284,7 @@ def _seed_scoped_source_files(
     """
     roots_to_files = {
         Path(".github/agents/example.agent.md"): "agent content",
+        Path(".github/hooks/example-hook.ps1"): "hook content",
         Path(".github/instructions/example.instructions.md"): "instruction content",
         Path(".github/prompts/example.prompt.md"): "prompt content",
         Path(".github/skills/example/SKILL.md"): "skill content",
@@ -314,9 +315,12 @@ def test_push_down_copies_scoped_github_trees_to_empty_destination() -> None:
         fs=fs,
     )
 
-    assert summary.created_count == 4
+    assert summary.created_count == 5
     assert fs.read_text(destination_repo / ".github/agents/example.agent.md") == (
         "agent content"
+    )
+    assert fs.read_text(destination_repo / ".github/hooks/example-hook.ps1") == (
+        "hook content"
     )
     assert (
         fs.read_text(destination_repo / ".github/instructions/example.instructions.md")

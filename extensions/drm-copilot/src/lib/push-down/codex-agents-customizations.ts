@@ -70,10 +70,27 @@ export const VIRTUAL_RESOURCE_PAIRS: ReadonlyArray<readonly [string, string]> =
     ],
   ];
 
-/** Destination roots answered from {@link VIRTUAL_RESOURCE_PAIRS} only. */
+/**
+ * Shared helper directories published at a destination-relative directory.
+ *
+ * Each pair is `[destination-relative directory, resource-relative directory]`.
+ * Every file stored under the resource directory publishes under the
+ * destination directory with the same name, so a helper library added by a
+ * later task needs no per-file entry. Mirrors the Python
+ * `VIRTUAL_RESOURCE_DIRECTORIES`.
+ */
+export const VIRTUAL_RESOURCE_DIRECTORIES: ReadonlyArray<
+  readonly [string, string]
+> = [[".codex/lib/discovery-validation", "lib/discovery-validation"]];
+
+/**
+ * Destination roots answered from {@link VIRTUAL_RESOURCE_PAIRS} and
+ * {@link VIRTUAL_RESOURCE_DIRECTORIES} only.
+ */
 export const VIRTUAL_ROOT_FOLDERS: ReadonlyArray<string> = [
   "config",
   ".codex/lib/codex-routing",
+  ...VIRTUAL_RESOURCE_DIRECTORIES.map(([destination]) => destination),
 ];
 
 const PUBLISHED_ROOT_FOLDERS: ReadonlyArray<string> = [
@@ -232,7 +249,7 @@ class RoutingConfigFileSystem implements PushDownFileSystem {
     options: { readonly sourceRoot: string; readonly bundleRoot: string },
   ) {
     const resourceRoot = parentPosix(options.bundleRoot);
-    this.virtualPaths = new Map(
+    const virtualPaths = new Map(
       VIRTUAL_RESOURCE_PAIRS.map(
         ([destination, resource]) =>
           [
@@ -241,6 +258,21 @@ class RoutingConfigFileSystem implements PushDownFileSystem {
           ] as const,
       ),
     );
+    // A mapped helper directory contributes one pair per stored resource file
+    // so the whole library publishes under its destination directory.
+    for (const [destinationDir, resourceDir] of VIRTUAL_RESOURCE_DIRECTORIES) {
+      const resourceDirectory = joinPosix(resourceRoot, resourceDir);
+      for (const resourcePath of inner.listFiles(resourceDirectory)) {
+        const relative = relativeToPosix(resourcePath, resourceDirectory);
+        if (relative !== null && relative !== "") {
+          virtualPaths.set(
+            joinPosix(joinPosix(options.sourceRoot, destinationDir), relative),
+            resourcePath,
+          );
+        }
+      }
+    }
+    this.virtualPaths = virtualPaths;
     this.virtualRoots = new Set(
       VIRTUAL_ROOT_FOLDERS.map((root) => joinPosix(options.sourceRoot, root)),
     );

@@ -167,6 +167,7 @@ describe("pushDownCustomizations (engine)", () => {
     // Arrange / Act / Assert
     expect(COPILOT_ROOT_FOLDERS).toEqual([
       ".github/agents",
+      ".github/hooks",
       ".github/instructions",
       ".github/prompts",
       ".github/skills",

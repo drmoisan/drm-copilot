@@ -92,9 +92,18 @@ VIRTUAL_RESOURCE_PAIRS: tuple[tuple[Path, Path], ...] = (
         Path("lib/codex-routing/CodexDiscoveryRouting.psm1"),
     ),
 )
+# Each pair maps a destination-relative helper directory to the resource
+# directory read from the bundle parent. Every file stored under the resource
+# directory publishes under the destination directory with the same name, so a
+# helper library added by a later task needs no per-file entry here.
+DISCOVERY_VALIDATION_LIB_RELATIVE_DIR = Path(".codex/lib/discovery-validation")
+VIRTUAL_RESOURCE_DIRECTORIES: tuple[tuple[Path, Path], ...] = (
+    (DISCOVERY_VALIDATION_LIB_RELATIVE_DIR, Path("lib/discovery-validation")),
+)
 VIRTUAL_ROOT_FOLDERS: tuple[Path, ...] = (
     ROUTING_CONFIG_RELATIVE_PATH.parent,
     CODEX_ROUTING_LIB_RELATIVE_DIR,
+    *(destination for destination, _resource in VIRTUAL_RESOURCE_DIRECTORIES),
 )
 SHARED_CONFIG_RELATIVE_PATHS: tuple[Path, ...] = tuple(
     destination
@@ -176,6 +185,15 @@ class _RoutingConfigFileSystem:
             source_root / destination: bundle_root.parent / resource
             for destination, resource in VIRTUAL_RESOURCE_PAIRS
         }
+        # A mapped helper directory contributes one pair per stored resource
+        # file so the whole library publishes under its destination directory.
+        for destination_dir, resource_dir in VIRTUAL_RESOURCE_DIRECTORIES:
+            resource_root = bundle_root.parent / resource_dir
+            for resource_path in inner.list_files(resource_root):
+                relative_path = resource_path.relative_to(resource_root)
+                self._virtual_paths[source_root / destination_dir / relative_path] = (
+                    resource_path
+                )
         self._virtual_roots = frozenset(
             source_root / root for root in VIRTUAL_ROOT_FOLDERS
         )

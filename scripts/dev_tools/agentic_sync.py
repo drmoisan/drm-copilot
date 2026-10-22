@@ -23,6 +23,7 @@ LOGGER = logging.getLogger(__name__)
 
 ROOT_FOLDERS: tuple[Path, ...] = (
     Path(".github/agents"),
+    Path(".github/hooks"),
     Path(".github/instructions"),
     Path(".github/prompts"),
     Path(".github/skills"),

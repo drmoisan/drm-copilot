@@ -188,3 +188,82 @@ def test_no_physical_codex_lib_directory_exists() -> None:
     # Act / Assert
     assert not repository_lib.exists()
     assert not bundle_lib.exists()
+
+
+HELPER_DESTINATION_DIR = Path(".codex/lib/discovery-validation")
+HELPER_NAMES: tuple[str, ...] = ("DiscoveryValidation.psm1", "DiscoveryAuthority.psd1")
+
+
+def _seed_helper_resources(fs: RecordingFileSystem, repo_root: Path) -> dict[str, str]:
+    """Seed distinct text for each shared discovery-validation helper resource.
+
+    Args:
+        fs: In-memory file system receiving the resources.
+        repo_root: Source repository root of the in-memory tree.
+
+    Returns:
+        dict[str, str]: Helper file name to the seeded text.
+    """
+    seeded: dict[str, str] = {}
+    # Two helpers with distinct bytes prove the directory mapping is per file.
+    for name in HELPER_NAMES:
+        text = f"# shared helper {name}\n"
+        resource = (
+            repo_root / RESOURCES_RELATIVE / "lib" / "discovery-validation" / name
+        )
+        fs.files[resource] = MemoryFile(text)
+        seeded[name] = text
+    return seeded
+
+
+def test_helper_directory_publishes_every_stored_resource_file() -> None:
+    """Every file stored under the mapped helper resource directory is published."""
+    # Arrange
+    module = load_module()
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
+    fs = _new_file_system(repo_root, destination_root)
+    seeded = _seed_helper_resources(fs, repo_root)
+
+    # Act
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    # Assert
+    for name, text in seeded.items():
+        assert fs.read_text(destination_root / HELPER_DESTINATION_DIR / name) == text
+    published = {result.relative_path for result in summary.files}
+    assert {
+        (HELPER_DESTINATION_DIR / name).as_posix() for name in HELPER_NAMES
+    } <= published
+    assert HELPER_DESTINATION_DIR in module.PUBLISHED_ROOT_FOLDERS
+
+
+def test_helper_directory_publishes_nothing_without_stored_resources() -> None:
+    """The mapped helper directory lists nothing until helper resources are stored."""
+    # Arrange
+    module = load_module()
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
+    fs = _new_file_system(repo_root, destination_root)
+
+    # Act
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    # Assert
+    published = {result.relative_path for result in summary.files}
+    assert not any(
+        path.startswith(".codex/lib/discovery-validation/") for path in published
+    )
+    assert not fs.is_dir(destination_root / HELPER_DESTINATION_DIR)
