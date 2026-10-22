@@ -40,14 +40,35 @@ import {
 } from "./mcp-handlers/push-down-handlers";
 import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 import {
+  handleConfigureDiscoveryWorkspace,
+  handleCreateDiscoveryArtifact,
+  handleFinalizeDiscoveryAgent,
+  handleImportDiscoveryInventory,
+  handleLinkDiscoveryEvidence,
+  handleMigrateDiscoveryArtifacts,
+  handlePrepareDiscoveryAgent,
+  handleReadDiscoverySource,
+  handleRunDiscoveryDoctor,
   handleRunDiscoveryDotnetAnalyzer,
   handleRunDiscoveryInit,
   handleRunDiscoveryReport,
   handleRunDiscoveryRepoInventory,
   handleRunDiscoveryScenarioGeneration,
   handleRunDiscoveryVstoAnalyzer,
+  handleTransferDiscoverySnapshot,
+  handleUpdateDiscoveryArtifact,
   handleValidateDiscoveryArtifacts,
 } from "./mcp-handlers/discovery-handlers";
+import {
+  discoveryRoleDeniedMessage,
+  isDiscoveryRole,
+  isRootOnlyDiscoveryTool,
+} from "./mcp-tool-inputs-discovery-authority";
+import type {
+  DiscoveryServiceResult,
+  FinalizedReceiptSummary,
+  PreparedInvocationSummary,
+} from "./repo-automation-service-discovery-types";
 import { handleRenderSubagentTree } from "./mcp-handlers/render-subagent-tree-handler";
 import {
   handleResolvePolicyAuditTemplateAsset,
@@ -87,6 +108,9 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly unsupported_capabilities?: ReadonlyArray<string>;
   readonly failure_cause?: string;
   readonly resolution?: Readonly<Record<string, unknown>> | null;
+  readonly discovery?: DiscoveryServiceResult;
+  readonly invocation?: PreparedInvocationSummary;
+  readonly receipt?: FinalizedReceiptSummary;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -136,6 +160,11 @@ function toMcpToolResult(
       ? {}
       : { resolved_head_sha: result.resolvedHeadSha }),
     ...(result.warnings === undefined ? {} : { warnings: result.warnings }),
+    ...(result.discovery === undefined ? {} : { discovery: result.discovery }),
+    ...(result.invocation === undefined
+      ? {}
+      : { invocation: result.invocation }),
+    ...(result.receipt === undefined ? {} : { receipt: result.receipt }),
   };
 }
 
@@ -177,6 +206,17 @@ export async function dispatchRepoAutomationTool(
   service: RepoAutomationService,
 ): Promise<RepoAutomationMcpToolResult> {
   const workspaceRoot = inferWorkspaceRoot(rawInput);
+
+  // Root-only discovery tools are refused for a trusted discovery role before
+  // any input is resolved; the role comes from the service, never the request.
+  const role = service.discoveryRole?.() ?? null;
+  if (isRootOnlyDiscoveryTool(toolName) && isDiscoveryRole(role)) {
+    return toFailureToolResult(
+      toolName,
+      workspaceRoot,
+      new Error(discoveryRoleDeniedMessage(toolName, role)),
+    );
+  }
 
   try {
     switch (toolName) {
@@ -340,6 +380,72 @@ export async function dispatchRepoAutomationTool(
       case "run_discovery_report": {
         return toMcpToolResult(
           await handleRunDiscoveryReport(rawInput, service),
+        );
+      }
+
+      case "configure_discovery_workspace": {
+        return toMcpToolResult(
+          await handleConfigureDiscoveryWorkspace(rawInput, service),
+        );
+      }
+
+      case "create_discovery_artifact": {
+        return toMcpToolResult(
+          await handleCreateDiscoveryArtifact(rawInput, service),
+        );
+      }
+
+      case "update_discovery_artifact": {
+        return toMcpToolResult(
+          await handleUpdateDiscoveryArtifact(rawInput, service),
+        );
+      }
+
+      case "link_discovery_evidence": {
+        return toMcpToolResult(
+          await handleLinkDiscoveryEvidence(rawInput, service),
+        );
+      }
+
+      case "transfer_discovery_snapshot": {
+        return toMcpToolResult(
+          await handleTransferDiscoverySnapshot(rawInput, service),
+        );
+      }
+
+      case "import_discovery_inventory": {
+        return toMcpToolResult(
+          await handleImportDiscoveryInventory(rawInput, service),
+        );
+      }
+
+      case "migrate_discovery_artifacts": {
+        return toMcpToolResult(
+          await handleMigrateDiscoveryArtifacts(rawInput, service),
+        );
+      }
+
+      case "run_discovery_doctor": {
+        return toMcpToolResult(
+          await handleRunDiscoveryDoctor(rawInput, service),
+        );
+      }
+
+      case "read_discovery_source": {
+        return toMcpToolResult(
+          await handleReadDiscoverySource(rawInput, service),
+        );
+      }
+
+      case "prepare_discovery_agent": {
+        return toMcpToolResult(
+          await handlePrepareDiscoveryAgent(rawInput, service),
+        );
+      }
+
+      case "finalize_discovery_agent": {
+        return toMcpToolResult(
+          await handleFinalizeDiscoveryAgent(rawInput, service),
         );
       }
     }

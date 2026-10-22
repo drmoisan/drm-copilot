@@ -108,6 +108,17 @@ describe("repo automation MCP server", () => {
       "run_discovery_vsto_analyzer",
       "run_discovery_scenario_generation",
       "run_discovery_report",
+      "create_discovery_artifact",
+      "update_discovery_artifact",
+      "link_discovery_evidence",
+      "configure_discovery_workspace",
+      "transfer_discovery_snapshot",
+      "import_discovery_inventory",
+      "migrate_discovery_artifacts",
+      "run_discovery_doctor",
+      "read_discovery_source",
+      "prepare_discovery_agent",
+      "finalize_discovery_agent",
     ]);
   });
 

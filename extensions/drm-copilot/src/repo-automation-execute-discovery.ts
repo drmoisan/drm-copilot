@@ -177,7 +177,8 @@ function optionalInputs(
   return inputs;
 }
 
-async function run(
+/** Compose one request from the shared workspace fields and run it. */
+export async function runDiscoveryOperation(
   output: CommandOutput,
   tool: RepoAutomationToolName,
   input: DiscoveryWorkspaceInput,
@@ -217,7 +218,7 @@ export async function runValidateDiscoveryArtifacts(
         "validate-all validates the whole configured workspace; artifact_path must be '.'.",
       );
     }
-    return run(
+    return runDiscoveryOperation(
       output,
       "validate_discovery_artifacts",
       input,
@@ -240,7 +241,7 @@ export async function runValidateDiscoveryArtifacts(
       "Individual artifact validators are structural; use artifact_type 'all' for a completion mode.",
     );
   }
-  return run(
+  return runDiscoveryOperation(
     output,
     "validate_discovery_artifacts",
     input,
@@ -268,7 +269,7 @@ export async function runDiscoveryInit(
   if (missing.length > 0) {
     throw new Error(`Discovery initialization requires ${missing.join(", ")}.`);
   }
-  return run(
+  return runDiscoveryOperation(
     output,
     "run_discovery_init",
     input,
@@ -301,7 +302,7 @@ async function runInventory(
     ["outputDir"],
     "inventory outputs follow the configured profile roots; use write and dry_run.",
   );
-  return run(
+  return runDiscoveryOperation(
     output,
     tool,
     input,
@@ -378,7 +379,7 @@ export async function runDiscoveryScenarioGeneration(
       "Acceptance generation requires acceptanceKind: legacy-characterization or target-acceptance.",
     );
   }
-  return run(
+  return runDiscoveryOperation(
     output,
     "run_discovery_scenario_generation",
     input,
@@ -413,7 +414,7 @@ export async function runDiscoveryReport(
     ["inputPath", "coverageInput", "parityInput", "outputPath"],
     "reports derive from the validated workspace; use mode, format and write.",
   );
-  return run(
+  return runDiscoveryOperation(
     output,
     "run_discovery_report",
     input,

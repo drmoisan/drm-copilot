@@ -69,6 +69,10 @@ export interface DiscoveryRequestSpec {
   readonly write?: boolean;
   readonly format?: DiscoveryOutputFormat;
   readonly inputs?: DiscoveryRequestInputs;
+  /** Protected invocation reference for agent-output requests. */
+  readonly invocationRef?: string;
+  /** One-use native tool authorization reference for controlled requests. */
+  readonly authorizationRef?: string;
 }
 
 /** Trusted outer invocation options chosen by the host, never by request data. */
@@ -140,8 +144,8 @@ export function buildDiscoveryServiceRequest(
     id: identifier,
     request_id: identifier,
     ...fields,
-    invocation_ref: null,
-    authorization_ref: null,
+    invocation_ref: spec.invocationRef ?? null,
+    authorization_ref: spec.authorizationRef ?? null,
   };
 }
 

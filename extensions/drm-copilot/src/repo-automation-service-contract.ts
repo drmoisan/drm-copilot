@@ -21,6 +21,21 @@ import type {
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import type { DiscoveryServiceResult } from "./discovery-service-types";
+import type {
+  ConfigureDiscoveryWorkspaceInput,
+  CreateDiscoveryArtifactInput,
+  FinalizeDiscoveryAgentInput,
+  FinalizedReceiptSummary,
+  ImportDiscoveryInventoryInput,
+  LinkDiscoveryEvidenceInput,
+  MigrateDiscoveryArtifactsInput,
+  PrepareDiscoveryAgentInput,
+  PreparedInvocationSummary,
+  ReadDiscoverySourceInput,
+  RunDiscoveryDoctorInput,
+  TransferDiscoverySnapshotInput,
+  UpdateDiscoveryArtifactInput,
+} from "./repo-automation-service-discovery-types";
 
 /**
  * Service contract declarations for {@link RepoAutomationService}.
@@ -61,6 +76,10 @@ export interface RepoAutomationExecutionResult {
    * results; it is the authoritative structured outcome and never a grant.
    */
   readonly discovery?: DiscoveryServiceResult;
+  /** Launchable deployment summary; present only on prepare_discovery_agent. */
+  readonly invocation?: PreparedInvocationSummary;
+  /** Protected receipt summary; present only on finalize_discovery_agent. */
+  readonly receipt?: FinalizedReceiptSummary;
 }
 
 export interface WorkspaceExecutionInput {
@@ -216,4 +235,42 @@ export interface RepoAutomationService {
   runDiscoveryReport(
     input: RunDiscoveryReportInput,
   ): Promise<RepoAutomationExecutionResult>;
+  configureDiscoveryWorkspace(
+    input: ConfigureDiscoveryWorkspaceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  createDiscoveryArtifact(
+    input: CreateDiscoveryArtifactInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  updateDiscoveryArtifact(
+    input: UpdateDiscoveryArtifactInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  linkDiscoveryEvidence(
+    input: LinkDiscoveryEvidenceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  transferDiscoverySnapshot(
+    input: TransferDiscoverySnapshotInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  importDiscoveryInventory(
+    input: ImportDiscoveryInventoryInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  migrateDiscoveryArtifacts(
+    input: MigrateDiscoveryArtifactsInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  runDiscoveryDoctor(
+    input: RunDiscoveryDoctorInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  readDiscoverySource(
+    input: ReadDiscoverySourceInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  prepareDiscoveryAgent(
+    input: PrepareDiscoveryAgentInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  finalizeDiscoveryAgent(
+    input: FinalizeDiscoveryAgentInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  /**
+   * Trusted discovery role of the principal this service runs for, or null for
+   * the local-user root. Root-only tools are refused when a role is present.
+   */
+  discoveryRole?(): string | null;
 }

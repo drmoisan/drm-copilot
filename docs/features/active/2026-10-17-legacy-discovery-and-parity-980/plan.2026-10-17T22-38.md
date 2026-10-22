@@ -386,7 +386,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test missing/new/deleted/renamed/edited inputs, evidence replacement, profile/root changes, schema/runtime/build/policy drift, wrong gate/role/session, absent outputs, forged success JSON, and valid output-valid/result-fail reviewer results.
   - Acceptance: Only a current authoritative result bound to the exact invocation/output/gate produces a protected receipt; source mutation or mismatched result invalidates it before stop/planning can succeed.
 
-- [ ] [P8-T6] Expose the full shared MCP operation contract.
+- [x] [P8-T6] Expose the full shared MCP operation contract.
   - Files and behavior: Update ES/{mcp-discovery-tool-definitions,mcp-tool-inputs-discovery,mcp-handlers/discovery-handlers,mcp-tools,repo-automation-tool-names,repo-automation-service-contract,repo-automation-service}.ts; extract ES/{mcp-discovery-authority-tool-definitions,mcp-tool-inputs-discovery-authority,repo-automation-service-discovery}.ts to keep files bounded. Update Sets G/H and add ET/mcp-discovery-authority-tools.test.ts; add every new executable module's coverage entry.
   - Tests and proof: Retain seven existing tools and add configure/create/update/link/transfer/import/migrate/read/prepare/finalize plus diagnostic operation as specified; test closed input enums, whole-workspace modes, noninteractive dry-run, service stub consumers, role-denied tools, and text/structuredContent/isError agreement.
   - Acceptance: Extension and standalone MCP share one service implementation; no wrapper computes schema, coverage, parity, or approval semantics, and all shared nondiscovery contract tests remain green.

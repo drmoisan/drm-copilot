@@ -65,19 +65,9 @@ import type {
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import {
-  runDiscoveryDotnetAnalyzer,
-  runDiscoveryInit,
-  runDiscoveryRepoInventory,
-  runDiscoveryReport,
-  runDiscoveryScenarioGeneration,
-  runDiscoveryVstoAnalyzer,
-  runValidateDiscoveryArtifacts,
-  type RunDiscoveryAnalyzerInput,
-  type RunDiscoveryInitInput,
-  type RunDiscoveryReportInput,
-  type RunDiscoveryScenarioGenerationInput,
-  type ValidateDiscoveryArtifactsInput,
-} from "./repo-automation-execute-discovery";
+  DiscoveryServiceBase,
+  type DiscoveryServiceDeps,
+} from "./repo-automation-service-discovery";
 
 export type {
   RepoAutomationExecutionResult,
@@ -105,9 +95,14 @@ export interface RepoAutomationServiceOptions {
   >;
   /** Optional push-down filesystem (distinct from {@link FileSystem}); tests inject an in-memory fake, production defaults to {@link RealPushDownFileSystem}. */
   readonly pushDownFileSystem?: PushDownFileSystem;
+  /** Optional discovery runtime/authority seams; production uses the Node defaults. */
+  readonly discovery?: DiscoveryServiceDeps;
 }
 
-class DefaultRepoAutomationService implements RepoAutomationService {
+class DefaultRepoAutomationService
+  extends DiscoveryServiceBase
+  implements RepoAutomationService
+{
   private readonly extensionRoot: string;
   private readonly output: CommandOutput;
   private readonly templateRoot: string;
@@ -122,6 +117,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly pushDownDeps: PushDownServiceDeps;
 
   constructor(options: RepoAutomationServiceOptions) {
+    super(options.output, options.discovery);
     this.extensionRoot = options.extensionRoot;
     this.output = options.output;
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
@@ -438,50 +434,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       ...input,
       fileSystem: this.fileSystem,
     });
-  }
-
-  async validateDiscoveryArtifacts(
-    input: ValidateDiscoveryArtifactsInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    // Thin delegation to the central discovery mapping + Python subprocess
-    // helper; no dev.discovery.* logic is re-authored here.
-    return runValidateDiscoveryArtifacts(this.output, input);
-  }
-
-  async runDiscoveryInit(
-    input: RunDiscoveryInitInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryInit(this.output, input);
-  }
-
-  async runDiscoveryRepoInventory(
-    input: RunDiscoveryAnalyzerInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryRepoInventory(this.output, input);
-  }
-
-  async runDiscoveryDotnetAnalyzer(
-    input: RunDiscoveryAnalyzerInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryDotnetAnalyzer(this.output, input);
-  }
-
-  async runDiscoveryVstoAnalyzer(
-    input: RunDiscoveryAnalyzerInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryVstoAnalyzer(this.output, input);
-  }
-
-  async runDiscoveryScenarioGeneration(
-    input: RunDiscoveryScenarioGenerationInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryScenarioGeneration(this.output, input);
-  }
-
-  async runDiscoveryReport(
-    input: RunDiscoveryReportInput,
-  ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryReport(this.output, input);
   }
 
   private async executeScript(
