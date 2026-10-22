@@ -23,6 +23,23 @@ Describe 'Codex routed model profile attestation' {
         $agentProfile.profile_sha256 | Should -Match '^[0-9a-f]{64}$'
     }
 
+    It 'parses the generated discovery specialist profile and projects it to the shared shape' {
+        $agentProfile = Get-CodexAgentProfileAttestation `
+            -RepositoryRoot $script:RepoRoot `
+            -AgentType 'legacy-parity-analyst-c3'
+        $shared = ConvertTo-CodexSharedAgentProfile -AgentProfile $agentProfile
+
+        $agentProfile.profile_name | Should -Be 'legacy-parity-analyst-c3'
+        $agentProfile.profile_model | Should -Be 'gpt-6.1-sol'
+        $agentProfile.profile_reasoning_effort | Should -Be 'high'
+        $shared.ProfilePath | Should -Be '.codex/agents/legacy-parity-analyst-c3.toml'
+        $shared.ProfileSha256 | Should -Be $agentProfile.profile_sha256
+        $shared.ProfileName | Should -Be 'legacy-parity-analyst-c3'
+        $shared.ProfileModel | Should -Be 'gpt-6.1-sol'
+        $shared.ProfileReasoningEffort | Should -Be 'high'
+        Test-CodexDiscoveryAgentType -AgentType $agentProfile.profile_name | Should -BeTrue
+    }
+
     It 'persists the receipt and profile model-reasoning binding' {
         $checkpoint = @{
             codex_model_routing_receipts = @(@{

@@ -200,8 +200,8 @@ function Find-DiscoveryAgentInvocation {
     $directory = "$(Get-DiscoverySessionDirectory -Location $Location -SessionId $Principal.SessionId)/invocations"
     $bindings = [System.Collections.Generic.List[object]]::new()
     # Every partition is inspected; only an exact identity binding in the started state counts.
-    foreach ($entry in @(& $Store.ListEntries $directory)) {
-        $text = & $Store.ReadText "$directory/$entry/invocation.json"
+    foreach ($entry in @(Invoke-DiscoveryStoreSeam -Seam $Store.ListEntries -Arguments @($directory))) {
+        $text = Invoke-DiscoveryStoreSeam -Seam $Store.ReadText -Arguments @("$directory/$entry/invocation.json")
         if ($null -eq $text) { continue }
         try { $record = ConvertFrom-Json -InputObject ([string]$text) -Depth 16 } catch { continue }
         if ($null -eq $record -or $record -isnot [System.Management.Automation.PSCustomObject]) { continue }
@@ -450,8 +450,8 @@ function Get-DiscoveryPreToolDecision {
     $directory = "$($invocation.Directory)/authorizations"
     $path = "$directory/$($authorization['authorization_ref']).json"
     try {
-        & $Store.EnsureDirectory $directory
-        & $Store.WriteText $path (($authorization | ConvertTo-Json -Depth 8) + "`n")
+        Invoke-DiscoveryStoreSeam -Seam $Store.EnsureDirectory -Arguments @($directory)
+        Invoke-DiscoveryStoreSeam -Seam $Store.WriteText -Arguments @($path, (($authorization | ConvertTo-Json -Depth 8) + "`n"))
     } catch {
         return Get-DiscoveryPreToolOutcome -Decision 'deny' -Code 'STORE' -Reason "the one-use authorization could not be recorded: $($_.Exception.Message)"
     }

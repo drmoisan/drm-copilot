@@ -13,6 +13,7 @@ param()
 . (Join-Path $PSScriptRoot 'codex-authority-store.ps1')
 . (Join-Path $PSScriptRoot 'codex-agent-profile-attestation.ps1')
 . (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1')
+. (Join-Path $PSScriptRoot 'discovery-start-attestation.ps1')
 $script:EpicPersonas = @('epic-planner', 'epic-orchestrator')
 
 function ConvertFrom-SubagentAttestationJson {
@@ -365,6 +366,13 @@ function Invoke-CodexSubagentAttestationCommand {
     )
     try {
         $payload = ConvertFrom-SubagentAttestationJson -Raw (& $ReadInput) -Name 'SubagentStart input'
+        if (Test-CodexDiscoveryAgentType -AgentType ([string]$payload.agent_type)) {
+            # A discovery specialist is attested against its protected invocation only;
+            # no checkpoint, HEAD or epic receipt is consulted (issue #980).
+            $attestation = Get-CodexDiscoveryStartAttestation -Payload $payload -RepositoryRoot $repositoryRoot -Now (& $GetNow)
+            $attestationPath = Write-CodexSubagentAttestation -RepositoryRoot $repositoryRoot -Attestation $attestation
+            return [ordered]@{ exit_code = 0; stdout = (Get-CodexDiscoveryStartCommandOutput -Attestation $attestation -AttestationPath $attestationPath); stderr = $null }
+        }
         $stateRoot = Join-Path $repositoryRoot 'artifacts/orchestration'
         $receiptPath = Get-CodexAuthorityReceiptPath `
             -RepositoryRoot $repositoryRoot `

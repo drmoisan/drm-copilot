@@ -1,0 +1,40 @@
+# P9-T3 Native start attestation contract
+
+Timestamp: 2026-10-22T16-04
+Task: [P9-T3] Attest discovery starts without altering feature checkpoints.
+Result: PASS
+
+## Surfaces delivered
+
+- `.claude/lib/discovery-validation/DiscoveryStartRecord.psm1` (new, shared): the discovery agent-type grammar (four roles with an optional `-c1`..`-c4`/`-c3-elevated` suffix), the per-host agent profile location (`.claude/agents/<type>.md`, `.codex/agents/<type>.toml`, `.github/agents/<type>.agent.md`), the Markdown front-matter profile reader and hasher, UTC coercion for decoded timestamps, the `started` transition of a protected invocation record edited as a JSON node tree so every untouched value (including `created_at`) keeps its spelling, the `start-attestation` record and the filesystem store seams (exclusive WriteText, ReplaceText).
+- `.claude/lib/discovery-validation/DiscoveryStart.psm1` (new, shared): `Find-DiscoveryPreparedInvocation`, `Get-DiscoveryDeploymentMismatch`, `Get-DiscoveryCapabilityMismatch`, `Get-DiscoveryStartDecision` and `ConvertTo-DiscoveryStartHookOutput`; `DiscoveryAuthority.psd1` nests and exports both modules. `DiscoveryAuthority.psm1` gains `Invoke-DiscoveryStoreSeam`, the single typed script-block seam through which every store call of the authorization and start modules runs.
+- `.claude/hooks/record-discovery-agent-start.ps1` (new): the Claude Code SubagentStart adapter with the shared dependency guard and guarded `Join-Path $PSScriptRoot` imports; `Invoke-DiscoveryAgentStartDecision -PayloadRaw` and `Invoke-DiscoveryAgentStartEntryPoint`.
+- `.github/hooks/discovery-agent-start.ps1` (new): the Copilot local-harness adapter over camelCase envelopes with its own fail-closed dependency list.
+- `.codex/hooks/discovery-start-attestation.ps1` (new, focused helper dot-sourced by `record-subagent-routing-attestation.ps1`): `Test-CodexDiscoveryAgentType`, published-or-self-hosted module resolution, lazy module import (ordinary starts never load the discovery modules), `Get-CodexDiscoveryStartAttestation` projecting the shared decision into the schema-2 routing attestation (`receipt_kind: discovery-invocation`, `invocation_id`, `start_attestation_ref`, `discovery_code`, `discovery_reason`) and `Get-CodexDiscoveryStartCommandOutput`. `record-subagent-routing-attestation.ps1` routes a discovery agent type to it before any checkpoint, HEAD or epic receipt read; `codex-agent-profile-attestation.ps1` gains `ConvertTo-CodexSharedAgentProfile`; `enforce-codex-model-routing.ps1` gates the four discovery specialist families on their SubagentStart attestation.
+
+## Decision contract (proven in `LPTEST/DiscoveryStart.Tests.ps1`, `CPTEST/discovery-start.Tests.ps1`, `XPTEST/discovery-start.Tests.ps1`, `tests/scripts/copilot-hooks/discovery-start.Tests.ps1`)
+
+- Receipt kind: only a `discovery-invocation` record of schema 2.0.0 with zero production writes in state `prepared` is a start receipt; a `validation-receipt`, a started record, another schema version or a non-zero write count is not (NO_INVOCATION / RECEIPT).
+- Trusted parent and session: the attested `DRM_DISCOVERY_HOST`, `DRM_DISCOVERY_SESSION_ID` and `DRM_DISCOVERY_PARENT_AGENT_ID` must equal the record's host, session and parent; an envelope from another host, a missing parent or a missing host agent identifier denies (IDENTITY), a record bound to another parent or session is not found (NO_INVOCATION), and two prepared records for the same agent type are AMBIGUOUS.
+- Exact role, model, effort and profile hash: the agent type's role must equal the record role (ROLE); where the host exposes them, the actual model and the profile's reasoning effort must equal the prepared deployment (MODEL, EFFORT), and a Markdown profile that declares a different model is likewise MODEL; the agent profile must declare the launched agent type with a 64-hex hash (PROFILE); the record's workspace, domain-profile path and hash and runtime schema version must equal the current activation (BINDING).
+- Allowed schema, runtime, build and capability: the session's protected `capability-attestation.json` must exist, match `capability_ref`, be `supported` and unexpired, be bound to the same host, session and workspace (CAPABILITY), and carry exactly the five runtime pins (`package_version`, `schema_version`, `build_sha256`, `policy_version`, `policy_sha256`) with values equal to the invocation's (RUNTIME).
+- Mirror tampering: the workspace diagnostic mirror names another agent and a tampered model in every fixture store; the adapters never read it (the store records every read) and decide on the protected record only.
+- Nested launch: a start whose launching process is itself an attested specialist (`DRM_DISCOVERY_AGENT_ID`/`_ROLE` present) is NESTED.
+- Absent ordinary checkpoint: the Codex command path for a discovery agent reads no `artifacts/orchestration` checkpoint and no repository HEAD (seam counters stay at zero), and the Claude and Copilot adapters read nothing under `artifacts/orchestration`; `orchestrator-state.json` is never written.
+- Unchanged ordinary and epic starts: `atomic-executor`, `atomic-planner`, `orchestrator`, `pr-author`, `feature-review`, `epic-planner` and `epic-orchestrator` starts are skipped by all three adapters without a store read or write, and the Codex command keeps its existing provenance and routing path with the discovery attestation never invoked.
+- Attested start: one `start-attestation.json` is written exclusively under the invocation directory (a second start for the same invocation is refused as STORE), the invocation record moves to `started` with the host-assigned `agent_id` and `start_attestation_ref`, and `Find-DiscoveryAgentInvocation` of the P9-T2 PreToolUse adapter then finds exactly that record, so no tool grant activates before the matching native start attestation.
+- Codex: a rejected discovery attestation is written with `routing_valid: false` and the `DISCOVERY_START_ATTESTATION_BLOCKED` marker, and `enforce-codex-model-routing.ps1` denies the specialist's first tool use with or without it; an attested one passes `Test-CodexModelGateProfileAttestation`, which rehashes the generated profile.
+
+## Classification and publication
+
+- Both core pack manifests list the two modules, the Claude hook and the Codex helper; the Claude bundle, the Codex bundle (`discovery-start-attestation.ps1`, `record-subagent-routing-attestation.ps1`, `codex-agent-profile-attestation.ps1`, `enforce-codex-model-routing.ps1`) and `resources/lib/discovery-validation` are byte-identical; `codex-epic-runtime-contracts` includes the helper in its runtime surface. The GitHub hook publishes through the `.github/hooks` Copilot push-down root (P8-T9) inside the T3 root classified in P9-T2.
+
+## Gates
+
+- PoshQC format and analyze clean; PSScriptAnalyzer launcher zero findings; MCP Pester 294/0 over discovery-validation and copilot-hooks; launcher runs 94/94 (updated Codex suites), 563 cases with two parallel-copy mirror failures that pass on rerun, 1,183/1,184 framework cases (the single failure is the pre-existing P7-T4 `CodexDiscoveryRouting.psm1` convention defect); Python 126 passed.
+
+## Carried notes
+
+- Event registration (Claude settings `SubagentStart`, `.codex/config.toml` matcher extension, `.github/hooks/*.json`) is P9-T6; until then the three start adapters are published but unregistered and the Codex command branch is reached through the existing `SubagentStart` registration only when its matcher admits a discovery agent type.
+- Claude Code and GitHub Copilot expose no model in their start events and their Markdown profiles declare none, so the shared decision records `actual_model: null` for them and binds model and effort through the agent profile hash and the prepared deployment; Codex exposes the model and the generated profile declares effort, and both are compared.
+- `CodexDiscoveryRouting.psm1` convention defect remains recorded for the P11 closing review; `.claude/hooks/record-discovery-agent-start.ps1` uses the SubagentStop-shaped dependency tail (stderr, exit 2) because the shared guard models only PreToolUse and SubagentStop.
