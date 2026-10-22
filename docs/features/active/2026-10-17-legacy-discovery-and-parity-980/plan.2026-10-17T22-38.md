@@ -376,7 +376,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test exact normalized request ID/tool/input digest plus trusted agent/session/role binding, expiry, duplicate/ambiguous matches, replay, concurrent consumption, wrong workspace, unknown operation, and root-only versus analyst operations.
   - Acceptance: Only a matching unconsumed native authorization admits a controlled tool request; caller role strings or request IDs cannot expand grants or impersonate a root approval.
 
-- [ ] [P8-T4] Prepare constrained discovery invocations through existing routing authority.
+- [x] [P8-T4] Prepare constrained discovery invocations through existing routing authority.
   - Files and behavior: Create ES/{discovery-invocation,discovery-routing}.ts and ET/{discovery-invocation,discovery-routing}.test.ts; bind existing resolver outputs, capability attestation, expected artifact outputs and selected inputs. Add coverage entries.
   - Tests and proof: Cover all nine workflows/four roles, exact model/effort/profile hash, parent/session context, zero-code-write topology, protected record and diagnostic mirror separation, absent feature checkpoint, unsupported capability, output-contract substitution, and nested self-launch denial.
   - Acceptance: prepare_discovery_agent returns a launchable exact deployment only after persisted protected bindings, without modifying artifacts/orchestration/orchestrator-state.json or requiring a new feature issue.

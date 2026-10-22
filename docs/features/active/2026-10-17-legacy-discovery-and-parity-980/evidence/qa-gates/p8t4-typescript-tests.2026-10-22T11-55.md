@@ -1,0 +1,6 @@
+# P8-T4 TypeScript test gate with coverage (extension project)
+
+Timestamp: 2026-10-22T11-55
+Command: npm --prefix extensions/drm-copilot run test:coverage
+EXIT_CODE: 0
+Output Summary: Complete extension population: 295 suites passed, 4,639 tests passed, 0 failed (P8-T3 state was 291 suites/4,483 tests; the four new suites add 156 cases and the coverage-contract suite now covers 15 entries). Totals: lines 97.28% (55800/57358), branches 93.14% (8455/9077). Every configured per-file threshold passed, including the three new jest.discovery-coverage.json entries at 90% lines / 75% branches. Per-file results read from coverage/lcov.info: src/discovery-routing.ts 445/452 lines (98.45%) and 76/78 branches (97.44%); src/discovery-invocation.ts 456/456 lines (100%) and 67/67 branches (100%); src/discovery-invocation-record.ts 217/217 lines (100%) and 30/30 branches (100%). The full run executed after the last production-source edit; the two later edits were type-only changes in test files, after which the focused run of test/discovery-routing.test.ts, test/discovery-invocation.test.ts, test/discovery-invocation.refusals.test.ts, test/discovery-invocation-record.test.ts and test/discovery-coverage-contracts.test.ts passed 160/160. No assertion was changed during the task.
