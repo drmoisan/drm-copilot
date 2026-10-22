@@ -1,3 +1,8 @@
+// Issue #980: the discovery host modules keep their per-file thresholds in a
+// sibling JSON map (gated at 90% lines / 75% branches) because this file sits
+// at the 500-line limit; the map is merged below and carries no `global` key.
+const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
+
 /** @type {import('jest').Config} */
 module.exports = {
   testEnvironment: "node",
@@ -23,6 +28,7 @@ module.exports = {
   // unrelated legacy coverage. Zero-branch definition modules report 100% branch
   // by convention and therefore satisfy the branch gate.
   coverageThreshold: {
+    ...discoveryCoverageThresholds,
     // Issue #574: the three pr-context modules changed by the collect-pr-context
     // path-identity and freshness fix. The map carried no entry for any
     // src/lib/pr-context/ file before this change.
@@ -236,26 +242,9 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
-    "./src/repo-automation-execute-discovery.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-tool-inputs-discovery.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-handlers/discovery-handlers.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/mcp-discovery-tool-definitions.ts": {
-      lines: 85,
-      branches: 75,
-    },
-    "./src/discovery-command-registration.ts": {
-      lines: 85,
-      branches: 75,
-    },
+    // The discovery host-module entries (execute adapters, MCP inputs/handlers/
+    // definitions, command registration, result and runtime transport) live in
+    // jest.discovery-coverage.json and are merged at the top of this map.
     "./src/mcp-tools.ts": {
       lines: 85,
       branches: 75,

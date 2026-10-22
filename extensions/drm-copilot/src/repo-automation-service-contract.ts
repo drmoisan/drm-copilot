@@ -20,6 +20,7 @@ import type {
   TransitionPreparedOrchestrationRequest,
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
+import type { DiscoveryServiceResult } from "./discovery-service-types";
 
 /**
  * Service contract declarations for {@link RepoAutomationService}.
@@ -55,6 +56,11 @@ export interface RepoAutomationExecutionResult {
   readonly resolvedHeadRef?: string | null;
   /** The head SHA the collector actually used, or `null` when unresolved. */
   readonly resolvedHeadSha?: string | null;
+  /**
+   * The validated v2 discovery service result. Present only on discovery tool
+   * results; it is the authoritative structured outcome and never a grant.
+   */
+  readonly discovery?: DiscoveryServiceResult;
 }
 
 export interface WorkspaceExecutionInput {

@@ -17,37 +17,62 @@ import {
   showInputBoxMock,
   showQuickPickMock,
 } from "./extension-test-harness";
+import type { MockChildProcess } from "./runtime-test-helpers";
+import { buildServiceResult } from "./discovery-test-helpers";
 
 const WORKSPACE_ROOT = "C:/workspace";
+const GATEWAY_ARGV_PREFIX = ["-I", "-m", "drm_copilot_discovery.gateway"];
 
-function entryCode(module: string, functionName: string): string {
-  return `import sys; from ${module} import ${functionName}; sys.exit(${functionName}())`;
-}
+/** The most recent spawned child, so its stdin request can be inspected. */
+let spawnedProcesses: MockChildProcess[] = [];
 
-function spawnArgs(callIndex = 0): string[] {
+function spawnCall(callIndex = 0): [string, string[], { cwd: string }] {
   const call = childProcessMock.spawn.mock.calls[callIndex] as
     [string, string[], { cwd: string }] | undefined;
   if (call === undefined) {
     throw new Error("spawn was not invoked");
   }
-  return call[1];
+  return call;
 }
 
-function spawnCwd(callIndex = 0): string {
-  const call = childProcessMock.spawn.mock.calls[callIndex] as [
-    string,
-    string[],
-    { cwd: string },
-  ];
-  return call[2].cwd;
+function spawnArgs(callIndex = 0): string[] {
+  return spawnCall(callIndex)[1];
+}
+
+function stdinRequest(callIndex = 0): Record<string, unknown> {
+  const child = spawnedProcesses[callIndex];
+  if (child === undefined || child.stdin.written.length !== 1) {
+    throw new Error("exactly one request document was expected on stdin");
+  }
+  return JSON.parse(child.stdin.written[0] ?? "") as Record<string, unknown>;
+}
+
+function expectGatewayInvocation(): void {
+  const [, args, options] = spawnCall();
+  expect(args.slice(0, 3)).toEqual(GATEWAY_ARGV_PREFIX);
+  expect(args).toEqual([
+    ...GATEWAY_ARGV_PREFIX,
+    "--workspace-root",
+    WORKSPACE_ROOT,
+    "--principal",
+    "local-user",
+  ]);
+  expect(args).not.toContain("-c");
+  expect(options.cwd).toBe(WORKSPACE_ROOT);
 }
 
 describe("discovery VS Code commands", () => {
   beforeEach(() => {
     resetExtensionHarnessState();
-    // Resolve a PATH python and make every spawned discovery CLI succeed.
+    spawnedProcesses = [];
+    // Resolve a PATH python and make every spawned gateway return one valid
+    // success result document on stdout.
     setExecutablePresence({ python: true, py: false });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    childProcessMock.spawn.mockImplementation((): MockChildProcess => {
+      const child = createMockProcess(0, JSON.stringify(buildServiceResult()));
+      spawnedProcesses.push(child);
+      return child;
+    });
   });
 
   afterEach(() => {
@@ -68,79 +93,77 @@ describe("discovery VS Code commands", () => {
     }
   });
 
-  it("validateDiscoveryArtifacts direct invocation spawns the per-kind entry", async () => {
+  it("validateDiscoveryArtifacts direct invocation sends the per-kind request to the gateway", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.validateDiscoveryArtifacts",
     );
     await handler({ artifact_type: "profile", artifact_path: "p.yaml" });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode(
-        "scripts.dev_tools.validate_discovery_artifacts",
-        "main_profile",
-      ),
-    );
-    expect(args).toContain("p.yaml");
-    expect(spawnCwd()).toBe(WORKSPACE_ROOT);
+    expectGatewayInvocation();
+    expect(stdinRequest()).toMatchObject({
+      $schema: "urn:drm-copilot:discovery:2.0.0:service-request",
+      operation: "validate-profile",
+      mode: "structural",
+      inputs: { input_path: "p.yaml" },
+    });
     expect(appendLineMock).toHaveBeenCalled();
     expect(showQuickPickMock).not.toHaveBeenCalled();
   });
 
-  it("validateDiscoveryArtifacts interactive invocation prompts then spawns", async () => {
+  it("validateDiscoveryArtifacts interactive invocation prompts then validates the whole workspace", async () => {
     showQuickPickMock.mockResolvedValueOnce("all");
-    showInputBoxMock.mockResolvedValueOnce("discovery/");
+    showInputBoxMock.mockResolvedValueOnce(".");
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.validateDiscoveryArtifacts",
     );
     await handler();
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.validate_discovery_artifacts", "main"),
-    );
-    expect(args).toContain("discovery/");
+    expectGatewayInvocation();
+    expect(stdinRequest()).toMatchObject({
+      operation: "validate-all",
+      mode: "structural",
+      inputs: {},
+    });
   });
 
-  it("runDiscoveryInit direct invocation spawns init_cli:main with target_dir", async () => {
+  it("runDiscoveryInit rejects the retired target_dir contract without spawning", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryInit",
     );
-    await handler({ target_dir: "discovery" });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.discovery.init_cli", "main"),
+    await expect(handler({ target_dir: "discovery" })).rejects.toThrow(
+      "does not accept targetDir",
     );
-    expect(args).toContain("discovery");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryInit interactive invocation prompts for the target directory", async () => {
+  it("runDiscoveryInit interactive invocation prompts for the target directory and rejects it", async () => {
     showInputBoxMock.mockResolvedValueOnce("discovery");
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryInit",
     );
-    await handler();
 
-    expect(spawnArgs()).toContain(
-      entryCode("scripts.dev_tools.discovery.init_cli", "main"),
-    );
+    await expect(handler()).rejects.toThrow("does not accept targetDir");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryRepoInventory direct invocation spawns analyzer.cli:main with --json", async () => {
+  it("runDiscoveryRepoInventory direct invocation sends the inventory request with the profile", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryRepoInventory",
     );
     await handler({ profile_path: "profile.yaml" });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.discovery.analyzer.cli", "main"),
-    );
-    expect(args).toContain("profile.yaml");
-    expect(args).toContain("--json");
+    expectGatewayInvocation();
+    expect(stdinRequest()).toMatchObject({
+      operation: "inventory",
+      profile_path: "profile.yaml",
+      write: false,
+      dry_run: false,
+      inputs: {},
+    });
+    expect(spawnArgs()).not.toContain("--json");
   });
 
   it("runDiscoveryRepoInventory interactive invocation runs without prompts", async () => {
@@ -149,86 +172,61 @@ describe("discovery VS Code commands", () => {
     );
     await handler();
 
-    expect(spawnArgs()).toContain(
-      entryCode("scripts.dev_tools.discovery.analyzer.cli", "main"),
-    );
+    expectGatewayInvocation();
+    expect(stdinRequest()).toMatchObject({ operation: "inventory" });
     expect(showInputBoxMock).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryDotnetAnalyzer direct invocation spawns stack_cli:main_dotnet", async () => {
+  it("runDiscoveryDotnetAnalyzer direct and interactive invocations select the dotnet analyzer", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryDotnetAnalyzer",
     );
     await handler({});
-
-    expect(spawnArgs()).toContain(
-      entryCode(
-        "scripts.dev_tools.discovery.analyzer.stack_cli",
-        "main_dotnet",
-      ),
-    );
-  });
-
-  it("runDiscoveryDotnetAnalyzer interactive invocation spawns stack_cli:main_dotnet", async () => {
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.runDiscoveryDotnetAnalyzer",
-    );
     await handler();
 
-    expect(spawnArgs()).toContain(
-      entryCode(
-        "scripts.dev_tools.discovery.analyzer.stack_cli",
-        "main_dotnet",
-      ),
-    );
+    expectGatewayInvocation();
+    expect(stdinRequest(0)).toMatchObject({
+      operation: "inventory",
+      inputs: { analyzer_ids: ["dotnet"] },
+    });
+    expect(stdinRequest(1)).toMatchObject({
+      inputs: { analyzer_ids: ["dotnet"] },
+    });
   });
 
-  it("runDiscoveryVstoAnalyzer direct invocation spawns stack_cli:main_vsto", async () => {
+  it("runDiscoveryVstoAnalyzer rejects the retired output_dir input and otherwise selects office-vsto", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryVstoAnalyzer",
     );
-    await handler({ output_dir: "out" });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.discovery.analyzer.stack_cli", "main_vsto"),
+    await expect(handler({ output_dir: "out" })).rejects.toThrow(
+      "does not accept outputDir",
     );
-    expect(args).toContain("--output-dir");
-    expect(args).toContain("out");
-  });
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
 
-  it("runDiscoveryVstoAnalyzer interactive invocation spawns stack_cli:main_vsto", async () => {
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.runDiscoveryVstoAnalyzer",
-    );
     await handler();
-
-    expect(spawnArgs()).toContain(
-      entryCode("scripts.dev_tools.discovery.analyzer.stack_cli", "main_vsto"),
-    );
+    expectGatewayInvocation();
+    expect(stdinRequest()).toMatchObject({
+      inputs: { analyzer_ids: ["office-vsto"] },
+    });
   });
 
-  it("runDiscoveryScenarioGeneration direct invocation spawns the generator with three inputs", async () => {
+  it("runDiscoveryScenarioGeneration rejects the retired three-input contract", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryScenarioGeneration",
     );
-    await handler({
-      feature_contract: "fc.yaml",
-      parity_matrix: "pm.yaml",
-      runtime_characterization: "rc.yaml",
-    });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.generate_acceptance_scenarios", "main"),
-    );
-    expect(args).toContain("--feature-contract");
-    expect(args).toContain("fc.yaml");
-    expect(args).toContain("--parity-matrix");
-    expect(args).toContain("--runtime-characterization");
+    await expect(
+      handler({
+        feature_contract: "fc.yaml",
+        parity_matrix: "pm.yaml",
+        runtime_characterization: "rc.yaml",
+      }),
+    ).rejects.toThrow("does not accept featureContract");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryScenarioGeneration interactive invocation prompts for the three inputs", async () => {
+  it("runDiscoveryScenarioGeneration interactive invocation still prompts for the three inputs and rejects them", async () => {
     showInputBoxMock
       .mockResolvedValueOnce("fc.yaml")
       .mockResolvedValueOnce("pm.yaml")
@@ -237,29 +235,24 @@ describe("discovery VS Code commands", () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryScenarioGeneration",
     );
-    await handler();
 
-    const args = spawnArgs();
-    expect(args).toContain("fc.yaml");
-    expect(args).toContain("pm.yaml");
-    expect(args).toContain("rc.yaml");
+    await expect(handler()).rejects.toThrow("does not accept featureContract");
+    expect(showInputBoxMock).toHaveBeenCalledTimes(3);
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryReport direct invocation spawns parity_report:main with --input", async () => {
+  it("runDiscoveryReport rejects the retired input_path contract", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryReport",
     );
-    await handler({ report_type: "parity", input_path: "matrix.yaml" });
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.discovery.parity_report", "main"),
-    );
-    expect(args).toContain("--input");
-    expect(args).toContain("matrix.yaml");
+    await expect(
+      handler({ report_type: "parity", input_path: "matrix.yaml" }),
+    ).rejects.toThrow("does not accept inputPath");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("runDiscoveryReport interactive completion invocation prompts for both inputs", async () => {
+  it("runDiscoveryReport interactive completion invocation prompts for both inputs and rejects them", async () => {
     showQuickPickMock.mockResolvedValueOnce("completion");
     showInputBoxMock
       .mockResolvedValueOnce("cov.json")
@@ -268,15 +261,66 @@ describe("discovery VS Code commands", () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.runDiscoveryReport",
     );
-    await handler();
 
-    const args = spawnArgs();
-    expect(args).toContain(
-      entryCode("scripts.dev_tools.discovery.completion_report", "main"),
+    await expect(handler()).rejects.toThrow(
+      "does not accept coverageInput, parityInput",
     );
-    expect(args).toContain("--coverage-input");
-    expect(args).toContain("cov.json");
-    expect(args).toContain("--parity-input");
-    expect(args).toContain("par.yaml");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
+
+  it("surfaces a malformed gateway result as a blocking transport error", async () => {
+    childProcessMock.spawn.mockImplementation((): MockChildProcess => {
+      const child = createMockProcess(0, "ok: wrote discovery/x.json");
+      spawnedProcesses.push(child);
+      return child;
+    });
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.runDiscoveryRepoInventory",
+    );
+
+    await expect(handler({})).rejects.toThrow("DISCOVERY_RESULT_MALFORMED");
+  });
+
+  it.each([
+    ["validateDiscoveryArtifacts", "quick pick", [undefined], []],
+    ["validateDiscoveryArtifacts", "artifact path", ["profile"], [undefined]],
+    ["runDiscoveryInit", "target directory", [], [undefined]],
+    ["runDiscoveryScenarioGeneration", "feature contract", [], [undefined]],
+    [
+      "runDiscoveryScenarioGeneration",
+      "parity matrix",
+      [],
+      ["fc.yaml", undefined],
+    ],
+    [
+      "runDiscoveryScenarioGeneration",
+      "runtime characterization",
+      [],
+      ["fc.yaml", "pm.yaml", undefined],
+    ],
+    ["runDiscoveryReport", "report type", [undefined], []],
+    ["runDiscoveryReport", "coverage input", ["completion"], [undefined]],
+    [
+      "runDiscoveryReport",
+      "parity input",
+      ["completion"],
+      ["cov.json", undefined],
+    ],
+    ["runDiscoveryReport", "report input", ["parity"], [undefined]],
+  ] as const)(
+    "%s interactive invocation cancelled at the %s prompt neither spawns nor rejects",
+    async (command, _prompt, quickPicks, inputs) => {
+      for (const pick of quickPicks) {
+        showQuickPickMock.mockResolvedValueOnce(pick);
+      }
+      for (const value of inputs) {
+        showInputBoxMock.mockResolvedValueOnce(value);
+      }
+      const handler = activateAndGetHandler(`drmCopilotExtension.${command}`);
+
+      await expect(handler()).resolves.toBeUndefined();
+
+      expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    },
+  );
 });
