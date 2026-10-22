@@ -127,7 +127,10 @@ function Test-CodexModelGateAgentType {
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $AgentType)
 
-    return $AgentType -match '-c(?:1|2|3|4|3-elevated)$' -or @(
+    # Discovery specialists are gated by their SubagentStart attestation of the
+    # protected invocation (issue #980); a start without one denies the first tool use.
+    return $AgentType -match '-c(?:1|2|3|4|3-elevated)$' -or
+    $AgentType -cmatch '^(legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer)$' -or @(
         'orchestrator', 'atomic-planner', 'atomic-executor', 'feature-review',
         'feature-reviewer', 'task-researcher', 'prd-feature', 'pr-author',
         'python-typed-engineer', 'powershell-typed-engineer',

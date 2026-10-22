@@ -458,7 +458,27 @@ function Read-DiscoveryActivationState {
     return [pscustomobject]@{ Status = $status; Record = $record; Reason = $null; Path = $path }
 }
 
+function Invoke-DiscoveryStoreSeam {
+    <#
+    .SYNOPSIS
+        Invokes one injected store seam (ReadText, ListEntries, WriteText, ReplaceText, EnsureDirectory) with its arguments.
+    .DESCRIPTION
+        Hooks hand their store as a hashtable of script blocks; this is the single
+        place that invokes one, so every store call is a typed script-block seam and
+        never a dynamic command position.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)][scriptblock]$Seam,
+        [Parameter(Mandatory = $false)][AllowEmptyCollection()][object[]]$Arguments = @()
+    )
+
+    return & $Seam @Arguments
+}
+
 Export-ModuleMember -Function `
+    Invoke-DiscoveryStoreSeam, `
     Resolve-DiscoveryAuthorityLocation, `
     Get-DiscoveryTrustedHostEnvironment, `
     Get-DiscoveryPartitionName, `

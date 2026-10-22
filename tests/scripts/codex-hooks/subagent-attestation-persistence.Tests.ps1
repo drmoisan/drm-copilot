@@ -126,6 +126,7 @@ Describe 'Subagent attestation persistence with memory streams' {
 
     It 'returns without opening authority for <Case>' -ForEach @(
         @{ Case = 'non-epic'; Agent = 'atomic-executor-c3'; Exists = $true }
+        @{ Case = 'discovery specialist'; Agent = 'legacy-parity-analyst-c3'; Exists = $true }
         @{ Case = 'absent receipt'; Agent = 'epic-planner'; Exists = $false }
     ) {
         $script:Payload.agent_type = $Agent
