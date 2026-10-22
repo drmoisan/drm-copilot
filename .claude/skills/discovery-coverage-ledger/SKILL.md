@@ -1,66 +1,50 @@
 ---
 name: discovery-coverage-ledger
-description: 'Produce feature contracts and the coverage ledger from inventory output in the discovery workflow. Use when deriving the feature contract set and the migration coverage ledger from the repository inventory and routing coverage review to the coverage role. Third stage, after inventory and before runtime characterization.'
+description: 'Dispatch explicit inventory, extraction or review without mixing coverage ownership. Use when invoking the existing coverage-ledger alias with action=inventory, extract or review.'
 ---
 
-# Discovery Coverage Ledger
-
-Runs the coverage stage of the discovery and parity-definition workflow. It
-derives feature contracts and the coverage ledger from the inventory output, so
-that every inventoried unit of behavior has a contract and a tracked coverage
-state. All domain specificity is read from the domain profile at runtime.
+# Discovery Coverage Ledger Alias
 
 ## When to Use This Skill
 
-- The inventory stage has produced analyzer outputs under the profile's artifact
-  root.
-- You need the feature contract set and the coverage ledger before runtime
-  characterization and parity analysis.
+Use this compatibility name only to dispatch to its canonical workflow.
 
-## Prerequisites
+## Inputs
 
-- `discovery-repo-inventory` has completed and recorded its outputs.
-- The domain profile is loaded and valid.
+| Input | Required contract |
+| --- | --- |
+| action | Required inventory, extract or review; reject missing, mixed or unknown actions with no fallback. |
 
-## Workflow
+Forward all other supplied canonical inputs to the selected target. These
+alias selectors are not service-request fields. A fixed mapping requires no
+additional selector; it does not add fields to `prepare-agent`.
 
-1. **Derive feature contracts.** From the inventory output, produce one feature
-   contract per inventoried unit of behavior, conforming to the schema
-   `schemas/discovery/v1/feature-contract.schema.json`.
+## Dispatch
 
-2. **Build the coverage ledger.** Aggregate the feature contracts into the
-   coverage ledger, conforming to the schema
-   `schemas/discovery/v1/coverage-ledger.schema.json`. The ledger records the
-   coverage state of each contract so later stages can measure parity progress.
+| Selector | Canonical skill |
+| --- | --- |
+| inventory | inventory-legacy-system |
+| extract | extract-feature-contract |
+| review | review-discovery-coverage |
 
-3. **Route coverage review.** Hand the ledger to the coverage role for review
-   (see `## Worker Routing`).
+`action=inventory|extract|review` selects the corresponding canonical workflow. Inventory and extraction use `legacy-parity-analyst`; review uses `migration-coverage-reviewer` with no reviewer ledger writes. These names describe the target's mapping and never authorize an unprepared logical-role launch.
 
-## Worker Routing
+This alias has no independent output or write authority. Do not duplicate
+business validation, call tools independently, create a receipt, change a model
+or auto-launch a role. Use only the linked canonical workflow's lifecycle and
+exact grants; no alias chain or filesystem fallback is permitted.
 
-- Worker: `migration-coverage-reviewer`
+## Stop and result
 
-The coverage role reviews the derived feature contracts and the coverage ledger
-for completeness and correctness before the workflow proceeds to runtime
-characterization.
+Return the selected canonical workflow's explicit result and references without
+changing failed, blocked, pending or incremental outcomes into completion.
+An unknown selector fails with no fallback. Missing configuration or native
+capability is handled by the canonical workflow, including initialization's
+explicit root bootstrap exception. The alias cannot bypass prepare/finalize or
+native start/stop requirements.
 
-## Validation
+## References
 
-- Validate feature contracts with `dev.discovery.validate-feature-contract`.
-- Validate the coverage ledger with `dev.discovery.validate-coverage-ledger`.
-- An empty error list is a pass. On any error, follow the direction in
-  `discovery-validate-artifacts`.
-
-## Referenced Skills
-
-- `discovery-workflow` — stage order and the canonical Referenced Contracts
-  registry.
-- `discovery-validate-artifacts` — pass/fail semantics and error routing.
-
-## Notes
-
-- Feature contracts and the coverage ledger are jointly derived from the
-  inventory, so contract authorship is assigned to this stage and reviewed by
-  the coverage role.
-- Outputs from this stage feed `discovery-runtime-characterization` and
-  `discovery-parity-matrix`.
+- [inventory-legacy-system](../inventory-legacy-system/SKILL.md)
+- [extract-feature-contract](../extract-feature-contract/SKILL.md)
+- [review-discovery-coverage](../review-discovery-coverage/SKILL.md)

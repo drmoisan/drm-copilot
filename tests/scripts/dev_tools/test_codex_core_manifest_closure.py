@@ -41,6 +41,7 @@ WRAPPER_PATHS: tuple[str, ...] = (
 MODULE_DESTINATIONS: tuple[str, ...] = (
     ".codex/lib/codex-routing/CodexTopology.psm1",
     ".codex/lib/codex-routing/CodexDeployment.psm1",
+    ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1",
 )
 
 ReadText = Callable[[str], str | None]

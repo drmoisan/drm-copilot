@@ -43,6 +43,10 @@ GENERATED_AGENT_FAMILIES: frozenset[str] = frozenset(
         "powershell-typed-engineer",
         "csharp-typed-engineer",
         "typescript-engineer",
+        "legacy-parity-analyst",
+        "runtime-characterization-analyst",
+        "requirements-reconciler",
+        "migration-coverage-reviewer",
     }
 )
 LOGICAL_AGENT_ALIASES: dict[str, str] = {"feature-review": "feature-reviewer"}

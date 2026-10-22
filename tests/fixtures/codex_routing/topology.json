@@ -193,5 +193,208 @@
     "expected_exit": 1,
     "expected_stdout": "",
     "expected_stderr_contains": "A forced root persona requires standalone context."
+  },
+  {
+    "id": "topo-discovery-inventory-legacy-system",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"coverage-ledger\",\n    \"evidence-reference\",\n    \"inventory-snapshot\",\n    \"required-output-manifest\",\n    \"unspecified-behavior\",\n    \"unspecified-behavior-collection\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"inventory-legacy-system\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-extract-feature-contract",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "extract-feature-contract"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"coverage-ledger\",\n    \"evidence-reference\",\n    \"feature-contract\",\n    \"required-output-manifest\",\n    \"unspecified-behavior\",\n    \"unspecified-behavior-collection\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"extract-feature-contract\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-characterize-runtime-behavior",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "characterize-runtime-behavior"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"evidence-payload\",\n    \"evidence-reference\",\n    \"required-output-manifest\",\n    \"runtime-characterization-scenario\",\n    \"unspecified-behavior\",\n    \"unspecified-behavior-collection\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"characterize-runtime-behavior\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-reconcile-parity-matrix",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "reconcile-parity-matrix"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"requirements-reconciler\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"parity-matrix\",\n    \"required-output-manifest\",\n    \"unspecified-behavior\",\n    \"unspecified-behavior-collection\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"reconcile-parity-matrix\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-review-discovery-coverage",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "review-discovery-coverage"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"completion-report\",\n    \"coverage-report\",\n    \"parity-report\",\n    \"required-output-manifest\",\n    \"validation-report\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"review-discovery-coverage\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-adjudicate-unspecified-behavior",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "adjudicate-unspecified-behavior"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"requirements-reconciler\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"acceptance-specification\",\n    \"acceptance-view\",\n    \"product-decision\",\n    \"product-decision-collection\",\n    \"required-output-manifest\",\n    \"unspecified-behavior\",\n    \"unspecified-behavior-collection\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"adjudicate-unspecified-behavior\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-generate-acceptance-scenarios",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "generate-acceptance-scenarios"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"requirements-reconciler\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"acceptance-specification\",\n    \"acceptance-view\",\n    \"required-output-manifest\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"generate-acceptance-scenarios\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-initialize-discovery-workspace",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "initialize-discovery-workspace"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"coverage-report\",\n    \"required-output-manifest\",\n    \"validation-report\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"initialize-discovery-workspace\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-validate-discovery-artifacts",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "validate-discovery-artifacts"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"coverage-report\",\n    \"required-output-manifest\",\n    \"validation-report\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"validate-discovery-artifacts\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-epic_preparation_child",
+    "argv": ["--execution-context", "epic_preparation_child", "--invocation-kind", "discovery", "--skill-id", "review-discovery-coverage"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"epic_preparation_child\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"completion-report\",\n    \"coverage-report\",\n    \"parity-report\",\n    \"required-output-manifest\",\n    \"validation-report\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"review-discovery-coverage\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-epic_execution_child",
+    "argv": ["--execution-context", "epic_execution_child", "--invocation-kind", "discovery", "--skill-id", "review-discovery-coverage"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"epic_execution_child\",\n  \"gate_mode\": \"agent-output\",\n  \"invocation_kind\": \"discovery\",\n  \"languages\": [],\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"output_contract_version\": \"2.0.0\",\n  \"permissible_artifact_kinds\": [\n    \"completion-report\",\n    \"coverage-report\",\n    \"parity-report\",\n    \"required-output-manifest\",\n    \"validation-report\"\n  ],\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"discovery\",\n  \"routing_reason\": \"fixed_discovery_operation\",\n  \"skill_id\": \"review-discovery-coverage\",\n  \"test_file_count\": 0,\n  \"topology\": \"discovery_specialist\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-explicit-ordinary-small",
+    "argv": ["--language", "python", "--production-file-count", "2", "--test-file-count", "3", "--execution-context", "standalone", "--invocation-kind", "ordinary"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"python\"\n  ],\n  \"logical_agent\": \"python-typed-engineer\",\n  \"max_production_files\": 3,\n  \"max_test_files\": 3,\n  \"production_file_count\": 2,\n  \"root_persona\": null,\n  \"route\": \"small\",\n  \"routing_reason\": \"within_language_budget\",\n  \"test_file_count\": 3,\n  \"topology\": \"typed_engineer\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-explicit-ordinary-root",
+    "argv": ["--execution-context", "standalone", "--root-persona", "epic-planner", "--invocation-kind", "ordinary"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [],\n  \"logical_agent\": \"epic-planner\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 0,\n  \"root_persona\": \"epic-planner\",\n  \"route\": \"epic\",\n  \"routing_reason\": \"forced_root_persona\",\n  \"test_file_count\": 0,\n  \"topology\": \"epic_persona\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-ordinary-zero-count",
+    "argv": ["--execution-context", "standalone"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 0,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"invalid_estimate\",\n  \"test_file_count\": 0,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-discovery-missing-skill",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require a supported skill_id."
+  },
+  {
+    "id": "topo-discovery-unknown-skill",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "unknown-discovery-skill"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require a supported skill_id."
+  },
+  {
+    "id": "topo-discovery-alias-skill",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "discovery-repo-inventory"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require a supported skill_id."
+  },
+  {
+    "id": "topo-discovery-empty-skill",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", ""],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require a supported skill_id."
+  },
+  {
+    "id": "topo-discovery-whitespace-skill",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", " inventory-legacy-system "],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require a supported skill_id."
+  },
+  {
+    "id": "topo-discovery-production-positive",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--production-file-count", "1"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require production_file_count=0."
+  },
+  {
+    "id": "topo-discovery-production-negative",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--production-file-count", "-1"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require production_file_count=0."
+  },
+  {
+    "id": "topo-discovery-test-count",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--test-file-count", "1"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations require test_file_count=0."
+  },
+  {
+    "id": "topo-discovery-language",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--language", "python"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations do not accept languages."
+  },
+  {
+    "id": "topo-discovery-cross-cutting",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--cross-cutting"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations do not accept cross_cutting."
+  },
+  {
+    "id": "topo-discovery-root-override",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--root-persona", "epic-planner"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations do not accept root_persona."
+  },
+  {
+    "id": "topo-discovery-epic-root-refused",
+    "argv": ["--execution-context", "epic_execution_child", "--invocation-kind", "discovery", "--skill-id", "inventory-legacy-system", "--root-persona", "epic-orchestrator"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Discovery invocations do not accept root_persona."
+  },
+  {
+    "id": "topo-ordinary-skill-default",
+    "argv": ["--execution-context", "standalone", "--skill-id", "inventory-legacy-system"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "skill_id is only valid for discovery invocations."
+  },
+  {
+    "id": "topo-ordinary-skill-explicit",
+    "argv": ["--execution-context", "standalone", "--skill-id", "inventory-legacy-system", "--invocation-kind", "ordinary"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "skill_id is only valid for discovery invocations."
+  },
+  {
+    "id": "topo-invalid-invocation-kind",
+    "argv": ["--execution-context", "standalone", "--invocation-kind", "unsupported"],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
   }
 ]

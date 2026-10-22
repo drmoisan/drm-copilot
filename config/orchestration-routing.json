@@ -269,6 +269,62 @@
     ],
     "receipt_key": "codex_topology_receipts"
   },
+  "discovery_operations": {
+    "inventory-legacy-system": {
+      "logical_agent": "legacy-parity-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["coverage-ledger", "evidence-reference", "inventory-snapshot", "required-output-manifest", "unspecified-behavior", "unspecified-behavior-collection"],
+      "gate_mode": "agent-output"
+    },
+    "extract-feature-contract": {
+      "logical_agent": "legacy-parity-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["coverage-ledger", "evidence-reference", "feature-contract", "required-output-manifest", "unspecified-behavior", "unspecified-behavior-collection"],
+      "gate_mode": "agent-output"
+    },
+    "characterize-runtime-behavior": {
+      "logical_agent": "runtime-characterization-analyst",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["evidence-payload", "evidence-reference", "required-output-manifest", "runtime-characterization-scenario", "unspecified-behavior", "unspecified-behavior-collection"],
+      "gate_mode": "agent-output"
+    },
+    "reconcile-parity-matrix": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["parity-matrix", "required-output-manifest", "unspecified-behavior", "unspecified-behavior-collection"],
+      "gate_mode": "agent-output"
+    },
+    "review-discovery-coverage": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["completion-report", "coverage-report", "parity-report", "required-output-manifest", "validation-report"],
+      "gate_mode": "agent-output"
+    },
+    "adjudicate-unspecified-behavior": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["acceptance-specification", "acceptance-view", "product-decision", "product-decision-collection", "required-output-manifest", "unspecified-behavior", "unspecified-behavior-collection"],
+      "gate_mode": "agent-output"
+    },
+    "generate-acceptance-scenarios": {
+      "logical_agent": "requirements-reconciler",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["acceptance-specification", "acceptance-view", "required-output-manifest"],
+      "gate_mode": "agent-output"
+    },
+    "initialize-discovery-workspace": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["coverage-report", "required-output-manifest", "validation-report"],
+      "gate_mode": "agent-output"
+    },
+    "validate-discovery-artifacts": {
+      "logical_agent": "migration-coverage-reviewer",
+      "output_contract_version": "2.0.0",
+      "permissible_artifact_kinds": ["coverage-report", "required-output-manifest", "validation-report"],
+      "gate_mode": "agent-output"
+    }
+  },
   "codex_model_policy": {
     "description": "Codex-native deployment profiles. Complexity selects model and reasoning independently from the file-count route; exact model slugs are mandatory and unavailable profiles do not fall back silently.",
     "profile_order": [
@@ -350,7 +406,11 @@
       "python-typed-engineer",
       "powershell-typed-engineer",
       "csharp-typed-engineer",
-      "typescript-engineer"
+      "typescript-engineer",
+      "legacy-parity-analyst",
+      "runtime-characterization-analyst",
+      "requirements-reconciler",
+      "migration-coverage-reviewer"
     ]
   }
 }

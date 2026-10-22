@@ -14,6 +14,9 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib
 
+from scripts.dev_tools._codex_discovery_routing import (
+    DISCOVERY_GENERATED_AGENT_FAMILIES,
+)
 from scripts.dev_tools.resolve_codex_deployment import (
     BASE_PROFILES,
     C3_ELEVATED_PROFILE,
@@ -39,6 +42,8 @@ CORE_FAMILIES = (
     "prd-feature",
     "pr-author",
     "commit-steward",
+    # The four discovery specialist roles ship in the always-included core pack.
+    *DISCOVERY_GENERATED_AGENT_FAMILIES,
 )
 PACK_FAMILIES: dict[str, tuple[str, ...]] = {
     "core.json": CORE_FAMILIES,

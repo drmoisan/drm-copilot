@@ -172,6 +172,63 @@ describe("resolveCodexTopology", () => {
     expect(invoke).toThrow();
   });
 
+  it("selects the fixed discovery specialist for an exact canonical skill", () => {
+    // Arrange / Act
+    const receipt = resolveCodexTopology([], 0, 0, "standalone", {
+      invocationKind: "discovery",
+      skillId: "reconcile-parity-matrix",
+    });
+
+    // Assert
+    expect(receipt).toMatchObject({
+      route: "discovery",
+      topology: "discovery_specialist",
+      logical_agent: "requirements-reconciler",
+      routing_reason: "fixed_discovery_operation",
+      max_production_files: 0,
+    });
+    expect(Object.keys(receipt)).toHaveLength(17);
+  });
+
+  it("keeps an explicit ordinary selector on the twelve-key ordinary receipt", () => {
+    // Arrange / Act
+    const receipt = resolveCodexTopology(["python"], 2, 3, "standalone", {
+      invocationKind: "ordinary",
+    });
+
+    // Assert
+    expect(Object.keys(receipt)).toHaveLength(12);
+    expect(receipt.logical_agent).toBe("python-typed-engineer");
+  });
+
+  it.each([
+    [
+      "null selector",
+      () =>
+        resolveCodexTopology([], 0, 0, "standalone", { invocationKind: null }),
+      "invocation_kind must be ordinary or discovery.",
+    ],
+    [
+      "ordinary skill",
+      () =>
+        resolveCodexTopology(["python"], 1, 1, "standalone", {
+          skillId: "inventory-legacy-system",
+        }),
+      "skill_id is only valid for discovery invocations.",
+    ],
+    [
+      "discovery code scope",
+      () =>
+        resolveCodexTopology(["python"], 1, 1, "standalone", {
+          invocationKind: "discovery",
+          skillId: "inventory-legacy-system",
+        }),
+      "Discovery invocations require production_file_count=0.",
+    ],
+  ])("rejects %s with the shared message", (_label, invoke, message) => {
+    expect(invoke).toThrow(message);
+  });
+
   it("keeps a root persona distinct from epic child context", () => {
     expect(() =>
       resolveCodexTopology([], 0, 0, "epic_execution_child", {

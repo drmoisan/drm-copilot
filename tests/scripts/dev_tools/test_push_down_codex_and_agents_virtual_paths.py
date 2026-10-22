@@ -21,7 +21,11 @@ from tests.scripts.dev_tools.push_down_customizations_test_support import (
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RESOURCES_RELATIVE = Path("extensions/drm-copilot/resources")
 CODEX_BUNDLE_RELATIVE = RESOURCES_RELATIVE / "codex-and-agents-customizations"
-MODULE_NAMES: tuple[str, ...] = ("CodexTopology.psm1", "CodexDeployment.psm1")
+MODULE_NAMES: tuple[str, ...] = (
+    "CodexTopology.psm1",
+    "CodexDeployment.psm1",
+    "CodexDiscoveryRouting.psm1",
+)
 MODULE_DESTINATION_DIR = Path(".codex/lib/codex-routing")
 
 
@@ -141,7 +145,7 @@ def test_unmapped_config_file_is_not_published() -> None:
 
 
 def test_codex_routing_lib_is_walked_as_published_root() -> None:
-    """`.codex/lib/codex-routing` is a published root listing both modules (AC-4.2)."""
+    """`.codex/lib/codex-routing` is a published root listing every module (AC-4.2)."""
     # Arrange
     module = load_module()
     repo_root = Path("C:/repo")

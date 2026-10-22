@@ -1,6 +1,7 @@
 /** Deterministic Codex deployment resolution and checkpoint receipt validation. */
 
 import { compareCodePoint } from "../string-ordering";
+import { DISCOVERY_GENERATED_AGENT_FAMILIES } from "./codex-discovery-routing";
 
 export const CODEX_MODEL_ROUTING_RECEIPTS_KEY = "codex_model_routing_receipts";
 
@@ -51,6 +52,7 @@ const GENERATED_AGENT_FAMILIES: ReadonlySet<string> = new Set([
   "powershell-typed-engineer",
   "csharp-typed-engineer",
   "typescript-engineer",
+  ...DISCOVERY_GENERATED_AGENT_FAMILIES,
 ]);
 export const LOGICAL_AGENT_ALIASES: Readonly<Record<string, string>> = {
   "feature-review": "feature-reviewer",

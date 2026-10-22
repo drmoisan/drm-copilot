@@ -3,6 +3,8 @@
 This module implements the production-file-count axis recorded in
 ``config/orchestration-routing.json`` under ``codex_topology_policy``. Model
 and reasoning selection remain independent in ``resolve_codex_deployment``.
+Direct discovery invocations select a fixed specialist through
+``_codex_discovery_routing`` before the ordinary route is evaluated.
 """
 
 from __future__ import annotations
@@ -10,6 +12,12 @@ from __future__ import annotations
 import argparse
 import json
 from typing import TYPE_CHECKING, Literal, TypedDict, cast
+
+from scripts.dev_tools._codex_discovery_routing import (
+    VALID_INVOCATION_KINDS,
+    CodexDiscoveryTopologyReceipt,
+    resolve_codex_discovery_topology,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -172,19 +180,38 @@ def resolve_codex_topology(
     *,
     cross_cutting: bool = False,
     root_persona: str | None = None,
-) -> CodexTopologyReceipt:
+    invocation_kind: str = "ordinary",
+    skill_id: str | None = None,
+) -> CodexTopologyReceipt | CodexDiscoveryTopologyReceipt:
     """Resolve the initial implementation agent from deterministic scope data.
 
     A standalone, single-language change inside a canonical direct-mode budget
     selects that language's typed engineer. All escalation conditions select
     the orchestrator. Epic child work always selects the orchestrator, while an
-    explicit root epic persona selects itself.
+    explicit root epic persona selects itself. A ``discovery`` invocation with
+    an exact canonical ``skill_id`` and zero code scope selects the fixed
+    discovery specialist instead; its receipt carries no write authority.
     """
 
     context = _validate_context(execution_context)
     normalized_languages = _normalize_languages(languages)
     _validate_counts(production_file_count, test_file_count)
     _validate_cross_cutting(cross_cutting)
+
+    # Discovery validates its closed selector before the ordinary root, epic,
+    # and count dispatch; an ordinary request returns None and continues.
+    discovery = resolve_codex_discovery_topology(
+        invocation_kind=invocation_kind,
+        skill_id=skill_id,
+        execution_context=context,
+        languages=normalized_languages,
+        production_file_count=production_file_count,
+        test_file_count=test_file_count,
+        cross_cutting=cross_cutting,
+        root_persona=root_persona,
+    )
+    if discovery is not None:
+        return discovery
 
     if root_persona is not None:
         if root_persona not in FORCED_ROOT_PERSONAS:
@@ -268,6 +295,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--cross-cutting", action="store_true")
     parser.add_argument("--root-persona", choices=tuple(sorted(FORCED_ROOT_PERSONAS)))
+    parser.add_argument(
+        "--invocation-kind", choices=VALID_INVOCATION_KINDS, default="ordinary"
+    )
+    parser.add_argument("--skill-id", default=None)
     return parser
 
 
@@ -282,6 +313,8 @@ def main(argv: list[str] | None = None) -> int:
         args.execution_context,
         cross_cutting=args.cross_cutting,
         root_persona=args.root_persona,
+        invocation_kind=args.invocation_kind,
+        skill_id=args.skill_id,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     return 0

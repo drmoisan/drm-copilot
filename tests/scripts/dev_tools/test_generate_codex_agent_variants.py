@@ -116,6 +116,30 @@ def test_commit_steward_is_a_core_family_with_complete_generated_profiles() -> N
         assert str(path).replace("\\", "/") in manifest
 
 
+def test_discovery_specialist_families_are_core_with_complete_profiles() -> None:
+    """Keep the four discovery roles in core with generated profiles (#980)."""
+
+    expected = expected_variant_files()
+    manifest = (PACK_ROOT / "core.json").read_text(encoding="utf-8")
+    # Each discovery role needs its base alias, five profiles, and manifest rows.
+    for family in (
+        "legacy-parity-analyst",
+        "runtime-characterization-analyst",
+        "requirements-reconciler",
+        "migration-coverage-reviewer",
+    ):
+        assert family in CORE_FAMILIES
+        base_path = Path(".codex") / "agents" / f"{family}.toml"
+        assert (REPO_ROOT / base_path).read_bytes() == (
+            BUNDLE_ROOT / base_path
+        ).read_bytes()
+        assert str(base_path).replace("\\", "/") in manifest
+        for profile in PROFILES:
+            path = generator.generated_agent_relative_path(family, profile)
+            assert (REPO_ROOT / path).read_bytes() == expected[path].encode("utf-8")
+            assert str(path).replace("\\", "/") in manifest
+
+
 def test_affected_pack_manifests_include_each_generated_profile() -> None:
     """Make every generated agent deployable through its applicable pack."""
 
