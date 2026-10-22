@@ -1,0 +1,29 @@
+{
+  "result_version": "2.0.0",
+  "operation": "doctor",
+  "mode": "structural",
+  "ok": false,
+  "exit_code": 3,
+  "findings": [
+    {
+      "code": "RUNTIME_CORRUPT",
+      "severity": "error",
+      "artifact_path": null,
+      "pointer": "/",
+      "related_ids": [],
+      "related_paths": [],
+      "message": "The installed runtime identity could not be verified.",
+      "next_action": "Reinstall the published wheel into the trusted interpreter."
+    }
+  ],
+  "artifacts": [],
+  "summary": {
+    "message": "The runtime is unavailable.",
+    "counts": [],
+    "validation_result": null,
+    "receipt_ref": null,
+    "invocation_ref": null
+  },
+  "input_manifest": null,
+  "runtime": null
+}

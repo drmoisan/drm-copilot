@@ -1,0 +1,29 @@
+{
+  "result_version": "2.0.0",
+  "operation": null,
+  "mode": null,
+  "ok": false,
+  "exit_code": 2,
+  "findings": [
+    {
+      "code": "SERVICE_REQUEST",
+      "severity": "error",
+      "artifact_path": null,
+      "pointer": "/operation",
+      "related_ids": [],
+      "related_paths": [],
+      "message": "The request names an operation the installed runtime does not provide.",
+      "next_action": "Send one of the fixed service operations."
+    }
+  ],
+  "artifacts": [],
+  "summary": {
+    "message": "The request was rejected before any operation ran.",
+    "counts": [],
+    "validation_result": null,
+    "receipt_ref": null,
+    "invocation_ref": null
+  },
+  "input_manifest": null,
+  "runtime": null
+}

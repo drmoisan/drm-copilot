@@ -1,0 +1,17 @@
+{
+  "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
+  "schema_version": "2.0.0",
+  "artifact_kind": "service-request",
+  "id": "fixture-generate-acceptance",
+  "request_id": "fixture-generate-acceptance",
+  "operation": "generate-acceptance",
+  "mode": "structural",
+  "workspace_root": "C:/workspace",
+  "profile_path": null,
+  "dry_run": false,
+  "write": false,
+  "format": "json",
+  "inputs": {"acceptance_kind": "legacy-characterization", "output_format": "both"},
+  "invocation_ref": null,
+  "authorization_ref": null
+}
