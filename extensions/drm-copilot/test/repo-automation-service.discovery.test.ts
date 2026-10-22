@@ -43,7 +43,7 @@ function markerResult(
   return { tool, workspaceRoot: "C:/workspace", summary: "done" };
 }
 
-describe("discovery service-method delegation", () => {
+describe("discovery service-method delegation through the shared base", () => {
   beforeEach(() => {
     output.appendLine.mockReset();
   });
@@ -65,7 +65,7 @@ describe("discovery service-method delegation", () => {
 
     const result = await createService().validateDiscoveryArtifacts(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
     expect(result.tool).toBe("validate_discovery_artifacts");
   });
 
@@ -81,7 +81,7 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryInit(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
     expect(mock.mock.calls[0]?.[1]).toMatchObject({
       workspaceRoot: "C:/workspace",
       invocationId: "id-init",
@@ -96,7 +96,7 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryRepoInventory(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
   });
 
   it("runDiscoveryDotnetAnalyzer delegates to the discovery helper", async () => {
@@ -107,7 +107,7 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryDotnetAnalyzer(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
   });
 
   it("runDiscoveryVstoAnalyzer delegates to the discovery helper", async () => {
@@ -118,7 +118,7 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryVstoAnalyzer(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
   });
 
   it("runDiscoveryScenarioGeneration delegates to the discovery helper", async () => {
@@ -134,7 +134,7 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryScenarioGeneration(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
   });
 
   it("runDiscoveryReport delegates to the discovery helper", async () => {
@@ -150,6 +150,6 @@ describe("discovery service-method delegation", () => {
 
     await createService().runDiscoveryReport(input);
 
-    expect(mock).toHaveBeenCalledWith(output, input);
+    expect(mock).toHaveBeenCalledWith(output, input, {});
   });
 });

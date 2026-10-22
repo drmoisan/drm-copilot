@@ -54,6 +54,17 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runDiscoveryVstoAnalyzer: jest.fn(),
     runDiscoveryScenarioGeneration: jest.fn(),
     runDiscoveryReport: jest.fn(),
+    configureDiscoveryWorkspace: jest.fn(),
+    createDiscoveryArtifact: jest.fn(),
+    updateDiscoveryArtifact: jest.fn(),
+    linkDiscoveryEvidence: jest.fn(),
+    transferDiscoverySnapshot: jest.fn(),
+    importDiscoveryInventory: jest.fn(),
+    migrateDiscoveryArtifacts: jest.fn(),
+    runDiscoveryDoctor: jest.fn(),
+    readDiscoverySource: jest.fn(),
+    prepareDiscoveryAgent: jest.fn(),
+    finalizeDiscoveryAgent: jest.fn(),
   };
 }
 
