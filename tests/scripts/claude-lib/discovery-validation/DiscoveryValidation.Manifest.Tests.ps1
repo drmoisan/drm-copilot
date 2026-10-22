@@ -36,7 +36,8 @@ BeforeAll {
         '.claude/lib/discovery-validation/DiscoveryStart.psm1',
         '.claude/lib/discovery-validation/DiscoveryStartRecord.psm1',
         '.claude/lib/discovery-validation/DiscoveryStop.psm1',
-        '.claude/lib/discovery-validation/DiscoveryPlanning.psm1'
+        '.claude/lib/discovery-validation/DiscoveryPlanning.psm1',
+        '.claude/lib/discovery-validation/DiscoveryCapability.psm1'
     )
     # The Codex bundle publishes the same helpers under .codex/lib through the shared
     # resource directory (issue #980, P8-T9 mapping); the compatibility module stays Claude-only.
@@ -50,7 +51,8 @@ BeforeAll {
         'DiscoveryStart.psm1',
         'DiscoveryStartRecord.psm1',
         'DiscoveryStop.psm1',
-        'DiscoveryPlanning.psm1'
+        'DiscoveryPlanning.psm1',
+        'DiscoveryCapability.psm1'
     )
     $codexManifestPath = Join-Path $repoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
     $script:CodexManifest = Get-Content -Path $codexManifestPath -Raw | ConvertFrom-Json

@@ -35,6 +35,10 @@ function Get-HookImportFailureExemption {
         Id = 'D3'; Kind = 'Design'; Surface = 'codex'; HandlerFile = @('.codex/hooks/codex-epic-child-launch-attestation.ps1', '.codex/hooks/enforce-epic-child-worktree-binding.ps1'); Leaf = @('epic-child-launch-contract.ps1')
         Justification = 'D3: an absent .codex/scripts/epic-child-launch-contract.ps1 is a skip; a present file that fails to load is a guarded dependency failure.'
     }
+    [pscustomobject]@{
+        Id = 'D4'; Kind = 'Design'; Surface = 'codex'; HandlerFile = @('.codex/hooks/enforce-discovery-artifact-gate.ps1', '.codex/hooks/enforce-discovery-planning-gate.ps1', '.codex/hooks/validate-discovery-agent-output.ps1'); Leaf = @('DiscoveryEncoding.psm1', 'DiscoveryAuthority.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryStart.psm1', 'DiscoveryStop.psm1', 'DiscoveryPlanning.psm1')
+        Justification = 'D4 (#980): the Codex discovery hooks import the shared helpers from the published .codex/lib layout through guarded direct edges; when that layout is absent (this repository hosts itself) the same helpers are imported at load time from .claude/lib through the same guarded recorder, so a helper that fails to load in either layout denies with the hook prefix before any payload is read.'
+    }
     $handlers = @(
         @('H1', '#565', 'claude', '.claude/hooks/enforce-feature-folder-order.ps1', 'FeatureFolderOrderResolutionImportFailure', '.claude/hooks/enforce-feature-folder-order.ps1', '.claude/hooks/enforce-feature-folder-order.ps1', '$script:FeatureFolderOrderResolutionImportFailure', 'FEATURE_FOLDER_ORDER_BLOCKED:',
             'H1 (#565): enforce-feature-folder-order.ps1 denies every plan write with FEATURE_FOLDER_ORDER_BLOCKED: when feature-folder-resolution.ps1 fails to load; non-plan writes never call the resolver; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),

@@ -122,9 +122,8 @@ Describe 'Codex enforce-discovery-artifact-gate.ps1' {
             Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1'
             try {
                 $outcome = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw (Get-GateEnvelope -HostName 'codex' -ToolName 'shell' -ToolInput @{ command = @('ls') })
-                $outcome.Decision | Should -Be 'deny'
-                $outcome.Code | Should -Be 'DEPENDENCY'
-                $outcome.Reason | Should -BeLike '*DiscoveryAuthorization.psm1*'
+                $outcome.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+                $outcome.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*DiscoveryAuthorization.psm1*'
             } finally {
                 $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             }
