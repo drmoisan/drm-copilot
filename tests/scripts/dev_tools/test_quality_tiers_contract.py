@@ -328,7 +328,9 @@ def test_discover_projects_discovers_claude_lib_child() -> None:
     assert projects == frozenset({".claude/lib/blast-radius"})
 
 
-@pytest.mark.parametrize("hook_root", [".claude/hooks", ".codex/hooks"])
+@pytest.mark.parametrize(
+    "hook_root", [".claude/hooks", ".codex/hooks", ".github/hooks"]
+)
 def test_discover_projects_discovers_hook_roots_only_with_tracked_file(
     hook_root: str,
 ) -> None:
@@ -336,10 +338,19 @@ def test_discover_projects_discovers_hook_roots_only_with_tracked_file(
     # Act
     with_file = discover_projects([f"{hook_root}/guard.sh"])
     without_file = discover_projects(["other/notes.txt"])
+    sibling_only = discover_projects(
+        [".github/workflows/ci.yml", ".github/agents/a.md"]
+    )
+    excluded_copy = discover_projects(
+        ["extensions/drm-copilot/resources/customizations/.github/hooks/x.ps1"]
+    )
 
     # Assert
     assert hook_root in with_file
     assert hook_root not in without_file
+    # A sibling `.github` folder and an excluded bundle copy never establish the root.
+    assert ".github/hooks" not in sibling_only
+    assert ".github/hooks" not in excluded_copy
 
 
 def test_discover_projects_empty_list_yields_empty_set() -> None:

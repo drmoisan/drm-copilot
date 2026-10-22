@@ -38,9 +38,9 @@ $script:EnvironmentKeys = @{
 # snake_case; the Copilot local harness uses camelCase and may fall back to
 # snake_case for fields it shares with the Claude shape.
 $script:EnvelopeKeys = @{
-    'claude-code'    = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type') }
-    'codex'          = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type') }
-    'github-copilot' = @{ SessionId = @('sessionId', 'session_id'); Event = @('hookEventName', 'hook_event_name'); ToolName = @('toolName', 'tool_name'); ToolInput = @('toolInput', 'tool_input'); Cwd = @('cwd'); AgentId = @('agentId', 'agent_id'); AgentType = @('agentType', 'agent_type') }
+    'claude-code'    = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id') }
+    'codex'          = @{ SessionId = @('session_id'); Event = @('hook_event_name'); ToolName = @('tool_name'); ToolInput = @('tool_input'); Cwd = @('cwd'); AgentId = @('agent_id'); AgentType = @('agent_type'); ToolUseId = @('tool_use_id') }
+    'github-copilot' = @{ SessionId = @('sessionId', 'session_id'); Event = @('hookEventName', 'hook_event_name'); ToolName = @('toolName', 'tool_name'); ToolInput = @('toolInput', 'tool_input'); Cwd = @('cwd'); AgentId = @('agentId', 'agent_id'); AgentType = @('agentType', 'agent_type'); ToolUseId = @('toolUseId', 'tool_use_id') }
 }
 $script:AnomalyReasonText = @{
     'EmptyEnvelope'      = 'the hook received no envelope object'
@@ -112,7 +112,7 @@ function ConvertFrom-DiscoveryHostEnvelope {
         Normalizes one host event envelope into the shared discovery shape.
     .DESCRIPTION
         Returns an object with HostName, Event, SessionId, AgentId, AgentType,
-        ToolName, ToolInput, Cwd and Anomaly. Anomaly is $null for a usable envelope
+        ToolName, ToolInput, Cwd, ToolUseId and Anomaly. Anomaly is $null for a usable envelope
         or one of EmptyEnvelope, UnsupportedHost, MissingSessionId, MissingEvent and
         NonObjectToolInput (a PreToolUse event whose tool input is absent or not an
         object). Property-level absence in a well-formed tool input is not an
@@ -127,7 +127,7 @@ function ConvertFrom-DiscoveryHostEnvelope {
 
     $result = [ordered]@{
         HostName = $HostName; Event = $null; SessionId = $null; AgentId = $null; AgentType = $null
-        ToolName = $null; ToolInput = $null; Cwd = $null; Anomaly = $null
+        ToolName = $null; ToolInput = $null; Cwd = $null; ToolUseId = $null; Anomaly = $null
     }
     # Decision order: host support, envelope presence, then the trusted fields
     # a hook cannot proceed without (session, event), then tool-input shape.
@@ -148,6 +148,7 @@ function ConvertFrom-DiscoveryHostEnvelope {
     $result.Cwd = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.Cwd
     $result.AgentId = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.AgentId
     $result.AgentType = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.AgentType
+    $result.ToolUseId = Get-DiscoveryEnvelopeMember -Envelope $Envelope -Names $keys.ToolUseId
     if ($result.SessionId -isnot [string] -or [string]::IsNullOrWhiteSpace($result.SessionId)) {
         $result.Anomaly = 'MissingSessionId'
     } elseif ($result.Event -isnot [string] -or [string]::IsNullOrWhiteSpace($result.Event)) {

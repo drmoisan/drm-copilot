@@ -26,8 +26,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -Force -ErrorAction Stop
-Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -ErrorAction Stop
 
 $script:InputCategories = @(
     'profile', 'activation', 'scope', 'inventory', 'artifact', 'evidence',

@@ -30,7 +30,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'DiscoveryEncoding.psm1') -ErrorAction Stop
 
 $script:AuthorityRootSegments = @('drm-copilot', 'discovery')
 $script:ActivationRecordFile = 'activation.json'

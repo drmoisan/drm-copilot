@@ -184,6 +184,7 @@
     ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
     ".claude/lib/discovery-validation/DiscoveryAuthority.psd1",
     ".claude/lib/discovery-validation/DiscoveryAuthority.psm1",
+    ".claude/lib/discovery-validation/DiscoveryAuthorization.psm1",
     ".claude/lib/discovery-validation/DiscoveryEncoding.psm1",
     ".claude/lib/discovery-validation/DiscoveryManifest.psm1",
     ".claude/lib/discovery-validation/DiscoveryPayload.psm1",

@@ -29,6 +29,7 @@ BeforeAll {
         '.claude/lib/discovery-validation/DiscoveryValidation.psm1',
         '.claude/lib/discovery-validation/DiscoveryAuthority.psd1',
         '.claude/lib/discovery-validation/DiscoveryAuthority.psm1',
+        '.claude/lib/discovery-validation/DiscoveryAuthorization.psm1',
         '.claude/lib/discovery-validation/DiscoveryEncoding.psm1',
         '.claude/lib/discovery-validation/DiscoveryManifest.psm1',
         '.claude/lib/discovery-validation/DiscoveryPayload.psm1'
@@ -38,6 +39,7 @@ BeforeAll {
     $script:CodexPublishedNames = @(
         'DiscoveryAuthority.psd1',
         'DiscoveryAuthority.psm1',
+        'DiscoveryAuthorization.psm1',
         'DiscoveryEncoding.psm1',
         'DiscoveryManifest.psm1',
         'DiscoveryPayload.psm1'

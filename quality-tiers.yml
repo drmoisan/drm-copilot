@@ -34,6 +34,9 @@ projects:
   - path: ".codex/hooks"
     tier: T3
     rationale: "Enforcement hooks shipped to consumers; adapters over the Codex hook API"
+  - path: ".github/hooks"
+    tier: T3
+    rationale: "Enforcement hooks published to consumers; adapters over the GitHub Copilot local-harness hook API"
   - path: ".claude/lib/bash"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
