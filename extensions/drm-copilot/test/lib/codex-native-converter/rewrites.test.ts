@@ -89,6 +89,28 @@ describe("rewriteSupportedAutomationReference", () => {
     expect(detectUnresolvedRuntimeReference(rewritten)).toEqual([]);
   });
 
+  it("rewrites GitHub hook handler, registration, directory and Claude helper references", () => {
+    const [rewritten, applied] = rewriteSupportedAutomationReference(
+      [
+        "Register .github/hooks/discovery.json first.",
+        "Run .github/hooks/discovery-pre-tool.ps1 before every tool call.",
+        "Handlers live under .github/hooks/ and helpers under .claude/lib/discovery-validation/.",
+      ].join("\n"),
+      { enableRepoPrompts: false },
+    );
+
+    expect(rewritten).toContain(".codex/config.toml");
+    expect(rewritten).toContain(".codex/hooks/discovery-pre-tool.ps1");
+    expect(rewritten).not.toContain(".ps1.ps1");
+    expect(rewritten).toContain(
+      "under .codex/hooks/ and helpers under .codex/lib/discovery-validation/",
+    );
+    expect(rewritten).not.toContain(".github/");
+    expect(rewritten).not.toContain(".claude/");
+    expect(applied).toHaveLength(4);
+    expect(detectUnresolvedRuntimeReference(rewritten)).toEqual([]);
+  });
+
   it("rewrites bare and placeholder Claude directory references to native roots", () => {
     const sourceText = [
       "See .claude/skills/<name>/SKILL.md and .claude/skills/**/SKILL.md examples.",
@@ -231,6 +253,15 @@ describe("detectUnresolvedRuntimeReference", () => {
     expect(
       detectUnresolvedRuntimeReference("All native here: AGENTS.md"),
     ).toEqual([]);
+  });
+
+  it("flags leftover GitHub hook and Claude helper roots as runtime paths", () => {
+    expect(
+      detectUnresolvedRuntimeReference("See .github/hooks/discovery.json"),
+    ).toEqual(["GitHub Copilot runtime path"]);
+    expect(
+      detectUnresolvedRuntimeReference("Import .claude/lib/x/Y.psm1"),
+    ).toEqual(["Claude runtime path"]);
   });
 
   it("ignores non-runtime github workflow paths", () => {

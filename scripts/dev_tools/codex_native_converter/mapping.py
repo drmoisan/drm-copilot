@@ -34,6 +34,9 @@ from scripts.dev_tools.codex_native_converter.models import (
     TargetRole,
 )
 
+CLAUDE_HELPER_ROOT = ".claude/lib"
+CODEX_HELPER_ROOT = ".codex/lib"
+
 
 def _normalized_name(source_path: str) -> str:
     """Normalize one source path into a stable target-friendly base name.
@@ -105,6 +108,17 @@ def _planned_hook_name(mapping_record: MappingRecord) -> str:
     return _normalized_name(mapping_record.source_path)
 
 
+def _planned_helper_path(source_path: str) -> str:
+    """Map one `.claude/lib` helper onto the native `.codex/lib` library root.
+
+    The library-relative path is preserved verbatim so published hooks can
+    import the helper by its original module name.
+    """
+
+    relative_path = PurePosixPath(source_path).relative_to(CLAUDE_HELPER_ROOT)
+    return (PurePosixPath(CODEX_HELPER_ROOT) / relative_path).as_posix()
+
+
 def plan_target_paths(
     mapping_record: MappingRecord,
     *,
@@ -154,6 +168,13 @@ def plan_target_paths(
         return replace(mapping_record, target_path=".codex/config.toml")
 
     if mapping_record.target_role is TargetRole.HOOK:
+        # A shared helper keeps its library-relative name because hooks import
+        # it by file name; a handler script becomes a native `.ps1` hook.
+        if mapping_record.source_kind is SourceKind.HOST_ADAPTER_REFERENCE:
+            return replace(
+                mapping_record,
+                target_path=_planned_helper_path(mapping_record.source_path),
+            )
         hook_name = _planned_hook_name(mapping_record)
         return replace(
             mapping_record,

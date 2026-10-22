@@ -29,8 +29,18 @@ import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.codex_native_converter.rewrites_detection import (
+    detect_unresolved_runtime_reference,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+__all__ = [
+    "RewriteRule",
+    "detect_unresolved_runtime_reference",
+    "rewrite_supported_automation_reference",
+]
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,6 +131,22 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         description="Rewrite GitHub Copilot agent manifest paths to Codex agent paths.",
     ),
     RewriteRule(
+        pattern=re.compile(
+            r"(?<![A-Za-z0-9_])\.github/hooks/([A-Za-z0-9_.-]+)\.json\b"
+        ),
+        replacement=".codex/config.toml",
+        description=(
+            "Rewrite GitHub hook registration paths to the native Codex config path."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/hooks/([A-Za-z0-9_.-]+)\b"),
+        replacement=lambda match: (
+            f".codex/hooks/{_normalize_hook_target_name(match.group(1))}.ps1"
+        ),
+        description="Rewrite GitHub hook handler paths to Codex hook paths.",
+    ),
+    RewriteRule(
         pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/instructions/"),
         replacement=".agents/skills/",
         description=(
@@ -142,6 +168,13 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         description=(
             "Rewrite GitHub Copilot agent-directory references to the native agent "
             "root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/hooks/"),
+        replacement=".codex/hooks/",
+        description=(
+            "Rewrite GitHub hook-directory references to the native hook root."
         ),
     ),
     RewriteRule(
@@ -210,6 +243,14 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         replacement=".codex/hooks/",
         description=(
             "Rewrite Claude hook-directory references to the native hook root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/lib/"),
+        replacement=".codex/lib/",
+        description=(
+            "Rewrite Claude helper-library references to the native hook library "
+            "root."
         ),
     ),
     RewriteRule(
@@ -386,31 +427,6 @@ def _rewrite_rules(
     )
 
 
-_UNRESOLVED_RUNTIME_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
-    (
-        re.compile(r"\bdrmCopilotExtension\.[A-Za-z0-9_]+\b"),
-        "raw VS Code command identifier",
-    ),
-    (
-        re.compile(
-            r"(^|[^A-Za-z0-9_])\.github/(copilot-instructions\.md|instructions/|skills/|agents/|prompts/)"
-        ),
-        "GitHub Copilot runtime path",
-    ),
-    (
-        re.compile(
-            r"(^|[^A-Za-z0-9_])\.claude/(skills/|agents/|hooks/|settings\.json)"
-        ),
-        "Claude runtime path",
-    ),
-    (re.compile(r"\bCLAUDE\.md\b"), "Claude standing-instructions file"),
-    (
-        re.compile(r"\bscripts/dev_tools/[A-Za-z0-9_./-]+\b"),
-        "repository-local script reference",
-    ),
-)
-
-
 def rewrite_supported_automation_reference(
     text: str,
     *,
@@ -455,35 +471,3 @@ def rewrite_supported_automation_reference(
             rewritten_text = updated_text
 
     return rewritten_text, tuple(applied_descriptions)
-
-
-def detect_unresolved_runtime_reference(text: str) -> tuple[str, ...]:
-    """Detect runtime-specific references that still require manual handling.
-
-    Purpose:
-        Flag unresolved source-runtime references that cannot remain in emitted
-        native Codex output.
-
-    Args:
-        text (str): Generated text to inspect after supported rewrites have run.
-
-    Returns:
-        tuple[str, ...]: Human-readable descriptions of unresolved runtime
-        references discovered in the text.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    findings: list[str] = []
-
-    # Scan for unresolved source-runtime references that must block apply mode
-    # when a native Codex target is required.
-    for unresolved_pattern, description in _UNRESOLVED_RUNTIME_PATTERNS:
-        if unresolved_pattern.search(text):
-            findings.append(description)
-
-    return tuple(findings)

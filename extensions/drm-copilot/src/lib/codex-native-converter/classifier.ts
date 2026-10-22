@@ -111,6 +111,64 @@ export function hasRepoWidePathsYaml(
   );
 }
 
+// Published GitHub hook handlers and their registration documents are the
+// approved `.github/hooks` native surfaces; documentation and templates are not.
+const GITHUB_HOOK_SCRIPT_SUFFIXES: ReadonlyArray<string> = [".ps1", ".py"];
+
+/**
+ * Classify one published `.github/hooks` resource.
+ *
+ * Mirrors `_classify_github_hook`: a handler script is a direct hook, a JSON
+ * registration decomposes into native config, and anything else (README,
+ * templates) is an instruction-only resource that never becomes a native
+ * control.
+ *
+ * @param pathText Source-root-relative hook resource path.
+ * @returns The classification result with an unresolved target path.
+ */
+function classifyGithubHook(pathText: string): MappingRecord {
+  if (GITHUB_HOOK_SCRIPT_SUFFIXES.some((suffix) => pathText.endsWith(suffix))) {
+    return {
+      sourcePath: pathText,
+      sourceEcosystem: SourceEcosystem.GITHUB_COPILOT,
+      sourceKind: SourceKind.HOOK_DEFINITION,
+      conversionClass: ConversionClass.DIRECT,
+      targetRole: TargetRole.HOOK,
+      targetPath: null,
+      notes: [],
+      isRequired: true,
+    };
+  }
+  if (pathText.endsWith(".json")) {
+    return {
+      sourcePath: pathText,
+      sourceEcosystem: SourceEcosystem.GITHUB_COPILOT,
+      sourceKind: SourceKind.PERMISSIONS_OR_SETTINGS,
+      conversionClass: ConversionClass.DECOMPOSED,
+      targetRole: TargetRole.MCP_CONFIG,
+      targetPath: null,
+      notes: [
+        "GitHub hook registration requires decomposition into native " +
+          "Codex config, hooks, and approval surfaces.",
+      ],
+      isRequired: true,
+    };
+  }
+  return {
+    sourcePath: pathText,
+    sourceEcosystem: SourceEcosystem.GITHUB_COPILOT,
+    sourceKind: SourceKind.UNKNOWN,
+    conversionClass: ConversionClass.UNSUPPORTED,
+    targetRole: TargetRole.UNSUPPORTED,
+    targetPath: null,
+    notes: [
+      "Hook documentation and template resources have no native runtime " +
+        "surface in v1.",
+    ],
+    isRequired: false,
+  };
+}
+
 /**
  * Classify one GitHub Copilot source artifact.
  *
@@ -234,6 +292,10 @@ function classifyGithubCopilot(
       notes,
       isRequired: true,
     };
+  }
+
+  if (pathText.startsWith(".github/hooks/")) {
+    return classifyGithubHook(pathText);
   }
 
   if (pathText.startsWith(".github/prompts/") && pathText.endsWith(".md")) {

@@ -39,6 +39,7 @@ _SUPPORTED_ROOTS: dict[SourceEcosystem, tuple[Path, ...]] = {
         Path(".github/skills"),
         Path(".github/agents"),
         Path(".github/prompts"),
+        Path(".github/hooks"),
     ),
     SourceEcosystem.CLAUDE: (
         Path("CLAUDE.md"),
@@ -47,6 +48,7 @@ _SUPPORTED_ROOTS: dict[SourceEcosystem, tuple[Path, ...]] = {
         Path(".claude/hooks"),
         Path(".claude/settings.json"),
         Path(".claude/rules"),
+        Path(".claude/lib"),
     ),
 }
 

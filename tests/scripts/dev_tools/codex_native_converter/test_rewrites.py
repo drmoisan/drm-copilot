@@ -223,3 +223,42 @@ def test_detect_unresolved_runtime_reference_ignores_non_runtime_github_paths() 
     rendered_text = "This skill applies to .github/workflows/*.yml files."
 
     assert not detect_unresolved_runtime_reference(rendered_text)
+
+
+def test_rewrite_supported_automation_reference_rewrites_github_hook_paths() -> None:
+    """Rewrite GitHub hook handler, registration and directory references natively."""
+
+    source_text = """
+Register .github/hooks/discovery.json first.
+Run .github/hooks/discovery-pre-tool.ps1 before every tool call.
+Handlers live under .github/hooks/ and helpers under .claude/lib/discovery-validation/.
+""".strip()
+
+    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".codex/config.toml" in rewritten_text
+    assert ".codex/hooks/discovery-pre-tool.ps1" in rewritten_text
+    assert ".ps1.ps1" not in rewritten_text
+    assert "under .codex/hooks/ and helpers under .codex/lib/discovery-validation/" in (
+        rewritten_text
+    )
+    assert ".github/" not in rewritten_text
+    assert ".claude/" not in rewritten_text
+    assert len(applied_rewrites) == 4
+    assert not detect_unresolved_runtime_reference(rewritten_text)
+
+
+def test_detect_unresolved_runtime_reference_flags_hook_and_helper_roots() -> None:
+    """Treat leftover GitHub hook and Claude helper paths as unresolved."""
+
+    hook_findings = detect_unresolved_runtime_reference(
+        "See .github/hooks/discovery.json"
+    )
+
+    assert hook_findings == ("GitHub Copilot runtime path",)
+    assert detect_unresolved_runtime_reference("Import .claude/lib/x/Y.psm1") == (
+        "Claude runtime path",
+    )

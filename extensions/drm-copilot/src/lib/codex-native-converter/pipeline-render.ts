@@ -163,6 +163,11 @@ function wrapRenderedTargetContent(options: {
   }
 
   if (targetRole === TargetRole.HOOK) {
+    // Shared helper modules are imported by published hooks, so they are
+    // emitted verbatim after reference rewrites instead of being wrapped.
+    if ((targetPath ?? "").startsWith(".codex/lib/")) {
+      return `${rewrittenText}\n`;
+    }
     return (
       "# Converted hook\n" +
       "# Review the generated hook behavior before enabling it.\n\n" +

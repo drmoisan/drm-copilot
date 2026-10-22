@@ -130,6 +130,10 @@ def _wrap_rendered_target_content(
         )
 
     if target_role is TargetRole.HOOK:
+        # Shared helper modules are imported by published hooks, so they are
+        # emitted verbatim after reference rewrites instead of being wrapped.
+        if (target_path or "").startswith(".codex/lib/"):
+            return f"{rewritten_text}\n"
         return (
             "# Converted hook\n"
             "# Review the generated hook behavior before enabling it.\n\n"

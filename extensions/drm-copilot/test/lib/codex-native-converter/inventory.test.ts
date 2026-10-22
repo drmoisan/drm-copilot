@@ -26,8 +26,12 @@ function seedGithubTree(fs: InMemoryFileSystem): void {
     `${SOURCE_ROOT}/.github/prompts/mixed-runtime.prompt.md`,
     "prompt",
   );
-  // An unsupported directory must not be discovered.
+  fs.addFile(`${SOURCE_ROOT}/.github/hooks/discovery.json`, "{}");
+  fs.addFile(`${SOURCE_ROOT}/.github/hooks/discovery-pre-tool.ps1`, "hook");
+  // An unsupported directory must not be discovered, nor an unrelated
+  // `.github` surface such as workflows.
   fs.addFile(`${SOURCE_ROOT}/docs/readme.md`, "doc");
+  fs.addFile(`${SOURCE_ROOT}/.github/workflows/ci.yml`, "workflow");
 }
 
 function seedClaudeTree(fs: InMemoryFileSystem): void {
@@ -37,6 +41,10 @@ function seedClaudeTree(fs: InMemoryFileSystem): void {
   fs.addFile(`${SOURCE_ROOT}/.claude/hooks/pre-claude-session.ps1`, "hook");
   fs.addFile(`${SOURCE_ROOT}/.claude/settings.json`, "{}");
   fs.addFile(`${SOURCE_ROOT}/.claude/rules/typescript.md`, "rule");
+  fs.addFile(
+    `${SOURCE_ROOT}/.claude/lib/discovery-validation/DiscoveryValidation.psm1`,
+    "helper",
+  );
 }
 
 describe("discoverSourceArtifacts", () => {
@@ -62,6 +70,8 @@ describe("discoverSourceArtifacts", () => {
       ".github/agents/beast-topology.agent.md",
       ".github/agents/orchestrator.agent.md",
       ".github/copilot-instructions.md",
+      ".github/hooks/discovery-pre-tool.ps1",
+      ".github/hooks/discovery.json",
       ".github/instructions/general-code-change.instructions.md",
       ".github/prompts/launch-review.prompt.md",
       ".github/prompts/mixed-runtime.prompt.md",
@@ -84,6 +94,7 @@ describe("discoverSourceArtifacts", () => {
     expect(discovered).toEqual([
       ".claude/agents/atomic-executor.md",
       ".claude/hooks/pre-claude-session.ps1",
+      ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
       ".claude/rules/typescript.md",
       ".claude/settings.json",
       ".claude/skills/research/SKILL.md",
@@ -124,7 +135,7 @@ describe("discoverSourceArtifacts", () => {
     );
 
     // Assert
-    expect(discovered.length).toBe(7);
+    expect(discovered.length).toBe(9);
   });
 
   it("returns an empty list for an empty source root", () => {

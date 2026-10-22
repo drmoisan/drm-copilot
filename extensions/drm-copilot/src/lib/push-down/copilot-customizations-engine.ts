@@ -37,6 +37,7 @@ export const ARTIFACT_DIRECTORY = "artifacts/copilot-customizations";
  */
 export const COPILOT_ROOT_FOLDERS: ReadonlyArray<string> = [
   ".github/agents",
+  ".github/hooks",
   ".github/instructions",
   ".github/prompts",
   ".github/skills",

@@ -65,6 +65,18 @@ const BASE_REWRITE_RULES: ReadonlyArray<RewriteRule> = [
       "Rewrite GitHub Copilot agent manifest paths to Codex agent paths.",
   },
   {
+    pattern: /(?<![A-Za-z0-9_])\.github\/hooks\/([A-Za-z0-9_.-]+)\.json\b/g,
+    replacement: ".codex/config.toml",
+    description:
+      "Rewrite GitHub hook registration paths to the native Codex config path.",
+  },
+  {
+    pattern: /(?<![A-Za-z0-9_])\.github\/hooks\/([A-Za-z0-9_.-]+)\b/g,
+    replacement: (_match, group1: string) =>
+      `.codex/hooks/${normalizeHookTargetName(group1)}.ps1`,
+    description: "Rewrite GitHub hook handler paths to Codex hook paths.",
+  },
+  {
     pattern: /(?<![A-Za-z0-9_])\.github\/instructions\//g,
     replacement: ".agents/skills/",
     description:
@@ -84,6 +96,12 @@ const BASE_REWRITE_RULES: ReadonlyArray<RewriteRule> = [
     description:
       "Rewrite GitHub Copilot agent-directory references to the native agent " +
       "root.",
+  },
+  {
+    pattern: /(?<![A-Za-z0-9_])\.github\/hooks\//g,
+    replacement: ".codex/hooks/",
+    description:
+      "Rewrite GitHub hook-directory references to the native hook root.",
   },
   {
     pattern: /(?<![A-Za-z0-9_])CLAUDE\.md\b/g,
@@ -143,6 +161,13 @@ const BASE_REWRITE_RULES: ReadonlyArray<RewriteRule> = [
     replacement: ".codex/hooks/",
     description:
       "Rewrite Claude hook-directory references to the native hook root.",
+  },
+  {
+    pattern: /(?<![A-Za-z0-9_])\.claude\/lib\//g,
+    replacement: ".codex/lib/",
+    description:
+      "Rewrite Claude helper-library references to the native hook library " +
+      "root.",
   },
   {
     pattern: /\bdrmCopilotExtension\.collectPrContext\b/g,

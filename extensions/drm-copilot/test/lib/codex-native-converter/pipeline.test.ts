@@ -86,6 +86,48 @@ describe("renderTargetContent", () => {
     expect(rendered).toContain('name = "orchestrator"');
     expect(rendered).toContain("developer_instructions = '''");
   });
+
+  it("emits a shared helper verbatim under .codex/lib after reference rewrites", () => {
+    fs.addFile(
+      `${SOURCE_ROOT}/.claude/lib/discovery-validation/DiscoveryValidation.psm1`,
+      "# Siblings import from .claude/lib/discovery-validation/ by name.\nfunction Test-Helper { 1 }",
+    );
+    const rendered = renderTargetContent(
+      fs,
+      runOptions({ sourceEcosystem: SourceEcosystem.CLAUDE }),
+      record({
+        sourcePath: ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
+        sourceEcosystem: SourceEcosystem.CLAUDE,
+        sourceKind: SourceKind.HOST_ADAPTER_REFERENCE,
+        targetRole: TargetRole.HOOK,
+        targetPath: ".codex/lib/discovery-validation/DiscoveryValidation.psm1",
+      }),
+      [],
+    );
+    expect(rendered).toBe(
+      "# Siblings import from .codex/lib/discovery-validation/ by name.\nfunction Test-Helper { 1 }\n",
+    );
+  });
+
+  it("still wraps a handler hook with the converted-hook header", () => {
+    fs.addFile(
+      `${SOURCE_ROOT}/.github/hooks/discovery-pre-tool.ps1`,
+      "Write-Output 1",
+    );
+    const rendered = renderTargetContent(
+      fs,
+      runOptions(),
+      record({
+        sourcePath: ".github/hooks/discovery-pre-tool.ps1",
+        sourceKind: SourceKind.HOOK_DEFINITION,
+        targetRole: TargetRole.HOOK,
+        targetPath: ".codex/hooks/discovery-pre-tool.ps1",
+      }),
+      [],
+    );
+    expect(rendered.startsWith("# Converted hook\n")).toBe(true);
+    expect(rendered).toContain("Write-Output 1");
+  });
 });
 
 describe("renderMergedStandingGuidance", () => {
