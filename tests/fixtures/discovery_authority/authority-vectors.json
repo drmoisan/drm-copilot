@@ -1,0 +1,288 @@
+{
+  "schema_version": "2.0.0",
+  "description": "Shared activation-authority parity vectors. Generated from the Python discovery runtime (RegistryLocation.for_host, ActivationRecord); replayed by tests/discovery_runtime/test_activation_authority_fixture.py and extensions/drm-copilot/test/discovery-authority*.test.ts.",
+  "record_file": "activation.json",
+  "lock_file": "mutation.lock",
+  "locations": [
+    {
+      "platform": "windows",
+      "workspace_root": "C:/Users/Example/Repos/Workspace",
+      "user_home": "C:/Users/Example",
+      "local_app_data": "C:/Users/Example/AppData/Local",
+      "xdg_state_home": null,
+      "workspace": "C:/Users/Example/Repos/Workspace",
+      "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+      "directory": "C:/Users/Example/AppData/Local/drm-copilot/discovery/workspaces/77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+    },
+    {
+      "platform": "windows",
+      "workspace_root": "c:\\users\\example\\repos\\workspace\\",
+      "user_home": "C:/Users/Example",
+      "local_app_data": "C:/Users/Example/AppData/Local",
+      "xdg_state_home": null,
+      "workspace": "c:/users/example/repos/workspace",
+      "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6",
+      "directory": "C:/Users/Example/AppData/Local/drm-copilot/discovery/workspaces/77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+    },
+    {
+      "platform": "windows",
+      "workspace_root": "D:\\Work\\Repo",
+      "user_home": "C:/Users/Example",
+      "local_app_data": "C:/State",
+      "xdg_state_home": null,
+      "workspace": "D:/Work/Repo",
+      "workspace_sha256": "09654088b8408981c34694d210d132c1a5a5dcc908f51d673166cf5289dcdefd",
+      "directory": "C:/State/drm-copilot/discovery/workspaces/09654088b8408981c34694d210d132c1a5a5dcc908f51d673166cf5289dcdefd"
+    },
+    {
+      "platform": "macos",
+      "workspace_root": "/Users/example/repos/workspace",
+      "user_home": "/Users/example",
+      "local_app_data": null,
+      "xdg_state_home": null,
+      "workspace": "/Users/example/repos/workspace",
+      "workspace_sha256": "b954e4c9d827a1f2d9fa2a1d4648bfb82ddc863a2576a169728033c373cdfe12",
+      "directory": "/Users/example/Library/Application Support/drm-copilot/discovery/workspaces/b954e4c9d827a1f2d9fa2a1d4648bfb82ddc863a2576a169728033c373cdfe12"
+    },
+    {
+      "platform": "macos",
+      "workspace_root": "/Users/Example/Repos/Workspace",
+      "user_home": "/Users/example",
+      "local_app_data": null,
+      "xdg_state_home": null,
+      "workspace": "/Users/Example/Repos/Workspace",
+      "workspace_sha256": "17f880ef14b0dbbe2e3fe37e7136e166246313b00f882b91c288ee775a2be8b5",
+      "directory": "/Users/example/Library/Application Support/drm-copilot/discovery/workspaces/17f880ef14b0dbbe2e3fe37e7136e166246313b00f882b91c288ee775a2be8b5"
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/home/example/repos/workspace",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": null,
+      "workspace": "/home/example/repos/workspace",
+      "workspace_sha256": "32d372959b8f77494182a3ea2f4433cba01a98565d362ff98f1954463162427c",
+      "directory": "/home/example/.local/state/drm-copilot/discovery/workspaces/32d372959b8f77494182a3ea2f4433cba01a98565d362ff98f1954463162427c"
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/home/example/repos/workspace/",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": "/trusted/state",
+      "workspace": "/home/example/repos/workspace",
+      "workspace_sha256": "32d372959b8f77494182a3ea2f4433cba01a98565d362ff98f1954463162427c",
+      "directory": "/trusted/state/drm-copilot/discovery/workspaces/32d372959b8f77494182a3ea2f4433cba01a98565d362ff98f1954463162427c"
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/srv/équipe/workspace",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": null,
+      "workspace": "/srv/équipe/workspace",
+      "workspace_sha256": "4430bb2849d265f34061a064892113c50efaf9e597d8cf8ffa55a93237cb0410",
+      "directory": "/home/example/.local/state/drm-copilot/discovery/workspaces/4430bb2849d265f34061a064892113c50efaf9e597d8cf8ffa55a93237cb0410"
+    }
+  ],
+  "invalid_locations": [
+    {
+      "platform": "windows",
+      "workspace_root": "C:/Workspace",
+      "user_home": "C:/Users/Example",
+      "local_app_data": null,
+      "xdg_state_home": null
+    },
+    {
+      "platform": "windows",
+      "workspace_root": "C:/Users/Example/AppData",
+      "user_home": "C:/Users/Example",
+      "local_app_data": "C:/Users/Example/AppData/Local",
+      "xdg_state_home": null
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "relative/workspace",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": null
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/workspace",
+      "user_home": "home/example",
+      "local_app_data": null,
+      "xdg_state_home": null
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/workspace",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": "/workspace"
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/workspace",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": "/state/../other"
+    },
+    {
+      "platform": "linux",
+      "workspace_root": "/home/example/.local",
+      "user_home": "/home/example",
+      "local_app_data": null,
+      "xdg_state_home": null
+    },
+    {
+      "platform": "macos",
+      "workspace_root": "/Users/example",
+      "user_home": "/Users/example",
+      "local_app_data": null,
+      "xdg_state_home": null
+    }
+  ],
+  "records": [
+    {
+      "name": "generation-1-activate",
+      "profile_bytes": "schema_version: 2.0.0\nname: example\n",
+      "locator_text": "{\n  \"enabled\": true,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"required_runtime_major\": 2,\n  \"schema_version\": \"2.0.0\"\n}\n",
+      "record": {
+        "action": "activate",
+        "generation": 1,
+        "locator_sha256": "5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219",
+        "previous_sha256": null,
+        "profile_path": "docs/migration/discovery/domain-profile.yaml",
+        "profile_sha256": "342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653",
+        "schema_version": "2.0.0",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+      },
+      "encoded": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "encoded_sha256": "a605f85b4b5c0d352d470e8712ea53de550afca19d8ce983321d2d6c99c0140e"
+    },
+    {
+      "name": "generation-2-activate",
+      "profile_bytes": "schema_version: 2.0.0\nname: équipe\n",
+      "locator_text": "{\n  \"enabled\": true,\n  \"profile_path\": \"docs/\\u00e9quipe/Discovery Profile.yaml\",\n  \"required_runtime_major\": 2,\n  \"schema_version\": \"2.0.0\"\n}\n",
+      "record": {
+        "action": "activate",
+        "generation": 2,
+        "locator_sha256": "8881ea375d7b12d01197e393cb22da11890973d067e556cf4cf15f9b223b0a4f",
+        "previous_sha256": "a605f85b4b5c0d352d470e8712ea53de550afca19d8ce983321d2d6c99c0140e",
+        "profile_path": "docs/équipe/Discovery Profile.yaml",
+        "profile_sha256": "b9cbda70709dcff0d889f75fdd991fca3e1b4f3d57cfe9e7fad0f64567fa774f",
+        "schema_version": "2.0.0",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+      },
+      "encoded": "{\n  \"action\": \"activate\",\n  \"generation\": 2,\n  \"locator_sha256\": \"8881ea375d7b12d01197e393cb22da11890973d067e556cf4cf15f9b223b0a4f\",\n  \"previous_sha256\": \"a605f85b4b5c0d352d470e8712ea53de550afca19d8ce983321d2d6c99c0140e\",\n  \"profile_path\": \"docs/\\u00e9quipe/Discovery Profile.yaml\",\n  \"profile_sha256\": \"b9cbda70709dcff0d889f75fdd991fca3e1b4f3d57cfe9e7fad0f64567fa774f\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "encoded_sha256": "0d3205642c31585b82617260d200eabd86cc3695daca642e769facfd6e3dc67c"
+    },
+    {
+      "name": "generation-3-deactivate",
+      "profile_bytes": "schema_version: 2.0.0\nname: équipe\n",
+      "locator_text": "{\n  \"enabled\": true,\n  \"profile_path\": \"docs/\\u00e9quipe/Discovery Profile.yaml\",\n  \"required_runtime_major\": 2,\n  \"schema_version\": \"2.0.0\"\n}\n",
+      "record": {
+        "action": "deactivate",
+        "generation": 3,
+        "locator_sha256": "8881ea375d7b12d01197e393cb22da11890973d067e556cf4cf15f9b223b0a4f",
+        "previous_sha256": "0d3205642c31585b82617260d200eabd86cc3695daca642e769facfd6e3dc67c",
+        "profile_path": "docs/équipe/Discovery Profile.yaml",
+        "profile_sha256": "b9cbda70709dcff0d889f75fdd991fca3e1b4f3d57cfe9e7fad0f64567fa774f",
+        "schema_version": "2.0.0",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+      },
+      "encoded": "{\n  \"action\": \"deactivate\",\n  \"generation\": 3,\n  \"locator_sha256\": \"8881ea375d7b12d01197e393cb22da11890973d067e556cf4cf15f9b223b0a4f\",\n  \"previous_sha256\": \"0d3205642c31585b82617260d200eabd86cc3695daca642e769facfd6e3dc67c\",\n  \"profile_path\": \"docs/\\u00e9quipe/Discovery Profile.yaml\",\n  \"profile_sha256\": \"b9cbda70709dcff0d889f75fdd991fca3e1b4f3d57cfe9e7fad0f64567fa774f\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "encoded_sha256": "c9a4acb1ddddc7b8fc39b5298ce01dc460a7d2ef4dd33bb7d184b69ee9d3f7bd"
+    },
+    {
+      "name": "generation-4-tombstone",
+      "profile_bytes": null,
+      "locator_text": null,
+      "record": {
+        "action": "deactivate",
+        "generation": 4,
+        "locator_sha256": null,
+        "previous_sha256": "c9a4acb1ddddc7b8fc39b5298ce01dc460a7d2ef4dd33bb7d184b69ee9d3f7bd",
+        "profile_path": null,
+        "profile_sha256": null,
+        "schema_version": "2.0.0",
+        "workspace_sha256": "77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6"
+      },
+      "encoded": "{\n  \"action\": \"deactivate\",\n  \"generation\": 4,\n  \"locator_sha256\": null,\n  \"previous_sha256\": \"c9a4acb1ddddc7b8fc39b5298ce01dc460a7d2ef4dd33bb7d184b69ee9d3f7bd\",\n  \"profile_path\": null,\n  \"profile_sha256\": null,\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "encoded_sha256": "dd598166d98afd0cf52db39ec843a7d455f8faf73e488f4451b505b00a33d0a0"
+    }
+  ],
+  "invalid_records": [
+    {
+      "name": "not-json",
+      "text": "{",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "array",
+      "text": "[]",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "missing-key",
+      "text": "{\n  \"action\": \"activate\",\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "extra-key",
+      "text": "{\n  \"action\": \"activate\",\n  \"destination\": \"C:/anywhere\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "wrong-version",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"1.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "wrong-action",
+      "text": "{\n  \"action\": \"enable\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "zero-generation",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 0,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "float-generation",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1.0,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "uppercase-digest",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429E9DC6D7C15C1437172BE47630B3B779E7187164CC653DCAEA906BC7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "short-digest",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"abc\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "incomplete-binding",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": null,\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "absolute-profile",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"/etc/profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "dotdot-profile",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"../profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"77f077989d4b47c3249dcb4b1f5d5c59fa91f1045e244879660ef1ef212a19b6\"\n}\n",
+      "code": "ACTIVATION_INVALID"
+    },
+    {
+      "name": "wrong-workspace",
+      "text": "{\n  \"action\": \"activate\",\n  \"generation\": 1,\n  \"locator_sha256\": \"5b778b46d4bcffa9a0ac7f4c7d949a5839d0417cb222d150fe056fac449cb219\",\n  \"previous_sha256\": null,\n  \"profile_path\": \"docs/migration/discovery/domain-profile.yaml\",\n  \"profile_sha256\": \"342429e9dc6d7c15c1437172be47630b3b779e7187164cc653dcaea906bc7653\",\n  \"schema_version\": \"2.0.0\",\n  \"workspace_sha256\": \"5b54853dffd38388e58b4484c05104f95552059ab11eda8d9fae252bcd3d472a\"\n}\n",
+      "code": "ACTIVATION_WORKSPACE"
+    }
+  ]
+}
