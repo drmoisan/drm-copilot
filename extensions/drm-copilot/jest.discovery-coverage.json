@@ -1,0 +1,9 @@
+{
+  "./src/discovery-result.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-runtime.ts": { "lines": 90, "branches": 75 },
+  "./src/repo-automation-execute-discovery.ts": { "lines": 90, "branches": 75 },
+  "./src/mcp-tool-inputs-discovery.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-handlers/discovery-handlers.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-discovery-tool-definitions.ts": { "lines": 85, "branches": 75 },
+  "./src/discovery-command-registration.ts": { "lines": 85, "branches": 75 }
+}

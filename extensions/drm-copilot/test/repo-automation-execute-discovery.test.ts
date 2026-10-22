@@ -1,438 +1,483 @@
+import { describe, expect, it } from "@jest/globals";
+
+import { DiscoveryOperationError } from "../src/discovery-result";
 import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from "@jest/globals";
-
-jest.mock("vscode", () => ({}), { virtual: true });
-
-jest.mock("node:fs", () => ({
-  existsSync: jest.fn(),
-}));
-
-jest.mock("node:child_process", () => ({
-  spawn: jest.fn(),
-}));
-
-import {
-  runValidateDiscoveryArtifacts,
+  runDiscoveryDotnetAnalyzer,
   runDiscoveryInit,
   runDiscoveryRepoInventory,
-  runDiscoveryDotnetAnalyzer,
-  runDiscoveryVstoAnalyzer,
-  runDiscoveryScenarioGeneration,
   runDiscoveryReport,
+  runDiscoveryScenarioGeneration,
+  runDiscoveryVstoAnalyzer,
+  runValidateDiscoveryArtifacts,
 } from "../src/repo-automation-execute-discovery";
-import { CommandExecutionError } from "../src/command-runtime";
 import {
-  createMockProcess,
-  createMockProcessWithStderr,
-  setExecutablePresenceOnFsMock,
-  type MockChildProcess,
-  type MockExistsSync,
-} from "./runtime-test-helpers";
-
-const fsMock = jest.requireMock("node:fs") as { existsSync: MockExistsSync };
-const childProcessMock = jest.requireMock("node:child_process") as {
-  spawn: jest.Mock<
-    (
-      executable: string,
-      args: ReadonlyArray<string>,
-      options: { cwd: string },
-    ) => MockChildProcess
-  >;
-};
+  buildBlockingResult,
+  buildServiceResult,
+  FAKE_INTERPRETER,
+  FakeLauncher,
+  SHA_A,
+  successOutcome,
+} from "./discovery-test-helpers";
 
 const WORKSPACE_ROOT = "C:/workspace";
-const bufferedOutput = { appendLine: (): void => undefined };
+const output = { appendLine: (): void => undefined };
 
-interface SpawnCapture {
-  readonly executable: string;
-  readonly args: ReadonlyArray<string>;
-  readonly cwd: string;
-}
-
-/** Configure the spawn mock to emit `stdout` then close with `exitCode`. */
-function primeSpawn(
-  exitCode: number,
-  stdout = "",
-): { capture(): SpawnCapture } {
-  let captured: SpawnCapture | undefined;
-  childProcessMock.spawn.mockImplementation(
-    (
-      executable: string,
-      args: ReadonlyArray<string>,
-      options: { cwd: string },
-    ): MockChildProcess => {
-      captured = { executable, args, cwd: options.cwd };
-      return createMockProcess(exitCode, stdout);
-    },
-  );
+/** Dependencies that record one launch and replay the given result. */
+function deps(result = buildServiceResult()): {
+  launcher: FakeLauncher;
+  dependencies: Parameters<typeof runDiscoveryInit>[2];
+} {
+  const launcher = new FakeLauncher(successOutcome(result));
   return {
-    capture(): SpawnCapture {
-      if (captured === undefined) {
-        throw new Error("spawn was not invoked");
-      }
-      return captured;
-    },
+    launcher,
+    dependencies: { launcher, detectInterpreter: () => FAKE_INTERPRETER },
   };
 }
 
-function primeSpawnWithStderr(
-  exitCode: number,
-  stderr: string,
-): { capture(): SpawnCapture } {
-  let captured: SpawnCapture | undefined;
-  childProcessMock.spawn.mockImplementation(
-    (
-      executable: string,
-      args: ReadonlyArray<string>,
-      options: { cwd: string },
-    ): MockChildProcess => {
-      captured = { executable, args, cwd: options.cwd };
-      return createMockProcessWithStderr(exitCode, stderr);
-    },
-  );
-  return {
-    capture(): SpawnCapture {
-      if (captured === undefined) {
-        throw new Error("spawn was not invoked");
-      }
-      return captured;
-    },
-  };
-}
-
-/** Assert the interpreter `-c` argv shape and return the CLI args tail. */
-function expectEntryArgv(
-  capture: SpawnCapture,
-  module: string,
-  functionName: string,
-): ReadonlyArray<string> {
-  expect(capture.args[0]).toBe("-c");
-  expect(capture.args[1]).toBe(
-    `import sys; from ${module} import ${functionName}; sys.exit(${functionName}())`,
-  );
+function expectGatewayArgv(launcher: FakeLauncher): void {
+  const capture = launcher.single();
+  expect(capture.args.slice(0, 3)).toEqual([
+    "-I",
+    "-m",
+    "drm_copilot_discovery.gateway",
+  ]);
+  expect(capture.args).not.toContain("-c");
   expect(capture.cwd).toBe(WORKSPACE_ROOT);
-  return capture.args.slice(2);
 }
 
-describe("discovery service-call helper", () => {
-  beforeEach(() => {
-    process.env["PATH"] = "C:/bin";
-    process.env["PATHEXT"] = ".EXE;.CMD";
-    fsMock.existsSync.mockReset();
-    // Resolve a PATH `python`; suppress the workspace `.venv` candidate so the
-    // interpreter resolution is deterministic.
-    setExecutablePresenceOnFsMock(fsMock, {
-      "C:/workspace/.venv/Scripts/python.exe": false,
-      "C:/workspace/.venv/bin/python": false,
-      py: false,
-      python: true,
-    });
-    childProcessMock.spawn.mockReset();
-  });
+describe("runValidateDiscoveryArtifacts", () => {
+  it.each([
+    ["profile", "validate-profile", "input_path"],
+    ["feature-contract", "validate-feature-contract", "artifact_path"],
+    ["coverage-ledger", "validate-coverage-ledger", "artifact_path"],
+    ["runtime-scenario", "validate-runtime-scenario", "artifact_path"],
+    ["parity-matrix", "validate-parity-matrix", "artifact_path"],
+    ["unspecified-behavior", "validate-unspecified-behavior", "artifact_path"],
+    ["product-decision", "validate-product-decision", "artifact_path"],
+    ["evidence-reference", "validate-evidence-reference", "artifact_path"],
+  ])(
+    "maps %s to the %s request carrying %s",
+    async (artifactType, operation, key) => {
+      const { launcher, dependencies } = deps();
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+      const result = await runValidateDiscoveryArtifacts(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          artifactType,
+          artifactPath: "d/a.yaml",
+        },
+        dependencies,
+      );
 
-  it("selects the per-kind validate function and passes exactly one positional path", async () => {
-    const spawn = primeSpawn(0);
-    await runValidateDiscoveryArtifacts(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      artifactType: "profile",
-      artifactPath: "discovery/profile.yaml",
-    });
+      expectGatewayArgv(launcher);
+      expect(launcher.request()).toMatchObject({
+        operation,
+        mode: "structural",
+        dry_run: false,
+        write: false,
+        inputs: { [key]: "d/a.yaml" },
+      });
+      expect(result.tool).toBe("validate_discovery_artifacts");
+      expect(result.discovery?.ok).toBe(true);
+    },
+  );
 
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.validate_discovery_artifacts",
-      "main_profile",
+  it("maps all to a whole-workspace validate-all request in the selected mode", async () => {
+    const { launcher, dependencies } = deps();
+
+    await runValidateDiscoveryArtifacts(
+      output,
+      {
+        workspaceRoot: WORKSPACE_ROOT,
+        artifactType: "all",
+        artifactPath: ".",
+        mode: "discovery-complete",
+        dryRun: true,
+        profilePath: "discovery/profile.yaml",
+        invocationId: "id-validate",
+      },
+      dependencies,
     );
-    expect(tail).toEqual(["discovery/profile.yaml"]);
-  });
 
-  it("maps the all kind to the module main entry", async () => {
-    const spawn = primeSpawn(0);
-    await runValidateDiscoveryArtifacts(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      artifactType: "all",
-      artifactPath: "discovery/",
+    expect(launcher.request()).toMatchObject({
+      operation: "validate-all",
+      mode: "discovery-complete",
+      dry_run: true,
+      profile_path: "discovery/profile.yaml",
+      inputs: {},
     });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.validate_discovery_artifacts",
-      "main",
-    );
-    expect(tail).toEqual(["discovery/"]);
   });
 
-  it("maps evidence-reference to main_evidence_reference", async () => {
-    const spawn = primeSpawn(0);
-    await runValidateDiscoveryArtifacts(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      artifactType: "evidence-reference",
-      artifactPath: "e.yaml",
-    });
+  it("rejects a non-workspace path for all and a completion mode for one kind", async () => {
+    const { launcher, dependencies } = deps();
 
-    expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.validate_discovery_artifacts",
-      "main_evidence_reference",
-    );
-  });
-
-  it("returns no parsed artifacts for the validate path", async () => {
-    primeSpawn(0, '{"written_paths": ["ignored.txt"]}');
-    const result = await runValidateDiscoveryArtifacts(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      artifactType: "profile",
-      artifactPath: "p.yaml",
-    });
-
-    expect(result.artifacts).toBeUndefined();
-    expect(result.tool).toBe("validate_discovery_artifacts");
-  });
-
-  it("composes init with required positional target_dir plus optional flags", async () => {
-    const spawn = primeSpawn(0);
-    await runDiscoveryInit(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      targetDir: "discovery",
-      templateRoot: "templates/discovery",
-      force: true,
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.init_cli",
-      "main",
-    );
-    expect(tail).toEqual([
-      "discovery",
-      "--template-root",
-      "templates/discovery",
-      "--force",
-    ]);
-  });
-
-  it("omits optional init flags when not supplied", async () => {
-    const spawn = primeSpawn(0);
-    await runDiscoveryInit(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      targetDir: "discovery",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.init_cli",
-      "main",
-    );
-    expect(tail).toEqual(["discovery"]);
-  });
-
-  it("runs the repo inventory analyzer with optional profile, output-dir, and always --json", async () => {
-    const spawn = primeSpawn(0, '{"written_paths": ["a.json", "b.json"]}');
-    const result = await runDiscoveryRepoInventory(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      profilePath: "profile.yaml",
-      outputDir: "out",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.analyzer.cli",
-      "main",
-    );
-    expect(tail).toEqual(["profile.yaml", "--output-dir", "out", "--json"]);
-    expect(result.artifacts).toEqual(["a.json", "b.json"]);
-  });
-
-  it("passes only --json when the analyzer profile and output-dir are omitted", async () => {
-    const spawn = primeSpawn(0, "{}");
-    const result = await runDiscoveryRepoInventory(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.analyzer.cli",
-      "main",
-    );
-    expect(tail).toEqual(["--json"]);
-    expect(result.artifacts).toBeUndefined();
-  });
-
-  it("runs the dotnet analyzer via stack_cli:main_dotnet", async () => {
-    const spawn = primeSpawn(0, '{"written_paths": ["dotnet.json"]}');
-    const result = await runDiscoveryDotnetAnalyzer(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.analyzer.stack_cli",
-      "main_dotnet",
-    );
-    expect(tail).toEqual(["--json"]);
-    expect(result.artifacts).toEqual(["dotnet.json"]);
-  });
-
-  it("runs the vsto analyzer via stack_cli:main_vsto", async () => {
-    const spawn = primeSpawn(0, '{"written_paths": ["vsto.json"]}');
-    await runDiscoveryVstoAnalyzer(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-    });
-
-    expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.analyzer.stack_cli",
-      "main_vsto",
-    );
-  });
-
-  it("composes scenario generation with three required inputs and optional output/check", async () => {
-    const spawn = primeSpawn(0, "ok: wrote discovery/scenarios.md");
-    const result = await runDiscoveryScenarioGeneration(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      featureContract: "fc.yaml",
-      parityMatrix: "pm.yaml",
-      runtimeCharacterization: "rc.yaml",
-      outputPath: "discovery/scenarios.md",
-      check: true,
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.generate_acceptance_scenarios",
-      "main",
-    );
-    expect(tail).toEqual([
-      "--feature-contract",
-      "fc.yaml",
-      "--parity-matrix",
-      "pm.yaml",
-      "--runtime-characterization",
-      "rc.yaml",
-      "--output",
-      "discovery/scenarios.md",
-      "--check",
-    ]);
-    expect(result.artifacts).toEqual(["discovery/scenarios.md"]);
-  });
-
-  it("omits scenario output/check flags and parses no artifact without --output", async () => {
-    const spawn = primeSpawn(0, "");
-    const result = await runDiscoveryScenarioGeneration(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      featureContract: "fc.yaml",
-      parityMatrix: "pm.yaml",
-      runtimeCharacterization: "rc.yaml",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.generate_acceptance_scenarios",
-      "main",
-    );
-    expect(tail).toEqual([
-      "--feature-contract",
-      "fc.yaml",
-      "--parity-matrix",
-      "pm.yaml",
-      "--runtime-characterization",
-      "rc.yaml",
-    ]);
-    expect(result.artifacts).toBeUndefined();
-  });
-
-  it("dispatches coverage report to coverage_report:main with --input", async () => {
-    const spawn = primeSpawn(0);
-    await runDiscoveryReport(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      reportType: "coverage",
-      inputPath: "ledger.json",
-      outputPath: "reports/coverage.md",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.coverage_report",
-      "main",
-    );
-    expect(tail).toEqual([
-      "--input",
-      "ledger.json",
-      "--output",
-      "reports/coverage.md",
-    ]);
-  });
-
-  it("dispatches parity report to parity_report:main with --input", async () => {
-    const spawn = primeSpawn(0);
-    await runDiscoveryReport(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      reportType: "parity",
-      inputPath: "matrix.yaml",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.parity_report",
-      "main",
-    );
-    expect(tail).toEqual(["--input", "matrix.yaml"]);
-  });
-
-  it("dispatches completion report to completion_report:main with the two required inputs", async () => {
-    const spawn = primeSpawn(0);
-    const result = await runDiscoveryReport(bufferedOutput, {
-      workspaceRoot: WORKSPACE_ROOT,
-      reportType: "completion",
-      coverageInput: "cov.json",
-      parityInput: "par.yaml",
-      outputPath: "reports/completion.md",
-    });
-
-    const tail = expectEntryArgv(
-      spawn.capture(),
-      "scripts.dev_tools.discovery.completion_report",
-      "main",
-    );
-    expect(tail).toEqual([
-      "--coverage-input",
-      "cov.json",
-      "--parity-input",
-      "par.yaml",
-      "--output",
-      "reports/completion.md",
-    ]);
-    expect(result.artifacts).toBeUndefined();
-  });
-
-  it("propagates a non-zero exit as CommandExecutionError carrying stderr", async () => {
-    primeSpawnWithStderr(1, "ModuleNotFoundError: scripts.dev_tools");
     await expect(
-      runDiscoveryReport(bufferedOutput, {
+      runValidateDiscoveryArtifacts(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          artifactType: "all",
+          artifactPath: "discovery/",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow("artifact_path must be '.'");
+    await expect(
+      runValidateDiscoveryArtifacts(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          artifactType: "profile",
+          artifactPath: "p.yaml",
+          mode: "planning",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow("Individual artifact validators are structural");
+    await expect(
+      runValidateDiscoveryArtifacts(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          artifactType: "unknown",
+          artifactPath: "x",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow("Unsupported discovery artifact_type 'unknown'.");
+    expect(launcher.captures).toHaveLength(0);
+  });
+
+  it("surfaces a blocking validation result as a typed operation error", async () => {
+    const blocking = buildBlockingResult({ operation: "validate-all" });
+    const launcher = new FakeLauncher({
+      exitCode: 1,
+      stdout: JSON.stringify(blocking),
+      stderr: "",
+    });
+
+    await expect(
+      runValidateDiscoveryArtifacts(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          artifactType: "all",
+          artifactPath: ".",
+        },
+        { launcher, detectInterpreter: () => FAKE_INTERPRETER },
+      ),
+    ).rejects.toBeInstanceOf(DiscoveryOperationError);
+  });
+});
+
+describe("runDiscoveryInit", () => {
+  it("composes the init request from the system identity and roots", async () => {
+    const { launcher, dependencies } = deps(
+      buildServiceResult({
+        operation: "init",
+        artifacts: [
+          {
+            path: "discovery/profile.yaml",
+            kind: "domain-profile",
+            status: "created",
+            sha256: SHA_A,
+          },
+        ],
+      }),
+    );
+
+    const result = await runDiscoveryInit(
+      output,
+      {
+        workspaceRoot: WORKSPACE_ROOT,
+        systemId: "sample-system",
+        systemName: "Sample System",
+        systemRole: "legacy-source",
+        repositoryId: "example/source",
+        productionRoots: ["src"],
+        testRoots: ["tests"],
+        draft: true,
+        dryRun: true,
+      },
+      dependencies,
+    );
+
+    expectGatewayArgv(launcher);
+    expect(launcher.request()).toMatchObject({
+      operation: "init",
+      dry_run: true,
+      inputs: {
+        system_id: "sample-system",
+        system_name: "Sample System",
+        system_role: "legacy-source",
+        repository_id: "example/source",
+        production_roots: ["src"],
+        test_roots: ["tests"],
+        draft: true,
+      },
+    });
+    expect(result.artifacts).toEqual(["discovery/profile.yaml"]);
+  });
+
+  it("rejects the retired target_dir, template_root and force inputs explicitly", async () => {
+    const { launcher, dependencies } = deps();
+
+    await expect(
+      runDiscoveryInit(
+        output,
+        { workspaceRoot: WORKSPACE_ROOT, targetDir: "discovery", force: true },
+        dependencies,
+      ),
+    ).rejects.toThrow("does not accept targetDir, force");
+    expect(launcher.captures).toHaveLength(0);
+  });
+
+  it("requires the system identity fields", async () => {
+    const { dependencies } = deps();
+
+    await expect(
+      runDiscoveryInit(
+        output,
+        { workspaceRoot: WORKSPACE_ROOT, systemId: "s" },
+        dependencies,
+      ),
+    ).rejects.toThrow(
+      "Discovery initialization requires systemName, systemRole, repositoryId.",
+    );
+  });
+});
+
+describe("inventory adapters", () => {
+  it("runs the repository inventory with optional analyzer selection and write intent", async () => {
+    const { launcher, dependencies } = deps(
+      buildServiceResult({ operation: "inventory" }),
+    );
+
+    const result = await runDiscoveryRepoInventory(
+      output,
+      {
+        workspaceRoot: WORKSPACE_ROOT,
+        analyzerIds: ["repository", "dependencies"],
+        write: true,
+      },
+      dependencies,
+    );
+
+    expect(launcher.request()).toMatchObject({
+      operation: "inventory",
+      write: true,
+      dry_run: false,
+      inputs: { analyzer_ids: ["repository", "dependencies"] },
+    });
+    expect(result.tool).toBe("run_discovery_repo_inventory");
+  });
+
+  it("omits analyzer_ids when none are selected", async () => {
+    const { launcher, dependencies } = deps();
+
+    await runDiscoveryRepoInventory(
+      output,
+      { workspaceRoot: WORKSPACE_ROOT },
+      dependencies,
+    );
+
+    expect(launcher.request()["inputs"]).toEqual({});
+  });
+
+  it("selects the fixed dotnet and office-vsto analyzers for the stack tools", async () => {
+    const dotnet = deps();
+    const vsto = deps();
+
+    await runDiscoveryDotnetAnalyzer(
+      output,
+      { workspaceRoot: WORKSPACE_ROOT, dryRun: true },
+      dotnet.dependencies,
+    );
+    await runDiscoveryVstoAnalyzer(
+      output,
+      { workspaceRoot: WORKSPACE_ROOT },
+      vsto.dependencies,
+    );
+
+    expect(dotnet.launcher.request()).toMatchObject({
+      operation: "inventory",
+      dry_run: true,
+      inputs: { analyzer_ids: ["dotnet"] },
+    });
+    expect(vsto.launcher.request()).toMatchObject({
+      inputs: { analyzer_ids: ["office-vsto"] },
+    });
+  });
+
+  it("rejects the retired output_dir input", async () => {
+    const { launcher, dependencies } = deps();
+
+    await expect(
+      runDiscoveryVstoAnalyzer(
+        output,
+        { workspaceRoot: WORKSPACE_ROOT, outputDir: "out" },
+        dependencies,
+      ),
+    ).rejects.toThrow("does not accept outputDir");
+    expect(launcher.captures).toHaveLength(0);
+  });
+});
+
+describe("runDiscoveryScenarioGeneration", () => {
+  it("composes the generate-acceptance request with kind, filters and format", async () => {
+    const { launcher, dependencies } = deps(
+      buildServiceResult({ operation: "generate-acceptance" }),
+    );
+
+    await runDiscoveryScenarioGeneration(
+      output,
+      {
+        workspaceRoot: WORKSPACE_ROOT,
+        acceptanceKind: "target-acceptance",
+        featureIds: ["feature.alpha"],
+        clientIds: ["web"],
+        outputFormat: "both",
+        write: true,
+      },
+      dependencies,
+    );
+
+    expect(launcher.request()).toMatchObject({
+      operation: "generate-acceptance",
+      write: true,
+      dry_run: false,
+      inputs: {
+        acceptance_kind: "target-acceptance",
+        feature_ids: ["feature.alpha"],
+        client_ids: ["web"],
+        output_format: "both",
+      },
+    });
+  });
+
+  it("rejects the retired three-input contract and requires the acceptance kind", async () => {
+    const { launcher, dependencies } = deps();
+
+    await expect(
+      runDiscoveryScenarioGeneration(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          featureContract: "fc.yaml",
+          parityMatrix: "pm.yaml",
+          runtimeCharacterization: "rc.yaml",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow(
+      "does not accept featureContract, parityMatrix, runtimeCharacterization",
+    );
+    await expect(
+      runDiscoveryScenarioGeneration(
+        output,
+        { workspaceRoot: WORKSPACE_ROOT },
+        dependencies,
+      ),
+    ).rejects.toThrow("requires acceptanceKind");
+    expect(launcher.captures).toHaveLength(0);
+  });
+});
+
+describe("runDiscoveryReport", () => {
+  it.each([
+    ["coverage", "coverage-report"],
+    ["parity", "parity-report"],
+    ["completion", "completion-report"],
+  ])(
+    "maps %s to the %s request with mode, format and write",
+    async (reportType, operation) => {
+      const { launcher, dependencies } = deps(
+        buildServiceResult({ operation: operation as "coverage-report" }),
+      );
+
+      const result = await runDiscoveryReport(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          reportType,
+          mode: "parity-complete",
+          format: "both",
+          write: true,
+        },
+        dependencies,
+      );
+
+      expectGatewayArgv(launcher);
+      expect(launcher.request()).toMatchObject({
+        operation,
+        mode: "parity-complete",
+        format: "both",
+        write: true,
+      });
+      expect(result.summary).toBe("Validation passed.");
+    },
+  );
+
+  it("defaults to the structural JSON report without writes", async () => {
+    const { launcher, dependencies } = deps();
+
+    await runDiscoveryReport(
+      output,
+      { workspaceRoot: WORKSPACE_ROOT, reportType: "coverage" },
+      dependencies,
+    );
+
+    expect(launcher.request()).toMatchObject({
+      mode: "structural",
+      format: "json",
+      write: false,
+    });
+  });
+
+  it("rejects an unknown report type and the retired path inputs", async () => {
+    const { launcher, dependencies } = deps();
+
+    await expect(
+      runDiscoveryReport(
+        output,
+        { workspaceRoot: WORKSPACE_ROOT, reportType: "summary" },
+        dependencies,
+      ),
+    ).rejects.toThrow("Unsupported discovery report_type 'summary'.");
+    await expect(
+      runDiscoveryReport(
+        output,
+        {
+          workspaceRoot: WORKSPACE_ROOT,
+          reportType: "completion",
+          coverageInput: "cov.json",
+          parityInput: "par.yaml",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow("does not accept coverageInput, parityInput");
+    expect(launcher.captures).toHaveLength(0);
+  });
+
+  it("passes the invocation id and trusted interpreter through to the runtime", async () => {
+    const lines: string[] = [];
+    const launcher = new FakeLauncher(successOutcome());
+
+    await runDiscoveryReport(
+      { appendLine: (line) => lines.push(line) },
+      {
         workspaceRoot: WORKSPACE_ROOT,
         reportType: "parity",
-        inputPath: "matrix.yaml",
-      }),
-    ).rejects.toBeInstanceOf(CommandExecutionError);
-  });
+        invocationId: "id-report",
+        interpreter: "D:/venv/Scripts/python.exe",
+      },
+      { launcher },
+    );
 
-  it("captures the stderr excerpt on the propagated error", async () => {
-    primeSpawnWithStderr(2, "boom-detail");
-    await expect(
-      runDiscoveryInit(bufferedOutput, {
-        workspaceRoot: WORKSPACE_ROOT,
-        targetDir: "discovery",
-      }),
-    ).rejects.toMatchObject({ stderr: expect.stringContaining("boom-detail") });
+    expect(launcher.single().executable).toBe("D:/venv/Scripts/python.exe");
+    expect(lines[0]).toBe(
+      "[id-report] runtime probe success: D:/venv/Scripts/python.exe",
+    );
   });
 });

@@ -15,7 +15,20 @@ export type MockExistsSync = jest.MockedFunction<(filePath: string) => boolean>;
 export type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
   stderr: EventEmitter;
+  /** Piped stdin stub; `end` records the single request document written. */
+  stdin: EventEmitter & { written: string[]; end(chunk?: unknown): void };
 };
+
+function createMockStdin(): MockChildProcess["stdin"] {
+  const stdin = new EventEmitter() as MockChildProcess["stdin"];
+  stdin.written = [];
+  stdin.end = (chunk?: unknown): void => {
+    if (typeof chunk === "string") {
+      stdin.written.push(chunk);
+    }
+  };
+  return stdin;
+}
 
 /**
  * Applies the runtime-presence fixture to a mocked fs.existsSync implementation.
@@ -119,6 +132,7 @@ export function createMockProcess(
   const processMock = new EventEmitter() as MockChildProcess;
   processMock.stdout = new EventEmitter();
   processMock.stderr = new EventEmitter();
+  processMock.stdin = createMockStdin();
   process.nextTick(() => {
     if (stdoutText.length > 0) {
       processMock.stdout.emit("data", Buffer.from(stdoutText, "utf-8"));
@@ -143,6 +157,7 @@ export function createMockProcessWithStderr(
   const processMock = new EventEmitter() as MockChildProcess;
   processMock.stdout = new EventEmitter();
   processMock.stderr = new EventEmitter();
+  processMock.stdin = createMockStdin();
   process.nextTick(() => {
     processMock.stderr.emit("data", Buffer.from(stderrLine, "utf-8"));
     processMock.emit("close", exitCode);

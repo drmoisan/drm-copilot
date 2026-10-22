@@ -361,7 +361,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 8 — Shared TypeScript gateway, workspace surfaces, and native publication prerequisites
 
-- [ ] [P8-T1] Transport only validated fixed-runtime requests and results.
+- [x] [P8-T1] Transport only validated fixed-runtime requests and results.
   - Files and behavior: Create ES/{discovery-result,discovery-runtime,discovery-service-types}.ts; refactor ES/repo-automation-execute-discovery.ts into thin operation adapters; add ET/{discovery-result,discovery-runtime}.test.ts and update Set G execute assertions. Add exact per-file entries to extensions/drm-copilot/jest.config.cjs. Because jest.config.cjs is already 493 physical lines, extract the discovery per-file thresholds to extensions/drm-copilot/jest.discovery-coverage.json and merge that map from the existing configuration; add ET/discovery-coverage-contracts.test.ts. Preserve existing stricter entries and gate new executable modules at 90% lines and 75% branches.
   - Tests and proof: Test fixed isolated installed-module invocation, trusted interpreter selection, JSON stdin, version/build compatibility, malformed/truncated output, inconsistent process/result exits, missing dependencies, stderr context, actionable install diagnostics, and no shell interpolation/human sentence parsing.
   - Acceptance: Both hosts receive authoritative structured findings/artifacts or a blocking transport error; malformed stdout can never be reported as successful validation.
