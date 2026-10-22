@@ -11,6 +11,8 @@
   "./src/discovery-input-manifest.ts": { "lines": 90, "branches": 75 },
   "./src/discovery-finalization.ts": { "lines": 90, "branches": 75 },
   "./src/discovery-authority-provider.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-capabilities.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-capability-record.ts": { "lines": 90, "branches": 75 },
   "./src/repo-automation-service-discovery.ts": { "lines": 90, "branches": 75 },
   "./src/repo-automation-service-discovery-agent.ts": {
     "lines": 90,

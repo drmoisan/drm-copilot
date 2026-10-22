@@ -11,6 +11,10 @@
 
 import type { CommandOutput } from "./command-runtime";
 import type { DiscoveryAuthorityProvider } from "./discovery-authority-provider";
+import {
+  assessSessionCapability,
+  projectCapabilityDiagnostics,
+} from "./discovery-capabilities";
 import { finalizeDiscoveryInvocation } from "./discovery-finalization";
 import { prepareDiscoveryInvocation } from "./discovery-invocation";
 import {
@@ -27,6 +31,39 @@ export interface DiscoveryAgentOperationDeps {
   readonly output: CommandOutput;
   readonly runtime: DiscoveryRuntimeDependencies;
   readonly authority: DiscoveryAuthorityProvider;
+}
+
+/**
+ * Project the session's host capability into a `doctor` result.
+ *
+ * The runtime cannot see the protected attestation, so the gateway replaces
+ * its generic enforcement warning with the verified finding or one warning
+ * per deficiency. Results without a discovery payload pass through unchanged.
+ */
+export function projectDoctorCapability(
+  authority: DiscoveryAuthorityProvider,
+  workspaceRoot: string,
+  result: RepoAutomationExecutionResult,
+): RepoAutomationExecutionResult {
+  if (result.discovery === undefined) {
+    return result;
+  }
+  const location = authority.location(workspaceRoot);
+  const assessment = assessSessionCapability({
+    location,
+    io: authority.io,
+    activation: authority.activation(location),
+    context: authority.context,
+    runtime: result.discovery.runtime,
+    ...(authority.capabilityPins === undefined
+      ? {}
+      : { pins: authority.capabilityPins }),
+    now: authority.now(),
+  });
+  return {
+    ...result,
+    discovery: projectCapabilityDiagnostics(result.discovery, assessment),
+  };
 }
 
 /**
@@ -76,6 +113,9 @@ export async function prepareDiscoveryAgentOperation(
           }),
     },
     runtime: doctor.runtime,
+    ...(authority.capabilityPins === undefined
+      ? {}
+      : { pins: authority.capabilityPins }),
     now: authority.now(),
     nonce: authority.nonce,
   });

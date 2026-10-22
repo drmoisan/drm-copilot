@@ -35,6 +35,7 @@ import type { RepoAutomationExecutionResult } from "./repo-automation-service-co
 import {
   finalizeDiscoveryAgentOperation,
   prepareDiscoveryAgentOperation,
+  projectDoctorCapability,
 } from "./repo-automation-service-discovery-agent";
 import type {
   ConfigureDiscoveryWorkspaceInput,
@@ -339,13 +340,22 @@ export class DiscoveryServiceBase {
   async runDiscoveryDoctor(
     input: RunDiscoveryDoctorInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return runDiscoveryOperation(
+    const result = await runDiscoveryOperation(
       this.discoveryOutput,
       "run_discovery_doctor",
       input,
       { operation: "doctor" },
       this.runtime,
     );
+    // Only an injected trusted provider can describe the host capability; a
+    // bare service leaves the runtime's own enforcement warning in place.
+    return this.authorityProvider === undefined
+      ? result
+      : projectDoctorCapability(
+          this.authorityProvider,
+          input.workspaceRoot,
+          result,
+        );
   }
 
   async readDiscoverySource(

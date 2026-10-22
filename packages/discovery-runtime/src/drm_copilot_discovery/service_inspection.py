@@ -241,10 +241,20 @@ def inspect_request(context: OperationContext) -> DiscoveryResult:
     if operation == "read-source":
         return _source(context)
     if operation == "doctor":
-        from drm_copilot_discovery.doctor import inspect_doctor
+        from drm_copilot_discovery.doctor import CapabilityObserving, inspect_doctor
 
+        # Only a gateway-provided protected observation reaches doctor; request
+        # data never supplies capability.
+        capability = (
+            context.io.capability_observation()
+            if isinstance(context.io, CapabilityObserving)
+            else None
+        )
         return inspect_doctor(
-            io=context.io, request=context.request, runtime=context.runtime
+            io=context.io,
+            request=context.request,
+            runtime=context.runtime,
+            capability=capability,
         )
     kinds = {
         "validate-feature-contract": "feature-contract",

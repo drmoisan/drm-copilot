@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, cast
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Literal, Protocol, cast, runtime_checkable
 
 from drm_copilot_discovery.activation_store import ActivationStore
 from drm_copilot_discovery.configuration import LOCATOR_PATH, ConfigurationError
@@ -23,6 +24,113 @@ if TYPE_CHECKING:
         ServiceIO,
         ServiceRequest,
     )
+
+
+CapabilityStatus = Literal["supported", "unsupported", "missing"]
+
+
+@dataclass(frozen=True, kw_only=True)
+class CapabilityObservation:
+    """Carry the gateway's assessment of the native host capability for one session.
+
+    The host gateway, not this runtime, observes hook handlers, trusted
+    attribution and the denial sentinel; it hands the outcome here so doctor can
+    explain exactly which control is missing. A supported observation names its
+    protected attestation and carries no reasons; an unsupported one carries at
+    least one reason. The value grants nothing and performs no I/O.
+    """
+
+    status: CapabilityStatus
+    reasons: tuple[str, ...] = ()
+    attestation_ref: str | None = None
+    observed_at: str | None = None
+
+    def __post_init__(self) -> None:
+        """Reject contradictory observations instead of reporting them as health."""
+        if self.status not in ("supported", "unsupported", "missing"):
+            raise ValueError(
+                "Capability status must be supported, unsupported or missing"
+            )
+        if self.status == "supported" and (
+            self.reasons or self.attestation_ref is None
+        ):
+            raise ValueError(
+                "A supported capability names its attestation and has no reasons"
+            )
+        if self.status == "unsupported" and not self.reasons:
+            raise ValueError("An unsupported capability must state at least one reason")
+        if any(not reason.strip() for reason in self.reasons):
+            raise ValueError("Capability reasons must be nonblank")
+
+
+@runtime_checkable
+class CapabilityObserving(Protocol):
+    """Optional ServiceIO extension through which a host gateway reports capability."""
+
+    def capability_observation(self) -> CapabilityObservation | None:
+        """Return the current protected capability observation, or None when unknown."""
+        ...
+
+
+def capability_findings(
+    observation: CapabilityObservation | None,
+) -> tuple[Finding, ...]:
+    """Project an optional capability observation into doctor findings.
+
+    Returns a tuple of Finding values: an informational verification when the host
+    is supported, otherwise one warning explaining each deficiency or the generic
+    unavailability when nothing was observed. No value here authorizes execution.
+    """
+    if observation is not None and observation.status == "supported":
+        return (
+            Finding(
+                code="DISCOVERY_ENFORCEMENT_VERIFIED",
+                severity="info",
+                pointer="/summary/deployment",
+                related_ids=("capability-attestation",),
+                message=(
+                    "Native discovery capability verified by attestation "
+                    f"{observation.attestation_ref}."
+                ),
+                next_action=(
+                    "Controlled agent preparation may proceed for this session."
+                ),
+            ),
+        )
+    if observation is None or observation.status == "missing":
+        return (
+            Finding(
+                code="DISCOVERY_ENFORCEMENT_UNAVAILABLE",
+                severity="warning",
+                pointer="/summary/deployment",
+                message="Native discovery capability has not been verified.",
+                next_action=(
+                    "Install and verify a supported native capability provider."
+                ),
+            ),
+        )
+    # Each reported deficiency becomes its own actionable warning.
+    return tuple(
+        Finding(
+            code="DISCOVERY_ENFORCEMENT_UNAVAILABLE",
+            severity="warning",
+            pointer="/summary/deployment",
+            related_ids=("capability-attestation",),
+            message=f"Native discovery capability is unavailable: {reason}.",
+            next_action=(
+                "Repair the named host control and re-run the capability probe "
+                "before preparing a discovery agent."
+            ),
+        )
+        for reason in observation.reasons
+    )
+
+
+def _capability_state(observation: CapabilityObservation | None) -> str:
+    """Return the summary wording for the observed capability status."""
+    if observation is None or observation.status == "missing":
+        return "unavailable"
+    return "verified" if observation.status == "supported" else "unsupported"
 
 
 class _DoctorCapture:
@@ -168,15 +276,21 @@ class _DoctorCapture:
 
 
 def inspect_doctor(
-    *, io: ServiceIO, request: ServiceRequest, runtime: RuntimeIdentity
+    *,
+    io: ServiceIO,
+    request: ServiceRequest,
+    runtime: RuntimeIdentity,
+    capability: CapabilityObservation | None = None,
 ) -> DiscoveryResult:
     """Diagnose authenticated request configuration using verified runtime identity.
 
     The service supplies ServiceIO, a parsed doctor ServiceRequest and an already
-    verified RuntimeIdentity. Return a DiscoveryResult with actual read bytes and
-    absence, or fixed configuration/I/O findings. No write, activation, native
-    probe, receipt or source enumeration occurs. Constructor/contract errors
-    propagate; ordinary configuration and read failures become diagnostics.
+    verified RuntimeIdentity, plus the host gateway's optional protected
+    CapabilityObservation. Return a DiscoveryResult with actual read bytes and
+    absence, or fixed configuration/I/O findings, and the capability projection.
+    No write, activation, native probe, receipt or source enumeration occurs.
+    Constructor/contract errors propagate; ordinary configuration and read
+    failures become diagnostics.
     """
     initialization = io.initialization
     limits = ParseLimits()
@@ -241,15 +355,7 @@ def inspect_doctor(
                 next_action="Check local access and retry with stable configuration.",
             )
         )
-    findings.append(
-        Finding(
-            code="DISCOVERY_ENFORCEMENT_UNAVAILABLE",
-            severity="warning",
-            pointer="/summary/deployment",
-            message="Native discovery capability has not been verified.",
-            next_action="Install and verify a supported native capability provider.",
-        )
-    )
+    findings.extend(capability_findings(capability))
     # Only observed ordinary workspace inputs enter this diagnostic manifest.
     captured = tuple(
         SnapshotFile(
@@ -264,7 +370,7 @@ def inspect_doctor(
             (
                 "message",
                 f"Installed runtime verified; configuration {state}; "
-                "native capability unavailable.",
+                f"native capability {_capability_state(capability)}.",
             ),
             ("counts", ()),
             ("validation_result", None),
