@@ -4,6 +4,7 @@
     ".claude/hooks",
     ".claude/lib",
     ".codex/hooks",
+    ".github/hooks",
     ".codex/scripts",
     "scripts"
   ]

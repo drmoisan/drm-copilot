@@ -10,8 +10,9 @@
     Get-HookImportFailureExemption returns the D2 and D3 design entries and one Handler entry per
     surface for every handler whose fail-closed proof recorded FAIL-CLOSED (W-EXEMPT in
     exemption-decisions.md). Each handler row carries its guarded leaf as the last tuple element
-    (issue #984): H1 to H6 guard feature-folder-resolution.ps1, and H9 to H12 guard the
-    evaluation-only dependency of a path-scoped Write/Edit hook. Get-HookScopedImportFailureHandler detects scoped import-failure
+    (issue #984): H1 to H6 guard feature-folder-resolution.ps1, and H9, H11 and H12 guard the
+    evaluation-only dependency of a path-scoped Write/Edit hook. H10 was retired by issue #980:
+    the discovery gate now guards every helper import through the shared dependency guard. Get-HookScopedImportFailureHandler detects scoped import-failure
     handlers in script text, and Get-HookExemptionFinding reports a missing handler site, an
     unlisted handler, or a missing deny code. Every reader is an injectable script block, so the
     fixtures are in-memory here-strings and no file is written.
@@ -51,8 +52,6 @@ function Get-HookImportFailureExemption {
             'H6 (#565): enforce-parallel-cohort-barrier.ps1 denies with PARALLEL_COHORT_BARRIER_BLOCKED: before any other logic when feature-folder-resolution.ps1 fails to load; fail-closed proof recorded.', 'feature-folder-resolution.ps1'),
         @('H9', '#984', 'claude', '.claude/hooks/enforce-completion-consistency.ps1', 'CompletionHelpersImportFailure', '.claude/hooks/enforce-completion-consistency.ps1', '.claude/hooks/enforce-completion-consistency.ps1', '$script:CompletionHelpersImportFailure', 'COMPLETION_CONSISTENCY_BLOCKED:',
             'H9 (#984, H1 #565): enforce-completion-consistency.ps1 denies every checkpoint write with COMPLETION_CONSISTENCY_BLOCKED: when enforce-completion-helpers.ps1 fails to load; other paths never call the helpers; fail-closed proof recorded.', 'enforce-completion-helpers.ps1'),
-        @('H10', '#984', 'claude', '.claude/hooks/enforce-discovery-artifact-gate.ps1', 'DiscoveryValidationImportFailure', '.claude/hooks/enforce-discovery-artifact-gate.ps1', '.claude/hooks/enforce-discovery-artifact-gate.ps1', '$script:DiscoveryValidationImportFailure', 'DISCOVERY_ARTIFACT_GATE_BLOCKED:',
-            'H10 (#984, H1 #565): enforce-discovery-artifact-gate.ps1 denies every Write of a discovery artifact type with DISCOVERY_ARTIFACT_GATE_BLOCKED: when DiscoveryValidation.psm1 fails to load; other paths and Edit calls never call the validator; fail-closed proof recorded.', 'DiscoveryValidation.psm1'),
         @('H11', '#984', 'claude', '.claude/hooks/enforce-python-batch-budget.ps1', 'PythonBatchBudgetRouteImportFailure', '.claude/hooks/enforce-python-batch-budget.ps1', '.claude/hooks/enforce-python-batch-budget.ps1', '$script:PythonBatchBudgetRouteImportFailure', 'PYTHON_LARGE_PATH_REQUIRED:',
             'H11 (#984, H1 #565): enforce-python-batch-budget.ps1 denies every .py path with PYTHON_LARGE_PATH_REQUIRED: when enforce-batch-budget-route.ps1 fails to load; other paths never call the route helper; fail-closed proof recorded.', 'enforce-batch-budget-route.ps1'),
         @('H12', '#984', 'claude', '.claude/hooks/enforce-powershell-batch-budget.ps1', 'PowerShellBatchBudgetRouteImportFailure', '.claude/hooks/enforce-powershell-batch-budget.ps1', '.claude/hooks/enforce-powershell-batch-budget.ps1', '$script:PowerShellBatchBudgetRouteImportFailure', 'POWERSHELL_LARGE_PATH_REQUIRED:',

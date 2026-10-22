@@ -20,7 +20,8 @@ Discovery rules (applied after the excluded roots are removed):
     R2 the folder of every ``*.psd1`` with a same-stem sibling ``*.psm1``.
     R3 every ``scripts/<name>`` folder directly holding a code file.
     R4 every ``.claude/lib/<name>`` folder holding any file.
-    R5 ``.claude/hooks`` and ``.codex/hooks`` when they hold any file.
+    R5 ``.claude/hooks``, ``.codex/hooks`` and ``.github/hooks`` when they hold any
+       file.
 """
 
 from __future__ import annotations
@@ -75,7 +76,7 @@ DISCOVERY_RULES = DiscoveryRules(
     script_root="scripts",
     script_suffixes=(".py", ".ps1", ".psm1", ".sh"),
     library_root=".claude/lib",
-    hook_roots=(".claude/hooks", ".codex/hooks"),
+    hook_roots=(".claude/hooks", ".codex/hooks", ".github/hooks"),
 )
 """The single constant holding every discovery root and exclusion."""
 
