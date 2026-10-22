@@ -391,7 +391,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Retain seven existing tools and add configure/create/update/link/transfer/import/migrate/read/prepare/finalize plus diagnostic operation as specified; test closed input enums, whole-workspace modes, noninteractive dry-run, service stub consumers, role-denied tools, and text/structuredContent/isError agreement.
   - Acceptance: Extension and standalone MCP share one service implementation; no wrapper computes schema, coverage, parity, or approval semantics, and all shared nondiscovery contract tests remain green.
 
-- [ ] [P8-T7] Register justified VS Code commands without business logic.
+- [x] [P8-T7] Register justified VS Code commands without business logic.
   - Files and behavior: Update ES/discovery-command-registration.ts and extensions/drm-copilot/package.json; extract ES/discovery-artifact-command-registration.ts and ES/discovery-workspace-command-registration.ts. Update ET/extension.discovery-commands.test.ts, add ET/discovery-artifact-commands.test.ts, and add coverage thresholds.
   - Tests and proof: Test existing command ID compatibility, initialize/configure/inventory/create/link/validate/reports/generate/snapshot/migrate/diagnostic commands, direct structured arguments, only-missing-input prompts, cancellation, custom workspace/profile, and no terminal creation.
   - Acceptance: Every documented user-facing operation is available noninteractively and calls the shared MCP/service contract; prepare/finalize and bounded reads remain agent/service operations.
