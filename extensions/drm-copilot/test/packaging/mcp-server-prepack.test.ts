@@ -65,6 +65,30 @@ describe("mcp-server prepack", () => {
     }
   });
 
+  it("copies the newly mapped discovery hooks, helpers, config and templates (issue #980)", () => {
+    // Arrange: one representative of each non-Python resource class P8-T9 mapped.
+    const resources = [
+      "lib/discovery-validation/DiscoveryAuthority.psm1",
+      "lib/discovery-validation/DiscoveryStop.psm1",
+      "customizations/.github/hooks/discovery-pre-tool.ps1",
+      "customizations/.github/hooks/discovery.json",
+      "customizations/.github/agents/legacy-parity-analyst.agent.md",
+      "claude-customizations/.claude/hooks/enforce-discovery-artifact-gate.ps1",
+      "claude-customizations/.claude/lib/discovery-validation/DiscoveryValidation.psm1",
+      "claude-customizations/config/orchestration-routing.json",
+      "codex-and-agents-customizations/.codex/hooks/validate-discovery-agent-output.ps1",
+      "codex-and-agents-customizations/.codex/config.toml",
+      "config/orchestration-routing.json",
+      "templates/new-claude-worktree-session.ps1",
+      "powershell/PoshQC/PoshQC.psd1",
+    ];
+
+    // Act / Assert
+    for (const relative of resources) {
+      expect(prepack.shouldCopy(resource(relative))).toBe(true);
+    }
+  });
+
   it("excludes the resources-root scripts subtree", () => {
     for (const relative of [
       "scripts",
