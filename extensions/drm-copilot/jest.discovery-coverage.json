@@ -8,6 +8,8 @@
   "./src/discovery-invocation.ts": { "lines": 90, "branches": 75 },
   "./src/discovery-invocation-record.ts": { "lines": 90, "branches": 75 },
   "./src/discovery-routing.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-input-manifest.ts": { "lines": 90, "branches": 75 },
+  "./src/discovery-finalization.ts": { "lines": 90, "branches": 75 },
   "./src/discovery-authority-paths.ts": { "lines": 90, "branches": 75 },
   "./src/repo-automation-execute-discovery.ts": { "lines": 90, "branches": 75 },
   "./src/mcp-tool-inputs-discovery.ts": { "lines": 85, "branches": 75 },

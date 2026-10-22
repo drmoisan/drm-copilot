@@ -381,7 +381,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Cover all nine workflows/four roles, exact model/effort/profile hash, parent/session context, zero-code-write topology, protected record and diagnostic mirror separation, absent feature checkpoint, unsupported capability, output-contract substitution, and nested self-launch denial.
   - Acceptance: prepare_discovery_agent returns a launchable exact deployment only after persisted protected bindings, without modifying artifacts/orchestration/orchestrator-state.json or requiring a new feature issue.
 
-- [ ] [P8-T5] Finalize role output and mint fresh gate-specific receipts.
+- [x] [P8-T5] Finalize role output and mint fresh gate-specific receipts.
   - Files and behavior: Create ES/{discovery-finalization,discovery-input-manifest}.ts and ET/{discovery-finalization,discovery-input-manifest}.test.ts; add coverage entries. Recompute the complete input set/hashes independently after the Python result before protected receipt creation.
   - Tests and proof: Test missing/new/deleted/renamed/edited inputs, evidence replacement, profile/root changes, schema/runtime/build/policy drift, wrong gate/role/session, absent outputs, forged success JSON, and valid output-valid/result-fail reviewer results.
   - Acceptance: Only a current authoritative result bound to the exact invocation/output/gate produces a protected receipt; source mutation or mismatched result invalidates it before stop/planning can succeed.
