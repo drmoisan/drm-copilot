@@ -1,0 +1,17 @@
+{
+  "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
+  "schema_version": "2.0.0",
+  "artifact_kind": "service-request",
+  "id": "fixture-validate-parity-complete",
+  "request_id": "fixture-validate-parity-complete",
+  "operation": "validate-all",
+  "mode": "parity-complete",
+  "workspace_root": "C:/workspace",
+  "profile_path": null,
+  "dry_run": false,
+  "write": false,
+  "format": "json",
+  "inputs": {},
+  "invocation_ref": null,
+  "authorization_ref": null
+}

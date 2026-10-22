@@ -1,0 +1,17 @@
+{
+  "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
+  "schema_version": "2.0.0",
+  "artifact_kind": "service-request",
+  "id": "fixture-inventory",
+  "request_id": "fixture-inventory",
+  "operation": "inventory",
+  "mode": "structural",
+  "workspace_root": "C:/workspace",
+  "profile_path": null,
+  "dry_run": true,
+  "write": false,
+  "format": "json",
+  "inputs": {"analyzer_ids": ["repository"]},
+  "invocation_ref": null,
+  "authorization_ref": null
+}

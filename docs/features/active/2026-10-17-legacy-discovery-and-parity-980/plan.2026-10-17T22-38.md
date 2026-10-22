@@ -472,7 +472,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 11 — Full verification, self-review, and execution handoff
 
-- [ ] [P11-T1] Prove the complete source and target public workflows in memory.
+- [x] [P11-T1] Prove the complete source and target public workflows in memory.
   - Files and behavior: Create PT/test_{public_source_workflow,public_target_workflow,public_combined_workflow}.py, ET/discovery-public-workflow.test.ts, and shared synthetic fixtures under tests/fixtures/discovery_workflow/; write FEATURE/evidence/regression-testing/discovery-public-workflows.<timestamp>.md.
   - Tests and proof: Drive init→inventory→scope/coverage/contracts/unknowns→runtime/manual evidence→decision→source export/import→target implementation/parity→ready/pending acceptance→all reports/gates through real service rules. Cover no-runtime, optional dimensions, multiple clients, repeat runs, dry-run, malformed/unreferenced artifacts, stale bytes, and negative exit mapping.
   - Acceptance: The public path demonstrates structural draft success, honest incomplete discovery failure, evidence-backed completion and parity, and no false pass in any negative scenario; host transport uses the same authority.

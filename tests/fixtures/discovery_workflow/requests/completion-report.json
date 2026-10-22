@@ -1,0 +1,17 @@
+{
+  "$schema": "urn:drm-copilot:discovery:2.0.0:service-request",
+  "schema_version": "2.0.0",
+  "artifact_kind": "service-request",
+  "id": "fixture-completion-report",
+  "request_id": "fixture-completion-report",
+  "operation": "completion-report",
+  "mode": "discovery-complete",
+  "workspace_root": "C:/workspace",
+  "profile_path": null,
+  "dry_run": false,
+  "write": false,
+  "format": "both",
+  "inputs": {},
+  "invocation_ref": null,
+  "authorization_ref": null
+}
