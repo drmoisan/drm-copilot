@@ -26,6 +26,7 @@ from drm_copilot_discovery.source_read_models import ReadGrant, ReadSelection
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from drm_copilot_discovery.doctor import CapabilityObservation
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace
     from drm_copilot_discovery.repository_reader import (
         RepositoryIdentity,
@@ -95,6 +96,15 @@ class LocalServiceIO:
     def runtime_identity(self) -> RuntimeIdentity:
         """Return verified installed identity; propagate typed failure unchanged."""
         return self._identity()
+
+    def capability_observation(self) -> CapabilityObservation | None:
+        """Return None: the explicit local-user principal observes no native capability.
+
+        Only a host gateway bound to a trusted session can report a protected
+        capability attestation; the CLI's read-only diagnostics therefore report
+        native enforcement as unavailable without claiming a deficiency cause.
+        """
+        return None
 
     def _matches_workspace(self, path: str) -> bool:
         """Compare path (str) to the bound root with strict platform identity.

@@ -16,13 +16,11 @@ import type { DiscoveryRuntimeIdentity } from "./discovery-service-types";
 import {
   type AuthorityStoreIO,
   type ProtectedEnvelope,
-  type ProtectedWorkspaceBinding,
   rejectCallerAuthorityClaims,
 } from "./discovery-authority";
 import {
   type AuthorityLocation,
   invocationDirectory,
-  sessionDirectory,
   sha256Hex,
 } from "./discovery-authority-paths";
 import {
@@ -31,8 +29,15 @@ import {
   type NativeIdentity,
 } from "./discovery-authorization-record";
 import {
+  assessProtectedCapability,
+  type CapabilityDeficiencyKind,
+  type CapabilityExpectation,
+  type CapabilityPins,
+  DISCOVERY_ENFORCEMENT_UNAVAILABLE,
+} from "./discovery-capabilities";
+import {
   DISCOVERY_INVOCATION_SCHEMA,
-  type DiscoveryInvocationError,
+  type DiscoveryInvocationCode,
   type DiscoveryInvocationRecord,
   HOSTS,
   INVOCATION_RECORD_FILE,
@@ -61,9 +66,10 @@ export type {
   DiscoveryInvocationCode,
   DiscoveryInvocationRecord,
 } from "./discovery-invocation-record";
-export const CAPABILITY_ATTESTATION_SCHEMA =
-  "urn:drm-copilot:discovery:2.0.0:capability-attestation";
-export const CAPABILITY_ATTESTATION_FILE = "capability-attestation.json";
+export {
+  CAPABILITY_ATTESTATION_FILE,
+  CAPABILITY_ATTESTATION_SCHEMA,
+} from "./discovery-capabilities";
 export const TOPOLOGY_RECEIPT_FILE = "topology-receipt.json";
 export const MODEL_RECEIPT_FILE = "model-receipt.json";
 export const REQUIRED_OUTPUTS_FILE = "required-outputs.json";
@@ -83,15 +89,27 @@ const OPTIONAL_REQUEST_KEYS: ReadonlyArray<string> = [
 ];
 const CORRELATION_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/u;
 const NONCE = /^[a-z0-9]{8,64}$/u;
-const CONTROL_NAMES: ReadonlyArray<string> = [
-  "workspace_trusted",
-  "hooks_enabled",
-  "trusted_attribution",
-  "start_event",
-  "tool_event",
-  "stop_event",
-  "forbidden_tools_denied",
-];
+/** Refusal code for each capability deficiency, in the assessment's vocabulary. */
+const CAPABILITY_REFUSALS: Readonly<
+  Record<CapabilityDeficiencyKind, DiscoveryInvocationCode>
+> = {
+  "attestation-missing": "INVOCATION_CAPABILITY_MISSING",
+  "attestation-malformed": "INVOCATION_CAPABILITY_INVALID",
+  "context-missing": "INVOCATION_CAPABILITY_MISSING",
+  "activation-unavailable": "INVOCATION_CAPABILITY_MISSING",
+  "harness-unsupported": "INVOCATION_CAPABILITY_UNSUPPORTED",
+  "hooks-disabled": "INVOCATION_CAPABILITY_UNSUPPORTED",
+  "trust-missing": "INVOCATION_CAPABILITY_UNSUPPORTED",
+  "event-unsupported": "INVOCATION_CAPABILITY_UNSUPPORTED",
+  "probe-not-denied": "INVOCATION_CAPABILITY_UNSUPPORTED",
+  "probe-stale": "INVOCATION_CAPABILITY_EXPIRED",
+  "workspace-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+  "host-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+  "session-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+  "runtime-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+  "configuration-hash-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+  "hook-hash-mismatch": "INVOCATION_CAPABILITY_MISMATCH",
+};
 
 export interface PrepareContext {
   readonly host: string;
@@ -124,6 +142,8 @@ export interface PrepareOptions {
   readonly request: unknown;
   readonly runtime: DiscoveryRuntimeIdentity;
   readonly availableModels?: ReadonlySet<string>;
+  /** Host-pinned configuration and hook hashes the attestation must match. */
+  readonly pins?: CapabilityPins;
   readonly now: Date;
   readonly nonce: () => string;
 }
@@ -202,110 +222,41 @@ function validateRequestShape(request: unknown): PrepareRequestFields {
   return request as PrepareRequestFields;
 }
 
-function capabilityInvalid(detail: string): DiscoveryInvocationError {
-  return refuse(
-    "INVOCATION_CAPABILITY_INVALID",
-    `Capability attestation is malformed: ${detail}`,
-  );
-}
-
 /**
  * Read and verify the session's capability attestation from the protected store.
  *
  * Only the protected copy is consulted; attestations supplied by the caller or
- * by repository JSON are never accepted. The attestation must be `supported`
- * with every control true and the sentinel probe denied, bound to this
- * workspace, host, session and runtime, and inside its validity window.
+ * by repository JSON are never accepted. The assessment in
+ * `discovery-capabilities` decides support; the first deficiency in contract
+ * order becomes the refusal, prefixed with `DISCOVERY_ENFORCEMENT_UNAVAILABLE`
+ * so a caller can distinguish a host gap from a request defect.
  */
 export function readCapabilityAttestation(options: {
   readonly location: AuthorityLocation;
   readonly io: AuthorityStoreIO;
   readonly sessionId: string;
-  readonly expected: {
-    readonly workspace: ProtectedWorkspaceBinding;
-    readonly host: string;
-    readonly runtime: DiscoveryRuntimeIdentity;
-  };
+  readonly expected: CapabilityExpectation;
   readonly now: Date;
 }): string {
-  const path = `${sessionDirectory(options.location, options.sessionId)}/${CAPABILITY_ATTESTATION_FILE}`;
-  const text = options.io.readText(path);
-  if (text === null) {
+  const assessment = assessProtectedCapability(options);
+  const [first] = assessment.deficiencies;
+  if (first !== undefined || assessment.attestation === null) {
+    const deficiency = first ?? {
+      kind: "attestation-missing" as const,
+      detail: "no attestation was decoded",
+    };
+    const code = CAPABILITY_REFUSALS[deficiency.kind];
+    // The unsupported wording stays stable: callers key on "required discovery controls".
+    const summary =
+      code === "INVOCATION_CAPABILITY_UNSUPPORTED"
+        ? "The host does not provide the required discovery controls"
+        : `Capability attestation is unavailable (${deficiency.kind})`;
     throw refuse(
-      "INVOCATION_CAPABILITY_MISSING",
-      "No current capability attestation exists for this session.",
+      code,
+      `${DISCOVERY_ENFORCEMENT_UNAVAILABLE}: ${summary}: ${deficiency.detail}.`,
     );
   }
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw capabilityInvalid("not JSON");
-  }
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw capabilityInvalid("not an object");
-  }
-  const value = parsed as Record<string, unknown>;
-  const {
-    $schema: schema,
-    attestation_ref: attestationRef,
-    status,
-    controls,
-    probe,
-    workspace,
-    host,
-    session_id: sessionId,
-    runtime,
-    observed_at: observedAt,
-    expires_at: expiresAt,
-  } = value;
-  if (
-    schema !== CAPABILITY_ATTESTATION_SCHEMA ||
-    typeof attestationRef !== "string" ||
-    attestationRef.length < 16 ||
-    typeof observedAt !== "string" ||
-    typeof expiresAt !== "string" ||
-    Number.isNaN(Date.parse(observedAt)) ||
-    Number.isNaN(Date.parse(expiresAt)) ||
-    controls === null ||
-    typeof controls !== "object" ||
-    probe === null ||
-    typeof probe !== "object"
-  ) {
-    throw capabilityInvalid("envelope fields");
-  }
-  const controlValues = controls as Record<string, unknown>;
-  const { result: probeResult } = probe as { result?: unknown };
-  // Fail closed: anything short of full supported controls is unsupported.
-  if (
-    status !== "supported" ||
-    CONTROL_NAMES.some((name) => controlValues[name] !== true) ||
-    probeResult !== "denied"
-  ) {
-    throw refuse(
-      "INVOCATION_CAPABILITY_UNSUPPORTED",
-      "The host does not provide the required discovery controls.",
-    );
-  }
-  if (
-    canonicalJson(workspace) !== canonicalJson(options.expected.workspace) ||
-    host !== options.expected.host ||
-    sessionId !== options.sessionId ||
-    canonicalJson(runtime) !== canonicalJson(options.expected.runtime)
-  ) {
-    throw refuse(
-      "INVOCATION_CAPABILITY_MISMATCH",
-      "Capability attestation is bound to another workspace, host, session or runtime.",
-    );
-  }
-  const instant = options.now.getTime();
-  if (!(Date.parse(observedAt) <= instant && instant < Date.parse(expiresAt))) {
-    throw refuse(
-      "INVOCATION_CAPABILITY_EXPIRED",
-      "Capability attestation is outside its validity window.",
-    );
-  }
-  return attestationRef;
+  return assessment.attestation.attestation_ref;
 }
 
 /** Render the diagnostic workspace mirror; it is a copy and never authority. */
@@ -354,7 +305,13 @@ export function prepareDiscoveryInvocation(
     location,
     io,
     sessionId: context.sessionId,
-    expected: { workspace: envelope.workspace, host: context.host, runtime },
+    expected: {
+      workspace: envelope.workspace,
+      host: context.host,
+      sessionId: context.sessionId,
+      runtime,
+      ...(options.pins === undefined ? {} : { pins: options.pins }),
+    },
     now,
   });
   const nonce = options.nonce();

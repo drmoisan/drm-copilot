@@ -1,0 +1,34 @@
+# P8-T8 Host capability diagnostics and probe orchestration contract
+
+Timestamp: 2026-10-22T13-31
+Task: [P8-T8] Define current host capability diagnostics and probe orchestration.
+Result: PASS
+
+## Behavior verified
+
+- `extensions/drm-copilot/src/discovery-capability-record.ts` (new) declares the `capability-attestation` record contract: the schema URN, the protected file name, the seven control names, the three handler events, the three probe results, the sorted 17-key set, a strict decoder that rejects any extra or missing key, non-opaque reference, unknown host, non-boolean control, malformed handler or probe, and a caller-claim detector over the keys a caller might use to assert capability.
+- `extensions/drm-copilot/src/discovery-capabilities.ts` (new) assesses a decoded attestation against the host-verified expectation in contract order (harness support, hooks enabled, workspace trust and attribution, observed start/tool/stop handlers with their controls, denied sentinel with protected evidence, workspace/host/session/runtime bindings, pinned configuration and hook hashes, validity window), reads only the protected session copy, assesses a doctor session from trusted provider state (empty host or session, missing runtime identity and unreadable activation become explained deficiencies rather than errors), describes the harmless forbidden-tool sentinel a host adapter must see denied, composes a schema-shaped attestation whose status is derived rather than supplied, and projects the assessment into a doctor result as one verified info finding or one warning per deficiency.
+- `extensions/drm-copilot/src/discovery-invocation.ts` delegates `readCapabilityAttestation` to the assessment and maps the first deficiency to the existing INVOCATION_CAPABILITY_MISSING / INVALID / UNSUPPORTED / MISMATCH / EXPIRED refusal codes; every refusal message is prefixed `DISCOVERY_ENFORCEMENT_UNAVAILABLE` and the unsupported message keeps the "required discovery controls" wording. The duplicated schema/file constants and control list were removed and are re-exported from the capabilities module. Prepare accepts optional host pins, which the service forwards from the provider.
+- `extensions/drm-copilot/src/repo-automation-service-discovery.ts` and `-agent.ts` project the session capability into `run_discovery_doctor` only when a trusted authority provider was injected; a bare service leaves the runtime's own enforcement warning untouched, and a result without a discovery payload passes through unchanged.
+- `packages/discovery-runtime/src/drm_copilot_discovery/doctor.py` adds the frozen `CapabilityObservation` value object (supported requires an attestation reference and no reasons; unsupported requires at least one nonblank reason), the optional `CapabilityObserving` port, `capability_findings`, and the `capability` keyword on `inspect_doctor`; `service_inspection.py` supplies the observation only from a gateway port that implements the protocol, never from request data; `gateway_local.py` returns None for the explicit local-user principal so CLI read-only diagnostics keep reporting DISCOVERY_ENFORCEMENT_UNAVAILABLE.
+
+## Required and rejected conditions (tests)
+
+- Required: trusted observed start/tool/stop handler attribution, exact host, configuration and hook hashes, denied harmless sentinel with protected evidence, and a current validity window — `test/discovery-capabilities.test.ts` (compose derives supported only from complete observations; assess returns no deficiency) and `test/discovery-capabilities-session.test.ts` (protected read, session assessment).
+- Rejected: caller-only capability claims (`isCallerCapabilityClaim`, and the protected read ignores another session's partition), disabled hooks (`hooks-disabled`), missing trust or attribution (`trust-missing`), unsupported harness (`harness-unsupported`), stale or not-yet-observed probes (`probe-stale`), allowed or unavailable sentinel and false forbidden-tool control (`probe-not-denied`), wrong workspace/profile (`workspace-mismatch`), wrong host, session and runtime version or build (`host-mismatch`, `session-mismatch`, `runtime-mismatch`), configuration and hook hash drift (`configuration-hash-mismatch`, `hook-hash-mismatch`), missing or unobserved handler events (`event-unsupported`), and twelve malformed-document shapes (`DiscoveryCapabilityError`).
+- Prepare refusals: the fifteen-case matrix in `test/discovery-invocation.refusals.test.ts` and the agent-suite "required discovery controls" assertion pass unchanged against the delegated reader.
+- Doctor: `test/repo-automation-service-discovery.test.ts` proves no projection without a provider, a verified finding naming the attestation reference with a seeded protected attestation, and separate warnings for a missing attestation, no trusted session context, an unreadable activation and a runtime without identity, with no protected write in any case. `tests/discovery_runtime/test_doctor_capability.py` proves the Python projection and the CLI principal; `tests/discovery_runtime/test_doctor.py` keeps the "only truthful unavailability" assertion for every configuration state.
+
+## Acceptance statement
+
+doctor explains installation and configuration deficiencies by name (one warning per deficiency, each with the next action), controlled agent preparation returns a DISCOVERY_ENFORCEMENT_UNAVAILABLE-prefixed refusal until a current supported-host probe exists in the protected store, and CLI read-only diagnostics remain usable because the local principal observes no capability and reports the generic unavailability.
+
+## File accounting
+
+- New authored code: `src/discovery-capabilities.ts`, `src/discovery-capability-record.ts`, `test/discovery-capabilities.test.ts`, `test/discovery-capabilities-session.test.ts`, `test/discovery-capabilities-test-support.ts`, `tests/discovery_runtime/test_doctor_capability.py`.
+- Changed existing code: `src/discovery-invocation.ts` (reader delegated; constants relocated), `src/discovery-authority-provider.ts` (optional `capabilityPins`), `src/repo-automation-service-discovery.ts`, `src/repo-automation-service-discovery-agent.ts`, `jest.discovery-coverage.json` (two entries), `doctor.py`, `gateway_local.py`, `service_inspection.py`, `tests/discovery_runtime/test_doctor.py` (imports restored after the capability tests moved to their own module), `test/repo-automation-service-discovery.test.ts`.
+- No generated mirrors or relocated implementations. All production and test files remain under 500 physical lines (largest touched: discovery-capabilities.ts at 460 after formatting).
+
+## Deviation note
+
+The plan names a single `ET/discovery-capabilities.test.ts` and `PT/test_doctor.py`; the 500-line file limit required the suite to be split into two suites plus a fixture support module and the Python cases to land in `test_doctor_capability.py`. The behavior under test is unchanged from the task text.

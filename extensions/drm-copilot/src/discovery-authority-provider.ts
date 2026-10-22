@@ -23,6 +23,7 @@ import {
   resolveAuthorityLocation,
   type TrustedHostEnvironment,
 } from "./discovery-authority-paths";
+import type { CapabilityPins } from "./discovery-capabilities";
 import type { ReceiptWriter } from "./discovery-finalization";
 import {
   createNodeInputReader,
@@ -44,6 +45,8 @@ export interface DiscoveryAuthorityProvider {
   readonly io: AuthorityStoreIO;
   readonly reader: InputBytesReader;
   readonly writer: Omit<ReceiptWriter, "kind" | "host">;
+  /** Host-pinned configuration and hook hashes an attestation must reproduce. */
+  readonly capabilityPins?: CapabilityPins;
   location(workspaceRoot: string): AuthorityLocation;
   activation(location: AuthorityLocation): { envelope(): ProtectedEnvelope };
   now(): Date;

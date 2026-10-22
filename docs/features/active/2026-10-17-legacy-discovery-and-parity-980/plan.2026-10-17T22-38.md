@@ -396,7 +396,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test existing command ID compatibility, initialize/configure/inventory/create/link/validate/reports/generate/snapshot/migrate/diagnostic commands, direct structured arguments, only-missing-input prompts, cancellation, custom workspace/profile, and no terminal creation.
   - Acceptance: Every documented user-facing operation is available noninteractively and calls the shared MCP/service contract; prepare/finalize and bounded reads remain agent/service operations.
 
-- [ ] [P8-T8] Define current host capability diagnostics and probe orchestration.
+- [x] [P8-T8] Define current host capability diagnostics and probe orchestration.
   - Files and behavior: Create ES/discovery-capabilities.ts and ET/discovery-capabilities.test.ts; extend R/doctor.py and PT/test_doctor.py from P6-T1 to project protected host diagnostics through the existing gateway/service. Add the TypeScript module coverage entry.
   - Tests and proof: Require trusted observed hook start/tool/stop attribution, exact host/config/hook hashes and harmless denial sentinel result; reject caller-only capabilities, disabled hooks, missing trust, unsupported harness, stale probes, wrong workspace and runtime versions.
   - Acceptance: doctor explains installation/configuration deficiencies, while controlled agent preparation returns DISCOVERY_ENFORCEMENT_UNAVAILABLE until an actual supported-host probe is current; CLI read-only diagnostics remain usable.

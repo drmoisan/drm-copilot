@@ -10,8 +10,10 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
+import { DiscoveryAuthorityError } from "../src/discovery-authority";
 import type { RepoAutomationService } from "../src/repo-automation-service";
-import { seeded } from "./discovery-invocation-test-support";
+import { projectDoctorCapability } from "../src/repo-automation-service-discovery-agent";
+import { CONTEXT, RUNTIME, seeded } from "./discovery-invocation-test-support";
 import {
   buildServiceResult,
   FakeLauncher,
@@ -230,7 +232,119 @@ describe("discovery request composition", () => {
     const result = await call(service(launcher));
     expect(launcher.request()).toMatchObject(expected);
     expect(launcher.single().cwd).toBe(WS_ROOT);
-    expect(result.discovery).toEqual(buildServiceResult());
+    expect(result.discovery).toMatchObject({
+      ok: true,
+      runtime: buildServiceResult().runtime,
+    });
+  });
+
+  describe("doctor capability projection", () => {
+    const unavailable = {
+      code: "DISCOVERY_ENFORCEMENT_UNAVAILABLE",
+      severity: "warning" as const,
+      artifact_path: null,
+      pointer: "/summary/deployment",
+      related_ids: [],
+      related_paths: [],
+      message: "Native discovery capability has not been verified.",
+      next_action: "Install and verify a supported native capability provider.",
+    };
+    const doctor = (runtime: typeof RUNTIME | null = RUNTIME) =>
+      new FakeLauncher(
+        successOutcome(
+          buildServiceResult({
+            operation: "doctor",
+            runtime,
+            findings: [unavailable],
+          }),
+        ),
+      );
+    const codes = (result: {
+      discovery?: {
+        findings: ReadonlyArray<{ code: string; message: string }>;
+      };
+    }) =>
+      result.discovery?.findings.map(
+        (finding) => `${finding.code} ${finding.message}`,
+      ) ?? [];
+
+    it("leaves the runtime warning in place without a trusted provider", async () => {
+      const result = await service(doctor()).runDiscoveryDoctor({
+        workspaceRoot: WS_ROOT,
+      });
+      expect(codes(result)).toEqual([
+        `${unavailable.code} ${unavailable.message}`,
+      ]);
+    });
+
+    it("reports a verified capability from the protected attestation", async () => {
+      const result = await service(
+        doctor(),
+        provider(seeded()),
+      ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
+      expect(codes(result)).toEqual([
+        expect.stringContaining(
+          "DISCOVERY_ENFORCEMENT_VERIFIED Native discovery capability verified by attestation attestation-alpha",
+        ),
+      ]);
+    });
+
+    it.each([
+      ["a missing attestation", seeded(null), {}, "(attestation-missing)"],
+      [
+        "no trusted session context",
+        seeded(),
+        { context: { ...CONTEXT, sessionId: "" } },
+        "(context-missing)",
+      ],
+      [
+        "an unreadable activation",
+        seeded(),
+        {
+          activation: () => ({
+            envelope: () => {
+              throw new DiscoveryAuthorityError(
+                "ACTIVATION_INACTIVE",
+                "inactive",
+              );
+            },
+          }),
+        },
+        "(activation-unavailable)",
+      ],
+    ])(
+      "explains %s as a deficiency warning",
+      async (_label, io, overrides, text) => {
+        const result = await service(
+          doctor(),
+          provider(io, overrides),
+        ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
+        expect(codes(result)).toEqual([
+          expect.stringContaining(
+            `DISCOVERY_ENFORCEMENT_UNAVAILABLE Native discovery capability is unavailable ${text}`,
+          ),
+        ]);
+        expect(io.writtenPaths()).toEqual([]);
+      },
+    );
+
+    it("names a runtime without identity and passes through results without a discovery payload", async () => {
+      const result = await service(
+        doctor(null),
+        provider(seeded()),
+      ).runDiscoveryDoctor({ workspaceRoot: WS_ROOT });
+      expect(codes(result)).toEqual([
+        expect.stringContaining("(runtime-mismatch)"),
+      ]);
+      const bare = {
+        tool: "run_discovery_doctor" as const,
+        workspaceRoot: WS_ROOT,
+        summary: "none",
+      };
+      expect(projectDoctorCapability(provider(seeded()), WS_ROOT, bare)).toBe(
+        bare,
+      );
+    });
   });
 
   it("reports no role without an authority provider and the agent role with one", () => {
