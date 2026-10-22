@@ -1,0 +1,58 @@
+import {
+  type AuthorityStoreIO,
+  DiscoveryAuthorityError,
+} from "../src/discovery-authority";
+
+/**
+ * In-memory `AuthorityStoreIO` shared by the discovery invocation suites.
+ *
+ * Records every operation so tests can prove which protected paths a flow
+ * touched, and exposes a post-create hook for race simulations.
+ */
+export class MemoryStoreIO implements AuthorityStoreIO {
+  readonly files = new Map<string, string>();
+  readonly directories = new Set<string>();
+  readonly operations: string[] = [];
+  afterCreate: (path: string) => void = () => undefined;
+  failPublish = false;
+
+  readText(path: string): string | null {
+    this.operations.push(`read ${path}`);
+    return this.files.get(path) ?? null;
+  }
+
+  createExclusive(path: string, text: string): void {
+    this.operations.push(`create ${path}`);
+    if (this.files.has(path)) {
+      throw new DiscoveryAuthorityError("AUTHORITY_LOCKED", `exists ${path}`);
+    }
+    this.files.set(path, text);
+    this.afterCreate(path);
+  }
+
+  publish(stagedPath: string, targetPath: string, replace: boolean): void {
+    this.operations.push(`publish ${targetPath} ${String(replace)}`);
+    if (this.failPublish) {
+      throw new Error("publish failed");
+    }
+    this.files.set(targetPath, this.files.get(stagedPath)!);
+    this.files.delete(stagedPath);
+  }
+
+  remove(path: string): void {
+    this.operations.push(`remove ${path}`);
+    this.files.delete(path);
+  }
+
+  ensureDirectory(path: string): void {
+    this.operations.push(`mkdir ${path}`);
+    this.directories.add(path);
+  }
+
+  /** Paths of every write-type operation recorded so far. */
+  writtenPaths(): string[] {
+    return this.operations
+      .filter((entry) => !entry.startsWith("read "))
+      .map((entry) => entry.split(" ")[1]!);
+  }
+}
