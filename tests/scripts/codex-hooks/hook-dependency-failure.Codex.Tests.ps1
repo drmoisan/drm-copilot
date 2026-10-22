@@ -70,6 +70,8 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'                 = 'CHECKPOINT_ORDER_BLOCKED:'
             '.codex/hooks/enforce-codex-model-routing.ps1'                  = 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
             '.codex/hooks/enforce-completion-consistency.ps1'               = 'COMPLETION_CONSISTENCY_BLOCKED:'
+            '.codex/hooks/enforce-discovery-artifact-gate.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            '.codex/hooks/enforce-discovery-planning-gate.ps1'              = 'DISCOVERY_PLANNING_GATE_BLOCKED:'
             '.codex/hooks/enforce-epic-child-worktree-binding.ps1'          = 'EPIC_WORKTREE_BINDING_BLOCKED:'
             '.codex/hooks/enforce-epic-merge-gate.ps1'                      = 'EPIC_MERGE_GATE_BLOCKED:'
             '.codex/hooks/enforce-epic-planning-only.ps1'                   = 'EPIC_PLANNING_ONLY_BLOCKED:'
@@ -83,6 +85,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             '.codex/hooks/enforce-python-batch-budget.ps1'                  = 'PYTHON_LARGE_PATH_REQUIRED:'
             '.codex/hooks/validate-bash.ps1'                                = 'HOOK_DEPENDENCY_LOAD_FAILED:'
             '.codex/hooks/validate-codex-subagent-routing.ps1'              = 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
+            '.codex/hooks/validate-discovery-agent-output.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
             '.codex/hooks/validate-feature-review-coverage.ps1'             = 'validate-feature-review-coverage:'
         }
 

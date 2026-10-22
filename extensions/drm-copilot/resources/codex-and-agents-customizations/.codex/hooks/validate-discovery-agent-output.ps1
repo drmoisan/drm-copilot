@@ -50,12 +50,34 @@ function Get-DiscoveryStopHelperModulePath {
     return $published
 }
 
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryStopHelperModulePath -ModuleName 'DiscoveryStop.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStop.psm1' -ErrorRecord $_ }
+function Import-DiscoveryOutputSelfHostedModule {
+    <#
+    .SYNOPSIS
+        Imports the shared helpers from this repository's .claude/lib layout when no published .codex/lib exists (exemption D4).
+    #>
+    [CmdletBinding()]
+    param()
+
+    $ScriptRoot = $PSScriptRoot
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryStop.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStop.psm1' -ErrorRecord $_ }
+}
+
+# The published destination keeps the helpers beside .codex/hooks; this repository hosts them under .claude/lib.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStop.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStop.psm1' -ErrorRecord $_ }
+} else {
+    Import-DiscoveryOutputSelfHostedModule
+}
 
 $script:DiscoveryGateReasonPrefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
 
@@ -77,10 +99,8 @@ function Invoke-DiscoveryAgentOutputDecision {
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
     )
-    if (Test-HookDependencyFailure) {
-        $reason = Get-HookDependencyFailureReason -ReasonPrefix $script:DiscoveryGateReasonPrefix
-        return [pscustomobject]@{ Decision = 'block'; Code = 'DEPENDENCY'; Reason = $reason.Substring($script:DiscoveryGateReasonPrefix.Length).TrimStart(); Receipt = $null; Invocation = $null }
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix $script:DiscoveryGateReasonPrefix
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
@@ -136,7 +156,9 @@ function Invoke-DiscoveryAgentOutputEntryPoint {
     param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw)
 
     $outcome = Invoke-DiscoveryAgentOutputDecision -PayloadRaw $PayloadRaw
-    if ($outcome.Code -in @('ENVELOPE', 'DEPENDENCY')) {
+    # A dependency failure is already the SubagentStop block result (ExitCode, Reason).
+    if ($null -ne $outcome.PSObject.Properties['ExitCode']) { [Console]::Error.WriteLine([string]$outcome.Reason); return [int]$outcome.ExitCode }
+    if ($outcome.Code -eq 'ENVELOPE') {
         [Console]::Error.WriteLine("$($script:DiscoveryGateReasonPrefix) $($outcome.Reason)")
         return 2
     }

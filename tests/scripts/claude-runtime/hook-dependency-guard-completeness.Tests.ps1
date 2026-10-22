@@ -154,7 +154,7 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
     }
 
     It 'S8: names every exemption with its justification' {
-        @($script:Exemptions | Where-Object { $_.Kind -eq 'Design' } | ForEach-Object Id) | Should -Be @('D2', 'D3')
+        @($script:Exemptions | Where-Object { $_.Kind -eq 'Design' } | ForEach-Object Id) | Should -Be @('D2', 'D3', 'D4')
         foreach ($entry in $script:Exemptions) {
             $entry.Justification.StartsWith($entry.Id, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "exemption $($entry.Id) must carry its named justification"
             $entry.Justification.Length | Should -BeGreaterThan 40

@@ -58,10 +58,30 @@ function Get-DiscoveryHelperModulePath {
     return $published
 }
 
-try { Import-Module (Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryHelperModulePath -ModuleName 'DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+function Import-DiscoveryGateSelfHostedModule {
+    <#
+    .SYNOPSIS
+        Imports the shared helpers from this repository's .claude/lib layout when no published .codex/lib exists (exemption D4).
+    #>
+    [CmdletBinding()]
+    param()
+
+    $ScriptRoot = $PSScriptRoot
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+}
+
+# The published destination keeps the helpers beside .codex/hooks; this repository hosts them under .claude/lib.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+} else {
+    Import-DiscoveryGateSelfHostedModule
+}
 
 $script:DiscoveryGateReasonPrefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
 $script:DiscoveryGateHandlerPath = $PSCommandPath
@@ -100,10 +120,8 @@ function Invoke-DiscoveryArtifactGateDecision {
         [Parameter(Mandatory = $false)][AllowNull()][nullable[datetime]]$Now = $null,
         [Parameter(Mandatory = $false)][AllowNull()][string]$Nonce = $null
     )
-    if (Test-HookDependencyFailure) {
-        $reason = Get-HookDependencyFailureReason -ReasonPrefix $script:DiscoveryGateReasonPrefix
-        return [pscustomobject]@{ Decision = 'deny'; Code = 'DEPENDENCY'; Reason = $reason.Substring($script:DiscoveryGateReasonPrefix.Length).TrimStart(); Record = $null; RecordPath = $null }
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix $script:DiscoveryGateReasonPrefix
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     # Seams resolve only after the dependency check so a missing module denies
     # instead of raising while a default is evaluated.
@@ -132,6 +150,8 @@ function Invoke-DiscoveryArtifactGateEntryPoint {
     param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw)
 
     $outcome = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $PayloadRaw
+    # A dependency failure is already the PreToolUse deny decision.
+    if ($outcome -is [System.Collections.IDictionary]) { [Console]::Out.WriteLine(($outcome | ConvertTo-Json -Compress -Depth 5)); return 0 }
     if ($outcome.Decision -eq 'allow') { return 0 }
     if ($outcome.Code -eq 'ENVELOPE') {
         [Console]::Error.WriteLine("$($script:DiscoveryGateReasonPrefix) $($outcome.Reason)")

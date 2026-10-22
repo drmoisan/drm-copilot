@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "SubagentStart": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File .github/hooks/discovery-agent-start.ps1",
+        "windows": "pwsh -NoProfile -File .github/hooks/discovery-agent-start.ps1",
+        "timeout": 30
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File .github/hooks/discovery-pre-tool.ps1",
+        "windows": "pwsh -NoProfile -File .github/hooks/discovery-pre-tool.ps1",
+        "timeout": 30
+      },
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File .github/hooks/discovery-planning.ps1",
+        "windows": "pwsh -NoProfile -File .github/hooks/discovery-planning.ps1",
+        "timeout": 30
+      }
+    ],
+    "SubagentStop": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File .github/hooks/discovery-agent-stop.ps1",
+        "windows": "pwsh -NoProfile -File .github/hooks/discovery-agent-stop.ps1",
+        "timeout": 60
+      }
+    ]
+  }
+}

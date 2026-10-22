@@ -107,7 +107,7 @@ timeout = 15
 statusMessage = "Authorizing root epic entry"
 
 [[hooks.SubagentStart]]
-matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c|legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer"
 
 [[hooks.SubagentStart.hooks]]
 type = "command"
@@ -151,6 +151,12 @@ timeout = 30
 
 [[hooks.PreToolUse]]
 matcher = "^(Bash|shell_command|apply_patch|Edit|Write|mcp__.*)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1"'
+timeout = 30
 
 [[hooks.PreToolUse.hooks]]
 type = "command"
@@ -233,13 +239,37 @@ command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/
 command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-completion-consistency.ps1"'
 timeout = 30
 
+[[hooks.PreToolUse]]
+matcher = "^(Agent|Task|spawn_agent|run_subagent|delegate)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-planning-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-planning-gate.ps1"'
+timeout = 30
+
 [[hooks.SubagentStop]]
-matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c|legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer"
 
 [[hooks.SubagentStop.hooks]]
 type = "command"
 command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-codex-subagent-routing.ps1"'
 command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-codex-subagent-routing.ps1"'
+timeout = 30
+
+[[hooks.SubagentStop]]
+matcher = "legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer"
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-discovery-agent-output.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-discovery-agent-output.ps1"'
 timeout = 30
 
 [[hooks.SubagentStop]]

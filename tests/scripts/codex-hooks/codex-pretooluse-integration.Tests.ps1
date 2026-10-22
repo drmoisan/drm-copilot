@@ -154,6 +154,8 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $script:RegisteredHookNames | Should -Contain 'check-python-test-purity.ps1'
         $script:RegisteredHookNames | Should -Contain 'enforce-completion-consistency.ps1'
         $script:RegisteredHookNames | Should -Contain 'validate-bash.ps1'
+        $script:RegisteredHookNames | Should -Contain 'enforce-discovery-artifact-gate.ps1'
+        $script:RegisteredHookNames | Should -Contain 'enforce-discovery-planning-gate.ps1'
 
         foreach ($name in $script:RegisteredHookNames) {
             Test-Path -LiteralPath (Join-Path $script:HookRoot $name) -PathType Leaf |

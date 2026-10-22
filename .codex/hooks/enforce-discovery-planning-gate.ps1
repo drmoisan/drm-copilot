@@ -48,13 +48,36 @@ function Get-DiscoveryPlanningHelperModulePath {
     return $published
 }
 
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
-try { Import-Module (Get-DiscoveryPlanningHelperModulePath -ModuleName 'DiscoveryPlanning.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPlanning.psm1' -ErrorRecord $_ }
+function Import-DiscoveryPlanningSelfHostedModule {
+    <#
+    .SYNOPSIS
+        Imports the shared helpers from this repository's .claude/lib layout when no published .codex/lib exists (exemption D4).
+    #>
+    [CmdletBinding()]
+    param()
+
+    $ScriptRoot = $PSScriptRoot
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $ScriptRoot '../../.claude/lib/discovery-validation/DiscoveryPlanning.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPlanning.psm1' -ErrorRecord $_ }
+}
+
+# The published destination keeps the helpers beside .codex/hooks; this repository hosts them under .claude/lib.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthorization.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthorization.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPlanning.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPlanning.psm1' -ErrorRecord $_ }
+} else {
+    Import-DiscoveryPlanningSelfHostedModule
+}
 
 $script:DiscoveryPlanningReasonPrefix = 'DISCOVERY_PLANNING_GATE_BLOCKED:'
 
@@ -75,10 +98,8 @@ function Invoke-DiscoveryPlanningGateDecision {
         [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
         [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
     )
-    if (Test-HookDependencyFailure) {
-        $reason = Get-HookDependencyFailureReason -ReasonPrefix $script:DiscoveryPlanningReasonPrefix
-        return [pscustomobject]@{ Decision = 'deny'; Code = 'DEPENDENCY'; Reason = $reason.Substring($script:DiscoveryPlanningReasonPrefix.Length).TrimStart(); Receipt = $null; Prerequisite = $null }
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix $script:DiscoveryPlanningReasonPrefix
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
     if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
@@ -103,6 +124,8 @@ function Invoke-DiscoveryPlanningGateEntryPoint {
     param([Parameter(Mandatory = $false)][AllowNull()][AllowEmptyString()][string]$PayloadRaw)
 
     $outcome = Invoke-DiscoveryPlanningGateDecision -ToolInputRaw $PayloadRaw
+    # A dependency failure is already the PreToolUse deny decision.
+    if ($outcome -is [System.Collections.IDictionary]) { [Console]::Out.WriteLine(($outcome | ConvertTo-Json -Compress -Depth 5)); return 0 }
     if ($outcome.Decision -eq 'allow') { return 0 }
     if ($outcome.Code -eq 'ENVELOPE') {
         [Console]::Error.WriteLine("$($script:DiscoveryPlanningReasonPrefix) $($outcome.Reason)")

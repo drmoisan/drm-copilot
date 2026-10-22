@@ -74,6 +74,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'                 = 'CHECKPOINT_MONOTONIC_BLOCKED:'
             '.claude/hooks/enforce-completion-consistency.ps1'               = 'COMPLETION_CONSISTENCY_BLOCKED:'
             '.claude/hooks/enforce-discovery-artifact-gate.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            '.claude/hooks/enforce-discovery-planning-gate.ps1'              = 'DISCOVERY_PLANNING_GATE_BLOCKED:'
             '.claude/hooks/enforce-epic-invocation-origin.ps1'               = 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
             '.claude/hooks/enforce-epic-merge-gate.ps1'                      = 'EPIC_MERGE_GATE_BLOCKED:'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'                    = 'EPIC_WAVE_BARRIER_BLOCKED:'
