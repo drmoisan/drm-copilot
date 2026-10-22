@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
+
 import {
   type AuthorityStoreIO,
   DiscoveryAuthorityError,
 } from "../src/discovery-authority";
+import type { InputBytesReader } from "../src/discovery-input-manifest";
 
 /**
  * In-memory `AuthorityStoreIO` shared by the discovery invocation suites.
@@ -55,4 +58,25 @@ export class MemoryStoreIO implements AuthorityStoreIO {
       .filter((entry) => !entry.startsWith("read "))
       .map((entry) => entry.split(" ")[1]!);
   }
+}
+
+/** In-memory workspace byte reader keyed by absolute forward-slash path. */
+export class MemoryInputReader implements InputBytesReader {
+  readonly files = new Map<string, Uint8Array>();
+  readonly reads: string[] = [];
+
+  /** Store UTF-8 text at `path`. */
+  write(path: string, text: string): void {
+    this.files.set(path, new TextEncoder().encode(text));
+  }
+
+  readBytes(path: string): Uint8Array | null {
+    this.reads.push(path);
+    return this.files.get(path) ?? null;
+  }
+}
+
+/** Lowercase hex SHA-256 of UTF-8 `text`, for expected digests in tests. */
+export function digestOf(text: string): string {
+  return createHash("sha256").update(text, "utf8").digest("hex");
 }
