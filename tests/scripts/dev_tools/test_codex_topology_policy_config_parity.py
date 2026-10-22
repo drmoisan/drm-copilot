@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
+from scripts.dev_tools._codex_discovery_routing import DISCOVERY_OPERATIONS
 from scripts.dev_tools.resolve_codex_topology import (
     EPIC_CHILD_CONTEXTS,
     ESCALATION_PRECEDENCE,
@@ -65,6 +66,20 @@ def test_small_route_requires_resolved_typed_engineer_receipt() -> None:
         "required_route": "small",
         "delegation_agent_source": "resolved_language_typed_engineer",
     }
+
+
+def test_discovery_operations_match_canonical_config() -> None:
+    """Keep the fixed skill-to-role/kind/gate map synchronized with config (#980)."""
+
+    configured = _load_document()["discovery_operations"]
+
+    assert list(configured) == list(DISCOVERY_OPERATIONS)
+    # Normalize tuple-stored kinds to lists before comparing each row.
+    for skill_id, operation in DISCOVERY_OPERATIONS.items():
+        assert configured[skill_id] == {
+            **operation,
+            "permissible_artifact_kinds": list(operation["permissible_artifact_kinds"]),
+        }
 
 
 def test_tracked_and_bundled_routing_configs_are_byte_identical() -> None:

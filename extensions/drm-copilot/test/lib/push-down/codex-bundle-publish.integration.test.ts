@@ -56,12 +56,17 @@ describe("Codex bundle publish (real bundle, in-memory destination)", () => {
       "config/orchestration-handoff.schema.json",
       ".codex/lib/codex-routing/CodexTopology.psm1",
       ".codex/lib/codex-routing/CodexDeployment.psm1",
+      ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1",
       ".codex/scripts/Resolve-CodexTopology.ps1",
       ".codex/scripts/Resolve-CodexDeployment.ps1",
     ]) {
       expect(fsDouble.isFile(`/dest/${destination}`)).toBe(true);
     }
-    for (const moduleName of ["CodexTopology.psm1", "CodexDeployment.psm1"]) {
+    for (const moduleName of [
+      "CodexTopology.psm1",
+      "CodexDeployment.psm1",
+      "CodexDiscoveryRouting.psm1",
+    ]) {
       const published = Buffer.from(
         fsDouble.readTextFile(`/dest/.codex/lib/codex-routing/${moduleName}`),
         "utf8",

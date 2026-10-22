@@ -64,6 +64,10 @@ export const VIRTUAL_RESOURCE_PAIRS: ReadonlyArray<readonly [string, string]> =
       ".codex/lib/codex-routing/CodexDeployment.psm1",
       "lib/codex-routing/CodexDeployment.psm1",
     ],
+    [
+      ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1",
+      "lib/codex-routing/CodexDiscoveryRouting.psm1",
+    ],
   ];
 
 /** Destination roots answered from {@link VIRTUAL_RESOURCE_PAIRS} only. */

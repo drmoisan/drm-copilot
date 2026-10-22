@@ -4,10 +4,11 @@
 
 .DESCRIPTION
     Asserts that .claude/lib/codex-routing/CodexDeployment.psm1 and
-    .claude/lib/codex-routing/CodexTopology.psm1 are listed in the paths array of the core
+    .claude/lib/codex-routing/CodexTopology.psm1 and CodexDiscoveryRouting.psm1
+    are listed in the paths array of the core
     pack manifest
     (extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json),
-    so push-down delivers both modules under --packs core, and that each is mirrored
+    so push-down delivers all three modules under --packs core, and each is mirrored
     byte-identically into
     extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/.
     Mirrors tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Manifest.Tests.ps1.
@@ -28,7 +29,8 @@ BeforeAll {
     $script:Manifest = Get-Content -Path $manifestPath -Raw | ConvertFrom-Json
     $script:ExpectedPaths = @(
         '.claude/lib/codex-routing/CodexDeployment.psm1',
-        '.claude/lib/codex-routing/CodexTopology.psm1'
+        '.claude/lib/codex-routing/CodexTopology.psm1',
+        '.claude/lib/codex-routing/CodexDiscoveryRouting.psm1'
     )
 }
 
@@ -50,11 +52,15 @@ Describe 'CodexRouting core.json manifest membership' {
     }
 
     It 'lists each codex-routing module path exactly once' {
-        # Assert: neither module path is duplicated in the manifest paths.
+        # Assert: no module path is duplicated in the manifest paths.
         foreach ($expected in $script:ExpectedPaths) {
             $occurrences = @($script:Manifest.paths | Where-Object { $_ -eq $expected }).Count
             $occurrences | Should -Be 1
         }
+    }
+
+    It 'lists the discovery helper in core.json paths' {
+        @($script:Manifest.paths) | Should -Contain $script:ExpectedPaths[2]
     }
 
     It 'registers every on-disk codex-routing module so none is unregistered' {

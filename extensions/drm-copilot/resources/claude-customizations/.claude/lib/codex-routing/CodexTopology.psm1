@@ -53,6 +53,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot 'CodexDiscoveryRouting.psm1') -ErrorAction Stop
+
 # The three permitted execution contexts, the sorted tuple rendering the Python
 # message interpolates, and the two contexts that mark epic child work.
 $script:VALID_EXECUTION_CONTEXTS = @('standalone', 'epic_preparation_child', 'epic_execution_child')
@@ -249,11 +251,17 @@ function Resolve-CodexTopology {
         Whether the change is cross-cutting. Must be a boolean.
     .PARAMETER RootPersona
         An optional forced root persona, which requires a standalone context.
+    .PARAMETER InvocationKind
+        Exact ordinary or discovery selector. Defaults to ordinary routing.
+    .PARAMETER SkillId
+        Exact canonical discovery operation. Must be absent for ordinary routing.
     .OUTPUTS
         System.Collections.Hashtable with the twelve resolved keys:
         execution_context, languages, production_file_count, test_file_count,
         cross_cutting, root_persona, route, topology, logical_agent,
-        routing_reason, max_production_files, max_test_files.
+        routing_reason, max_production_files, max_test_files. Discovery adds
+        invocation_kind, skill_id, output_contract_version,
+        permissible_artifact_kinds, and gate_mode; it grants no write authority.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -281,7 +289,15 @@ function Resolve-CodexTopology {
 
         [Parameter(Mandatory = $false)]
         [AllowNull()]
-        [object] $RootPersona = $null
+        [object] $RootPersona = $null,
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [object] $InvocationKind = 'ordinary',
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [object] $SkillId = $null
     )
 
     if ($script:VALID_EXECUTION_CONTEXTS -cnotcontains $ExecutionContext) {
@@ -306,6 +322,13 @@ function Resolve-CodexTopology {
     $productionCount = [int]$ProductionFileCount
     $testCount = [int]$TestFileCount
     $isCrossCutting = [bool]$CrossCutting
+
+    # Discovery validates its closed selector before ordinary root/epic/count
+    # dispatch. A fixed specialist receipt conveys routing, never tool grants.
+    $discovery = Resolve-CodexDiscoveryTopology -InvocationKind $InvocationKind -SkillId $SkillId `
+        -Context $context -Language $languages -ProductionFileCount $productionCount `
+        -TestFileCount $testCount -CrossCutting $isCrossCutting -RootPersona $RootPersona
+    if ($null -ne $discovery) { return $discovery }
 
     # A forced root persona short-circuits all escalation logic and selects
     # itself, but only from a standalone context.

@@ -21,6 +21,8 @@ const VIRTUAL_CONTENT: Readonly<Record<string, string>> = {
   "config/orchestration-handoff.schema.json": '{"schema":1}\n',
   ".codex/lib/codex-routing/CodexTopology.psm1": "# topology module\n",
   ".codex/lib/codex-routing/CodexDeployment.psm1": "# deployment module\n",
+  ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1":
+    "# discovery routing module\n",
 };
 
 /**
@@ -87,6 +89,7 @@ describe("pushDownCustomizations (codex/agents)", () => {
       "config/orchestration-handoff.schema.json",
       "config/orchestration-routing.json",
       ".codex/lib/codex-routing/CodexDeployment.psm1",
+      ".codex/lib/codex-routing/CodexDiscoveryRouting.psm1",
       ".codex/lib/codex-routing/CodexTopology.psm1",
     ]);
     expect(fs.readTextFile("/dest/config/orchestration-routing.json")).toBe(

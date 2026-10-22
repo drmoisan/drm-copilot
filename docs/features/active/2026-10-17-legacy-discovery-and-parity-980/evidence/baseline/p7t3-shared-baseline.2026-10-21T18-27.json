@@ -1,0 +1,2391 @@
+{
+  "Timestamp": "2026-10-21T18-27",
+  "Command": "python SCRATCH/issue-980-p7t3-baseline.py",
+  "EXIT_CODE": 0,
+  "Output Summary": "Pre-edit snapshot captured for shared files, language/conversion predecessors, canonical dependencies, and current native/bundled Codex profiles. QA and implementation remain pending.",
+  "task": "P7-T3",
+  "status": "BASELINE_FROZEN_BEFORE_SHARED_EDITS",
+  "accepted_predecessor_commit": "bfe9999897ef2ed81ac8f3de7569b0038f6ab67d",
+  "preparation": {
+    "path": "docs/features/active/2026-10-17-legacy-discovery-and-parity-980/evidence/other/p7t3-routing-publication-preparation.2026-10-21T17-43.md",
+    "sha256": "371a76bfd33476a21287981d12160fb58cb78388aa4482acd7426ef93ea6d212"
+  },
+  "owned_shared_files": [
+    "config/orchestration-routing.json",
+    "tests/fixtures/codex_routing/topology.json",
+    "tests/fixtures/codex_routing/deployment.json"
+  ],
+  "bindings": {
+    ".agents/skills/adjudicate-unspecified-behavior/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/characterize-runtime-behavior/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-behavior-reconciliation/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-coverage-ledger/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-repo-inventory/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-runtime-characterization/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-validate-artifacts/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/discovery-workflow/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/extract-feature-contract/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/generate-acceptance-scenarios/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/initialize-discovery-workspace/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/inventory-legacy-system/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/reconcile-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/review-discovery-coverage/SKILL.md": {
+      "exists": false
+    },
+    ".agents/skills/validate-discovery-artifacts/SKILL.md": {
+      "exists": false
+    },
+    ".claude/agents/legacy-parity-analyst.md": {
+      "exists": true,
+      "sha256": "65e8a4f95cd9834b898117cf72085ca2fc718a8e93e3758f80f015b9c1db2d8a",
+      "bytes": 3067,
+      "physical_lines": 64
+    },
+    ".claude/agents/migration-coverage-reviewer.md": {
+      "exists": true,
+      "sha256": "0b1e318c821864fa9c780a9ad2503ba181f1bb0c943a01d2cfa271e3137ba381",
+      "bytes": 3060,
+      "physical_lines": 64
+    },
+    ".claude/agents/requirements-reconciler.md": {
+      "exists": true,
+      "sha256": "8801ba1ef6edba46bd21c0d801802974458fea3bd432a3bdf938ac245f7638a2",
+      "bytes": 2900,
+      "physical_lines": 63
+    },
+    ".claude/agents/runtime-characterization-analyst.md": {
+      "exists": true,
+      "sha256": "4d18a44f853420e8578767ad8c8f9d7aeeeeebd04eba5414199f74ccfa676dbe",
+      "bytes": 2972,
+      "physical_lines": 64
+    },
+    ".claude/lib/codex-routing/CodexDeployment.psm1": {
+      "exists": true,
+      "sha256": "aa29eb2c8afc86ff8524530b1ef66a87ca018aaf4af8a8ddf3d0f2b1a69ed106",
+      "bytes": 13483,
+      "physical_lines": 315
+    },
+    ".claude/lib/codex-routing/CodexDiscoveryRouting.psm1": {
+      "exists": false
+    },
+    ".claude/lib/codex-routing/CodexTopology.psm1": {
+      "exists": true,
+      "sha256": "f7458ee4c3f46db9dfc2a4b38f333f1e61a6c5738c11b74d36ad587fbdc2affd",
+      "bytes": 17389,
+      "physical_lines": 394
+    },
+    ".claude/skills/adjudicate-unspecified-behavior/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/characterize-runtime-behavior/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/discovery-behavior-reconciliation/SKILL.md": {
+      "exists": true,
+      "sha256": "0be7812181bece9de4100bca07e38d6bec0a3d47cfefd3170603058905f1dfab",
+      "bytes": 2508,
+      "physical_lines": 65
+    },
+    ".claude/skills/discovery-coverage-ledger/SKILL.md": {
+      "exists": true,
+      "sha256": "dec4327bd428c20064d56e5f40f1498f2037119b8b3325c4791358214ad97a47",
+      "bytes": 2667,
+      "physical_lines": 66
+    },
+    ".claude/skills/discovery-parity-matrix/SKILL.md": {
+      "exists": true,
+      "sha256": "1f3e1cf899b3c9bc8b679a1d6c90cb4d8ab2a3f3acd48ebc6c52bf1605e8c603",
+      "bytes": 2455,
+      "physical_lines": 63
+    },
+    ".claude/skills/discovery-repo-inventory/SKILL.md": {
+      "exists": true,
+      "sha256": "8cbab14058ea512732d2038e926cfd1119ff0aa6887deb5b97c906e0752c8d19",
+      "bytes": 3831,
+      "physical_lines": 80
+    },
+    ".claude/skills/discovery-runtime-characterization/SKILL.md": {
+      "exists": true,
+      "sha256": "7606582e48cd5437a7183e769a4b65f2b1ccfb26afad0581bfd2c9448139691b",
+      "bytes": 2483,
+      "physical_lines": 63
+    },
+    ".claude/skills/discovery-validate-artifacts/SKILL.md": {
+      "exists": true,
+      "sha256": "e3cda04805e5c7f8f38e9976d6e0af0cd5be69808919906dc54c1c01590cb070",
+      "bytes": 4151,
+      "physical_lines": 79
+    },
+    ".claude/skills/discovery-workflow/SKILL.md": {
+      "exists": true,
+      "sha256": "8b2336da1d942fe62e2cbb97abe6f6fa0f233200329d71a2a55d8df763ca4607",
+      "bytes": 6492,
+      "physical_lines": 146
+    },
+    ".claude/skills/extract-feature-contract/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/generate-acceptance-scenarios/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/initialize-discovery-workspace/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/inventory-legacy-system/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/reconcile-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/review-discovery-coverage/SKILL.md": {
+      "exists": false
+    },
+    ".claude/skills/validate-discovery-artifacts/SKILL.md": {
+      "exists": false
+    },
+    ".codex/agents/5.1-beast-adjusted.toml": {
+      "exists": true,
+      "sha256": "62477501d95a05e98f2962f227892d70636160d9e7440c6b28da3bbb49640dac",
+      "bytes": 1579,
+      "physical_lines": 23
+    },
+    ".codex/agents/5.1-thinking-beast-mode-adjusted.toml": {
+      "exists": true,
+      "sha256": "cffa159319c627d0f05cb74fa6f9e61a39a539fe3a5e6a449b3c2b725577f1f9",
+      "bytes": 1701,
+      "physical_lines": 23
+    },
+    ".codex/agents/api-architect.toml": {
+      "exists": true,
+      "sha256": "7c3675cb10c4d7f1758d21259de36375cb6d78fdf2fa2b6545252c022b028bce",
+      "bytes": 1632,
+      "physical_lines": 23
+    },
+    ".codex/agents/atomic-executor-c1.toml": {
+      "exists": true,
+      "sha256": "273bfd762f0633a693ce823454300c9ce2a3db8e99f2072af053d5a8ac3f2630",
+      "bytes": 9456,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-executor-c2.toml": {
+      "exists": true,
+      "sha256": "da2611fbb59ac84bcd37708880accf99920bae01e596af7d0bc32d9aafa4fb9d",
+      "bytes": 9460,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-executor-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+      "bytes": 9467,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-executor-c3.toml": {
+      "exists": true,
+      "sha256": "2460c2bdf20fa8b88136c16492ee3a810441f60be697432b1975882e8832d46a",
+      "bytes": 9458,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-executor-c4.toml": {
+      "exists": true,
+      "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+      "bytes": 9457,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-executor.toml": {
+      "exists": true,
+      "sha256": "86a77c8f9bfd86a42d83a058111c4e100aa275787c0d90f3ff53cb4d97e717de",
+      "bytes": 9455,
+      "physical_lines": 168
+    },
+    ".codex/agents/atomic-planner-c1.toml": {
+      "exists": true,
+      "sha256": "c9f0a41b2b5a2500a4aeb2be3c73531650881dffcf495bb30e3e9d285eae5384",
+      "bytes": 5616,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planner-c2.toml": {
+      "exists": true,
+      "sha256": "31284406af08802a591279be6d9ca0678bb97b981efadc366f5acf4538292e84",
+      "bytes": 5620,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planner-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "5bbf82472b1ff6b1a2e2114d0b2991682a0dcced73824ba0d8d7495e01ccefc9",
+      "bytes": 5627,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planner-c3.toml": {
+      "exists": true,
+      "sha256": "b677beac9849d9055c174dfe1a2127bf70e018d6e33f3cb33f33746fae97e357",
+      "bytes": 5618,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planner-c4.toml": {
+      "exists": true,
+      "sha256": "525ffcdd489fd16377468fc3490e9e2acd4115329323ac0746aacca5ae0fb4ca",
+      "bytes": 5617,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planner.toml": {
+      "exists": true,
+      "sha256": "f511dce381ef920810d54846434738af7e61c128af3c4c2e8921ccc3b016c35a",
+      "bytes": 5615,
+      "physical_lines": 108
+    },
+    ".codex/agents/atomic-planning.toml": {
+      "exists": true,
+      "sha256": "179182cdf673a657249219ff981a6bab056458140007dcbf60e771225c4c7632",
+      "bytes": 1144,
+      "physical_lines": 24
+    },
+    ".codex/agents/commentary-remediation.toml": {
+      "exists": true,
+      "sha256": "6624c1aeab6e2dc1e2cdf80f26e54dfd9621e2e3d593967c5ab19fd1bc7ade64",
+      "bytes": 1741,
+      "physical_lines": 23
+    },
+    ".codex/agents/commit-steward-c1.toml": {
+      "exists": true,
+      "sha256": "f46a509659c7c2d656fb13d17057a3945ee19a3cacc54245afe55e1e941929aa",
+      "bytes": 1006,
+      "physical_lines": 22
+    },
+    ".codex/agents/commit-steward-c2.toml": {
+      "exists": true,
+      "sha256": "0809d6a1d60e5e2d1b5d4a4ae6558e75b1d1cd0b7661b3b41deb97ac5cc583d9",
+      "bytes": 1010,
+      "physical_lines": 22
+    },
+    ".codex/agents/commit-steward-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "1fefb15a58233e1758f0ea6e664370dfb952781973dac658ddb891e50e11cd1a",
+      "bytes": 1017,
+      "physical_lines": 22
+    },
+    ".codex/agents/commit-steward-c3.toml": {
+      "exists": true,
+      "sha256": "2707d8a27c1db7e35a90a5744aab9ef7d202cfe3137eef3ce84e4c7057ba9326",
+      "bytes": 1008,
+      "physical_lines": 22
+    },
+    ".codex/agents/commit-steward-c4.toml": {
+      "exists": true,
+      "sha256": "94f60c8aecbc48b1f40b567252273227d200750ee336a0669c91d6fdbdb2e993",
+      "bytes": 1007,
+      "physical_lines": 22
+    },
+    ".codex/agents/commit-steward.toml": {
+      "exists": true,
+      "sha256": "8c08040549bf5240f0fb36aba0333c57bcc3176d11857fa09f686c310fc515bf",
+      "bytes": 1005,
+      "physical_lines": 22
+    },
+    ".codex/agents/csharp-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "7ab4f3c376ceeb97b869ed6b8c0f7a5eca65c76427ed2d81b1ef1fd9e41b5310",
+      "bytes": 1187,
+      "physical_lines": 24
+    },
+    ".codex/agents/csharp-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "6e5871c852a78782019efb48a101b802385f5bf53069a8ea2c30664079ffc501",
+      "bytes": 1343,
+      "physical_lines": 25
+    },
+    ".codex/agents/csharp-orchestrator.toml": {
+      "exists": true,
+      "sha256": "ecc0f03963450a42d5e9fab0ad8243d2448d8f50fb228d891365f7834445f9a2",
+      "bytes": 3217,
+      "physical_lines": 56
+    },
+    ".codex/agents/csharp-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "5c28619ac59bef843a7fa3dd3b9d685f19461a8b3cd967f6b4d3e61c14d7f4c7",
+      "bytes": 6204,
+      "physical_lines": 99
+    },
+    ".codex/agents/csharp-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "506c94e0230441e6c4c71c1241fb30dfff236e9ca173cf7f138510d0c18491f2",
+      "bytes": 6208,
+      "physical_lines": 99
+    },
+    ".codex/agents/csharp-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "958182bdb0e6ed512a55a22bf731716ca500a9827e6c682a526714bd5637ddfe",
+      "bytes": 6215,
+      "physical_lines": 99
+    },
+    ".codex/agents/csharp-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "e2758f2e917853f451375ef3628829f5084a987a255c96a2dbee61cb1b1104d0",
+      "bytes": 6206,
+      "physical_lines": 99
+    },
+    ".codex/agents/csharp-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "2d7a609da29ba3652d3715933a45bbab0157bd89d5f54d0cc97d5b4e56b7cca5",
+      "bytes": 6205,
+      "physical_lines": 99
+    },
+    ".codex/agents/csharp-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "74269fba79314e0a578430e5ed72d94b32d23bfcedf37d7868c33bbcb074e45d",
+      "bytes": 6203,
+      "physical_lines": 99
+    },
+    ".codex/agents/epic-orchestrator.toml": {
+      "exists": true,
+      "sha256": "6e7b4e9a484c9985b9675ce8284938315e47934941ab23bdd09ddcc1fa25628a",
+      "bytes": 5329,
+      "physical_lines": 99
+    },
+    ".codex/agents/epic-planner.toml": {
+      "exists": true,
+      "sha256": "f73a16c5ea975e877bddea9b642fb13213c4cb870de9b8bbb0d774e4c07749cb",
+      "bytes": 5446,
+      "physical_lines": 97
+    },
+    ".codex/agents/epic-review.toml": {
+      "exists": true,
+      "sha256": "d73feea157d72222a113b1231aafa90505206b439aaef4b0af6fee02673c109b",
+      "bytes": 2930,
+      "physical_lines": 52
+    },
+    ".codex/agents/expert-nextjs-developer.toml": {
+      "exists": true,
+      "sha256": "d512db12d578c5d0554bfb9bd6a65aeeee10ff9221cef303d98529530129cb90",
+      "bytes": 1694,
+      "physical_lines": 23
+    },
+    ".codex/agents/expert-react-frontend-engineer.toml": {
+      "exists": true,
+      "sha256": "ba332ae15d52494edfdbbb545531b66b30c5520228f6f4a6bb96df93ed115973",
+      "bytes": 1704,
+      "physical_lines": 23
+    },
+    ".codex/agents/feature-review.toml": {
+      "exists": true,
+      "sha256": "7c23c868acfa34ad91e862892e8f30865457130bc483d0ea2ec1b22b4c24f782",
+      "bytes": 9346,
+      "physical_lines": 149
+    },
+    ".codex/agents/feature-reviewer-c1.toml": {
+      "exists": true,
+      "sha256": "581758611f79c02aee5cd8044fbe2fd61fb67f9c77bc6c444dd01fddfbcfc0b2",
+      "bytes": 3775,
+      "physical_lines": 63
+    },
+    ".codex/agents/feature-reviewer-c2.toml": {
+      "exists": true,
+      "sha256": "f55cbd94b9f3dc8594ea58b853ede93f6fdae05816973acb9324e18033760c51",
+      "bytes": 3779,
+      "physical_lines": 63
+    },
+    ".codex/agents/feature-reviewer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "c48ca79730d732c1208488ce435ffd66ccf4cfb96df75b0a695ff7a73673f9d3",
+      "bytes": 3786,
+      "physical_lines": 63
+    },
+    ".codex/agents/feature-reviewer-c3.toml": {
+      "exists": true,
+      "sha256": "48f7f8940d4f4e4b972beccf3c07ce9eecf255c4c907aa91d0ef3bfd85d8631e",
+      "bytes": 3777,
+      "physical_lines": 63
+    },
+    ".codex/agents/feature-reviewer-c4.toml": {
+      "exists": true,
+      "sha256": "369eb3ec3d07dd6c8e17cb3edaae9870185ee34e2eed94ad344d69edb9d9c970",
+      "bytes": 3776,
+      "physical_lines": 63
+    },
+    ".codex/agents/feature-reviewer.toml": {
+      "exists": true,
+      "sha256": "ca35550fe800c7758042e3f6275cc71f64c7d0e6e5a92d1b65e0890271ce0f39",
+      "bytes": 3774,
+      "physical_lines": 63
+    },
+    ".codex/agents/gpt-5-beast-mode.toml": {
+      "exists": true,
+      "sha256": "1e9b340ed12baaa501afb81cf47ba2411f169b56cc88332b482d32c5c5e82aa2",
+      "bytes": 1722,
+      "physical_lines": 23
+    },
+    ".codex/agents/hlbpa.toml": {
+      "exists": true,
+      "sha256": "dc2baaf270461ba8ca61368c69f9e5eb28a0405ead6fd4a795ae354fc250493e",
+      "bytes": 1706,
+      "physical_lines": 23
+    },
+    ".codex/agents/legacy-parity-analyst-c1.toml": {
+      "exists": false
+    },
+    ".codex/agents/legacy-parity-analyst-c2.toml": {
+      "exists": false
+    },
+    ".codex/agents/legacy-parity-analyst-c3-elevated.toml": {
+      "exists": false
+    },
+    ".codex/agents/legacy-parity-analyst-c3.toml": {
+      "exists": false
+    },
+    ".codex/agents/legacy-parity-analyst-c4.toml": {
+      "exists": false
+    },
+    ".codex/agents/legacy-parity-analyst.toml": {
+      "exists": false
+    },
+    ".codex/agents/mentor.toml": {
+      "exists": true,
+      "sha256": "2867ba968dfe9f14b975fb80c4917c810f99f864e15926693df97aef6cab0a81",
+      "bytes": 1557,
+      "physical_lines": 23
+    },
+    ".codex/agents/migration-coverage-reviewer-c1.toml": {
+      "exists": false
+    },
+    ".codex/agents/migration-coverage-reviewer-c2.toml": {
+      "exists": false
+    },
+    ".codex/agents/migration-coverage-reviewer-c3-elevated.toml": {
+      "exists": false
+    },
+    ".codex/agents/migration-coverage-reviewer-c3.toml": {
+      "exists": false
+    },
+    ".codex/agents/migration-coverage-reviewer-c4.toml": {
+      "exists": false
+    },
+    ".codex/agents/migration-coverage-reviewer.toml": {
+      "exists": false
+    },
+    ".codex/agents/orchestrator-c1.toml": {
+      "exists": true,
+      "sha256": "4a58d03fd629393558bfbf811475b95c818e517fffc4199be7ee3d20b07393fd",
+      "bytes": 14264,
+      "physical_lines": 214
+    },
+    ".codex/agents/orchestrator-c2.toml": {
+      "exists": true,
+      "sha256": "cc263d97c63fc8b940fee60b4c15bfa61c1700d23cbec44cdb8989d0a2dc5885",
+      "bytes": 14268,
+      "physical_lines": 214
+    },
+    ".codex/agents/orchestrator-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "a351e6654f79f2ce40e4f13549317ae63ed2f45ff7bfb0e3e862e33f27e691d1",
+      "bytes": 14275,
+      "physical_lines": 214
+    },
+    ".codex/agents/orchestrator-c3.toml": {
+      "exists": true,
+      "sha256": "018578f0339cc93d4311a808e2747d67c19aeaf6c41837264b468cc68c833c3f",
+      "bytes": 14266,
+      "physical_lines": 214
+    },
+    ".codex/agents/orchestrator-c4.toml": {
+      "exists": true,
+      "sha256": "80083abfe81be6a9dca07f942e2ce3ab37e750261fb91901dd3e83ffb71d8e59",
+      "bytes": 14265,
+      "physical_lines": 214
+    },
+    ".codex/agents/orchestrator.toml": {
+      "exists": true,
+      "sha256": "8819de2413bd0410c946188b5f1cf3be9071c000d2ee4f7c3cfb75da3429d48e",
+      "bytes": 14263,
+      "physical_lines": 214
+    },
+    ".codex/agents/powershell-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "7a98efee468211f89b01b05e02e0d12bc3af1b31272d39af71f026ae51559370",
+      "bytes": 1359,
+      "physical_lines": 24
+    },
+    ".codex/agents/powershell-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "8aa21bc29b1067f3e3cf705b0f1f65494a51bd60accbdd59060e365ace8e72d2",
+      "bytes": 1362,
+      "physical_lines": 25
+    },
+    ".codex/agents/powershell-di-unit-test-engineer.toml": {
+      "exists": true,
+      "sha256": "385d10644f42c9b5dc13d4526b94dbc203b4dd127b039a9957991df504195c80",
+      "bytes": 1672,
+      "physical_lines": 24
+    },
+    ".codex/agents/powershell-orchestrator.toml": {
+      "exists": true,
+      "sha256": "1eb1c4aeb135e93b50223ae79c806881bd6a14945b49b2d035462728dd9c5125",
+      "bytes": 3317,
+      "physical_lines": 56
+    },
+    ".codex/agents/powershell-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "31ee5ac69d1782d3a0e3dacd6892fde6efc62ff85393c46b66c0fca972410d38",
+      "bytes": 7437,
+      "physical_lines": 109
+    },
+    ".codex/agents/powershell-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "e9a7c0cbc2cd4ecddc4cafdc235dcc5a0388f9980c5d761356095a37092264ce",
+      "bytes": 7441,
+      "physical_lines": 109
+    },
+    ".codex/agents/powershell-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "066cd316166bdcc729595406e5d0e8106e9f26cc77cdaf61ad66f9db63af7209",
+      "bytes": 7448,
+      "physical_lines": 109
+    },
+    ".codex/agents/powershell-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "8d8441b1f45b5ebe9277a779cd0270c2686c76739002fafe4d27089b1d92d8a6",
+      "bytes": 7439,
+      "physical_lines": 109
+    },
+    ".codex/agents/powershell-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "f01f5afd26c20e0aa0c321c1a5526f355e4df5b998d49ff0ad786f0b1990a509",
+      "bytes": 7438,
+      "physical_lines": 109
+    },
+    ".codex/agents/powershell-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "750cb7918adc6205595aa7efa06de7f2432e8158b4cd7724448a9765ab7678c5",
+      "bytes": 7436,
+      "physical_lines": 109
+    },
+    ".codex/agents/pr-author-c1.toml": {
+      "exists": true,
+      "sha256": "278e97bf6b444d4d681c2da8e41a746c930588e793cf7cd90d949da3ae1e7701",
+      "bytes": 1255,
+      "physical_lines": 28
+    },
+    ".codex/agents/pr-author-c2.toml": {
+      "exists": true,
+      "sha256": "7fb21e16c68726943e64cf97f0349ad048142ca750dca62c2e94ac3675b01ec0",
+      "bytes": 1259,
+      "physical_lines": 28
+    },
+    ".codex/agents/pr-author-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "8cc18f16087c4ec94eb2e04532b7e730ff4716238d6fe52b7b90a18594c76f5a",
+      "bytes": 1266,
+      "physical_lines": 28
+    },
+    ".codex/agents/pr-author-c3.toml": {
+      "exists": true,
+      "sha256": "598965692dc6d8de107f0bf3424032fbb5985020a701c761d35702805a504b9e",
+      "bytes": 1257,
+      "physical_lines": 28
+    },
+    ".codex/agents/pr-author-c4.toml": {
+      "exists": true,
+      "sha256": "36beb0f2fcc2b57f82e74ddc03aee5588636675bb8e9542f2b9b2a3d29bdb999",
+      "bytes": 1256,
+      "physical_lines": 28
+    },
+    ".codex/agents/pr-author.toml": {
+      "exists": true,
+      "sha256": "cd80b0e177c6dff9cabdc52d6a99ccdb33f0db2ecbad5ba95c8f5622f6e02997",
+      "bytes": 1254,
+      "physical_lines": 28
+    },
+    ".codex/agents/prd-feature-c1.toml": {
+      "exists": true,
+      "sha256": "0f2400ace85254824551f9d5930041395a308f6c6e511efcc0702e395ff1a0cc",
+      "bytes": 3035,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd-feature-c2.toml": {
+      "exists": true,
+      "sha256": "21ee1e52aaf343bbf1d2227afbedfeddfb77ac58ad48b9a23cde18a1b73d2985",
+      "bytes": 3039,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd-feature-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "a69488bf91792326ef2ecb54226c3dca5ae419dda3718ad4516643bfc0263c99",
+      "bytes": 3046,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd-feature-c3.toml": {
+      "exists": true,
+      "sha256": "d8744df35f6a56da95fb2cff35e64cf1a617818059f2fa382228b4308b425770",
+      "bytes": 3037,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd-feature-c4.toml": {
+      "exists": true,
+      "sha256": "1be2b4c38eead4da781eea18bd1bce9a2bc9043c0fa178d0714049c48e23bc99",
+      "bytes": 3036,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd-feature.toml": {
+      "exists": true,
+      "sha256": "83dcc851928a66c40e1047dabb22d8d9d0859f11ba0438ed7a75fea7208c2b06",
+      "bytes": 3034,
+      "physical_lines": 55
+    },
+    ".codex/agents/prd.toml": {
+      "exists": true,
+      "sha256": "abaea77dc0697f398ca201d51ffe9577fd395214315832fbc4790d8a3c53ac73",
+      "bytes": 1702,
+      "physical_lines": 23
+    },
+    ".codex/agents/pytest-unit-test-coding.toml": {
+      "exists": true,
+      "sha256": "47c3eebc4867243c26e38a5c1f4363f5c8d25ab3d2e91580948f48fcb2c15051",
+      "bytes": 1644,
+      "physical_lines": 24
+    },
+    ".codex/agents/python-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "d2b65ff48e57b079f7feee12f9e4a98062384057c760dd70159fc0b145fb479b",
+      "bytes": 1174,
+      "physical_lines": 24
+    },
+    ".codex/agents/python-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "cb1f18e430ed06ed9f1c0ce6ad94d93c2f5b112884f2a4d29e16804b7b465b0b",
+      "bytes": 1335,
+      "physical_lines": 25
+    },
+    ".codex/agents/python-execution-only-typed.toml": {
+      "exists": true,
+      "sha256": "dad6db0518879a84e736394f521cd29bf132a12fb0b64762b4de4d4af02b4ceb",
+      "bytes": 1710,
+      "physical_lines": 24
+    },
+    ".codex/agents/python-orchestrator.toml": {
+      "exists": true,
+      "sha256": "1a6e7f0289bf0066277fb38345c95d2ef06c9de701e3325d92685438c2a97fe4",
+      "bytes": 3239,
+      "physical_lines": 54
+    },
+    ".codex/agents/python-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "854ad7fb210e835330d2e840eed45ed25ce65041e945600039ef6d06188d0783",
+      "bytes": 6090,
+      "physical_lines": 102
+    },
+    ".codex/agents/python-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "cebd6304f84e8c33f8d72a7c09b0b0d6d8fc20421d1227c70d4409454c668815",
+      "bytes": 6094,
+      "physical_lines": 102
+    },
+    ".codex/agents/python-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363",
+      "bytes": 6101,
+      "physical_lines": 102
+    },
+    ".codex/agents/python-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "80beacdb0824690bd5f244dccf5b869127934310d9b7c90a27566fd6dd6eb5b6",
+      "bytes": 6092,
+      "physical_lines": 102
+    },
+    ".codex/agents/python-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+      "bytes": 6091,
+      "physical_lines": 102
+    },
+    ".codex/agents/python-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "0aea5baa98a07d53f0839e0e7e0413b98b513549209d6a23d38becd837afe79f",
+      "bytes": 6089,
+      "physical_lines": 102
+    },
+    ".codex/agents/requirements-reconciler-c1.toml": {
+      "exists": false
+    },
+    ".codex/agents/requirements-reconciler-c2.toml": {
+      "exists": false
+    },
+    ".codex/agents/requirements-reconciler-c3-elevated.toml": {
+      "exists": false
+    },
+    ".codex/agents/requirements-reconciler-c3.toml": {
+      "exists": false
+    },
+    ".codex/agents/requirements-reconciler-c4.toml": {
+      "exists": false
+    },
+    ".codex/agents/requirements-reconciler.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst-c1.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst-c2.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst-c3-elevated.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst-c3.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst-c4.toml": {
+      "exists": false
+    },
+    ".codex/agents/runtime-characterization-analyst.toml": {
+      "exists": false
+    },
+    ".codex/agents/staged-review.toml": {
+      "exists": true,
+      "sha256": "b07791b92264d8740a50ea73cfa3dd4365fd4401e8f829352a7c9c5db5e06972",
+      "bytes": 2958,
+      "physical_lines": 53
+    },
+    ".codex/agents/status-updater.toml": {
+      "exists": true,
+      "sha256": "89fc8e3459a8c8e0c382eb0f473d019c50e5cfb3240b8f56fd710c72336e88a8",
+      "bytes": 3003,
+      "physical_lines": 53
+    },
+    ".codex/agents/task-researcher-c1.toml": {
+      "exists": true,
+      "sha256": "fb8501d6d25173eddc3b1300fb08779da4fb6c8e9aef279b3a169b6fe01f6023",
+      "bytes": 5326,
+      "physical_lines": 111
+    },
+    ".codex/agents/task-researcher-c2.toml": {
+      "exists": true,
+      "sha256": "c4b6d7f77c326d318b57eb999ca23ae260cc705d0a676ecc7ae5b3e109993f56",
+      "bytes": 5330,
+      "physical_lines": 111
+    },
+    ".codex/agents/task-researcher-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "745b53656436d404d904619fa602673a39e51fc443b5fed1dcdc0e587b2bf117",
+      "bytes": 5337,
+      "physical_lines": 111
+    },
+    ".codex/agents/task-researcher-c3.toml": {
+      "exists": true,
+      "sha256": "a6fcb77a3c102c81bced469d275e7a93a25461943f6af880896758b98fdd05fe",
+      "bytes": 5328,
+      "physical_lines": 111
+    },
+    ".codex/agents/task-researcher-c4.toml": {
+      "exists": true,
+      "sha256": "6d2fc8feb19233eb0ad35676c8ec80e848b0950a005c3229b6ab97d48ede9723",
+      "bytes": 5327,
+      "physical_lines": 111
+    },
+    ".codex/agents/task-researcher.toml": {
+      "exists": true,
+      "sha256": "231c57e4d316112e5cf36f12f6f147a5737bd3ce6898be2dc8987f77b33a0199",
+      "bytes": 5325,
+      "physical_lines": 111
+    },
+    ".codex/agents/tdd-green.toml": {
+      "exists": true,
+      "sha256": "97232a8e7fcc4449e009a2f86481e70c0ffd48a055a86d84bd87f35440e09fcf",
+      "bytes": 1620,
+      "physical_lines": 23
+    },
+    ".codex/agents/tdd-red.toml": {
+      "exists": true,
+      "sha256": "c78b62180bee9832963eea30d8a78bc596dab06c81889f34d6683a3df1a6385d",
+      "bytes": 1642,
+      "physical_lines": 23
+    },
+    ".codex/agents/tdd-refactor.toml": {
+      "exists": true,
+      "sha256": "d62a422afb4801823a7b2f8df48606e711f258fe6285b49756daa2f8c29feffe",
+      "bytes": 1647,
+      "physical_lines": 23
+    },
+    ".codex/agents/typescript-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "ca8dbe1a925a639b14f032a8df6c03029f56e7401bfff37167093bf7f7d1ff6f",
+      "bytes": 3033,
+      "physical_lines": 50
+    },
+    ".codex/agents/typescript-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "3fce996eb22676303c608a5437ff89b2028e122e2d0aaa02665f578ab94cfc6c",
+      "bytes": 3037,
+      "physical_lines": 50
+    },
+    ".codex/agents/typescript-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "12bfc9d53cb3f6d1d4a32a3bb8711f5e123a48d91efd585b7f692e4996524a4d",
+      "bytes": 3044,
+      "physical_lines": 50
+    },
+    ".codex/agents/typescript-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "fc910d224518f7e173a6a558f031ead6bdcc22a1d0817046e92b1fdf0b3b33bd",
+      "bytes": 3035,
+      "physical_lines": 50
+    },
+    ".codex/agents/typescript-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "896ba78c69cc7f408c8b658272ad9b4587d1d48a55d011118f4cd5514745d68a",
+      "bytes": 3034,
+      "physical_lines": 50
+    },
+    ".codex/agents/typescript-engineer.toml": {
+      "exists": true,
+      "sha256": "e390b9176a79ae63e833fe9ca12a9ff1c259e2377fe5f5e4a86c6d97348f7849",
+      "bytes": 3032,
+      "physical_lines": 50
+    },
+    ".codex/agents/voidbeast-gpt41enhanced.toml": {
+      "exists": true,
+      "sha256": "13d5b6d8f2989d399ecbe49eaac2fb41dbf5ec491bb6bf401247b522f02945c7",
+      "bytes": 1918,
+      "physical_lines": 23
+    },
+    ".codex/scripts/Resolve-CodexDeployment.ps1": {
+      "exists": true,
+      "sha256": "71083e936934283935cd727291c43d5aaba1c7a3aa3e791b4590925065df6a6c",
+      "bytes": 4174,
+      "physical_lines": 87
+    },
+    ".codex/scripts/Resolve-CodexTopology.ps1": {
+      "exists": true,
+      "sha256": "71a29fe96d7f70f73b4632ac7a3fab029d558ebcf2f75c8287a09c15b06ac578",
+      "bytes": 4430,
+      "physical_lines": 96
+    },
+    ".codex/scripts/codex-routing-cli-common.ps1": {
+      "exists": true,
+      "sha256": "b9e2952a70f9e7b18dc424bb41cc84b16a0677e4732ce55110b12928842fd04d",
+      "bytes": 14161,
+      "physical_lines": 370
+    },
+    ".github/agents/legacy-parity-analyst.agent.md": {
+      "exists": true,
+      "sha256": "d509368846ec2202fff7e839018b25ff0bfa288ce1c629c1ffda67a1a6ab5afb",
+      "bytes": 6905,
+      "physical_lines": 122
+    },
+    ".github/agents/migration-coverage-reviewer.agent.md": {
+      "exists": true,
+      "sha256": "67b9d95b3c4ffecc2b88b632d9bd39560b369204badfc15061c42e25e42def71",
+      "bytes": 7276,
+      "physical_lines": 128
+    },
+    ".github/agents/requirements-reconciler.agent.md": {
+      "exists": true,
+      "sha256": "0f3e4ea4164f669ea6e0c4621150dd56a79c581d319ebbac60ca45cc58fec0df",
+      "bytes": 7859,
+      "physical_lines": 138
+    },
+    ".github/agents/runtime-characterization-analyst.agent.md": {
+      "exists": true,
+      "sha256": "bbc9dacd58b4a85c235b3ee280e3d4650dfe081d7144a19ad947c617a5087d10",
+      "bytes": 7239,
+      "physical_lines": 124
+    },
+    ".github/skills/adjudicate-unspecified-behavior/SKILL.md": {
+      "exists": true,
+      "sha256": "37bd93207253c28ed79beca4e56c7f8c3dfa97b7571c6eb40a75bd27e1401e45",
+      "bytes": 9354,
+      "physical_lines": 135
+    },
+    ".github/skills/characterize-runtime-behavior/SKILL.md": {
+      "exists": true,
+      "sha256": "75ac4af39feb85330a8816761606f6d647adb72c935997ee144eb409ca4b9887",
+      "bytes": 8903,
+      "physical_lines": 134
+    },
+    ".github/skills/discovery-behavior-reconciliation/SKILL.md": {
+      "exists": true,
+      "sha256": "64a53ec1bcecd0911aa7b07269bdadb41e3c631cfb5844c2c7468d113b7982ca",
+      "bytes": 1809,
+      "physical_lines": 46
+    },
+    ".github/skills/discovery-coverage-ledger/SKILL.md": {
+      "exists": true,
+      "sha256": "100361719990e26f3013ee964b568dfc990018c24d0d00d7a7b005a4b338cd5c",
+      "bytes": 2190,
+      "physical_lines": 50
+    },
+    ".github/skills/discovery-parity-matrix/SKILL.md": {
+      "exists": true,
+      "sha256": "3248b2f3a50717952aa85bf9dbcc487e5c5c45c4b49990fedd630e94b0b372b9",
+      "bytes": 1794,
+      "physical_lines": 46
+    },
+    ".github/skills/discovery-repo-inventory/SKILL.md": {
+      "exists": true,
+      "sha256": "38dedd3a4d3414229b734ee3622f02e3fd68d51f62528c42e63317f31a9a70be",
+      "bytes": 1770,
+      "physical_lines": 46
+    },
+    ".github/skills/discovery-runtime-characterization/SKILL.md": {
+      "exists": true,
+      "sha256": "914b9ee9fbfcad269acaaa0aa219c6736d45e89473ca58bc9072bc44aa766663",
+      "bytes": 1830,
+      "physical_lines": 46
+    },
+    ".github/skills/discovery-validate-artifacts/SKILL.md": {
+      "exists": true,
+      "sha256": "8792fb05fcea406b66d751126c9dd68eeb65226a7be4bffe2fcae3c718fd3961",
+      "bytes": 1786,
+      "physical_lines": 46
+    },
+    ".github/skills/discovery-workflow/SKILL.md": {
+      "exists": true,
+      "sha256": "b46d9c502f6ff694023fd3a79ceb95772f1b8f1edbafe3d4b39e4aa8e2e5cba0",
+      "bytes": 3038,
+      "physical_lines": 62
+    },
+    ".github/skills/extract-feature-contract/SKILL.md": {
+      "exists": true,
+      "sha256": "c7d46a2d4e9efdccdbdade35b4281d8ebdcf3f5d2d4a7c991534f4fc222fbda4",
+      "bytes": 8726,
+      "physical_lines": 133
+    },
+    ".github/skills/generate-acceptance-scenarios/SKILL.md": {
+      "exists": true,
+      "sha256": "3fb78114ca75a6de8d2d4b1055df77654c7ee988bad56026e9e733d70ed57ccf",
+      "bytes": 8763,
+      "physical_lines": 132
+    },
+    ".github/skills/initialize-discovery-workspace/SKILL.md": {
+      "exists": true,
+      "sha256": "9252381ca701197c8fab6ff5387de78839f52a6daea53a569fc4b6bae58beaa6",
+      "bytes": 9240,
+      "physical_lines": 131
+    },
+    ".github/skills/inventory-legacy-system/SKILL.md": {
+      "exists": true,
+      "sha256": "697e04ad7a16fe3f1f9d35ac09605075233dfba0d4f285feebd9d6717e5aaaff",
+      "bytes": 8532,
+      "physical_lines": 131
+    },
+    ".github/skills/reconcile-parity-matrix/SKILL.md": {
+      "exists": true,
+      "sha256": "bcb19f19ccdd55e776a2beb75a02540286a3e917d2fc73cce71de48088ba48b2",
+      "bytes": 8443,
+      "physical_lines": 131
+    },
+    ".github/skills/review-discovery-coverage/SKILL.md": {
+      "exists": true,
+      "sha256": "e73b19f1ed2f1f76f5df2a610e91562bda13a3ba19d85eca447843a0f6909849",
+      "bytes": 8187,
+      "physical_lines": 129
+    },
+    ".github/skills/validate-discovery-artifacts/SKILL.md": {
+      "exists": true,
+      "sha256": "da6db6789ea9c173d405d636bcfca1159291744b6662794fdcbcc22455008c19",
+      "bytes": 8318,
+      "physical_lines": 127
+    },
+    "config/orchestration-routing.json": {
+      "exists": true,
+      "sha256": "e4479577ea684b4b4fa6a94f3adc4d746dfe96abcf345dd9e7bd3f8dd14fedc5",
+      "bytes": 11324,
+      "physical_lines": 356,
+      "raw": {
+        "encoding": "gzip-base64",
+        "data": "H4sIAAAAAAAC/+1aS4/cuBG+z68gGjnYQGvseSAI7JMxSAAHSLDY7G2xENhSSc0dilRIqmc6C//3VBX1lrpnxmvHRrCXwTSfxaqvqj4W9duFEJs/+WwPldy8E5t9CLV/9+bNr96aJDZfWle+yZ0swpvrt9dvk6vrN+34LU0+gPPKGpx8xb+dbQJ4/Pkb/sLfvpJa9z+xIQefOVWHOGnzD2WsS2STqyBqGfaisE48WHcvlPEqBxH2IGRda5XJnQahpSkbWYLYNXkJ4ZKl4IUzm8NjGmxttS2PqYN/N8pBBSaMticJIQPcP72HIwmwmMa9vl+XZ/BSeQqPkDUkeZpZE+CRVt74IE0utTWwOocVwuNYE6MhOWgoJS+HBzIh9bZxGY914K0+4OzuuGk41iSAKZUBcJt2lU/96fv9eCkywM/DTjLYSmVJjasZnLxd9MSD2UlXATI0DhIHBwUP3Y6/LHf090rr2Y7WIUZ8cDLA2pq1s5WlkydaFZAdMw0rUpG8CWnaySxM+rMMalR7BgliKYBTMqFB98qU43G1S1pDJdIFVeAyfta/kx6SncO19kkFrgRuOXPaKqsRLXZ+YAMPaW0D6l5JjXYK7jjZqe8KNlXeN5Pz0mSUTR0gbTWUFlbnU1NlVmvIQlq7Hn2j3oPUKkdtp4PmGVj9sbsTXYxws9EST3zGO//WaC1akQQ65q4pZ16K6GY3ZXQn3LfwzFZ3nkQvJXtDcA08D7tB+nvEoAdJB3NT8+VJK9wJ9Hw22qcgkU3YW/eHC/w/ugCliFzJFvGnHOFHhgVqWJUloA7EaJrQ1tZLuH/nofirAuzF2Pkalq0d1NI9Zdm/1ioTo6ExvuUOkWjE7iigHsz1TvReuxVdTNr2ATK3WUN8w29F1K7geagwbDA57VJoVe6DQGeX5HAYVI0+XooPcXjPL7bihx9FjDr97LuPorJGBW4SkgJyE4QthM9sDTwkhwIcoTNY5k0k+7CoqPfo11vhqVN5wcxEdMFZGEtbUHxG6UVmq1oDTVsL5JnqAnkhtf8OIvk3D83fYbT8TK9BYKIvnuPsP7RDBipAN4K80QRMZXKoAf+YIDBsVB5bEI47LX1InMxV4xFcCOzghcyc9V50WzKjCA7Avxcgsz3PR0/whOdKKjNeXB/Fg8LtEba4AZSt98Y8dp58vACzg+qs+xKkoDtqcgKC3wdpwDSDKsZRGFSSoCqUSFY1LXkgUFrjvxHF+BppgoLkk/lhBehSdFjMjgLhV+8pGGd7pfMuI5xBeARvgYZCWB+UxOX8XlLsfiman0+lvzSYOTX+AeRvDuSLFsybyuagMatolR2HEswM0H/H6xmxFJY8bxP9owpHbEAOwWsIDyQeZX/xE3GFnbbZvSjtAZzxTFqYYAwljHZeUOAuxUcM/UQoAqI6sgxl6iZEHtM2tP0mdnGEn+3camRDa6ImKLsNOtzspbpvBsfwFinCoMSNrZvBdpuCakdRa62NNsO5x87vM6m5AnN3hY6l0DE13XsryPbSKOwU9E8Jfe7ZwV4eFA6BAnEcLsXdNd4HcKD6D+Tzq3M7Fy1eKBNpmow3Z+Ebh6YFnH8jOGYkSGwCxZl2UtgjK5Mase6j1g4SUW9QqZ2DbHmbTp428qBSGw1iZxuT4wTwuMMtCn4AjeaodqpsbON5akfNkj3Iw7HbNyKZBCGDV9YjN5Q11+LIMO9pOSKTlLDxSAwNpM2/tihjk5OxAaEjCrwquQQDaQb5KKp5VRo5c5GhYkd8R1ZslQxZhFdFBEQa4a5tiQF8Ox7O28xCY4wb6Lfcs7nj0zGzGBYVsb6G6kBOHZk3GZ+2SSTbl/TAG4pXP121yvWvLzf9Jp+2509AgZZkD/YeTIpC5Hoas14sPq1IwSyT8ebAK4tuZT6BxRGYu5ArO/JzD8YrIo+c1/wLpEeo4RqOUh4dgp3yc8T/iIhF3WV4gqhgUj/xwn55kjsuzifAuB2AQjxLbkf4f5H45BJptFrauU0agf7iM3xofVHUzQ4Dbu+GoqUJlaQmjzfC/LQzPl92j6pAqQuFf/oAk0KuwrrkE5I7F30UomiFSUSyBgTt0oe4aThq49zzBR9iZ4qWxcbougf4HLlHgTguthW0FGMEw0olJzFzEaRj+wuExyu9J3kxW1A0Sym8fY7cXWmAfTThIEnixFXj76Vsq3R1yFt0M+TYNE5gd1f8jjNNjnfXjKBZiry7odZpory7pbZRuhwVU2JtISUOoOXxDGX+QM81XS5AqFPgpxVbZiL6tTAXtXGsZxSU/gDzIQKR50TOwN3Ev2mIVj6QTzHDvRT/tG184wYebrqmXZt9YvCe5JyXFedOFChOV43nxY4FQyTROJLfDDJ11pwYYMbuYnX9JLv7F3jPtBrzrW4pVVuQnxqBtILqxLtI8iCPwqOv4I2bgxhyU3Kihz2wEknnRZ/waWKuPP3OxSsH5H45ax3zaFW3MQRB9RpNd5BK88xXDXFN6RNF7WjIHgPiFb/uUS7DfRYwe93TwLH0nEm7xTe9hmZveU8Q4TsanRgZMyHnI/ZOCn54EWgQTMRVURUtCZaP+Cfy0yitMopKNEKRS/buLToBZuWKAu884u4qQcJ0iuouHhjHAF17aeQ7WDoqX6Z8AZ31j5bl3gkR7p8YI0z82LHrI14LzfT9NMd7DWZNOkKKIZhwsEiUm0o+poNKOWvRwjezIQEvN6udzLEwY7CXkrGiJAk/gyann0Fr+4BJeQ+TN+ffKfT15wvdS/Ok4Bnd/uvvQdNRkicFpv7oTs8RepYdT0n99pzUb89JPYizlHmSyMZFkHSxzEqJJLoQO86qV/5uD6TYxjei1Fkb0hohY41cq7WsJKZZDWathtMVn5SvZqaCQjYabUXGaAd19WTa/na0D2IiPznwLwt0AF2kozpq+qSCqzALrU2UOmiMuL1WSG59UNW4gNQS+C5iDe0N8uy6ti6MPpmYz2oJ7OQLjBFWu5w2zfo9QmNwRDtmgIeZhdBnflIyy1PPqtZMkhRmE22PfK1G0dgvkEL1hLDPTTG9cLEFJIJpVpfvchEn9mmyg/cCHukS02Yo3ZSe35oqSj0IryMv25ghtXeSIMflkk5B5YydzO6Fx2barU9v7dBlMSe7GlnrevT/zfj/BI93QDyMnCu7nVrimyTQcRBJEbnSwySLzljiu3lLF6rWKX6rtAXJHzmyb4pCPTL0rsb47flkiWHxz4lGsy260x4iKV7t0IVovLYPy4jPt4j1Xa9P73p5lXirn7ctPak31crONyd3vvkyO+9VuV/Z9/bkvrdn9CwpFD/zxPJxNU0x3tMO72sYGOtgxTHOivSUIoZLEr0xzl/QuboKMdkQDzeTh8uzHnjao7aLEUuf7If8svrQEPfsXQeDLpfW3rEdL6Z36pGa47B0qC3NQ3KrMYxtqKxsycDm0X+x4OTlor2JpqOv/1Tu0/7BgH6bjEzTPe4sRG7Zwogo/HaxRhNOYPfLIBeJAw5dJv4FH/kfSjGJohiNCaTdW1hayErRPXOcEFZfxE6VAU5+obMM5wNLPvHNw2pBYfQQN/qqtapUSHyAB2Rgo6Gr96GVe9DJIes8f4Xfzwg1laM+XXy6+C9v6RVmPCwAAA=="
+      }
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/agents/legacy-parity-analyst.md": {
+      "exists": true,
+      "sha256": "65e8a4f95cd9834b898117cf72085ca2fc718a8e93e3758f80f015b9c1db2d8a",
+      "bytes": 3067,
+      "physical_lines": 64
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/agents/migration-coverage-reviewer.md": {
+      "exists": true,
+      "sha256": "0b1e318c821864fa9c780a9ad2503ba181f1bb0c943a01d2cfa271e3137ba381",
+      "bytes": 3060,
+      "physical_lines": 64
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/agents/requirements-reconciler.md": {
+      "exists": true,
+      "sha256": "8801ba1ef6edba46bd21c0d801802974458fea3bd432a3bdf938ac245f7638a2",
+      "bytes": 2900,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/agents/runtime-characterization-analyst.md": {
+      "exists": true,
+      "sha256": "4d18a44f853420e8578767ad8c8f9d7aeeeeebd04eba5414199f74ccfa676dbe",
+      "bytes": 2972,
+      "physical_lines": 64
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/CodexDeployment.psm1": {
+      "exists": true,
+      "sha256": "aa29eb2c8afc86ff8524530b1ef66a87ca018aaf4af8a8ddf3d0f2b1a69ed106",
+      "bytes": 13483,
+      "physical_lines": 315
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/CodexDiscoveryRouting.psm1": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/lib/codex-routing/CodexTopology.psm1": {
+      "exists": true,
+      "sha256": "f7458ee4c3f46db9dfc2a4b38f333f1e61a6c5738c11b74d36ad587fbdc2affd",
+      "bytes": 17389,
+      "physical_lines": 394
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/adjudicate-unspecified-behavior/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/characterize-runtime-behavior/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-behavior-reconciliation/SKILL.md": {
+      "exists": true,
+      "sha256": "0be7812181bece9de4100bca07e38d6bec0a3d47cfefd3170603058905f1dfab",
+      "bytes": 2508,
+      "physical_lines": 65
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-coverage-ledger/SKILL.md": {
+      "exists": true,
+      "sha256": "dec4327bd428c20064d56e5f40f1498f2037119b8b3325c4791358214ad97a47",
+      "bytes": 2667,
+      "physical_lines": 66
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-parity-matrix/SKILL.md": {
+      "exists": true,
+      "sha256": "1f3e1cf899b3c9bc8b679a1d6c90cb4d8ab2a3f3acd48ebc6c52bf1605e8c603",
+      "bytes": 2455,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-repo-inventory/SKILL.md": {
+      "exists": true,
+      "sha256": "8cbab14058ea512732d2038e926cfd1119ff0aa6887deb5b97c906e0752c8d19",
+      "bytes": 3831,
+      "physical_lines": 80
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-runtime-characterization/SKILL.md": {
+      "exists": true,
+      "sha256": "7606582e48cd5437a7183e769a4b65f2b1ccfb26afad0581bfd2c9448139691b",
+      "bytes": 2483,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-validate-artifacts/SKILL.md": {
+      "exists": true,
+      "sha256": "e3cda04805e5c7f8f38e9976d6e0af0cd5be69808919906dc54c1c01590cb070",
+      "bytes": 4151,
+      "physical_lines": 79
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/discovery-workflow/SKILL.md": {
+      "exists": true,
+      "sha256": "8b2336da1d942fe62e2cbb97abe6f6fa0f233200329d71a2a55d8df763ca4607",
+      "bytes": 6492,
+      "physical_lines": 146
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/extract-feature-contract/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/generate-acceptance-scenarios/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/initialize-discovery-workspace/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/inventory-legacy-system/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/reconcile-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/review-discovery-coverage/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/.claude/skills/validate-discovery-artifacts/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json": {
+      "exists": true,
+      "sha256": "e4479577ea684b4b4fa6a94f3adc4d746dfe96abcf345dd9e7bd3f8dd14fedc5",
+      "bytes": 11324,
+      "physical_lines": 356
+    },
+    "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json": {
+      "exists": true,
+      "sha256": "2baa9999cdb93fa212f22f3764f6134a908ef0320102c9e5aaa830580e7c7a1f",
+      "bytes": 12848,
+      "physical_lines": 235
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/adjudicate-unspecified-behavior/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/characterize-runtime-behavior/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-behavior-reconciliation/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-coverage-ledger/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-repo-inventory/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-runtime-characterization/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-validate-artifacts/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/discovery-workflow/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/extract-feature-contract/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/generate-acceptance-scenarios/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/initialize-discovery-workspace/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/inventory-legacy-system/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/reconcile-parity-matrix/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/review-discovery-coverage/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/validate-discovery-artifacts/SKILL.md": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/5.1-beast-adjusted.toml": {
+      "exists": true,
+      "sha256": "62477501d95a05e98f2962f227892d70636160d9e7440c6b28da3bbb49640dac",
+      "bytes": 1579,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/5.1-thinking-beast-mode-adjusted.toml": {
+      "exists": true,
+      "sha256": "cffa159319c627d0f05cb74fa6f9e61a39a539fe3a5e6a449b3c2b725577f1f9",
+      "bytes": 1701,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/api-architect.toml": {
+      "exists": true,
+      "sha256": "7c3675cb10c4d7f1758d21259de36375cb6d78fdf2fa2b6545252c022b028bce",
+      "bytes": 1632,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml": {
+      "exists": true,
+      "sha256": "273bfd762f0633a693ce823454300c9ce2a3db8e99f2072af053d5a8ac3f2630",
+      "bytes": 9456,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml": {
+      "exists": true,
+      "sha256": "da2611fbb59ac84bcd37708880accf99920bae01e596af7d0bc32d9aafa4fb9d",
+      "bytes": 9460,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "70a346f46bbe7fb411dd05eb077acf6e8e69b0b2992f2761e72ff52295ef6c0c",
+      "bytes": 9467,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml": {
+      "exists": true,
+      "sha256": "2460c2bdf20fa8b88136c16492ee3a810441f60be697432b1975882e8832d46a",
+      "bytes": 9458,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml": {
+      "exists": true,
+      "sha256": "ac681ebf70607a2d00c76e29d142df0a05751c0c375f0ee878cec30b29c044b9",
+      "bytes": 9457,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml": {
+      "exists": true,
+      "sha256": "86a77c8f9bfd86a42d83a058111c4e100aa275787c0d90f3ff53cb4d97e717de",
+      "bytes": 9455,
+      "physical_lines": 168
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml": {
+      "exists": true,
+      "sha256": "c9f0a41b2b5a2500a4aeb2be3c73531650881dffcf495bb30e3e9d285eae5384",
+      "bytes": 5616,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml": {
+      "exists": true,
+      "sha256": "31284406af08802a591279be6d9ca0678bb97b981efadc366f5acf4538292e84",
+      "bytes": 5620,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "5bbf82472b1ff6b1a2e2114d0b2991682a0dcced73824ba0d8d7495e01ccefc9",
+      "bytes": 5627,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml": {
+      "exists": true,
+      "sha256": "b677beac9849d9055c174dfe1a2127bf70e018d6e33f3cb33f33746fae97e357",
+      "bytes": 5618,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml": {
+      "exists": true,
+      "sha256": "525ffcdd489fd16377468fc3490e9e2acd4115329323ac0746aacca5ae0fb4ca",
+      "bytes": 5617,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner.toml": {
+      "exists": true,
+      "sha256": "f511dce381ef920810d54846434738af7e61c128af3c4c2e8921ccc3b016c35a",
+      "bytes": 5615,
+      "physical_lines": 108
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planning.toml": {
+      "exists": true,
+      "sha256": "179182cdf673a657249219ff981a6bab056458140007dcbf60e771225c4c7632",
+      "bytes": 1144,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commentary-remediation.toml": {
+      "exists": true,
+      "sha256": "6624c1aeab6e2dc1e2cdf80f26e54dfd9621e2e3d593967c5ab19fd1bc7ade64",
+      "bytes": 1741,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c1.toml": {
+      "exists": true,
+      "sha256": "f46a509659c7c2d656fb13d17057a3945ee19a3cacc54245afe55e1e941929aa",
+      "bytes": 1006,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c2.toml": {
+      "exists": true,
+      "sha256": "0809d6a1d60e5e2d1b5d4a4ae6558e75b1d1cd0b7661b3b41deb97ac5cc583d9",
+      "bytes": 1010,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "1fefb15a58233e1758f0ea6e664370dfb952781973dac658ddb891e50e11cd1a",
+      "bytes": 1017,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c3.toml": {
+      "exists": true,
+      "sha256": "2707d8a27c1db7e35a90a5744aab9ef7d202cfe3137eef3ce84e4c7057ba9326",
+      "bytes": 1008,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c4.toml": {
+      "exists": true,
+      "sha256": "94f60c8aecbc48b1f40b567252273227d200750ee336a0669c91d6fdbdb2e993",
+      "bytes": 1007,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward.toml": {
+      "exists": true,
+      "sha256": "8c08040549bf5240f0fb36aba0333c57bcc3176d11857fa09f686c310fc515bf",
+      "bytes": 1005,
+      "physical_lines": 22
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "7ab4f3c376ceeb97b869ed6b8c0f7a5eca65c76427ed2d81b1ef1fd9e41b5310",
+      "bytes": 1187,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "6e5871c852a78782019efb48a101b802385f5bf53069a8ea2c30664079ffc501",
+      "bytes": 1343,
+      "physical_lines": 25
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-orchestrator.toml": {
+      "exists": true,
+      "sha256": "ecc0f03963450a42d5e9fab0ad8243d2448d8f50fb228d891365f7834445f9a2",
+      "bytes": 3217,
+      "physical_lines": 56
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "5c28619ac59bef843a7fa3dd3b9d685f19461a8b3cd967f6b4d3e61c14d7f4c7",
+      "bytes": 6204,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "506c94e0230441e6c4c71c1241fb30dfff236e9ca173cf7f138510d0c18491f2",
+      "bytes": 6208,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "958182bdb0e6ed512a55a22bf731716ca500a9827e6c682a526714bd5637ddfe",
+      "bytes": 6215,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "e2758f2e917853f451375ef3628829f5084a987a255c96a2dbee61cb1b1104d0",
+      "bytes": 6206,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "2d7a609da29ba3652d3715933a45bbab0157bd89d5f54d0cc97d5b4e56b7cca5",
+      "bytes": 6205,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "74269fba79314e0a578430e5ed72d94b32d23bfcedf37d7868c33bbcb074e45d",
+      "bytes": 6203,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml": {
+      "exists": true,
+      "sha256": "6e7b4e9a484c9985b9675ce8284938315e47934941ab23bdd09ddcc1fa25628a",
+      "bytes": 5329,
+      "physical_lines": 99
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-planner.toml": {
+      "exists": true,
+      "sha256": "f73a16c5ea975e877bddea9b642fb13213c4cb870de9b8bbb0d774e4c07749cb",
+      "bytes": 5446,
+      "physical_lines": 97
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-review.toml": {
+      "exists": true,
+      "sha256": "d73feea157d72222a113b1231aafa90505206b439aaef4b0af6fee02673c109b",
+      "bytes": 2930,
+      "physical_lines": 52
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/expert-nextjs-developer.toml": {
+      "exists": true,
+      "sha256": "d512db12d578c5d0554bfb9bd6a65aeeee10ff9221cef303d98529530129cb90",
+      "bytes": 1694,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/expert-react-frontend-engineer.toml": {
+      "exists": true,
+      "sha256": "ba332ae15d52494edfdbbb545531b66b30c5520228f6f4a6bb96df93ed115973",
+      "bytes": 1704,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml": {
+      "exists": true,
+      "sha256": "7c23c868acfa34ad91e862892e8f30865457130bc483d0ea2ec1b22b4c24f782",
+      "bytes": 9346,
+      "physical_lines": 149
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c1.toml": {
+      "exists": true,
+      "sha256": "581758611f79c02aee5cd8044fbe2fd61fb67f9c77bc6c444dd01fddfbcfc0b2",
+      "bytes": 3775,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c2.toml": {
+      "exists": true,
+      "sha256": "f55cbd94b9f3dc8594ea58b853ede93f6fdae05816973acb9324e18033760c51",
+      "bytes": 3779,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "c48ca79730d732c1208488ce435ffd66ccf4cfb96df75b0a695ff7a73673f9d3",
+      "bytes": 3786,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3.toml": {
+      "exists": true,
+      "sha256": "48f7f8940d4f4e4b972beccf3c07ce9eecf255c4c907aa91d0ef3bfd85d8631e",
+      "bytes": 3777,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c4.toml": {
+      "exists": true,
+      "sha256": "369eb3ec3d07dd6c8e17cb3edaae9870185ee34e2eed94ad344d69edb9d9c970",
+      "bytes": 3776,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer.toml": {
+      "exists": true,
+      "sha256": "ca35550fe800c7758042e3f6275cc71f64c7d0e6e5a92d1b65e0890271ce0f39",
+      "bytes": 3774,
+      "physical_lines": 63
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/gpt-5-beast-mode.toml": {
+      "exists": true,
+      "sha256": "1e9b340ed12baaa501afb81cf47ba2411f169b56cc88332b482d32c5c5e82aa2",
+      "bytes": 1722,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/hlbpa.toml": {
+      "exists": true,
+      "sha256": "dc2baaf270461ba8ca61368c69f9e5eb28a0405ead6fd4a795ae354fc250493e",
+      "bytes": 1706,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst-c1.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst-c2.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst-c3-elevated.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst-c3.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst-c4.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/legacy-parity-analyst.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/mentor.toml": {
+      "exists": true,
+      "sha256": "2867ba968dfe9f14b975fb80c4917c810f99f864e15926693df97aef6cab0a81",
+      "bytes": 1557,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer-c1.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer-c2.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer-c3-elevated.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer-c3.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer-c4.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/migration-coverage-reviewer.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c1.toml": {
+      "exists": true,
+      "sha256": "4a58d03fd629393558bfbf811475b95c818e517fffc4199be7ee3d20b07393fd",
+      "bytes": 14264,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c2.toml": {
+      "exists": true,
+      "sha256": "cc263d97c63fc8b940fee60b4c15bfa61c1700d23cbec44cdb8989d0a2dc5885",
+      "bytes": 14268,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "a351e6654f79f2ce40e4f13549317ae63ed2f45ff7bfb0e3e862e33f27e691d1",
+      "bytes": 14275,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3.toml": {
+      "exists": true,
+      "sha256": "018578f0339cc93d4311a808e2747d67c19aeaf6c41837264b468cc68c833c3f",
+      "bytes": 14266,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c4.toml": {
+      "exists": true,
+      "sha256": "80083abfe81be6a9dca07f942e2ce3ab37e750261fb91901dd3e83ffb71d8e59",
+      "bytes": 14265,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator.toml": {
+      "exists": true,
+      "sha256": "8819de2413bd0410c946188b5f1cf3be9071c000d2ee4f7c3cfb75da3429d48e",
+      "bytes": 14263,
+      "physical_lines": 214
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "7a98efee468211f89b01b05e02e0d12bc3af1b31272d39af71f026ae51559370",
+      "bytes": 1359,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "8aa21bc29b1067f3e3cf705b0f1f65494a51bd60accbdd59060e365ace8e72d2",
+      "bytes": 1362,
+      "physical_lines": 25
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml": {
+      "exists": true,
+      "sha256": "385d10644f42c9b5dc13d4526b94dbc203b4dd127b039a9957991df504195c80",
+      "bytes": 1672,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-orchestrator.toml": {
+      "exists": true,
+      "sha256": "1eb1c4aeb135e93b50223ae79c806881bd6a14945b49b2d035462728dd9c5125",
+      "bytes": 3317,
+      "physical_lines": 56
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "31ee5ac69d1782d3a0e3dacd6892fde6efc62ff85393c46b66c0fca972410d38",
+      "bytes": 7437,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "e9a7c0cbc2cd4ecddc4cafdc235dcc5a0388f9980c5d761356095a37092264ce",
+      "bytes": 7441,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "066cd316166bdcc729595406e5d0e8106e9f26cc77cdaf61ad66f9db63af7209",
+      "bytes": 7448,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "8d8441b1f45b5ebe9277a779cd0270c2686c76739002fafe4d27089b1d92d8a6",
+      "bytes": 7439,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "f01f5afd26c20e0aa0c321c1a5526f355e4df5b998d49ff0ad786f0b1990a509",
+      "bytes": 7438,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "750cb7918adc6205595aa7efa06de7f2432e8158b4cd7724448a9765ab7678c5",
+      "bytes": 7436,
+      "physical_lines": 109
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c1.toml": {
+      "exists": true,
+      "sha256": "278e97bf6b444d4d681c2da8e41a746c930588e793cf7cd90d949da3ae1e7701",
+      "bytes": 1255,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c2.toml": {
+      "exists": true,
+      "sha256": "7fb21e16c68726943e64cf97f0349ad048142ca750dca62c2e94ac3675b01ec0",
+      "bytes": 1259,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "8cc18f16087c4ec94eb2e04532b7e730ff4716238d6fe52b7b90a18594c76f5a",
+      "bytes": 1266,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c3.toml": {
+      "exists": true,
+      "sha256": "598965692dc6d8de107f0bf3424032fbb5985020a701c761d35702805a504b9e",
+      "bytes": 1257,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c4.toml": {
+      "exists": true,
+      "sha256": "36beb0f2fcc2b57f82e74ddc03aee5588636675bb8e9542f2b9b2a3d29bdb999",
+      "bytes": 1256,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author.toml": {
+      "exists": true,
+      "sha256": "cd80b0e177c6dff9cabdc52d6a99ccdb33f0db2ecbad5ba95c8f5622f6e02997",
+      "bytes": 1254,
+      "physical_lines": 28
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c1.toml": {
+      "exists": true,
+      "sha256": "0f2400ace85254824551f9d5930041395a308f6c6e511efcc0702e395ff1a0cc",
+      "bytes": 3035,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c2.toml": {
+      "exists": true,
+      "sha256": "21ee1e52aaf343bbf1d2227afbedfeddfb77ac58ad48b9a23cde18a1b73d2985",
+      "bytes": 3039,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "a69488bf91792326ef2ecb54226c3dca5ae419dda3718ad4516643bfc0263c99",
+      "bytes": 3046,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c3.toml": {
+      "exists": true,
+      "sha256": "d8744df35f6a56da95fb2cff35e64cf1a617818059f2fa382228b4308b425770",
+      "bytes": 3037,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c4.toml": {
+      "exists": true,
+      "sha256": "1be2b4c38eead4da781eea18bd1bce9a2bc9043c0fa178d0714049c48e23bc99",
+      "bytes": 3036,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature.toml": {
+      "exists": true,
+      "sha256": "83dcc851928a66c40e1047dabb22d8d9d0859f11ba0438ed7a75fea7208c2b06",
+      "bytes": 3034,
+      "physical_lines": 55
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd.toml": {
+      "exists": true,
+      "sha256": "abaea77dc0697f398ca201d51ffe9577fd395214315832fbc4790d8a3c53ac73",
+      "bytes": 1702,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pytest-unit-test-coding.toml": {
+      "exists": true,
+      "sha256": "47c3eebc4867243c26e38a5c1f4363f5c8d25ab3d2e91580948f48fcb2c15051",
+      "bytes": 1644,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-atomic-executor.toml": {
+      "exists": true,
+      "sha256": "d2b65ff48e57b079f7feee12f9e4a98062384057c760dd70159fc0b145fb479b",
+      "bytes": 1174,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-atomic-planning.toml": {
+      "exists": true,
+      "sha256": "cb1f18e430ed06ed9f1c0ce6ad94d93c2f5b112884f2a4d29e16804b7b465b0b",
+      "bytes": 1335,
+      "physical_lines": 25
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-execution-only-typed.toml": {
+      "exists": true,
+      "sha256": "dad6db0518879a84e736394f521cd29bf132a12fb0b64762b4de4d4af02b4ceb",
+      "bytes": 1710,
+      "physical_lines": 24
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-orchestrator.toml": {
+      "exists": true,
+      "sha256": "1a6e7f0289bf0066277fb38345c95d2ef06c9de701e3325d92685438c2a97fe4",
+      "bytes": 3239,
+      "physical_lines": 54
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "854ad7fb210e835330d2e840eed45ed25ce65041e945600039ef6d06188d0783",
+      "bytes": 6090,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "cebd6304f84e8c33f8d72a7c09b0b0d6d8fc20421d1227c70d4409454c668815",
+      "bytes": 6094,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "6a4be9ed26fba66f7a437895b20c0b4f2d1534d1a6098c39c9fc796aa64bf363",
+      "bytes": 6101,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "80beacdb0824690bd5f244dccf5b869127934310d9b7c90a27566fd6dd6eb5b6",
+      "bytes": 6092,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "0d02ca1f9b97abd4d84120f9443359404ab6ef4d094a1b97d520381fb1f9edd6",
+      "bytes": 6091,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer.toml": {
+      "exists": true,
+      "sha256": "0aea5baa98a07d53f0839e0e7e0413b98b513549209d6a23d38becd837afe79f",
+      "bytes": 6089,
+      "physical_lines": 102
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler-c1.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler-c2.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler-c3-elevated.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler-c3.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler-c4.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/requirements-reconciler.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst-c1.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst-c2.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst-c3-elevated.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst-c3.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst-c4.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/runtime-characterization-analyst.toml": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/staged-review.toml": {
+      "exists": true,
+      "sha256": "b07791b92264d8740a50ea73cfa3dd4365fd4401e8f829352a7c9c5db5e06972",
+      "bytes": 2958,
+      "physical_lines": 53
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/status-updater.toml": {
+      "exists": true,
+      "sha256": "89fc8e3459a8c8e0c382eb0f473d019c50e5cfb3240b8f56fd710c72336e88a8",
+      "bytes": 3003,
+      "physical_lines": 53
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c1.toml": {
+      "exists": true,
+      "sha256": "fb8501d6d25173eddc3b1300fb08779da4fb6c8e9aef279b3a169b6fe01f6023",
+      "bytes": 5326,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c2.toml": {
+      "exists": true,
+      "sha256": "c4b6d7f77c326d318b57eb999ca23ae260cc705d0a676ecc7ae5b3e109993f56",
+      "bytes": 5330,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "745b53656436d404d904619fa602673a39e51fc443b5fed1dcdc0e587b2bf117",
+      "bytes": 5337,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3.toml": {
+      "exists": true,
+      "sha256": "a6fcb77a3c102c81bced469d275e7a93a25461943f6af880896758b98fdd05fe",
+      "bytes": 5328,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c4.toml": {
+      "exists": true,
+      "sha256": "6d2fc8feb19233eb0ad35676c8ec80e848b0950a005c3229b6ab97d48ede9723",
+      "bytes": 5327,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher.toml": {
+      "exists": true,
+      "sha256": "231c57e4d316112e5cf36f12f6f147a5737bd3ce6898be2dc8987f77b33a0199",
+      "bytes": 5325,
+      "physical_lines": 111
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-green.toml": {
+      "exists": true,
+      "sha256": "97232a8e7fcc4449e009a2f86481e70c0ffd48a055a86d84bd87f35440e09fcf",
+      "bytes": 1620,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-red.toml": {
+      "exists": true,
+      "sha256": "c78b62180bee9832963eea30d8a78bc596dab06c81889f34d6683a3df1a6385d",
+      "bytes": 1642,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-refactor.toml": {
+      "exists": true,
+      "sha256": "d62a422afb4801823a7b2f8df48606e711f258fe6285b49756daa2f8c29feffe",
+      "bytes": 1647,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c1.toml": {
+      "exists": true,
+      "sha256": "ca8dbe1a925a639b14f032a8df6c03029f56e7401bfff37167093bf7f7d1ff6f",
+      "bytes": 3033,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c2.toml": {
+      "exists": true,
+      "sha256": "3fce996eb22676303c608a5437ff89b2028e122e2d0aaa02665f578ab94cfc6c",
+      "bytes": 3037,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c3-elevated.toml": {
+      "exists": true,
+      "sha256": "12bfc9d53cb3f6d1d4a32a3bb8711f5e123a48d91efd585b7f692e4996524a4d",
+      "bytes": 3044,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c3.toml": {
+      "exists": true,
+      "sha256": "fc910d224518f7e173a6a558f031ead6bdcc22a1d0817046e92b1fdf0b3b33bd",
+      "bytes": 3035,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c4.toml": {
+      "exists": true,
+      "sha256": "896ba78c69cc7f408c8b658272ad9b4587d1d48a55d011118f4cd5514745d68a",
+      "bytes": 3034,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer.toml": {
+      "exists": true,
+      "sha256": "e390b9176a79ae63e833fe9ca12a9ff1c259e2377fe5f5e4a86c6d97348f7849",
+      "bytes": 3032,
+      "physical_lines": 50
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/voidbeast-gpt41enhanced.toml": {
+      "exists": true,
+      "sha256": "13d5b6d8f2989d399ecbe49eaac2fb41dbf5ec491bb6bf401247b522f02945c7",
+      "bytes": 1918,
+      "physical_lines": 23
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/lib/codex-routing/CodexDeployment.psm1": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/lib/codex-routing/CodexDiscoveryRouting.psm1": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/lib/codex-routing/CodexTopology.psm1": {
+      "exists": false
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/Resolve-CodexDeployment.ps1": {
+      "exists": true,
+      "sha256": "71083e936934283935cd727291c43d5aaba1c7a3aa3e791b4590925065df6a6c",
+      "bytes": 4174,
+      "physical_lines": 87
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/Resolve-CodexTopology.ps1": {
+      "exists": true,
+      "sha256": "71a29fe96d7f70f73b4632ac7a3fab029d558ebcf2f75c8287a09c15b06ac578",
+      "bytes": 4430,
+      "physical_lines": 96
+    },
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json": {
+      "exists": true,
+      "sha256": "699a61203a946e5dfe10307066dc93c389b09b46941ec9901cf75fae35a40717",
+      "bytes": 6382,
+      "physical_lines": 134
+    },
+    "extensions/drm-copilot/resources/config/orchestration-routing.json": {
+      "exists": true,
+      "sha256": "e4479577ea684b4b4fa6a94f3adc4d746dfe96abcf345dd9e7bd3f8dd14fedc5",
+      "bytes": 11324,
+      "physical_lines": 356
+    },
+    "extensions/drm-copilot/src/lib/validate/codex-discovery-routing.ts": {
+      "exists": false
+    },
+    "extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts": {
+      "exists": true,
+      "sha256": "818747a5a7a5ae194bdf9891ae2bd5bd2e82f67f7decf0982d9e48580565aeac",
+      "bytes": 7869,
+      "physical_lines": 270
+    },
+    "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts": {
+      "exists": true,
+      "sha256": "cf4329a2d899ec99783a8a990c0505ae42c6c1a59a401a1f015482f86b9817fc",
+      "bytes": 14371,
+      "physical_lines": 487
+    },
+    "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts": {
+      "exists": true,
+      "sha256": "daeda646191f2e3bfc219cc98d36e81340b88705cfa121749ddd084f88e04d75",
+      "bytes": 9589,
+      "physical_lines": 323
+    },
+    "extensions/drm-copilot/test/lib/validate/codex-deployment.test.ts": {
+      "exists": true,
+      "sha256": "17d507aff12ea67f33d63858bd9088b822de0374e9cf2d321ef985d7de7bc928",
+      "bytes": 5541,
+      "physical_lines": 196
+    },
+    "extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts": {
+      "exists": true,
+      "sha256": "4f6f7035b9f80c532ed9638490cf2130f5319c2791d1a7637a32fa42bab39384",
+      "bytes": 6097,
+      "physical_lines": 217
+    },
+    "packages/discovery-runtime/src/drm_copilot_discovery/agent_output.py": {
+      "exists": true,
+      "sha256": "19a21c6dea5200a03e3b67dd9e22c15aa4eed628ca2481cbaea20f56b5f4e992",
+      "bytes": 17110,
+      "physical_lines": 411
+    },
+    "schemas/discovery/v2/required-output-manifest.schema.json": {
+      "exists": true,
+      "sha256": "e23a929b05e27ce3e1db740ead0e05491491d5376d97965eccd86ff30ff62c8d",
+      "bytes": 2901,
+      "physical_lines": 73
+    },
+    "scripts/dev_tools/_codex_discovery_routing.py": {
+      "exists": false
+    },
+    "scripts/dev_tools/_orchestrator_state_codex_topology.py": {
+      "exists": true,
+      "sha256": "20a2d4f7c350aeaca07c69c6e058ac0f3526d1907dbb30bce04e1be5a6d34112",
+      "bytes": 8549,
+      "physical_lines": 228
+    },
+    "scripts/dev_tools/codex_native_converter/mapping.py": {
+      "exists": true,
+      "sha256": "4d932f70d38cd2f067a1def46bf6aa345ab53c21174aca18fb63c0b6738dd415",
+      "bytes": 7327,
+      "physical_lines": 234
+    },
+    "scripts/dev_tools/codex_native_converter/pipeline.py": {
+      "exists": true,
+      "sha256": "25836e409cb34495957da073bb594b0b2f32f23f2b9011bdf57876663e639a8f",
+      "bytes": 14832,
+      "physical_lines": 462
+    },
+    "scripts/dev_tools/codex_native_converter/rewrites.py": {
+      "exists": true,
+      "sha256": "46f402215a33af09ce913e6e4d6c5e250b2bfa75262bcbd4480a5ffff4974f2b",
+      "bytes": 17455,
+      "physical_lines": 489
+    },
+    "scripts/dev_tools/codex_native_converter/validation.py": {
+      "exists": true,
+      "sha256": "04d56999d2221926a9805be96f1cf454ac8b6c0399bd9ed318e6656c7d09e21d",
+      "bytes": 13537,
+      "physical_lines": 418
+    },
+    "scripts/dev_tools/generate_codex_agent_variants.py": {
+      "exists": true,
+      "sha256": "237bdd7e8813e4d512b236399abc3f6104c385d578bde7ca1b4ce6ce57790396",
+      "bytes": 10197,
+      "physical_lines": 295
+    },
+    "scripts/dev_tools/push_down_claude_routing_merge.py": {
+      "exists": true,
+      "sha256": "f1a2315176774ab83e414f9d989d479a711affbd74b7ca4e4405401aa3b93f23",
+      "bytes": 5826,
+      "physical_lines": 155
+    },
+    "scripts/dev_tools/push_down_codex_and_agents_customizations.py": {
+      "exists": true,
+      "sha256": "ded98242f6aa04c0bca80392cc275fd968fc09d6adf0756cc662168ce942519d",
+      "bytes": 14514,
+      "physical_lines": 428
+    },
+    "scripts/dev_tools/resolve_codex_deployment.py": {
+      "exists": true,
+      "sha256": "109049ab49f0d498663e0a96c8001e82d972da9c0ad51c15bdd9f0435f6b20a3",
+      "bytes": 8292,
+      "physical_lines": 255
+    },
+    "scripts/dev_tools/resolve_codex_topology.py": {
+      "exists": true,
+      "sha256": "200012b655503cab082df1fa76d2b5601304fbf0844069b4c74d740240d9c1f0",
+      "bytes": 9915,
+      "physical_lines": 291
+    },
+    "tests/fixtures/codex_routing/deployment.json": {
+      "exists": true,
+      "sha256": "0676b85d4b5bf61798275d8ebff91179754ce146a3b81a85262b8f44f002cfa4",
+      "bytes": 4995,
+      "physical_lines": 140,
+      "raw": {
+        "encoding": "gzip-base64",
+        "data": "H4sIAAAAAAAC/9WYzW6jMBDH730Ki0svcbUN7B56zTPsqVTIhQlYMrbXmDRR1Xff4WP5SAkQkabZQ6SQGY89//mNbfJ8R8g7fghxeOQ8EScCTcNHmlkmIyaUBGdVmZmJd+jwXD7hM6VCxTxkgrIYpK3dCkerUh5S2EOYW2VaA6WhSrWAPbcH+orxW9PmsetWDeVK4gBpYd8J/mld5QBlwgQya1g9qJklBC64jHsTlV9f6qxgryG0EAWFP6b34/j3zEYqLyzOuy8J8Z3QDdQOjGCHgGktOEQ+WrdMZLD65GGAZUoWDjIX4p+9WV9QqFBYfVyY79R2LIFQhxRFDUppK4cjWbFIzYBGr6DWqxrRatV41iUbidu4pioCUbnE2tJfVOSS9a11eihwANutMnVEod4av15lgk7mdWXa5H354QyID8aUWTEus1pGdPpYDXKr0pRbZBfemInOBndw+AS362tx694qt+sJbvuq0nB9GWz7YU9S+4BbmRKzsE0h4nl6LrnuRcjdArO5AWpgx+GNMsFZRkFjX2oDmlWLOBvoftR5QLszgS4WF3QWF4QJF9FtwW1NPsq2X2XR0DfKuTvBeV9swA3apSBgxyxEU8gPizmGf3+205s2KwowC/+Ex8n3wF8IpZsjqITFO4JkPvP6YBOMYA8aIgoy5hLAfAH6nUouAN+7BfADlCEIvba2i/pgsABnN8ORvGOtMDjhd3WEd5njAGcrkikPAMGkbBCe3wgDgyf49651l/Fu9S7jTbDd1fQy15jBiAuYzUXX86rQpjzLMCYeSX9ybuD8+3e7WnxrHCVkfZqQpVlwucPbF95TE8VDWJbDrK77eSNd94Wa1muhr4Cvht38v1JX91q6rsd1fVyk62QLkzTPLHkFEuOGYMEQmzBJlCHYhUwQq8jRVrciW5XLiGzWpKwH2bgPzsnS5TLLtcbtBY+jbknmV04qDf/Xf0ALK/a7lYxscKvek1oZUirzRO4LSe4r0e9e7v4Cwd3im4MTAAA="
+      }
+    },
+    "tests/fixtures/codex_routing/topology.json": {
+      "exists": true,
+      "sha256": "4524dd6192a35fafd36be3a15c13cf4f43f51cd7de51a89dc591f4656e24b769",
+      "bytes": 7853,
+      "physical_lines": 197,
+      "raw": {
+        "encoding": "gzip-base64",
+        "data": "H4sIAAAAAAAC/+2YzY7bIBDH7/sUyOe4cpJTe+sb9L5eIYpnHSQHKODdRKt994KNbZI4H06cZBv14IOZAWb+/BiN/fyE0Id9EIpYFv1AkRFSxNoQnpFCcIj1khRFNKldiMrfrNNz9Wbf47ggPC9JDt7Djsm1WQjevcexVCIrqWGCx6+sgJiKkpvOYRb6GtCm12seesEKaFktSAU3sAr8utCjaujFhw4rCdRAhmHFjM0h2R7XJhOls0QfKUcojagSWmO7j2E8T63hlRQaJrWxjQD7CJxDGuyeRt6zUUg7j2c35kZrldLIvb80niJnlBTYOnO/Xu0Wm7WELAaeMw6g2qWXZIU7cbGTrdplHtidoLuWrVm4Ets5zLyDEsJgCUoLTtw4L4uiNZUGfLoOjjYcZ7BSYQVEu9ycxzszC8ZxIwL+XWY5mHZKG10XQROiA9Eqsq7XqRTAnQIp/4x6ThCUqg6EMK591Nbpc9JLuRTvNsEFFEVch2W5ogAZZIN4b1cZwPz8JOanD8Z8q9RR7oWiC6uKIkYcx312Pu7zQbgXlgc4iHuwUY0UbpA6hPy0F/lNDcYAHiSjlkyQxC5akbRgRXbV4j4dFXSXAA4SwHUCd4C+P5Jxiv4g+ANSd/kPjHuvwHTkK1ApU6nRKfZF0A/IGgo+1Qui5H3BD1C8K/ZbcRyBvlbuP/R3gL464dif8BDaXbelqWLS3I34oKcJJmxmNPYFMKocq9fpFByX/GQv9smtmd+S7/64u8Rin5jvdezhcFD70R8MYLjHZnluN/uKLfgB/MLYr194kz0Q7okjANLZD/L4aomygm6uvJ/KpJfKuq9rZl+HypD826C5seO/yOdtu4MjkPYG8wikggRiJ243BCe1DL92vgxHaKJP+zU4e6zfJE3DPPnSn42zq3QTjSKHrsPsRu0EtwwRTRk76z6kZZLA99Hb5+SxWE9rmR7867DkupRSKKfvKYQnNyJ8ybS2sdrC/6dkCs75E3gQrtl+uC6OnfE3UrAspgvBKJzVRnXnf780XJFhNq4c1MZV78nkSP0w72Lk2nDNvGEpzfqswjpyktOLkuzKGlqW2iBvQu5YqxSRvbD2iulv0YlfCG7mTn8/jOven4UjfsNeKNlPVPe/yMWBfBzI1yCNuuSRz6zW7unl6S+B0t08rR4AAA=="
+      }
+    },
+    "tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1": {
+      "exists": true,
+      "sha256": "f68122927dcce4f1f4902f7d33d036b23c98f798cbda1a9a9bc6690b7a598e7e",
+      "bytes": 7598,
+      "physical_lines": 150
+    },
+    "tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1": {
+      "exists": true,
+      "sha256": "59e0b6fabfc10be0e5dcfd38965a59c0eff21f15ea71e092c06c69c77757082c",
+      "bytes": 14852,
+      "physical_lines": 286
+    },
+    "tests/scripts/claude-lib/codex-routing/CodexRouting.Manifest.Tests.ps1": {
+      "exists": true,
+      "sha256": "e99ff088355c115297fee117bd46c0c4d5381a1bd0e3e87fc95d0c2bbbe34abb",
+      "bytes": 4135,
+      "physical_lines": 87
+    },
+    "tests/scripts/claude-lib/codex-routing/CodexTopology.Parity.Tests.ps1": {
+      "exists": true,
+      "sha256": "bd6cd4a611ed047051c5ba514ef0ebafed09909c19e5d699a6c109be573d1ca2",
+      "bytes": 14701,
+      "physical_lines": 304
+    },
+    "tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1": {
+      "exists": true,
+      "sha256": "11b955d2664cdedc0cb03b0e9ffcba801406728b519e673d410d4ae6227b30bb",
+      "bytes": 17787,
+      "physical_lines": 485
+    },
+    "tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1": {
+      "exists": true,
+      "sha256": "62054f0b8e8489d09cbd88ce8f008e36817010eef688fa7a684a57b7d8a20ec0",
+      "bytes": 10674,
+      "physical_lines": 216
+    },
+    "tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py": {
+      "exists": true,
+      "sha256": "6f60cf03abda36e705b87ecf48dcf03e9d0a877f9cf1879f8007a87049ac8c5e",
+      "bytes": 9042,
+      "physical_lines": 247
+    },
+    "tests/scripts/dev_tools/test_codex_handoff_contract_parity.py": {
+      "exists": true,
+      "sha256": "da518e349f374bc99cc16b18983217d686043f689af47c3d159278c6b5fdad9e",
+      "bytes": 5674,
+      "physical_lines": 165
+    },
+    "tests/scripts/dev_tools/test_codex_model_policy_config_parity.py": {
+      "exists": true,
+      "sha256": "7e8d3ca8f0e8f2b1d0c12da5dcfb9fd215c519767d7a3395f37478f77aeae59a",
+      "bytes": 2659,
+      "physical_lines": 83
+    },
+    "tests/scripts/dev_tools/test_codex_model_routing_skill.py": {
+      "exists": true,
+      "sha256": "b91b0910ff4ba09db8f74a6be001c9bf46b5862e525bbbd598c27df44234e6d5",
+      "bytes": 2330,
+      "physical_lines": 74
+    },
+    "tests/scripts/dev_tools/test_codex_routing_cli_corpus.py": {
+      "exists": true,
+      "sha256": "0d4dd903b8e914dd45a2b0a24cf3ced4f41f9b9b60fddc991be81978ebec5c4f",
+      "bytes": 5267,
+      "physical_lines": 155
+    },
+    "tests/scripts/dev_tools/test_codex_topology_policy_config_parity.py": {
+      "exists": true,
+      "sha256": "ebfa71d91edab4c4b2ad40762587112e029355c09db0312bdc743f7a95fa1f2e",
+      "bytes": 2429,
+      "physical_lines": 73
+    },
+    "tests/scripts/dev_tools/test_discovery_agent_contracts.py": {
+      "exists": true,
+      "sha256": "cadf87bdeacbd06a0f81b6187ab216c33f62cceebecf36ccda9a0f2b89c85620",
+      "bytes": 18916,
+      "physical_lines": 457
+    },
+    "tests/scripts/dev_tools/test_discovery_workflow_contracts.py": {
+      "exists": true,
+      "sha256": "195d24080dcf9b1954589888b48922df3351198f4349b598ed4fc7e71cec4d24",
+      "bytes": 18307,
+      "physical_lines": 467
+    },
+    "tests/scripts/dev_tools/test_generate_codex_agent_variants.py": {
+      "exists": true,
+      "sha256": "b099b9cd47032a2c79da677fc996672274254c42d46fe41ed82aac2fa9ca4dbc",
+      "bytes": 7928,
+      "physical_lines": 233
+    },
+    "tests/scripts/dev_tools/test_resolve_codex_deployment.py": {
+      "exists": true,
+      "sha256": "127d015ddbff8bbb6655b608ea17405a0a60cc19b829eb3cf5b7cff64c4bde0e",
+      "bytes": 8240,
+      "physical_lines": 254
+    },
+    "tests/scripts/dev_tools/test_resolve_codex_topology.py": {
+      "exists": true,
+      "sha256": "fb96ece6b945a65ef96b8ea1a0a35c42b7d34eac9ca2ede3b85d5bf7f54c4c8f",
+      "bytes": 7030,
+      "physical_lines": 217
+    }
+  },
+  "active_profile_preservation": {
+    "enumeration_scope": [
+      ".codex/agents",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents"
+    ],
+    "pattern": "*.toml",
+    "paths": [
+      ".codex/agents/5.1-beast-adjusted.toml",
+      ".codex/agents/5.1-thinking-beast-mode-adjusted.toml",
+      ".codex/agents/api-architect.toml",
+      ".codex/agents/atomic-executor-c1.toml",
+      ".codex/agents/atomic-executor-c2.toml",
+      ".codex/agents/atomic-executor-c3-elevated.toml",
+      ".codex/agents/atomic-executor-c3.toml",
+      ".codex/agents/atomic-executor-c4.toml",
+      ".codex/agents/atomic-executor.toml",
+      ".codex/agents/atomic-planner-c1.toml",
+      ".codex/agents/atomic-planner-c2.toml",
+      ".codex/agents/atomic-planner-c3-elevated.toml",
+      ".codex/agents/atomic-planner-c3.toml",
+      ".codex/agents/atomic-planner-c4.toml",
+      ".codex/agents/atomic-planner.toml",
+      ".codex/agents/atomic-planning.toml",
+      ".codex/agents/commentary-remediation.toml",
+      ".codex/agents/commit-steward-c1.toml",
+      ".codex/agents/commit-steward-c2.toml",
+      ".codex/agents/commit-steward-c3-elevated.toml",
+      ".codex/agents/commit-steward-c3.toml",
+      ".codex/agents/commit-steward-c4.toml",
+      ".codex/agents/commit-steward.toml",
+      ".codex/agents/csharp-atomic-executor.toml",
+      ".codex/agents/csharp-atomic-planning.toml",
+      ".codex/agents/csharp-orchestrator.toml",
+      ".codex/agents/csharp-typed-engineer-c1.toml",
+      ".codex/agents/csharp-typed-engineer-c2.toml",
+      ".codex/agents/csharp-typed-engineer-c3-elevated.toml",
+      ".codex/agents/csharp-typed-engineer-c3.toml",
+      ".codex/agents/csharp-typed-engineer-c4.toml",
+      ".codex/agents/csharp-typed-engineer.toml",
+      ".codex/agents/epic-orchestrator.toml",
+      ".codex/agents/epic-planner.toml",
+      ".codex/agents/epic-review.toml",
+      ".codex/agents/expert-nextjs-developer.toml",
+      ".codex/agents/expert-react-frontend-engineer.toml",
+      ".codex/agents/feature-review.toml",
+      ".codex/agents/feature-reviewer-c1.toml",
+      ".codex/agents/feature-reviewer-c2.toml",
+      ".codex/agents/feature-reviewer-c3-elevated.toml",
+      ".codex/agents/feature-reviewer-c3.toml",
+      ".codex/agents/feature-reviewer-c4.toml",
+      ".codex/agents/feature-reviewer.toml",
+      ".codex/agents/gpt-5-beast-mode.toml",
+      ".codex/agents/hlbpa.toml",
+      ".codex/agents/mentor.toml",
+      ".codex/agents/orchestrator-c1.toml",
+      ".codex/agents/orchestrator-c2.toml",
+      ".codex/agents/orchestrator-c3-elevated.toml",
+      ".codex/agents/orchestrator-c3.toml",
+      ".codex/agents/orchestrator-c4.toml",
+      ".codex/agents/orchestrator.toml",
+      ".codex/agents/powershell-atomic-executor.toml",
+      ".codex/agents/powershell-atomic-planning.toml",
+      ".codex/agents/powershell-di-unit-test-engineer.toml",
+      ".codex/agents/powershell-orchestrator.toml",
+      ".codex/agents/powershell-typed-engineer-c1.toml",
+      ".codex/agents/powershell-typed-engineer-c2.toml",
+      ".codex/agents/powershell-typed-engineer-c3-elevated.toml",
+      ".codex/agents/powershell-typed-engineer-c3.toml",
+      ".codex/agents/powershell-typed-engineer-c4.toml",
+      ".codex/agents/powershell-typed-engineer.toml",
+      ".codex/agents/pr-author-c1.toml",
+      ".codex/agents/pr-author-c2.toml",
+      ".codex/agents/pr-author-c3-elevated.toml",
+      ".codex/agents/pr-author-c3.toml",
+      ".codex/agents/pr-author-c4.toml",
+      ".codex/agents/pr-author.toml",
+      ".codex/agents/prd-feature-c1.toml",
+      ".codex/agents/prd-feature-c2.toml",
+      ".codex/agents/prd-feature-c3-elevated.toml",
+      ".codex/agents/prd-feature-c3.toml",
+      ".codex/agents/prd-feature-c4.toml",
+      ".codex/agents/prd-feature.toml",
+      ".codex/agents/prd.toml",
+      ".codex/agents/pytest-unit-test-coding.toml",
+      ".codex/agents/python-atomic-executor.toml",
+      ".codex/agents/python-atomic-planning.toml",
+      ".codex/agents/python-execution-only-typed.toml",
+      ".codex/agents/python-orchestrator.toml",
+      ".codex/agents/python-typed-engineer-c1.toml",
+      ".codex/agents/python-typed-engineer-c2.toml",
+      ".codex/agents/python-typed-engineer-c3-elevated.toml",
+      ".codex/agents/python-typed-engineer-c3.toml",
+      ".codex/agents/python-typed-engineer-c4.toml",
+      ".codex/agents/python-typed-engineer.toml",
+      ".codex/agents/staged-review.toml",
+      ".codex/agents/status-updater.toml",
+      ".codex/agents/task-researcher-c1.toml",
+      ".codex/agents/task-researcher-c2.toml",
+      ".codex/agents/task-researcher-c3-elevated.toml",
+      ".codex/agents/task-researcher-c3.toml",
+      ".codex/agents/task-researcher-c4.toml",
+      ".codex/agents/task-researcher.toml",
+      ".codex/agents/tdd-green.toml",
+      ".codex/agents/tdd-red.toml",
+      ".codex/agents/tdd-refactor.toml",
+      ".codex/agents/typescript-engineer-c1.toml",
+      ".codex/agents/typescript-engineer-c2.toml",
+      ".codex/agents/typescript-engineer-c3-elevated.toml",
+      ".codex/agents/typescript-engineer-c3.toml",
+      ".codex/agents/typescript-engineer-c4.toml",
+      ".codex/agents/typescript-engineer.toml",
+      ".codex/agents/voidbeast-gpt41enhanced.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/5.1-beast-adjusted.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/5.1-thinking-beast-mode-adjusted.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/api-architect.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planning.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commentary-remediation.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/commit-steward.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-executor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-atomic-planning.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-orchestrator.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-planner.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-review.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/expert-nextjs-developer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/expert-react-frontend-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/gpt-5-beast-mode.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/hlbpa.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/mentor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-atomic-executor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-atomic-planning.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-di-unit-test-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-orchestrator.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pr-author.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd-feature.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/prd.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/pytest-unit-test-coding.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-atomic-executor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-atomic-planning.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-execution-only-typed.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-orchestrator.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/staged-review.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/status-updater.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-green.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-red.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/tdd-refactor.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c1.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c2.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c3-elevated.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c3.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer-c4.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer.toml",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/voidbeast-gpt41enhanced.toml"
+    ],
+    "rule": "All present native/bundled Codex profiles are conservatively bound. Identical bytes permit authority reuse; changed active profiles require a fresh verified native launch, with orchestrator transitions coordinated by root."
+  },
+  "manifest_paths": [
+    "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json"
+  ],
+  "retained_proof_qualification": "Accepted predecessor proof is retained without replay. Proposed absent helper names are observations, not implementation authorization.",
+  "pre_capture_diagnostic": "An inline metadata-only command was rejected before process creation by PROMOTION_MCP_ONLY_BLOCKED. No promotion command or product execution was attempted. The existing file-based runner convention is used here.",
+  "execution": {
+    "tests_run": false,
+    "resolvers_run": false,
+    "generators_run": false,
+    "native_launch_run": false
+  }
+}

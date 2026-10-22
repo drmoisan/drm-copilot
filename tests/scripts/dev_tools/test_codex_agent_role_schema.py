@@ -55,7 +55,9 @@ ROUTED_ROOT_PERSONAS: frozenset[str] = frozenset({"epic-planner", "epic-orchestr
 CODEX_SET = ".codex/agents"
 BUNDLE_SET = "bundle/.codex/agents"
 VARIANT_SET = ".codex-variants"
-EXPECTED_ROUTED_COUNTS: dict[str, int] = {CODEX_SET: 74, BUNDLE_SET: 74, VARIANT_SET: 1}
+# Sixteen generated families times six routed files plus two root personas (#980
+# added the four discovery specialist families to the twelve of issue #697).
+EXPECTED_ROUTED_COUNTS: dict[str, int] = {CODEX_SET: 98, BUNDLE_SET: 98, VARIANT_SET: 1}
 UNROUTED_REFERENCE_FILE = REPO_ROOT / ".codex" / "agents" / "5.1-beast-adjusted.toml"
 
 

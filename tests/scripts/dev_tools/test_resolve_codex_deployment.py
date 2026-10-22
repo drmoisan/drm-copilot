@@ -180,6 +180,26 @@ def test_resolves_commit_steward_standalone_c3_without_overlay() -> None:
 
 
 @pytest.mark.parametrize(
+    "family",
+    [
+        "legacy-parity-analyst",
+        "runtime-characterization-analyst",
+        "requirements-reconciler",
+        "migration-coverage-reviewer",
+    ],
+)
+def test_resolves_discovery_specialist_families(family: str) -> None:
+    """Route each discovery role as a generated family with the C3 overlay (#980)."""
+
+    receipt = resolve_codex_deployment(family, "C3", "epic_execution_child", "C4")
+
+    assert receipt["deployment_agent"] == f"{family}-c3-elevated"
+    assert receipt["c3_overlay_reason"] == "epic_context_and_c4_ceiling"
+    with pytest.raises(ValueError, match="Unsupported Codex logical agent"):
+        resolve_codex_deployment(f"{family}-c1", "C1", "standalone", "C1")
+
+
+@pytest.mark.parametrize(
     ("agent", "band", "context", "ceiling", "message"),
     [
         ("unknown", "C1", "standalone", "C1", "Unsupported Codex logical agent"),

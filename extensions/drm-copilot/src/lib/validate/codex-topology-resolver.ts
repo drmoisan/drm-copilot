@@ -1,6 +1,15 @@
-/** Resolve Codex implementation topology from deterministic scope inputs. */
+/**
+ * Resolve Codex implementation topology from deterministic scope inputs.
+ *
+ * Direct discovery invocations select a fixed specialist through
+ * `codex-discovery-routing` before the ordinary route is evaluated.
+ */
 
 import { compareCodePoint } from "../string-ordering";
+import {
+  resolveCodexDiscoveryTopology,
+  type CodexDiscoveryTopologyReceipt,
+} from "./codex-discovery-routing";
 
 export type ExecutionContext =
   "standalone" | "epic_preparation_child" | "epic_execution_child";
@@ -30,9 +39,26 @@ export interface CodexTopologyReceipt {
   readonly max_test_files: number | null;
 }
 
+/** Options of an ordinary resolution; the discovery selectors are absent. */
 export interface ResolveCodexTopologyOptions {
   readonly crossCutting?: unknown;
   readonly rootPersona?: unknown;
+  readonly invocationKind?: undefined;
+  readonly skillId?: undefined;
+}
+
+/**
+ * Options that may carry the discovery selectors.
+ *
+ * `invocationKind` defaults to `ordinary` only when omitted or `undefined`;
+ * an explicit `null` is invalid. `skillId` omitted, `undefined`, or `null`
+ * means absence.
+ */
+export interface ResolveCodexInvocationOptions {
+  readonly crossCutting?: unknown;
+  readonly rootPersona?: unknown;
+  readonly invocationKind?: unknown;
+  readonly skillId?: unknown;
 }
 
 export const VALID_EXECUTION_CONTEXTS: ReadonlySet<string> = new Set([
@@ -170,8 +196,23 @@ export function resolveCodexTopology(
   productionFileCountValue: unknown,
   testFileCountValue: unknown,
   executionContextValue: unknown,
-  options: ResolveCodexTopologyOptions = {},
-): CodexTopologyReceipt {
+  options?: ResolveCodexTopologyOptions,
+): CodexTopologyReceipt;
+/** Resolve an ordinary or discovery topology from an explicit selector. */
+export function resolveCodexTopology(
+  languagesValue: unknown,
+  productionFileCountValue: unknown,
+  testFileCountValue: unknown,
+  executionContextValue: unknown,
+  options: ResolveCodexInvocationOptions,
+): CodexTopologyReceipt | CodexDiscoveryTopologyReceipt;
+export function resolveCodexTopology(
+  languagesValue: unknown,
+  productionFileCountValue: unknown,
+  testFileCountValue: unknown,
+  executionContextValue: unknown,
+  options: ResolveCodexInvocationOptions = {},
+): CodexTopologyReceipt | CodexDiscoveryTopologyReceipt {
   const context = validateContext(executionContextValue);
   const languages = normalizeLanguages(languagesValue);
   const productionFileCount = requireInteger(
@@ -183,6 +224,25 @@ export function resolveCodexTopology(
     options.crossCutting === undefined ? false : options.crossCutting,
   );
   const rootPersona = options.rootPersona ?? null;
+
+  // Discovery validates its closed selector before the ordinary root, epic,
+  // and count dispatch; an ordinary request returns null and continues.
+  const discovery = resolveCodexDiscoveryTopology({
+    invocationKind:
+      options.invocationKind === undefined
+        ? "ordinary"
+        : options.invocationKind,
+    skillId: options.skillId,
+    executionContext: context,
+    languages,
+    productionFileCount,
+    testFileCount,
+    crossCutting,
+    rootPersona,
+  });
+  if (discovery !== null) {
+    return discovery;
+  }
 
   if (rootPersona !== null) {
     if (

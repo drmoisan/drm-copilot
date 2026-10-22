@@ -95,6 +95,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #980: the fixed discovery-routing helper beside the topology resolver.
+    "./src/lib/validate/codex-discovery-routing.ts": {
+      lines: 90,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-blocked-reason.ts": {
       lines: 85,
       branches: 75,

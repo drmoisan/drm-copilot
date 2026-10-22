@@ -87,6 +87,10 @@ VIRTUAL_RESOURCE_PAIRS: tuple[tuple[Path, Path], ...] = (
         CODEX_ROUTING_LIB_RELATIVE_DIR / "CodexDeployment.psm1",
         Path("lib/codex-routing/CodexDeployment.psm1"),
     ),
+    (
+        CODEX_ROUTING_LIB_RELATIVE_DIR / "CodexDiscoveryRouting.psm1",
+        Path("lib/codex-routing/CodexDiscoveryRouting.psm1"),
+    ),
 )
 VIRTUAL_ROOT_FOLDERS: tuple[Path, ...] = (
     ROUTING_CONFIG_RELATIVE_PATH.parent,

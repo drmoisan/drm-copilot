@@ -75,7 +75,11 @@ $script:GENERATED_AGENT_FAMILIES = @(
     'python-typed-engineer',
     'powershell-typed-engineer',
     'csharp-typed-engineer',
-    'typescript-engineer'
+    'typescript-engineer',
+    'legacy-parity-analyst',
+    'runtime-characterization-analyst',
+    'requirements-reconciler',
+    'migration-coverage-reviewer'
 )
 $script:LOGICAL_AGENT_ALIASES = @{ 'feature-review' = 'feature-reviewer' }
 

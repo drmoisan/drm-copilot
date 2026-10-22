@@ -136,5 +136,173 @@
     "expected_exit": 1,
     "expected_stdout": "",
     "expected_stderr_contains": "Unsupported Codex logical agent: 'nope'."
+  },
+  {
+    "id": "dep-discovery-legacy-parity-analyst-c1",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C1", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C1"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"legacy-parity-analyst-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-legacy-parity-analyst-c2",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C2", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C2"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"legacy-parity-analyst-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C2\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-legacy-parity-analyst-c3",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"legacy-parity-analyst-c3\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-legacy-parity-analyst-c4",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C4", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"legacy-parity-analyst-c4\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"max\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-runtime-characterization-analyst-c1",
+    "argv": ["--logical-agent", "runtime-characterization-analyst", "--complexity-band", "C1", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C1"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"runtime-characterization-analyst-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"model\": \"gpt-6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-runtime-characterization-analyst-c2",
+    "argv": ["--logical-agent", "runtime-characterization-analyst", "--complexity-band", "C2", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C2"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"runtime-characterization-analyst-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C2\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-runtime-characterization-analyst-c3",
+    "argv": ["--logical-agent", "runtime-characterization-analyst", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"runtime-characterization-analyst-c3\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-runtime-characterization-analyst-c4",
+    "argv": ["--logical-agent", "runtime-characterization-analyst", "--complexity-band", "C4", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"runtime-characterization-analyst-c4\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"max\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-requirements-reconciler-c1",
+    "argv": ["--logical-agent", "requirements-reconciler", "--complexity-band", "C1", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C1"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"requirements-reconciler-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"requirements-reconciler\",\n  \"model\": \"gpt-6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-requirements-reconciler-c2",
+    "argv": ["--logical-agent", "requirements-reconciler", "--complexity-band", "C2", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C2"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"requirements-reconciler-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"requirements-reconciler\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C2\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-requirements-reconciler-c3",
+    "argv": ["--logical-agent", "requirements-reconciler", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"requirements-reconciler-c3\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"requirements-reconciler\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-requirements-reconciler-c4",
+    "argv": ["--logical-agent", "requirements-reconciler", "--complexity-band", "C4", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"requirements-reconciler-c4\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"requirements-reconciler\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"max\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-migration-coverage-reviewer-c1",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C1", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C1"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-migration-coverage-reviewer-c2",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C2", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C2"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C2\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-migration-coverage-reviewer-c3",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c3\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-migration-coverage-reviewer-c4",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C4", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c4\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"max\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-legacy-parity-analyst-epic-c3",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C3", "--execution-context", "epic_preparation_child", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"legacy-parity-analyst-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-runtime-characterization-analyst-epic-c3",
+    "argv": ["--logical-agent", "runtime-characterization-analyst", "--complexity-band", "C3", "--execution-context", "epic_preparation_child", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"runtime-characterization-analyst-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"runtime-characterization-analyst\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-requirements-reconciler-epic-c3",
+    "argv": ["--logical-agent", "requirements-reconciler", "--complexity-band", "C3", "--execution-context", "epic_preparation_child", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"requirements-reconciler-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"requirements-reconciler\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-migration-coverage-reviewer-epic-c3",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C3", "--execution-context", "epic_preparation_child", "--orchestration-complexity-ceiling", "C3"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-c3-c4-ceiling",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"c4_orchestration_ceiling\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"legacy-parity-analyst-c3-elevated\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"legacy-parity-analyst\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-c3-epic-c4-ceiling",
+    "argv": ["--logical-agent", "migration-coverage-reviewer", "--complexity-band", "C3", "--execution-context", "epic_execution_child", "--orchestration-complexity-ceiling", "C4"],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context_and_c4_ceiling\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"migration-coverage-reviewer-c3-elevated\",\n  \"execution_context\": \"epic_execution_child\",\n  \"logical_agent\": \"migration-coverage-reviewer\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-discovery-ceiling-below-band",
+    "argv": ["--logical-agent", "legacy-parity-analyst", "--complexity-band", "C3", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C2"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "orchestration_complexity_ceiling must be greater than or equal to complexity_band, found C2 below C3."
+  },
+  {
+    "id": "dep-discovery-profile-is-not-logical-role",
+    "argv": ["--logical-agent", "legacy-parity-analyst-c1", "--complexity-band", "C1", "--execution-context", "standalone", "--orchestration-complexity-ceiling", "C1"],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Unsupported Codex logical agent: 'legacy-parity-analyst-c1'."
   }
 ]

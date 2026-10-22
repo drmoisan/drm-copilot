@@ -105,7 +105,9 @@ Describe 'Resolve-CodexDeployment agent family resolution' {
         $families = @(
             'orchestrator', 'atomic-planner', 'atomic-executor', 'feature-reviewer',
             'task-researcher', 'prd-feature', 'pr-author', 'commit-steward', 'python-typed-engineer',
-            'powershell-typed-engineer', 'csharp-typed-engineer', 'typescript-engineer'
+            'powershell-typed-engineer', 'csharp-typed-engineer', 'typescript-engineer',
+            'legacy-parity-analyst', 'runtime-characterization-analyst',
+            'requirements-reconciler', 'migration-coverage-reviewer'
         )
         foreach ($family in $families) {
             $result = Resolve-CodexDeployment -LogicalAgent $family -ComplexityBand 'C1' `

@@ -49,6 +49,14 @@ function Invoke-CodexTopologyCli {
             Default  = $null
         }
         '--cross-cutting'         = @{ Key = 'cross_cutting'; Kind = 'switch'; Required = $false; Default = $false }
+        '--invocation-kind'       = @{
+            Key      = 'invocation_kind'
+            Kind     = 'value'
+            Required = $false
+            Choices  = @('ordinary', 'discovery')
+            Default  = 'ordinary'
+        }
+        '--skill-id'              = @{ Key = 'skill_id'; Kind = 'value'; Required = $false; Default = $null }
         '--root-persona'          = @{
             Key      = 'root_persona'
             Kind     = 'value'
@@ -79,7 +87,9 @@ function Invoke-CodexTopologyCli {
             -TestFileCount $values['test_file_count'] `
             -ExecutionContext $values['execution_context'] `
             -CrossCutting ([bool]$values['cross_cutting']) `
-            -RootPersona $values['root_persona']
+            -RootPersona $values['root_persona'] `
+            -InvocationKind $values['invocation_kind'] `
+            -SkillId $values['skill_id']
     } catch [System.ArgumentException] {
         return New-CodexRoutingCliResult -ExitCode 1 -Stderr "$($_.Exception.Message)`n"
     }
