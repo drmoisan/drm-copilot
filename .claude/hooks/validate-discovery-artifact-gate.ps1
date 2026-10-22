@@ -1,244 +1,90 @@
 <#
 .SYNOPSIS
-    SubagentStop hook that validates discovery artifacts referenced in a
-    terminating subagent's final output.
+    SubagentStop hook that validates a discovery specialist's protected output authority.
 
 .DESCRIPTION
     Invoked by the Claude Code SubagentStop hook under the existing broad
-    generic-agent matcher group. The hook reads the SubagentStop envelope JSON
-    from stdin through the shared envelope helper (subagentstop-envelope.ps1),
-    takes its last_assistant_message field (the terminating subagent's last
-    assistant message), scans that text for discovery-artifact path references
-    via Get-DiscoveryArtifactType, and for each recognized reference (when a
-    required-artifact declaration is present) invokes the discovery validator
-    via Invoke-DiscoveryValidatorExe.
+    generic-agent matcher group. The hook reads the SubagentStop envelope through
+    the shared envelope helper (subagentstop-envelope.ps1), derives the trusted
+    launch context from the envelope session and the DRM_DISCOVERY_* values the
+    native host adapter placed in the environment, and takes its decision from the
+    shared DiscoveryStop module:
 
-    Any referenced artifact that fails validation blocks the subagent's
-    termination: the hook writes the reason with a
-    DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix to stderr and exits 2 through the
-    shared envelope helper. An invalid envelope (empty, not valid JSON, not a
-    JSON object, or without a string last_assistant_message) also blocks, with
-    a "DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly" reason. The hook
-    allows termination when the last assistant message is blank, when it
-    references no discovery-artifact path, when the required-artifact
-    declaration is absent (fail-open), or when every referenced artifact
-    passes validation.
+    - a stop whose agent type is not a discovery specialist is allowed, so the
+      other SubagentStop validators keep their behavior;
+    - a discovery specialist may stop only when its protected invocation was
+      finalized through the gateway and the completion receipt is the gateway's
+      validation-receipt for this invocation, session, role and gate mode, bound to
+      the current activation and workspace, with every required output present,
+      every input unchanged since the receipt and output_valid true; the
+      migration-coverage-reviewer may stop on a valid failing report;
+    - filenames or success prose in the final message never admit a stop, and a
+      blank final message never skips the validation.
 
-    This hook provides the authoritative, defense-in-depth check of final
-    workspace state, regardless of which tool produced the artifact,
-    complementing the PreToolUse gate in
-    enforce-discovery-artifact-gate.ps1. Neither hook implements or
-    reimplements discovery-validator logic; both only route to the validator
-    CLI delivered by a separate feature and interpret its exit code and
-    captured output.
+    A stop that cannot be validated blocks: the reason is written with the
+    DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix to stderr and the hook exits 2 through
+    the shared envelope helper. An invalid envelope blocks with a "payload anomaly"
+    reason. An unhandled error during validation blocks with exit 2 and a reason
+    (issue #928). No orchestrator checkpoint is read or written.
 
 .NOTES
-    Requires PowerShell 7.4+ (the shared validation module uses
-    `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
-    invokes NO external process: validation runs in-process through
-    `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
-    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
+    Requires PowerShell 7+. Invokes NO external process and never reads a profile,
+    locator or final-message field to decide identity or authority (issue #980).
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryValidation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryValidation.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryEncoding.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryEncoding.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryAuthority.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryAuthority.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryManifest.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryManifest.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryPayload.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStartRecord.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStartRecord.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryStop.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryStop.psm1' -ErrorRecord $_ }
 
-function Invoke-DiscoveryValidatorExe {
-    <#
-    .SYNOPSIS
-        Wrapper around the discovery-artifact validator. Mockable seam.
-    .DESCRIPTION
-        Delegates to the portable PowerShell implementation in
-        `.claude/lib/discovery-validation/DiscoveryValidation.psm1`, keeping this
-        function's name, its `-ValidatorArgs <string[]>` parameter, and its
-        `@{ ExitCode; Output }` return shape unchanged so existing mocks and
-        `Should -Invoke` assertions continue to bind.
-
-        This no longer invokes a Python interpreter (issue #475). The `.claude/**`
-        payload ships to destinations with no guaranteed Python, Poetry, or
-        `scripts/dev_tools`, where the previous `python -m ...` call failed
-        obscurely or blocked every operation.
-
-        Success is SILENT by contract: a passing validation returns `ExitCode = 0`
-        with an EMPTY `Output`. The caller denies on a non-zero exit code OR on
-        non-empty output, so any success chatter here would deny a passing
-        validation (defect D-2).
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string[]] $ValidatorArgs
-    )
-
-    $modulePath = Join-Path -Path $PSScriptRoot `
-        -ChildPath '../lib/discovery-validation/DiscoveryValidation.psm1'
-    if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
-        return @{ ExitCode = 1; Output = "Discovery-validation module not found: $modulePath" }
-    }
-
-    Import-Module -Name $modulePath -Force -ErrorAction Stop
-    return Invoke-DiscoveryArtifactValidation -ValidatorArgs $ValidatorArgs
-}
-
-function Get-DiscoveryArtifactType {
-    <#
-    .SYNOPSIS
-        Maps a normalized file path to a discovery-artifact-type token.
-    .DESCRIPTION
-        Returns one of the eight validator subcommand tokens (profile,
-        feature-contract, coverage-ledger, runtime-scenario, parity-matrix,
-        unspecified-behavior, product-decision, evidence-reference), or $null
-        when the path does not resolve to a recognized discovery-artifact
-        type.
-
-        # TODO(#9002): this is a narrow, replaceable directory/filename lookup.
-        The schema-versioned directory/filename convention this mapping
-        depends on is owned by #9002 and is not finalized in this branch.
-        Replace this lookup once #9002 ships its versioning convention.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $Path
-    )
-
-    $normalized = $Path -replace '\\', '/'
-
-    $typeMap = [ordered]@{
-        'discovery/profile'              = 'profile'
-        'discovery/feature-contract'     = 'feature-contract'
-        'discovery/coverage-ledger'      = 'coverage-ledger'
-        'discovery/runtime-scenario'     = 'runtime-scenario'
-        'discovery/parity-matrix'        = 'parity-matrix'
-        'discovery/unspecified-behavior' = 'unspecified-behavior'
-        'discovery/product-decision'     = 'product-decision'
-        'discovery/evidence-reference'   = 'evidence-reference'
-    }
-
-    foreach ($prefix in $typeMap.Keys) {
-        if ($normalized -match "(^|/)$([regex]::Escape($prefix))") {
-            return $typeMap[$prefix]
-        }
-    }
-
-    return $null
-}
-
-function Get-RequiredDiscoveryArtifactDeclaration {
-    <#
-    .SYNOPSIS
-        Reads the domain-profile required-artifact declaration, if present.
-    .DESCRIPTION
-        # TODO(#9001): this is a narrow, injectable RequiredArtifactPathsReader
-        seam. The discovery-workspace root and which of the eight artifact
-        types are "required" for a given gate are domain-profile runtime
-        configuration owned by #9001, which has no shipped parser/schema in
-        this branch.
-
-        Default behavior on absence is documented inline as fail-open
-        (allow/exit 0): when no domain profile is present, this function
-        returns an object with Present = $false, and callers must treat that
-        as "always allow, never invoke the validator" rather than as an error.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $ProfileReader = { $null }
-    )
-
-    $declaration = & $ProfileReader
-    if ($null -eq $declaration) {
-        # Fail open: no domain profile / required-artifact declaration present.
-        return @{ Present = $false }
-    }
-
-    return @{ Present = $true; Declaration = $declaration }
-}
-
-function Find-DiscoveryArtifactReference {
-    <#
-    .SYNOPSIS
-        Extracts candidate discovery-artifact path references from subagent
-        output text.
-    .DESCRIPTION
-        Splits the output text into whitespace-delimited tokens and returns
-        the distinct set of tokens that resolve to a recognized
-        discovery-artifact type via Get-DiscoveryArtifactType. This is a
-        lightweight text scan, not a JSON/markdown parser, matching the
-        precision needed for a defense-in-depth completion gate.
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string] $OutputText
-    )
-
-    if ([string]::IsNullOrWhiteSpace($OutputText)) {
-        return [string[]]@()
-    }
-
-    $tokens = $OutputText -split '\s+' | Where-Object { $_ }
-    $foundReferences = New-Object System.Collections.Generic.List[string]
-    foreach ($token in $tokens) {
-        $trimmed = $token.Trim('`', '"', "'", ',', ';', '(', ')', '[', ']')
-        if ($trimmed -and (Get-DiscoveryArtifactType -Path $trimmed)) {
-            if (-not $foundReferences.Contains($trimmed)) {
-                $foundReferences.Add($trimmed)
-            }
-        }
-    }
-
-    return [string[]]$foundReferences
-}
+$script:DiscoveryGateReasonPrefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
 
 function Invoke-DiscoveryArtifactGateValidation {
     <#
     .SYNOPSIS
-        Reads the SubagentStop envelope and returns an Ok/Message validation
-        result for a discovery-artifact completion gate.
+        Reads the SubagentStop envelope and returns an Ok/Message validation result for a discovery stop.
+    .DESCRIPTION
+        Every seam defaults to the real host (process environment, platform state
+        roots, protected store, workspace bytes) and is injectable so tests run over
+        in-memory values. A recorded dependency failure blocks before the envelope is
+        read. The result also carries the shared outcome Code for diagnostics.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [AllowNull()] [AllowEmptyString()] [string] $InputText,
-
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $RequiredArtifactReader = { Get-RequiredDiscoveryArtifactDeclaration }
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$EnvironmentValues = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$HostEnvironment = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][hashtable]$Store = $null,
+        [Parameter(Mandatory = $false)][AllowNull()][scriptblock]$ReadBytes = $null
     )
-    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix $script:DiscoveryGateReasonPrefix
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
-    if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
-    $assistantMessage = [string]$envelope.AssistantText
+    if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "$($script:DiscoveryGateReasonPrefix) payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)"; Code = 'ENVELOPE' } }
 
-    $references = Find-DiscoveryArtifactReference -OutputText $assistantMessage
-    if ($references.Count -eq 0) {
-        return @{ Ok = $true; Message = $null }
+    # Seams resolve only after the dependency check so a missing module blocks
+    # instead of raising while a default is evaluated.
+    if ($null -eq $EnvironmentValues) { $EnvironmentValues = Get-DiscoveryHostEnvironmentValueTable }
+    if ($null -eq $HostEnvironment) { $HostEnvironment = Get-DiscoveryTrustedHostEnvironment }
+    if ($null -eq $Store) { $Store = Get-DiscoveryStartStore }
+
+    $normalized = ConvertFrom-DiscoveryHostEnvelope -HostName 'claude-code' -Envelope $envelope.Envelope
+    $parameters = @{
+        Normalized = $normalized; Environment = $EnvironmentValues; HostEnvironment = $HostEnvironment
+        AssistantText = [string]$envelope.AssistantText; StopHookActive = [bool]$envelope.StopHookActive; Store = $Store
     }
-
-    $requiredDeclaration = & $RequiredArtifactReader
-    if (-not $requiredDeclaration.Present) {
-        # Fail open: no domain profile / required-artifact declaration present.
-        return @{ Ok = $true; Message = $null }
+    if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
+    $outcome = Get-DiscoveryStopDecision @parameters
+    if ($outcome.Decision -eq 'block') {
+        return @{ Ok = $false; Message = "$($script:DiscoveryGateReasonPrefix) $($outcome.Reason)"; Code = $outcome.Code }
     }
-
-    foreach ($reference in $references) {
-        $artifactType = Get-DiscoveryArtifactType -Path $reference
-        $validatorResult = Invoke-DiscoveryValidatorExe -ValidatorArgs @($artifactType, $reference)
-        $hasErrorOutput = -not [string]::IsNullOrWhiteSpace($validatorResult['Output'])
-        if ($validatorResult['ExitCode'] -ne 0 -or $hasErrorOutput) {
-            return @{ Ok = $false; Message = "DISCOVERY_ARTIFACT_GATE_BLOCKED: $($validatorResult['Output'])" }
-        }
-    }
-
-    return @{ Ok = $true; Message = $null }
+    return @{ Ok = $true; Message = $null; Code = $outcome.Code }
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.

@@ -1,0 +1,6 @@
+# P9-T4 PowerShell analyze gate
+
+Timestamp: 2026-10-22T16-32
+Command: mcp__drm-copilot__run_poshqc_analyze (scan_folders: .claude/lib/discovery-validation, .claude/hooks, .codex/hooks, .github/hooks, tests/scripts/claude-lib/discovery-validation, tests/scripts/claude-hooks, tests/scripts/codex-hooks, tests/scripts/copilot-hooks); Invoke-ScriptAnalyzer -Recurse with scripts/powershell/PoshQC/settings/pssa.settings.psd1 (Severity Error, Warning, Information) over every new or changed file through the SCRATCH launcher for readable findings
+EXIT_CODE: 0 (ok: true); launcher findings: 0 on the final pass
+Output Summary: The first launcher pass reported two PSUseSingularNouns warnings on fixture helpers (`Get-StopReadBytes`, `Get-StopRequiredOutputs`), renamed to `Get-StopByteReader` and `Get-StopRequiredOutputManifest` across the fixture and the five suites that use them; the production module, the three adapters and the Codex routing validator reported no finding on either pass. The `hook-dependency-guard-completeness` S6 rule additionally required the replaced Claude stop hook's decision function to return the dependency decision object itself first; the wrapper hashtable was removed and the suite passes for the repository and the mirror root.

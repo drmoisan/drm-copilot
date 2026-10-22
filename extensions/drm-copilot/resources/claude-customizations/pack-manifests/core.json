@@ -191,6 +191,7 @@
     ".claude/lib/discovery-validation/DiscoveryPayload.psm1",
     ".claude/lib/discovery-validation/DiscoveryStart.psm1",
     ".claude/lib/discovery-validation/DiscoveryStartRecord.psm1",
+    ".claude/lib/discovery-validation/DiscoveryStop.psm1",
     ".claude/lib/codex-routing/CodexDeployment.psm1",
     ".claude/lib/codex-routing/CodexTopology.psm1",
     ".claude/lib/codex-routing/CodexDiscoveryRouting.psm1",
