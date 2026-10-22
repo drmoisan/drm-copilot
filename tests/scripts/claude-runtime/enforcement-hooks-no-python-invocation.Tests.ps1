@@ -485,4 +485,16 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
                 Should -BeGreaterThan 0 -Because 'the Codex hooks directory is enumerated'
         }
     }
+
+    Context 'retired discovery validator (issue #980)' {
+        It 'scans the DiscoveryValidation compatibility module and finds no direct or indirect Python invocation' {
+            # The retired validator only names the Python service; it stays in the guarded tree and never invokes it.
+            $relative = '.claude/lib/discovery-validation/DiscoveryValidation.psm1'
+            Test-GuardedPathUnderScanRoot -RelativePath $relative | Should -BeTrue -Because 'the shared library is a scan root'
+            @((Get-GuardedPowerShellFile) | Where-Object { $_.Relative -eq $relative }).Count | Should -Be 1 -Because 'the module is enumerated by the scan'
+            $findings = [System.Collections.Generic.List[object]]::new()
+            foreach ($finding in (Get-PythonInvocationFinding -ScriptText (Get-Content -LiteralPath (Join-Path $script:RepoRoot $relative) -Raw) -SourceLabel $relative)) { $findings.Add($finding) }
+            $findings.Count | Should -Be 0 -Because ("Python invocation sites in the compatibility module:`n" + (($findings | ForEach-Object { $_.Message }) -join "`n"))
+        }
+    }
 }
