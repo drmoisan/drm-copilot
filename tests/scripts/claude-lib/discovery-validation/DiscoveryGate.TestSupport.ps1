@@ -55,18 +55,23 @@ function Get-GateActivationText {
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param([Parameter(Mandatory = $false)][string]$Action = 'activate')
+    param(
+        [Parameter(Mandatory = $false)][string]$Action = 'activate',
+        [Parameter(Mandatory = $false)][hashtable]$Overrides = @{}
+    )
 
-    return ([ordered]@{
-            action           = $Action
-            generation       = 1
-            locator_sha256   = $script:GateLocatorSha256
-            previous_sha256  = $null
-            profile_path     = $script:GateProfilePath
-            profile_sha256   = $script:GateProfileSha256
-            schema_version   = '2.0.0'
-            workspace_sha256 = $script:GateWorkspaceSha256
-        } | ConvertTo-Json -Depth 4)
+    $record = [ordered]@{
+        action           = $Action
+        generation       = 1
+        locator_sha256   = $script:GateLocatorSha256
+        previous_sha256  = $null
+        profile_path     = $script:GateProfilePath
+        profile_sha256   = $script:GateProfileSha256
+        schema_version   = '2.0.0'
+        workspace_sha256 = $script:GateWorkspaceSha256
+    }
+    foreach ($key in $Overrides.Keys) { $record[$key] = $Overrides[$key] }
+    return ($record | ConvertTo-Json -Depth 4)
 }
 
 function Get-GateInvocationText {

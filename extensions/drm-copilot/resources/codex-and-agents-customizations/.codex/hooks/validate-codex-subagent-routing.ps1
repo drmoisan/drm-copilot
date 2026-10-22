@@ -31,7 +31,7 @@ function Test-CodexStopGatedAgent {
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $AgentType)
 
-    if ($AgentType -match '-c(?:1|2|3|4|3-elevated)$') {
+    if ($AgentType -match '-c(?:1|2|3|4|3-elevated)$' -or (Test-CodexStopDiscoveryAgent -AgentType $AgentType)) {
         return $true
     }
     return @(
@@ -40,6 +40,19 @@ function Test-CodexStopGatedAgent {
         'prd-feature', 'pr-author', 'python-typed-engineer', 'powershell-typed-engineer',
         'csharp-typed-engineer', 'typescript-engineer'
     ) -contains $AgentType
+}
+
+function Test-CodexStopDiscoveryAgent {
+    <#
+    .SYNOPSIS
+        True for a discovery specialist, whose stop requires the discovery-invocation start attestation (issue #980).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([AllowNull()][AllowEmptyString()][string] $AgentType)
+
+    return -not [string]::IsNullOrWhiteSpace($AgentType) -and
+    $AgentType -cmatch '^(legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer)(-c(1|2|3|4|3-elevated))?$'
 }
 
 function Get-CodexStopContinuation {
@@ -96,6 +109,14 @@ function Invoke-CodexSubagentStopDecision {
     if (@('epic-planner', 'epic-orchestrator') -contains $agentType) {
         if ($attestation.provenance_valid -isnot [bool] -or -not [bool]$attestation.provenance_valid) {
             return Get-CodexStopContinuation -Reason "EPIC_INVOCATION_ORIGIN_BLOCKED: '$agentType' lacks valid root provenance." -AlreadyContinued $alreadyContinued
+        }
+    }
+    if (Test-CodexStopDiscoveryAgent -AgentType $agentType) {
+        # A specialist's attestation must be the protected discovery-invocation receipt kind;
+        # the output authority itself is validated by validate-discovery-agent-output.ps1.
+        $attestationNames = @($attestation.PSObject.Properties.Name)
+        if ($attestationNames -notcontains 'receipt_kind' -or [string]$attestation.receipt_kind -cne 'discovery-invocation') {
+            return Get-CodexStopContinuation -Reason "DISCOVERY_START_ATTESTATION_BLOCKED: '$agentType' was not attested against a protected discovery invocation." -AlreadyContinued $alreadyContinued
         }
     }
     if ($attestation.routing_valid -isnot [bool] -or -not [bool]$attestation.routing_valid) {
