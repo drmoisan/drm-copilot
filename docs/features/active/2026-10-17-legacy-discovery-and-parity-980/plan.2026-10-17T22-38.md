@@ -366,7 +366,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test fixed isolated installed-module invocation, trusted interpreter selection, JSON stdin, version/build compatibility, malformed/truncated output, inconsistent process/result exits, missing dependencies, stderr context, actionable install diagnostics, and no shell interpolation/human sentence parsing.
   - Acceptance: Both hosts receive authoritative structured findings/artifacts or a blocking transport error; malformed stdout can never be reported as successful validation.
 
-- [ ] [P8-T2] Own protected activation and authority storage outside workspaces.
+- [x] [P8-T2] Own protected activation and authority storage outside workspaces.
   - Files and behavior: Create ES/{discovery-authority,discovery-authority-paths}.ts and ET/{discovery-authority,discovery-authority-paths}.test.ts; add per-file coverage entries. Share versioned registry/envelope formats with R/activation_store.py through schema fixtures.
   - Tests and proof: Test Windows/macOS/Linux trusted user-state resolution, canonical workspace hashes, session/invocation partitioning, external containment, profile/locator hash binding, exclusive writes, malformed store records, and rejection of analyst-supplied destination/identity/success claims.
   - Acceptance: Editable workspace reports and invocation mirrors cannot create or modify native authority; activation survives locator/profile deletion and all store I/O is isolated behind testable adapters.
