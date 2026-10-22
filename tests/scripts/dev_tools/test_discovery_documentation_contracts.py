@@ -298,6 +298,50 @@ def test_consumer_names_appear_only_in_separated_examples() -> None:
             assert consumer not in text, f"{name} names the consumer {consumer}"
 
 
+def test_separated_example_is_the_only_consumer_specific_page() -> None:
+    """The example names both consumers, the wheel and the push-down tools."""
+
+    example = " ".join(
+        (DOC / "examples" / "taskmaster-tmw.md").read_text("utf-8").split()
+    )
+    for consumer in CONSUMER_NAMES:
+        assert consumer in example
+    assert "non-canonical example" in example
+    assert "drm_copilot_discovery-2.0.0-py3-none-any.whl" in example
+    for tool in (
+        "push_down_copilot_customizations",
+        "push_down_claude_customizations",
+        "push_down_codex_and_agents_customizations",
+    ):
+        assert tool in example, f"{tool} is absent from the example"
+    assert "](examples/taskmaster-tmw.md)" in page("README.md")
+    # Both consumer trees carry the workspace locator and the discovery artifact root.
+    assert example.count("config/discovery.json") >= 2
+    assert example.count("docs/migration/discovery/") >= 2
+
+
+def test_handoff_reconciles_the_built_artifacts() -> None:
+    """The feature handoff names the three built packages with versions and digests."""
+
+    feature = REPO_ROOT / "docs" / "features" / "active"
+    handoffs = sorted(feature.glob("*-980/handoff.md"))
+    assert len(handoffs) == 1, [str(path) for path in handoffs]
+    text = handoffs[0].read_text("utf-8")
+    for artifact in (
+        "drm_copilot_discovery-2.0.0-py3-none-any.whl",
+        "drm-copilot.vsix",
+        "danmoisan-drm-copilot-mcp-1.1.22.tgz",
+    ):
+        assert artifact in text, f"{artifact} is absent from the handoff"
+    assert len(re.findall(r"`[0-9a-f]{64}`", text)) >= 3
+    for phrase in (
+        "Publication prerequisites",
+        "Consumer-owned artifacts",
+        "memory_mode",
+    ):
+        assert phrase in text
+
+
 def test_no_checkout_is_required() -> None:
     """Onboarding states that no asset must be copied from this repository."""
 
