@@ -445,7 +445,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
 
 ### Phase 10 — Publication, installed resources, and consumer documentation
 
-- [ ] [P10-T1] Regenerate the three complete native customization bundles.
+- [x] [P10-T1] Regenerate the three complete native customization bundles.
   - Files and behavior: Regenerate the four role families, all nine workflows/seven aliases, native settings/hooks/helpers, .agents/.codex/.claude outputs, extensions/drm-copilot/resources/{copilot-customizations,claude-customizations,codex-and-agents-customizations}, and affected core pack manifests from canonical sources and explicit native adapter mappings.
   - Tests and proof: Run Set K/L plus DTTEST/test_push_down_{claude_resource_contracts,claude_pack_manifest_completeness,codex_and_agents_resource_contracts,codex_and_agents_pack_manifest_completeness,issue_824_follow_ups}.py, test_skill_bundle_contract_repo.py, test_claude_rules_frontmatter.py, native architecture/dependency contracts, and generator check mode. Add DTTEST/test_discovery_publication_contracts.py for complete role/skill/hook/tool/resource representation.
   - Acceptance: All source/bundle bytes and manifest inventories agree, every logical role has exact native variants and stop/tool controls, and no unresolved source-ecosystem reference or consumer-specific standing content remains.
