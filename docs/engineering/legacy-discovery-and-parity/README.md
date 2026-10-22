@@ -19,8 +19,8 @@ a checkout of this repository. Each page below covers one area end to end.
 (the system under discovery, its repositories, clients, platforms, modes, analyzers,
 artifact locations and completion gates) is supplied at runtime through the version 2
 domain profile described in [`domain-profile.md`](domain-profile.md). Consumer names appear
-only in the separated example documents under `examples/` (added with the publication
-handoff) and in the feature delivery records; they are never framework behavior.
+only in the separated example [`examples/taskmaster-tmw.md`](examples/taskmaster-tmw.md) and
+in the feature delivery records; they are never framework behavior.
 
 ## Ownership
 
@@ -63,7 +63,7 @@ separation.
 | [`migration.md`](migration.md) | Migrating version 1 artifacts and workspaces to version 2, snapshot transport and inventory import. |
 | [`consumer-onboarding.md`](consumer-onboarding.md) | Installing the packages, pushing down the native customizations, initializing and activating a workspace. |
 | [`maintainer-guide.md`](maintainer-guide.md) | Regenerating bundles, building the wheel and packages, mirrors and manifests, and the tests that pin them. |
-| `examples/` | Separated consumer examples (added with the publication handoff); the only place consumer names appear. |
+| [`examples/taskmaster-tmw.md`](examples/taskmaster-tmw.md) | The separated, non-canonical consumer example; the only place consumer names appear. |
 
 ## Capability Provenance
 

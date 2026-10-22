@@ -2,7 +2,8 @@
 
 A consumer repository receives the capability through three published packages and
 operates it without a checkout of this repository. Consumer names appear only in the
-separated examples under `examples/`, never in the generic sequence below.
+separated example [`examples/taskmaster-tmw.md`](examples/taskmaster-tmw.md), never in the
+generic sequence below.
 
 ## What is delivered
 
