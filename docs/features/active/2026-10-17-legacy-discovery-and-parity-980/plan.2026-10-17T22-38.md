@@ -455,7 +455,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Assert all published hooks/helper/config/setup/template references survive packaging, standalone imports no VS Code host, wheel runtime requirement is explicit, and shared MCP input/result/tool sets match extension registration. Build both distributables and record FEATURE/evidence/other/discovery-host-packages.<timestamp>.md.
   - Acceptance: The built VSIX/npm artifacts contain complete native customization support and thin shared wrappers without copied Python business logic or unresolved resource references.
 
-- [ ] [P10-T3] Build the versioned Python wheel with complete isolated resources.
+- [x] [P10-T3] Build the versioned Python wheel with complete isolated resources.
   - Files and behavior: Finalize packages/discovery-runtime/{pyproject.toml,resource-manifest.json,README.md}, DT/build_discovery_runtime.py and their tests; produce dist/discovery/drm_copilot_discovery-2.0.0-py3-none-any.whl and FEATURE/evidence/other/discovery-wheel-build.<timestamp>.md.
   - Tests and proof: Inspect wheel metadata/import closure, all console entries, frozen v1 and exact v2 schema/template hashes, required approved dependencies, no unrelated root ML/dev dependencies, and deterministic staged manifests. Keep operational build work under SCRATCH and record the actual artifact digest/version.
   - Acceptance: The wheel is buildable from the dedicated package and includes every runtime resource; final independent installation proof is scheduled in P11-T7.

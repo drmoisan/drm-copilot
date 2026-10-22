@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import json
 from itertools import permutations
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+import tomllib
+from drm_copilot_discovery import cli
 
 from scripts.dev_tools import build_discovery_runtime as build
 
@@ -92,6 +95,54 @@ class MemoryFileSystem:
         if len(result) > limits.artifact_records:
             raise ValueError("Memory enumeration exceeds limits")
         return result
+
+
+def test_project_metadata_matches_runtime_contract() -> None:
+    """The committed pyproject declares the runtime version, scripts and dependencies.
+
+    The wheel is built from ``packages/discovery-runtime/pyproject.toml``; this pins
+    its contract to the runtime package: the poetry-core backend, the package
+    version, one console entry per ``cli.main_*`` function (and no other), exactly
+    the approved runtime dependencies, the Python floor, and the typed marker plus
+    build manifest in the wheel includes.
+    """
+    project = tomllib.loads(
+        (
+            Path(__file__).resolve().parents[3] / build.PACKAGE_ROOT / "pyproject.toml"
+        ).read_text(encoding="utf-8")
+    )
+    poetry = project["tool"]["poetry"]
+    scripts: dict[str, str] = poetry["scripts"]
+
+    assert project["build-system"]["build-backend"] == "poetry.core.masonry.api"
+    assert poetry["name"] == "drm-copilot-discovery"
+    assert poetry["version"] == build.__version__
+    # Every console entry targets an existing CLI function, and every CLI entry
+    # function is exposed exactly once under the dev.discovery.* namespace.
+    targets = sorted(scripts.values())
+    assert targets == sorted(set(targets))
+    for name, target in scripts.items():
+        module, attribute = target.split(":")
+        assert name.startswith("dev.discovery.")
+        assert module == "drm_copilot_discovery.cli"
+        assert callable(getattr(cli, attribute))
+    main_functions = sorted(
+        f"drm_copilot_discovery.cli:{name}"
+        for name in dir(cli)
+        if name.startswith("main_") and callable(getattr(cli, name))
+    )
+    assert targets == main_functions
+    dependencies = dict(poetry["dependencies"])
+    assert dependencies.pop("python") == ">=3.10,<4.0"
+    assert sorted(dependencies) == sorted(build.DEPENDENCY_IMPORTS.values())
+    includes = [
+        entry if isinstance(entry, str) else entry["path"]
+        for entry in poetry["include"]
+    ]
+    assert includes == [
+        "src/drm_copilot_discovery/py.typed",
+        f"src/drm_copilot_discovery/{build.BUILD_MANIFEST_PATH.rsplit('/', 1)[1]}",
+    ]
 
 
 def test_stage_then_check_is_idempotent_and_reports_closure() -> None:
