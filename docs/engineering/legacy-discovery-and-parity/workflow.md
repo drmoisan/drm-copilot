@@ -1,72 +1,81 @@
-# End-to-End Discovery/Parity Workflow
+# End-to-End Discovery and Parity Workflow
 
-This page describes the discovery/parity workflow as a single end-to-end sequence: what
-happens from workspace initialization through validated artifacts to the terminal outputs
-(rendered reports and generated acceptance scenarios). It summarizes the sequence at
-capability level and links to each owning feature's own reference documentation instead
-of restating command flags, hook I/O contracts, or parser internals.
+The workflow is a fixed sequence of nine canonical workflows carried out by four constrained
+roles. Every step reads the version 2 domain profile ([`domain-profile.md`](domain-profile.md))
+and produces artifacts governed by the version 2 schemas
+([`artifacts-and-schemas.md`](artifacts-and-schemas.md)). No step contains domain-specific
+behavior and no step asserts that a consumer's implementation passes.
 
-See the [domain-neutrality invariant](README.md#domain-neutrality-invariant): every stage
-below operates only on the domain profile's configuration; no stage contains
-domain-specific behavior.
+## Roles
 
-## The Seven-Stage Sequence
+| Role | Owns | Tools |
+|---|---|---|
+| `legacy-parity-analyst` | Source inventory, feature contracts, coverage ledger, parity matrix | `read_discovery_source`, `run_discovery_repo_inventory`, `create_discovery_artifact`, `update_discovery_artifact`, `link_discovery_evidence`, `finalize_discovery_agent` |
+| `runtime-characterization-analyst` | Runtime characterization scenarios and their evidence | `read_discovery_source`, `create_discovery_artifact`, `update_discovery_artifact`, `link_discovery_evidence`, `finalize_discovery_agent` |
+| `requirements-reconciler` | Unspecified behavior, product decisions, acceptance specifications | `read_discovery_source`, `update_discovery_artifact`, `link_discovery_evidence`, `run_discovery_scenario_generation`, `finalize_discovery_agent` |
+| `migration-coverage-reviewer` | Coverage, validation and completion review | `read_discovery_source`, `validate_discovery_artifacts`, `run_discovery_report`, `finalize_discovery_agent` |
 
-The workflow is a seven-stage pipeline, orchestrated end to end by the umbrella
-`discovery-workflow` skill (`.claude/skills/discovery-workflow/SKILL.md`) and reachable
-stage by stage through the CLI, MCP, and VS Code surfaces documented in
-[`running-the-workflow.md`](running-the-workflow.md).
+The canonical role contracts are `.github/agents/<role>.agent.md`; the Claude personas
+`.claude/agents/<role>.md` and the Codex bases `.codex/agents/<role>.toml` (with the generated
+`-c1`, `-c2`, `-c3`, `-c3-elevated` and `-c4` variants) are produced from them by the
+deterministic conversion described in [`maintainer-guide.md`](maintainer-guide.md). A role
+holds no Write grant: every artifact mutation flows through the controlled MCP tools, and
+the native hooks in [`enforcement.md`](enforcement.md) attest its start, authorize each call
+and validate its output.
 
-1. **Workspace initialization and profile load.** A consumer repository scaffolds a
-   discovery workspace (`dev.discovery.init`) from the bundled init templates, then
-   authors its domain profile as described in [`domain-profile.md`](domain-profile.md).
-   Every later stage reads the domain profile to resolve the legacy source location, the
-   target location, the technology stack, and the artifact output location; no stage
-   hardcodes a domain-specific path or technology.
-2. **Repository inventory.** The language-neutral repository/project inventory analyzer
-   (`dev.discovery.inventory`) runs against the domain profile's source and target roots,
-   plus stack-specific analyzers selected generically by the profile's declared technology
-   stack (the .NET analyzer, `dev.discovery.dotnet`, and the VSTO/Office analyzer,
-   `dev.discovery.vsto`). Driven by the `discovery-repo-inventory` skill.
-3. **Coverage ledger.** Feature contracts and the coverage ledger are derived from the
-   inventory output. Driven by the `discovery-coverage-ledger` skill
-   (`.claude/skills/discovery-coverage-ledger/SKILL.md`).
-4. **Runtime characterization.** Observed runtime behavior of the legacy application is
-   captured as characterization scenarios with supporting evidence references. Driven by
-   the `discovery-runtime-characterization` skill and the `runtime-characterization-analyst`
-   agent persona.
-5. **Parity matrix.** The parity matrix is built (or refreshed) from the feature contracts
-   and runtime-characterization evidence, defining source-to-target parity. Driven by the
-   `discovery-parity-matrix` skill and the `legacy-parity-analyst` agent persona.
-6. **Behavior reconciliation.** Unspecified or contradictory behavior surfaced by the
-   parity matrix is captured and reconciled into product-decision records. Driven by the
-   `discovery-behavior-reconciliation` skill and the `requirements-reconciler` agent
-   persona.
-7. **Validation gate.** Every artifact produced by stages 2 through 6 is validated against
-   its declared JSON schema (see [`artifacts-and-schemas.md`](artifacts-and-schemas.md))
-   before the workflow is considered complete for that stage. Driven by the
-   `discovery-validate-artifacts` skill; enforced automatically by the completion-gate
-   hooks described in `artifacts-and-schemas.md`.
+## The nine canonical workflows
 
-The `migration-coverage-reviewer` agent persona reviews the coverage ledger and parity
-outputs across stages 3 through 6 rather than owning a single stage.
+Each workflow is a skill (`.github/skills/<name>/SKILL.md`, mirrored to
+`.claude/skills` and `.agents/skills`) that routes to exactly one role and names its exact
+output boundary.
 
-## Terminal Outputs
+| Workflow | Role | Produces |
+|---|---|---|
+| `initialize-discovery-workspace` | migration-coverage-reviewer | The draft profile, scope and collection templates (`init`), then activation (`configure --activate`). |
+| `inventory-legacy-system` | legacy-parity-analyst | `inventory-snapshot` records from the enabled analyzers; a confirmed `scope`. |
+| `extract-feature-contract` | legacy-parity-analyst | `feature-contract` drafts and the `coverage-ledger` dispositions that link components to features. |
+| `characterize-runtime-behavior` | runtime-characterization-analyst | `runtime-characterization-scenario` plans, observations, runs and `evidence-reference` links. |
+| `reconcile-parity-matrix` | requirements-reconciler | The `parity-matrix` entries binding source contracts to target implementation records per dimension. |
+| `review-discovery-coverage` | migration-coverage-reviewer | Validation in `discovery-complete` or `parity-complete` mode and the coverage, parity and completion reports. |
+| `adjudicate-unspecified-behavior` | requirements-reconciler | `unspecified-behavior` records and the `product-decision` records that resolve them. |
+| `generate-acceptance-scenarios` | requirements-reconciler | `acceptance-specification` artifacts (`legacy-characterization` or `target-acceptance`) rendered as Markdown or Gherkin. |
+| `validate-discovery-artifacts` | migration-coverage-reviewer | A validation receipt for the selected mode; the only path that can satisfy a completion gate. |
 
-Once validated artifacts exist, the workflow produces two kinds of terminal output:
+## The seven aliases
 
-- **Reports rendered** from the validated artifacts: a coverage report, a parity report,
-  and a completion report (see [`running-the-workflow.md`](running-the-workflow.md) for
-  the exact commands).
-- **Acceptance scenarios generated** from a feature contract, a parity matrix, and a
-  runtime-characterization scenario together, producing executable acceptance scenarios
-  for the migration effort.
+`discovery-workflow`, `discovery-repo-inventory`, `discovery-coverage-ledger`,
+`discovery-runtime-characterization`, `discovery-parity-matrix`,
+`discovery-behavior-reconciliation` and `discovery-validate-artifacts` are thin dispatch
+skills kept for compatibility. Each names the canonical workflows it dispatches to and
+carries no procedure, tool list or authority of its own.
 
-## What This Page Does Not Cover
+## Sequence
 
-This page does not restate parser internals, hook input/output contracts, schema field
-tables, or command flag references. Those are owned by the functional features that
-deliver them and documented in their own reference docs, most of which live under
-`docs/features/active/` at the time of writing (link-drift is possible once the epic
-completes and folders move to `docs/features/completed/`; the topic pages below prefer
-linking to durable code, schema, and template paths for that reason).
+1. **Initialize and activate.** `init` writes the draft profile, scope and collections
+   from the staged templates without overwriting existing files; the engineer completes
+   the profile; `configure --activate` validates it, writes the workspace locator and the
+   protected activation. Until activation every native hook treats the workspace as
+   inactive and ordinary behavior applies.
+2. **Inventory and scope.** The enabled analyzers produce inventory snapshots over the
+   configured production and test roots; the scope is confirmed against them.
+3. **Contracts and coverage.** Feature contracts are drafted from inventory and source
+   reads; every component in scope receives a coverage disposition.
+4. **Runtime characterization.** Scenarios are planned with explicit `unknown`
+   expectations, executed under the profile's runtime capability, and recorded with
+   evidence.
+5. **Parity.** The parity matrix binds each required feature to the target's
+   implementation records per client, platform, mode and dimension.
+6. **Reconciliation.** Unspecified or contradictory behavior is recorded and resolved by
+   approved product decisions; approvals are scoped and owned.
+7. **Acceptance.** Acceptance specifications are generated only from verified source facts
+   or approved decisions; unresolved criteria stay `pending`.
+8. **Validation and completion.** `validate-all` in `discovery-complete` or
+   `parity-complete` mode produces the receipt the completion gates and the planning gate
+   verify; the completion report states what remains.
+
+## Planning linkage
+
+Implementation planning in a consumer repository is gated on discovery: the profile's
+`completion_gates.planning_prerequisite` (`none`, `discovery-complete` or
+`parity-complete`) names the validation receipt the native planning gate requires before an
+atomic-planner or orchestrator delegation may start. See [`enforcement.md`](enforcement.md).

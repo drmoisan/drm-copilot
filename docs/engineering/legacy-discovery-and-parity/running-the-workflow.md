@@ -1,92 +1,80 @@
 # Running the Workflow
 
-The discovery/parity workflow (see [`workflow.md`](workflow.md)) is reachable through
-three surfaces, documented here in the order CLI, then MCP tools, then VS Code commands.
-**The three surfaces are lockstep equivalents at the capability level**: every discovery
-capability reachable through the CLI is reachable through both the MCP tools and the VS
-Code commands, and the MCP tools and VS Code commands invoke the same underlying service
-calls (each VS Code command is a thin front end over the matching MCP-tool service call).
-They are not, however, a naive one-to-one command-name mirror — the CLI exposes finer
-granularity (separate commands per validated artifact kind and per report kind) than the
-MCP/VS Code layer, which consolidates related CLI commands behind one parameterized tool.
-That consolidation is documented explicitly below rather than assumed.
+The capability is reachable through three surfaces: the console scripts installed with the
+wheel, the MCP tools of the extension-hosted or standalone MCP server, and the VS Code
+commands. All three call the same engine through the same gateway contract, so a result
+does not depend on the surface. [`cli-reference.md`](cli-reference.md) lists every entry.
+
+## The gateway contract
+
+A host launches `python -I -m drm_copilot_discovery.gateway --workspace-root <absolute>
+--principal <local-user|host>` in the trusted interpreter, writes one `service-request`
+document to stdin and reads one `service-result` from stdout. The request carries the
+`operation`, the validation `mode`, `workspace_root`, `profile_path`, `dry_run`, `write`,
+`format`, typed `inputs`, and for agent calls the `invocation_ref` and `authorization_ref`
+that bind it to a protected invocation and a one-use tool authorization. The result carries
+findings, artifacts and the exact exit code (`0` success, `1` validation failure, `2` usage
+or policy rejection, `3` runtime unavailable or corrupt). Nothing else is exchanged.
 
 ## CLI
 
-Every discovery command is a Poetry console script under the `dev.discovery.*` namespace,
-invoked as `poetry run dev.discovery.<command> ...`, matching the repository's established
-`dev.*` alias convention (`pyproject.toml`, `[tool.poetry.scripts]`). Poetry console
-scripts always resolve through this uniform `poetry run <script-name>` form regardless of
-which module implements them — several `dev.discovery.*` commands are entry points into
-modules outside the `scripts.dev_tools.discovery` package, and several use a non-`main`
-entry function, so `poetry run dev.discovery.<command>` is the invocation form to use; a
-guessed `python -m scripts.dev_tools.discovery.<command>` equivalent is not reliable for
-every command.
+With the wheel installed in the trusted interpreter, every operation is a console script
+`dev.discovery.<command>` (or `python -I -m drm_copilot_discovery.cli <command>`). Common
+options are `--workspace-root`, `--profile` and `--repository-id`; writing commands accept
+`--dry-run`, and optional-write commands (`inventory`, `import-inventory`,
+`generate-acceptance`, the three reports) publish only with `--write`. Validation and report
+commands accept `--mode` and `--format json|markdown|both`.
 
-| Command | Entry point |
-|---|---|
-| `dev.discovery.init` | `scripts.dev_tools.discovery.init_cli:main` |
-| `dev.discovery.profile` | `scripts.dev_tools.discovery.profile_cli:main` |
-| `dev.discovery.inventory` | `scripts.dev_tools.discovery.analyzer.cli:main` |
-| `dev.discovery.dotnet` | `scripts.dev_tools.discovery.analyzer.stack_cli:main_dotnet` |
-| `dev.discovery.vsto` | `scripts.dev_tools.discovery.analyzer.stack_cli:main_vsto` |
-| `dev.discovery.generate-acceptance-scenarios` | `scripts.dev_tools.generate_acceptance_scenarios:main` |
-| `dev.discovery.completion-report` | `scripts.dev_tools.discovery.completion_report:main` |
-| `dev.discovery.coverage-report` | `scripts.dev_tools.discovery.coverage_report:main` |
-| `dev.discovery.parity-report` | `scripts.dev_tools.discovery.parity_report:main` |
-| `dev.discovery.validate-all` | `scripts.dev_tools.validate_discovery_artifacts:main` |
-| `dev.discovery.validate-profile` | `scripts.dev_tools.validate_discovery_artifacts:main_profile` |
-| `dev.discovery.validate-feature-contract` | `scripts.dev_tools.validate_discovery_artifacts:main_feature_contract` |
-| `dev.discovery.validate-coverage-ledger` | `scripts.dev_tools.validate_discovery_artifacts:main_coverage_ledger` |
-| `dev.discovery.validate-runtime-scenario` | `scripts.dev_tools.validate_discovery_artifacts:main_runtime_scenario` |
-| `dev.discovery.validate-parity-matrix` | `scripts.dev_tools.validate_discovery_artifacts:main_parity_matrix` |
-| `dev.discovery.validate-unspecified-behavior` | `scripts.dev_tools.validate_discovery_artifacts:main_unspecified_behavior` |
-| `dev.discovery.validate-product-decision` | `scripts.dev_tools.validate_discovery_artifacts:main_product_decision` |
-| `dev.discovery.validate-evidence-reference` | `scripts.dev_tools.validate_discovery_artifacts:main_evidence_reference` |
+Typical sequence:
 
-## MCP Tools
+```text
+dev.discovery.init --system-id <id> --system-name "<name>" --role legacy-source --production-root src --test-root tests
+dev.discovery.configure --activate
+dev.discovery.inventory --write
+dev.discovery.new-contract --feature-id <feature> --name "<name>" --input <proposal>
+dev.discovery.validate-all --mode discovery-complete
+dev.discovery.coverage-report --format markdown --write
+```
 
-Seven MCP tools expose the discovery capability, defined in
-`extensions/drm-copilot/src/mcp-discovery-tool-definitions.ts` and available from both the
-extension-hosted MCP server and the standalone `@danmoisan/drm-copilot-mcp` npm package
-(`packages/mcp-server/`, usable via `npx`):
+## MCP tools
 
-| MCP tool | CLI equivalent |
-|---|---|
-| `validate_discovery_artifacts` | The `dev.discovery.validate-*` family, selected by an `artifact_type` input (`all` validates every kind under a supplied path). |
-| `run_discovery_init` | `dev.discovery.init` |
-| `run_discovery_repo_inventory` | `dev.discovery.inventory` |
-| `run_discovery_dotnet_analyzer` | `dev.discovery.dotnet` |
-| `run_discovery_vsto_analyzer` | `dev.discovery.vsto` |
-| `run_discovery_scenario_generation` | `dev.discovery.generate-acceptance-scenarios` |
-| `run_discovery_report` | The `dev.discovery.*-report` family, selected by a `report_type` input (`coverage`, `parity`, or `completion`). |
+Eighteen discovery tools are registered by both MCP hosts
+(`extensions/drm-copilot/src/mcp-discovery-tool-definitions.ts` and
+`mcp-discovery-authority-tool-definitions.ts`). Root-only tools (`run_discovery_init`,
+`configure_discovery_workspace`, `transfer_discovery_snapshot`, `import_discovery_inventory`,
+`migrate_discovery_artifacts`, `prepare_discovery_agent`) are rejected for a discovery agent
+principal; controlled tools (`read_discovery_source`, `run_discovery_repo_inventory`,
+`create_discovery_artifact`, `update_discovery_artifact`, `link_discovery_evidence`,
+`run_discovery_scenario_generation`, `validate_discovery_artifacts`, `run_discovery_report`,
+`finalize_discovery_agent`) are the only tools a role may call, each under a one-use
+authorization written by the tool gate. `run_discovery_doctor` is available to every caller
+and grants nothing.
 
-`dev.discovery.profile` (authoring/updating the domain-profile file directly) has no
-dedicated MCP tool; domain-profile authoring is a file-editing activity performed as
-described in [`domain-profile.md`](domain-profile.md), not a discrete MCP action.
+The standalone server runs as `npx @danmoisan/drm-copilot-mcp` (or the `drm-copilot-mcp`
+bin) and ships the native customization resources; the extension registers the same server
+as the `drmCopilotMcpProvider` definition.
 
-Each MCP tool invokes the workspace discovery CLI in the target workspace rather than
-reimplementing discovery logic in the extension. Where the tool call requires a Python
-process, the extension resolves a Python interpreter for the *target workspace* — the
-workspace `.venv` interpreter, then `py`, then `python` on PATH — because the extension
-itself bundles no Python; the discovery code lives in the consumer workspace.
+## VS Code commands
 
-## VS Code Commands
+Thirteen command-palette entries (`drmCopilotExtension.*`) wrap the MCP service calls:
+validate artifacts, run init, repo inventory, .NET analyzer, VSTO analyzer, scenario
+generation and report, create artifact, link evidence, configure workspace, transfer
+snapshot, migrate artifacts and run doctor. Each accepts a direct argument object or
+prompts for its inputs, then calls the same in-process service the MCP tool calls.
 
-Seven command-palette entries mirror the MCP tools one-to-one, registered in
-`extensions/drm-copilot/src/discovery-command-registration.ts` and contributed in
-`extensions/drm-copilot/package.json`:
+## Agent-driven runs
 
-| Command ID | Palette title |
-|---|---|
-| `drmCopilotExtension.validateDiscoveryArtifacts` | drm-copilot: Validate Discovery Artifacts |
-| `drmCopilotExtension.runDiscoveryInit` | drm-copilot: Run Discovery Init |
-| `drmCopilotExtension.runDiscoveryRepoInventory` | drm-copilot: Run Discovery Repo Inventory |
-| `drmCopilotExtension.runDiscoveryDotnetAnalyzer` | drm-copilot: Run Discovery .NET Analyzer |
-| `drmCopilotExtension.runDiscoveryVstoAnalyzer` | drm-copilot: Run Discovery VSTO Analyzer |
-| `drmCopilotExtension.runDiscoveryScenarioGeneration` | drm-copilot: Run Discovery Scenario Generation |
-| `drmCopilotExtension.runDiscoveryReport` | drm-copilot: Run Discovery Report |
+When a discovery role runs under Claude Code, Codex or GitHub Copilot, the root session
+prepares the invocation (`prepare_discovery_agent`), the host's start hook attests the
+launch, every controlled tool call is authorized by the tool gate, and the agent finishes
+through `finalize_discovery_agent`, whose receipt the stop hook requires. Filenames or
+success prose in a final message never satisfy a gate. [`enforcement.md`](enforcement.md)
+describes the controls; [`workflow.md`](workflow.md) describes which role runs which
+workflow.
 
-Each command accepts either a direct argument object (matching its MCP tool's input) or
-falls back to an interactive prompt sequence when invoked from the command palette without
-arguments, then calls the same in-process service method the corresponding MCP tool calls.
+## Doctor
+
+`dev.discovery.doctor` (MCP `run_discovery_doctor`, command "Run Discovery Doctor") reports
+the installed runtime identity, the workspace locator and activation state, the profile's
+validity and the host capability attestation, without changing anything. Run it first when a
+gate denies unexpectedly.
