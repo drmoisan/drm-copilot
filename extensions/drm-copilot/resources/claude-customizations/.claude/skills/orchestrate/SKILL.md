@@ -26,6 +26,7 @@ Before proceeding, the orchestrator must:
 2. Read applicable `.claude/rules/` files for the languages in scope.
 3. Read the policy files listed in the compliance reading order section of `CLAUDE.md`.
 4. Read the `execution-environment` skill (`.claude/skills/execution-environment/SKILL.md`) before delegating any worker. Delegation prompts and plans reference that brief instead of restating tool routes, command-text restrictions, the batch budget, hook context, or CI shape.
+5. In a workspace with an active discovery activation, expect the native planning gate (`.claude/hooks/enforce-discovery-planning-gate.ps1`) on every `atomic-planner` or orchestrator delegation: it admits the launch only when the session holds a current `planning`-mode validation receipt satisfying the profile's `completion_gates.planning_prerequisite`. A `DISCOVERY_PLANNING_GATE_BLOCKED:` denial means the discovery criteria are not current; run `validate-all --mode planning` through the installed gateway and re-delegate rather than bypassing. Discovery criteria gate planning and never substitute for the plan's own tests (`docs/engineering/legacy-discovery-and-parity/enforcement.md`).
 
 ## Checkpoint Handling
 

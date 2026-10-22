@@ -241,6 +241,8 @@ Two enforcement boundaries protect this orchestration flow through hooks and per
 
 3. **`config-change handling` boundary — configuration edit control.** The migration research defines config-change handling as the boundary for auditing or blocking edits to Claude configuration files. In the implemented repository runtime, this boundary is documented but not currently wired as a live `ConfigChange` hook entry in `.claude/settings.json`.
 
+4. **Discovery controls — protected-authority verification.** In a workspace with an active discovery activation, four hooks verify protected records written by the installed discovery engine and gateway: `record-discovery-agent-start.ps1` (`SubagentStart`) attests a discovery specialist's launch against its prepared invocation, `enforce-discovery-artifact-gate.ps1` (`PreToolUse`) admits only read-only native tools and controlled discovery MCP tools under a one-use authorization, `enforce-discovery-planning-gate.ps1` (`PreToolUse` on `Agent`) admits an `atomic-planner` or orchestrator delegation only when a current `planning`-mode validation receipt satisfies the profile's `completion_gates.planning_prerequisite`, and `validate-discovery-artifact-gate.ps1` (`SubagentStop`) requires the gateway's completion receipt. Each denies with its `DISCOVERY_*_BLOCKED:` prefix, invokes no Python, and allows every call in an inactive workspace so the boundaries above apply unchanged. `docs/engineering/legacy-discovery-and-parity/enforcement.md` documents the controls.
+
 ## 5. Repository-Enforceable Controls
 
 The repository can enforce the following controls directly through committed files:
@@ -249,6 +251,7 @@ The repository can enforce the following controls directly through committed fil
 - `.claude/settings.json` enforces project-scoped `permissions.allow` and `permissions.deny` entries.
 - `PreToolUse` enforces dangerous-command validation before Bash execution.
 - `SubagentStop` enforces worker completion markers before bounded workers stop.
+- The discovery start, tool, planning and stop hooks enforce protected discovery authority in active discovery workspaces; the planning gate links the profile's `planning_prerequisite` to planner and orchestrator delegation without asserting any implementation passes.
 - `config-change handling` is represented as a documented repository boundary for configuration edits, even though the live runtime hook is not yet wired in the committed settings file.
 
 ## 6. Managed-Settings-Only Controls

@@ -1,55 +1,69 @@
 # Authoring the Domain Profile
 
-The domain profile is the single configuration contract through which a consumer
-repository supplies all domain specificity to the discovery/parity workflow. Every stage
-in [`workflow.md`](workflow.md) reads the domain profile; no stage contains a
-domain-specific default. This page documents the contract fields and domain-neutral
-authoring guidance; it defers parser internals and the profile-format decision to the
-domain-profile configuration-contract feature's own reference documentation.
+The version 2 domain profile (`$schema: urn:drm-copilot:discovery:2.0.0:domain-profile`,
+`schemas/discovery/v2/domain-profile.schema.json`) is the single configuration contract
+through which a consumer supplies all domain specificity. The engine treats every value as
+consumer-owned data; it special-cases no path, repository, technology or name.
 
-## Starting Point
+## Starting point
 
-`dev.discovery.init` scaffolds a new discovery workspace from the bundled template at
-`docs/discovery/templates/domain-profile/domain-profile.yaml`. A consumer repository
-copies and edits this template rather than authoring a profile from a blank file.
+`dev.discovery.init` writes a draft profile from the staged template
+(`docs/discovery/templates/v2/domain-profile.yaml`) to
+`docs/migration/discovery/domain-profile.yaml`, together with a draft `scope`, the empty
+`unspecified-behaviors` and `product-decisions` collections, and the empty
+`coverage-ledger` and `parity-matrix`. Initialization never overwrites an existing file: it
+reports `created`, `skipped` or `conflict` per path and supports `--dry-run`. The engineer
+completes the draft, then `dev.discovery.configure --activate` validates it and records the
+activation.
 
-## Contract Fields
-
-The profile is authored as YAML with four domain-neutral contract fields, each mapping to
-one of the four configuration areas from the epic's shared design:
+## Fields
 
 | Field | Meaning |
 |---|---|
-| `legacy_source.root` | The legacy source location: the path (or path-like identifier) to the repository or codebase being discovered. |
-| `target.root` | The target location: the path (or path-like identifier) to the modern repository or codebase the migration targets. |
-| `technology_stack.legacy` | The technology stack: an ordered list of technology identifiers (for example a language or framework name) that selects which stack-specific analyzers run against the legacy source during the repository-inventory stage. |
-| `artifacts.root` | The artifact conventions: the output directory under which every discovery artifact (feature contracts, the coverage ledger, runtime-characterization scenarios, the parity matrix, unspecified-behavior records, product-decision records, evidence references) is written. |
+| `profile_version` (const `2`), `schema_version` (`2.0.0`), `artifact_kind` | Version identity. |
+| `profile_state` | `draft` while roots or identities are incomplete; `configured` once activation is permitted. A configured `modernization-target` or `combined` profile must name its related repositories and clients. |
+| `system` | `id`, `name` and `role` (`legacy-source`, `modernization-target`, `combined`). |
+| `repository` | `id`, `vcs: git`, `revision` and `revision_policy` (`pinned` or `working-tree-at-pin`); every artifact pins the revision it observed. |
+| `production_roots`, `test_roots`, `project_entry_points`, `documentation_roots`, `evidence_roots` | Workspace-relative roots the analyzers, source reads and evidence links may touch; nothing outside them is read. |
+| `repositories` | Related repositories (`legacy-source` or `modernization-target`) for the separate-repository flow. |
+| `clients`, `required_platforms`, `required_modes`, `required_feature_dimensions` | The multi-client matrix every feature contract, parity entry and acceptance specification is assessed against. |
+| `runtime` | `capability` (`none`, `manual`, `semi-automated`, `automated`) and `required_feature_ids`, the features that need runtime evidence. |
+| `analyzers` | `enabled` identifiers (see [`analyzers.md`](analyzers.md)), `options`, `ignored_paths` and `extension_result_manifests` for separately produced inventories. |
+| `excluded_paths` | Paths excluded from scope with a recorded rationale. |
+| `artifacts` | The workspace-relative artifact root. |
+| `completion_gates` | Eight boolean gates and the `planning_prerequisite`, below. |
+| `decision_owners` | Who may approve product decisions; approvals name an owner from this list. |
+| `extensions` | Consumer-owned extension data the engine preserves and never interprets. |
 
-A `profile_version` field is also present at the top level of the profile and is read by
-the profile loader; its versioning semantics are owned by the domain-profile
-configuration-contract feature.
+## Completion gates and the planning prerequisite
 
-## Domain-Neutral Authoring Guidance
+`completion_gates` holds `require_confirmed_scope`, `require_current_inventory`,
+`require_all_dispositions`, `require_feature_evidence`, `require_acceptance_scenarios`,
+`require_runtime_for_declared_features`, `block_on_unresolved_required_behavior` and
+`require_approved_deviations`. The `discovery-complete` and `parity-complete` validation
+modes evaluate these gates; a gate set to `false` records a deliberate waiver in the
+completion report rather than a pass.
 
-- Every value in the profile is consumer-supplied configuration. The framework treats
-  `legacy_source.root`, `target.root`, and `technology_stack.legacy` as opaque strings; it
-  does not special-case any particular path, repository, or technology name.
-  `technology_stack.legacy` is what selects which stack-specific analyzers run — for
-  example, listing a .NET/C# identifier is what causes the .NET stack analyzer to run
-  against `legacy_source.root`, not a hardcoded rule tied to any specific consumer.
-- Author the profile once per consumer repository. TaskMaster's profile and TMW's profile
-  are two independent instances of the same domain-neutral contract; see
-  [`consumer-onboarding.md`](consumer-onboarding.md) for how they are used as worked
-  examples.
-- Keep `artifacts.root` inside the discovery workspace so that every stage in
-  [`workflow.md`](workflow.md) and every validator in
-  [`artifacts-and-schemas.md`](artifacts-and-schemas.md) resolves artifact paths
-  consistently.
+`planning_prerequisite` takes `none`, `discovery-complete` (the template default) or
+`parity-complete`. It names the validation mode whose current, passing receipt the native
+planning gate requires before an implementation planner or orchestrator may be delegated in
+this workspace ([`enforcement.md`](enforcement.md)). `none` records that planning is not
+gated on discovery; it is still read from the profile the activation binds, so it cannot be
+changed by editing a copy.
 
-## Parser Internals (Deferred)
+## Authoring guidance
 
-The profile is parsed with PyYAML (`yaml.safe_load`), not the repository's separate
-hand-rolled frontmatter-regex convention used elsewhere. The parser implementation, the
-full field schema, validation rules (via `dev.discovery.validate-profile`), and the
-decision record comparing PyYAML against the frontmatter-regex convention are owned by the
-domain-profile configuration-contract feature; this page does not restate them.
+- Keep every root inside the repository; the path policy rejects absolute paths, parent
+  references and symbolic links that resolve outside the workspace.
+- Enable only the analyzers the stack needs; `office-vsto` is an optional adapter that
+  runs only when listed.
+- Pin `repository.revision` when artifacts must be reproducible across machines; use
+  `working-tree-at-pin` while the inventory is being refreshed.
+- Treat `profile_state: configured` as a commitment: activation binds the profile bytes, and
+  a changed profile fails every receipt check until it is re-validated.
+
+## Version 1 profiles
+
+Version 1 profiles (`profile_version: 1`, `legacy_source.root`, `target.root`,
+`technology_stack.legacy`, `artifacts.root`) remain readable through the compatibility
+import and are converted by `dev.discovery.migrate`; see [`migration.md`](migration.md).
