@@ -371,7 +371,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Test Windows/macOS/Linux trusted user-state resolution, canonical workspace hashes, session/invocation partitioning, external containment, profile/locator hash binding, exclusive writes, malformed store records, and rejection of analyst-supplied destination/identity/success claims.
   - Acceptance: Editable workspace reports and invocation mirrors cannot create or modify native authority; activation survives locator/profile deletion and all store I/O is isolated behind testable adapters.
 
-- [ ] [P8-T3] Consume exact one-use tool authorizations.
+- [x] [P8-T3] Consume exact one-use tool authorizations.
   - Files and behavior: Create ES/discovery-authorization.ts and ET/discovery-authorization.test.ts; add its coverage threshold and versioned native tool/input digest fixtures under tests/fixtures/discovery_host/.
   - Tests and proof: Test exact normalized request ID/tool/input digest plus trusted agent/session/role binding, expiry, duplicate/ambiguous matches, replay, concurrent consumption, wrong workspace, unknown operation, and root-only versus analyst operations.
   - Acceptance: Only a matching unconsumed native authorization admits a controlled tool request; caller role strings or request IDs cannot expand grants or impersonate a root approval.
