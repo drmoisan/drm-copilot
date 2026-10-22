@@ -31,6 +31,7 @@ import pytest
 from scripts.dev_tools import push_down_claude_pack_selection as claude_packs
 from scripts.dev_tools import push_down_codex_pack_selection as codex_packs
 from scripts.dev_tools.push_down_codex_and_agents_customizations import (
+    VIRTUAL_RESOURCE_DIRECTORIES,
     VIRTUAL_RESOURCE_PAIRS,
 )
 from scripts.dev_tools.push_down_copilot_customizations_filesystem import (
@@ -196,6 +197,15 @@ def codex_surface() -> Surface:
         destination.as_posix(): RESOURCES_ROOT / resource
         for destination, resource in VIRTUAL_RESOURCE_PAIRS
     }
+    # A mapped helper directory publishes every stored file under its destination.
+    for destination_dir, resource_dir in VIRTUAL_RESOURCE_DIRECTORIES:
+        resource_root = RESOURCES_ROOT / resource_dir
+        if not resource_root.is_dir():
+            continue
+        for resource_file in sorted(resource_root.rglob("*")):
+            if resource_file.is_file():
+                relative = resource_file.relative_to(resource_root).as_posix()
+                virtual[(destination_dir / relative).as_posix()] = resource_file
     return _load_surface(CODEX_BUNDLE_ROOT, codex_packs.CORE_PACK_NAME, virtual)
 
 
