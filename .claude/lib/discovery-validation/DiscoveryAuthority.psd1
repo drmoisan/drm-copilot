@@ -10,7 +10,7 @@
     Copyright         = '(c) drm-copilot. All rights reserved.'
     Description       = 'Protected discovery authority location, activation decoding, input-manifest freshness and host envelope normalization for native discovery hooks.'
     PowerShellVersion = '7.0'
-    NestedModules     = @('DiscoveryEncoding.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryStart.psm1', 'DiscoveryStop.psm1')
+    NestedModules     = @('DiscoveryEncoding.psm1', 'DiscoveryManifest.psm1', 'DiscoveryPayload.psm1', 'DiscoveryAuthorization.psm1', 'DiscoveryStartRecord.psm1', 'DiscoveryStart.psm1', 'DiscoveryStop.psm1', 'DiscoveryPlanning.psm1')
     FunctionsToExport = @(
         'Get-DiscoverySha256Hex',
         'Get-DiscoveryBytesSha256Hex',
@@ -64,7 +64,12 @@
         'Find-DiscoveryAgentInvocationForStop',
         'Get-DiscoveryReceiptMismatch',
         'Get-DiscoveryStopDecision',
-        'Get-DiscoveryStopVerdict'
+        'Get-DiscoveryStopVerdict',
+        'Get-DiscoveryPlanningTarget',
+        'Get-DiscoveryPlanningPrerequisite',
+        'Get-DiscoveryPlanningReceiptMismatch',
+        'Get-DiscoveryPlanningDecision',
+        'ConvertTo-DiscoveryPlanningHookOutput'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

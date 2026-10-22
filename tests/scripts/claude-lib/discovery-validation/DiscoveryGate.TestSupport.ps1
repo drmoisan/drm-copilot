@@ -158,13 +158,14 @@ function Get-GateEnvelope {
         [Parameter(Mandatory = $true)][string]$ToolName,
         [Parameter(Mandatory = $false)][AllowNull()][object]$ToolInput = @{},
         [Parameter(Mandatory = $false)][string]$SessionId = 'session-alpha',
-        [Parameter(Mandatory = $false)][string]$Event = 'PreToolUse'
+        [Parameter(Mandatory = $false)][string]$Event = 'PreToolUse',
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Cwd = $script:GateWorkspaceRoot
     )
 
     if ($HostName -eq 'github-copilot') {
-        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = $Event; toolName = $ToolName; toolInput = $ToolInput; cwd = $script:GateWorkspaceRoot; toolUseId = 'tool-use-alpha' }
+        $envelope = [ordered]@{ sessionId = $SessionId; hookEventName = $Event; toolName = $ToolName; toolInput = $ToolInput; cwd = $Cwd; toolUseId = 'tool-use-alpha' }
     } else {
-        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = $Event; tool_name = $ToolName; tool_input = $ToolInput; cwd = $script:GateWorkspaceRoot; tool_use_id = 'tool-use-alpha' }
+        $envelope = [ordered]@{ session_id = $SessionId; hook_event_name = $Event; tool_name = $ToolName; tool_input = $ToolInput; cwd = $Cwd; tool_use_id = 'tool-use-alpha' }
     }
     return ($envelope | ConvertTo-Json -Compress -Depth 8)
 }
