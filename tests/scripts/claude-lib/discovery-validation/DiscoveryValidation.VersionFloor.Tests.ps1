@@ -116,6 +116,16 @@ Describe 'DiscoveryValidation destination version floor' {
             $errors[0] | Should -Match '#475'
         }
 
+        It 'fails closed from the compatibility validation entry on an unsupported host' {
+            # Act
+            $result = Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', 'docs/evidence.json') `
+                -PowerShellVersion ([version]'7.3.0')
+
+            # Assert
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -Match 'PowerShell 7\.4'
+        }
+
         It 'fails closed from the dispatch entry point on an unsupported host' {
             # Act
             $errors = Get-DiscoveryArtifactValidationError -ArtifactType 'evidence-reference' `
