@@ -487,7 +487,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Apply the documented ordered loops, complete coverage-enabled Jest populations, source/test type checks, architecture-boundary checks, and both extension/standalone builds; restart from formatting after any fix/failure.
   - Acceptance: All applicable root/extension tests and builds pass in one clean cycle, no architecture violation remains, and new per-file thresholds are measured rather than bypassed by blanket mocks.
 
-- [ ] [P11-T4] Complete PowerShell gates and CI-shaped execution.
+- [x] [P11-T4] Complete PowerShell gates and CI-shaped execution.
   - Files and behavior: Verify changed canonical and generated PowerShell hooks/libraries/scripts, config/poshqc coverage population, and every touched Pester suite. Write separate FEATURE/evidence/qa-gates/powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md with retained actual result/coverage files.
   - Tests and proof: Run formatting→analysis→tests in the documented order, restart after fixes, inspect actual analyzer/JUnit/coverage evidence, execute the full registered population in CI-shaped single-process and shard/completeness form, and include new Copilot hook suites.
   - Acceptance: No formatting/analyzer/test failure, missing shard, leaked module state, or incomplete coverage population remains; PowerShell line metrics are numeric and no branch metric is fabricated.
