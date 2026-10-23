@@ -1,0 +1,67 @@
+[
+  {
+    "module": "path_policy",
+    "sites": 63,
+    "selected": 8,
+    "killed": 7,
+    "survived": 1,
+    "equivalent": 0,
+    "score_percent": 87.5,
+    "survivors": [
+      "const:243:75"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_path_policy.py",
+      "tests/discovery_runtime/test_path_collisions.py",
+      "tests/discovery_runtime/test_path_resolution.py"
+    ]
+  },
+  {
+    "module": "claim_rules",
+    "sites": 61,
+    "selected": 8,
+    "killed": 7,
+    "survived": 1,
+    "equivalent": 0,
+    "score_percent": 87.5,
+    "survivors": [
+      "const:43:18"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_observation_claims.py",
+      "tests/discovery_runtime/test_runtime_claims.py"
+    ]
+  },
+  {
+    "module": "completion_rules",
+    "sites": 27,
+    "selected": 8,
+    "killed": 6,
+    "survived": 2,
+    "equivalent": 0,
+    "score_percent": 75.0,
+    "survivors": [
+      "const:29:18",
+      "bool:75"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_completion_rules.py"
+    ]
+  },
+  {
+    "module": "acceptance_rules",
+    "sites": 90,
+    "selected": 8,
+    "killed": 7,
+    "survived": 1,
+    "equivalent": 0,
+    "score_percent": 87.5,
+    "survivors": [
+      "const:65:18"
+    ],
+    "tests": [
+      "tests/discovery_runtime/test_acceptance_rules.py",
+      "tests/discovery_runtime/test_acceptance_scope.py"
+    ]
+  }
+]

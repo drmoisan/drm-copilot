@@ -119,6 +119,18 @@ Describe 'DiscoveryValidation compatibility surface' {
             $result.Output | Should -Match 'PowerShell 7\.4'
         }
 
+        It 'checks the artifact path through the default seam against committed files only' {
+            # The default seam is a plain existence test; a committed schema file is present and
+            # a path under the fixture root is absent, so no file is created or read.
+            $committed = Join-Path $script:RepoRoot 'schemas/discovery/v2/evidence-reference.schema.json'
+            $present = Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', $committed) -PowerShellVersion $script:Supported
+            $present.ExitCode | Should -Be 1
+            $present.Output | Should -Match 'DISCOVERY_VALIDATION_REQUIRED'
+            $absent = Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', 'C:/Users/Example/Repos/NoArtifacts/missing.json') -PowerShellVersion $script:Supported
+            $absent.ExitCode | Should -Be 1
+            $absent.Output | Should -Match 'Artifact not found'
+        }
+
         It 'reads no artifact bytes and never returns a passing result whatever the document' {
             $probe = { param([string]$Candidate) $script:Probed = $Candidate; $true }
             $result = Invoke-DiscoveryArtifactValidation -ValidatorArgs @('coverage-ledger', $script:ConformingDocument) -PowerShellVersion $script:Supported -TestArtifactPath $probe
