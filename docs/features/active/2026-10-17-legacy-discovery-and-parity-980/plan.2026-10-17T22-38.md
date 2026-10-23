@@ -477,7 +477,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Drive init→inventory→scope/coverage/contracts/unknowns→runtime/manual evidence→decision→source export/import→target implementation/parity→ready/pending acceptance→all reports/gates through real service rules. Cover no-runtime, optional dimensions, multiple clients, repeat runs, dry-run, malformed/unreferenced artifacts, stale bytes, and negative exit mapping.
   - Acceptance: The public path demonstrates structural draft success, honest incomplete discovery failure, evidence-backed completion and parity, and no false pass in any negative scenario; host transport uses the same authority.
 
-- [ ] [P11-T2] Complete the Python formatting, lint, type, and full coverage loop.
+- [x] [P11-T2] Complete the Python formatting, lint, type, and full coverage loop.
   - Files and behavior: Verify all changed Python code/tests, dedicated runtime package, root adapters, schemas, generator/converter/publisher/build modules using pyproject.toml and package configuration. Write separate FEATURE/evidence/qa-gates/python-{format,lint,types,tests}.<timestamp>.md plus canonical numeric coverage output.
   - Tests and proof: Run the complete documented order and restart at formatting after every fix/failure; run full Pytest with line and branch coverage, exact-version schema fixtures, new package import closure, and existing safe v1/compatibility suites.
   - Acceptance: One clean pass has zero formatter/lint/type/test failures, Python line coverage meets the existing 85% CI floor, branch coverage is at least 75%, and required numeric new/changed coverage is available for P11-T5.

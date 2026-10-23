@@ -1,0 +1,15 @@
+# P11-T2 Python test gate with coverage
+
+Timestamp: 2026-10-23T02-16
+Command: poetry run pytest --cov --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-980-p11t2-coverage.json --junitxml=SCRATCH/issue-980-p11t2-junit.xml -p no:cacheprovider; poetry run python -m scripts.dev_tools.check_python_coverage_thresholds --report SCRATCH/issue-980-p11t2-coverage.json --min-line 85 --min-branch 75
+EXIT_CODE: 0 (pytest), 0 (threshold gate)
+Output Summary: 15443 passed, 6 skipped, 0 failed, 0 errors in 14248.04s (3:57:28) over the complete `tests` population in the default rootdir import mode that CI uses (15449 collected). Repository coverage: 31408/32507 statements, lines 96.62%; 11466/12264 branches, branches 93.49% (TOTAL row `32507 1099 12264 548 96%`); the CI threshold gate passes at 85/75. Baseline at Phase 0 was 94.11% lines and 88.78% branches over 17849 statements, so the branch adds 14658 statements at a higher aggregate coverage. Per changed production file (174 files since the merge base of origin/main and HEAD: 136 added, 38 modified; every one present in the report) the numeric line and branch figures are recorded in `python-coverage-metrics.2026-10-23T02-16.json` for P11-T5. 173 of the 174 meet the per-file 85/75 floors; the exception is the pre-existing `scripts/dev_tools/agentic_sync.py` at 87.2% lines and 62.5% branches, identical to its baseline figures (the branch changes one line of it and adds twelve test lines, and none of the uncovered lines or branches is a changed line); its disposition belongs to the P11-T5 delta table. The six skips are the same six as the baseline (the issue #722 tolerance detection and five manifest accessor cases with no expectation).
+
+## Loop record
+
+- Pass 1: Black check clean (940 files), Ruff clean, Pyright clean, then the full collection failed before any test ran: `tests/discovery_runtime/test_configuration.py` and `tests/discovery_runtime/analyzer/test_configuration.py` share a basename and the default import mode registered both as `test_configuration` (the defect P7-T3 escalated to this task). Repair: add the package marker `tests/discovery_runtime/analyzer/__init__.py`, following the existing `tests/scripts/dev_tools/discovery/analyzer` precedent, so the analyzer tree collects as `analyzer.test_configuration`; the explicit `tests.discovery_runtime.analyzer.*` imports of the sibling suites are unchanged.
+- Pass 2 (restart from formatting): Black, Ruff and Pyright clean on the repository and on the new marker; collection 15449 tests with no error; focused rerun of `tests/discovery_runtime/analyzer`, the colliding sibling and `tests/test_pytest_collection.py` 1913 passed; the full coverage run above passed.
+
+## Scope confirmation
+
+- The run covers the dedicated runtime package (`packages/discovery-runtime/src`), the root adapters and generator, converter, publisher and build modules under `scripts/dev_tools`, `src`, the exact-version v2 schema fixtures, the package import-closure and build-identity suites, the frozen v1 and compatibility suites, and the three P11-T1 public workflow suites.
