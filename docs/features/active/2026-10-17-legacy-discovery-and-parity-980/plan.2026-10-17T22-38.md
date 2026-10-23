@@ -482,7 +482,7 @@ Task evidence distinguishes changed existing code, relocated implementations wit
   - Tests and proof: Run the complete documented order and restart at formatting after every fix/failure; run full Pytest with line and branch coverage, exact-version schema fixtures, new package import closure, and existing safe v1/compatibility suites.
   - Acceptance: One clean pass has zero formatter/lint/type/test failures, Python line coverage meets the existing 85% CI floor, branch coverage is at least 75%, and required numeric new/changed coverage is available for P11-T5.
 
-- [ ] [P11-T3] Complete both TypeScript project quality loops and builds.
+- [x] [P11-T3] Complete both TypeScript project quality loops and builds.
   - Files and behavior: Verify root and extensions/drm-copilot TypeScript, shared MCP wrappers, new authority/operation modules, conversion/publishing adapters, and packages/mcp-server build inputs. Write separate FEATURE/evidence/qa-gates/typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md.
   - Tests and proof: Apply the documented ordered loops, complete coverage-enabled Jest populations, source/test type checks, architecture-boundary checks, and both extension/standalone builds; restart from formatting after any fix/failure.
   - Acceptance: All applicable root/extension tests and builds pass in one clean cycle, no architecture violation remains, and new per-file thresholds are measured rather than bypassed by blanket mocks.
