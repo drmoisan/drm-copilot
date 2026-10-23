@@ -310,23 +310,29 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             # never reaches this hook on the Codex surface, which is why the parity cases
             # above call the shared predicates directly instead of fabricating an
             # envelope. Closing the gap is issue #555's scope, not issue #554's.
+            # The discovery adapters registered by issue #980 carry their own PreToolUse
+            # block whose matcher admits the Agent transport (nested-specialist denial);
+            # that block never names this hook, so only the blocks that register this
+            # hook are read here.
             $configPath = (Resolve-Path "$PSScriptRoot/../../../.codex/config.toml").Path
             $lines = Get-Content -LiteralPath $configPath
+            $hookToken = 'enforce-orchestration-preimplementation-gate.ps1'
 
             $toolMatchers = @()
             for ($index = 0; $index -lt $lines.Count; $index++) {
                 if ($lines[$index].Trim() -ne '[[hooks.PreToolUse]]') { continue }
+                $matcher = $null
+                $registersHook = $false
                 for ($scan = $index + 1; $scan -lt $lines.Count; $scan++) {
+                    if ($lines[$scan].Trim() -eq '[[hooks.PreToolUse]]' -or $lines[$scan].Trim() -match '^\[\[hooks\.(?!PreToolUse)') { break }
                     $candidate = [regex]::Match($lines[$scan], '^\s*matcher\s*=\s*"(?<value>.*)"\s*$')
-                    if ($candidate.Success) {
-                        $toolMatchers += $candidate.Groups['value'].Value
-                        break
-                    }
-                    if ($lines[$scan].Trim().StartsWith('[')) { break }
+                    if ($candidate.Success -and $null -eq $matcher) { $matcher = $candidate.Groups['value'].Value }
+                    if ($lines[$scan].Contains($hookToken)) { $registersHook = $true }
                 }
+                if ($registersHook -and $null -ne $matcher) { $toolMatchers += $matcher }
             }
 
-            $toolMatchers.Count | Should -BeGreaterThan 0 -Because 'the parse must find the PreToolUse tool matchers'
+            $toolMatchers.Count | Should -BeGreaterThan 0 -Because 'the parse must find the PreToolUse blocks that register this hook'
             foreach ($matcher in $toolMatchers) {
                 'Agent' | Should -Not -Match $matcher -Because "$matcher must not admit an Agent tool name"
                 'Task' | Should -Not -Match $matcher -Because "$matcher must not admit a Task tool name"

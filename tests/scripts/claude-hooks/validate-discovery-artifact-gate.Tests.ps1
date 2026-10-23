@@ -94,10 +94,13 @@ Describe 'validate-discovery-artifact-gate.ps1' {
 
     Context 'script entrypoint (stdin envelope, issue #905)' {
         It 'exits 2 with a payload anomaly reason for <Name>' -ForEach @(
-            @{ Name = 'empty stdin'; Stdin = '' }
-            @{ Name = 'malformed stdin'; Stdin = '{' }
-            @{ Name = 'an absent last_assistant_message'; Stdin = (ConvertTo-SubagentStopEnvelopeJson -OmitAssistantMessage) }
+            @{ Name = 'empty stdin'; Stdin = ''; OmitAssistantMessage = $false }
+            @{ Name = 'malformed stdin'; Stdin = '{'; OmitAssistantMessage = $false }
+            @{ Name = 'an absent last_assistant_message'; Stdin = $null; OmitAssistantMessage = $true }
         ) {
+            # The envelope helper is dot-sourced in BeforeAll, which runs after the -ForEach
+            # rows are evaluated at discovery, so the envelope is built inside the test body.
+            if ($OmitAssistantMessage) { $Stdin = ConvertTo-SubagentStopEnvelopeJson -OmitAssistantMessage }
             $result = Invoke-DiscoveryStdinEntry -Stdin $Stdin
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 2
@@ -112,9 +115,15 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         }
 
         It 'exits 2 with the gate prefix for a discovery specialist whose protected receipt is missing' {
-            Mock Get-DiscoveryHostEnvironmentValueTable { Get-StartEnvironment }
-            Mock Get-DiscoveryTrustedHostEnvironment { $script:GateHostEnvironment }
-            Mock Get-DiscoveryStartStore { Get-StopStore -NoReceipt }
+            # The & route runs the hook in its own script scope, where $script: no longer
+            # names this file and module-internal callers do not see this scope, so every
+            # mocked value is built here and bound into the mock bodies as closures.
+            $environmentValues = Get-StartEnvironment
+            $gateHostEnvironment = $script:GateHostEnvironment
+            $storeWithoutReceipt = Get-StopStore -NoReceipt
+            Mock Get-DiscoveryHostEnvironmentValueTable { $environmentValues }.GetNewClosure()
+            Mock Get-DiscoveryTrustedHostEnvironment { $gateHostEnvironment }.GetNewClosure()
+            Mock Get-DiscoveryStartStore { $storeWithoutReceipt }.GetNewClosure()
             $result = Invoke-DiscoveryStdinEntry -Stdin (Get-StopEnvelope)
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 2

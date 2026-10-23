@@ -6,6 +6,7 @@
     config/orchestration-routing.json so published consumers need no config or
     interpreter. Receipts describe a specialist and allowed output kinds; they
     grant no writes, approvals, installation rights, or native tool authority.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

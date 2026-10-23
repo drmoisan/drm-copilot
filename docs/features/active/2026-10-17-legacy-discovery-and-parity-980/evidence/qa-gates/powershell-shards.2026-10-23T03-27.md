@@ -1,0 +1,6 @@
+# P11-T4 PowerShell shard and completeness shape
+
+Timestamp: 2026-10-23T03-27
+Command: Invoke-PoshQCTest -Root <worktree> -ShardIndex N -ShardCount 3 -ShardFileListPath artifacts/shards/poshqc-test-results-shard-N/shard-files.json -DisableKoverageCopy for N in 1..3; then Test-PoshQCShardCompleteness over the three manifests, a discovery-only Invoke-Pester over the manifest's `all` list, Test-PoshQCShardTestCount against the three JUnit totals, and Merge-PoshQCCoverageReport over the three coverage reports (the `poshqc / PowerShell QC shard 1..3` and `poshqc / PowerShell QC` job shapes)
+EXIT_CODE: 0, 0, 0 (shards), 0 (completeness and merge)
+Output Summary: Shard 1: 3822 tests, 0 failed; shard 2: 3856 tests, 0 failed; shard 3: 4421 tests, 0 failed, 10 skipped. "Shard completeness verified: 3 shards, 435 test files, shard tests 3822 + 3856 + 4421 = discovery 12099." Merged line coverage 19400 of 20937 lines (92.66%) over 240 files, equal to the single-process figure, so no shard is missing and no test file is selected twice. Retained files: `powershell-junit-shard-{1,2,3}.2026-10-23T03-27.xml`, `powershell-shard-files-{1,2,3}.2026-10-23T03-27.json`, `powershell-coverage-merged.2026-10-23T03-27.xml`. The new `.github/hooks` Copilot suites under tests/scripts/copilot-hooks are part of the 435-file population and run in the shards and in the single process.
