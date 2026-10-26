@@ -4,15 +4,19 @@
  * `prepare_discovery_agent` is a root operation. Given the trusted parent and
  * session context, the protected activation envelope, the session's current
  * capability attestation and the routing decision from `discovery-routing`,
- * this module writes the protected `discovery-invocation` record and its
- * topology, model and required-output receipts under the invocation partition
- * of the authority store, then returns the exact launchable deployment. The
+ * this module writes the protected `discovery-invocation` record, its
+ * topology, model and required-output receipts and the authoritative
+ * `prepare-agent` baseline result under the invocation partition of the
+ * authority store, then returns the exact launchable deployment. The
  * workspace mirror it offers is diagnostic only: protected reads never consult
  * it. Nothing here reads or writes `artifacts/orchestration/orchestrator-state.json`,
  * and no feature issue or checkpoint is required.
  */
 
-import type { DiscoveryRuntimeIdentity } from "./discovery-service-types";
+import type {
+  DiscoveryRuntimeIdentity,
+  DiscoveryServiceResult,
+} from "./discovery-service-types";
 import {
   type AuthorityStoreIO,
   type ProtectedEnvelope,
@@ -73,6 +77,8 @@ export {
 export const TOPOLOGY_RECEIPT_FILE = "topology-receipt.json";
 export const MODEL_RECEIPT_FILE = "model-receipt.json";
 export const REQUIRED_OUTPUTS_FILE = "required-outputs.json";
+/** Verbatim `prepare-agent` result: the pre-invocation baseline Python pinned. */
+export const BASELINE_RESULT_FILE = "baseline-result.json";
 export const DIAGNOSTIC_MIRROR_ROOT = "artifacts/discovery/invocations";
 export const PREPARE_REQUEST_KEYS: ReadonlyArray<string> = [
   "complexity",
@@ -141,6 +147,12 @@ export interface PrepareOptions {
   readonly context: PrepareContext;
   readonly request: unknown;
   readonly runtime: DiscoveryRuntimeIdentity;
+  /**
+   * Authoritative ok `prepare-agent` result of the installed runtime for the
+   * same request. It is persisted verbatim so the host-principal gateway can
+   * reconstruct the pre-invocation inputs; it is never derived from the caller.
+   */
+  readonly baseline: DiscoveryServiceResult;
   readonly availableModels?: ReadonlySet<string>;
   /** Host-pinned configuration and hook hashes the attestation must match. */
   readonly pins?: CapabilityPins;
@@ -271,12 +283,35 @@ export function diagnosticMirror(
 }
 
 /**
+ * Require the baseline to be the ok `prepare-agent` result of this runtime.
+ *
+ * A failed, foreign or runtime-less result would persist a baseline the
+ * Python gateway cannot verify, so it is refused before any protected write.
+ */
+function validateBaseline(
+  baseline: DiscoveryServiceResult,
+  runtime: DiscoveryRuntimeIdentity,
+): void {
+  if (
+    baseline.operation !== "prepare-agent" ||
+    !baseline.ok ||
+    baseline.runtime === null ||
+    canonicalJson(baseline.runtime) !== canonicalJson(runtime)
+  ) {
+    throw refuse(
+      "INVOCATION_REQUEST_INVALID",
+      "Prepare requires the ok prepare-agent baseline result of the installed runtime.",
+    );
+  }
+}
+
+/**
  * Prepare one discovery invocation and persist its protected bindings.
  *
- * Order: trusted context, request shape, routing (fails before any I/O),
- * activation envelope, capability attestation, then exclusive creation of the
- * four protected records. The deployment is returned only after every record
- * exists.
+ * Order: trusted context, request shape, baseline result, routing (fails
+ * before any I/O), activation envelope, capability attestation, then exclusive
+ * creation of the five protected records. The deployment is returned only
+ * after every record exists.
  */
 export function prepareDiscoveryInvocation(
   options: PrepareOptions,
@@ -284,6 +319,7 @@ export function prepareDiscoveryInvocation(
   const { location, io, context, runtime, now } = options;
   validateContext(context);
   const request = validateRequestShape(options.request);
+  validateBaseline(options.baseline, runtime);
   const decision = resolveDiscoveryRouting(
     {
       skillId: request.skill_id,
@@ -390,6 +426,7 @@ export function prepareDiscoveryInvocation(
       { ref: decision.modelReceiptRef, receipt: decision.deployment },
     ],
     [REQUIRED_OUTPUTS_FILE, manifest],
+    [BASELINE_RESULT_FILE, options.baseline],
   ];
   const protectedPaths: string[] = [];
   for (const [name, document] of files) {

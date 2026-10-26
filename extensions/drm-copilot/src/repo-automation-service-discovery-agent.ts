@@ -3,9 +3,10 @@
  * finalize.
  *
  * Both wrap the protected-store modules around one runtime call. Prepare pins
- * the installed runtime identity through `doctor` before routing and persisting
- * bindings; finalize obtains the authoritative `finalize-agent` result before
- * minting the receipt. Trusted identity comes only from the injected
+ * the pre-invocation baseline and the installed runtime identity through the
+ * root `prepare-agent` route before routing and persisting bindings; finalize
+ * obtains the authoritative `finalize-agent` result before minting the
+ * receipt. Trusted identity comes only from the injected
  * {@link DiscoveryAuthorityProvider}.
  */
 
@@ -77,29 +78,52 @@ export function projectDoctorCapability(
 }
 
 /**
- * Prepare a constrained invocation: pin the installed runtime identity through
- * `doctor`, then route and persist protected bindings before returning the
- * exact deployment.
+ * Prepare a constrained invocation: pin the pre-invocation baseline and the
+ * installed runtime identity through the root `prepare-agent` route, then
+ * route and persist protected bindings before returning the exact deployment.
+ *
+ * The runtime checks every expected output against the configured capture; a
+ * non-ok result is refused before any protected write so a drifted or
+ * misplaced output can never become an invocation baseline.
  */
 export async function prepareDiscoveryAgentOperation(
   deps: DiscoveryAgentOperationDeps,
   input: PrepareDiscoveryAgentInput,
 ): Promise<RepoAutomationExecutionResult> {
   const { authority } = deps;
-  const doctor = await invokeDiscoveryRuntime(
+  const baseline = await invokeDiscoveryRuntime(
     deps.output,
     {
       invocationId: input.invocationId ?? "prepare_discovery_agent",
-      request: { operation: "doctor", workspaceRoot: input.workspaceRoot },
+      request: {
+        operation: "prepare-agent",
+        workspaceRoot: input.workspaceRoot,
+        ...(input.profilePath === undefined
+          ? {}
+          : { profilePath: input.profilePath }),
+        inputs: {
+          skill_id: input.skillId,
+          selected_ids: input.selectedIds,
+          paths: input.paths,
+          expected_outputs: input.expectedOutputs,
+          execution_context: input.executionContext,
+          complexity: input.complexity,
+        },
+      },
       ...(input.interpreter === undefined
         ? {}
         : { interpreter: input.interpreter }),
     },
     deps.runtime,
   );
-  if (!doctor.ok || doctor.runtime === null) {
+  if (
+    !baseline.ok ||
+    baseline.operation !== "prepare-agent" ||
+    baseline.runtime === null
+  ) {
+    const codes = baseline.findings.map((finding) => finding.code).join(", ");
     throw new Error(
-      "DISCOVERY_RUNTIME_IDENTITY_UNAVAILABLE: the installed runtime did not report a healthy identity; run run_discovery_doctor.",
+      `DISCOVERY_PREPARE_BASELINE_FAILED: the installed runtime did not pin the pre-invocation baseline (exit ${String(baseline.exit_code)}${codes.length > 0 ? `: ${codes}` : ""}); correct the expected outputs or repair the runtime and retry.`,
     );
   }
   const location = authority.location(input.workspaceRoot);
@@ -122,7 +146,8 @@ export async function prepareDiscoveryAgentOperation(
               input.orchestrationComplexityCeiling,
           }),
     },
-    runtime: doctor.runtime,
+    runtime: baseline.runtime,
+    baseline,
     ...(authority.capabilityPins === undefined
       ? {}
       : { pins: authority.capabilityPins }),

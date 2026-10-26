@@ -24,8 +24,10 @@ import {
   type PrepareOptions,
 } from "../src/discovery-invocation";
 import { DiscoveryRoutingError } from "../src/discovery-routing";
+import type { DiscoveryServiceResult } from "../src/discovery-service-types";
 import { DISCOVERY_OPERATIONS } from "../src/lib/validate/codex-discovery-routing";
 import { MemoryStoreIO } from "./discovery-store-test-helpers";
+import { buildServiceResult } from "./discovery-test-helpers";
 export const SCHEMA_PATH = path.resolve(
   __dirname,
   "..",
@@ -145,6 +147,42 @@ export function request(
   };
 }
 
+/** An ok `prepare-agent` result of RUNTIME: the baseline the prepare flow persists. */
+export function baselineResult(
+  overrides: Partial<DiscoveryServiceResult> = {},
+): DiscoveryServiceResult {
+  return buildServiceResult({
+    operation: "prepare-agent",
+    mode: "structural",
+    summary: {
+      message: "Operation passed.",
+      counts: [
+        { name: "expected_outputs", value: 1 },
+        { name: "existing_outputs", value: 0 },
+      ],
+      validation_result: null,
+      receipt_ref: null,
+      invocation_ref: null,
+    },
+    input_manifest: {
+      entries: [
+        {
+          path: WORKSPACE.profile_path,
+          sha256: WORKSPACE.profile_sha256,
+          size: 32,
+          category: "profile",
+        },
+      ],
+      missing_paths: [],
+      source_repositories: [],
+      target_repositories: [],
+      sha256: "a".repeat(64),
+    },
+    runtime: RUNTIME,
+    ...overrides,
+  });
+}
+
 export function seeded(
   attestation: Record<string, unknown> | string | null = capability(),
 ): MemoryStoreIO {
@@ -172,6 +210,7 @@ export function options(
     context: CONTEXT,
     request: request(),
     runtime: RUNTIME,
+    baseline: baselineResult(),
     now: NOW,
     nonce: () => {
       counter += 1;

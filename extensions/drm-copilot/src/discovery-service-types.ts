@@ -58,9 +58,18 @@ export type DiscoveryFindingSeverity = "error" | "warning" | "info";
 export type DiscoveryArtifactStatus =
   "planned" | "created" | "updated" | "skipped" | "conflict";
 
+/** One closed request input value; object rows carry `expected_outputs` only. */
+export type DiscoveryRequestInputValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ReadonlyArray<string>
+  | ReadonlyArray<Readonly<Record<string, unknown>>>;
+
 /** Closed request data; the service enforces operation-specific combinations. */
 export type DiscoveryRequestInputs = Readonly<
-  Record<string, string | number | boolean | null | ReadonlyArray<string>>
+  Record<string, DiscoveryRequestInputValue>
 >;
 
 /** The complete v2 service-request document written to the gateway stdin. */

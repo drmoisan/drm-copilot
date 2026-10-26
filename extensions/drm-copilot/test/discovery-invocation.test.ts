@@ -9,6 +9,7 @@
 
 import { invocationDirectory } from "../src/discovery-authority-paths";
 import {
+  BASELINE_RESULT_FILE,
   diagnosticMirror,
   INVOCATION_RECORD_KEYS,
   loadPreparedInvocation,
@@ -20,12 +21,14 @@ import {
 } from "../src/discovery-routing";
 import { DISCOVERY_OPERATIONS } from "../src/lib/validate/codex-discovery-routing";
 import {
+  baselineResult,
   codeOf,
   INVOCATION_SCHEMA,
   LOCATION,
   NOW,
   options,
   request,
+  RUNTIME,
   seeded,
   WORKSPACE,
 } from "./discovery-invocation-test-support";
@@ -82,7 +85,12 @@ describe("prepareDiscoveryInvocation", () => {
         `${directory}/topology-receipt.json`,
         `${directory}/model-receipt.json`,
         `${directory}/required-outputs.json`,
+        `${directory}/${BASELINE_RESULT_FILE}`,
       ]);
+      // Exactly the five protected records are created, each exclusively.
+      expect(
+        io.writtenPaths().filter((written) => written !== directory),
+      ).toHaveLength(5);
       // Every write stays inside the protected partition; no checkpoint, no workspace.
       for (const written of io.writtenPaths()) {
         expect(written.startsWith(`${directory}`)).toBe(true);
@@ -162,6 +170,47 @@ describe("prepareDiscoveryInvocation", () => {
     ).toBe(false);
     expect(diagnosticMirror(loaded).text).toBe(prepared.mirror.text);
   });
+
+  it("persists the supplied prepare-agent baseline result byte-identically", () => {
+    const io = seeded();
+    const baseline = baselineResult({
+      artifacts: [
+        {
+          path: "out/inventory-snapshot.json",
+          kind: "inventory-snapshot",
+          status: "planned",
+          sha256: "7".repeat(64),
+          content: '{"prior": true}\n',
+        },
+      ],
+    });
+    const prepared = prepareDiscoveryInvocation(options(io, { baseline }));
+    const path = `${invocationDirectory(LOCATION, "session-alpha", prepared.record.invocation_id)}/${BASELINE_RESULT_FILE}`;
+    expect(prepared.protectedPaths).toContain(path);
+    expect(io.files.get(path)).toBe(`${JSON.stringify(baseline, null, 2)}\n`);
+    expect(JSON.parse(io.files.get(path)!)).toEqual(baseline);
+    expect(prepared.record.runtime).toEqual(RUNTIME);
+  });
+
+  it.each([
+    ["a failed result", baselineResult({ ok: false, exit_code: 1 })],
+    ["a foreign operation", baselineResult({ operation: "doctor" })],
+    ["a result without runtime identity", baselineResult({ runtime: null })],
+    [
+      "a result of another runtime",
+      baselineResult({ runtime: { ...RUNTIME, build_sha256: "9".repeat(64) } }),
+    ],
+  ])(
+    "refuses %s as a baseline before any protected write",
+    (_label, baseline) => {
+      const io = seeded();
+      const before = io.writtenPaths().length;
+      expect(
+        codeOf(() => prepareDiscoveryInvocation(options(io, { baseline }))),
+      ).toBe("INVOCATION_REQUEST_INVALID");
+      expect(io.writtenPaths()).toHaveLength(before);
+    },
+  );
 
   it("does not reuse a partially written invocation directory", () => {
     const io = seeded();
