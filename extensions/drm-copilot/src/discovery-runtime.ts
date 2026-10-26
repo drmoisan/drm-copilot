@@ -83,8 +83,25 @@ export interface DiscoveryRuntimeInvocation {
   readonly interpreter?: string;
   readonly principal?: DiscoveryPrincipal;
   readonly repositoryId?: string;
+  /** Local author id, or the trusted agent id when the principal is `host`. */
   readonly authorId?: string;
+  /** Trusted host session id; required with principal `host`, refused otherwise. */
+  readonly sessionId?: string;
+  /** Trusted host name; required with principal `host`, refused otherwise. */
+  readonly hostName?: string;
+  /** Trusted agent role; required with principal `host`, refused otherwise. */
+  readonly agentRole?: string;
 }
+
+/** Host identity options and the gateway option that carries each one. */
+const HOST_IDENTITY_OPTIONS: ReadonlyArray<
+  readonly [keyof DiscoveryRuntimeInvocation, string]
+> = [
+  ["authorId", "--author-id"],
+  ["sessionId", "--session-id"],
+  ["hostName", "--host-name"],
+  ["agentRole", "--agent-role"],
+];
 
 function isAbsoluteWorkspaceRoot(workspaceRoot: string): boolean {
   return (
@@ -219,10 +236,38 @@ function resolveInterpreter(
   }
 }
 
+/**
+ * Require the trusted identity set that matches the principal.
+ *
+ * A `host` invocation carries the agent id, session id, host name and agent
+ * role together; a `local-user` invocation carries none of the session, host
+ * or role values. A partial set would let the runtime admit a host request
+ * under an unverifiable identity or a local request under a host marker, so
+ * either shape is refused before any process is launched.
+ */
+function requireHostIdentity(invocation: DiscoveryRuntimeInvocation): void {
+  const principal = invocation.principal ?? "local-user";
+  const supplied = HOST_IDENTITY_OPTIONS.filter(
+    ([key]) => invocation[key] !== undefined,
+  ).map(([, option]) => option);
+  const complete = supplied.length === HOST_IDENTITY_OPTIONS.length;
+  const sessionBound = supplied.some((option) => option !== "--author-id");
+  if (principal === "host" ? !complete : sessionBound) {
+    throw new DiscoveryTransportError({
+      code: "DISCOVERY_HOST_IDENTITY_INCOMPLETE",
+      message:
+        principal === "host"
+          ? `A host invocation requires ${HOST_IDENTITY_OPTIONS.map(([, option]) => option).join(", ")}; received ${supplied.length > 0 ? supplied.join(", ") : "none"}.`
+          : `A local-user invocation cannot carry ${supplied.filter((option) => option !== "--author-id").join(", ")}.`,
+    });
+  }
+}
+
 function buildGatewayArgs(
   runtime: RuntimeResolution,
   invocation: DiscoveryRuntimeInvocation,
 ): string[] {
+  requireHostIdentity(invocation);
   const args = [
     ...runtime.argsPrefix,
     "-I",
@@ -236,8 +281,12 @@ function buildGatewayArgs(
   if (invocation.repositoryId !== undefined) {
     args.push("--repository-id", invocation.repositoryId);
   }
-  if (invocation.authorId !== undefined) {
-    args.push("--author-id", invocation.authorId);
+  // Identity options follow the fixed order the gateway's option table expects.
+  for (const [key, option] of HOST_IDENTITY_OPTIONS) {
+    const value = invocation[key];
+    if (typeof value === "string") {
+      args.push(option, value);
+    }
   }
   return args;
 }

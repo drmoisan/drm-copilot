@@ -16,6 +16,7 @@ import {
   invokeDiscoveryRuntime,
   type DiscoveryRequestSpec,
   type DiscoveryRuntimeDependencies,
+  type DiscoveryRuntimeInvocation,
 } from "./discovery-runtime";
 import type {
   DiscoveryMode,
@@ -177,13 +178,28 @@ function optionalInputs(
   return inputs;
 }
 
-/** Compose one request from the shared workspace fields and run it. */
+/** Trusted outer identity options a caller may add to one runtime invocation. */
+export type DiscoveryInvocationIdentity = Partial<
+  Pick<
+    DiscoveryRuntimeInvocation,
+    "principal" | "authorId" | "sessionId" | "hostName" | "agentRole"
+  >
+>;
+
+/**
+ * Compose one request from the shared workspace fields and run it.
+ *
+ * `identity` carries the trusted outer principal options; it is empty for a
+ * root request and the complete host set for a request bound to a protected
+ * invocation. It never comes from request data.
+ */
 export async function runDiscoveryOperation(
   output: CommandOutput,
   tool: RepoAutomationToolName,
   input: DiscoveryWorkspaceInput,
   request: Omit<DiscoveryRequestSpec, "workspaceRoot" | "profilePath">,
   dependencies: DiscoveryRuntimeDependencies,
+  identity: DiscoveryInvocationIdentity = {},
 ): Promise<RepoAutomationExecutionResult> {
   const result = await invokeDiscoveryRuntime(
     output,
@@ -199,6 +215,7 @@ export async function runDiscoveryOperation(
       ...(input.interpreter === undefined
         ? {}
         : { interpreter: input.interpreter }),
+      ...identity,
     },
     dependencies,
   );

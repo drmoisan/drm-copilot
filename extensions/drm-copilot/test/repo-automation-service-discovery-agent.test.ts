@@ -217,6 +217,20 @@ describe("finalizeDiscoveryAgent", () => {
       invocation_ref: scene.invocationId,
       workspace_root: WS.workspace_root,
     });
+    // Finalize runs under the host principal with the trusted identity set,
+    // never as local-user (P12-T3 transport).
+    expect(launcher.single().args.slice(-10)).toEqual([
+      "--principal",
+      "host",
+      "--author-id",
+      "agent-alpha",
+      "--session-id",
+      "session-alpha",
+      "--host-name",
+      "codex",
+      "--agent-role",
+      scene.role,
+    ]);
     expect(result.tool).toBe("finalize_discovery_agent");
     expect(result.receipt).toMatchObject({
       validation_result: "pass",
@@ -318,6 +332,14 @@ describe("agent operations with explicit host options", () => {
     });
     expect(launcher.single().executable).toBe("C:/custom/python.exe");
     expect(launcher.request()).toMatchObject({ profile_path: WS.profile_path });
+    expect(launcher.single().args).toEqual(
+      expect.arrayContaining([
+        "--principal",
+        "host",
+        "--agent-role",
+        scene.role,
+      ]),
+    );
     expect(result.receipt?.planning_authorized).toBe(true);
     expect(output.appendLine).toHaveBeenCalledWith(
       expect.stringContaining("[finalize-custom]"),

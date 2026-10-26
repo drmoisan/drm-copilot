@@ -25,6 +25,8 @@ import {
   WS_ROOT,
 } from "./repo-automation-service-discovery-test-support";
 
+const AGENT = { agentId: "agent-alpha", role: "requirements-reconciler" };
+
 describe("discovery request composition", () => {
   it.each([
     [
@@ -229,14 +231,103 @@ describe("discovery request composition", () => {
     ],
   ])("composes the %s request", async (_label, call, expected) => {
     const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
-    const result = await call(service(launcher));
+    // A request bound to a protected invocation runs for a discovery agent and
+    // must reach the runtime as host; every other request stays local-user.
+    const bound =
+      typeof (expected as Record<string, unknown>)["invocation_ref"] ===
+      "string";
+    const result = await call(
+      bound
+        ? service(launcher, provider(seeded(), { agent: AGENT }))
+        : service(launcher),
+    );
     expect(launcher.request()).toMatchObject(expected);
     expect(launcher.single().cwd).toBe(WS_ROOT);
+    const args = launcher.single().args;
+    if (bound) {
+      expect(args.slice(-10)).toEqual([
+        "--principal",
+        "host",
+        "--author-id",
+        AGENT.agentId,
+        "--session-id",
+        "session-alpha",
+        "--host-name",
+        "codex",
+        "--agent-role",
+        AGENT.role,
+      ]);
+    } else {
+      expect(args).toEqual(
+        expect.arrayContaining(["--principal", "local-user"]),
+      );
+      expect(args).not.toContain("--session-id");
+    }
     expect(result.discovery).toMatchObject({
       ok: true,
       runtime: buildServiceResult().runtime,
     });
   });
+
+  it.each([
+    [
+      "new-contract",
+      (svc: RepoAutomationService) =>
+        svc.createDiscoveryArtifact({
+          workspaceRoot: WS_ROOT,
+          artifactKind: "feature-contract",
+          featureId: "orders",
+          name: "Orders",
+          invocationRef: "invocation-alpha-0000000001",
+        }),
+    ],
+    [
+      "update-artifact",
+      (svc: RepoAutomationService) =>
+        svc.updateDiscoveryArtifact({
+          workspaceRoot: WS_ROOT,
+          artifactKind: "feature-contract",
+          artifactPath: "a",
+          inputPath: "b",
+          expectedSha256: null,
+          updateAction: "replace",
+          invocationRef: "invocation-alpha-0000000001",
+        }),
+    ],
+    [
+      "link-evidence",
+      (svc: RepoAutomationService) =>
+        svc.linkDiscoveryEvidence({
+          workspaceRoot: WS_ROOT,
+          artifactKind: "feature-contract",
+          artifactId: "f",
+          evidencePath: "e.json",
+          expectedSha256: "a".repeat(64),
+          invocationRef: "invocation-alpha-0000000001",
+        }),
+    ],
+    [
+      "read-source",
+      (svc: RepoAutomationService) =>
+        svc.readDiscoverySource({
+          workspaceRoot: WS_ROOT,
+          readOperation: "list",
+          paths: ["src"],
+          invocationRef: "invocation-alpha-0000000001",
+          mode: "agent-output",
+        }),
+    ],
+  ])(
+    "refuses a %s request bound to an invocation without a trusted agent identity",
+    async (_label, call) => {
+      const launcher = new FakeLauncher(successOutcome(buildServiceResult()));
+      await expect(call(service(launcher, provider(seeded())))).rejects.toThrow(
+        "DISCOVERY_AGENT_IDENTITY_REQUIRED",
+      );
+      // Refused before any process launch; nothing is downgraded to local-user.
+      expect(launcher.captures).toHaveLength(0);
+    },
+  );
 
   describe("doctor capability projection", () => {
     const unavailable = {

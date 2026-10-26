@@ -24,6 +24,7 @@ import {
   invokeDiscoveryRuntime,
 } from "./discovery-runtime";
 import type { RepoAutomationExecutionResult } from "./repo-automation-service-contract";
+import { hostInvocationOptions } from "./repo-automation-service-discovery-identity";
 import type {
   FinalizeDiscoveryAgentInput,
   PrepareDiscoveryAgentInput,
@@ -183,6 +184,8 @@ export async function finalizeDiscoveryAgentOperation(
       "FINALIZATION_IDENTITY_UNAVAILABLE: finalize_discovery_agent requires the trusted discovery agent identity of this process.",
     );
   }
+  // The finalize request runs under the host principal with the trusted
+  // agent, session, host and role values; the runtime never sees local-user here.
   const result = await invokeDiscoveryRuntime(
     deps.output,
     {
@@ -199,6 +202,7 @@ export async function finalizeDiscoveryAgentOperation(
       ...(input.interpreter === undefined
         ? {}
         : { interpreter: input.interpreter }),
+      ...hostInvocationOptions(authority),
     },
     deps.runtime,
   );

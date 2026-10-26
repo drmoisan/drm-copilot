@@ -193,6 +193,125 @@ describe("invokeDiscoveryRuntime", () => {
     ]);
   });
 
+  const HOST = {
+    principal: "host" as const,
+    authorId: "agent-alpha",
+    sessionId: "session-alpha",
+    hostName: "codex",
+    agentRole: "legacy-parity-analyst",
+  };
+
+  it("forwards the complete trusted host identity in the fixed option order", async () => {
+    const launcher = new FakeLauncher(successOutcome());
+
+    await invokeDiscoveryRuntime(
+      output,
+      invocation({ ...HOST, repositoryId: "example/source" }),
+      { launcher, detectInterpreter: () => FAKE_INTERPRETER },
+    );
+
+    expect(launcher.single().args).toEqual([
+      "-I",
+      "-m",
+      DISCOVERY_GATEWAY_MODULE,
+      "--workspace-root",
+      WORKSPACE_ROOT,
+      "--principal",
+      "host",
+      "--repository-id",
+      "example/source",
+      "--author-id",
+      "agent-alpha",
+      "--session-id",
+      "session-alpha",
+      "--host-name",
+      "codex",
+      "--agent-role",
+      "legacy-parity-analyst",
+    ]);
+  });
+
+  it.each([
+    [
+      "authorId",
+      {
+        principal: "host" as const,
+        sessionId: "session-alpha",
+        hostName: "codex",
+        agentRole: "legacy-parity-analyst",
+      },
+    ],
+    [
+      "sessionId",
+      {
+        principal: "host" as const,
+        authorId: "agent-alpha",
+        hostName: "codex",
+        agentRole: "legacy-parity-analyst",
+      },
+    ],
+    [
+      "hostName",
+      {
+        principal: "host" as const,
+        authorId: "agent-alpha",
+        sessionId: "session-alpha",
+        agentRole: "legacy-parity-analyst",
+      },
+    ],
+    [
+      "agentRole",
+      {
+        principal: "host" as const,
+        authorId: "agent-alpha",
+        sessionId: "session-alpha",
+        hostName: "codex",
+      },
+    ],
+  ])(
+    "refuses a host invocation without %s before launching",
+    async (_missing, partial) => {
+      const launcher = new FakeLauncher(successOutcome());
+
+      const error = await expectTransportError(
+        () =>
+          invokeDiscoveryRuntime(output, invocation(partial), {
+            launcher,
+            detectInterpreter: () => FAKE_INTERPRETER,
+          }),
+        "DISCOVERY_HOST_IDENTITY_INCOMPLETE",
+      );
+      expect(error.message).toContain("--session-id");
+      expect(launcher.captures).toHaveLength(0);
+    },
+  );
+
+  it.each([
+    ["sessionId", { sessionId: "session-alpha" }],
+    ["hostName", { hostName: "codex" }],
+    ["agentRole", { agentRole: "legacy-parity-analyst" }],
+  ])(
+    "refuses a local-user invocation that supplies %s before launching",
+    async (_label, supplied) => {
+      const launcher = new FakeLauncher(successOutcome());
+
+      await expectTransportError(
+        () =>
+          invokeDiscoveryRuntime(
+            output,
+            invocation({
+              principal: "local-user",
+              authorId: "dan",
+              ...supplied,
+            }),
+            { launcher, detectInterpreter: () => FAKE_INTERPRETER },
+          ),
+        "DISCOVERY_HOST_IDENTITY_INCOMPLETE",
+      );
+      expect(launcher.captures).toHaveLength(0);
+    },
+  );
+
   it("reports an unavailable interpreter with the install diagnostic", async () => {
     const error = await expectTransportError(
       () =>

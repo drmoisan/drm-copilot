@@ -37,6 +37,7 @@ import {
   prepareDiscoveryAgentOperation,
   projectDoctorCapability,
 } from "./repo-automation-service-discovery-agent";
+import { invocationOptions } from "./repo-automation-service-discovery-identity";
 import type {
   ConfigureDiscoveryWorkspaceInput,
   CreateDiscoveryArtifactInput,
@@ -113,6 +114,15 @@ export class DiscoveryServiceBase {
   private get authority(): DiscoveryAuthorityProvider {
     this.authorityProvider ??= createNodeDiscoveryAuthorityProvider();
     return this.authorityProvider;
+  }
+
+  /**
+   * Outer identity for one request: the trusted host set when the request is
+   * bound to a protected invocation, none for a root request. A bound request
+   * without a trusted agent identity is refused, never run as local-user.
+   */
+  private identity(invocationRef: string | undefined) {
+    return invocationOptions(() => this.authority, invocationRef);
   }
 
   async validateDiscoveryArtifacts(
@@ -216,6 +226,7 @@ export class DiscoveryServiceBase {
         ),
       },
       this.runtime,
+      this.identity(input.invocationRef),
     );
   }
 
@@ -241,6 +252,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
+      this.identity(input.invocationRef),
     );
   }
 
@@ -262,6 +274,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
+      this.identity(input.invocationRef),
     );
   }
 
@@ -381,6 +394,7 @@ export class DiscoveryServiceBase {
         ]),
       },
       this.runtime,
+      this.identity(input.invocationRef),
     );
   }
 

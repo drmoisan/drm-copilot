@@ -85,7 +85,8 @@ export type DiscoveryTransportErrorCode =
   | "DISCOVERY_RUNTIME_MISSING"
   | "DISCOVERY_INTERPRETER_UNAVAILABLE"
   | "DISCOVERY_WORKSPACE_ROOT_INVALID"
-  | "DISCOVERY_REQUEST_INVALID";
+  | "DISCOVERY_REQUEST_INVALID"
+  | "DISCOVERY_HOST_IDENTITY_INCOMPLETE";
 
 /** Blocking transport failure between the host and the fixed runtime. */
 export class DiscoveryTransportError extends Error {
