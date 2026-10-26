@@ -1,21 +1,23 @@
-"""Prove the service admits a verified host authority and refuses every other host mix."""
+"""Prove the service admits a verified host authority and refuses other host mixes."""
 
 from __future__ import annotations
 
 import json
 from hashlib import sha256
+from typing import TYPE_CHECKING
 
 import pytest
 from drm_copilot_discovery.configuration import DEFAULT_PROFILE
+from drm_copilot_discovery.models import canonical_json
+from drm_copilot_discovery.mutation_io import capture_workspace
 from drm_copilot_discovery.path_models import WriteGrant
 
+from tests.discovery_runtime.evidence_test_support import request_for
 from tests.discovery_runtime.host_test_support import (
     AUTHORIZATION_REF,
-    INVOCATION_ID,
     MemoryHostService,
     invoke_host,
 )
-from tests.discovery_runtime.test_service import MemoryService
 from tests.discovery_runtime.test_service import (
     initialization_catalog as initialization_catalog,
 )
@@ -26,6 +28,9 @@ from tests.discovery_runtime.test_service import service_io as service_io
 from tests.discovery_runtime.test_service import service_plan as service_plan
 from tests.discovery_runtime.test_service_publication import seed_contract
 
+if TYPE_CHECKING:
+    from tests.discovery_runtime.test_service import MemoryService
+
 CONTRACTS = "docs/migration/discovery/feature-contracts"
 CONTRACT = CONTRACTS + "/feature.json"
 QUESTIONS = "docs/migration/discovery/unspecified-behaviors.yaml"
@@ -34,7 +39,7 @@ CONTRACT_GRANTS = (
     WriteGrant(artifact_kind="feature-contract", artifact_id="feature", path=CONTRACT),
     WriteGrant(
         artifact_kind="unspecified-behavior-collection",
-        artifact_id="questions",
+        artifact_id="unresolved-consumer-system",
         path=QUESTIONS,
     ),
 )
@@ -59,7 +64,7 @@ def test_granted_new_contract_publishes_with_agent_attribution(
         sha256(service_io.disk.store.files[row.path]).hexdigest() == row.sha256
         for row in result.artifacts
     )
-    assert result.summary["invocation_ref"] is None or True
+    assert result.summary["invocation_ref"] is None
 
 
 def test_granted_update_artifact_publishes_the_replacement(
@@ -75,7 +80,9 @@ def test_granted_update_artifact_publishes_the_replacement(
     host = MemoryHostService(
         service_io,
         grants=(
-            WriteGrant(artifact_kind="feature-contract", artifact_id="feature", path=path),
+            WriteGrant(
+                artifact_kind="feature-contract", artifact_id="feature", path=path
+            ),
         ),
     )
 
@@ -99,28 +106,39 @@ def test_granted_update_artifact_publishes_the_replacement(
 def test_granted_link_evidence_publishes_the_linked_record(
     service_io: MemoryService,
 ) -> None:
-    """A host link-evidence on a granted evidence path publishes the reference."""
+    """A host link-evidence on granted rows publishes the reference and contract."""
     path = seed_contract(service_io)
-    service_io.disk.store.put(
-        "proposals/proof.json",
-        json.dumps(
-            {
-                "$schema": "urn:drm-copilot:discovery:2.0.0:evidence-reference",
-                "schema_version": "2.0.0",
-                "artifact_kind": "evidence-reference",
-                "id": "proof",
-                "evidence_type": "documentation",
-                "summary": "Documented behavior.",
-                "locations": [{"repository": "consumer-repository", "path": "application"}],
-                "author_or_agent": {"kind": "agent", "id": "agent-alpha"},
-            }
-        ).encode("utf-8"),
+    baseline = capture_workspace(
+        workspace_root=service_io.disk.root,
+        profile_path=DEFAULT_PROFILE,
+        metadata=service_io.disk.store.metadata,
+        read_bytes=service_io.disk.store.read,
+        catalog=service_io.initialization.catalog,
+        repository=service_io.repository,
     )
+    payload_path = "proposals/capture.txt"
+    link = request_for(
+        baseline,
+        updates={
+            "path": payload_path,
+            "revision": baseline.snapshot.profile.repository.revision,
+            "runtime_artifact": {"path": payload_path, "capture_method": "manual"},
+        },
+    )
+    # The payload and the proposed record are captured inputs, as for local-user.
+    service_io.disk.store.put(payload_path, link.payloads[0].content)
+    service_io.disk.store.put("proposals/evidence.json", canonical_json(link.record))
     host = MemoryHostService(
         service_io,
         grants=(
-            WriteGrant(artifact_kind="feature-contract", artifact_id="feature", path=path),
-            WriteGrant(artifact_kind="evidence-reference", artifact_id="proof", path=EVIDENCE),
+            WriteGrant(
+                artifact_kind="evidence-reference",
+                artifact_id=str(link.record["id"]),
+                path=EVIDENCE,
+            ),
+            WriteGrant(
+                artifact_kind="feature-contract", artifact_id="feature", path=path
+            ),
         ),
     )
 
@@ -130,17 +148,21 @@ def test_granted_link_evidence_publishes_the_linked_record(
         {
             "artifact_kind": "feature-contract",
             "artifact_id": "feature",
-            "evidence_path": "proposals/proof.json",
-            "expected_sha256": sha256(service_io.disk.store.files[path]).hexdigest(),
+            "expected_sha256": link.expected_sha256,
+            "evidence_path": "proposals/evidence.json",
         },
         write=True,
     )
 
-    assert result.exit_code in (0, 1), result.findings
-    assert host.writer_calls <= 1
+    assert result.ok, result.findings
+    assert host.writer_calls == 1
+    assert {path, EVIDENCE} <= {row.path for row in result.artifacts}
+    assert EVIDENCE in service_io.disk.store.files
 
 
-def test_ungranted_change_is_refused_before_any_write(service_io: MemoryService) -> None:
+def test_ungranted_change_is_refused_before_any_write(
+    service_io: MemoryService,
+) -> None:
     """A planned change outside the invocation's grants never reaches the writer."""
     host = MemoryHostService(service_io, grants=CONTRACT_GRANTS[:1])
     before = dict(service_io.disk.store.files)
@@ -156,9 +178,11 @@ def test_ungranted_change_is_refused_before_any_write(service_io: MemoryService)
 @pytest.mark.parametrize(
     "fields",
     [
-        {"invocation_ref": "invocation-beta"},
+        # A well-formed reference (16+ characters) naming another invocation.
+        {"invocation_ref": "invocation-gamma"},
         {"authorization_ref": None},
-        {"mode": "structural", "invocation_ref": None},
+        # A structural request carrying no host marker reaches the admission rule.
+        {"mode": "structural", "invocation_ref": None, "authorization_ref": None},
     ],
 )
 def test_host_requests_without_their_bindings_are_refused_before_capture(
@@ -201,7 +225,9 @@ def test_root_only_operation_is_refused_under_host_authority(
     assert host.writer_calls == 0 and service_io.disk.store.files == before
 
 
-def test_host_authority_without_invocation_is_refused(service_io: MemoryService) -> None:
+def test_host_authority_without_invocation_is_refused(
+    service_io: MemoryService,
+) -> None:
     """A host authority that carries no verified invocation is not admitted."""
     host = MemoryHostService(service_io, grants=CONTRACT_GRANTS)
     host.invocation = None
@@ -225,4 +251,4 @@ def test_local_user_behavior_is_unchanged(service_io: MemoryService) -> None:
     )
 
     assert result.exit_code == 3 and result.findings[0].code == "SERVICE_AUTHORITY"
-    assert INVOCATION_ID not in result.to_json() or True
+    assert host.writer_calls == 0 and result.input_manifest is None

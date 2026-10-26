@@ -10,7 +10,6 @@ from drm_copilot_discovery.models import JsonObject, ParseLimits
 from drm_copilot_discovery.mutation_io import commit_mutation
 from drm_copilot_discovery.mutation_plan import MutationChange, plan_mutation
 from drm_copilot_discovery.parsing import parse_document
-from drm_copilot_discovery.path_models import WriteGrant
 from drm_copilot_discovery.report_models import ReportBudget
 from drm_copilot_discovery.service_contracts import DiscoveryResult, ServiceArtifact
 from drm_copilot_discovery.service_serialization import wire_object
@@ -19,6 +18,7 @@ from drm_copilot_discovery.snapshot import InputManifest
 if TYPE_CHECKING:
     from drm_copilot_discovery.analyzer.registry import InventoryRegistry
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace, MutationPlan
+    from drm_copilot_discovery.path_models import WriteGrant
     from drm_copilot_discovery.service_contracts import (
         RuntimeIdentity,
         ServiceAuthority,

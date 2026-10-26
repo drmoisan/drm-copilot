@@ -13,7 +13,6 @@ from drm_copilot_discovery.operations import OperationFailure
 from drm_copilot_discovery.path_models import WriteGrant
 from drm_copilot_discovery.service_contracts import ServiceAuthority, ServiceRequest
 
-from tests.discovery_runtime.test_service import MemoryService
 from tests.discovery_runtime.test_service import (
     initialization_catalog as initialization_catalog,
 )
@@ -25,6 +24,8 @@ from tests.discovery_runtime.test_service import service_plan as service_plan
 
 if TYPE_CHECKING:
     from drm_copilot_discovery.snapshot import DiscoverySnapshot
+
+    from tests.discovery_runtime.test_service import MemoryService
 
 CONTRACT = "docs/migration/discovery/feature-contracts/feature.json"
 QUESTIONS = "docs/migration/discovery/unspecified-behaviors.yaml"
@@ -170,10 +171,28 @@ def test_host_receives_only_granted_rows_without_expansion(
 @pytest.mark.parametrize(
     "grants,fields",
     [
-        (EXACT[:1], {"invocation": "invocation-alpha", "authorization": "protected-alpha-00000001"}),
-        (EXACT, {"invocation": "invocation-beta", "authorization": "protected-alpha-00000001"}),
+        (
+            EXACT[:1],
+            {
+                "invocation": "invocation-alpha",
+                "authorization": "protected-alpha-00000001",
+            },
+        ),
+        (
+            EXACT,
+            {
+                "invocation": "invocation-beta",
+                "authorization": "protected-alpha-00000001",
+            },
+        ),
         (EXACT, {"invocation": "invocation-alpha"}),
-        ((), {"invocation": "invocation-alpha", "authorization": "protected-alpha-00000001"}),
+        (
+            (),
+            {
+                "invocation": "invocation-alpha",
+                "authorization": "protected-alpha-00000001",
+            },
+        ),
     ],
 )
 def test_host_refuses_ungranted_mismatched_or_unauthorized_changes(
