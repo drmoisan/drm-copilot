@@ -1,0 +1,42 @@
+# Synthetic start attestation written by a native SubagentStart adapter when the
+# prepared invocation starts. Values are illustrative; a copy of this file never
+# establishes authority.
+$schema: urn:drm-copilot:discovery:2.0.0:start-attestation
+schema_version: 2.0.0
+artifact_kind: start-attestation
+id: start-0123456789abcdef0123
+start_attestation_ref: start-0123456789abcdef0123
+invocation_ref: invocation-0123456789abcdef0001
+workspace:
+  workspace_root: /workspace/synthetic
+  workspace_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  profile_path: docs/migration/discovery/domain-profile.yaml
+  profile_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+host: claude-code
+session_id: session-alpha
+parent_agent_id: root-alpha
+agent_id: agent-alpha
+agent_type: legacy-parity-analyst-c3
+role: legacy-parity-analyst
+deployment:
+  agent_name: legacy-parity-analyst-c3
+  model: model-alpha
+  reasoning_effort: high
+  actual_model: model-alpha
+  actual_effort: null
+agent_profile:
+  path: .claude/agents/legacy-parity-analyst-c3.md
+  sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  name: legacy-parity-analyst-c3
+capability_ref: capability-alpha-000000000001
+runtime:
+  package_version: 2.0.0
+  schema_version: 2.0.0
+  build_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  policy_version: 1
+  policy_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+attested_at: "2026-01-01T00:00:00Z"
+writer:
+  host: claude-code
+  event: SubagentStart
+  handler_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

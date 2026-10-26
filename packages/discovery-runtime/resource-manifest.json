@@ -41,6 +41,7 @@
     "schemas/discovery/v2/service-request.schema.json",
     "schemas/discovery/v2/service-result.schema.json",
     "schemas/discovery/v2/source-snapshot-manifest.schema.json",
+    "schemas/discovery/v2/start-attestation.schema.json",
     "schemas/discovery/v2/tool-authorization.schema.json",
     "schemas/discovery/v2/unspecified-behavior-collection.schema.json",
     "schemas/discovery/v2/unspecified-behavior.schema.json",

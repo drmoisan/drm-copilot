@@ -21,6 +21,7 @@ from tests.schemas.discovery.v2_schema_test_support import (
     SCHEMAS,
     URN,
     as_object,
+    load_fixture,
     load_schema,
     schema_errors,
 )
@@ -282,6 +283,55 @@ def test_prepare_and_finalize_require_explicit_scoped_invocation_data() -> None:
     document["invocation_ref"] = OPAQUE_REFERENCE
 
     assert schema_errors("service-request", document) == []
+
+
+def test_start_attestation_example_validates_and_invalid_fixture_is_rejected() -> None:
+    """The committed example matches the native writer; the invalid fixture does not."""
+    assert schema_errors("start-attestation", load_fixture("start-attestation")) == []
+
+    errors = schema_errors(
+        "start-attestation", load_fixture("start-attestation", invalid=True)
+    )
+
+    assert errors
+    messages = " ".join(error.message for error in errors)
+    assert "agent_profile" in messages and "SubagentStart" in messages
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        (
+            "writer",
+            {"host": "codex", "event": "PreToolUse", "handler_sha256": "c" * 64},
+        ),
+        ("start_attestation_ref", "short"),
+        ("agent_id", None),
+        ("role", "native-root"),
+        ("deployment", {"agent_name": "x", "model": "m", "reasoning_effort": "max"}),
+        ("agent_profile", {"path": "../profile.md", "sha256": "c" * 64, "name": "x"}),
+        ("runtime", None),
+    ],
+)
+def test_start_attestation_binds_identity_deployment_and_writer(
+    field: str, value: object
+) -> None:
+    """Only a SubagentStart writer with complete identity and runtime validates."""
+    document = control_fixture("start-attestation")
+    document[field] = value
+
+    assert schema_errors("start-attestation", document)
+
+
+def test_start_attestation_actual_model_and_effort_may_be_observed_or_null() -> None:
+    """Hosts that expose the started model record it; others record null."""
+    document = control_fixture("start-attestation")
+    deployment = as_object(document["deployment"])
+    assert schema_errors("start-attestation", document) == []
+    deployment["actual_model"] = "model-alpha"
+    deployment["actual_effort"] = "max"
+
+    assert schema_errors("start-attestation", document) == []
 
 
 @pytest.mark.parametrize("code", (1, 2, 3))

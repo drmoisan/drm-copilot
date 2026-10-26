@@ -81,7 +81,7 @@ def test_complete_catalog_and_all_registered_aliases_are_fresh_and_offline() -> 
     """Every supported version resolves; returned dictionaries cannot alter schemas."""
     catalog = load_catalog()
 
-    assert len(catalog.documents) == 33
+    assert len(catalog.documents) == 34
     # Exercise all exact version identities instead of sampling one schema family.
     for version, kinds in (("1.0.0", V1_KINDS), ("2.0.0", V2_KINDS)):
         # Common definitions intentionally cannot be selected as an artifact validator.
@@ -138,7 +138,7 @@ def test_unregistered_aliases_never_resolve(identifier: str) -> None:
 def test_catalog_resource_reader_is_complete_and_checksum_verified() -> None:
     """An injected store follows the same manifest and byte checks as installation."""
     store = _store()
-    assert len(load_catalog(read_bytes=store.__getitem__).documents) == 33
+    assert len(load_catalog(read_bytes=store.__getitem__).documents) == 34
     store[schema_path("scope", "2.0.0")] += b" "
 
     with pytest.raises(CatalogError, match="checksum"):

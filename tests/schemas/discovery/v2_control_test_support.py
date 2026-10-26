@@ -14,8 +14,10 @@ CONTROL_KINDS = (
     "migration-report",
     "capability-attestation",
     "tool-authorization",
+    "start-attestation",
 )
 OPAQUE_REFERENCE = "protected-alpha-00000001"
+START_ATTESTATION_REFERENCE = "start-0123456789abcdef0123"
 PROFILE = "docs/migration/discovery/domain-profile.yaml"
 STAMP = "2026-01-01T00:00:00Z"
 
@@ -192,6 +194,34 @@ def control_fixture(kind: str) -> dict[str, object]:
             created_at=STAMP,
             start_attestation_ref=None,
             completion_receipt_ref=None,
+        )
+    elif kind == "start-attestation":
+        document.update(
+            start_attestation_ref=START_ATTESTATION_REFERENCE,
+            invocation_ref="invocation-alpha",
+            workspace=workspace_binding(),
+            host="codex",
+            session_id="session-alpha",
+            parent_agent_id="root-alpha",
+            agent_id="agent-alpha",
+            agent_type="legacy-parity-analyst-c4",
+            role="legacy-parity-analyst",
+            deployment={
+                "agent_name": "legacy-parity-analyst-c4",
+                "model": "model-alpha",
+                "reasoning_effort": "max",
+                "actual_model": None,
+                "actual_effort": None,
+            },
+            agent_profile={
+                "path": ".codex/agents/legacy-parity-analyst-c4.toml",
+                "sha256": HASH,
+                "name": "legacy-parity-analyst-c4",
+            },
+            capability_ref=OPAQUE_REFERENCE,
+            runtime=runtime_binding(),
+            attested_at=STAMP,
+            writer={"host": "codex", "event": "SubagentStart", "handler_sha256": HASH},
         )
     elif kind == "capability-attestation":
         document.update(

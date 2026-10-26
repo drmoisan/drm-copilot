@@ -60,6 +60,7 @@ V2_KINDS = (
     "service-request",
     "service-result",
     "source-snapshot-manifest",
+    "start-attestation",
     "tool-authorization",
     "unspecified-behavior",
     "unspecified-behavior-collection",

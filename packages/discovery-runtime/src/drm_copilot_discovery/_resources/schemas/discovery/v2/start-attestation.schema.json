@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:discovery:2.0.0:start-attestation",
+  "title": "Discovery v2 native start attestation",
+  "description": "Record the native SubagentStart adapter writes when a prepared discovery invocation starts for the host-assigned agent. Every identity value comes from the trusted principal, the protected invocation record and the host's profile read; a shape-valid copy supplied by a caller is never authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "artifact_kind",
+    "id",
+    "start_attestation_ref",
+    "invocation_ref",
+    "workspace",
+    "host",
+    "session_id",
+    "parent_agent_id",
+    "agent_id",
+    "agent_type",
+    "role",
+    "deployment",
+    "agent_profile",
+    "capability_ref",
+    "runtime",
+    "attested_at",
+    "writer"
+  ],
+  "properties": {
+    "$schema": {"const":"urn:drm-copilot:discovery:2.0.0:start-attestation"},
+    "schema_version": {"const":"2.0.0"},
+    "artifact_kind": {"const":"start-attestation"},
+    "id": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+    "start_attestation_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "invocation_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "workspace": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/workspace-binding"},
+    "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+    "session_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "parent_agent_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "agent_id": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "agent_type": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/correlation-id"},
+    "role": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/role"},
+    "deployment": {"$ref":"urn:drm-copilot:discovery:2.0.0:start-attestation#/$defs/deployment"},
+    "agent_profile": {"$ref":"urn:drm-copilot:discovery:2.0.0:start-attestation#/$defs/agent-profile"},
+    "capability_ref": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/opaque-reference"},
+    "runtime": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/runtime"},
+    "attested_at": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/timestamp"},
+    "writer": {"$ref":"urn:drm-copilot:discovery:2.0.0:start-attestation#/$defs/writer"}
+  },
+  "$defs": {
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_name","model","reasoning_effort","actual_model","actual_effort"],
+      "properties": {
+        "agent_name": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/identifier"},
+        "model": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},
+        "reasoning_effort": {"enum":["low","medium","high","xhigh","max","ultra"]},
+        "actual_model": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},{"type":"null"}]},
+        "actual_effort": {"anyOf":[{"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"},{"type":"null"}]}
+      }
+    },
+    "agent-profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path","sha256","name"],
+      "properties": {
+        "path": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/relative-path"},
+        "sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"},
+        "name": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/text"}
+      }
+    },
+    "writer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host","event","handler_sha256"],
+      "properties": {
+        "host": {"$ref":"urn:drm-copilot:discovery:2.0.0:service-request#/$defs/host"},
+        "event": {"const":"SubagentStart"},
+        "handler_sha256": {"$ref":"urn:drm-copilot:discovery:2.0.0:common#/$defs/sha256"}
+      }
+    }
+  }
+}

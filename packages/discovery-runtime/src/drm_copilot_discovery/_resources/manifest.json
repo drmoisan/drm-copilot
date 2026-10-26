@@ -177,6 +177,11 @@
       "size": 4451
     },
     {
+      "path": "schemas/discovery/v2/start-attestation.schema.json",
+      "sha256": "0a620f83d88ac88756710accea87007f2179bc8d8de445cdce7d5ef36623655f",
+      "size": 4163
+    },
+    {
       "path": "schemas/discovery/v2/tool-authorization.schema.json",
       "sha256": "6aa2ca5b06628d6f7915ee7fb53ddd04d1f896617df44de49884ef28c8bc04c8",
       "size": 4288

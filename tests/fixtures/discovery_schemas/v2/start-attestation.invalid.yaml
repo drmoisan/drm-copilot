@@ -1,0 +1,37 @@
+# Invalid start attestation: the writer names a PreToolUse event, the agent
+# profile is missing, and the start reference is too short to be opaque.
+$schema: urn:drm-copilot:discovery:2.0.0:start-attestation
+schema_version: 2.0.0
+artifact_kind: start-attestation
+id: start-short
+start_attestation_ref: start-short
+invocation_ref: invocation-0123456789abcdef0001
+workspace:
+  workspace_root: /workspace/synthetic
+  workspace_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  profile_path: docs/migration/discovery/domain-profile.yaml
+  profile_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+host: claude-code
+session_id: session-alpha
+parent_agent_id: root-alpha
+agent_id: agent-alpha
+agent_type: legacy-parity-analyst-c3
+role: legacy-parity-analyst
+deployment:
+  agent_name: legacy-parity-analyst-c3
+  model: model-alpha
+  reasoning_effort: high
+  actual_model: null
+  actual_effort: null
+capability_ref: capability-alpha-000000000001
+runtime:
+  package_version: 2.0.0
+  schema_version: 2.0.0
+  build_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  policy_version: 1
+  policy_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+attested_at: "2026-01-01T00:00:00Z"
+writer:
+  host: claude-code
+  event: PreToolUse
+  handler_sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
