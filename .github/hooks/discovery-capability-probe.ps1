@@ -41,12 +41,15 @@ function Get-DiscoveryProbeRuntime {
     if (-not [string]::IsNullOrWhiteSpace($RuntimeJson)) {
         $parsed = ConvertFrom-Json -InputObject $RuntimeJson -Depth 4
         $runtime = [ordered]@{}
-        foreach ($key in @('build_sha256', 'package_version', 'policy_sha256', 'policy_version', 'schema_version')) { $runtime[$key] = [string]$parsed.$key }
+        foreach ($key in @('build_sha256', 'package_version', 'policy_sha256', 'policy_version', 'schema_version')) {
+            # The runtime identity contract types policy_version as an integer; the hosts compare it canonically.
+            $runtime[$key] = $(if ($key -eq 'policy_version') { [int]$parsed.$key } else { [string]$parsed.$key })
+        }
         return $runtime
     }
     $configuration = Join-Path $WorkspaceRoot '.github/hooks/discovery.json'
     $digest = $(if (Test-Path -LiteralPath $configuration -PathType Leaf) { Get-DiscoveryBytesSha256Hex -Bytes ([System.IO.File]::ReadAllBytes($configuration)) } else { '0' * 64 })
-    return [ordered]@{ build_sha256 = $digest; package_version = '2.0.0'; policy_sha256 = $digest; policy_version = '2.0.0'; schema_version = '2.0.0' }
+    return [ordered]@{ build_sha256 = $digest; package_version = '2.0.0'; policy_sha256 = $digest; policy_version = 2; schema_version = '2.0.0' }
 }
 
 function Invoke-DiscoveryCapabilityProbe {
@@ -86,7 +89,10 @@ function Invoke-DiscoveryCapabilityProbe {
         SentinelDecision = $sentinel; HostEnvironment = $HostEnvironment; Store = $Store
     }
     if ($null -ne $ReadBytes) { $parameters['ReadBytes'] = $ReadBytes }
-    return Get-DiscoveryCapabilityObservation @parameters
+    $observation = Get-DiscoveryCapabilityObservation @parameters
+    # The doctor, the agent preparation and the start attestation read only the protected session copy.
+    [void](Write-DiscoveryCapabilityAttestation -Observation $observation -WorkspaceRoot $WorkspaceRoot -HostEnvironment $HostEnvironment -Store $Store)
+    return $observation
 }
 
 if ($MyInvocation.InvocationName -eq '.') {

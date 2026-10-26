@@ -347,15 +347,11 @@ export class DiscoveryServiceBase {
       { operation: "doctor" },
       this.runtime,
     );
-    // Only an injected trusted provider can describe the host capability; a
-    // bare service leaves the runtime's own enforcement warning in place.
-    return this.authorityProvider === undefined
-      ? result
-      : projectDoctorCapability(
-          this.authorityProvider,
-          input.workspaceRoot,
-          result,
-        );
+    // The same lazily created trusted provider that prepares agents describes
+    // the host capability, so a production service with no injected provider
+    // still projects the session's protected attestation (or the exact
+    // deficiency) instead of leaving the runtime's generic warning in place.
+    return projectDoctorCapability(this.authority, input.workspaceRoot, result);
   }
 
   async readDiscoverySource(

@@ -13,6 +13,7 @@ import type { CommandOutput } from "./command-runtime";
 import type { DiscoveryAuthorityProvider } from "./discovery-authority-provider";
 import {
   assessSessionCapability,
+  missingContextAssessment,
   projectCapabilityDiagnostics,
 } from "./discovery-capabilities";
 import { finalizeDiscoveryInvocation } from "./discovery-finalization";
@@ -39,6 +40,8 @@ export interface DiscoveryAgentOperationDeps {
  * The runtime cannot see the protected attestation, so the gateway replaces
  * its generic enforcement warning with the verified finding or one warning
  * per deficiency. Results without a discovery payload pass through unchanged.
+ * A process without a trusted host session answers `context-missing` before
+ * any protected path is resolved, so doctor stays diagnostic everywhere.
  */
 export function projectDoctorCapability(
   authority: DiscoveryAuthorityProvider,
@@ -47,6 +50,13 @@ export function projectDoctorCapability(
 ): RepoAutomationExecutionResult {
   if (result.discovery === undefined) {
     return result;
+  }
+  const missing = missingContextAssessment(authority.context);
+  if (missing !== null) {
+    return {
+      ...result,
+      discovery: projectCapabilityDiagnostics(result.discovery, missing),
+    };
   }
   const location = authority.location(workspaceRoot);
   const assessment = assessSessionCapability({

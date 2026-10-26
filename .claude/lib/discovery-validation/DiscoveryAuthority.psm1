@@ -214,8 +214,10 @@ function Get-DiscoveryTrustedHostEnvironment {
         $Platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' })
     }
     if ([string]::IsNullOrEmpty($UserHome)) { $UserHome = [System.Environment]::GetFolderPath('UserProfile') }
-    if ($null -eq $LocalAppData) { $LocalAppData = [System.Environment]::GetFolderPath('LocalApplicationData') }
-    if ($null -eq $XdgStateHome) { $XdgStateHome = [string]$env:XDG_STATE_HOME }
+    # An omitted [string] parameter arrives as an empty string, never as $null, so the
+    # host defaults apply on the empty value as well.
+    if ([string]::IsNullOrEmpty($LocalAppData)) { $LocalAppData = [System.Environment]::GetFolderPath('LocalApplicationData') }
+    if ([string]::IsNullOrEmpty($XdgStateHome)) { $XdgStateHome = [string]$env:XDG_STATE_HOME }
     return @{ Platform = $Platform; UserHome = $UserHome; LocalAppData = $LocalAppData; XdgStateHome = $XdgStateHome }
 }
 

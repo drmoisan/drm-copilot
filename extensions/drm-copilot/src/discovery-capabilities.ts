@@ -263,6 +263,26 @@ export function assessProtectedCapability(options: {
 }
 
 /**
+ * Return the `context-missing` assessment when the host supplied no trusted
+ * session, or null when a host and session are both present.
+ *
+ * Callers check this before resolving any protected path, so a process that
+ * was not launched by a discovery host answers without touching the store.
+ */
+export function missingContextAssessment(context: {
+  readonly host: string;
+  readonly sessionId: string;
+}): CapabilityAssessment | null {
+  if (context.host === "" || context.sessionId === "") {
+    return unavailable(
+      "context-missing",
+      "no trusted session context was supplied by the host",
+    );
+  }
+  return null;
+}
+
+/**
  * Assess the session's capability for `doctor` from the trusted provider state.
  *
  * Without a trusted host and session, or without a readable protected
@@ -279,11 +299,9 @@ export function assessSessionCapability(options: {
   readonly pins?: CapabilityPins;
   readonly now: Date;
 }): CapabilityAssessment {
-  if (options.context.host === "" || options.context.sessionId === "") {
-    return unavailable(
-      "context-missing",
-      "no trusted session context was supplied by the host",
-    );
+  const missing = missingContextAssessment(options.context);
+  if (missing !== null) {
+    return missing;
   }
   if (options.runtime === null) {
     return unavailable(

@@ -142,6 +142,11 @@ function Get-GateStore {
         $store.Files[$Path] = $Text
         $store.Writes.Add($Path)
     }.GetNewClosure()
+    $store['ReplaceText'] = {
+        param([string]$Path, [string]$Text)
+        $store.Files[$Path] = $Text
+        $store.Writes.Add($Path)
+    }.GetNewClosure()
     $store['EnsureDirectory'] = { param([string]$Directory) $store.Directories.Add($Directory) }.GetNewClosure()
     return $store
 }

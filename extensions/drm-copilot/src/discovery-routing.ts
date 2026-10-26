@@ -433,7 +433,14 @@ export function buildRequiredOutputManifest(options: {
   return { ...body, manifest_sha256: sha256Hex(canonicalJson(body)) };
 }
 
-/** Project the routing decision into the invocation deployment binding. */
+/**
+ * Project the routing decision into the invocation deployment binding.
+ *
+ * `agent_name` is the profile the host actually launches and the native start
+ * hook matches it exactly: Codex publishes one generated variant per complexity
+ * band, so it receives the routed deployment agent; Claude Code and GitHub
+ * Copilot publish one profile per role, so they receive the role itself.
+ */
 export function buildInvocationDeployment(
   decision: DiscoveryRoutingDecision,
   provider: string,
@@ -441,7 +448,10 @@ export function buildInvocationDeployment(
 ): InvocationDeployment {
   return {
     provider,
-    agent_name: decision.deployment.deployment_agent,
+    agent_name:
+      provider === "codex"
+        ? decision.deployment.deployment_agent
+        : decision.role,
     model: decision.deployment.model,
     reasoning_effort: decision.deployment.model_reasoning_effort,
     profile_path: workspace.profile_path,

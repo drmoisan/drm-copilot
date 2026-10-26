@@ -7,6 +7,7 @@ import json
 import sys
 from dataclasses import replace
 from datetime import datetime, timezone
+from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING
 
@@ -16,6 +17,7 @@ from drm_copilot_discovery.analyzer.registry import InstalledInventoryRegistry
 from drm_copilot_discovery.catalog import CatalogError
 from drm_copilot_discovery.gateway_local import LocalServiceIO
 from drm_copilot_discovery.models import ParseLimits
+from drm_copilot_discovery.repository_reader import LocalGitReader
 from drm_copilot_discovery.resources import ResourceError
 from drm_copilot_discovery.schema_validation import validate_document
 from drm_copilot_discovery.service_contracts import (
@@ -394,7 +396,29 @@ def test_main_binds_one_outer_reader_to_the_fixed_service(
             assert zone is timezone.utc
             return NOW
 
+    bindings: list[tuple[str, str | None]] = []
+
+    def bind(root: str, repository_id: str | None) -> RepositoryReader | None:
+        """Record the outer binding request; return a reader only for an explicit id.
+
+        root (str): trusted workspace. repository_id (str | None): outer option.
+        Returns RepositoryReader | None; memory-only effects; Git is never run.
+        """
+        bindings.append((root, repository_id))
+        if repository_id is None:
+            return None
+        return LocalGitReader(
+            workspace_root=root, repository_id=repository_id, run=forbidden_git
+        )
+
+    def forbidden_git(argv: tuple[str, ...], *, output_limit: int) -> bytes:
+        """Reject Git execution during binding. argv (tuple[str, ...]) and
+        output_limit (int) are the attempted call. Raises AssertionError always.
+        """
+        raise AssertionError((argv, output_limit))
+
     monkeypatch.setattr(gateway, "installed_local_io", create)
+    monkeypatch.setattr(gateway, "installed_repository", bind)
     monkeypatch.setattr("drm_copilot_discovery.gateway.datetime", FixedDatetime)
     arguments = [
         "--workspace-root",
@@ -415,9 +439,44 @@ def test_main_binds_one_outer_reader_to_the_fixed_service(
     assert code == 0 and not errors.getvalue()
     assert len(factories) == 1 and len(executor.calls) == 1
     assert (factories[0] is not None) == with_repository
+    expected_id = "consumer-repository" if with_repository else None
+    assert bindings == [(case.disk.root, expected_id)]
     assert executor.calls[0][2] is factories[0]
     assert executor.calls[0][1].initialization.repository is factories[0]
     assert output.getvalue() == executor.result.to_json()
+
+
+def test_main_reports_a_binding_read_failure_as_service_io(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed configured-repository derivation is an I/O refusal with exit 2.
+    monkeypatch (pytest.MonkeyPatch): test-local restoration of the binding seam.
+    Returns None; memory-only effects; AssertionError on mismatch.
+    """
+
+    # The outer root must be absolute on the current platform to reach the binding.
+    workspace = Path(Path.cwd().anchor, "workspace").as_posix()
+
+    def fail(root: str, repository_id: str | None) -> RepositoryReader | None:
+        """Raise the modeled read failure for root (str), repository_id (str | None)."""
+        assert root == workspace and repository_id is None
+        raise PermissionError("private-state-path")
+
+    monkeypatch.setattr(gateway, "installed_repository", fail)
+    output, errors = io.StringIO(), io.StringIO()
+
+    code = gateway.main(
+        ["--workspace-root", workspace, "--principal", "local-user"],
+        stdin=io.BytesIO(REQUEST),
+        stdout=output,
+        stderr=errors,
+    )
+
+    document = json.loads(output.getvalue())
+    # Unknown operation/mode context always carries the fixed exit 2 envelope.
+    assert code == 2 and document["exit_code"] == 2
+    assert document["findings"][0]["code"] == "SERVICE_IO"
+    assert "private-state-path" not in output.getvalue() + errors.getvalue()
 
 
 def test_unexpected_executor_failure_cannot_claim_empty_effects(

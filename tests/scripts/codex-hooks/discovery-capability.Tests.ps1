@@ -65,6 +65,14 @@ Describe 'discovery-capability-probe.ps1 (Codex)' {
         $observation['controls']['stop_event'] | Should -BeFalse
     }
 
+    It 'persists the observation as the protected session capability attestation' {
+        $store = Get-GateStore -HostName 'codex'
+        $observation = Invoke-Probe -Store $store
+        $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
+        @($store.Writes) | Should -Be @($path)
+        (ConvertFrom-Json -InputObject $store.Files[$path] -Depth 16).attestation_ref | Should -Be $observation['attestation_ref']
+    }
+
     Context '.codex/config.toml registration' {
         BeforeAll {
             $script:Config = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/config.toml')

@@ -31,6 +31,7 @@ Import-Module (Join-Path $PSScriptRoot 'DiscoveryAuthority.psm1') -ErrorAction S
 Import-Module (Join-Path $PSScriptRoot 'DiscoveryPayload.psm1') -ErrorAction Stop
 
 $script:CapabilitySchema = 'urn:drm-copilot:discovery:2.0.0:capability-attestation'
+$script:CapabilityAttestationFile = 'capability-attestation.json'
 $script:DiscoveryAgentNames = @('legacy-parity-analyst', 'runtime-characterization-analyst', 'requirements-reconciler', 'migration-coverage-reviewer')
 $script:ControlledToolNames = @('Bash', 'Write', 'mcp__drm-copilot__run_discovery_repo_inventory', 'Agent')
 $script:ControlNames = @('workspace_trusted', 'hooks_enabled', 'trusted_attribution', 'start_event', 'tool_event', 'stop_event', 'forbidden_tools_denied')
@@ -291,10 +292,46 @@ function Get-DiscoveryCapabilityObservation {
     }
 }
 
+function Write-DiscoveryCapabilityAttestation {
+    <#
+    .SYNOPSIS
+        Persists an observation as the session's protected capability attestation and returns its path.
+    .DESCRIPTION
+        The doctor, the agent preparation and the start attestation read only the protected
+        session copy at `<sessions>/<session>/capability-attestation.json`, so a probe that
+        only prints its observation leaves every control unverifiable. The record is written
+        exclusively on first observation and replaced on a later probe of the same session
+        when the store offers ReplaceText; a store without it keeps the first record.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$Observation,
+        [Parameter(Mandatory = $true)][string]$WorkspaceRoot,
+        [Parameter(Mandatory = $true)][hashtable]$HostEnvironment,
+        [Parameter(Mandatory = $true)][hashtable]$Store
+    )
+
+    $location = Resolve-DiscoveryAuthorityLocation -WorkspaceRoot $WorkspaceRoot -Platform $HostEnvironment.Platform -UserHome $HostEnvironment.UserHome -LocalAppData $HostEnvironment.LocalAppData -XdgStateHome $HostEnvironment.XdgStateHome
+    $directory = Get-DiscoverySessionDirectory -Location $location -SessionId ([string]$Observation['session_id'])
+    $path = "$directory/$($script:CapabilityAttestationFile)"
+    $text = (($Observation | ConvertTo-Json -Depth 8) + "`n")
+    Invoke-DiscoveryStoreSeam -Seam $Store.EnsureDirectory -Arguments @($directory)
+    # A re-probe of the same session replaces its earlier record; the exclusive write guards the first.
+    $existing = Invoke-DiscoveryStoreSeam -Seam $Store.ReadText -Arguments @($path)
+    if ($null -ne $existing -and $Store.ContainsKey('ReplaceText')) {
+        Invoke-DiscoveryStoreSeam -Seam $Store.ReplaceText -Arguments @($path, $text)
+    } else {
+        Invoke-DiscoveryStoreSeam -Seam $Store.WriteText -Arguments @($path, $text)
+    }
+    return $path
+}
+
 Export-ModuleMember -Function `
     Get-DiscoverySentinelRequest, `
     Get-DiscoverySentinelEnvelope, `
     Get-DiscoverySentinelEnvironment, `
     Get-DiscoveryHostRegistration, `
     Test-DiscoveryHandlerRegistered, `
-    Get-DiscoveryCapabilityObservation
+    Get-DiscoveryCapabilityObservation, `
+    Write-DiscoveryCapabilityAttestation

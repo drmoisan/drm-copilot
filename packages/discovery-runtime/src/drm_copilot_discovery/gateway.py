@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING, Literal, Protocol, cast, get_args
 from drm_copilot_discovery.analyzer.registry import InstalledInventoryRegistry
 from drm_copilot_discovery.catalog import CatalogError
 from drm_copilot_discovery.findings import Finding
-from drm_copilot_discovery.gateway_local import installed_local_io, run_local_git
+from drm_copilot_discovery.gateway_local import installed_local_io
 from drm_copilot_discovery.models import JsonObject, ParseLimits, canonical_json
 from drm_copilot_discovery.parsing import parse_document
-from drm_copilot_discovery.repository_reader import LocalGitReader
+from drm_copilot_discovery.repository_binding import installed_repository
 from drm_copilot_discovery.resources import ResourceError
 from drm_copilot_discovery.service_contracts import (
     DiscoveryResult,
@@ -316,20 +316,18 @@ def main(
                 "host",
             ):
                 raise ValueError("Invalid trusted outer options")
-            repository = (
-                LocalGitReader(
-                    workspace_root=root,
-                    repository_id=options["--repository-id"],
-                    run=run_local_git,
-                )
-                if "--repository-id" in options
-                else None
-            )
+            # Without an explicit id the activated profile's Git repository is bound.
+            repository = installed_repository(root, options.get("--repository-id"))
         except ValueError:
             return _emit(
                 _failure(code="SERVICE_REQUEST", exit_code=2),
                 stdout=output,
                 stderr=errors,
+            )
+        except OSError:
+            # No request context exists yet, so the fixed pre-context exit applies.
+            return _emit(
+                _failure(code="SERVICE_IO", exit_code=3), stdout=output, stderr=errors
             )
         return run_gateway(
             stdin=stdin or sys.stdin.buffer,

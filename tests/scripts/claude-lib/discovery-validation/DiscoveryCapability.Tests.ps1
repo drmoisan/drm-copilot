@@ -18,6 +18,7 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
     $lib = Join-Path $script:RepoRoot '.claude/lib/discovery-validation'
     Import-Module (Join-Path $lib 'DiscoveryCapability.psm1') -Force
+    Import-Module (Join-Path $lib 'DiscoveryStart.psm1') -Force
     Import-Module (Join-Path $lib 'DiscoveryAuthorization.psm1') -Force
     Import-Module (Join-Path $lib 'DiscoveryPayload.psm1') -Force
     Import-Module (Join-Path $lib 'DiscoveryAuthority.psm1') -Force
@@ -146,5 +147,59 @@ Describe 'capability observation' {
         ($observation['findings'] | ForEach-Object { $_['message'] }) -join ' ' | Should -BeLike '*No active protected activation*'
         $observation['probe']['result'] | Should -Be 'denied'
         (Get-Command Get-DiscoveryCapabilityObservation).Parameters.Keys | Should -Not -Contain 'Supported'
+    }
+}
+
+Describe 'capability attestation persistence' {
+    BeforeAll {
+        $script:SessionAttestationPath = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
+
+        function Write-Attestation {
+            param([hashtable]$Store, [string]$Nonce = $script:GateNonce)
+            $observation = Get-DiscoveryCapabilityObservation -HostName 'claude-code' -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $Nonce -Runtime $script:Runtime `
+                -SentinelDecision $script:DenySentinel -HostEnvironment $script:GateHostEnvironment -Store $Store -WorkspaceTrusted $true -Now $script:GateNow -ReadBytes (Get-ProbeReader)
+            $path = Write-DiscoveryCapabilityAttestation -Observation $observation -WorkspaceRoot $script:GateWorkspaceRoot -HostEnvironment $script:GateHostEnvironment -Store $Store
+            return [pscustomobject]@{ Observation = $observation; Path = $path }
+        }
+    }
+
+    It 'writes the observation exclusively into the protected session partition' {
+        $store = Get-GateStore
+        $written = Write-Attestation -Store $store
+        $written.Path | Should -Be $script:SessionAttestationPath
+        @($store.Writes) | Should -Be @($script:SessionAttestationPath)
+        $store.Directories | Should -Contain (Split-Path $script:SessionAttestationPath -Parent).Replace('\', '/')
+        $record = ConvertFrom-Json -InputObject $store.Files[$script:SessionAttestationPath] -Depth 16
+        $record.artifact_kind | Should -Be 'capability-attestation'
+        $record.attestation_ref | Should -Be $written.Observation['attestation_ref']
+        $record.status | Should -Be 'supported'
+        @($record.PSObject.Properties.Name | Sort-Object) -join ',' | Should -Be (@($written.Observation.Keys | Sort-Object) -join ',')
+    }
+
+    It 'satisfies the start-time capability check that reads only the protected copy' {
+        $store = Get-GateStore
+        $written = Write-Attestation -Store $store
+        $principal = [pscustomobject]@{ HostName = 'claude-code'; SessionId = 'session-alpha' }
+        $record = [pscustomobject]@{ capability_ref = $written.Observation['attestation_ref']; runtime = [pscustomobject]$script:Runtime }
+        Get-DiscoveryCapabilityMismatch -Location $script:GateLocation -Principal $principal -Record $record -Store $store -Now $script:GateNow | Should -BeNullOrEmpty
+        $stale = [pscustomobject]@{ capability_ref = 'capability-other'; runtime = [pscustomobject]$script:Runtime }
+        (Get-DiscoveryCapabilityMismatch -Location $script:GateLocation -Principal $principal -Record $stale -Store $store -Now $script:GateNow).Code | Should -Be 'CAPABILITY'
+    }
+
+    It 'replaces the earlier record of the same session on a later probe' {
+        $store = Get-GateStore
+        $first = Write-Attestation -Store $store
+        $second = Write-Attestation -Store $store -Nonce 'fedcba9876543210fedc'
+        $second.Observation['id'] | Should -Not -Be $first.Observation['id']
+        @($store.Writes).Count | Should -Be 2
+        (ConvertFrom-Json -InputObject $store.Files[$script:SessionAttestationPath] -Depth 16).id | Should -Be $second.Observation['id']
+    }
+
+    It 'keeps the first record when the store offers no replacement seam' {
+        $store = Get-GateStore
+        $store.Remove('ReplaceText')
+        $first = Write-Attestation -Store $store
+        { Write-Attestation -Store $store -Nonce 'fedcba9876543210fedc' } | Should -Throw '*exists*'
+        (ConvertFrom-Json -InputObject $store.Files[$script:SessionAttestationPath] -Depth 16).id | Should -Be $first.Observation['id']
     }
 }

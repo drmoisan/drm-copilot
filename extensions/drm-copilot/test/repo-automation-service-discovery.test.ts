@@ -268,13 +268,30 @@ describe("discovery request composition", () => {
         (finding) => `${finding.code} ${finding.message}`,
       ) ?? [];
 
-    it("leaves the runtime warning in place without a trusted provider", async () => {
-      const result = await service(doctor()).runDiscoveryDoctor({
-        workspaceRoot: WS_ROOT,
-      });
-      expect(codes(result)).toEqual([
-        `${unavailable.code} ${unavailable.message}`,
-      ]);
+    it("projects the lazily created host provider without an injected one", async () => {
+      // Production never injects a provider, so the doctor must still project the
+      // session capability; outside a discovery host session that is the exact
+      // context-missing deficiency, reported before any protected path is resolved.
+      const saved = {
+        host: process.env["DRM_DISCOVERY_HOST"],
+        session: process.env["DRM_DISCOVERY_SESSION_ID"],
+      };
+      delete process.env["DRM_DISCOVERY_HOST"];
+      delete process.env["DRM_DISCOVERY_SESSION_ID"];
+      try {
+        const result = await service(doctor()).runDiscoveryDoctor({
+          workspaceRoot: WS_ROOT,
+        });
+        expect(codes(result)).toEqual([
+          `${unavailable.code} Native discovery capability is unavailable (context-missing): no trusted session context was supplied by the host.`,
+        ]);
+      } finally {
+        if (saved.host !== undefined)
+          process.env["DRM_DISCOVERY_HOST"] = saved.host;
+        if (saved.session !== undefined) {
+          process.env["DRM_DISCOVERY_SESSION_ID"] = saved.session;
+        }
+      }
     });
 
     it("reports a verified capability from the protected attestation", async () => {

@@ -16,9 +16,9 @@ from drm_copilot_discovery.cli_arguments import (
     parse_cli_arguments,
 )
 from drm_copilot_discovery.findings import Finding
-from drm_copilot_discovery.gateway_local import installed_local_io, run_local_git
+from drm_copilot_discovery.gateway_local import installed_local_io
 from drm_copilot_discovery.models import JsonObject, ParseLimits
-from drm_copilot_discovery.repository_reader import LocalGitReader
+from drm_copilot_discovery.repository_binding import installed_repository
 from drm_copilot_discovery.service_contracts import DiscoveryResult, ServiceRuntimeError
 
 if TYPE_CHECKING:
@@ -42,8 +42,9 @@ class CliPorts:
     """Bind trusted composition seams without invoking them or granting authority.
 
     Construct once per invocation. resolve_workspace (Callable[[str], str])
-    canonicalizes the directory; repository_factory (Callable[[str, str],
-    RepositoryReader]) binds its explicit ID; create_io (Callable[[str,
+    canonicalizes the directory; repository_factory (Callable[[str, str | None],
+    RepositoryReader | None]) binds the explicit ID, or the activated profile's
+    Git repository when none is given, or returns None; create_io (Callable[[str,
     RepositoryReader | None], ServiceIO]) receives that exact reader. clock
     (Clock), analyzer_registry (InventoryRegistry) and execute_request
     (ServiceExecutor) are forwarded unchanged. Frozen references select no
@@ -52,7 +53,7 @@ class CliPorts:
     """
 
     resolve_workspace: Callable[[str], str]
-    repository_factory: Callable[[str, str], RepositoryReader]
+    repository_factory: Callable[[str, str | None], RepositoryReader | None]
     create_io: Callable[[str, RepositoryReader | None], ServiceIO]
     clock: Clock
     analyzer_registry: InventoryRegistry
@@ -169,13 +170,10 @@ def run_cli(
             return _emit(
                 _failure(operation, mode, code="CLI_WORKSPACE"), stdout, stderr
             )
-        # One reader instance binds both capture/I/O and authoritative execution.
+        # One reader instance binds both capture/I/O and authoritative execution;
+        # the factory derives the configured repository when no id was given.
         try:
-            repository = (
-                ports.repository_factory(root, parsed.repository_id)
-                if parsed.repository_id is not None
-                else None
-            )
+            repository = ports.repository_factory(root, parsed.repository_id)
             io = ports.create_io(root, repository)
         except ServiceRuntimeError as error:
             return _emit(
@@ -217,15 +215,14 @@ def _resolve_workspace(selected: str) -> str:
     return root.as_posix()
 
 
-def _repository(root: str, identifier: str) -> RepositoryReader:
-    """Bind root (str) and identifier (str) to one fixed LocalGitReader.
+def _repository(root: str, identifier: str | None) -> RepositoryReader | None:
+    """Bind root (str) and identifier (str | None) to one fixed LocalGitReader.
 
-    Return RepositoryReader without executing Git. Invalid identities/roots raise
+    Return RepositoryReader without executing Git, or None when neither an
+    explicit nor a configured Git identity exists. Invalid identities/roots raise
     ValueError; later reads use only the installed bounded Git command seam.
     """
-    return LocalGitReader(
-        workspace_root=root, repository_id=identifier, run=run_local_git
-    )
+    return installed_repository(root, identifier)
 
 
 def _create_io(root: str, repository: RepositoryReader | None) -> ServiceIO:

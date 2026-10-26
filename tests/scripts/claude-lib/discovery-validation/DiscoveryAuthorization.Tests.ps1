@@ -238,7 +238,7 @@ Describe 'Get-DiscoveryPreToolDecision' {
 
     It 'provides a filesystem store and a hex nonce by default' {
         $store = Get-DiscoveryDefaultStore
-        @($store.Keys | Sort-Object) | Should -Be @('EnsureDirectory', 'ListEntries', 'ReadText', 'WriteText')
+        @($store.Keys | Sort-Object) | Should -Be @('EnsureDirectory', 'ListEntries', 'ReadText', 'ReplaceText', 'WriteText')
         (& $store.ListEntries (Join-Path $script:RepoRoot 'tests/fixtures/discovery_authority')) | Should -Contain 'authority-vectors.json'
         (& $store.ListEntries (Join-Path $script:RepoRoot 'tests/fixtures/does-not-exist')) | Should -BeNullOrEmpty
         (& $store.ReadText (Join-Path $script:RepoRoot 'tests/fixtures/does-not-exist/x.json')) | Should -BeNullOrEmpty

@@ -371,23 +371,31 @@ def index_references(snapshot: DiscoverySnapshot) -> ReferenceIndex:
         collector.add(finding)
     # Flatten configured documents and permitted collection members exactly once.
     aliases = replica_aliases(snapshot)
+    schemas = dict(snapshot.catalog.documents)
+    # Only catalog-described kinds join the graph: derived reports (coverage, parity,
+    # completion, validation) carry an id but have no document schema, so they can
+    # neither hold nor satisfy authored references and must not break indexing.
+    described = tuple(
+        artifact
+        for artifact in snapshot.artifacts
+        if V2_URN + artifact.expected_kind in schemas
+    )
     # Canonical enumeration preserves logical uniqueness without dropping raw inputs.
     records = tuple(
         record
-        for artifact in snapshot.artifacts
+        for artifact in described
         if artifact.path not in aliases
         for record in _records(artifact, collector)
     )
     # Retain each proven physical replica for path-keyed outgoing-link checks.
     replicas = tuple(
         (aliases[artifact.path], record)
-        for artifact in snapshot.artifacts
+        for artifact in described
         if artifact.path in aliases
         for record in _records(artifact, collector)
     )
     index = ReferenceIndex(records=records, replicas=replicas)
     _duplicates(index, collector)
-    schemas = dict(snapshot.catalog.documents)
     links: dict[tuple[str, str], ReferenceResolution] = {}
     # Physical replicas need outgoing links for later path-keyed provenance checks.
     # Their common links retain canonical targets and existing evidence assessments.

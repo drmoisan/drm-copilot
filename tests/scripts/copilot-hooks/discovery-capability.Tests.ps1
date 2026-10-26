@@ -35,9 +35,17 @@ Describe 'discovery-capability-probe.ps1 (GitHub Copilot)' {
         }
 
         function Invoke-Probe {
-            param([scriptblock]$Reader = (Get-RepoReader), [bool]$Trusted = $true)
-            return Invoke-DiscoveryCapabilityProbe -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -WorkspaceTrusted $Trusted -HostEnvironment $script:GateHostEnvironment -Store (Get-GateStore -HostName 'github-copilot') -ReadBytes $Reader -Now $script:GateNow
+            param([scriptblock]$Reader = (Get-RepoReader), [bool]$Trusted = $true, [hashtable]$Store = (Get-GateStore -HostName 'github-copilot'))
+            return Invoke-DiscoveryCapabilityProbe -WorkspaceRoot $script:GateWorkspaceRoot -SessionId 'session-alpha' -Nonce $script:GateNonce -WorkspaceTrusted $Trusted -HostEnvironment $script:GateHostEnvironment -Store $Store -ReadBytes $Reader -Now $script:GateNow
         }
+    }
+
+    It 'persists the observation as the protected session capability attestation' {
+        $store = Get-GateStore -HostName 'github-copilot'
+        $observation = Invoke-Probe -Store $store
+        $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
+        @($store.Writes) | Should -Be @($path)
+        (ConvertFrom-Json -InputObject $store.Files[$path] -Depth 16).attestation_ref | Should -Be $observation['attestation_ref']
     }
 
     It 'observes the registered Copilot handlers from discovery.json and denies the sentinel through the real adapter' {

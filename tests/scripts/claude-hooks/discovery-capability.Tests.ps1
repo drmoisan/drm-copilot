@@ -60,12 +60,23 @@ Describe 'discovery-capability-probe.ps1 (Claude Code)' {
         $observation = Invoke-Probe -Reader (Get-RepoReader -Omit $Omit) -Trusted $Trusted
         $observation['status'] | Should -Be 'unsupported' -Because $Name
         $observation['controls'][$Control] | Should -BeFalse
-        $runtimeJson = '{"build_sha256":"' + ('e' * 64) + '","package_version":"2.0.0","policy_sha256":"' + ('f' * 64) + '","policy_version":"2.0.0","schema_version":"2.0.0"}'
+        $runtimeJson = '{"build_sha256":"' + ('e' * 64) + '","package_version":"2.0.0","policy_sha256":"' + ('f' * 64) + '","policy_version":2,"schema_version":"2.0.0"}'
         $runtime = Get-DiscoveryProbeRuntime -RuntimeJson $runtimeJson -WorkspaceRoot $script:GateWorkspaceRoot -ConfigurationPath '.claude/settings.json'
         $runtime['build_sha256'] | Should -Be ('e' * 64)
+        # The installed runtime reports an integer policy version; the attestation must reproduce the type.
+        $runtime['policy_version'] | Should -BeOfType [int]
+        $observation['runtime']['policy_version'] | Should -BeOfType [int]
     }
 
     It 'reports unsupported when the workspace has no protected activation' {
         (Invoke-Probe -Store (Get-GateStore -NoActivation))['status'] | Should -Be 'unsupported'
+    }
+
+    It 'persists the observation as the protected session capability attestation' {
+        $store = Get-GateStore
+        $observation = Invoke-Probe -Store $store
+        $path = "$(Get-DiscoverySessionDirectory -Location $script:GateLocation -SessionId 'session-alpha')/capability-attestation.json"
+        @($store.Writes) | Should -Be @($path)
+        (ConvertFrom-Json -InputObject $store.Files[$path] -Depth 16).attestation_ref | Should -Be $observation['attestation_ref']
     }
 }

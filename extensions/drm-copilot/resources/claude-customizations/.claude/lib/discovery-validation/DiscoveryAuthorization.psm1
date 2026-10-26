@@ -277,10 +277,11 @@ function ConvertTo-DiscoveryToolAuthorizationRecord {
 function Get-DiscoveryDefaultStore {
     <#
     .SYNOPSIS
-        Returns the real-filesystem store seams (ReadText, ListEntries, WriteText, EnsureDirectory).
+        Returns the real-filesystem store seams (ReadText, ListEntries, WriteText, ReplaceText, EnsureDirectory).
     .DESCRIPTION
         WriteText creates the file exclusively, so a second writer for the same
-        authorization reference fails instead of replacing a record.
+        authorization reference fails instead of replacing a record; ReplaceText is
+        the explicit in-place rewrite that only the session capability attestation uses.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -304,6 +305,10 @@ function Get-DiscoveryDefaultStore {
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes($Text)
                 $stream.Write($bytes, 0, $bytes.Length)
             } finally { $stream.Dispose() }
+        }
+        ReplaceText     = {
+            param([string]$Path, [string]$Text)
+            [System.IO.File]::WriteAllText($Path, $Text, [System.Text.UTF8Encoding]::new($false))
         }
         EnsureDirectory = { param([string]$Directory) [void](New-Item -ItemType Directory -Path $Directory -Force) }
     }

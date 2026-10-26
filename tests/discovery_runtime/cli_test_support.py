@@ -62,7 +62,9 @@ def memory_ports(store: MemoryService, executor: ServiceExecutor) -> CliPorts:
     """
     return CliPorts(
         resolve_workspace=lambda selected: store.disk.root,
-        repository_factory=lambda root, identifier: store.repository,
+        repository_factory=lambda root, identifier: (
+            store.repository if identifier is not None else None
+        ),
         create_io=lambda root, repository: store,
         clock=lambda: NOW,
         analyzer_registry=InstalledInventoryRegistry(),

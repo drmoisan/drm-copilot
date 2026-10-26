@@ -369,4 +369,28 @@ describe("manifest and deployment shapes", () => {
     expect(deployment.profile_sha256).toBe(WORKSPACE.profile_sha256);
     expect(deployment.complexity).toBe(band);
   });
+
+  it("names the profile each host launches: the routed variant for Codex, the role elsewhere", () => {
+    const decision = resolveDiscoveryRouting({
+      skillId: "inventory-legacy-system",
+      executionContext: "standalone",
+      complexity: "C1",
+    });
+    expect(decision.deployment.deployment_agent).toBe(`${decision.role}-c1`);
+    expect(
+      buildInvocationDeployment(decision, "codex", WORKSPACE).agent_name,
+    ).toBe(`${decision.role}-c1`);
+    // Claude Code and Copilot publish one profile per role, so the native start
+    // hook can only ever observe the role name as the launched agent type.
+    for (const provider of ["claude-code", "github-copilot"]) {
+      const deployment = buildInvocationDeployment(
+        decision,
+        provider,
+        WORKSPACE,
+      );
+      expect(deployment.agent_name).toBe(decision.role);
+      expect(deployment.provider).toBe(provider);
+      expect(deployment.model).toBe(decision.deployment.model);
+    }
+  });
 });

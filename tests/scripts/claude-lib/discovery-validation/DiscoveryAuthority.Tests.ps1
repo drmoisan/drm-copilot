@@ -178,4 +178,19 @@ Describe 'Relative path and host environment helpers' {
         $environment.XdgStateHome | Should -Be '/state'
         (Get-DiscoveryTrustedHostEnvironment).Platform | Should -BeIn @('windows', 'macos', 'linux')
     }
+
+    It 'applies the host defaults when the state roots are omitted or empty (issue #980 installed smoke)' {
+        # An omitted [string] parameter arrives as an empty string; the Windows state root must
+        # still resolve to the known folder, otherwise every real hook run fails closed with
+        # AUTHORITY_STATE_ROOT_MISSING while the injected unit tests keep passing.
+        $omitted = Get-DiscoveryTrustedHostEnvironment
+        $empty = Get-DiscoveryTrustedHostEnvironment -LocalAppData '' -XdgStateHome ''
+        $omitted.UserHome | Should -Not -BeNullOrEmpty
+        if ($IsWindows) {
+            $omitted.LocalAppData | Should -Be ([System.Environment]::GetFolderPath('LocalApplicationData'))
+            $empty.LocalAppData | Should -Be $omitted.LocalAppData
+            $omitted.LocalAppData | Should -Not -BeNullOrEmpty
+        }
+        $empty.XdgStateHome | Should -Be ([string]$env:XDG_STATE_HOME)
+    }
 }

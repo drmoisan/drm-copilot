@@ -75,7 +75,8 @@
         'Get-DiscoverySentinelEnvironment',
         'Get-DiscoveryHostRegistration',
         'Test-DiscoveryHandlerRegistered',
-        'Get-DiscoveryCapabilityObservation'
+        'Get-DiscoveryCapabilityObservation',
+        'Write-DiscoveryCapabilityAttestation'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
