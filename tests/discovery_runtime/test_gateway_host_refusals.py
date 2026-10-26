@@ -295,6 +295,47 @@ def test_another_invocation_reference_finds_no_partition(
     assert INVOCATION not in "".join(case.store.writes)
 
 
+def test_read_outside_the_configured_input_scope_is_refused(
+    service_io: MemoryService,
+) -> None:
+    """A selected path outside the profile's configured roots still cannot be read."""
+    case = host_case(service_io)
+    case.authorization(
+        "protected-read-000000000002",
+        tool="read_discovery_source",
+        operation="read-source",
+    )
+    edit(case, "invocation.json", selected_paths=["application", "secrets"])
+
+    refused(
+        case,
+        lambda: case.io.authorize(
+            request(
+                "read-source",
+                {"read_operation": "list", "paths": ["secrets/key.txt"]},
+                root=service_io.disk.root,
+                reference="protected-read-000000000002",
+            ),
+            baseline=case.capture(),
+        ),
+        "SERVICE_AUTHORITY",
+    )
+
+
+def test_an_inactive_workspace_is_refused_before_any_record_read(
+    service_io: MemoryService,
+) -> None:
+    """Without an active protected activation no host record is consulted."""
+    case = host_case(service_io)
+    service_io.configuration.registry.raw = None
+
+    with pytest.raises(OperationFailure) as caught:
+        case.io.authorize(new_contract(case), baseline=None)
+    assert caught.value.exit_code == 3
+    assert "not active" in caught.value.findings[0].message
+    assert case.store.reads == []
+
+
 def test_a_malformed_record_is_refused_by_kind(service_io: MemoryService) -> None:
     """Bytes that are not the expected document refuse before any binding is read."""
     case = host_case(service_io)

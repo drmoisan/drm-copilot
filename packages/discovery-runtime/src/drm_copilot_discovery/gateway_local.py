@@ -442,21 +442,11 @@ def installed_local_io(
     catalog failures propagate. Reads installed metadata without creating workspace
     files.
     """
-    workspace = Path(root)
-    if not workspace.is_absolute() or workspace.resolve(strict=True) != workspace:
-        raise ValueError("Select an absolute canonical workspace")
+    location = installed_location(root)
     if principal != "local-user":
         raise PermissionError("Native host capability is unavailable")
-    location = RegistryLocation.for_host(
-        workspace_root=workspace.as_posix(),
-        platform=installed_platform(),
-        user_home=str(Path.home()),
-        local_app_data=os.environ.get("LOCALAPPDATA"),
-        xdg_state_home=os.environ.get("XDG_STATE_HOME"),
-    )
-    activation = ActivationStore.local(
-        location=_canonical_state_location(location),
-        catalog=load_catalog(),
+    activation = installed_activation(
+        location,
         authorize_root=_authorize_local_root,
         invalidate_authority=_invalidate_empty_authority,
     )

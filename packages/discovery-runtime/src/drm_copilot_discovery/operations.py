@@ -187,10 +187,12 @@ class OperationContext:
     def author(self) -> JsonObject:
         """Return trusted principal attribution as a fresh JsonObject; no I/O.
 
-        The authenticated ServiceAuthority ID determines attribution, never
-        request data. Missing host support is rejected before context creation.
+        The authenticated ServiceAuthority decides attribution, never request
+        data: a local-user is a human author and a host principal is an agent.
         """
-        return JsonObject((("kind", "human"), ("id", self.authority.author_or_agent)))
+        from drm_copilot_discovery.operation_grants import attribution
+
+        return attribution(self.authority)
 
     def manifest(self, *, verify: bool = True) -> InputManifest:
         """Return actual captured inputs as InputManifest; never virtual outputs.
@@ -302,33 +304,17 @@ class OperationContext:
         )
 
     def grants(self, changes: tuple[MutationChange, ...]) -> tuple[WriteGrant, ...]:
-        """Return exact grants for bounded changes from authenticated local intent.
+        """Return exact grants for bounded changes from the authenticated authority.
 
-        A local-user with no opaque host marker may derive these exact rows.
-        Nonempty provider grants must match without expansion. Raises
-        OperationFailure on authority mismatch; no wildcard, I/O or host fallback.
+        A local-user derives the exact rows of its own changes; a host authority
+        receives only rows its verified invocation already grants. The policy
+        lives in operation_grants. Raises OperationFailure on authority mismatch;
+        no wildcard, I/O or host fallback.
         """
-        request, authority = self.request, self.authority
-        if (
-            authority.principal != "local-user"
-            or authority.invocation is not None
-            or request.invocation_ref is not None
-            or request.authorization_ref is not None
-        ):
-            raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
+        from drm_copilot_discovery.operation_grants import derive_grants
+
         self.budget.work(4 * len(changes))
-        # Derive only the already computed output identities, never a root grant.
-        exact = tuple(
-            WriteGrant(
-                artifact_kind=c.artifact_kind, artifact_id=c.artifact_id, path=c.path
-            )
-            for c in changes
-        )
-        if authority.grants and (
-            len(authority.grants) != len(exact) or set(authority.grants) != set(exact)
-        ):
-            raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
-        return authority.grants or exact
+        return derive_grants(self.authority, self.request, changes)
 
     def plan(
         self,

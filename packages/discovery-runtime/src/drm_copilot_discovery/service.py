@@ -35,6 +35,7 @@ from drm_copilot_discovery.service_contracts import (
     parse_service_request,
     validate_service_result,
 )
+from drm_copilot_discovery.service_request_rules import CONTROLLED_OPERATIONS
 from drm_copilot_discovery.snapshot_io import SnapshotIO
 
 if TYPE_CHECKING:
@@ -127,25 +128,44 @@ def _recognized(request: JsonValue) -> tuple[Operation | None, Mode | None]:
     )
 
 
-def _local(authority: ServiceAuthority, request: ServiceRequest) -> None:
-    """Require authenticated local authority for request; return None or fail.
+def _authority(authority: ServiceAuthority, request: ServiceRequest) -> None:
+    """Require an admitted authority for request; return None or fail with exit 3.
 
-    ServiceAuthority is supplied by the trusted provider. Request references and
-    an absent host implementation never confer authority. No I/O or grant
-    derivation occurs; unavailable host contexts raise OperationFailure(exit 3).
-    The root `prepare-agent` baseline route is a local-user operation; only
-    `finalize-agent` requires a verified host invocation.
+    ServiceAuthority is supplied by the trusted provider; request references
+    never confer authority. A local-user is admitted with no host marker, no
+    invocation, a non-agent-output mode and any operation except finalize-agent
+    (the root `prepare-agent` baseline route is local-user work). A host
+    principal is admitted only with a present invocation that the request's
+    invocation_ref names, a present authorization_ref, agent-output mode and a
+    controlled operation (finalize-agent is a member). No I/O occurs.
     """
-    if (
-        type(authority) is not ServiceAuthority
-        or authority.principal != "local-user"
-        or authority.invocation is not None
-        or request.invocation_ref is not None
-        or request.authorization_ref is not None
-        or request.mode == "agent-output"
-        or request.operation == "finalize-agent"
-    ):
+    if type(authority) is not ServiceAuthority:
         raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
+    # The principal selects its admission rule; neither rule falls back to the other.
+    if authority.principal == "local-user":
+        admitted = (
+            authority.invocation is None
+            and request.invocation_ref is None
+            and request.authorization_ref is None
+            and request.mode != "agent-output"
+            and request.operation != "finalize-agent"
+        )
+    else:
+        admitted = (
+            authority.principal == "host"
+            and authority.invocation is not None
+            and request.invocation_ref == authority.invocation.invocation_id
+            and request.authorization_ref is not None
+            and request.mode == "agent-output"
+            and request.operation in CONTROLLED_OPERATIONS
+        )
+    if not admitted:
+        raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
+
+
+def _invocation_id(authority: ServiceAuthority) -> str | None:
+    """Return the invocation id bound to authority, or None for a root principal."""
+    return None if authority.invocation is None else authority.invocation.invocation_id
 
 
 def _context(
@@ -172,7 +192,7 @@ def _context(
     ):
         raise OperationFailure("SERVICE_PROVIDER", exit_code=3)
     authority = io.authorize(request, baseline=None)
-    _local(authority, request)
+    _authority(authority, request)
     now = clock()
     if type(now) is not datetime or now.tzinfo is None or now.utcoffset() is None:
         raise OperationFailure("SERVICE_CLOCK", exit_code=3)
@@ -217,8 +237,11 @@ def _context(
 
             baseline = pin_inventory_sources(baseline, repository_reader)
         selected = io.authorize(request, baseline=baseline)
-        _local(selected, request)
-        if selected.author_or_agent != authority.author_or_agent:
+        _authority(selected, request)
+        # Both authorizations must name the same principal identity and invocation.
+        if selected.author_or_agent != authority.author_or_agent or _invocation_id(
+            selected
+        ) != _invocation_id(authority):
             raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
         authority = selected
     return OperationContext(
