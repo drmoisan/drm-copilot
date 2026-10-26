@@ -140,6 +140,35 @@ _REQUIRED = {
     ),
 }
 _REPORTS = ("validate-all", "coverage-report", "parity-report", "completion-report")
+# The controlled operation set: the union of the native adapters' tool table,
+# pinned by tests/fixtures/discovery_host/controlled-operations.json. A host
+# principal is admitted only for these operations (finalize-agent is a member).
+CONTROLLED_OPERATIONS = frozenset(
+    {
+        "completion-report",
+        "coverage-report",
+        "finalize-agent",
+        "generate-acceptance",
+        "inventory",
+        "link-evidence",
+        "new-contract",
+        "new-scenario",
+        "parity-report",
+        "profile",
+        "read-source",
+        "update-artifact",
+        "validate-all",
+        "validate-coverage-ledger",
+        "validate-decisions",
+        "validate-evidence-reference",
+        "validate-feature-contract",
+        "validate-parity-matrix",
+        "validate-product-decision",
+        "validate-profile",
+        "validate-runtime-scenario",
+        "validate-unspecified-behavior",
+    }
+)
 _ROLE_AWARE = (
     "inventory",
     "new-contract",

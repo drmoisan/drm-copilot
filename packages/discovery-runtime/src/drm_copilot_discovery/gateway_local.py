@@ -208,31 +208,42 @@ class LocalServiceIO:
         Returns CapturedWorkspace; I/O, path and budget failures propagate. Reads the
         exact bound workspace and repository.
         """
-        io = self.initialization
-        current = capture_workspace(
-            workspace_root=io.workspace_root,
-            profile_path=baseline.snapshot.profile.artifacts["profile"],
-            metadata=io.metadata,
-            read_bytes=io.read_bytes,
-            catalog=io.catalog,
-            repository=io.repository,
-        )
-        selected, loaded = _repository_selection(baseline), _repository_selection(
-            current
-        )
-        # Inventory alone adds source pins; repeat that exact accepted selection.
-        if set(selected) - set(loaded):
-            if io.repository is None:
-                raise OSError("Pinned repository reader is unavailable")
-            from drm_copilot_discovery.analyzer.input_capture import (
-                pin_inventory_sources,
-            )
+        return recapture_workspace(self.initialization, baseline)
 
-            current = pin_inventory_sources(current, io.repository)
-            loaded = _repository_selection(current)
-        if loaded != selected:
-            raise OSError("Writer source selection differs from baseline")
-        return current
+
+def recapture_workspace(
+    io: InitializationIO, baseline: CapturedWorkspace
+) -> CapturedWorkspace:
+    """Reload baseline's profile and repository through the bound trusted ports.
+
+    io (InitializationIO): the composition's bound readers and repository.
+    baseline (CapturedWorkspace): prior capture whose profile and exact source
+    pins are repeated. Returns CapturedWorkspace; I/O, path and budget failures
+    propagate, and a changed source selection raises OSError. Both the local-user
+    and the host guarded writers recapture through this one function.
+    """
+    current = capture_workspace(
+        workspace_root=io.workspace_root,
+        profile_path=baseline.snapshot.profile.artifacts["profile"],
+        metadata=io.metadata,
+        read_bytes=io.read_bytes,
+        catalog=io.catalog,
+        repository=io.repository,
+    )
+    selected, loaded = _repository_selection(baseline), _repository_selection(current)
+    # Inventory alone adds source pins; repeat that exact accepted selection.
+    if set(selected) - set(loaded):
+        if io.repository is None:
+            raise OSError("Pinned repository reader is unavailable")
+        from drm_copilot_discovery.analyzer.input_capture import (
+            pin_inventory_sources,
+        )
+
+        current = pin_inventory_sources(current, io.repository)
+        loaded = _repository_selection(current)
+    if loaded != selected:
+        raise OSError("Writer source selection differs from baseline")
+    return current
 
 
 def _repository_selection(
@@ -395,6 +406,25 @@ def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:
     return replace(location, directory=canonical.as_posix())
 
 
+def canonical_state_location(location: RegistryLocation) -> RegistryLocation:
+    """Return the canonical host state location for location (RegistryLocation).
+
+    Thin public wrapper over the installed-path resolution so the host-principal
+    composition reuses the same partition and containment checks as the local one.
+    Resolution errors and ValueError propagate unchanged; metadata is read only.
+    """
+    return _canonical_state_location(location)
+
+
+def installed_platform() -> Literal["windows", "macos", "linux"]:
+    """Return the fixed registry platform of this interpreter; no I/O occurs."""
+    return (
+        "windows"
+        if os.name == "nt"
+        else "macos" if sys.platform == "darwin" else "linux"
+    )
+
+
 def installed_local_io(
     root: str, repository: RepositoryReader | None, principal: str, author_id: str
 ) -> LocalServiceIO:
@@ -417,14 +447,9 @@ def installed_local_io(
         raise ValueError("Select an absolute canonical workspace")
     if principal != "local-user":
         raise PermissionError("Native host capability is unavailable")
-    platform: Literal["windows", "macos", "linux"] = (
-        "windows"
-        if os.name == "nt"
-        else "macos" if sys.platform == "darwin" else "linux"
-    )
     location = RegistryLocation.for_host(
         workspace_root=workspace.as_posix(),
-        platform=platform,
+        platform=installed_platform(),
         user_home=str(Path.home()),
         local_app_data=os.environ.get("LOCALAPPDATA"),
         xdg_state_home=os.environ.get("XDG_STATE_HOME"),

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Literal, Protocol, cast, get_args
 from drm_copilot_discovery.analyzer.registry import InstalledInventoryRegistry
 from drm_copilot_discovery.catalog import CatalogError
 from drm_copilot_discovery.findings import Finding
+from drm_copilot_discovery.gateway_host import installed_host_io
 from drm_copilot_discovery.gateway_local import installed_local_io
 from drm_copilot_discovery.models import JsonObject, ParseLimits, canonical_json
 from drm_copilot_discovery.parsing import parse_document
@@ -285,37 +286,25 @@ def main(
 ) -> int:
     """Run the installed module with fixed outer options and injectable streams.
 
-    Require --workspace-root and --principal; permit --repository-id/--author-id. No
-    module, interpreter, shell or arbitrary executable option exists. Invalid outer
-    options produce one fixed JSON failure; runtime work is deferred until a bounded
-    request is decoded. Return the emitted result's process exit code.
+    Require --workspace-root and --principal; permit --repository-id/--author-id.
+    With --principal host, --author-id (the agent id), --session-id, --host-name and
+    --agent-role are all required; with --principal local-user the three host
+    options are refused. No module, interpreter, shell or arbitrary executable option
+    exists. Invalid outer options produce one fixed JSON failure; runtime work is
+    deferred until a bounded request is decoded. Return the emitted result's exit.
 
     argv (Sequence[str] | None): fixed outer argument sequence. stdin (BinaryIO | None):
     bounded binary request stream. stdout (TextIO | None): result text stream. stderr
     (TextIO | None): fixed diagnostic text stream. Returns int process exit; composes
-    fixed local ports and dispatches once. Invalid options yield an invocation failure.
+    fixed local or host ports and dispatches once. Invalid options yield an
+    invocation failure.
     """
     output, errors = stdout or sys.stdout, stderr or sys.stderr
     arguments = tuple(sys.argv[1:] if argv is None else argv)
-    allowed = {"--workspace-root", "--principal", "--repository-id", "--author-id"}
-    options: dict[str, str] = {}
-    valid = len(arguments) <= 8 and len(arguments) % 2 == 0
-    if valid:
-        # A finite exact option table prevents request-selected command execution.
-        for index in range(0, len(arguments), 2):
-            key, value = arguments[index], arguments[index + 1]
-            if key not in allowed or key in options:
-                valid = False
-                break
-            options[key] = value
-    if valid and "--workspace-root" in options and "--principal" in options:
+    options = _parse_options(arguments)
+    if options is not None:
         root = options["--workspace-root"]
         try:
-            if not Path(root).is_absolute() or options["--principal"] not in (
-                "local-user",
-                "host",
-            ):
-                raise ValueError("Invalid trusted outer options")
             # Without an explicit id the activated profile's Git repository is bound.
             repository = installed_repository(root, options.get("--repository-id"))
         except ValueError:
@@ -333,18 +322,78 @@ def main(
             stdin=stdin or sys.stdin.buffer,
             stdout=output,
             stderr=errors,
-            create_io=lambda: installed_local_io(
-                root,
-                repository,
-                options["--principal"],
-                options.get("--author-id", "local-user"),
-            ),
+            create_io=lambda: _compose_io(options, root, repository),
             repository_reader=repository,
             clock=lambda: datetime.now(timezone.utc),
             analyzer_registry=InstalledInventoryRegistry(),
         )
     return _emit(
         _failure(code="SERVICE_REQUEST", exit_code=2), stdout=output, stderr=errors
+    )
+
+
+_HOST_OPTIONS = ("--author-id", "--session-id", "--host-name", "--agent-role")
+_OPTION_CEILING = 14
+
+
+def _parse_options(arguments: tuple[str, ...]) -> dict[str, str] | None:
+    """Return the validated fixed option table for arguments, or None when invalid.
+
+    arguments (tuple[str, ...]) is the outer argument sequence. The table admits
+    --workspace-root, --principal, --repository-id, --author-id, --session-id,
+    --host-name and --agent-role once each, requires an absolute root and a known
+    principal, requires the four identity options with principal host and refuses
+    the session, host and role options with principal local-user. No I/O occurs.
+    """
+    allowed = {"--workspace-root", "--principal", "--repository-id", *_HOST_OPTIONS}
+    options: dict[str, str] = {}
+    if len(arguments) > _OPTION_CEILING or len(arguments) % 2:
+        return None
+    # A finite exact option table prevents request-selected command execution.
+    for index in range(0, len(arguments), 2):
+        key, value = arguments[index], arguments[index + 1]
+        if key not in allowed or key in options or not value:
+            return None
+        options[key] = value
+    if "--workspace-root" not in options or "--principal" not in options:
+        return None
+    principal = options["--principal"]
+    if not Path(options["--workspace-root"]).is_absolute() or principal not in (
+        "local-user",
+        "host",
+    ):
+        return None
+    supplied = tuple(option for option in _HOST_OPTIONS if option in options)
+    # The host principal travels with its complete identity; local-user never
+    # carries a session, host or role marker.
+    if principal == "host" and supplied != _HOST_OPTIONS:
+        return None
+    if principal == "local-user" and set(supplied) - {"--author-id"}:
+        return None
+    return options
+
+
+def _compose_io(
+    options: dict[str, str], root: str, repository: RepositoryReader | None
+) -> ServiceIO:
+    """Compose the installed ports for the validated options; perform host reads only.
+
+    options (dict[str, str]) is the parsed fixed table; root (str) the absolute
+    workspace; repository (RepositoryReader | None) the bound reader. Returns the
+    local-user composition, or the host composition carrying the agent id,
+    session, host and role; installed_local_io keeps refusing the host principal.
+    """
+    if options["--principal"] == "host":
+        return installed_host_io(
+            root,
+            repository,
+            session_id=options["--session-id"],
+            host_name=options["--host-name"],
+            agent_id=options["--author-id"],
+            agent_role=options["--agent-role"],
+        )
+    return installed_local_io(
+        root, repository, "local-user", options.get("--author-id", "local-user")
     )
 
 

@@ -321,6 +321,25 @@ def test_output_failure_never_appends_a_second_document(
             "--repository-id",
             "INVALID ID",
         ],
+        ["--workspace-root", "/workspace", "--principal", "host"],
+        [
+            "--workspace-root",
+            "/workspace",
+            "--principal",
+            "host",
+            "--author-id",
+            "agent-alpha",
+            "--session-id",
+            "session-alpha",
+        ],
+        [
+            "--workspace-root",
+            "/workspace",
+            "--principal",
+            "local-user",
+            "--session-id",
+            "session-alpha",
+        ],
     ],
 )
 def test_fixed_outer_options_reject_arbitrary_dispatch(arguments: list[str]) -> None:
