@@ -11,7 +11,7 @@
 
 ## Size Justification
 
-The feature changes versioned artifacts, an installable Python runtime, twelve analyzer adapters, protected native authority, three host integrations, four specialist roles, nine workflows, conversion, and publication. Independently verifiable transitions and complete baseline/final evidence require more than 40 tasks and 400 lines. Keeping these distinct avoids a single implementation or testing bucket. Each implementation task includes its own tests; final QA verifies integration and repository-wide invariants.
+The feature changes versioned artifacts, an installable Python runtime, twelve analyzer adapters, protected native authority, three host integrations, four specialist roles, nine workflows, conversion, and publication. Independently verifiable transitions and complete baseline/final evidence require more than 40 tasks and 400 lines. Keeping these distinct avoids a single implementation or testing bucket. Each implementation task includes its own tests; final QA verifies integration and repository-wide invariants. The revision that adds Phases 12 and 13 closes the two escalated self-review rows (installed completion-receipt path, over-limit publisher files) with separately verifiable Python, TypeScript, packaging, installed-host, and final-QA transitions; folding them into fewer tasks would hide the security-sensitive refusal classes behind one bucket.
 
 ## Governing contracts and ownership
 
@@ -66,466 +66,599 @@ These sets are part of the named tasks' explicit file scope. A task citing a set
 | K: roles and skills | tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1 and DTTEST/test_legacy_discovery_skills_contracts.py: update old Write(discovery/**), legacy-parity-analyst parity ownership, v1-only schema paths, seven-name-only and Fan-in reconciliation assumption assertions to four constrained roles, nine workflows, and seven thin aliases; preserve professional metadata, neutrality, valid routing, and mirror assertions. |
 | L: routing/publication | DTTEST/test_{resolve_codex_topology,resolve_codex_deployment,generate_codex_agent_variants,codex_model_policy_config_parity,codex_model_routing_skill,codex_agent_wrapper_contracts,codex_handoff_contract_parity}.py; tests/scripts/claude-lib/codex-routing/Codex{Topology.Parity,Deployment.Parity,Deployment.GeneratedFamilies.Parity,Routing.Manifest}.Tests.ps1: expand fixed family/operation inventories and direct-discovery receipts; retain ordinary and epic routing/profile guarantees. tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 expands the wrapper-argument map and runs every shared corpus case through Invoke-CodexTopologyCli in P7-T3; ordinary/epic assertions remain unchanged. Converter/publisher suites named in P8-T9 preserve all existing destinations and exclusion behavior. |
 | M: registered hooks and bundles | tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1: P9-T4 preserves U1/U1-ST exception blocks and U2 complete validator inventory while adapting the discovery seam. tests/scripts/{claude-hooks/hook-dependency-failure.Claude,codex-hooks/hook-dependency-failure.Codex}.Tests.ps1: P9-T2/P9-T4 retain existing prefixes; P9-T6 extends ReasonPrefix exactly with registrations and retains B1-B3 fail-closed envelopes. tests/scripts/claude-runtime/claude-settings.Tests.ps1 keeps the fifteen-agent group and gains dedicated four-role registration assertions in P9-T6. tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 keeps inactive admitted-tool success, malformed-input blocks and state-isolation assertions while adding active discovery cases. tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 and DTTEST/test_codex_core_manifest_closure.py retain bundle execution/dependency closure and run when their outputs first change. |
+| N: host-principal path (Phase 12) | PT/test_gateway.py::test_fixed_outer_options_reject_arbitrary_dispatch: P12-T6 adds host-incomplete and local-user-with-session rows and retains every existing row. PT/test_gateway_local.py::test_host_principal_is_never_converted_to_local_user, test_request_markers_cannot_expand_local_authority, PT/test_gateway_factory.py::test_factory_rejects_invalid_outer_authority (host row) and test_composed_ports_reject_host_references: unchanged, because LocalServiceIO and installed_local_io keep refusing the host principal and host markers; no principal conversion is introduced. PT/test_service_boundaries.py::test_native_operations_remain_unavailable_without_a_verified_provider: P12-T1 removes the prepare-agent row (prepare-agent becomes a root route) and retains the finalize-agent row; test_direct_publication_context_cannot_derive_host_grants: unchanged (principal host without an invocation and without provider grants is still refused). PT/test_service_context_guards.py, test_service_publication.py and test_service.py SERVICE_AUTHORITY assertions: unchanged (local-user provider). ET/repo-automation-service-discovery-agent.test.ts and ET/repo-automation-service-discovery.test.ts assertions on the doctor call at prepare, on `--principal local-user` for finalize or for requests carrying an invocation reference, and on the prepared protected path count: updated by P12-T2 and P12-T3 with the reason stated in each test. ET/discovery-runtime.test.ts root-request argument assertions: unchanged. Set G/H service stubs: unchanged apart from the optional finalize authorization reference added in P12-T4. DTTEST/test_agentic_sync.py and test_agentic_sync_branches.py: P12-T10 relocates helpers and artifact/CLI tests without changing any assertion; the monkeypatch targets `agentic_sync.Path`, `agentic_sync.RealSyncFileSystem` and `agentic_sync.AgenticSyncer` remain valid because `main` resolves them from the `agentic_sync` module namespace. |
 
 Before changing an existing public behavior, search the test tree for its symbol, filename, and asserted output again; include any additional asserting caller in that task's change/proof record. Do not alter a shared fixture without running its full consumer set. This search supplements the explicit dispositions above rather than deferring design discovery.
 
 ## Pre-Mortem
 
-- Review checklists: P11-T9 walks every policy-audit, code-review, and feature-audit checklist item against the branch diff from the merge base of origin/main and HEAD; missing implementation or proof remains FAIL, and independent feature review follows the executor.
-- Coverage: P0-T2 through P0-T4 capture numeric baselines; P11-T2 through P11-T5 measure final totals, changed lines, per-new-module targets, Python/TypeScript branches, T2 properties/mutation trend, and no exclusion or threshold weakening.
-- Mirror parity: P8-T9 and P10-T1–P10-T3 publish and validate native/resource manifests and exact profiles; P10-T4 updates execution-environment through canonical authoring and all six byte-identical copies if a stated tool-route, hook-context, CI, or packaging fact changes. No CI context change is planned.
-- File size: each task counts physical lines of changed production, test, and reusable script files; the 500-line maximum includes generated wrappers and new tests. Near-limit modules are extracted into the named focused components before adding behavior.
-- Test isolation: P11-T6 runs seeded shuffled Jest, reversed-order new/changed Python modules, and shuffled touched Pester file order with at least three recorded seeds; CI-shaped single-process/shard checks also run.
-- CI-only behavior: P11-T7 proves independent installed resources and native-host behavior; P11-T8 verifies Linux/Windows fixture handling, no ignored artifacts dependency, no shallow-clone base assumption, correct case, deterministic LF content, and full package/contract gates.
-- Evidence: every gate writes its own canonical write-time evidence; protected host authority stays distinct from editable reports. P11-T10 reconciles all 66 ACs and 22 deliverables, and P11-T11 leaves review/CI-dependent completion unchecked until actual authority passes.
+- Review checklists: P11-T9 walks every policy-audit, code-review, and feature-audit checklist item against the branch diff from the merge base of origin/main and HEAD; missing implementation or proof remains FAIL, and independent feature review follows the executor. The first P11-T9 pass recorded two FAIL rows; P13-T8 re-executes the walk after Phase 12 and Phase 13 close them, and P11-T9 is checked only by that re-execution.
+- Coverage: P0-T2 through P0-T4 capture numeric baselines; P11-T2 through P11-T5 measure final totals, changed lines, per-new-module targets, Python/TypeScript branches, T2 properties/mutation trend, and no exclusion or threshold weakening. P13-T1, P13-T2 and P13-T4 repeat the measurements for every file Phase 12 adds or changes, including the per-file entries P12-T3 and P12-T4 add to extensions/drm-copilot/jest.discovery-coverage.json.
+- Mirror parity: P8-T9 and P10-T1–P10-T3 publish and validate native/resource manifests and exact profiles; P10-T4 updates execution-environment through canonical authoring and all six byte-identical copies if a stated tool-route, hook-context, CI, or packaging fact changes. No CI context change is planned. Phase 12 changes no tool route, launcher, hook context, CI job or batch-budget rule stated by the brief (the gateway's outer options are a runtime contract, not an agent tool route); P12-T13 records that unchanged-fact check, and P12-T11 and P13-T6 re-verify the resource, pack, and packaging mirrors after the rebuild.
+- File size: each task counts physical lines of changed production, test, and reusable script files; the 500-line maximum includes generated wrappers and new tests. Near-limit modules are extracted into the named focused components before adding behavior. P12-T7 extracts grant derivation out of R/operations.py before adding the host branch, Phase 12 places every new Python test in a new PT module because PT/test_gateway_local.py, PT/test_service_boundaries.py and PT/test_agent_output.py are at the limit, and P12-T10 splits the two over-limit publisher files that the first self-review reported.
+- Test isolation: P11-T6 runs seeded shuffled Jest, reversed-order new/changed Python modules, and shuffled touched Pester file order with at least three recorded seeds; CI-shaped single-process/shard checks also run. P13-T5 repeats the seeded shuffled Jest run with its seed recorded, the reversed-order run of every Python test module Phase 12 adds or changes, and, when P13-T3 ran the PowerShell loop, the shuffled Pester file order with at least three recorded seeds.
+- CI-only behavior: P11-T7 proves independent installed resources and native-host behavior; P11-T8 verifies Linux/Windows fixture handling, no ignored artifacts dependency, no shallow-clone base assumption, correct case, deterministic LF content, and full package/contract gates. P12-T12 repeats the installed-host proof with the rebuilt packages and P13-T6 repeats the repository and publication contracts on the final tree; Phase 12 tests read protected records only through injected in-memory store seams, never from `artifacts/` or a host state directory.
+- Evidence: every gate writes its own canonical write-time evidence; protected host authority stays distinct from editable reports. P11-T10 reconciles all 66 ACs and 22 deliverables, and P11-T11 leaves review/CI-dependent completion unchecked until actual authority passes. P13-T7 re-reconciles the receipt-dependent criteria from P12-T12's observed evidence, and P13-T9 refreshes the handoff; no criterion is checked from an in-process proof alone.
 
-Before a task runs a contract that inventories tracked files, the orchestrator stages that task's complete owned file set without committing. This prevents new package/configuration paths from being omitted by tracked-file checks. Implementation ownership is Python for Phases 1–6, customization plus routed Python/PowerShell/TypeScript resolver specialists for Phase 7, TypeScript for P8-T1–P8-T8, publishing specialists for the P8-T9 prerequisite, PowerShell for Phase 9 with the narrow P9-T2 Python classification update, publishing/documentation specialists for Phase 10, and executor verification for Phases 0 and 11. Mixed-language tasks retain the stated single behavior and use sequential owned-file handoffs.
+Before a task runs a contract that inventories tracked files, the orchestrator stages that task's complete owned file set without committing. This prevents new package/configuration paths from being omitted by tracked-file checks. Implementation ownership is Python for Phases 1–6, customization plus routed Python/PowerShell/TypeScript resolver specialists for Phase 7, TypeScript for P8-T1–P8-T8, publishing specialists for the P8-T9 prerequisite, PowerShell for Phase 9 with the narrow P9-T2 Python classification update, publishing/documentation specialists for Phase 10, executor verification for Phases 0 and 11, Python for P12-T1 and P12-T5–P12-T10, TypeScript for P12-T2–P12-T4, publishing/documentation specialists for P12-T11 and P12-T13, and executor verification for P12-T12 and Phase 13. Mixed-language tasks retain the stated single behavior and use sequential owned-file handoffs.
 
 Task evidence distinguishes changed existing code, relocated implementations with compatibility adapters, genuinely new authored code, and generated mirrors/resources; generated copies are counted separately. Reuse existing orchestration and publishing services rather than introduce a second scheduler or semantic engine.
 
+## Revision: host-principal completion path and publisher file size
+
+This revision adds Phases 12 and 13 so the executor can close the escalation it raised at [P11-T9]. Every task of Phases 0–11 keeps its identifier, order, checkbox state and sub-bullet requirements; the self-review that P11-T9 names is re-executed by P13-T8 and [P11-T9] is checked only when that re-execution records zero FAIL rows. The only change to a checked task line is a trailing parenthetical naming one path that the task's own sub-bullets already name: the planner output hook (`Test-TaskContainsExplicitPath` in .claude/hooks/validate-planner-output.ps1) reads the task line alone and requires a path token there, so the token is added for hook compliance and alters no requirement, acceptance condition or evidence location. The first self-review (the lexicographically greatest FEATURE/evidence/qa-gates/self-review.*.md at the time of this revision) reports two blocking rows: the installed runtime cannot mint a completion receipt, and two pre-existing publisher files above 500 lines were extended.
+
+The following facts of the current tree determine the design, and they differ from the executor's proposed delta in the ways stated:
+
+- `service._local` in R/service.py refuses every host marker, `LocalServiceIO` and `installed_local_io` in R/gateway_local.py refuse the host principal, and `inspect_request` in R/service_inspection.py has no `finalize-agent` or `prepare-agent` route (an unrouted operation raises SERVICE_OPERATION). The finalize operation is therefore unimplemented in Python, not merely refused, so the delta adds a finalize route (P12-T8) in addition to the host composition (P12-T6) and the admission change (P12-T7).
+- `buildGatewayArgs` in ES/discovery-runtime.ts sends `--principal local-user` for every request, including `finalizeDiscoveryAgentOperation` in ES/repo-automation-service-discovery-agent.ts and every request that `granted` in ES/repo-automation-service-discovery.ts marks agent-output. The proposal named only the Python side; P12-T3 adds the TypeScript transport of the trusted host, session, agent and role values, and a request that carries an invocation reference without a trusted agent identity is refused rather than downgraded to local-user.
+- `consumeToolAuthorization` in ES/discovery-authorization.ts has no production caller: the native PreToolUse adapters write one-use `tool-authorization` records, and nothing consumes them. One-use grants are therefore wired by P12-T4 (TypeScript consumes by trusted binding, because only the MCP layer holds the raw tool input the hook digested) and verified by P12-T5/P12-T6 (Python admits a host request only against a consumed, latched record bound to the same operation, invocation and identity).
+- `InvocationContext` in R/agent_output.py requires the pre-invocation snapshot: `_OutputRules` compares `invocation.baseline.manifest.files` against the current capture (OUTPUT_UNEXPECTED), preserves unselected collection members, and protects approved decisions from `invocation.baseline.artifacts`. The prepared invocation partition stores no pre-invocation inputs today (`input_sha256` digests request fields). Supplying the current capture as the baseline would make those three controls unreachable on an installed host, so P12-T1 adds a root `prepare-agent` route that captures the baseline through the authoritative Python runtime and P12-T2 persists its result in the protected partition; P12-T6 reconstructs the baseline from that record and refuses finalization when any non-output input drifted.
+- No v2 schema exists for the `start-attestation` record that the native start adapters write (S2 holds `discovery-invocation`, `tool-authorization`, `capability-attestation` and `validation-receipt`). P12-T5 adds it so Python validates every protected record it reads through the offline catalog.
+- Rejected: admitting `prepare-agent` under host authority. It is root-only in `ROOT_ONLY_OPERATIONS` (ES/discovery-authorization-record.ts) and in the PowerShell pre-tool decision, and TypeScript never calls it for an agent. Rejected: an admission check keyed on "agent-output mode" alone; admission requires a verified started invocation, a consumed one-use authorization, and the fixed controlled operation set. Rejected: placing the self-review rewrite inside the implementation phase; the contract requires the final phase to end with the self-review after the full loops re-run.
+
+Host-path invariants every Phase 12 task preserves: no principal conversion (LocalServiceIO and installed_local_io keep refusing `host`; HostServiceIO never returns a local-user authority); fail closed on every refusal class with exit 3 and a typed finding, never exit 0 and never a partial authority; one-use authorizations are consumed exactly once in TypeScript and verified as consumed in Python; the Python runtime never writes a receipt and never writes to the protected store; request JSON never selects a store location, an identity or a baseline; protected records are validated through the catalog before any field is read.
+
 ### Phase 0 — Policy and numeric baselines
 
-- [x] [P0-T1] Record the policy and requirement baseline.
+- [x] [P0-T1] Record the policy and requirement baseline (FEATURE/evidence/baseline/).
   - Files and behavior: Read AGENTS.md, .agents/skills/{general-code-change,general-unit-test,python,python-suppressions,typescript,typescript-suppressions,powershell,quality-tiers,architecture-boundaries,self-explanatory-code-commenting}/SKILL.md in the required precedence, then FEATURE/{issue,spec,user-story,requirements-traceability}.md and both research artifacts. Write FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md.
   - Tests and proof: Inventory all 66 ACs, seven DoD items, twelve seeded conditions, existing runtime/adapters, and initial physical file lengths; confirm no C# production addition is planned.
   - Acceptance: The evidence lists the actual files read, policy order, selected full-feature mode, and unresolved baseline blockers; no implementation has preceded it.
 
-- [x] [P0-T2] Capture the full Python baseline with coverage.
+- [x] [P0-T2] Capture the full Python baseline with coverage (FEATURE/evidence/baseline/).
   - Files and behavior: Measure the current pyproject.toml Python scope, schemas, discovery tests, conversion/publishing/routing suites, and quality-tiers.yml classification. Write separate FEATURE/evidence/baseline/python-{format,lint,types,tests,contracts}.<timestamp>.md and numeric coverage JSON under that canonical baseline directory.
   - Tests and proof: Apply the ordered Python gate from execution-environment, including full Pytest line/branch coverage, existing discovery-specific values, and schema/resource/generator/quality-tier contracts. Preserve failing baseline diagnostics.
   - Acceptance: Every baseline step has its own exit/output artifact and numeric repository/discovery line and branch values; missing measurements remain blocking.
 
-- [x] [P0-T3] Capture both TypeScript project baselines with coverage.
+- [x] [P0-T3] Capture both TypeScript project baselines with coverage (FEATURE/evidence/baseline/).
   - Files and behavior: Measure package.json and extensions/drm-copilot/{package.json,jest.config.cjs} scopes plus packages/mcp-server build contracts. Write separate FEATURE/evidence/baseline/typescript-{root,extension}-{format,lint,types,tests,architecture}.<timestamp>.md.
   - Tests and proof: Run the applicable ordered gates and coverage-enabled Jest suites for root and extension; retain per-file discovery wrapper metrics and package/build status.
   - Acceptance: Baseline records distinguish both projects, all command-step exits, numeric line/branch totals and existing changed-file thresholds; no summary-only success is accepted.
 
-- [x] [P0-T4] Capture the PowerShell baseline with actual results.
+- [x] [P0-T4] Capture the PowerShell baseline with actual results (FEATURE/evidence/baseline/).
   - Files and behavior: Measure config/{poshqc-scan,poshqc-coverage}.json scopes, discovery hooks/libraries, routing helpers, and the full registered Pester population. Write FEATURE/evidence/baseline/powershell-{format,analyze,tests}.<timestamp>.md and retain coverage/test result copies in that directory.
   - Tests and proof: Use the documented PoshQC path plus branch-current result files/direct analyzer evidence; capture full suite counts and numeric line coverage, with no invented branch metric.
   - Acceptance: Actual test/analyzer results and coverage, rather than MCP invocation summaries, establish the baseline and expose any existing failures.
 
 ### Phase 1 — Installable runtime and trusted artifact boundaries
 
-- [x] [P1-T1] Establish the single canonical Python package and preserve value-object imports.
+- [x] [P1-T1] Establish the single canonical Python package and preserve value-object imports (packages/discovery-runtime/pyproject.toml).
   - Files and behavior: Create packages/discovery-runtime/{pyproject.toml,README.md} and R/{__init__,domain_profile,domain_profile_models,init_models,io,rendering}.py by moving the existing reusable implementations once; retain thin adapters at DT/discovery/{__init__,domain_profile,domain_profile_models,init_models,io,rendering}.py. Update root pyproject.toml, poetry.lock, quality-tiers.yml, DT/quality_tiers_contract.py (DiscoveryRules, DISCOVERY_RULES, _discover_from_path), and DTTEST/test_quality_tiers_contract{,_classification}.py. Discover tracked pyproject.toml project roots before classifying the dedicated runtime T2; retain existing root/adapter classifications and exclusions.
   - Tests and proof: Add PT/test_package_contract.py; update Set A import/patch seams. Add nested/root Python-project discovery cases and extend test_discover_projects_ignores_excluded_roots; retain package.json/.csproj/module tests. Update test_committed_quality_tiers_yml_assigns_spec_tiers for only the approved new T2 package and preserve all old assignments; run test_committed_quality_tiers_yml_matches_live_tree and complete classification checks. Verify version 2.0.0, Python >=3.10, approved runtime dependencies, type/coverage inclusion, no duplicate model implementation, and unchanged v1 values.
   - Acceptance: Root tooling imports the dedicated package, legacy model exports resolve to it, and focused package/value suites pass. The tracked package exists before classification is verified; no QT007 or QT008 failure occurs at this task boundary.
 
-- [x] [P1-T2] Build a deterministic schema/template resource staging boundary.
+- [x] [P1-T2] Build a deterministic schema/template resource staging boundary (DT/build_discovery_runtime.py).
   - Files and behavior: Create DT/build_discovery_runtime.py, packages/discovery-runtime/resource-manifest.json, R/resources.py and its generated resource directory; initially enumerate the existing canonical schemas/discovery/v1 resources. Every following schema/template authoring task extends this same explicit allowlist when its files land. Add DTTEST/test_build_discovery_runtime.py and PT/test_resources.py.
   - Tests and proof: Exercise byte hashes, sorted manifest paths, missing/extra input rejection, importlib.resources lookup independent of cwd, dependency/resource closure reporting, and repeatable staged bytes using injected I/O. Build artifacts are operational outputs under SCRATCH or dist/discovery, not unit-test temporary files.
   - Acceptance: The builder produces a deterministic complete manifest for currently authored resources and a buildable wheel project; no lookup requires a framework checkout. P1-T3 through P1-T7 and P3-T2 extend the allowlist, and P10-T3 verifies final v1/v2/template closure.
 
-- [x] [P1-T3] Define shared v2 reference, profile, and scope schemas.
+- [x] [P1-T3] Define shared v2 reference, profile, and scope schemas (S2/common.schema.json).
   - Files and behavior: Create S2/{common,domain-profile,scope}.schema.json, E2/{domain-profile,scope}.example.yaml, F2/{domain-profile,scope}.invalid.yaml, and tests/schemas/discovery/test_v2_profile_schemas.py. Common definitions govern IDs, immutable repository references, independent status axes, dimensions, closed objects, and namespaced extensions.
   - Tests and proof: Validate Draft 2020-12 schemas plus valid/invalid synthetic profiles, exact versions, role/client/mode unions, strict gate booleans, extension boundaries, draft versus configured fields, and null draft pins.
   - Acceptance: All requested profile configuration fields have validated representations; optional offline/mobile requirements remain optional unless declared; core keys cannot be replaced by extensions.
 
-- [x] [P1-T4] Define observation and evidence artifact schemas.
+- [x] [P1-T4] Define observation and evidence artifact schemas (S2/feature-contract.schema.json).
   - Files and behavior: Create S2/{feature-contract,evidence-reference,runtime-characterization-scenario}.schema.json, corresponding E2 examples and F2 invalid documents, and tests/schemas/discovery/test_v2_observation_schemas.py.
   - Tests and proof: Cover every specified behavior dimension, transition, trigger, permission/environment field, source/runtime evidence distinction, confidence, pre/post capture plan/result, known/unknown expectation, repeatability, and unresolved links with positive and negative cases.
   - Acceptance: Each observation artifact validates only its exact v2 kind/version and expresses all specified fields without conflating confidence, observation state, lifecycle, or runtime result.
 
-- [x] [P1-T5] Define coverage and immutable inventory transport schemas.
+- [x] [P1-T5] Define coverage and immutable inventory transport schemas (S2/coverage-ledger.schema.json).
   - Files and behavior: Create S2/{coverage-ledger,inventory-snapshot,source-snapshot-manifest,extension-result-manifest}.schema.json, corresponding E2/F2 fixtures, and tests/schemas/discovery/test_v2_inventory_schemas.py.
   - Tests and proof: Assert component path/symbol/span/hash, inspection/disposition, exclusions/rationale, test/runtime requirements, responsible actor, diagnostics, source pins, manifest digest, and detected/inferred adapter result structures.
   - Acceptance: Synthetic complete and partial inventories retain provenance and exact transport hashes; malformed component, manifest, and extension records fail with schema pointers.
 
-- [x] [P1-T6] Define target parity, decisions, and acceptance schemas.
+- [x] [P1-T6] Define target parity, decisions, and acceptance schemas (S2/parity-matrix.schema.json).
   - Files and behavior: Create S2/{parity-matrix,implementation-record,unspecified-behavior,product-decision,unspecified-behavior-collection,product-decision-collection,acceptance-specification}.schema.json, corresponding E2/F2 fixtures, and tests/schemas/discovery/test_v2_target_schemas.py.
   - Tests and proof: Cover all requested parity/decision fields, independent approval/applicability/verification states, client scopes, decision-key/supersession links, approval metadata, criterion IDs, ready/pending records, and no fabricated pending Then.
   - Acceptance: Every required target artifact and collection has a strict supported v2 schema and both passing and failing fixtures; v1 schema/fixture bytes remain unchanged.
 
-- [x] [P1-T7] Define versioned service and authority envelope schemas.
+- [x] [P1-T7] Define versioned service and authority envelope schemas (S2/service-request.schema.json).
   - Files and behavior: Create S2/{activation,service-request,service-result,discovery-invocation,required-output-manifest,validation-receipt,migration-report,capability-attestation,tool-authorization}.schema.json and tests/schemas/discovery/test_v2_control_schemas.py; extend the explicit resource manifest.
   - Tests and proof: Validate operation/mode/exit enums, findings/pointers/next actions, exact role/session/workspace/input bindings, opaque authority references, request correlation, and rejection of extra caller-selected executable or receipt-location fields.
   - Acceptance: Python, TypeScript, and native adapters have one versioned interoperability contract; a structurally valid workspace envelope alone carries no permission or success authority.
 
-- [x] [P1-T8] Reject ambiguous or resource-exhausting structured input.
+- [x] [P1-T8] Reject ambiguous or resource-exhausting structured input (R/parsing.py).
   - Files and behavior: Create R/{parsing,findings,models}.py and PT/test_{parsing,parsing_limits,findings}.py; implement parse_document and immutable finding/value types without weakening generic repository YAML/JSON helpers.
   - Tests and proof: Test duplicate JSON/YAML keys, merges, cycles, non-string keys, nonfinite/non-JSON values, wrong encoding/root types, 16 MiB/depth-64/record limits, aggregate bounded errors, stable pointer/code ordering, and round-trip/order properties.
   - Acceptance: Malformed or over-limit documents produce deterministic actionable findings before graph construction; valid JSON-compatible YAML and JSON normalize identically.
 
-- [x] [P1-T9] Resolve expected-kind schemas through a complete offline catalog.
+- [x] [P1-T9] Resolve expected-kind schemas through a complete offline catalog (R/catalog.py).
   - Files and behavior: Create R/{catalog,schema_validation}.py and PT/test_{catalog,schema_validation}.py; replace DT/validate_discovery_schema_artifacts.py with safe compatibility adapters. Update Set B schema tests and package resource manifest.
   - Tests and proof: Reject wrong kind, unsupported exact version, artifact-selected weaker/remote schema, unavailable jsonschema/referencing, invalid format, and extension-schema hash/network escape; accept only registered v1 aliases and v2 URNs. Preserve existing valid v1 fixture tests unchanged.
   - Acceptance: No discovery schema retrieval uses the network or reduced fallback; expected kind is caller/root controlled, and valid v1 reads are clearly compatibility-only.
 
-- [x] [P1-T10] Load the v2 profile and immutable gate policy through one parser.
+- [x] [P1-T10] Load the v2 profile and immutable gate policy through one parser (R/profile_v2.py).
   - Files and behavior: Create R/{profile_v2,profile_models,activation_models}.py and PT/test_{profile_v2,profile_dimensions}.py; update R/domain_profile.py only for explicit version dispatch and DT/validate_discovery_profile.py for authoritative validation. Update Set B obsolete profile assertions.
   - Tests and proof: Test every profile field, custom artifact roots, combined/separate roles, multiple clients, runtime capability, inherited requirements, mandatory non-disableable claim rules, unknown gate keys, draft state, and preserved valid v1 parser behavior.
   - Acceptance: Every discovery operation receives the same typed profile/gate configuration; missing or malformed configuration fails and explicit optional dimensions do not become unconditional requirements.
 
-- [x] [P1-T11] Enforce one cross-platform read/write path policy.
+- [x] [P1-T11] Enforce one cross-platform read/write path policy (R/path_policy.py).
   - Files and behavior: Create R/{path_policy,path_models}.py and PT/test_{path_policy,path_resolution,path_collisions}.py, using injected path metadata rather than platform-specific unit-test disk operations.
   - Tests and proof: Cover traversal, rooted/drive-relative/UNC/device paths, reserved names, alternate streams, separator/case aliases, symlink/reparse/cyclic ancestors, sibling prefix traps, protected/output overlap, and parent replacement before commit.
   - Acceptance: Only validated workspace-relative paths inside authorized input or exact artifact grants resolve; all documented Windows/POSIX escape and collision cases fail closed.
 
 ### Phase 2 — Artifact graph and completion rules
 
-- [x] [P2-T1] Load immutable snapshots and complete input manifests.
+- [x] [P2-T1] Load immutable snapshots and complete input manifests (R/snapshot.py).
   - Files and behavior: Create R/{snapshot,snapshot_io,repository_reader}.py and PT/test_{snapshot,snapshot_io,repository_reader}.py; expose read adapters for local Git identities/objects and configured file snapshots.
   - Tests and proof: Account for every structured artifact, raw profile/locator, local evidence payload, imported manifest, extension schema/result, and selected source byte sequence; reject unrecognized/malformed files instead of skipping them. Test injected read failures, enumeration limits, stable ordering, and read/hash consistency.
   - Acceptance: A snapshot carries the exact complete input set and bytes used for validation, with deterministic digest and no implicit remote or neighboring-repository read.
 
-- [x] [P2-T2] Index artifact identities and resolve typed references.
+- [x] [P2-T2] Index artifact identities and resolve typed references (R/references.py).
   - Files and behavior: Create R/references.py and PT/test_{references,reference_uniqueness}.py with a typed reference index over snapshots.
   - Tests and proof: Cover duplicate IDs by namespace, path-kind mismatch, missing and wrong-kind links, ambiguous foreign IDs, collection record IDs, linked scenarios/features/components/evidence, and deterministic duplicate diagnostics.
   - Acceptance: Every present reference resolves unambiguously to its expected artifact/repository identity or produces a stable blocking finding.
 
-- [x] [P2-T3] Validate evidence integrity and declared repository revisions.
+- [x] [P2-T3] Validate evidence integrity and declared repository revisions (R/evidence_rules.py).
   - Files and behavior: Create R/{evidence_rules,revision_rules}.py and PT/test_{evidence_rules,revision_rules}.py.
   - Tests and proof: Check one-based inclusive spans, required capture metadata, local payload checksums, source/test/full revision pins, source-versus-target identity, inspected bytes at a local pin, imported immutable hashes, and unknown remote freshness. Prove documentation-only HEAD changes do not invalidate matching historical source bytes.
   - Acceptance: A claim cannot use replaced bytes, a mismatched expected pin, or descriptive URI-only evidence as completion proof; valid intentionally historical snapshots remain usable for their declared pin.
 
-- [x] [P2-T4] Enforce honest observed behavior and runtime result claims.
+- [x] [P2-T4] Enforce honest observed behavior and runtime result claims (R/claim_rules.py).
   - Files and behavior: Create R/claim_rules.py and PT/test_{observation_claims,runtime_claims}.py.
   - Tests and proof: Test verified evidence, unknown/contradictory dimension-to-unresolved coverage, intentionally-unspecified approved rationale, confidence/state separation, first-run observed semantics, passed known expectations, required pre/post captures, environment and runtime evidence.
   - Acceptance: Prospective and stored claims reject false verified/passed states while legitimate draft/not-run/blocked observations remain structurally valid.
 
-- [x] [P2-T5] Reconcile product approval and deterministic decision conflicts.
+- [x] [P2-T5] Reconcile product approval and deterministic decision conflicts (R/decision_rules.py).
   - Files and behavior: Create R/decision_rules.py and PT/test_{decision_rules,decision_supersession}.py.
   - Tests and proof: Exercise valid owners/approval evidence, proposed versus approved target behavior, same decision-key overlapping feature/client/platform/mode/dimension scopes, disjoint scopes, supersession cycles, retired features, and unresolved resolutions preserving historical facts.
   - Acceptance: Only an approved scoped decision establishes target requirements; overlapping unsuperseded approvals and invalid resolution links are blocking findings.
 
-- [x] [P2-T6] Validate complete inventory-to-ledger accounting.
+- [x] [P2-T6] Validate complete inventory-to-ledger accounting (R/coverage_rules.py).
   - Files and behavior: Create R/coverage_rules.py and PT/test_{coverage_rules,coverage_scope}.py.
   - Tests and proof: Check confirmed scope, every inventory component exactly once, missing/foreign ledger entries, inspection/disposition independence, unassigned/blocked statuses, linked features/tests/evidence, supporting/excluded rationale, declared runtime need, and incomplete scan diagnostics.
   - Acceptance: Structural drafts pass without false completeness; discovery completion cannot pass while an in-scope component is absent, undispositioned, blocked, or unjustifiably excluded.
 
-- [x] [P2-T7] Evaluate required client, dimension, and scenario obligations.
+- [x] [P2-T7] Evaluate required client, dimension, and scenario obligations (R/dimension_rules.py).
   - Files and behavior: Create R/{dimension_rules,acceptance_rules}.py and PT/test_{dimension_rules,acceptance_rules}.py.
   - Tests and proof: Test the global/client/feature requirement union, explicit configured online/offline/mobile/custom classifications, approved not-applicable dispositions, required feature/criterion/client/mode scenario linkage, pending versus ready specifications, optional dimensions, and zero-feature confirmed-scope rules.
   - Acceptance: Required obligations cannot be weakened by a child record or satisfied by pending scenarios; unconfigured optional dimensions do not create failures or synthetic passes.
 
-- [x] [P2-T8] Verify parity against immutable source contracts and target evidence.
+- [x] [P2-T8] Verify parity against immutable source contracts and target evidence (R/parity_rules.py).
   - Files and behavior: Create R/parity_rules.py and PT/test_{parity_rules,parity_clients}.py.
   - Tests and proof: Cover missing source contracts, wrong source revision/hash, multiple target clients, implementation/test/evidence references, full/partial/missing/conflicting states, approved changes/retirements, source test evidence misused as target proof, and per-dimension verification.
   - Acceptance: Each required parity entry resolves its pinned source and independently justified target state; no report or status string can substitute for implementation/decision evidence.
 
-- [x] [P2-T9] Compose structural, completion, planning, and role-output validation.
+- [x] [P2-T9] Compose structural, completion, planning, and role-output validation (R/validation.py).
   - Files and behavior: Create R/{validation,completion_rules,agent_output}.py and PT/test_{validation_modes,completion_rules,agent_output}.py; implement validate_snapshot with bounded sorted findings and exact required-output manifests.
   - Tests and proof: Exercise empty initialized structural success versus discovery failure; discovery/parity/planning modes; each configurable prerequisite; missing profile; malformed unreferenced files; all four role output sets; valid incremental output; and a reviewer output-valid/result-fail report.
   - Acceptance: The selected mode is explicit and determines success; a v1 check, structural pass, another role's receipt, or valid failing review cannot authorize completion/planning.
 
 ### Phase 3 — Safe consumer workspace operations
 
-- [x] [P3-T1] Commit validated prospective artifact mutations with compare-and-swap.
+- [x] [P3-T1] Commit validated prospective artifact mutations with compare-and-swap (R/mutation_plan.py).
   - Files and behavior: Create R/{mutation_plan,mutation_io}.py and PT/test_{mutation_plan,mutation_commit}.py. Plan exact artifact-kind/path/ID grants, validate the prospective graph, recheck parent metadata and input hashes, and perform exclusive creation or digest-matched replacement.
   - Tests and proof: Test unchanged bytes, invalid proposed content over valid old content, wrong roles/kinds/IDs, stale original digest, concurrent collision, parent-link replacement, bounded partial I/O failure, and repeatable dry-run; use in-memory writers.
   - Acceptance: Unauthorized or invalid prospective writes change nothing; a race or partial failure is reported explicitly and invalidates completion authority; successful mutation preserves unrelated artifacts.
 
-- [x] [P3-T2] Initialize a structurally valid draft without overwriting existing content.
+- [x] [P3-T2] Initialize a structurally valid draft without overwriting existing content (R/init_flow.py).
   - Files and behavior: Move/rework DT/discovery/init_flow.py into R/init_flow.py with a thin old adapter; create docs/discovery/templates/v2/{domain-profile.yaml,scope.yaml,coverage-ledger.json,unspecified-behaviors.yaml,product-decisions.yaml,parity-matrix.json}; extend resource-manifest.json. Add PT/test_{initialization,initialization_conflicts}.py and update Set C flow/model/neutrality tests.
   - Tests and proof: Cover caller-provided identity/role/roots, honest null draft pins, all configured directories, source/target/combined structures, first/repeat/partial-recovery runs, invalid existing file, conflict-before-write, no-overwrite force compatibility, and dry-run without directories/activation/receipts.
   - Acceptance: Identical inputs produce identical projected content; repeat initialization skips valid files unchanged; the created or projected draft passes structural validation and fails completion.
 
-- [x] [P3-T3] Manage explicit activation and configuration changes.
+- [x] [P3-T3] Manage explicit activation and configuration changes (R/activation_store.py).
   - Files and behavior: Create R/{configuration,activation_store}.py and PT/test_{configuration,activation_store}.py for config/discovery.json and the trusted external per-workspace activation registry.
   - Tests and proof: Test default/custom profile selection, multiple candidates, argument/locator disagreement, missing/deleted/malformed active configuration, inactive nonparticipants, root-only activate/deactivate, no authority path from inputs, platform registry locations, invalidated grants, and dry-run no writes.
   - Acceptance: Configuration deletion cannot disable an active gate; deliberate deactivation is a recorded root operation, while repositories without activation or a default profile remain unaffected.
 
-- [x] [P3-T4] Create feature contracts and runtime scenarios with explicit unknowns.
+- [x] [P3-T4] Create feature contracts and runtime scenarios with explicit unknowns (R/draft_contracts.py).
   - Files and behavior: Create R/{draft_contracts,draft_scenarios}.py and PT/test_{draft_contracts,draft_scenarios}.py; use the shared mutation planner to create selected artifacts plus required unresolved records.
   - Tests and proof: Test unique stable IDs, custom roots, missing feature links, unknown required dimensions, multi-feature scenario linkage, nullable unknown expectations, zero synthetic approval/evidence, collisions, and dry-run.
   - Acceptance: New artifacts are structurally truthful drafts; unknown behavior has linked unresolved records and cannot become verified or passed merely through creation.
 
-- [x] [P3-T5] Register and link verifiable evidence to an authorized artifact.
+- [x] [P3-T5] Register and link verifiable evidence to an authorized artifact (R/evidence_linking.py).
   - Files and behavior: Create R/evidence_linking.py and PT/test_{evidence_linking,evidence_payloads}.py; register evidence records and supplied local payloads, then link the specified artifact through the shared validated mutation contract.
   - Tests and proof: Cover source/test/runtime/manual/decision evidence, immutable pins/checksums, allowed payload roots, duplicate IDs, checksum mismatch, path escape, stale destination digest, missing artifact, unrelated link preservation, and partial failure reporting.
   - Acceptance: A successful evidence link identifies exact local evidence and preserves the original observation/approval state; malformed or unverified evidence cannot upgrade a claim.
 
-- [x] [P3-T6] Export and import immutable source snapshots.
+- [x] [P3-T6] Export and import immutable source snapshots (R/source_snapshots.py).
   - Files and behavior: Create R/source_snapshots.py and PT/test_{snapshot_export,snapshot_import}.py, using the versioned manifest and configured source-snapshot root.
   - Tests and proof: Exercise source revision/contract/evidence hashes, local transport manifests, foreign identities, unsupported versions, changed bytes, duplicate or conflicting imports, no-overwrite/dry-run, combined-repository identities, and multiple target clients.
   - Acceptance: Target references resolve only to locally imported bytes matching the declared immutable source identity; no sibling checkout, remote fetch, or silent snapshot replacement occurs.
 
-- [x] [P3-T7] Migrate valid v1 artifacts into an explicit new v2 draft root.
+- [x] [P3-T7] Migrate valid v1 artifacts into an explicit new v2 draft root (R/migration_v1.py).
   - Files and behavior: Create R/{migration_v1,migration_models}.py and PT/test_{migration_v1,migration_unknowns}.py; preserve v1 source files and emit the versioned mapping report.
   - Tests and proof: Test each v1 artifact kind, deterministic old/new ID/hash mapping, unresolved missing dimensions/pins/approval/expectations, namespaced unmapped metadata, collisions, invalid v1 input, unsupported migration versions, and dry-run.
   - Acceptance: Migration never overwrites originals, activates automatically, or invents confidence/approvals/parity; the projected v2 result is structurally valid and incomplete obligations remain visible.
 
-- [x] [P3-T8] Provide bounded source inspection without executable access.
+- [x] [P3-T8] Provide bounded source inspection without executable access (R/source_reads.py).
   - Files and behavior: Create R/source_reads.py and PT/test_{source_reads,source_read_limits}.py for list/read/literal-search operations over configured selected production/test/project/documentation/evidence/snapshot roots.
   - Tests and proof: Cover byte/line/match bounds, source hashes/revisions/spans, exact grants, disabled regex or bounded supported search, encoding/read failures, symlink/path escapes, and deterministic pagination/order.
   - Acceptance: The service returns source evidence metadata and bounded text/matches with no shell/process/network execution or mutation capability.
 
 ### Phase 4 — Deterministic generic inventory analyzers
 
-- [x] [P4-T1] Move and harden repository inventory and the analyzer pipeline.
+- [x] [P4-T1] Move and harden repository inventory and the analyzer pipeline (R/analyzer/pipeline.py).
   - Files and behavior: Move DT/discovery/analyzer/{models,pipeline,inventory,emitter}.py into R/analyzer/ and leave compatibility adapters; create R/analyzer/{registry,findings}.py. Add PT/analyzer/test_{repository,pipeline,registry}.py and update Set F model/pipeline/emitter/inventory/E2E suites.
   - Tests and proof: Recognize real solution/project and generic manifest suffixes; traverse selected roots with early output/dependency/exclusion pruning; retain every included/excluded/read-failed input; hash parsed bytes once; distinguish detected/inferred findings; seed only uninspected/unassigned ledger proposals.
   - Acceptance: Default and dry-run inventory perform no writes; explicit writes are validated mutations; ordering, clock variation, separator variation, and enumeration order do not change semantic IDs/digests.
 
-- [x] [P4-T2] Inventory declared .NET solutions and projects safely.
+- [x] [P4-T2] Inventory declared .NET solutions and projects safely (R/analyzer/dotnet_projects.py).
   - Files and behavior: Create R/analyzer/{xml_input,dotnet_projects}.py, PT/analyzer/test_{xml_input,dotnet_projects}.py, and synthetic text fixtures under tests/fixtures/discovery_analyzers/dotnet/.
   - Tests and proof: Cover .sln/.slnx, project/props/targets XML, project/package/COM references, target frameworks, conditions, implicit SDK/unresolved expressions, malformed XML, DTD/entity/network rejection, and source spans/hashes.
   - Acceptance: Explicit declarations are machine-readable detected facts with provenance; unresolved/evaluated build semantics are not presented as a resolved dependency or runtime graph.
 
-- [x] [P4-T3] Preserve C# lexical inventory and classify event candidates honestly.
+- [x] [P4-T3] Preserve C# lexical inventory and classify event candidates honestly (R/analyzer/csharp_declarations.py).
   - Files and behavior: Move/split DT/discovery/analyzer/{source_text,dotnet_inventory}.py into R/analyzer/{source_text,csharp_declarations,event_subscriptions,dotnet_inventory}.py with thin old adapters. Add PT/analyzer/test_{csharp_declarations,event_subscriptions}.py and update Set F source-text/.NET assertions.
   - Tests and proof: Preserve namespace/type/record/delegate/event/member candidates and comment/string/raw-string masking; cover arithmetic +=/-= false positives, handler candidates, multiline declarations, Unicode, line endings, and unsupported preprocessing/binding diagnostics.
   - Acceptance: Detected syntax and inferred event relationships remain separate, source references identify inspected bytes, and no module exceeds 500 physical lines.
 
-- [x] [P4-T4] Extract configuration keys without exposing values.
+- [x] [P4-T4] Extract configuration keys without exposing values (R/analyzer/configuration.py).
   - Files and behavior: Create R/analyzer/configuration.py, PT/analyzer/test_configuration.py, and tests/fixtures/discovery_analyzers/configuration/ synthetic inputs.
   - Tests and proof: Parse JSON, secure XML, INI/settings declarations and key paths; cover conditions, duplicates/malformed input, secret-looking key values, deterministic ordering, and unsupported-format diagnostics. TOML value evaluation is not claimed without an approved compatible parser.
   - Acceptance: Findings expose key/declaration locations and provenance but no credential/secret values, executable configuration evaluation, or product-specific settings catalog.
 
-- [x] [P4-T5] Detect generic filesystem, registry, and COM constructs.
+- [x] [P4-T5] Detect generic filesystem, registry, and COM constructs (R/analyzer/com_interop.py).
   - Files and behavior: Create R/analyzer/{filesystem_access,registry_access,com_interop}.py and PT/analyzer/test_{filesystem_access,registry_access,com_interop}.py; extract reusable COM logic from the existing optional platform adapter without importing it from core.
   - Tests and proof: Test recognized file/directory/stream APIs, generic registry APIs/platform applicability, COM attributes/references/activation/marshal declarations, masked false positives, and unresolved runtime paths.
   - Acceptance: Static candidates are labeled inferred where appropriate and source-referenced; generic interop analysis is usable without loading any optional platform module.
 
-- [x] [P4-T6] Map declared UI callbacks and inferred test references.
+- [x] [P4-T6] Map declared UI callbacks and inferred test references (R/analyzer/ui_callbacks.py).
   - Files and behavior: Create R/analyzer/{ui_callbacks,test_references}.py and PT/analyzer/test_{ui_callbacks,test_references}.py with synthetic XAML/XML/code/test-project inputs.
   - Tests and proof: Cover declared callback attributes, code-behind links, unresolved symbols, test-project references, lexical production type references, ambiguous names, and negative cases that must not become coverage or test-pass claims.
   - Acceptance: Explicit declaration links and inferred test relevance are distinguishable; no finding claims runtime execution or behavioral test coverage.
 
-- [x] [P4-T7] Inventory local declared dependencies.
+- [x] [P4-T7] Inventory local declared dependencies (R/analyzer/dependencies.py).
   - Files and behavior: Create R/analyzer/dependencies.py and PT/analyzer/test_dependencies.py with synthetic Node package/lock, Python requirements/setup configuration, and .NET package/lock/project inputs.
   - Tests and proof: Cover pinned/unpinned versions, conditions/markers, direct versus declared lock relationships, malformed/unsupported manifests, duplicate ordering, and secret/token redaction; no package install/restore/network lookup.
   - Acceptance: Each supported ecosystem yields deterministic source-linked declarations and clear limitations; unsupported formats are diagnostics rather than fabricated evaluated dependencies.
 
-- [x] [P4-T8] Retain the optional platform analyzer behind explicit consent.
+- [x] [P4-T8] Retain the optional platform analyzer behind explicit consent (R/analyzer/optional/).
   - Files and behavior: Move DT/discovery/analyzer/{vsto_office,vsto_patterns}.py into R/analyzer/optional/ with thin compatibility imports; update registry lazy loading, add PT/analyzer/test_optional_adapter.py, and update Set F vsto_office/stack_neutrality/domain_neutrality suites.
   - Tests and proof: Retain generic Ribbon XML/callback, interop/lifecycle/COM/API marker fixtures with secure XML and shared generic COM detector; verify disabled imports, explicit profile consent, and absence of product IDs/semantics.
   - Acceptance: Core package imports, templates, schemas, roles, and ordinary inventories contain no optional-domain behavior; the existing optional adapter works only when explicitly selected and permitted.
 
-- [x] [P4-T9] Import local analyzer extension results as validated data.
+- [x] [P4-T9] Import local analyzer extension results as validated data (R/extension_results.py).
   - Files and behavior: Create R/extension_results.py and PT/test_{extension_results,extension_inventory_merge}.py; expose the Analyzer protocol and fixed built-in registry from R/analyzer/__init__.py.
   - Tests and proof: Test manifest/schema/provenance/path validation, incomplete coverage diagnostics, collisions, declared adapter identity, deterministic merges, and rejection of executable/module/shell fields from profiles.
   - Acceptance: Consumers can contribute separately produced inventory results without modifying core code or causing configuration-driven code execution; imported findings cannot weaken accounting or confidence rules.
 
 ### Phase 5 — Generated reports and acceptance specifications
 
-- [x] [P5-T1] Compute discovery coverage from the validated graph.
+- [x] [P5-T1] Compute discovery coverage from the validated graph (R/coverage_report.py).
   - Files and behavior: Move/rework DT/discovery/coverage_report.py into R/coverage_report.py with a thin adapter; create R/report_models.py and PT/test_coverage_report.py; update Set D coverage/rendering assertions.
   - Tests and proof: Assert all requested component/inspection/disposition/feature/runtime/evidence/unresolved counts, explicit numerators/denominators, null zero-denominator percentages, exclusions, stable ordering, findings and input digest.
   - Acceptance: Coverage JSON and its Markdown view agree exactly and do not treat an empty, invalid, or uninventoried graph as complete.
 
-- [x] [P5-T2] Compute parity totals per feature and client.
+- [x] [P5-T2] Compute parity totals per feature and client (R/parity_report.py).
   - Files and behavior: Move/rework DT/discovery/parity_report.py into R/parity_report.py with a thin adapter; add PT/test_parity_report.py and update Set D parity tests.
   - Tests and proof: Cover unique features versus feature-client totals, all parity states, required/applicable per-client online/offline/mobile verification, blockers, unresolved decisions, and invalid source references.
   - Acceptance: Parity reports use the canonical entry model, retain every blocking finding, and classify undeclared optional dimensions as not-required rather than passed.
 
-- [x] [P5-T3] Render explicit completion results and next actions.
+- [x] [P5-T3] Render explicit completion results and next actions (R/completion_report.py).
   - Files and behavior: Move/rework DT/discovery/completion_report.py into R/completion_report.py with a thin adapter; create R/report_rendering.py, PT/test_{completion_report,report_rendering}.py, and update Set D completion/I/O tests.
   - Tests and proof: Test structural/discovery/parity/planning mode labels, blocking findings/warnings, stale/conflicting refs, incomplete artifacts, pending scenarios, deduplicated actions, both renderings, safe report replacement, and no unconditional readiness.
   - Acceptance: Completion is derived from the selected validated mode and current digest; generated views cannot overwrite authored evidence/contracts or authorize a host gate.
 
-- [x] [P5-T4] Generate stable ready or pending acceptance records.
+- [x] [P5-T4] Generate stable ready or pending acceptance records (R/acceptance_generation.py).
   - Files and behavior: Create R/{acceptance_models,acceptance_generation}.py and PT/test_{acceptance_generation,acceptance_decisions,acceptance_properties}.py; move reusable stable-ID/digest logic from DT/generate_acceptance_scenarios.py into this authority.
   - Tests and proof: Cover kind/feature/criterion/client/mode-derived identities, immutable source refs, approved scoped decisions, supersession, known legacy characterization, target requirements, unresolved/proposed/rejected expectations, and permutation/content-change properties.
   - Acceptance: Confirmed requirements yield linked ready specifications; unknown or contradictory expectations remain pending with no invented expected result, and generation never modifies implementation AC files.
 
-- [x] [P5-T5] Render traceable Markdown and executable-ready Gherkin only.
+- [x] [P5-T5] Render traceable Markdown and executable-ready Gherkin only (R/gherkin.py).
   - Files and behavior: Create R/gherkin.py, PT/test_{gherkin,acceptance_tags}.py, and E2/acceptance/ synthetic examples; update Set E projection/generation assertions while retaining safe public adapters.
   - Tests and proof: Assert feature/scenario/client/platform/mode tags, configured offline/mobile tags, escaping/collision detection, sorted output, source/evidence/decision traceability, companion pending Markdown, and no pending executable scenarios.
   - Acceptance: Repeated generation is byte-stable; .feature output includes only ready scenarios and no implementation-specific test code or step definitions.
 
 ### Phase 6 — Authoritative service and complete CLI adapters
 
-- [x] [P6-T1] Expose the versioned Python service and fixed gateway.
+- [x] [P6-T1] Expose the versioned Python service and fixed gateway (R/service.py).
   - Files and behavior: Create R/{service,operations,gateway,doctor}.py and PT/test_{service,gateway,service_failures,doctor}.py. Implement service.execute with injected I/O/repository/clock/analyzer collaborators and operation-specific request validation; gateway reads one JSON request and emits one versioned result. doctor initially reports installed runtime/resource/profile status and explicit unavailable native capability; P8-T8 adds the protected host-probe result projection.
   - Tests and proof: Exercise every implemented operation through real validators and in-memory snapshots, stable findings/artifact statuses, unsupported requests, dependency/I/O failures, interrupted writes, result/exit consistency, and separation of local-user versus host-granted invocation context. Verify doctor remains read-only and cannot self-assert host capability.
   - Acceptance: The installed module is the sole semantic authority; malformed inputs return exit 2, blocking findings 1, runtime failures 3, and success 0 without arbitrary executable/module dispatch.
 
-- [x] [P6-T2] Register every required noninteractive console command.
+- [x] [P6-T2] Register every required noninteractive console command (R/cli.py).
   - Files and behavior: Create R/{cli,cli_arguments,cli_commands}.py and PT/test_{cli_commands,cli_errors,cli_dry_run}.py; update packages/discovery-runtime/pyproject.toml and root pyproject.toml console registrations.
   - Tests and proof: Exercise every command in spec.md's Command inventory, including create/update/link, all individual validators, decisions/workspace modes, report pairs, snapshots/extensions/migration/configure/doctor, and both acceptance aliases. Verify workspace/profile-relative resolution, help, mutually exclusive flags, and dry-run semantics.
   - Acceptance: All documented commands invoke service.execute and return its typed outcome; validate-all emits canonical JSON and Markdown reports by default, and dry-run emits projected reports without writes.
 
-- [x] [P6-T3] Finish safe legacy entry-point compatibility and remove checkout coupling.
+- [x] [P6-T3] Finish safe legacy entry-point compatibility and remove checkout coupling (DT/discovery/).
   - Files and behavior: Convert DT/discovery/{profile_cli,init_cli,coverage_report,parity_report,completion_report}.py, DT/discovery/analyzer/{__init__,__main__,cli,stack_cli}.py, DT/{validate_discovery_artifacts,validate_discovery_profile,validate_discovery_schema_artifacts,generate_acceptance_scenarios}.py into thin authoritative-package adapters; add PT/test_legacy_adapters.py and update Sets A–F CLI/import consumers.
   - Tests and proof: Preserve safe named exports and all existing console names; explicitly update obsolete profile/type-probing/overwrite/report-ready/generator-field expectations and targeted argv/error assertions. Verify no runtime import reaches scripts.dev_tools or checkout-relative schemas/templates; unsupported legacy ambiguity gives an actionable migration error.
   - Acceptance: Existing safe callers reach one implementation, v1 readers remain available, and no legacy path can bypass v2 claim safety or issue completion authority.
 
 ### Phase 7 — Canonical specialist workflows and existing routing integration
 
-- [x] [P7-T1] Author the four constrained specialist contracts canonically.
+- [x] [P7-T1] Author the four constrained specialist contracts canonically (.github/agents/).
   - Files and behavior: Create .github/agents/{legacy-parity-analyst,runtime-characterization-analyst,requirements-reconciler,migration-coverage-reviewer}.agent.md and DTTEST/test_discovery_agent_contracts.py. Existing Set K native assertions are updated with the first generated outputs in P7-T3.
   - Tests and proof: Assert all specified responsibilities, project memory limits, selected source reads, closed controlled-output grants, no production/configuration/authority writes, no shell/evaluation/arbitrary MCP, no analyst approval, per-role required-output/finalize contract, and explicit failing-review semantics.
   - Acceptance: Each role has one canonical domain-neutral body with precise inputs, outputs, routing and stop obligations; native derivatives are generated later rather than independently authored.
 
-- [x] [P7-T2] Author nine invoked workflows and reduce seven legacy skills to aliases.
+- [x] [P7-T2] Author nine invoked workflows and reduce seven legacy skills to aliases (.github/skills/).
   - Files and behavior: Create .github/skills/{inventory-legacy-system,extract-feature-contract,characterize-runtime-behavior,reconcile-parity-matrix,review-discovery-coverage,adjudicate-unspecified-behavior,generate-acceptance-scenarios,initialize-discovery-workspace,validate-discovery-artifacts}/SKILL.md and canonical .github/skills/discovery-{workflow,repo-inventory,coverage-ledger,runtime-characterization,parity-matrix,behavior-reconciliation,validate-artifacts}/SKILL.md aliases. Add DTTEST/test_discovery_workflow_contracts.py; Set K native expectations change with P7-T3 generation.
   - Tests and proof: Check each explicit input set, exact profile output keys, missing-configuration block, root bootstrap/approval split, prepare→exact role→finalize sequencing, incremental versus completion mode, deterministic artifacts, no standing catalog injection, and legacy alias routing correction.
   - Acceptance: All nine requested skills route to the specified roles with valid scoped output contracts; aliases contain no duplicate semantic workflow or stale future-dependency assumptions.
 
-- [x] [P7-T3] Extend deterministic routing for zero-production-write discovery invocations.
+- [x] [P7-T3] Extend deterministic routing for zero-production-write discovery invocations (config/orchestration-routing.json).
   - Files and behavior: Update config/orchestration-routing.json, DT/{resolve_codex_topology,resolve_codex_deployment,generate_codex_agent_variants}.py, .claude/lib/codex-routing/{CodexTopology,CodexDeployment}.psm1, ES/lib/validate/{codex-topology-resolver,orchestrator-state-codex-model-routing}.ts; add focused discovery-routing helpers only beside these existing resolvers. Update Set L and ET/lib/validate/{codex-topology-resolver,codex-deployment}.test.ts, tests/fixtures/codex_routing/{topology,deployment}.json, and existing config-policy parity tests. Convert the four canonical role bases and skill bodies through the existing converter before variant generation; regenerate the corresponding .claude/agents, .claude/skills, .codex/agents, .agents/skills, bundled counterparts, and core pack entries in the same task, updating Set K. This first generation carries the new role/routing contracts; P10-T1 regenerates them again after native enforcement mapping is complete. Extend .codex/scripts/Resolve-CodexTopology.ps1::Invoke-CodexTopologyCli and extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/Resolve-CodexTopology.ps1 through the existing native publication mechanism. Add the discovery selector/skill argument parsing and forwarding required by the shared topology contract; update tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1.
   - Tests and proof: Assert fixed skill→role/kind/gate mappings, production-write count zero, C1–C4/context/ceiling rules, all four generated families, unavailable-model failure, and equal Python/TypeScript/PowerShell receipts. Existing ordinary/epic topology and portable handoff behavior stays unchanged. Run that existing PowerShell CLI corpus consumer across every shared topology/deployment fixture, including positive discovery selections, rejected flags/combinations, and unchanged ordinary/epic cases.
   - Acceptance: A direct discovery invocation selects the exact existing-policy deployment without issue promotion, nested scheduler, ordinary checkpoint replacement, or silent model fallback. The published PowerShell topology CLI and the direct resolver return matching receipts for the entire shared corpus.
 
 ### Phase 8 — Shared TypeScript gateway, workspace surfaces, and native publication prerequisites
 
-- [x] [P8-T1] Transport only validated fixed-runtime requests and results.
+- [x] [P8-T1] Transport only validated fixed-runtime requests and results (ES/discovery-runtime.ts).
   - Files and behavior: Create ES/{discovery-result,discovery-runtime,discovery-service-types}.ts; refactor ES/repo-automation-execute-discovery.ts into thin operation adapters; add ET/{discovery-result,discovery-runtime}.test.ts and update Set G execute assertions. Add exact per-file entries to extensions/drm-copilot/jest.config.cjs. Because jest.config.cjs is already 493 physical lines, extract the discovery per-file thresholds to extensions/drm-copilot/jest.discovery-coverage.json and merge that map from the existing configuration; add ET/discovery-coverage-contracts.test.ts. Preserve existing stricter entries and gate new executable modules at 90% lines and 75% branches.
   - Tests and proof: Test fixed isolated installed-module invocation, trusted interpreter selection, JSON stdin, version/build compatibility, malformed/truncated output, inconsistent process/result exits, missing dependencies, stderr context, actionable install diagnostics, and no shell interpolation/human sentence parsing.
   - Acceptance: Both hosts receive authoritative structured findings/artifacts or a blocking transport error; malformed stdout can never be reported as successful validation.
 
-- [x] [P8-T2] Own protected activation and authority storage outside workspaces.
+- [x] [P8-T2] Own protected activation and authority storage outside workspaces (ES/discovery-authority.ts).
   - Files and behavior: Create ES/{discovery-authority,discovery-authority-paths}.ts and ET/{discovery-authority,discovery-authority-paths}.test.ts; add per-file coverage entries. Share versioned registry/envelope formats with R/activation_store.py through schema fixtures.
   - Tests and proof: Test Windows/macOS/Linux trusted user-state resolution, canonical workspace hashes, session/invocation partitioning, external containment, profile/locator hash binding, exclusive writes, malformed store records, and rejection of analyst-supplied destination/identity/success claims.
   - Acceptance: Editable workspace reports and invocation mirrors cannot create or modify native authority; activation survives locator/profile deletion and all store I/O is isolated behind testable adapters.
 
-- [x] [P8-T3] Consume exact one-use tool authorizations.
+- [x] [P8-T3] Consume exact one-use tool authorizations (ES/discovery-authorization.ts).
   - Files and behavior: Create ES/discovery-authorization.ts and ET/discovery-authorization.test.ts; add its coverage threshold and versioned native tool/input digest fixtures under tests/fixtures/discovery_host/.
   - Tests and proof: Test exact normalized request ID/tool/input digest plus trusted agent/session/role binding, expiry, duplicate/ambiguous matches, replay, concurrent consumption, wrong workspace, unknown operation, and root-only versus analyst operations.
   - Acceptance: Only a matching unconsumed native authorization admits a controlled tool request; caller role strings or request IDs cannot expand grants or impersonate a root approval.
 
-- [x] [P8-T4] Prepare constrained discovery invocations through existing routing authority.
+- [x] [P8-T4] Prepare constrained discovery invocations through existing routing authority (ES/discovery-invocation.ts).
   - Files and behavior: Create ES/{discovery-invocation,discovery-routing}.ts and ET/{discovery-invocation,discovery-routing}.test.ts; bind existing resolver outputs, capability attestation, expected artifact outputs and selected inputs. Add coverage entries.
   - Tests and proof: Cover all nine workflows/four roles, exact model/effort/profile hash, parent/session context, zero-code-write topology, protected record and diagnostic mirror separation, absent feature checkpoint, unsupported capability, output-contract substitution, and nested self-launch denial.
   - Acceptance: prepare_discovery_agent returns a launchable exact deployment only after persisted protected bindings, without modifying artifacts/orchestration/orchestrator-state.json or requiring a new feature issue.
 
-- [x] [P8-T5] Finalize role output and mint fresh gate-specific receipts.
+- [x] [P8-T5] Finalize role output and mint fresh gate-specific receipts (ES/discovery-finalization.ts).
   - Files and behavior: Create ES/{discovery-finalization,discovery-input-manifest}.ts and ET/{discovery-finalization,discovery-input-manifest}.test.ts; add coverage entries. Recompute the complete input set/hashes independently after the Python result before protected receipt creation.
   - Tests and proof: Test missing/new/deleted/renamed/edited inputs, evidence replacement, profile/root changes, schema/runtime/build/policy drift, wrong gate/role/session, absent outputs, forged success JSON, and valid output-valid/result-fail reviewer results.
   - Acceptance: Only a current authoritative result bound to the exact invocation/output/gate produces a protected receipt; source mutation or mismatched result invalidates it before stop/planning can succeed.
 
-- [x] [P8-T6] Expose the full shared MCP operation contract.
+- [x] [P8-T6] Expose the full shared MCP operation contract (ES/mcp-tools.ts).
   - Files and behavior: Update ES/{mcp-discovery-tool-definitions,mcp-tool-inputs-discovery,mcp-handlers/discovery-handlers,mcp-tools,repo-automation-tool-names,repo-automation-service-contract,repo-automation-service}.ts; extract ES/{mcp-discovery-authority-tool-definitions,mcp-tool-inputs-discovery-authority,repo-automation-service-discovery}.ts to keep files bounded. Update Sets G/H and add ET/mcp-discovery-authority-tools.test.ts; add every new executable module's coverage entry.
   - Tests and proof: Retain seven existing tools and add configure/create/update/link/transfer/import/migrate/read/prepare/finalize plus diagnostic operation as specified; test closed input enums, whole-workspace modes, noninteractive dry-run, service stub consumers, role-denied tools, and text/structuredContent/isError agreement.
   - Acceptance: Extension and standalone MCP share one service implementation; no wrapper computes schema, coverage, parity, or approval semantics, and all shared nondiscovery contract tests remain green.
 
-- [x] [P8-T7] Register justified VS Code commands without business logic.
+- [x] [P8-T7] Register justified VS Code commands without business logic (ES/discovery-command-registration.ts).
   - Files and behavior: Update ES/discovery-command-registration.ts and extensions/drm-copilot/package.json; extract ES/discovery-artifact-command-registration.ts and ES/discovery-workspace-command-registration.ts. Update ET/extension.discovery-commands.test.ts, add ET/discovery-artifact-commands.test.ts, and add coverage thresholds.
   - Tests and proof: Test existing command ID compatibility, initialize/configure/inventory/create/link/validate/reports/generate/snapshot/migrate/diagnostic commands, direct structured arguments, only-missing-input prompts, cancellation, custom workspace/profile, and no terminal creation.
   - Acceptance: Every documented user-facing operation is available noninteractively and calls the shared MCP/service contract; prepare/finalize and bounded reads remain agent/service operations.
 
-- [x] [P8-T8] Define current host capability diagnostics and probe orchestration.
+- [x] [P8-T8] Define current host capability diagnostics and probe orchestration (ES/discovery-capabilities.ts).
   - Files and behavior: Create ES/discovery-capabilities.ts and ET/discovery-capabilities.test.ts; extend R/doctor.py and PT/test_doctor.py from P6-T1 to project protected host diagnostics through the existing gateway/service. Add the TypeScript module coverage entry.
   - Tests and proof: Require trusted observed hook start/tool/stop attribution, exact host/config/hook hashes and harmless denial sentinel result; reject caller-only capabilities, disabled hooks, missing trust, unsupported harness, stale probes, wrong workspace and runtime versions.
   - Acceptance: doctor explains installation/configuration deficiencies, while controlled agent preparation returns DISCOVERY_ENFORCEMENT_UNAVAILABLE until an actual supported-host probe is current; CLI read-only diagnostics remain usable.
 
-- [x] [P8-T9] Enable approved native publication classifications and mappings before hook creation.
+- [x] [P8-T9] Enable approved native publication classifications and mappings before hook creation (DT/codex_native_converter/).
   - Files and behavior: Update DT/codex_native_converter/{inventory,classifier,mapping,pipeline,rewrites,validation}.py, ES/lib/codex-native-converter/{inventory,classifier,classifier-claude,mapping,pipeline,rewrites,validation}.ts, DT/{agentic_sync,push_down_copilot_customizations,push_down_codex_and_agents_customizations}.py, and ES/lib/push-down/{copilot-customizations,copilot-customizations-engine,codex-agents-customizations}.ts. Extend _classify_github_copilot/_classify_claude and classifyGithubCopilot/classifyClaude for the approved GitHub hooks and native helper/config/docs/template resources, with explicit per-host mappings and complete helper closure.
   - Tests and proof: Update DTTEST/codex_native_converter/test_{inventory,classifier,mapping,rewrites,validation,end_to_end}.py and ET/lib/codex-native-converter/{inventory,classifier,mapping,pipeline,rewrites,validation}.test.ts. Update DTTEST/test_{agentic_sync,push_down_copilot_customizations,push_down_copilot_customizations_helpers,push_down_copilot_customizations_rewrites,push_down_codex_and_agents_virtual_paths}.py and corresponding ET/lib/push-down suites. Add positive approved-surface classifications and preserve unrelated/foreign unsupported-path rejection, existing destination/exclusion assertions, mapping validation and in-memory publication fixtures.
   - Acceptance: The existing publishing/conversion pipeline can classify and deliver the approved native surfaces before P9-T1 creates helper files. No unrelated path becomes supported, and no instruction-only restriction is represented as a native control. Actual helper/hook mirrors are verified at each P9 creation/change task and final publication.
 
 ### Phase 9 — Native tool, output, and planning enforcement
 
-- [x] [P9-T1] Share narrow native authority, payload, and freshness primitives.
+- [x] [P9-T1] Share narrow native authority, payload, and freshness primitives (CL/DiscoveryAuthority.psm1).
   - Files and behavior: Create CL/{DiscoveryAuthority.psd1,DiscoveryAuthority.psm1,DiscoveryManifest.psm1,DiscoveryPayload.psm1} and LPTEST/{DiscoveryAuthority,DiscoveryManifest,DiscoveryPayload}.Tests.ps1. Update LPTEST/DiscoveryValidation.Manifest.Tests.ps1 ExpectedPaths and complete on-disk-module assertions now. Using the P8-T9 mapping prerequisite, publish the helper files to extensions/drm-copilot/resources/claude-customizations/.claude/lib/discovery-validation/ and the corresponding mapped Codex bundle helper directory; update the affected core pack manifests. Retain the existing .claude/lib/discovery-validation tier; GitHub hook population/classification is introduced with its first tracked hook in P9-T2.
   - Tests and proof: Use captured synthetic Claude/Codex/Copilot event envelopes and injected file/clock/store seams; verify trusted principal attribution, external authority location, canonical path hashes, complete input enumeration, current raw hashes, malformed/dependency failures and inactive detection. No Python or duplicate schema/graph logic. Run DiscoveryValidation.Manifest.Tests.ps1 at this boundary for every new module, manifest membership/uniqueness and byte identity; run DTTEST/test_push_down_claude_{resource_contracts,pack_manifest_completeness}.py and DTTEST/test_codex_core_manifest_closure.py. Preserve existing exports and module inventory assertions; do not defer helper mirror proof until Phase 10.
   - Acceptance: All hosts share the same narrow permission/receipt semantics; altered, added, missing, deleted, renamed, or untrusted authority inputs fail closed. All new helpers have current published mirrors/manifests, and classification produces no QT007/QT008 at this boundary.
 
-- [x] [P9-T2] Enforce tool and exact artifact grants before every analyst action.
+- [x] [P9-T2] Enforce tool and exact artifact grants before every analyst action (CH/enforce-discovery-artifact-gate.ps1).
   - Files and behavior: Replace CH/enforce-discovery-artifact-gate.ps1 with the native authorization adapter; add XH/enforce-discovery-artifact-gate.ps1 and .github/hooks/discovery-pre-tool.ps1, using shared CL helpers. Update Set I PreToolUse suites and add XPTEST/discovery-pre-tool.Tests.ps1 plus tests/scripts/copilot-hooks/discovery-pre-tool.Tests.ps1. With the first tracked .github/hooks/discovery-pre-tool.ps1, update DT/quality_tiers_contract.py (DISCOVERY_RULES.hook_roots and _discover_from_path), quality-tiers.yml, config/{poshqc-scan,poshqc-coverage}.json, and DTTEST/test_quality_tiers_contract{,_classification}.py to discover/classify/measure .github/hooks. Publish this task's canonical hook/helper outputs and affected manifests through P8-T9 mappings.
   - Tests and proof: Deny shell/terminal/exec/evaluation, generic Write/Edit/apply_patch, arbitrary MCP dispatch, outside grants, production/test/config/profile/locator/schema/policy/authority mutations and approval escalation; authorize only current allowed requests with one-use exact digest records. Test new/changed proposed bytes through the service boundary rather than old disk content. Extend test_discover_projects_discovers_hook_roots_only_with_tracked_file for .github/hooks, including absent/excluded-root negatives; extend approved committed tier assignments without altering existing ones. Preserve the existing DISCOVERY_ARTIFACT_GATE_BLOCKED: reason envelope for the replaced Claude hook and run its dependency-failure assertions. Run current helper/pack mirror and quality-tier classification checks.
   - Acceptance: Each supported native adapter blocks unauthorized attempts before execution; valid bounded reads and controlled draft mutations remain possible without a prior passing completion gate. The first GitHub hook is tracked before its classification/coverage checks; no QT007/QT008, premature classification, or unpublished helper dependency remains.
 
-- [x] [P9-T3] Attest discovery starts without altering feature checkpoints.
+- [x] [P9-T3] Attest discovery starts without altering feature checkpoints (CH/record-discovery-agent-start.ps1).
   - Files and behavior: Extend XH/{record-subagent-routing-attestation,codex-agent-profile-attestation,enforce-codex-model-routing}.ps1 with focused XH/discovery-start-attestation.ps1; add CH/record-discovery-agent-start.ps1 and .github/hooks/discovery-agent-start.ps1. Update XPTEST/{subagent-attestation-command,subagent-attestation-persistence,model-profile-attestation,enforce-codex-model-routing.Coverage}.Tests.ps1 and add CPTEST/discovery-start.Tests.ps1, XPTEST/discovery-start.Tests.ps1, and tests/scripts/copilot-hooks/discovery-start.Tests.ps1.
   - Tests and proof: Check protected discovery-invocation receipt kind, trusted parent/session, actual exact role/model/effort/profile hash, allowed schema/runtime/build and capability, missing/wrong receipts, mirror tampering, nested launch, absent ordinary checkpoint, and unchanged ordinary/epic start cases.
   - Acceptance: No tool grant activates before matching native start attestation; direct discovery actions work without feature promotion or fabricated model receipts.
 
-- [x] [P9-T4] Validate each specialist's actual required outputs at stop.
+- [x] [P9-T4] Validate each specialist's actual required outputs at stop (CH/validate-discovery-artifact-gate.ps1).
   - Files and behavior: Replace CH/validate-discovery-artifact-gate.ps1 with per-role protected output validation; add XH/validate-discovery-agent-output.ps1 and .github/hooks/discovery-agent-stop.ps1; extend XH/validate-codex-subagent-routing.ps1. Update Set I Stop suites, XPTEST/validate-codex-subagent-routing.Coverage.Tests.ps1, and add CPTEST/discovery-output.Tests.ps1, XPTEST/discovery-output.Tests.ps1, and tests/scripts/copilot-hooks/discovery-output.Tests.ps1. Update tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1 when the legacy stop implementation changes; preserve envelope-helper exception interception and the existing DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix. Publish the changed native hook mirrors/manifests in this task.
   - Tests and proof: Parametrize all four roles and generated variants; test missing/blank final text, absent required path/ID/kind, stale input/profile/evidence, wrong session/role/gate, forged workspace success, missing helper, output-valid failing reviewer report, and valid incremental results. Retain U1/U1-ST exit-2 guarantees and U2 complete validator inventory, adapting only the discovery validator's authorized seam/rows. Run the existing helper manifest/byte-identity checks and native bundle probe; unrelated and inactive stop behavior remains unchanged.
   - Acceptance: Every role has an enforced stop result derived from its protected invocation; filenames or success prose in an assistant message cannot bypass validation.
 
-- [x] [P9-T5] Gate implementation planning on current configured discovery authority.
+- [x] [P9-T5] Gate implementation planning on current configured discovery authority (CH/enforce-discovery-planning-gate.ps1).
   - Files and behavior: Create CH/enforce-discovery-planning-gate.ps1, XH/enforce-discovery-planning-gate.ps1, .github/hooks/discovery-planning.ps1, CPTEST/discovery-planning-gate.Tests.ps1, XPTEST/discovery-planning-gate.Tests.ps1, and tests/scripts/copilot-hooks/discovery-planning.Tests.ps1.
   - Tests and proof: Test atomic-planner/orchestrator planning entry with discovery-complete/parity-complete/none settings, inactive repositories, active missing/deleted/malformed profile/locator, stale/current/wrong-mode receipts, and structural/v1/output-only receipts that must not authorize planning.
   - Acceptance: Configured incomplete discovery blocks planning before delegation; inactive consumers follow existing behavior, and hooks only verify authority without invoking Python.
 
-- [x] [P9-T6] Register native events and execute a harmless capability probe.
+- [x] [P9-T6] Register native events and execute a harmless capability probe (.claude/settings.json).
   - Files and behavior: Update .claude/settings.json and .codex/config.toml through the native publishing mechanism; create .github/hooks/discovery.json, CH/discovery-capability-probe.ps1, XH/discovery-capability-probe.ps1, .github/hooks/discovery-capability-probe.ps1, and scripts/dev-tools/Test-DiscoveryHostCapability.ps1. Add CPTEST/discovery-capability.Tests.ps1, XPTEST/discovery-capability.Tests.ps1, tests/scripts/copilot-hooks/discovery-capability.Tests.ps1, and tests/scripts/dev-tools/Test-DiscoveryHostCapability.Tests.ps1 for registration and probes. Update tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1 and tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1 ReasonPrefix tables at registration; update tests/scripts/claude-runtime/claude-settings.Tests.ps1 and tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 for the new registered handlers. Publish settings/hooks/helpers and affected native core manifests through the available P8-T9 mechanism in this task.
   - Tests and proof: Verify actual host-shaped event registration, agent variants, trusted start/tool/stop attribution, Workspace Trust/enabled-hook requirements, allowed/forbidden MCP tool sets, harmless denied sentinel, current handler/config hashes, and missing/disabled/unsupported host failure. Use mocks for unit-test process boundaries. Keep each ReasonPrefix table equal to its discovered registered-hook set; retain B1-B3 missing dependency/bootstrap block envelopes. Preserve the existing fifteen-agent Claude stop group and add dedicated coverage for the four discovery roles. Retain Codex every-admitted-tool inactive success, malformed-input fail-closed and no-leaked-state assertions while adding activated denial tests. Run tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1, DTTEST/test_codex_core_manifest_closure.py and both existing Claude/Codex pack-manifest completeness suites now.
   - Acceptance: Only observed protected probe evidence enables native discovery launches; a caller capability Boolean or embedded YAML instruction cannot substitute for actual controls. Registration tests, dependency failures and all touched native/bundle copies agree at this task boundary; final Phase 10 generation cannot conceal an earlier broken hook contract.
 
-- [x] [P9-T7] Retire independent PowerShell artifact semantics and preserve hook contracts.
+- [x] [P9-T7] Retire independent PowerShell artifact semantics and preserve hook contracts (CL/DiscoveryValidation.psm1).
   - Files and behavior: Refactor CL/DiscoveryValidation.psm1 to bounded compatibility exports that direct semantic validation to the authoritative normal service; update Set J semantic/version tests, preserve and rerun the already-current P9-T1 manifest assertions, publish the changed compatibility module mirror, and update tests/scripts/claude-runtime/{enforcement-hooks-no-python-invocation,hook-dependency-guard-completeness}.Tests.ps1.
   - Tests and proof: Retain actionable fail-closed missing-authority/unsupported-host behavior; remove artifact-selected schema/profile parsing and false success. Verify no direct or indirect Python invocation, guarded helper loading, new-module export correctness, and old entry names cannot mint a passing gate.
   - Acceptance: One Python engine owns artifact meaning, native hooks verify protected current authority, all compatibility Pester assertions match the deliberate contract, and no changed script/module/test exceeds 500 lines.
 
 ### Phase 10 — Publication, installed resources, and consumer documentation
 
-- [x] [P10-T1] Regenerate the three complete native customization bundles.
+- [x] [P10-T1] Regenerate the three complete native customization bundles (extensions/drm-copilot/resources/).
   - Files and behavior: Regenerate the four role families, all nine workflows/seven aliases, native settings/hooks/helpers, .agents/.codex/.claude outputs, extensions/drm-copilot/resources/{copilot-customizations,claude-customizations,codex-and-agents-customizations}, and affected core pack manifests from canonical sources and explicit native adapter mappings.
   - Tests and proof: Run Set K/L plus DTTEST/test_push_down_{claude_resource_contracts,claude_pack_manifest_completeness,codex_and_agents_resource_contracts,codex_and_agents_pack_manifest_completeness,issue_824_follow_ups}.py, test_skill_bundle_contract_repo.py, test_claude_rules_frontmatter.py, native architecture/dependency contracts, and generator check mode. Add DTTEST/test_discovery_publication_contracts.py for complete role/skill/hook/tool/resource representation.
   - Acceptance: All source/bundle bytes and manifest inventories agree, every logical role has exact native variants and stop/tool controls, and no unresolved source-ecosystem reference or consumer-specific standing content remains.
 
-- [x] [P10-T2] Verify VSIX and standalone MCP package contents.
+- [x] [P10-T2] Verify VSIX and standalone MCP package contents (packages/mcp-server/prepack.cjs).
   - Files and behavior: Update packages/mcp-server/prepack.cjs and extension packaging allowlists only as needed for newly mapped non-Python resources; update ET/packaging/mcp-server-prepack.test.ts and add ET/packaging/discovery-resources.test.ts. Preserve the explicit Python-source exclusion and shared-server build.
   - Tests and proof: Assert all published hooks/helper/config/setup/template references survive packaging, standalone imports no VS Code host, wheel runtime requirement is explicit, and shared MCP input/result/tool sets match extension registration. Build both distributables and record FEATURE/evidence/other/discovery-host-packages.<timestamp>.md.
   - Acceptance: The built VSIX/npm artifacts contain complete native customization support and thin shared wrappers without copied Python business logic or unresolved resource references.
 
-- [x] [P10-T3] Build the versioned Python wheel with complete isolated resources.
+- [x] [P10-T3] Build the versioned Python wheel with complete isolated resources (packages/discovery-runtime/resource-manifest.json).
   - Files and behavior: Finalize packages/discovery-runtime/{pyproject.toml,resource-manifest.json,README.md}, DT/build_discovery_runtime.py and their tests; produce dist/discovery/drm_copilot_discovery-2.0.0-py3-none-any.whl and FEATURE/evidence/other/discovery-wheel-build.<timestamp>.md.
   - Tests and proof: Inspect wheel metadata/import closure, all console entries, frozen v1 and exact v2 schema/template hashes, required approved dependencies, no unrelated root ML/dev dependencies, and deterministic staged manifests. Keep operational build work under SCRATCH and record the actual artifact digest/version.
   - Acceptance: The wheel is buildable from the dedicated package and includes every runtime resource; final independent installation proof is scheduled in P11-T7.
 
-- [x] [P10-T4] Document the complete reusable architecture and operational contracts.
+- [x] [P10-T4] Document the complete reusable architecture and operational contracts (DOC/architecture.md).
   - Files and behavior: Update DOC/{README,domain-profile,artifacts-and-schemas,workflow,running-the-workflow,consumer-onboarding}.md; add DOC/{architecture,analyzers,enforcement,migration,cli-reference,maintainer-guide}.md and a Mermaid architecture diagram. Update docs/engineering/claude-code-architecture.md and canonical .github/skills/{orchestrator-workflow,atomic-planner}/SKILL.md only through authoring/conversion for the discovery planning prerequisite and criteria linkage.
   - Tests and proof: Add DTTEST/test_discovery_documentation_contracts.py and update tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1. Cover field/status/version semantics, ownership, local setup, no-runtime/manual/combined/separate/multiclient flows, safe extensions, evidence/pins, analyzer limits, supported native controls, inactive compatibility, migration, all commands, and criteria-versus-test-pass separation. If any execution-environment fact changes, update its canonical .github skill and all six byte-identical copies in this same task; otherwise record the unchanged-fact check.
   - Acceptance: A consumer can install and operate the full capability without a framework checkout or implied completion; all links and generated workflow mirrors are current and no standing policy is edited ad hoc.
 
-- [x] [P10-T5] Prepare exact publication and separated consumer handoff instructions.
+- [x] [P10-T5] Prepare exact publication and separated consumer handoff instructions (DOC/examples/taskmaster-tmw.md).
   - Files and behavior: Create DOC/examples/taskmaster-tmw.md and FEATURE/handoff.md with the example source/target trees and exact built package versions/digests/install commands, interpreter setting, three installed MCP push-down argument shapes, host probe, initialization and validation sequence.
   - Tests and proof: Reconcile the actual wheel/VSIX/npm evidence and list every consumer-owned local profile, scope, inventory, contract, characterization, evidence, unresolved/decision, source snapshot, implementation, parity, acceptance and report artifact; distinguish target architecture and implementation tests from reusable framework output.
   - Acceptance: The handoff states exact publication prerequisites and local source/target work without inspecting, populating, or modifying either consumer; domain names appear only in this separated example and feature delivery records.
 
 ### Phase 11 — Full verification, self-review, and execution handoff
 
-- [x] [P11-T1] Prove the complete source and target public workflows in memory.
+- [x] [P11-T1] Prove the complete source and target public workflows in memory (PT/test_public_source_workflow.py).
   - Files and behavior: Create PT/test_{public_source_workflow,public_target_workflow,public_combined_workflow}.py, ET/discovery-public-workflow.test.ts, and shared synthetic fixtures under tests/fixtures/discovery_workflow/; write FEATURE/evidence/regression-testing/discovery-public-workflows.<timestamp>.md.
   - Tests and proof: Drive init→inventory→scope/coverage/contracts/unknowns→runtime/manual evidence→decision→source export/import→target implementation/parity→ready/pending acceptance→all reports/gates through real service rules. Cover no-runtime, optional dimensions, multiple clients, repeat runs, dry-run, malformed/unreferenced artifacts, stale bytes, and negative exit mapping.
   - Acceptance: The public path demonstrates structural draft success, honest incomplete discovery failure, evidence-backed completion and parity, and no false pass in any negative scenario; host transport uses the same authority.
 
-- [x] [P11-T2] Complete the Python formatting, lint, type, and full coverage loop.
+- [x] [P11-T2] Complete the Python formatting, lint, type, and full coverage loop (FEATURE/evidence/qa-gates/).
   - Files and behavior: Verify all changed Python code/tests, dedicated runtime package, root adapters, schemas, generator/converter/publisher/build modules using pyproject.toml and package configuration. Write separate FEATURE/evidence/qa-gates/python-{format,lint,types,tests}.<timestamp>.md plus canonical numeric coverage output.
   - Tests and proof: Run the complete documented order and restart at formatting after every fix/failure; run full Pytest with line and branch coverage, exact-version schema fixtures, new package import closure, and existing safe v1/compatibility suites.
   - Acceptance: One clean pass has zero formatter/lint/type/test failures, Python line coverage meets the existing 85% CI floor, branch coverage is at least 75%, and required numeric new/changed coverage is available for P11-T5.
 
-- [x] [P11-T3] Complete both TypeScript project quality loops and builds.
+- [x] [P11-T3] Complete both TypeScript project quality loops and builds (FEATURE/evidence/qa-gates/).
   - Files and behavior: Verify root and extensions/drm-copilot TypeScript, shared MCP wrappers, new authority/operation modules, conversion/publishing adapters, and packages/mcp-server build inputs. Write separate FEATURE/evidence/qa-gates/typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md.
   - Tests and proof: Apply the documented ordered loops, complete coverage-enabled Jest populations, source/test type checks, architecture-boundary checks, and both extension/standalone builds; restart from formatting after any fix/failure.
   - Acceptance: All applicable root/extension tests and builds pass in one clean cycle, no architecture violation remains, and new per-file thresholds are measured rather than bypassed by blanket mocks.
 
-- [x] [P11-T4] Complete PowerShell gates and CI-shaped execution.
+- [x] [P11-T4] Complete PowerShell gates and CI-shaped execution (FEATURE/evidence/qa-gates/).
   - Files and behavior: Verify changed canonical and generated PowerShell hooks/libraries/scripts, config/poshqc coverage population, and every touched Pester suite. Write separate FEATURE/evidence/qa-gates/powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md with retained actual result/coverage files.
   - Tests and proof: Run formatting→analysis→tests in the documented order, restart after fixes, inspect actual analyzer/JUnit/coverage evidence, execute the full registered population in CI-shaped single-process and shard/completeness form, and include new Copilot hook suites.
   - Acceptance: No formatting/analyzer/test failure, missing shard, leaked module state, or incomplete coverage population remains; PowerShell line metrics are numeric and no branch metric is fabricated.
 
-- [x] [P11-T5] Verify coverage deltas and T2 rigor without lowering existing gates.
+- [x] [P11-T5] Verify coverage deltas and T2 rigor without lowering existing gates (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/{coverage-comparison,tier-properties-mutation}.<timestamp>.md from the latest baseline/final artifacts and the changed-file/function inventory; update missing focused tests only in their owning PT/ET/Pester files, then repeat affected full loops.
   - Tests and proof: Record a baseline/final/delta coverage table for every changed production file, including relocated-source baselines: Python and TypeScript lines >=85% and branches >=75%; PowerShell lines >=85%. Identify genuinely new files as absent from the baseline with zero prior executable lines, then measure their complete final coverage. Require repository lines >=80% and every stricter configured floor, new module/class/method lines >=90%, and no regression on changed lines. Map at least one deterministic property test to every new T2 pure function, execute core-path E2E, record retry rate and a bounded deterministic AST mutation trend over staged path/claim/completion/acceptance modules under SCRATCH with killed/survived/equivalent counts.
   - Acceptance: Every changed production file has its required baseline provenance, final numeric measurements and delta disposition; Python/TypeScript per-file 85% line/75% branch and PowerShell per-file 85% line floors, stricter existing floors, new-code 90%, repository 80% and changed-line no-regression gates pass. Missing measurements fail the gate. T2 property/contract-major/E2E/determinism obligations and mutation trend have evidence.
 
-- [x] [P11-T6] Prove isolation and cross-platform input behavior.
+- [x] [P11-T6] Prove isolation and cross-platform input behavior (FEATURE/evidence/regression-testing/).
   - Files and behavior: Write FEATURE/evidence/regression-testing/discovery-isolation.<timestamp>.md and per-run evidence under the same directory; keep transient ordering helpers under SCRATCH.
   - Tests and proof: Run seeded shuffled Jest with recorded seed, reversed-order all new/changed Python modules, and shuffled touched Pester file order with at least three recorded seeds. Exercise Windows/POSIX/case/reparse/UNC/line-ending fixtures, no mutable global state, and no unit-test temporary files/processes/network.
   - Acceptance: Every isolation order passes with reproducible seeds and no suite-specific ambient PATH/cwd/profile assumptions; failures are fixed and the affected full language loop is repeated.
 
-- [x] [P11-T7] Verify independent installed runtime and actual native host controls.
+- [x] [P11-T7] Verify independent installed runtime and actual native host controls (FEATURE/evidence/qa-gates/).
   - Files and behavior: Build/install the exact wheel and host packages into issue-scoped operational locations under SCRATCH; write FEATURE/evidence/qa-gates/discovery-installed-runtime.<timestamp>.md and discovery-native-capabilities.<timestamp>.md with actual versions/digests and probe results.
   - Tests and proof: Exclude the source checkout from import search paths and exercise every exposed console operation/resources, shared standalone MCP tools, and justified extension commands. For Claude Code, Codex, and the supported Copilot Local harness, run the automated capability smoke with real start/tool/stop events, harmless prohibited-operation denial, valid controlled output, stale receipt block, and disabled/unsupported fail-closed cases.
   - Acceptance: Installed behavior has no checkout dependency and all advertised supported-host controls have observed positive and negative proof. An unavailable or failed required installed-host check is an explicit blocker; no manual/user QA substitution or unsupported-host prevention claim is allowed.
 
-- [x] [P11-T8] Run complete repository and publication contracts on the final implementation.
+- [x] [P11-T8] Run complete repository and publication contracts on the final implementation (FEATURE/evidence/qa-gates/).
   - Files and behavior: Write FEATURE/evidence/qa-gates/discovery-repository-contracts.<timestamp>.md and separate command-step records for schema/docs/architecture/tier/generator/mirror/packaging/neutrality/size checks; use the full task-owned branch file set.
   - Tests and proof: Run all execution-environment contract suites and Set L, canonical-source conversion review, unresolved-reference checks, all three bundle/pack completeness checks, generator check mode, staged resource hashes, VSIX/npm closure, documentation links, package metadata, source-neutrality scan with only the isolated optional adapter/case study exceptions, and physical line counts. Stage task-owned new files through the orchestrator before tracked-file inventory checks.
   - Acceptance: All applicable repository checks and all source/bundle/package contracts pass with no generated drift, unsupported reference, unclassified project, production/test/script over 500 lines, forbidden test I/O, or consumer-specific core content.
 
-- [ ] [P11-T9] Perform the required complete checklist self-review.
+- [ ] [P11-T9] Perform the required complete checklist self-review (FEATURE/evidence/qa-gates/).
   - Files and behavior: Read docs/features/templates/policy_audit/{policy-audit.yyyy-MM-ddTHH-mm,code-review.yyyy-MM-ddTHH-mm,feature-audit.yyyy-MM-ddTHH-mm}.md against the entire branch diff from the merge base of origin/main and HEAD; write FEATURE/evidence/qa-gates/self-review.<timestamp>.md.
   - Tests and proof: Include one PASS, FAIL, or justified N/A row for every template checklist item, requirements/AC traceability, source-authority separation, installed proof, native grants, all existing asserting tests, evidence completeness, and architecture/file-size/isolation/coverage checks.
   - Acceptance: No FAIL or unverified blocking row remains; every correction is tested through the affected full loop before the self-review is rewritten.
 
-- [x] [P11-T10] Reconcile acceptance evidence and the publication handoff.
+- [x] [P11-T10] Reconcile acceptance evidence and the publication handoff (FEATURE/requirements-traceability.md).
   - Files and behavior: Update FEATURE/{requirements-traceability,spec,user-story,issue,handoff,completion-report}.md and DOC/examples/taskmaster-tmw.md using verified task/QA evidence only; write FEATURE/evidence/qa-gates/acceptance-criteria-status.<timestamp>.md.
   - Tests and proof: Map each of AC-01–AC-66 and D01–D22 to exact implementing task/artifact/test evidence, account separately for seven DoD and twelve seeded conditions, record conditional C# applicability, actual package versions/digests, known analyzer/host limits, backward compatibility, and exact remaining local consumer work.
   - Acceptance: Every verified criterion is individually checked without text changes; review/CI-dependent criteria remain explicitly pending until their own gates pass, and the report does not claim feature completion prematurely.
 
-- [x] [P11-T11] Return a complete executor handoff for independent review and repository delivery.
+- [x] [P11-T11] Return a complete executor handoff for independent review and repository delivery (FEATURE/completion-report.md).
   - Files and behavior: Finalize this plan's verified task state and FEATURE/completion-report.md; provide the orchestrator all baseline/final/coverage/self-review/package/handoff references and remaining review/CI-dependent acceptance items.
   - Tests and proof: Validate the plan and applicable execution artifacts, confirm each checked task has canonical proof, and supply full-branch review inputs. The orchestrator continues the mandatory lifecycle described below rather than treating this executor handoff as feature DONE.
   - Acceptance: The implementation/QA handoff is internally consistent and review-ready, with no unreported blocker or false completion claim; independent audit and exact-head CI remain mandatory delivery gates.
+
+### Phase 12 — Host-principal completion path and publisher file-size repair
+
+Protected partition layout, shared with ES/discovery-authority-paths.ts and CL/DiscoveryAuthority.psm1: `<workspace directory>/sessions/<sha256(session id)>/invocations/<sha256(invocation id)>/` holds `invocation.json`, `start-attestation.json`, `required-outputs.json`, `topology-receipt.json`, `model-receipt.json`, the `authorizations/` partition of `tool-authorization` records with `.consumed` latches, and the `receipts/` partition; the session directory holds `capability-attestation.json`. The controlled operation set is the union of `TOOL_OPERATIONS` in ES/discovery-authorization-record.ts; P12-T4 pins it in tests/fixtures/discovery_host/controlled-operations.json and both runtimes assert equality with that fixture.
+
+- [ ] [P12-T1] Pin the pre-invocation baseline through a root prepare-agent route (R/service_preparation.py).
+  - Files and behavior: Create R/service_preparation.py and PT/test_service_preparation.py; route `prepare-agent` from `inspect_request` in R/service_inspection.py to it. The route accepts local-user authority only (the existing `_local` rules), the structural mode that `check_combinations` already permits, and a configured capture. For every `expected_outputs` row it checks a unique relative path, that `WriteGrant(artifact_kind, id, path)` resolves through `PathPolicy.resolve_write`, that `expected_sha256` equals the captured digest or the path is absent when null, and that existing content decodes as UTF-8. The result carries the complete `input_manifest`, one `ServiceArtifact` per existing expected output with status `planned`, its sha256 and its text content, no finding on success, and performs no write.
+  - Tests and proof: Cover valid rows, absent and present outputs, digest mismatch, duplicate path, non-text existing content, path outside the kind's output location, inapplicable mode, and the unchanged refusal of `finalize-agent` under local-user; drive through `execute` with the MemoryService of PT/test_service.py. Apply the Set N disposition to PT/test_service_boundaries.py (prepare-agent row removed, finalize-agent row retained) and search PT for every remaining `prepare-agent` refusal assertion under local-user.
+  - Acceptance: A valid request returns exit 0 with a complete input manifest and the exact prior content of each existing expected output; a mismatched or malformed row returns exit 1 with a blocking finding and no artifact row; no grant, receipt or write is produced.
+
+- [ ] [P12-T2] Persist the baseline result in the protected invocation partition (ES/discovery-invocation.ts).
+  - Files and behavior: Update ES/discovery-invocation.ts (`prepareDiscoveryInvocation` options gain the authoritative `prepare-agent` result; the exclusive file set gains `baseline-result.json` holding that result document verbatim) and ES/repo-automation-service-discovery-agent.ts (`prepareDiscoveryAgentOperation` calls `prepare-agent` with the request's `skill_id`, `selected_ids`, `paths`, `expected_outputs`, `execution_context` and `complexity` instead of `doctor`, takes the runtime identity from that result, and refuses a non-ok result with `DISCOVERY_PREPARE_BASELINE_FAILED` before any protected write).
+  - Tests and proof: Update ET/discovery-invocation.test.ts (five exclusively created files, baseline document byte-identical to the supplied result, partial-directory refusal unchanged) and ET/repo-automation-service-discovery-agent.test.ts (prepare-agent request shape, failed-result refusal, no doctor call) per Set N; rerun ET/discovery-routing.test.ts unchanged.
+  - Acceptance: A prepared partition holds exactly five exclusively created records including the baseline result; a failing or malformed prepare-agent result creates no protected file and returns the typed refusal.
+
+- [ ] [P12-T3] Transport trusted host identity to the runtime for every granted request (ES/discovery-runtime.ts).
+  - Files and behavior: Update ES/discovery-runtime.ts (`DiscoveryRuntimeInvocation` gains `sessionId`, `hostName` and `agentRole`; `buildGatewayArgs` emits `--session-id`, `--host-name` and `--agent-role` only when `principal` is `host`, and throws `DISCOVERY_HOST_IDENTITY_INCOMPLETE` when a host invocation lacks any of them or a local-user invocation supplies one). Create ES/repo-automation-service-discovery-identity.ts with `hostInvocationOptions(authority)` returning principal `host`, `authorId` equal to the trusted agent id, and the session, host and role values of `DiscoveryAuthorityProvider`, throwing `DISCOVERY_AGENT_IDENTITY_REQUIRED` when `authority.agent` is null. Use it in ES/repo-automation-service-discovery.ts for every request `granted` marks agent-output and in `finalizeDiscoveryAgentOperation`. Add the module's entry to extensions/drm-copilot/jest.discovery-coverage.json.
+  - Tests and proof: Add ET/repo-automation-service-discovery-identity.test.ts; extend ET/discovery-runtime.test.ts with the host argument matrix and both refusals; update the Set N assertions in the agent and service suites so finalize and every invocation-bearing request assert the host arguments while root requests assert the unchanged local-user arguments.
+  - Acceptance: No request carrying an invocation reference reaches the runtime as local-user; a process without a trusted agent identity receives the typed refusal and launches no runtime process.
+
+- [ ] [P12-T4] Consume one native authorization per controlled tool call and forward its reference (ES/mcp-discovery-authorization-gate.ts).
+  - Files and behavior: Extend ES/discovery-authorization.ts with `consumeToolAuthorizationByBinding`, which selects the live issued, unlatched records of the invocation located by the trusted session and the request's `invocation_ref`, keeps those whose identity binds the trusted host, session, agent id and role and whose tool, operation and `input_sha256` equal the request, requires exactly one, applies the validity window, and latches it exactly as `consumeToolAuthorization`. Create ES/mcp-discovery-authorization-gate.ts, invoked from ES/mcp-handlers/discovery-handlers.ts for the eleven `CONTROLLED_TOOLS` whenever `discoveryRole()` is non-null: it computes the digest over the raw tool input as received, refuses a caller-supplied `authorization_ref` input with `AUTHORIZATION_REQUEST_INVALID`, consumes, and passes the consumed record's `authorization_ref` into the handler input. Add `authorizationRef` to `FinalizeDiscoveryAgentInput` in ES/repo-automation-service-discovery-types.ts and forward it in finalize. Root processes bypass the gate unchanged. Create tests/fixtures/discovery_host/controlled-operations.json and add the coverage entry for the gate module.
+  - Tests and proof: Extend ET/discovery-authorization.test.ts (by-binding admission, ambiguity, consumed or latched, revoked, expired, wrong identity, tool, operation or input) and add ET/mcp-discovery-authorization-gate.test.ts (role versus root, caller reference refused, forwarded reference, no store read for root); update the Set G/H stubs for the optional finalize reference; assert the fixture equals `CONTROLLED_OPERATIONS`.
+  - Acceptance: The first controlled call with a matching issued record is admitted and its record is latched; the second call with the same input is refused `AUTHORIZATION_CONSUMED`; a root call reads no authorization record.
+
+- [ ] [P12-T5] Decode and verify protected host records in Python (R/protected_records.py).
+  - Files and behavior: Create S2/start-attestation.schema.json with E2 and F2 fixtures matching the record `ConvertTo-DiscoveryStartAttestationRecord` in CL/DiscoveryStartRecord.psm1 writes, extend tests/schemas/discovery/test_v2_control_schemas.py and packages/discovery-runtime/resource-manifest.json. Create R/protected_records.py and PT/test_protected_records.py: pure decoders that validate `discovery-invocation`, `start-attestation`, `capability-attestation`, `tool-authorization` and the baseline `service-result` bytes through `validate_document` with exact kind and version, then bind them: workspace (`workspace_sha256`, `profile_path`, `profile_sha256`) equal to the activation selection; host, session, agent id, role and invocation id equal to the trusted outer values; invocation state `started` with `agent_id` set; `start_attestation_ref` linkage between record and attestation; `capability_ref` equal to the session attestation; record `runtime` equal to the installed `RuntimeIdentity`; authorization `state` consumed with `consumed_at` set, latch present, and `operation`, `invocation_ref` and identity bound to the request. Every failure raises `OperationFailure("SERVICE_AUTHORITY", exit_code=3)` with a distinct reason; unreadable store content raises OSError.
+  - Tests and proof: Parametrize one refusal per binding above plus malformed and wrong-kind documents, reusing the vectors under tests/fixtures/discovery_host/ where they exist; a decoder never reads a field before schema validation passes.
+  - Acceptance: Every protected record Python consumes is schema-validated and bound before use; each refusal class is a named passing test and none yields an authority value.
+
+- [ ] [P12-T6] Compose the host-principal gateway without principal conversion (R/gateway_host.py).
+  - Files and behavior: Create R/gateway_host.py with `HostServiceIO` (implements `ServiceIO` and `CapabilityObserving`; `capability_observation` returns None because doctor is not an admitted host operation) and `installed_host_io(root, repository, session_id, host_name, agent_id, agent_role)`, reading the partition derived from `RegistryLocation` through injected `read_text`, `list_entries` and `exists` seams with the same sha256 partition names as `sessionDirectory` and `invocationDirectory`; it never writes to the protected store. `authorize` requires mode `agent-output`, `request.invocation_ref` equal to the verified record's `invocation_id`, an operation in the controlled set or `finalize-agent`, and a consumed authorization for that operation (P12-T5); it reconstructs the baseline from `baseline-result.json` (current capture with each required-output path replaced by the stored content or removed when the stored row is absent, every other captured path required to match the stored manifest digest, drift raising `OperationFailure("SERVICE_BASELINE", exit_code=3)`), and returns `ServiceAuthority(principal="host", author_or_agent=agent_id, invocation=InvocationContext(...), grants=<one WriteGrant per required-output row>, read_selection=<for read-source: each requested path equal to or beneath a `selected_paths` entry and resolved through PathPolicy.resolve_read; otherwise refused>)`. `writer` returns a `GuardedMutationWriter` only for an authority with the same principal, agent and invocation. Update `main` in R/gateway.py: `--session-id`, `--host-name` and `--agent-role` are admitted only with `--principal host` and all three are then required, `--author-id` carries the agent id, the argument ceiling grows by six, and `installed_local_io` stays the only local-user composition and keeps refusing `host`.
+  - Tests and proof: Create PT/test_gateway_host.py (option matrix through `gateway.main`, composition over memory stores, finalize, read-source and new-contract authorities, writer identity, zero store writes) and PT/test_gateway_host_refusals.py (every P12-T5 class, baseline drift, read outside scope, missing baseline, unknown operation, missing authorization reference, each returning exit 3 with SERVICE_AUTHORITY, SERVICE_BASELINE or SERVICE_IO and never a local-user authority). Apply the Set N dispositions to PT/test_gateway.py, PT/test_gateway_local.py and PT/test_gateway_factory.py.
+  - Acceptance: A host request with complete trusted identity and verified records receives a host authority bound to its invocation; every incomplete, mismatched, stale, replayed or unverifiable case exits 3 before any dispatch; no code path constructs a local-user authority for the host principal.
+
+- [ ] [P12-T7] Admit verified host authority in the service and derive exact grants (R/operation_grants.py).
+  - Files and behavior: Replace `_local` in R/service.py with `_authority`: local-user rules unchanged; host requires principal `host`, a present `invocation`, `request.invocation_ref` equal to `invocation.invocation_id`, a present `authorization_ref`, mode `agent-output` and an operation in the controlled set or `finalize-agent`; both `authorize` calls in `_context` must agree on `author_or_agent` and invocation id. Move `OperationContext.grants` and `author` policy into new R/operation_grants.py (`derive_grants`: local-user as today; host: every change must be a row of `authority.grants`, a change outside them is SERVICE_AUTHORITY, no expansion; `attribution`: kind `human` for local-user and `agent` for host) so R/operations.py stays under 500 lines. Create PT/host_test_support.py with a `MemoryHostService` that implements `ServiceIO` with a verified `InvocationContext`, grants and a memory writer.
+  - Tests and proof: Create PT/test_operation_grants.py and PT/test_service_host_admission.py: host new-contract, update-artifact and link-evidence publish through `plan_mutation` in agent-output mode for granted rows; an ungranted path, a mismatched invocation reference, a missing authorization reference, a root-only operation, a non-agent-output mode and a host authority without invocation are each refused before any write; attribution kind is `agent`. Set N dispositions for the existing SERVICE_AUTHORITY assertions apply unchanged.
+  - Acceptance: A host-authorized controlled mutation on a granted output publishes with agent attribution; every other host combination is refused with exit 3 before capture or publication; local-user behavior and its tests are unchanged.
+
+- [ ] [P12-T8] Implement the finalize-agent route (R/service_finalization.py).
+  - Files and behavior: Create R/service_finalization.py and PT/test_service_finalization.py; route `finalize-agent` from `inspect_request`; add an `invocation_ref` keyword (default None) to `OperationContext.result` in R/operations.py. The route runs `validate_snapshot(context.snapshot, mode="agent-output", invocation=authority.invocation)`, reports one artifact row per required output from the current capture (status `created` when the row's `expected_sha256` is null, `updated` otherwise, `conflict` when the path is absent), sets `validation` to the validation result and `summary.invocation_ref` to the invocation id, leaves `receipt_ref` null, returns exit 0 only when `output_valid` is true and the result is `pass`, and exit 1 with the error findings otherwise. It performs no write.
+  - Tests and proof: Cover a passing finalize, a reviewer's valid failing review (output valid, result fail, exit 1), a missing required output, an ungranted output row, and the unchanged local-user refusal; assert the three invariants `requireAuthoritativeResult` in ES/discovery-finalization.ts checks (operation, mode and invocation reference; null receipt reference; verdict consistent with ok, exit code and error findings) on both verdicts.
+  - Acceptance: The finalize result is accepted by the TypeScript finalization gate for pass and fail verdicts and never carries a receipt reference; no finalize result is produced for a non-host authority.
+
+- [ ] [P12-T9] Prove the host workflow end to end in memory (PT/test_public_host_workflow.py).
+  - Files and behavior: Create PT/test_public_host_workflow.py and ET/discovery-host-workflow.test.ts with shared synthetic vectors under tests/fixtures/discovery_host/; write FEATURE/evidence/regression-testing/discovery-host-workflow.<timestamp>.md.
+  - Tests and proof: Python: local-user prepare-agent, a synthetic protected partition (started invocation, start and capability attestations, consumed authorization, baseline result), host read-source, host new-contract and update-artifact, host finalize pass, then drift refusal and unconsumed-authorization refusal. TypeScript: prepare with the baseline result, gate consumption, finalize with a recorded Python-shaped result, receipt minted, replay refused, all over memory stores and an injected clock.
+  - Acceptance: Both suites pass with no file, process or network I/O, and the evidence names each proven transition and refusal.
+
+- [ ] [P12-T10] Split the publisher synchronizer below the file-size limit (DT/agentic_sync.py).
+  - Files and behavior: Keep `AgenticSyncer`, `parse_args`, `main`, `ROOT_FOLDERS` and compatibility re-exports in DT/agentic_sync.py; move `SyncFileSystem` and `RealSyncFileSystem` to DT/agentic_sync_filesystem.py; move `SyncActionPayload`, `SyncSummaryPayload`, `SyncAction`, `SyncSummary`, `build_artifact_path`, `render_sync_summary` and `write_sync_artifact` to DT/agentic_sync_artifacts.py. Move `MemoryFile`, `InMemorySyncFileSystem` and the repository helpers to DTTEST/agentic_sync_test_support.py; keep the synchronization tests in DTTEST/test_agentic_sync.py; move the artifact, argument and `main` tests and the root-folder contract test to DTTEST/test_agentic_sync_artifacts.py; update the import in DTTEST/test_agentic_sync_branches.py.
+  - Tests and proof: No assertion changes (Set N); `main` keeps resolving `Path`, `RealSyncFileSystem` and `AgenticSyncer` from the `agentic_sync` namespace so the monkeypatched tests pass unchanged; the `ROOT_FOLDERS` import in DT/push_down_copilot_customizations.py is unchanged. Run DTTEST/test_push_down_copilot_customizations*.py, both push-down resource and pack-manifest contract suites and DTTEST/test_quality_tiers_contract_classification.py.
+  - Acceptance: Every file named here is under 500 physical lines, the three production modules each measure at least 85% lines and 75% branches, and the publication contract suites are unchanged and green.
+
+- [ ] [P12-T11] Rebuild and re-verify the distributables (FEATURE/evidence/other/).
+  - Files and behavior: Rebuild the wheel (P10-T3 procedure) and the VSIX and npm packages (P10-T2 procedure) from the Phase 12 sources under SCRATCH; update the digests and `## Built artifacts` in FEATURE/handoff.md; write FEATURE/evidence/other/discovery-wheel-build.<timestamp>.md and discovery-host-packages.<timestamp>.md.
+  - Tests and proof: Rerun PT/test_package_contract.py, DTTEST/test_build_discovery_runtime.py, PT/test_resources.py (the new schema resource), ET/packaging/discovery-resources.test.ts and ET/packaging/mcp-server-prepack.test.ts; record exact versions following the existing release procedure.
+  - Acceptance: The evidence records the rebuilt artifact digests and versions, the resource manifest includes the new schema, and no Python business logic is copied into the host packages.
+
+- [ ] [P12-T12] Observe the completion-receipt path on every supported host (FEATURE/evidence/qa-gates/).
+  - Files and behavior: Repeat the P11-T7 installed smoke with the P12-T11 packages in issue-scoped locations under SCRATCH on Claude Code, Codex and the supported Copilot Local harness; write FEATURE/evidence/qa-gates/discovery-installed-runtime.<timestamp>.md and discovery-native-capabilities.<timestamp>.md.
+  - Tests and proof: On each host observe: prepare writes five protected files; attested start; agent-scoped `read_discovery_source` with the invocation reference succeeds; a controlled `create_discovery_artifact` publishes a granted output; `finalize_discovery_agent` mints a `validation-receipt` with result `pass` and `output_valid` true; the stop is allowed with that receipt; after editing one input the stop blocks with `STALE_INPUTS`; a replayed controlled call is denied `AUTHORIZATION_CONSUMED`; finalize as local-user still exits 3 with SERVICE_AUTHORITY; `--principal host` without session identity exits 2. Any installed-host defect is repaired with tests in this task, as P11-T7 did, and the affected language loop is repeated in Phase 13.
+  - Acceptance: The capability record carries `Result: PASS` and no `Blocker` heading, and every listed positive and negative control is observed on all three hosts; an unobserved control remains an explicit blocker.
+
+- [ ] [P12-T13] Document the host-principal path and record the execution-environment check (DOC/enforcement.md).
+  - Files and behavior: Update DOC/{architecture,enforcement,cli-reference,maintainer-guide}.md for the root prepare-agent route, the gateway host options, the protected baseline record, one-use consumption, the finalize route and its refusal classes; replace the `## Known installed-host limit` section of FEATURE/handoff.md with the proven agent path and the remaining consumer steps; update DTTEST/test_discovery_documentation_contracts.py. Record in FEATURE/evidence/other/p12t13-execution-environment-check.<timestamp>.md that no fact the execution-environment brief states changed.
+  - Tests and proof: Run the documentation contracts suite and tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1 unchanged.
+  - Acceptance: Documentation describes every new command option, record and refusal; no stale limit statement remains in the handoff; the brief check is recorded.
+
+### Phase 13 — Final verification re-run, self-review, and handoff refresh
+
+- [ ] [P13-T1] Repeat the Python formatting, lint, type and full coverage loop (FEATURE/evidence/qa-gates/).
+  - Files and behavior: As P11-T2 over the final tree; write FEATURE/evidence/qa-gates/p13-python-{format,lint,types,tests}.<timestamp>.md with numeric line and branch coverage.
+  - Tests and proof: Restart at formatting after any fix or failure; one clean pass over the complete Python population.
+  - Acceptance: Zero formatter, lint, type or test failures; repository line coverage at least 85% and branch coverage at least 75%.
+
+- [ ] [P13-T2] Repeat both TypeScript quality loops and builds (FEATURE/evidence/qa-gates/).
+  - Files and behavior: As P11-T3 over the final tree; write FEATURE/evidence/qa-gates/p13-typescript-{root,extension}-{format,lint,types,tests,architecture,build}.<timestamp>.md.
+  - Tests and proof: Complete coverage-enabled Jest populations with the new per-file thresholds, type checks, architecture-boundary checks and both builds; restart from formatting after any fix.
+  - Acceptance: One clean cycle; every new module meets its configured per-file threshold without blanket mocks.
+
+- [ ] [P13-T3] Repeat the PowerShell gates when PowerShell changed after P11-T4 (FEATURE/evidence/qa-gates/).
+  - Files and behavior: Determine whether any PowerShell production, test or script path was changed by a commit later than the `Timestamp` of the lexicographically greatest FEATURE/evidence/qa-gates/powershell-tests.*.md. If so, run the P11-T4 loop and CI-shaped runs and write p13-powershell-{format,analyze,tests,single-process,shards}.<timestamp>.md; otherwise this task's authorized skip branch applies and FEATURE/evidence/qa-gates/p13-powershell-unchanged.<timestamp>.md records the empty changed-path list and the P11-T4 artifacts it relies on.
+  - Tests and proof: Actual analyzer, JUnit and coverage files, never MCP summaries.
+  - Acceptance: Either a clean PowerShell loop with numeric line coverage or a recorded proof that no PowerShell path changed since the verified run.
+
+- [ ] [P13-T4] Verify coverage deltas for every Phase 12 file (FEATURE/evidence/qa-gates/).
+  - Files and behavior: Write FEATURE/evidence/qa-gates/p13-coverage-comparison.<timestamp>.md from the P13-T1/P13-T2 artifacts and the Phase 12 changed-file inventory.
+  - Tests and proof: Per-file baseline, final and delta for every Python and TypeScript file Phase 12 added or changed, including the agentic_sync split modules and the new Python test-support module's production dependencies; new files at least 90% lines; branch at least 75%; no regression on changed lines; no exclusion or threshold weakening.
+  - Acceptance: Every Phase 12 production file has numeric measurements meeting the floors; a missing measurement fails the gate.
+
+- [ ] [P13-T5] Repeat isolation runs for the Phase 12 suites (FEATURE/evidence/regression-testing/).
+  - Files and behavior: Write FEATURE/evidence/regression-testing/p13-isolation.<timestamp>.md and per-run records.
+  - Tests and proof: Seeded shuffled Jest run with the seed recorded; reversed-order single-process run of every Python test module Phase 12 added or changed; when P13-T3 ran the PowerShell loop, shuffled touched Pester file order with at least three recorded seeds, otherwise the record states that no Pester suite changed.
+  - Acceptance: Every order passes; any order dependence is fixed on both sides and the affected loop repeated.
+
+- [ ] [P13-T6] Repeat repository and publication contracts on the final tree (FEATURE/evidence/qa-gates/).
+  - Files and behavior: As P11-T8; write FEATURE/evidence/qa-gates/p13-repository-contracts.<timestamp>.md and separate command-step records.
+  - Tests and proof: Generator check, mirror and pack contracts, packaging closure, documentation contracts, source-neutrality scan, test-I/O scan, and the physical line count of every production, test and reusable script file on the branch.
+  - Acceptance: Zero generated drift, zero unsupported references, zero files over 500 physical lines (including DT/agentic_sync.py and DTTEST/test_agentic_sync.py), no forbidden test I/O.
+
+- [ ] [P13-T7] Re-reconcile acceptance evidence from observed installed proof (FEATURE/requirements-traceability.md).
+  - Files and behavior: Update FEATURE/{requirements-traceability,spec,user-story,issue,completion-report}.md and write FEATURE/evidence/qa-gates/acceptance-criteria-status.<timestamp>.md.
+  - Tests and proof: Check "Every new agent has a SubagentStop output validator.", the Definition of Done item "Behavior matches acceptance criteria in all documented environments" and the seeded condition "agent and hook validation" only from P12-T12's observed receipt-accepting and stale-receipt controls; keep "Feature review reports no blocking defects." and the final full feature review pending; remove the open-blocker entries from the completion report.
+  - Acceptance: Every receipt-dependent criterion is checked from installed evidence without text changes; review- and CI-dependent items remain explicitly pending.
+
+- [ ] [P13-T8] Rewrite the complete checklist self-review and satisfy [P11-T9] (FEATURE/evidence/qa-gates/).
+  - Files and behavior: Re-execute [P11-T9]: walk docs/features/templates/policy_audit/{policy-audit.yyyy-MM-ddTHH-mm,code-review.yyyy-MM-ddTHH-mm,feature-audit.yyyy-MM-ddTHH-mm}.md against the branch diff from the merge base of origin/main and HEAD; write FEATURE/evidence/qa-gates/self-review.<timestamp>.md.
+  - Tests and proof: One PASS, FAIL or justified N/A row per checklist item; the two previously failing rows cite P12-T12 and P13-T6 evidence. A FAIL row is fixed, the affected P13-T1 through P13-T6 loop is repeated, and the self-review is rewritten before this task completes.
+  - Acceptance: The new self-review has zero FAIL rows and no unverified blocking row; [P11-T9] and this task are checked together, and only then.
+
+- [ ] [P13-T9] Return the refreshed executor handoff (FEATURE/handoff.md).
+  - Files and behavior: Finalize this plan's task state, FEATURE/completion-report.md and FEATURE/handoff.md; write FEATURE/evidence/qa-gates/p13-handoff-validation.<timestamp>.md.
+  - Tests and proof: Validate the plan and the orchestrator checkpoint, confirm each checked task names existing canonical proof, and list the remaining review- and CI-dependent items for the orchestrator continuation below.
+  - Acceptance: The handoff is internally consistent, names no open blocker, and claims no completion for the independent review or exact-head CI.
+
 ## Acceptance and deliverable coverage
 
 The exact criterion text remains in the requirements sources; these ranges identify implementing tasks rather than replace those requirements.
@@ -533,7 +666,7 @@ The exact criterion text remains in the requirements sources; these ranges ident
 | Acceptance IDs | Implementing and proving tasks |
 | --- | --- |
 | AC-01–AC-04 | P1-T1, P1-T10–P1-T11, P2-T1–P2-T9, P3-T3, P6-T1–P6-T3, P9-T5, P11-T1 |
-| AC-05–AC-09 | P7-T1–P7-T3, P8-T3–P8-T8, P9-T1–P9-T7, P8-T9, P10-T1, P11-T7 |
+| AC-05–AC-09 | P7-T1–P7-T3, P8-T3–P8-T8, P9-T1–P9-T7, P8-T9, P10-T1, P11-T7; AC-08 installed receipt path: P12-T1–P12-T9, P12-T11–P12-T12, P13-T7 |
 | AC-10–AC-14 | P1-T2–P1-T10, P2-T1–P2-T5, P3-T7, P11-T2 |
 | AC-15–AC-19 | P3-T1–P3-T4, P6-T2, P8-T6–P8-T7, P11-T1 |
 | AC-20–AC-30 | P2-T1–P2-T9, P3-T1, P5-T1–P5-T3, P6-T1–P6-T3, P8-T5, P9-T2–P9-T5 |
@@ -542,9 +675,9 @@ The exact criterion text remains in the requirements sources; these ranges ident
 | AC-43–AC-47 | P7-T1–P7-T3, P9-T1–P9-T7, P8-T9, P10-T1–P10-T3, P11-T7–P11-T8 |
 | AC-48–AC-52 | P2-T5, P2-T7–P2-T8, P3-T6, P5-T4–P5-T5, P11-T1 |
 | AC-53–AC-58 | P10-T4–P10-T5, P11-T10 |
-| AC-59–AC-66 | P0-T1–P0-T4, P11-T1–P11-T11, independent feature review and exact-head CI continuation |
+| AC-59–AC-66 | P0-T1–P0-T4, P11-T1–P11-T11, P12-T10 (file-size gate), P13-T1–P13-T9, independent feature review and exact-head CI continuation |
 
-Deliverables D01–D04 already have promoted documentation, research, specification, and this plan; final evidence must still verify their consistency. D05–D16 are implemented by Phases 1–10, D17–D19 by P10-T4/P10-T5, D20 by the independent feature review, D21 by P11-T10 plus delivery reconciliation, and D22 by P10-T5/P11-T10. All 15 functional areas and 16 resolved research questions remain covered by requirements-traceability.md.
+Deliverables D01–D04 already have promoted documentation, research, specification, and this plan; final evidence must still verify their consistency. Phase 12 extends D05–D16 (runtime, host integrations, publication) and D17–D19 (documentation and handoff) through P12-T13 and P13-T7–P13-T9; the deliverable set itself is unchanged. D05–D16 are implemented by Phases 1–10, D17–D19 by P10-T4/P10-T5, D20 by the independent feature review, D21 by P11-T10 plus delivery reconciliation, and D22 by P10-T5/P11-T10. All 15 functional areas and 16 resolved research questions remain covered by requirements-traceability.md.
 
 ## Orchestrator continuation after executor handoff
 
