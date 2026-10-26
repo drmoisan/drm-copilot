@@ -13,9 +13,9 @@ from drm_copilot_discovery.activation_store import ActivationStore
 from drm_copilot_discovery.gateway_host import (
     HostPrincipal,
     HostServiceIO,
-    InstalledHostStore,
     installed_host_io,
 )
+from drm_copilot_discovery.gateway_host_store import InstalledHostStore
 
 from tests.discovery_runtime.gateway_host_test_support import (
     AGENT,
@@ -27,7 +27,6 @@ from tests.discovery_runtime.gateway_host_test_support import (
     no_repository,
 )
 from tests.discovery_runtime.gateway_test_support import REQUEST
-from tests.discovery_runtime.test_gateway_factory import FactoryCase
 from tests.discovery_runtime.test_gateway_factory import (
     config_catalog as config_catalog,
 )
@@ -44,6 +43,7 @@ from tests.discovery_runtime.test_service import service_io as service_io
 from tests.discovery_runtime.test_service import service_plan as service_plan
 
 if TYPE_CHECKING:
+    from tests.discovery_runtime.test_gateway_factory import FactoryCase
     from tests.discovery_runtime.test_service import MemoryService
 
 

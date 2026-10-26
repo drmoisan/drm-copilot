@@ -14,15 +14,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
-from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, cast
 
 from drm_copilot_discovery.agent_output import InvocationContext
 from drm_copilot_discovery.build_identity import load_build_identity
+from drm_copilot_discovery.configuration import ConfigurationError
 from drm_copilot_discovery.gateway_host_baseline import (
     reconstruct_baseline,
     required_rows,
 )
+from drm_copilot_discovery.gateway_host_store import InstalledHostStore
 from drm_copilot_discovery.gateway_local import (
     installed_activation,
     installed_location,
@@ -53,6 +54,7 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.activation_filesystem import RegistryLocation
     from drm_copilot_discovery.activation_store import ActivationStore
     from drm_copilot_discovery.doctor import CapabilityObservation
+    from drm_copilot_discovery.gateway_host_store import HostStoreIO
     from drm_copilot_discovery.mutation_plan import CapturedWorkspace
     from drm_copilot_discovery.repository_reader import RepositoryReader
     from drm_copilot_discovery.service_contracts import RuntimeIdentity, ServiceRequest
@@ -65,23 +67,6 @@ START_ATTESTATION_FILE = "start-attestation.json"
 BASELINE_RESULT_FILE = "baseline-result.json"
 CAPABILITY_ATTESTATION_FILE = "capability-attestation.json"
 CONSUMED_LATCH_SUFFIX = ".consumed"
-RECORD_BYTE_LIMIT = 16777216
-
-
-class HostStoreIO(Protocol):
-    """Read-only seams over the protected authority store; nothing here writes."""
-
-    def read_text(self, path: str) -> str | None:
-        """Return the UTF-8 text at path, or None when the entry does not exist."""
-        ...
-
-    def list_entries(self, directory: str) -> tuple[str, ...]:
-        """Return the immediate entry names of directory; empty when absent."""
-        ...
-
-    def exists(self, path: str) -> bool:
-        """Return whether an entry exists at path without reading it."""
-        ...
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -202,8 +187,16 @@ class HostServiceIO:
         return text.encode("utf-8")
 
     def _binding(self) -> WorkspaceBinding:
-        """Return the activation selection every protected record must be bound to."""
-        selection = self.activation.select(controlled=True)
+        """Return the activation selection every protected record must be bound to.
+
+        Returns WorkspaceBinding of the active controlled selection. An inactive,
+        stale or unconfigured workspace raises the exit-3 refusal before any
+        protected record is read; only the activation store is consulted.
+        """
+        try:
+            selection = self.activation.select(controlled=True)
+        except ConfigurationError as error:
+            raise refusal("Discovery is not active for this workspace.") from error
         if selection.profile_path is None or selection.profile_bytes is None:
             raise refusal("Discovery is not active for this workspace.")
         return WorkspaceBinding(
@@ -427,32 +420,6 @@ class HostServiceIO:
             invalidate_authority=io.invalidate_authority,
             primitives=io.primitives,
         )
-
-
-class InstalledHostStore:
-    """Read the protected store through bounded filesystem reads; never write."""
-
-    def read_text(self, path: str) -> str | None:
-        """Return bounded UTF-8 text at path (str), or None when no file exists."""
-        target = Path(path)
-        if not target.is_file():
-            return None
-        with target.open("rb") as handle:
-            content = handle.read(RECORD_BYTE_LIMIT + 1)
-        if len(content) > RECORD_BYTE_LIMIT:
-            raise OSError("Protected record exceeds its byte limit")
-        return content.decode("utf-8")
-
-    def list_entries(self, directory: str) -> tuple[str, ...]:
-        """Return sorted entry names of directory (str); empty when it is absent."""
-        target = Path(directory)
-        if not target.is_dir():
-            return ()
-        return tuple(sorted(entry.name for entry in target.iterdir()))
-
-    def exists(self, path: str) -> bool:
-        """Return whether path (str) names an existing entry."""
-        return Path(path).exists()
 
 
 def _refuse_root_configuration() -> None:

@@ -10,10 +10,11 @@ from drm_copilot_discovery.gateway_host import CONSUMED_LATCH_SUFFIX
 from drm_copilot_discovery.operations import OperationFailure
 from drm_copilot_discovery.service_contracts import ServiceRequest
 
-from tests.discovery_runtime.test_gateway_host import (
+from tests.discovery_runtime.gateway_host_test_support import (
     EXISTING_OUTPUT,
     INVOCATION,
     NEW_OUTPUT,
+    READ_REFERENCE,
     HostCase,
     host_case,
     new_contract,
@@ -247,7 +248,7 @@ def test_read_outside_the_selected_paths_is_refused(service_io: MemoryService) -
     """A read beyond the invocation scope is refused even inside a configured root."""
     case = host_case(service_io)
     case.authorization(
-        "protected-read-000000000002",
+        READ_REFERENCE,
         tool="read_discovery_source",
         operation="read-source",
     )
@@ -259,7 +260,7 @@ def test_read_outside_the_selected_paths_is_refused(service_io: MemoryService) -
                 "read-source",
                 {"read_operation": "list", "paths": ["verification"]},
                 root=service_io.disk.root,
-                reference="protected-read-000000000002",
+                reference=READ_REFERENCE,
             ),
             baseline=case.capture(),
         ),
@@ -301,7 +302,7 @@ def test_read_outside_the_configured_input_scope_is_refused(
     """A selected path outside the profile's configured roots still cannot be read."""
     case = host_case(service_io)
     case.authorization(
-        "protected-read-000000000002",
+        READ_REFERENCE,
         tool="read_discovery_source",
         operation="read-source",
     )
@@ -314,7 +315,7 @@ def test_read_outside_the_configured_input_scope_is_refused(
                 "read-source",
                 {"read_operation": "list", "paths": ["secrets/key.txt"]},
                 root=service_io.disk.root,
-                reference="protected-read-000000000002",
+                reference=READ_REFERENCE,
             ),
             baseline=case.capture(),
         ),

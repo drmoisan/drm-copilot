@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from drm_copilot_discovery.gateway_host_baseline import reconstruct_baseline
@@ -37,6 +37,13 @@ Document = dict[str, object]
 def record(case: HostCase, name: str) -> Document:
     """Return the stored protected record name as a mutable document."""
     return json.loads(case.store.files[f"{case.directory}/{name}"])
+
+
+def rows_of(document: Document, key: str) -> list[Document]:
+    """Return the mutable non-empty row list stored under key in document."""
+    rows = document[key]
+    assert isinstance(rows, list) and rows, f"{key} must be a non-empty row list"
+    return cast("list[Document]", rows)
 
 
 def bound(document: Document) -> JsonObject:
@@ -132,9 +139,7 @@ def test_removed_input_is_drift(service_io: MemoryService) -> None:
     stored = record(case, "baseline-result.json")
     manifest = stored["input_manifest"]
     assert isinstance(manifest, dict)
-    entries = manifest["entries"]
-    assert isinstance(entries, list)
-    entries.append(
+    rows_of(cast("Document", manifest), "entries").append(
         {
             "path": "proposals/removed.md",
             "sha256": "0" * 64,
@@ -154,10 +159,7 @@ def test_pinned_row_without_text_is_drift(service_io: MemoryService) -> None:
     """A stored output row without text content cannot be replayed."""
     case = host_case(service_io)
     stored = record(case, "baseline-result.json")
-    rows = stored["artifacts"]
-    assert isinstance(rows, list) and rows
-    row = rows[0]
-    assert isinstance(row, dict)
+    row = rows_of(stored, "artifacts")[0]
     del row["content"]
 
     refused(
@@ -171,10 +173,7 @@ def test_pinned_row_digest_mismatch_is_drift(service_io: MemoryService) -> None:
     """A stored output row whose digest disagrees with its content is refused."""
     case = host_case(service_io)
     stored = record(case, "baseline-result.json")
-    rows = stored["artifacts"]
-    assert isinstance(rows, list) and rows
-    row = rows[0]
-    assert isinstance(row, dict)
+    row = rows_of(stored, "artifacts")[0]
     row["sha256"] = "0" * 64
 
     refused(

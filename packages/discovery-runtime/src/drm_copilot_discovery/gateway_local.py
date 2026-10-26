@@ -406,22 +406,51 @@ def _canonical_state_location(location: RegistryLocation) -> RegistryLocation:
     return replace(location, directory=canonical.as_posix())
 
 
-def canonical_state_location(location: RegistryLocation) -> RegistryLocation:
-    """Return the canonical host state location for location (RegistryLocation).
+def installed_location(root: str) -> RegistryLocation:
+    """Return the installed registry location for the trusted workspace root.
 
-    Thin public wrapper over the installed-path resolution so the host-principal
-    composition reuses the same partition and containment checks as the local one.
-    Resolution errors and ValueError propagate unchanged; metadata is read only.
+    root (str): trusted absolute canonical workspace from the outer options. Host
+    state paths come from platform settings, never request JSON. Returns the
+    RegistryLocation built by for_host; a relative or non-canonical root raises
+    ValueError and resolution errors propagate. Reads path metadata only. Both
+    the local-user and the host-principal compositions derive their location here.
     """
-    return _canonical_state_location(location)
-
-
-def installed_platform() -> Literal["windows", "macos", "linux"]:
-    """Return the fixed registry platform of this interpreter; no I/O occurs."""
-    return (
+    workspace = Path(root)
+    if not workspace.is_absolute() or workspace.resolve(strict=True) != workspace:
+        raise ValueError("Select an absolute canonical workspace")
+    platform: Literal["windows", "macos", "linux"] = (
         "windows"
         if os.name == "nt"
         else "macos" if sys.platform == "darwin" else "linux"
+    )
+    return RegistryLocation.for_host(
+        workspace_root=workspace.as_posix(),
+        platform=platform,
+        user_home=str(Path.home()),
+        local_app_data=os.environ.get("LOCALAPPDATA"),
+        xdg_state_home=os.environ.get("XDG_STATE_HOME"),
+    )
+
+
+def installed_activation(
+    location: RegistryLocation,
+    *,
+    authorize_root: Callable[[], None],
+    invalidate_authority: Callable[[], None],
+) -> ActivationStore:
+    """Return the trusted activation store at the canonical form of location.
+
+    location (RegistryLocation): output of installed_location. authorize_root
+    (Callable[[], None]): the composition's root-configuration callback.
+    invalidate_authority (Callable[[], None]): the composition's revocation
+    callback. Returns ActivationStore over the verified installed catalog;
+    resolution, ValueError and catalog failures propagate. Reads metadata only.
+    """
+    return ActivationStore.local(
+        location=_canonical_state_location(location),
+        catalog=load_catalog(),
+        authorize_root=authorize_root,
+        invalidate_authority=invalidate_authority,
     )
 
 
