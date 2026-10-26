@@ -135,11 +135,13 @@ class LocalServiceIO:
         PermissionError. Scoped-selection path failures propagate; reads metadata only
         for scoped selection.
         """
+        # The root prepare-agent baseline is local-user work; finalize-agent needs
+        # a verified host invocation that this local composition cannot supply.
         if (
             request.invocation_ref is not None
             or request.authorization_ref is not None
             or request.mode == "agent-output"
-            or request.operation in ("prepare-agent", "finalize-agent")
+            or request.operation == "finalize-agent"
             or not self._matches_workspace(request.workspace_root)
             or (
                 baseline is not None

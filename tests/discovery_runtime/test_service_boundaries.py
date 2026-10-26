@@ -372,33 +372,21 @@ def test_bootstrap_interruption_retains_directory_effects_without_file_digest(
     assert isinstance(created, int) and created > 0
 
 
-@pytest.mark.parametrize("operation", ["prepare-agent", "finalize-agent"])
+@pytest.mark.parametrize("operation", ["finalize-agent"])
 def test_native_operations_remain_unavailable_without_a_verified_provider(
     service_io: MemoryService, operation: str
 ) -> None:
-    """Reject operation before capture/publication; return None, no local fallback."""
-    inputs: dict[str, object] = {}
-    fields: dict[str, object] = {}
-    if operation == "prepare-agent":
-        inputs = {
-            "skill_id": "validate-discovery-artifacts",
-            "selected_ids": ["feature"],
-            "paths": ["feature.json"],
-            "execution_context": "standalone",
-            "complexity": "C1",
-            "expected_outputs": [
-                {
-                    "artifact_kind": "feature-contract",
-                    "id": "feature",
-                    "path": "feature.json",
-                    "format": "json",
-                    "expected_sha256": None,
-                }
-            ],
-        }
-    else:
-        fields.update(mode="agent-output", invocation_ref="protected-alpha-00000001")
-    result = invoke(service_io, operation, inputs, **fields)
+    """Reject operation before capture/publication; return None, no local fallback.
+
+    The root prepare-agent baseline route is local-user work and is proven in
+    test_service_preparation.py; only finalize requires a verified host invocation.
+    """
+    result = invoke(
+        service_io,
+        operation,
+        mode="agent-output",
+        invocation_ref="protected-alpha-00000001",
+    )
     assert result.exit_code == 3 and result.findings[0].code == "SERVICE_AUTHORITY"
     assert result.input_manifest is None and service_io.writer_calls == 0
 

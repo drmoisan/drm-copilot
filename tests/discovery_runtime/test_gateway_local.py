@@ -99,7 +99,7 @@ def test_host_principal_is_never_converted_to_local_user(
 
 @pytest.mark.parametrize(
     "marker",
-    ["invocation", "authorization", "mode", "workspace", "prepare", "finalize"],
+    ["invocation", "authorization", "mode", "workspace", "finalize"],
 )
 def test_request_markers_cannot_expand_local_authority(
     config_catalog: SchemaCatalog,
@@ -108,7 +108,8 @@ def test_request_markers_cannot_expand_local_authority(
     """Opaque references and a substituted root cannot acquire local permissions.
     config_catalog (SchemaCatalog): verified immutable schema fixture. marker (str):
     selected forbidden host-context marker. Returns None; memory-only effects;
-    AssertionError on mismatch.
+    AssertionError on mismatch. The root prepare-agent baseline is local-user
+    work and is no longer a forbidden marker.
     """
     case, local, _ = memory_io(config_catalog)
     request = doctor_request(case)
@@ -126,34 +127,6 @@ def test_request_markers_cannot_expand_local_authority(
         )
     elif marker == "workspace":
         request = replace(request, workspace_root="/other-workspace")
-    elif marker == "prepare":
-        request = replace(
-            request,
-            operation="prepare-agent",
-            inputs=JsonObject(
-                (
-                    ("skill_id", "analyst"),
-                    ("selected_ids", ("feature",)),
-                    ("paths", ("src",)),
-                    (
-                        "expected_outputs",
-                        (
-                            JsonObject(
-                                (
-                                    ("artifact_kind", "feature-contract"),
-                                    ("id", "feature"),
-                                    ("path", "docs/feature.json"),
-                                    ("format", "json"),
-                                    ("expected_sha256", None),
-                                )
-                            ),
-                        ),
-                    ),
-                    ("execution_context", "standalone"),
-                    ("complexity", "C1"),
-                )
-            ),
-        )
     else:
         request = replace(
             request,

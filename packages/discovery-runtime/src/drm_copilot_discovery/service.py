@@ -133,6 +133,8 @@ def _local(authority: ServiceAuthority, request: ServiceRequest) -> None:
     ServiceAuthority is supplied by the trusted provider. Request references and
     an absent host implementation never confer authority. No I/O or grant
     derivation occurs; unavailable host contexts raise OperationFailure(exit 3).
+    The root `prepare-agent` baseline route is a local-user operation; only
+    `finalize-agent` requires a verified host invocation.
     """
     if (
         type(authority) is not ServiceAuthority
@@ -141,7 +143,7 @@ def _local(authority: ServiceAuthority, request: ServiceRequest) -> None:
         or request.invocation_ref is not None
         or request.authorization_ref is not None
         or request.mode == "agent-output"
-        or request.operation in ("prepare-agent", "finalize-agent")
+        or request.operation == "finalize-agent"
     ):
         raise OperationFailure("SERVICE_AUTHORITY", exit_code=3)
 

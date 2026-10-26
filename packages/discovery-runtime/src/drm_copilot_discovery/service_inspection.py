@@ -240,6 +240,11 @@ def inspect_request(context: OperationContext) -> DiscoveryResult:
         return _inventory(context)
     if operation == "read-source":
         return _source(context)
+    if operation == "prepare-agent":
+        from drm_copilot_discovery.service_preparation import prepare_agent
+
+        # The root baseline route reads the configured capture and never writes.
+        return prepare_agent(context)
     if operation == "doctor":
         from drm_copilot_discovery.doctor import CapabilityObserving, inspect_doctor
 
